@@ -22,11 +22,7 @@ int main(int argc, char* argv[]) {
 
 	// input files
 	string bedFile;
-
 	bool haveBed = false;
-
-	// check to see if we should print out some help
-	if(argc <= 1) showHelp = true;
 
 	for(int i = 1; i < argc; i++) {
 		int parameterLength = (int)strlen(argv[i]);
@@ -39,14 +35,19 @@ int main(int argc, char* argv[]) {
 
 	if(showHelp) ShowHelp();
 
+	// was the file passed in via stdin?
+	if(argc == 1) {
+		haveBed = true;
+	}
+
 	// do some parsing (all of these parameters require 2 strings)
 	for(int i = 1; i < argc; i++) {
 
 		int parameterLength = (int)strlen(argv[i]);
 
- 		if(PARAMETER_CHECK("-i", 2, parameterLength)) {
+		if(argv[i]) {
 			haveBed = true;
-			bedFile = argv[i + 1];
+			bedFile = argv[i];
 			i++;
 		}
 		else {
@@ -84,7 +85,7 @@ void ShowHelp(void) {
 	cout << "Description: Sorts a BED file by chrom, then by start position." << endl << endl;
 	cout << "***NOTE: Only BED3 - BED6 formats allowed.***"<< endl << endl;
 
-	cout << "Usage: " << PROGRAM_NAME << " [OPTIONS] -i <input.bed>" << endl << endl;
+	cout << "Usage: " << PROGRAM_NAME << " <input.bed>" << endl << endl;
 	// end the program here
 	exit(1);
 	

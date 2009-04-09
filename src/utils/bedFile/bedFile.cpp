@@ -298,27 +298,52 @@ void BedFile::loadBedFileIntoMap() {
 
 void BedFile::loadBedFileIntoMapNoBin() {
 
-	// open the BED file for reading                                                                                                                                      
-	ifstream bed(bedFile.c_str(), ios::in);
-	if ( !bed ) {
-		cerr << "Error: The requested bed file (" <<bedFile << ") could not be opened. Exiting!" << endl;
-		exit (1);
-	}
+	// Are we dealing with a BED file or a BED passed via stdin?
+	
+	// Case 1: Proper BED File.
+	if (this->bedFile != "") {
 
-	string bedLine;
-	BED bedEntry;                                                                                                                        
-	int lineNum = 0;
+		// open the BED file for reading                                                                                                                                      
+		ifstream bed(bedFile.c_str(), ios::in);
+		if ( !bed ) {
+			cerr << "Error: The requested bed file (" <<bedFile << ") could not be opened. Exiting!" << endl;
+			exit (1);
+		}
 
-	while (getline(bed, bedLine)) {
+		string bedLine;
+		BED bedEntry;                                                                                                                        
+		int lineNum = 0;
+
+		while (getline(bed, bedLine)) {
 		
-		vector<string> bedFields;
-		Tokenize(bedLine,bedFields);
+			vector<string> bedFields;
+			Tokenize(bedLine,bedFields);
 
-		lineNum++;
+			lineNum++;
 
-		if (parseBedLine(bedEntry, bedFields, lineNum)) {
-			bedEntry.count = 0;
-			this->bedMapNoBin[bedEntry.chrom].push_back(bedEntry);	
+			if (parseBedLine(bedEntry, bedFields, lineNum)) {
+				bedEntry.count = 0;
+				this->bedMapNoBin[bedEntry.chrom].push_back(bedEntry);	
+			}
+		}
+	}
+	// Case 2: STDIN.
+	else {
+		string bedLine;
+		BED bedEntry;                                                                                                                        
+		int lineNum = 0;
+		
+		while (getline(cin, bedLine)) {
+
+			vector<string> bedFields;
+			Tokenize(bedLine,bedFields);
+
+			lineNum++;
+
+			if (parseBedLine(bedEntry, bedFields, lineNum)) {
+				bedEntry.count = 0;
+				this->bedMapNoBin[bedEntry.chrom].push_back(bedEntry);	
+			}
 		}
 	}
 
