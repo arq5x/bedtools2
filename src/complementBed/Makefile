@@ -28,7 +28,6 @@ all: $(PROGRAM)
 
 $(PROGRAM): $(BUILT_OBJECTS) $(EXT_OBJECTS)
 	@echo "  * linking $(PROGRAM)"
-	@$(CXX) $(LDFLAGS) $(CXXFLAGS) -o $@ $^ $(LIBS)	
 	@$(CXX) $(LDFLAGS) $(CXXFLAGS) -o $(BIN_DIR)/$@ $^ $(LIBS)
 
 $(BUILT_OBJECTS): $(SOURCES)
