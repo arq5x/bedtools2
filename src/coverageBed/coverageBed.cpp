@@ -1,4 +1,4 @@
-#include "graphBed.h"
+#include "coverageBed.h"
 
 
 BedGraph::BedGraph(string &bedAFile, string &bedBFile) {

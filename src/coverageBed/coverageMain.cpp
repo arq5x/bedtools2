@@ -1,4 +1,4 @@
-#include "graphBed.h"
+#include "coverageBed.h"
 
 using namespace std;
 
