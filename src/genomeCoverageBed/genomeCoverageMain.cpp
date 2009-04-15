@@ -23,7 +23,7 @@ int main(int argc, char* argv[]) {
 	// input files
 	string bedFile;
 	string genomeFile;
-	int max;
+	int max = 999999999;
 	
 	bool haveBed = false;
 	bool haveGenome = false;

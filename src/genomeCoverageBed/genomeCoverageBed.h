@@ -7,18 +7,16 @@
 
 using namespace std;
 
-
-struct COV {
-	unsigned short starts;
-	unsigned short ends;
-	unsigned short depth;
-};
-
 //***********************************************
 // Typedefs
 //***********************************************
 typedef list<BED> bedList;
 
+typedef map<int, int, less<int> > depthMap;
+typedef map<string, depthMap, less<string> > chromDepthMap;
+
+typedef map<int, unsigned int, less<int> > histMap;
+typedef map<string, histMap, less<string> > chromHistMap;
 
 //************************************************
 // Class methods and elements
@@ -45,5 +43,7 @@ private:
 
 	// instance of a bed file class.
 	BedFile *bed;
+	
+	chromDepthMap chromCov;
 
 };
