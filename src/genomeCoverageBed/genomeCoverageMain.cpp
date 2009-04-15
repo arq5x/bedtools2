@@ -72,14 +72,14 @@ int main(int argc, char* argv[]) {
 			i++;
 		}
 		else {
-		  cout << endl << "*****ERROR: Unrecognized parameter: " << argv[i] << " *****" << endl << endl;
+		  cerr << endl << "*****ERROR: Unrecognized parameter: " << argv[i] << " *****" << endl << endl;
 			showHelp = true;
 		}		
 	}
 
 	// make sure we have both input files
 	if (!haveBed || !haveGenome) {
-	  cout << endl << "*****" << endl << "*****ERROR: Need both a BED (-i) and a genome ()-g) file. " << endl << "*****" << endl;
+	  cerr << endl << "*****" << endl << "*****ERROR: Need both a BED (-i) and a genome (-g) file. " << endl << "*****" << endl;
 	  showHelp = true;
 	}
 	
@@ -97,32 +97,32 @@ int main(int argc, char* argv[]) {
 
 void ShowHelp(void) {
 	
-	cout << "=======================================================" << endl;
-	cout << PROGRAM_NAME << " v" << VERSION << endl ;
-	cout << "Aaron Quinlan, Ph.D." << endl;
-	cout << "aaronquinlan@gmail.com" << endl ;
-	cout << "Hall Laboratory" << endl;
-	cout << "Biochemistry and Molecular Genetics" << endl;
-	cout << "University of Virginia" << endl; 
-	cout << "=======================================================" << endl << endl;
-	cout << "Description: Compute the coverage of a BED (-i) file on genome (-g) file." << endl << endl;
-	cout << "***NOTE: Only BED3 - BED6 formats allowed.***"<< endl << endl;
+	cerr << "=======================================================" << endl;
+	cerr << PROGRAM_NAME << " v" << VERSION << endl ;
+	cerr << "Aaron Quinlan, Ph.D." << endl;
+	cerr << "aaronquinlan@gmail.com" << endl ;
+	cerr << "Hall Laboratory" << endl;
+	cerr << "Biochemistry and Molecular Genetics" << endl;
+	cerr << "University of Virginia" << endl; 
+	cerr << "=======================================================" << endl << endl;
+	cerr << "Description: Compute the coverage of a BED (-i) file on genome (-g) file." << endl << endl;
+	cerr << "***NOTE: Only BED3 - BED6 formats allowed.***"<< endl << endl;
 
-	cout << "Usage: " << PROGRAM_NAME << " [OPTIONS] -g <genome> -i <bed>" << endl << endl;
+	cerr << "Usage: " << PROGRAM_NAME << " [OPTIONS] -g <genome> -i <bed>" << endl << endl;
 	
-	cout << "OPTIONS: " << endl;
-	cout << "\t" << "-d\t\t\t"            	<< "Report the depth at each genome position." << endl << "\t\t\t\tDefault behavior is to report a histogram." << endl << endl;
-	cout << "\t" << "-s \t\t\t"             << "Report depth based on start sites." << endl << endl;
-	cout << "\t" << "-max\t\t\t"            << "Combine all positions with a depth > max into a single bin in the histogram." << endl << endl;
-	cout << "NOTES: " << endl;
-	cout << "\tThe genome file should tab delimited and structured as follows: <chr><TAB><size>. For example, Mus musculus:" << endl;
-	cout << "\tchr1\t197195432" << endl;
-	cout << "\tchr2\t181748087" << endl;
-	cout << "\t..." << endl;
-	cout << "\tchrY_random\t58682461" << endl << endl;
-	cout << "TIPS:" << endl;
-	cout << "\tOne can use the UCSC Genome Browser's MySQL database to extract chromosome sizes. For example, H. sapiens:" << endl << endl;
-	cout << "\tmysql --user=genome --host=genome-mysql.cse.ucsc.edu -A -e \"select chrom, size from hg18.chromInfo\"  > hg18.genome" 
+	cerr << "OPTIONS: " << endl;
+	cerr << "\t" << "-d\t\t\t"            	<< "Report the depth at each genome position." << endl << "\t\t\t\tDefault behavior is to report a histogram." << endl << endl;
+	cerr << "\t" << "-s \t\t\t"             << "Report depth based on start sites." << endl << endl;
+	cerr << "\t" << "-max\t\t\t"            << "Combine all positions with a depth > max into a single bin in the histogram." << endl << endl;
+	cerr << "NOTES: " << endl;
+	cerr << "\tThe genome file should tab delimited and structured as follows: <chr><TAB><size>. For example, Mus musculus:" << endl;
+	cerr << "\tchr1\t197195432" << endl;
+	cerr << "\tchr2\t181748087" << endl;
+	cerr << "\t..." << endl;
+	cerr << "\tchrY_random\t58682461" << endl << endl;
+	cerr << "TIPS:" << endl;
+	cerr << "\tOne can use the UCSC Genome Browser's MySQL database to extract chromosome sizes. For example, H. sapiens:" << endl << endl;
+	cerr << "\tmysql --user=genome --host=genome-mysql.cse.ucsc.edu -A -e \"select chrom, size from hg18.chromInfo\"  > hg18.genome" 
 		<< endl << endl;
 	// end the program here
 	exit(1);

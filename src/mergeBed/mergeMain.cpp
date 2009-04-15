@@ -63,14 +63,14 @@ int main(int argc, char* argv[]) {
 		  i++;
                 }
 		else {
-		  cout << endl << "*****ERROR: Unrecognized parameter: " << argv[i] << " *****" << endl << endl;
+		  cerr << endl << "*****ERROR: Unrecognized parameter: " << argv[i] << " *****" << endl << endl;
 			showHelp = true;
 		}		
 	}
 
 	// make sure we have both input files
 	if (!haveBed) {
-	  cout << endl << "*****" << endl << "*****ERROR: Need -i BED file. " << endl << "*****" << endl;
+	  cerr << endl << "*****" << endl << "*****ERROR: Need -i BED file. " << endl << "*****" << endl;
 	  showHelp = true;
 	}
 	
@@ -86,22 +86,22 @@ int main(int argc, char* argv[]) {
 
 void ShowHelp(void) {
 	
-	cout << "=======================================================" << endl;
-	cout << PROGRAM_NAME << " v" << VERSION << endl ;
-	cout << "Aaron Quinlan, Ph.D." << endl;
-	cout << "aaronquinlan@gmail.com" << endl ;
-	cout << "Hall Laboratory" << endl;
-	cout << "Biochemistry and Molecular Genetics" << endl;
-	cout << "University of Virginia" << endl; 
-	cout << "=======================================================" << endl << endl;
-	cout << "Description: Merges overlapping bed entries into a sinle interval." << endl << endl;
-	cout << "***NOTE: Only BED3 - BED6 formats allowed.***"<< endl << endl;
+	cerr << "=======================================================" << endl;
+	cerr << PROGRAM_NAME << " v" << VERSION << endl ;
+	cerr << "Aaron Quinlan, Ph.D." << endl;
+	cerr << "aaronquinlan@gmail.com" << endl ;
+	cerr << "Hall Laboratory" << endl;
+	cerr << "Biochemistry and Molecular Genetics" << endl;
+	cerr << "University of Virginia" << endl; 
+	cerr << "=======================================================" << endl << endl;
+	cerr << "Description: Merges overlapping bed entries into a sinle interval." << endl << endl;
+	cerr << "***NOTE: Only BED3 - BED6 formats allowed.***"<< endl << endl;
 
-	cout << "Usage: " << PROGRAM_NAME << " [OPTIONS] -i <input.bed>" << endl << endl;
+	cerr << "Usage: " << PROGRAM_NAME << " [OPTIONS] -i <input.bed>" << endl << endl;
 	
-	cout << "OPTIONS: " << endl;
-	cout << "\t" << "-n\t\t\t"	<< "Report the number of BED entries that were merged. (=1 if no merging occured)" << endl << endl;
-	cout << "\t" << "-d\t\t\t"      << "Maximum distance between features allowed for features to be merged. (Default=0)" << endl << endl;
+	cerr << "OPTIONS: " << endl;
+	cerr << "\t" << "-n\t\t\t"	<< "Report the number of BED entries that were merged. (=1 if no merging occured)" << endl << endl;
+	cerr << "\t" << "-d\t\t\t"      << "Maximum distance between features allowed for features to be merged. (Default=0)" << endl << endl;
 	// end the program here
 	exit(1);
 	

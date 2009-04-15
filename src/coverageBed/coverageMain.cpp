@@ -56,14 +56,14 @@ int main(int argc, char* argv[]) {
 			i++;
 		}	
 		else {
-			cout << endl << "*****ERROR: Unrecognized parameter: " << argv[i] << " *****" << endl << endl;
+			cerr << endl << "*****ERROR: Unrecognized parameter: " << argv[i] << " *****" << endl << endl;
 			showHelp = true;
 		}		
 	}
 
 	// make sure we have both input files
 	if (!haveBedA || !haveBedB) {
-		cout << endl << "*****" << endl << "*****ERROR: Need -a and -b files. " << endl << "*****" << endl;
+		cerr << endl << "*****" << endl << "*****ERROR: Need -a and -b files. " << endl << "*****" << endl;
 		showHelp = true;
 	}
 
@@ -80,25 +80,25 @@ int main(int argc, char* argv[]) {
 
 void ShowHelp(void) {
 
-	cout << "=======================================================" << endl;
-	cout << PROGRAM_NAME << " v" << VERSION << endl ;
-	cout << "Aaron Quinlan, Ph.D." << endl;
-	cout << "aaronquinlan@gmail.com" << endl ;
-	cout << "Hall Laboratory" << endl;
-	cout << "Biochemistry and Molecular Genetics" << endl;
-	cout << "University of Virginia" << endl; 
-	cout << "=======================================================" << endl << endl;
-	//cout << "Description: Reportoverlaps between a.bed and b.bed." << endl << endl;
-	cout << "***NOTE: Only BED3 - BED6 formats allowed.***"<< endl << endl;
+	cerr << "=======================================================" << endl;
+	cerr << PROGRAM_NAME << " v" << VERSION << endl ;
+	cerr << "Aaron Quinlan, Ph.D." << endl;
+	cerr << "aaronquinlan@gmail.com" << endl ;
+	cerr << "Hall Laboratory" << endl;
+	cerr << "Biochemistry and Molecular Genetics" << endl;
+	cerr << "University of Virginia" << endl; 
+	cerr << "=======================================================" << endl << endl;
+	//cerr << "Description: Reportoverlaps between a.bed and b.bed." << endl << endl;
+	cerr << "***NOTE: Only BED3 - BED6 formats allowed.***"<< endl << endl;
 
-	cout << "Usage: " << PROGRAM_NAME << " [OPTIONS] -a <a.bed> -b <b.bed>" << endl << endl;
+	cerr << "Usage: " << PROGRAM_NAME << " [OPTIONS] -a <a.bed> -b <b.bed>" << endl << endl;
 
-	//cout << "OPTIONS: " << endl;
-	//cout << "\t" << "-u\t\t\t"            	<< "Write ORIGINAL a.bed entry ONCE if ANY overlap bed." << endl << "\t\t\t\tIn other words, ignore multiple overlaps." << endl << endl;
-	//cout << "\t" << "-v \t\t\t"             << "Only report those entries in A that have NO OVERLAP in B." << endl << "\t\t\t\tSimilar to grep -v." << endl << endl;
-	//cout << "\t" << "-f (e.g. 0.05)\t\t"	<< "Minimum overlap req'd as fraction of a.bed." << endl << "\t\t\t\tDefault is 1E-9 (effectively 1bp)." << endl << endl;
-	//cout << "\t" << "-c \t\t\t"				<< "For each entry in A, report the number of hits in B while restricting to -f." << endl << "\t\t\t\tReports 0 for A entries that have no overlap with B." << endl << endl;
-	//cout << "\t" << "-wb \t\t\t"			<< "Write the entry in B for each overlap." << endl << "\t\t\t\tUseful for knowing _what_ A overlaps. Restricted by -f." << endl << endl;
+	//cerr << "OPTIONS: " << endl;
+	//cerr << "\t" << "-u\t\t\t"            	<< "Write ORIGINAL a.bed entry ONCE if ANY overlap bed." << endl << "\t\t\t\tIn other words, ignore multiple overlaps." << endl << endl;
+	//cerr << "\t" << "-v \t\t\t"             << "Only report those entries in A that have NO OVERLAP in B." << endl << "\t\t\t\tSimilar to grep -v." << endl << endl;
+	//cerr << "\t" << "-f (e.g. 0.05)\t\t"	<< "Minimum overlap req'd as fraction of a.bed." << endl << "\t\t\t\tDefault is 1E-9 (effectively 1bp)." << endl << endl;
+	//cerr << "\t" << "-c \t\t\t"				<< "For each entry in A, report the number of hits in B while restricting to -f." << endl << "\t\t\t\tReports 0 for A entries that have no overlap with B." << endl << endl;
+	//cerr << "\t" << "-wb \t\t\t"			<< "Write the entry in B for each overlap." << endl << "\t\t\t\tUseful for knowing _what_ A overlaps. Restricted by -f." << endl << endl;
 	// end the program here
 	exit(1);
 

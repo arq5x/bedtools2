@@ -51,14 +51,14 @@ int main(int argc, char* argv[]) {
 			i++;
 		}
 		else {
-		  cout << endl << "*****ERROR: Unrecognized parameter: " << argv[i] << " *****" << endl << endl;
+		  cerr << endl << "*****ERROR: Unrecognized parameter: " << argv[i] << " *****" << endl << endl;
 			showHelp = true;
 		}		
 	}
 
 	// make sure we have both input files
 	if (!haveBed) {
-	  cout << endl << "*****" << endl << "*****ERROR: Need -i BED file. " << endl << "*****" << endl;
+	  cerr << endl << "*****" << endl << "*****ERROR: Need -i BED file. " << endl << "*****" << endl;
 	  showHelp = true;
 	}
 	
@@ -74,18 +74,18 @@ int main(int argc, char* argv[]) {
 
 void ShowHelp(void) {
 	
-	cout << "=======================================================" << endl;
-	cout << PROGRAM_NAME << " v" << VERSION << endl ;
-	cout << "Aaron Quinlan, Ph.D." << endl;
-	cout << "aaronquinlan@gmail.com" << endl ;
-	cout << "Hall Laboratory" << endl;
-	cout << "Biochemistry and Molecular Genetics" << endl;
-	cout << "University of Virginia" << endl; 
-	cout << "=======================================================" << endl << endl;
-	cout << "Description: Sorts a BED file by chrom, then by start position." << endl << endl;
-	cout << "***NOTE: Only BED3 - BED6 formats allowed.***"<< endl << endl;
+	cerr << "=======================================================" << endl;
+	cerr << PROGRAM_NAME << " v" << VERSION << endl ;
+	cerr << "Aaron Quinlan, Ph.D." << endl;
+	cerr << "aaronquinlan@gmail.com" << endl ;
+	cerr << "Hall Laboratory" << endl;
+	cerr << "Biochemistry and Molecular Genetics" << endl;
+	cerr << "University of Virginia" << endl; 
+	cerr << "=======================================================" << endl << endl;
+	cerr << "Description: Sorts a BED file by chrom, then by start position." << endl << endl;
+	cerr << "***NOTE: Only BED3 - BED6 formats allowed.***"<< endl << endl;
 
-	cout << "Usage: " << PROGRAM_NAME << " <input.bed>" << endl << endl;
+	cerr << "Usage: " << PROGRAM_NAME << " <input.bed>" << endl << endl;
 	// end the program here
 	exit(1);
 	

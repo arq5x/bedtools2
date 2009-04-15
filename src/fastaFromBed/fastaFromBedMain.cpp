@@ -71,7 +71,7 @@ int main(int argc, char* argv[]) {
 			i++;
 		}	
 		else {
-			cout << "*****ERROR: Unrecognized parameter: " << argv[i] << " *****" << endl << endl;
+			cerr << "*****ERROR: Unrecognized parameter: " << argv[i] << " *****" << endl << endl;
 			showHelp = true;
 		}		
 	}
@@ -84,7 +84,7 @@ int main(int argc, char* argv[]) {
 
 		Bed2Fa *b2f = new Bed2Fa(useNameOnly, fastaDbFile, bedFile, fastaOutFile);
 		 
-		cout << PROGRAM_NAME << " completed." << endl;
+		cerr << PROGRAM_NAME << " completed." << endl;
 		return 0;
 	}
 	else {
@@ -94,27 +94,27 @@ int main(int argc, char* argv[]) {
 
 void ShowHelp(void) {
 	
-	cout << "=======================================================" << endl;
-	cout << PROGRAM_NAME << " v" << VERSION << endl << endl;
-	cout << "Aaron Quinlan, Ph.D." << endl;
-	cout << "aaronquinlan@gmail.com" << endl << endl;
-	cout << "Hall Laboratory" << endl;
-	cout << "Biochemistry and Molecular Genetics" << endl;
-	cout << "University of Virginia" << endl; 
-	cout << "=======================================================" << endl << endl;
-	cout << "Description: Extract DNA sequences into a fasta file based on BED coordinates." << endl << endl;
+	cerr << "=======================================================" << endl;
+	cerr << PROGRAM_NAME << " v" << VERSION << endl << endl;
+	cerr << "Aaron Quinlan, Ph.D." << endl;
+	cerr << "aaronquinlan@gmail.com" << endl << endl;
+	cerr << "Hall Laboratory" << endl;
+	cerr << "Biochemistry and Molecular Genetics" << endl;
+	cerr << "University of Virginia" << endl; 
+	cerr << "=======================================================" << endl << endl;
+	cerr << "Description: Extract DNA sequences into a fasta file based on BED coordinates." << endl << endl;
 
-	cout << "Usage: " << PROGRAM_NAME << " -db <fasta db file> -bed <bed coordinates file> -fo <output fasta file w/ requested DNA>" << endl << endl;
+	cerr << "Usage: " << PROGRAM_NAME << " -db <fasta db file> -bed <bed coordinates file> -fo <output fasta file w/ requested DNA>" << endl << endl;
 
-	cout << "Input Files:" << endl;
-	cout << "  -db   <FASTA db file>          " << endl;
-	cout << "  -bed  <BED coordinates file>          " << endl;
+	cerr << "Input Files:" << endl;
+	cerr << "  -db   <FASTA db file>          " << endl;
+	cerr << "  -bed  <BED coordinates file>          " << endl;
 
-	cout << "Output Files:" << endl;
-	cout << "  -fo <FASTA output file>                           " << endl;
+	cerr << "Output Files:" << endl;
+	cerr << "  -fo <FASTA output file>                           " << endl;
 
-	cout << "\nHelp:" << endl;
-	cout << "  -h                             shows this help text" << endl;
+	cerr << "\nHelp:" << endl;
+	cerr << "  -h                             shows this help text" << endl;
 
 	// end the program here
 	exit(1);

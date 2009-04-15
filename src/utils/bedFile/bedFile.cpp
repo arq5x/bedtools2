@@ -248,11 +248,11 @@ bool BedFile::parseBedLine (BED &bed, const vector<string> &lineVector, const in
 		}
 		
 		if (bed.start > bed.end) {
-			cout << "Error: malformed BED entry at line " << lineNum << ". Start was greater than End. Ignoring it and moving on." << endl;
+			cerr << "Error: malformed BED entry at line " << lineNum << ". Start was greater than End. Ignoring it and moving on." << endl;
 			return false;
 		}
 		else if ( (bed.start < 0) || (bed.end < 0) ) {
-			cout << "Error: malformed BED entry at line " << lineNum << ". Coordinate <= 0. Ignoring it and moving on." << endl;
+			cerr << "Error: malformed BED entry at line " << lineNum << ". Coordinate <= 0. Ignoring it and moving on." << endl;
 			return false;
 		}
 	}
