@@ -136,6 +136,11 @@ void ShowHelp(void) {
 	cerr << "\t" << "-f (e.g. 0.05)\t\t"	<< "Minimum overlap req'd as fraction of a.bed." << endl << "\t\t\t\tDefault is 1E-9 (effectively 1bp)." << endl << endl;
 	cerr << "\t" << "-c \t\t\t"				<< "For each entry in A, report the number of hits in B while restricting to -f." << endl << "\t\t\t\tReports 0 for A entries that have no overlap with B." << endl << endl;
 	cerr << "\t" << "-wb \t\t\t"			<< "Write the entry in B for each overlap." << endl << "\t\t\t\tUseful for knowing _what_ A overlaps. Restricted by -f." << endl << endl;
+
+	cerr << "NOTES: " << endl;
+	cerr << "\t" << "-i stdin\t\t"	<< "Allows intersectBed to read BED from stdin.  E.g.: cat a.bed | intersectBed -a stdin -b B.bed" << endl << endl;
+
+
 	// end the program here
 	exit(1);
 

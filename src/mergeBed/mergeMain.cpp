@@ -102,6 +102,11 @@ void ShowHelp(void) {
 	cerr << "OPTIONS: " << endl;
 	cerr << "\t" << "-n\t\t\t"	<< "Report the number of BED entries that were merged. (=1 if no merging occured)" << endl << endl;
 	cerr << "\t" << "-d\t\t\t"      << "Maximum distance between features allowed for features to be merged. (Default=0)" << endl << endl;
+
+	cerr << "NOTES: " << endl;
+	cerr << "\t" << "-i stdin\t\t"	<< "Allows mergeBed to read BED from stdin.  E.g.: cat a.bed | mergeBed -i stdin" << endl << endl;
+
+
 	// end the program here
 	exit(1);
 	
