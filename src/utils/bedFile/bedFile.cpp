@@ -301,7 +301,7 @@ void BedFile::loadBedFileIntoMapNoBin() {
 	// Are we dealing with a BED file or a BED passed via stdin?
 	
 	// Case 1: Proper BED File.
-	if (this->bedFile != "") {
+	if ( (this->bedFile != "") && (this->bedFile != "stdin") ) {
 
 		// open the BED file for reading                                                                                                                                      
 		ifstream bed(bedFile.c_str(), ios::in);
