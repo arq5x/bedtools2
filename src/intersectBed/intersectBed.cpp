@@ -1,6 +1,22 @@
+// 
+//  intersectBed.cpp
+//  BEDTools
+//  
+//  Created by Aaron Quinlan Spring 2009.
+//  Copyright 2009 Aaron Quinlan. All rights reserved.
+//
+//  Summary:  Looks for overlaps between features in two BED files.
+//
+
+/*
+	Includes
+*/
 #include "intersectBed.h"
 
 
+/*
+	Constructor
+*/
 BedIntersect::BedIntersect(string &bedAFile, string &bedBFile, bool &anyHit, 
 bool &writeB, float &overlapFraction, bool &noHit, bool &writeCount) {
 
@@ -16,12 +32,20 @@ bool &writeB, float &overlapFraction, bool &noHit, bool &writeCount) {
 	this->bedB = new BedFile(bedBFile);
 }
 
-
-
+/*
+	Destructor
+*/
 BedIntersect::~BedIntersect(void) {
 }
 
 
+
+/*
+	reportA
+	
+	Writes the _original_ BED entry for A.
+	Works for BED3 - BED6.
+*/
 void BedIntersect::reportA(const BED &a) {
 	
 	if (bedA->bedType == 3) {
@@ -39,11 +63,15 @@ void BedIntersect::reportA(const BED &a) {
 		cout << a.chrom << "\t" << a.start << "\t" << a.end << "\t" 
 		<< a.name << "\t" << a.score << "\t" << a.strand;
 	}
-	
 }
 
 
-
+/*
+	reportAIntersect
+	
+	Writes the base-pair _overlap_ for a BED entry in A.
+	Works for BED3 - BED6.
+*/
 void BedIntersect::reportAIntersect(const BED &a, int &start, int &end) {
 
 	if (bedA->bedType == 3) {
@@ -64,6 +92,14 @@ void BedIntersect::reportAIntersect(const BED &a, int &start, int &end) {
 	
 }
 
+
+
+/*
+	reportB
+	
+	Writes the _original_ BED entry for B.
+	Works for BED3 - BED6.
+*/
 void BedIntersect::reportB(const BED &b) {
 	if (bedB->bedType == 3) {
 		cout << b.chrom << "\t" << b.start << "\t" << b.end;

@@ -98,12 +98,21 @@ void BedMerge::MergeBed() {
 
 		// clean up based on the last entry for the current chromosome
 		if (OIP) {
-			cout << bedList[i-1].chrom << "\t" << minStart << "\t" << maxEnd << endl;
+			if (this->numEntries) {
+				cout << bedList[i-1].chrom << "\t" << minStart << "\t" << maxEnd << "\t" << mergeCount << endl;
+			}
+			else {
+				cout << bedList[i-1].chrom << "\t" << minStart << "\t" << maxEnd << endl;	
+			}
 		}
 		else {
-			cout << m->first << "\t" << bedList[i-1].chrom << "\t" << bedList[i-1].start << "\t" << bedList[i-1].end << endl;
+			if (this->numEntries) {
+				cout << bedList[i-1].chrom << "\t" << bedList[i-1].start << "\t" << bedList[i-1].end  << "\t" << mergeCount << endl;
+			}
+			else {
+				cout << bedList[i-1].chrom << "\t" << bedList[i-1].start << "\t" << bedList[i-1].end << endl;	
+			}
 		}
-
 	}
 }
 
