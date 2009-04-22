@@ -90,12 +90,11 @@ void ShowHelp(void) {
 	cerr << "Description: Returns the base pair complement of a BED file." << endl << endl;
 	cerr << "***NOTE: Only BED3 - BED6 formats allowed.***"<< endl << endl;
 
-	cerr << "Usage: " << PROGRAM_NAME << " [OPTIONS] -i <input.bed>" << endl << endl;
+	cerr << "Usage: " << PROGRAM_NAME << " [OPTIONS] -i <input.bed> -g <genome.txt>" << endl << endl;
 	
-	//cerr << "OPTIONS: " << endl;
-	//cerr << "\t" << "-n\t\t\t"	<< "Report the number of BED entries that were merged. (=1 if no merging occured)" << endl;
-	//cerr << "\t" << "-d\t\t\t"	<< "Maximum distance between features that will be merged. (Default is 0)" << endl;
-	//cerr << "\t\t\t\t"			<< "For example, \"-d 50\" will merge features that are <= 50 bp apart." << endl << endl;
+	cerr << "NOTES: " << endl;
+	cerr << "\t" << "-i stdin\t\t"	<< "Allows complementBed to read BED from stdin.  E.g.: cat a.bed | complementBed -i stdin" << endl << endl;
+
 	// end the program here
 	exit(1);
 	
