@@ -18,12 +18,14 @@
 	Constructor
 */
 BedIntersect::BedIntersect(string &bedAFile, string &bedBFile, bool &anyHit, 
-bool &writeB, float &overlapFraction, bool &noHit, bool &writeCount) {
+						   bool &writeA, bool &writeB, float &overlapFraction, 
+						   bool &noHit, bool &writeCount) {
 
 	this->bedAFile = bedAFile;
 	this->bedBFile = bedBFile;
 	this->anyHit = anyHit;
 	this->noHit = noHit;
+	this->writeA = writeA;	
 	this->writeB = writeB;
 	this->writeCount = writeCount;
 	this->overlapFraction = overlapFraction;
@@ -152,22 +154,37 @@ void BedIntersect::IntersectBed() {
 			if (bedA->parseBedLine(a, bedFields, lineNum)) {
 
 				vector<BED> hits;
+				
 				bedB->binKeeperFind(bedB->bedMap[a.chrom], a.start, a.end, hits);
 
 				int numOverlaps = 0;
 				for (vector<BED>::iterator h = hits.begin(); h != hits.end(); ++h) {
+				
 					int s = max(a.start, h->start);
 					int e = min(a.end, h->end);
+
 					if (s < e) {
+						// is there enough overlap (default ~ 1bp)
 						if ( ((float)(e-s) / (float)(a.end - a.start)) > this->overlapFraction ) { 
 							numOverlaps++;	
 							if (!anyHit && !noHit && !writeCount) {			
 								if (!writeB) {
-									reportAIntersect(a,s,e);  cout << endl;
+									if (writeA) {
+										reportA(a); cout << endl;
+									}
+									else {
+										reportAIntersect(a,s,e);  cout << endl;
+									}
 								}
 								else {
-									reportAIntersect(a,s,e); cout << "\t";
-									reportB(*h); cout << endl;
+									if (writeA) {
+										reportA(a); cout << "\t";
+										reportB(*h); cout << endl;
+									}
+									else {
+										reportAIntersect(a,s,e); cout << "\t";
+										reportB(*h); cout << endl;										
+									}
 								}
 							}
 						}
@@ -198,39 +215,53 @@ void BedIntersect::IntersectBed() {
 			if (bedA->parseBedLine(a, bedFields, lineNum)) {
 
 				vector<BED> hits;
+				
 				bedB->binKeeperFind(bedB->bedMap[a.chrom], a.start, a.end, hits);
 
 				int numOverlaps = 0;
 				for (vector<BED>::iterator h = hits.begin(); h != hits.end(); ++h) {
-
+				
 					int s = max(a.start, h->start);
 					int e = min(a.end, h->end);
+				
 					if (s < e) {
+						// is there enough overlap (default ~ 1bp)
 						if ( ((float)(e-s) / (float)(a.end - a.start)) > this->overlapFraction ) { 
 							numOverlaps++;	
 							if (!anyHit && !noHit && !writeCount) {			
 								if (!writeB) {
-									reportAIntersect(a,s,e);  cout << endl;
+									if (writeA) {
+										reportA(a); cout << endl;
+									}
+									else {
+										reportAIntersect(a,s,e);  cout << endl;
+									}
 								}
 								else {
-									reportAIntersect(a,s,e); cout << "\t";
-									reportB(*h); cout << endl;
+									if (writeA) {
+										reportA(a); cout << "\t";
+										reportB(*h); cout << endl;
+									}
+									else {
+										reportAIntersect(a,s,e); cout << "\t";
+										reportB(*h); cout << endl;										
+									}
 								}
 							}
-						} 
-					}
-					if (anyHit && (numOverlaps >= 1)) {
-						reportA(a); cout << endl;
-					}
-					else if (writeCount) {
-						reportA(a); cout << "\t" << numOverlaps << endl;
-					}
-					else if (noHit && (numOverlaps == 0)) {
-						reportA(a); cout << endl;
+						}
 					}
 				}
+				if (anyHit && (numOverlaps >= 1)) {
+					reportA(a); cout << endl;
+				}
+				else if (writeCount) {
+					reportA(a); cout << "\t" << numOverlaps << endl;
+				}
+				else if (noHit && (numOverlaps == 0)) {
+					reportA(a); cout << endl;
+				}	
 			}
-		}	
+		}
 	}
 }
 // END Intersect BED3

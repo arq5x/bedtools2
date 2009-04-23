@@ -25,13 +25,17 @@ int main(int argc, char* argv[]) {
 
 	// input arguments
 	float overlapFraction = 1E-9;
+	int slop = 0;
 
 	bool haveBedA = false;
 	bool haveBedB = false;
 	bool noHit = false;
 	bool anyHit = false;
+	bool writeA = false;	
 	bool writeB = false;
 	bool writeCount = false;
+	bool haveFraction = false;
+	bool haveSlop = false;
 
 	// check to see if we should print out some help
 	if(argc <= 1) showHelp = true;
@@ -53,34 +57,38 @@ int main(int argc, char* argv[]) {
 		int parameterLength = (int)strlen(argv[i]);
 
 		if(PARAMETER_CHECK("-a", 2, parameterLength)) {
-			haveBedA = true;
-			bedAFile = argv[i + 1];
+			if ((i+1) < argc) {
+				haveBedA = true;
+				bedAFile = argv[i + 1];
+			}
 			i++;
 		}
 		else if(PARAMETER_CHECK("-b", 2, parameterLength)) {
-			haveBedB = true;
-			bedBFile = argv[i + 1];
+			if ((i+1) < argc) {
+				haveBedB = true;
+				bedBFile = argv[i + 1];
+			}
 			i++;
 		}	
 		else if(PARAMETER_CHECK("-u", 2, parameterLength)) {
 			anyHit = true;
-			i++;
 		}
 		else if(PARAMETER_CHECK("-f", 2, parameterLength)) {
+			haveFraction = true;
 			overlapFraction = atof(argv[i + 1]);
 			i++;
 		}
+		else if(PARAMETER_CHECK("-wa", 3, parameterLength)) {
+			writeA = true;
+		}
 		else if(PARAMETER_CHECK("-wb", 3, parameterLength)) {
 			writeB = true;
-			i++;
 		}
 		else if(PARAMETER_CHECK("-c", 2, parameterLength)) {
 			writeCount = true;
-			i++;
 		}
 		else if (PARAMETER_CHECK("-v", 2, parameterLength)) {
 			noHit = true;
-			i++;
 		}
 		else {
 			cerr << endl << "*****ERROR: Unrecognized parameter: " << argv[i] << " *****" << endl << endl;
@@ -103,10 +111,15 @@ int main(int argc, char* argv[]) {
 		cerr << endl << "*****" << endl << "*****ERROR: Request either -wb OR -c, not both." << endl << "*****" << endl;
 		showHelp = true;
 	}
+	
+	if (anyHit && writeCount) {
+		cerr << endl << "*****" << endl << "*****ERROR: Request either -u OR -c, not both." << endl << "*****" << endl;
+		showHelp = true;
+	}
 
 	if (!showHelp) {
 
-		BedIntersect *bi = new BedIntersect(bedAFile, bedBFile, anyHit, writeB, overlapFraction, noHit,  writeCount);
+		BedIntersect *bi = new BedIntersect(bedAFile, bedBFile, anyHit, writeA, writeB, overlapFraction, noHit,  writeCount);
 		bi->IntersectBed();
 		return 0;
 	}
@@ -133,9 +146,11 @@ void ShowHelp(void) {
 	cerr << "OPTIONS: " << endl;
 	cerr << "\t" << "-u\t\t\t"            	<< "Write ORIGINAL a.bed entry ONCE if ANY overlap bed." << endl << "\t\t\t\tIn other words, ignore multiple overlaps." << endl << endl;
 	cerr << "\t" << "-v \t\t\t"             << "Only report those entries in A that have NO OVERLAP in B." << endl << "\t\t\t\tSimilar to grep -v." << endl << endl;
+	cerr << "\t" << "-s (100000)\t\t"	    << "Slop added before and after each entry in A" << endl << "\t\t\t\tUseful for finding overlaps within N bases upstream and downstream." << endl << endl;	
 	cerr << "\t" << "-f (e.g. 0.05)\t\t"	<< "Minimum overlap req'd as fraction of a.bed." << endl << "\t\t\t\tDefault is 1E-9 (effectively 1bp)." << endl << endl;
 	cerr << "\t" << "-c \t\t\t"				<< "For each entry in A, report the number of hits in B while restricting to -f." << endl << "\t\t\t\tReports 0 for A entries that have no overlap with B." << endl << endl;
-	cerr << "\t" << "-wb \t\t\t"			<< "Write the entry in B for each overlap." << endl << "\t\t\t\tUseful for knowing _what_ A overlaps. Restricted by -f." << endl << endl;
+	cerr << "\t" << "-wa \t\t\t"			<< "Write the original entry in A for each overlap." << endl << endl;
+	cerr << "\t" << "-wb \t\t\t"			<< "Write the original entry in B for each overlap." << endl << "\t\t\t\tUseful for knowing _what_ A overlaps. Restricted by -f." << endl << endl;
 
 	cerr << "NOTES: " << endl;
 	cerr << "\t" << "-i stdin\t\t"	<< "Allows intersectBed to read BED from stdin.  E.g.: cat a.bed | intersectBed -a stdin -b B.bed" << endl << endl;
