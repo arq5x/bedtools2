@@ -57,17 +57,13 @@ int main(int argc, char* argv[]) {
 		int parameterLength = (int)strlen(argv[i]);
 
 		if(PARAMETER_CHECK("-a", 2, parameterLength)) {
-			if ((i+1) < argc) {
-				haveBedA = true;
-				bedAFile = argv[i + 1];
-			}
+			haveBedA = true;
+			bedAFile = argv[i + 1];
 			i++;
 		}
 		else if(PARAMETER_CHECK("-b", 2, parameterLength)) {
-			if ((i+1) < argc) {
-				haveBedB = true;
-				bedBFile = argv[i + 1];
-			}
+			haveBedB = true;
+			bedBFile = argv[i + 1];
 			i++;
 		}	
 		else if(PARAMETER_CHECK("-u", 2, parameterLength)) {
@@ -89,6 +85,11 @@ int main(int argc, char* argv[]) {
 		}
 		else if (PARAMETER_CHECK("-v", 2, parameterLength)) {
 			noHit = true;
+		}
+		else if (PARAMETER_CHECK("-s", 2, parameterLength)) {
+			haveSlop = true;
+			slop = atoi(argv[i + 1]);
+			i++;
 		}
 		else {
 			cerr << endl << "*****ERROR: Unrecognized parameter: " << argv[i] << " *****" << endl << endl;
@@ -116,10 +117,20 @@ int main(int argc, char* argv[]) {
 		cerr << endl << "*****" << endl << "*****ERROR: Request either -u OR -c, not both." << endl << "*****" << endl;
 		showHelp = true;
 	}
+	
+	if (haveSlop && haveFraction) {
+		cerr << endl << "*****" << endl << "*****ERROR: Request either -s OR -f, not both." << endl << "*****" << endl;
+		showHelp = true;
+	}
+	
+	if (haveSlop && (slop < 0)) {
+		cerr << endl << "*****" << endl << "*****ERROR: Slop (-s) must be positive." << endl << "*****" << endl;
+		showHelp = true;
+	}
 
 	if (!showHelp) {
 
-		BedIntersect *bi = new BedIntersect(bedAFile, bedBFile, anyHit, writeA, writeB, overlapFraction, noHit,  writeCount);
+		BedIntersect *bi = new BedIntersect(bedAFile, bedBFile, anyHit, writeA, writeB, overlapFraction, slop, noHit,  writeCount);
 		bi->IntersectBed();
 		return 0;
 	}
@@ -130,11 +141,14 @@ int main(int argc, char* argv[]) {
 
 void ShowHelp(void) {
 
-	cerr << "===============================================" << endl;
-	cerr << " " <<PROGRAM_NAME << " v" << VERSION << endl ;
-	cerr << " Aaron Quinlan, Ph.D. (aaronquinlan@gmail.com)  " << endl ;
-	cerr << " Hall Laboratory, University of Virginia" << endl;
-	cerr << "===============================================" << endl << endl;
+	cerr << "=======================================================" << endl;
+	cerr << PROGRAM_NAME << " v" << VERSION << endl ;
+	cerr << "Aaron Quinlan, Ph.D." << endl;
+	cerr << "aaronquinlan@gmail.com" << endl ;
+	cerr << "Hall Laboratory" << endl;
+	cerr << "Biochemistry and Molecular Genetics" << endl;
+	cerr << "University of Virginia" << endl; 
+	cerr << "=======================================================" << endl << endl;
 	cerr << "Description: Report overlaps between a.bed and b.bed." << endl << endl;
 	cerr << "***NOTE: Only BED3 - BED6 formats allowed.***"<< endl << endl;
 
@@ -143,6 +157,7 @@ void ShowHelp(void) {
 	cerr << "OPTIONS: " << endl;
 	cerr << "\t" << "-u\t\t\t"            	<< "Write ORIGINAL a.bed entry ONCE if ANY overlap bed." << endl << "\t\t\t\tIn other words, ignore multiple overlaps." << endl << endl;
 	cerr << "\t" << "-v \t\t\t"             << "Only report those entries in A that have NO OVERLAP in B." << endl << "\t\t\t\tSimilar to grep -v." << endl << endl;
+	cerr << "\t" << "-s (100000)\t\t"	    << "Slop added before and after each entry in A" << endl << "\t\t\t\tUseful for finding overlaps within N bases upstream and downstream." << endl << endl;	
 	cerr << "\t" << "-f (e.g. 0.05)\t\t"	<< "Minimum overlap req'd as fraction of a.bed." << endl << "\t\t\t\tDefault is 1E-9 (effectively 1bp)." << endl << endl;
 	cerr << "\t" << "-c \t\t\t"				<< "For each entry in A, report the number of hits in B while restricting to -f." << endl << "\t\t\t\tReports 0 for A entries that have no overlap with B." << endl << endl;
 	cerr << "\t" << "-wa \t\t\t"			<< "Write the original entry in A for each overlap." << endl << endl;

@@ -80,14 +80,11 @@ int main(int argc, char* argv[]) {
 
 void ShowHelp(void) {
 
-	cerr << "=======================================================" << endl;
-	cerr << PROGRAM_NAME << " v" << VERSION << endl ;
-	cerr << "Aaron Quinlan, Ph.D." << endl;
-	cerr << "aaronquinlan@gmail.com" << endl ;
-	cerr << "Hall Laboratory" << endl;
-	cerr << "Biochemistry and Molecular Genetics" << endl;
-	cerr << "University of Virginia" << endl; 
-	cerr << "=======================================================" << endl << endl;
+	cerr << "===============================================" << endl;
+	cerr << " " <<PROGRAM_NAME << " v" << VERSION << endl ;
+	cerr << " Aaron Quinlan, Ph.D. (aaronquinlan@gmail.com)  " << endl ;
+	cerr << " Hall Laboratory, University of Virginia" << endl;
+	cerr << "===============================================" << endl << endl;
 	//cerr << "Description: Reportoverlaps between a.bed and b.bed." << endl << endl;
 	cerr << "***NOTE: Only BED3 - BED6 formats allowed.***"<< endl << endl;
 

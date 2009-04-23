@@ -94,14 +94,11 @@ int main(int argc, char* argv[]) {
 
 void ShowHelp(void) {
 	
-	cerr << "=======================================================" << endl;
-	cerr << PROGRAM_NAME << " v" << VERSION << endl << endl;
-	cerr << "Aaron Quinlan, Ph.D." << endl;
-	cerr << "aaronquinlan@gmail.com" << endl << endl;
-	cerr << "Hall Laboratory" << endl;
-	cerr << "Biochemistry and Molecular Genetics" << endl;
-	cerr << "University of Virginia" << endl; 
-	cerr << "=======================================================" << endl << endl;
+	cerr << "===============================================" << endl;
+	cerr << " " <<PROGRAM_NAME << " v" << VERSION << endl ;
+	cerr << " Aaron Quinlan, Ph.D. (aaronquinlan@gmail.com)  " << endl ;
+	cerr << " Hall Laboratory, University of Virginia" << endl;
+	cerr << "===============================================" << endl << endl;
 	cerr << "Description: Extract DNA sequences into a fasta file based on BED coordinates." << endl << endl;
 
 	cerr << "Usage: " << PROGRAM_NAME << " -db <fasta db file> -bed <bed coordinates file> -fo <output fasta file w/ requested DNA>" << endl << endl;
