@@ -1,9 +1,9 @@
-#include "intersectBed.h"
+#include "windowBed.h"
 
 using namespace std;
 
 // define our program name
-#define PROGRAM_NAME "intersectBed"
+#define PROGRAM_NAME "windowBed"
 
 // define the version
 #define VERSION "1.1.0"
@@ -24,17 +24,13 @@ int main(int argc, char* argv[]) {
 	string bedBFile;
 
 	// input arguments
-	float overlapFraction = 1E-9;
 	int slop = 0;
 
 	bool haveBedA = false;
 	bool haveBedB = false;
 	bool noHit = false;
 	bool anyHit = false;
-	bool writeA = false;	
-	bool writeB = false;
 	bool writeCount = false;
-	bool haveFraction = false;
 	bool haveSlop = false;
 
 	// check to see if we should print out some help
@@ -57,38 +53,28 @@ int main(int argc, char* argv[]) {
 		int parameterLength = (int)strlen(argv[i]);
 
 		if(PARAMETER_CHECK("-a", 2, parameterLength)) {
-			if ((i+1) < argc) {
-				haveBedA = true;
-				bedAFile = argv[i + 1];
-			}
+			haveBedA = true;
+			bedAFile = argv[i + 1];
 			i++;
 		}
 		else if(PARAMETER_CHECK("-b", 2, parameterLength)) {
-			if ((i+1) < argc) {
-				haveBedB = true;
-				bedBFile = argv[i + 1];
-			}
+			haveBedB = true;
+			bedBFile = argv[i + 1];
 			i++;
 		}	
 		else if(PARAMETER_CHECK("-u", 2, parameterLength)) {
 			anyHit = true;
-		}
-		else if(PARAMETER_CHECK("-f", 2, parameterLength)) {
-			haveFraction = true;
-			overlapFraction = atof(argv[i + 1]);
-			i++;
-		}
-		else if(PARAMETER_CHECK("-wa", 3, parameterLength)) {
-			writeA = true;
-		}
-		else if(PARAMETER_CHECK("-wb", 3, parameterLength)) {
-			writeB = true;
 		}
 		else if(PARAMETER_CHECK("-c", 2, parameterLength)) {
 			writeCount = true;
 		}
 		else if (PARAMETER_CHECK("-v", 2, parameterLength)) {
 			noHit = true;
+		}
+		else if (PARAMETER_CHECK("-w", 2, parameterLength)) {
+			haveSlop = true;
+			slop = atoi(argv[i + 1]);
+			i++;
 		}
 		else {
 			cerr << endl << "*****ERROR: Unrecognized parameter: " << argv[i] << " *****" << endl << endl;
@@ -106,21 +92,20 @@ int main(int argc, char* argv[]) {
 		cerr << endl << "*****" << endl << "*****ERROR: Request either -u OR -v, not both." << endl << "*****" << endl;
 		showHelp = true;
 	}
-
-	if (writeB && writeCount) {
-		cerr << endl << "*****" << endl << "*****ERROR: Request either -wb OR -c, not both." << endl << "*****" << endl;
-		showHelp = true;
-	}
 	
 	if (anyHit && writeCount) {
 		cerr << endl << "*****" << endl << "*****ERROR: Request either -u OR -c, not both." << endl << "*****" << endl;
 		showHelp = true;
 	}
+	
+	if (haveSlop && (slop < 0)) {
+		cerr << endl << "*****" << endl << "*****ERROR: Slop (-s) must be positive." << endl << "*****" << endl;
+		showHelp = true;
+	}
 
 	if (!showHelp) {
-
-		BedIntersect *bi = new BedIntersect(bedAFile, bedBFile, anyHit, writeA, writeB, overlapFraction, noHit,  writeCount);
-		bi->IntersectBed();
+		BedWindow *bi = new BedWindow(bedAFile, bedBFile, slop, anyHit, noHit, writeCount);
+		bi->WindowIntersectBed();
 		return 0;
 	}
 	else {
@@ -135,21 +120,21 @@ void ShowHelp(void) {
 	cerr << " Aaron Quinlan, Ph.D. (aaronquinlan@gmail.com)  " << endl ;
 	cerr << " Hall Laboratory, University of Virginia" << endl;
 	cerr << "===============================================" << endl << endl;
-	cerr << "Description: Report overlaps between a.bed and b.bed." << endl << endl;
+	cerr << "Description: Examines a \"window\" around each feature in A.bed and" << endl;
+	cerr << "reports all features in B.bed that are within the window. For each overlap the entire entry in A and B are reported." 
+		 << endl << endl;
 	cerr << "***NOTE: Only BED3 - BED6 formats allowed.***"<< endl << endl;
 
 	cerr << "Usage: " << PROGRAM_NAME << " [OPTIONS] -a <a.bed> -b <b.bed>" << endl << endl;
 
 	cerr << "OPTIONS: " << endl;
+	cerr << "\t" << "-w (e.g. 100000)\t"	<< "Base pairs added before and after each entry in A when searching for overlaps in B" << endl << endl;	
 	cerr << "\t" << "-u\t\t\t"            	<< "Write ORIGINAL a.bed entry ONCE if ANY overlap with B.bed." << endl << "\t\t\t\tIn other words, just report the fact >=1 hit was found." << endl << endl;
-	cerr << "\t" << "-v \t\t\t"             << "Only report those entries in A that have NO OVERLAP in B." << endl << "\t\t\t\tSimilar to grep -v." << endl << endl;
-	cerr << "\t" << "-f (e.g. 0.05)\t\t"	<< "Minimum overlap req'd as fraction of a.bed." << endl << "\t\t\t\tDefault is 1E-9 (effectively 1bp)." << endl << endl;
-	cerr << "\t" << "-c \t\t\t"				<< "For each entry in A, report the number of hits in B while restricting to -f." << endl << "\t\t\t\tReports 0 for A entries that have no overlap with B." << endl << endl;
-	cerr << "\t" << "-wa \t\t\t"			<< "Write the original entry in A for each overlap." << endl << endl;
-	cerr << "\t" << "-wb \t\t\t"			<< "Write the original entry in B for each overlap." << endl << "\t\t\t\tUseful for knowing _what_ A overlaps. Restricted by -f." << endl << endl;
+	cerr << "\t" << "-v \t\t\t"             << "Only report those entries in A that have NO OVERLAP in B within the requested window." << endl << "\t\t\t\tSimilar to grep -v." << endl << endl;
+	cerr << "\t" << "-c \t\t\t"				<< "For each entry in A, report the number of hits in B within the requested window." << endl << "\t\t\t\tReports 0 for A entries that have no overlap with B." << endl << endl;
 
 	cerr << "NOTES: " << endl;
-	cerr << "\t" << "-i stdin\t\t"	<< "Allows intersectBed to read BED from stdin.  E.g.: cat a.bed | intersectBed -a stdin -b B.bed" << endl << endl;
+	cerr << "\t" << "-i stdin\t\t"	<< "Allows windowBed to read BED from stdin.  E.g.: cat a.bed | windowBed -a stdin -b B.bed" << endl << endl;
 
 
 	// end the program here
