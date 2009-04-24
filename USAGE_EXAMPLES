@@ -10,6 +10,10 @@ http://people.virginia.edu/~arq5x/bedtools.html
 ===Example Usage===  
 
 	intersectBed.  Reports overlaps between features in two BED files.
+	
+	NOTE:  When intersecting SNPs, make sure the coordinate conform to the UCSC format.  That is,
+		   the start position for each SNP should be SNP position - 1 and the end position should
+		   be SNP position.  E.g. chr7	10000001	10000002	rs123464
 		
 			1. Report the base-pair overlap between the features in two BED files.
 			$ intersectBed -a reads.bed -b genes.bed

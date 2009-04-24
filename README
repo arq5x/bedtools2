@@ -10,6 +10,14 @@ http://people.virginia.edu/~arq5x/bedtools.html
 BEDTools, prosaic as it may be, is a collection of utilities for comparing and 
 intersecting genomic features in the UCSC Genome Browser BED format. 
 
+===Installation===
+1.  If you are reading this, you successfully downloaded and unzipped/unpacked the source tarball.  Great.
+2.  Type "make all" at the command line.
+3.  If you encountered no errors, then all of the BED Tools should now be in bin/
+	If not, try to troubleshoot then email me: aaronquinlan@gmail.com
+4.  Copy the files in bin/ to ~/bin or if you have the privileges, to /usr/local/bin.
+5.  Use the tools.
+
 
 ===Acknowledgments=== 
 1.  Jim Kent, UCSC.  
@@ -30,15 +38,6 @@ useful site that is rapidly approaching ubiquity.
 4.  Ira Hall.
 Discussion between Ira and I are largely the motivation for these tools.  We are frequently tracking 
 down impromptu ideas and these tools were largely designed to facilitate tangents.
-
-
-===Installation===
-1.  If you are reading this, you successfully downloaded and unzipped/unpacked the source tarball.  Great.
-2.  Type "make all" at the command line.
-3.  If you encountered no errors, then all of the BED Tools should now be in bin/
-	If not, try to troubleshoot then email me: aaronquinlan@gmail.com
-4.  Copy the files in bin/ to ~/bin or if you have the privileges, to /usr/local/bin.
-5.  Use the tools.
 
 
 ===Requests===
