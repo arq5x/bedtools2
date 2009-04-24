@@ -3,7 +3,7 @@
 using namespace std;
 
 // define our program name
-#define PROGRAM_NAME "graphBed"
+#define PROGRAM_NAME "coverageBed"
 
 // define the version
 #define VERSION "1.1.0"

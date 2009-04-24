@@ -122,22 +122,73 @@ void BedIntersect::reportB(const BED &b) {
 
 
 
+void BedIntersect::FindOverlaps(BED &a, vector<BED> &hits) {
+	
+	// find all of the overlaps between a and B.
+	bedB->binKeeperFind(bedB->bedMap[a.chrom], a.start, a.end, hits);
+
+	int numOverlaps = 0;
+	
+	for (vector<BED>::iterator h = hits.begin(); h != hits.end(); ++h) {
+	
+		int s = max(a.start, h->start);
+		int e = min(a.end, h->end);
+
+		if (s < e) {
+			
+			// is there enough overlap (default ~ 1bp)
+			if ( ((float)(e-s) / (float)(a.end - a.start)) > this->overlapFraction ) { 
+				numOverlaps++;	
+				if (!anyHit && !noHit && !writeCount) {			
+					if (!writeB) {
+						if (writeA) {
+							reportA(a); cout << endl;
+						}
+						else {
+							reportAIntersect(a,s,e);  cout << endl;
+						}
+					}
+					else {
+						if (writeA) {
+							reportA(a); cout << "\t";
+							reportB(*h); cout << endl;
+						}
+						else {
+							reportAIntersect(a,s,e); cout << "\t";
+							reportB(*h); cout << endl;										
+						}
+					}
+				}
+			}
+		}
+	}
+	if (anyHit && (numOverlaps >= 1)) {
+		reportA(a); cout << endl;
+	}
+	else if (writeCount) {
+		reportA(a); cout << "\t" << numOverlaps << endl;
+	}
+	else if (noHit && (numOverlaps == 0)) {
+		reportA(a); cout << endl;
+	}
+}
 
  
+
 void BedIntersect::IntersectBed() {
 
 	// load the "B" bed file into a map so
 	// that we can easily compare "A" to it for overlaps
 	bedB->loadBedFileIntoMap();
 
-
 	string bedLine;
 	BED bedEntry;                                                                                                                        
 	int lineNum = 0;
 
-	// open the BED file for reading
+	// are we dealing with a file?
 	if (bedA->bedFile != "stdin") {
 
+		// open the BED file for reading
 		ifstream bed(bedA->bedFile.c_str(), ios::in);
 		if ( !bed ) {
 			cerr << "Error: The requested bed file (" <<bedA->bedFile << ") could not be opened. Exiting!" << endl;
@@ -145,60 +196,19 @@ void BedIntersect::IntersectBed() {
 		}
 		
 		BED a;
+		// process each entry in A
 		while (getline(bed, bedLine)) {
 			
+			// split the current line into ditinct fields
 			vector<string> bedFields;
 			Tokenize(bedLine,bedFields);
 
 			lineNum++;
+			
+			// find the overlaps with B if it's a valid BED entry. 
 			if (bedA->parseBedLine(a, bedFields, lineNum)) {
-
 				vector<BED> hits;
-				
-				bedB->binKeeperFind(bedB->bedMap[a.chrom], a.start, a.end, hits);
-
-				int numOverlaps = 0;
-				for (vector<BED>::iterator h = hits.begin(); h != hits.end(); ++h) {
-				
-					int s = max(a.start, h->start);
-					int e = min(a.end, h->end);
-
-					if (s < e) {
-						// is there enough overlap (default ~ 1bp)
-						if ( ((float)(e-s) / (float)(a.end - a.start)) > this->overlapFraction ) { 
-							numOverlaps++;	
-							if (!anyHit && !noHit && !writeCount) {			
-								if (!writeB) {
-									if (writeA) {
-										reportA(a); cout << endl;
-									}
-									else {
-										reportAIntersect(a,s,e);  cout << endl;
-									}
-								}
-								else {
-									if (writeA) {
-										reportA(a); cout << "\t";
-										reportB(*h); cout << endl;
-									}
-									else {
-										reportAIntersect(a,s,e); cout << "\t";
-										reportB(*h); cout << endl;										
-									}
-								}
-							}
-						}
-					}
-				}
-				if (anyHit && (numOverlaps >= 1)) {
-					reportA(a); cout << endl;
-				}
-				else if (writeCount) {
-					reportA(a); cout << "\t" << numOverlaps << endl;
-				}
-				else if (noHit && (numOverlaps == 0)) {
-					reportA(a); cout << endl;
-				}	
+				FindOverlaps(a, hits);
 			}
 		}
 	}
@@ -206,64 +216,23 @@ void BedIntersect::IntersectBed() {
 	else {
 		
 		BED a;
+		// process each entry in A
 		while (getline(cin, bedLine)) {
 
+			// split the current line into ditinct fields
 			vector<string> bedFields;
 			Tokenize(bedLine,bedFields);
 
 			lineNum++;
+			
+			// find the overlaps with B if it's a valid BED entry. 
 			if (bedA->parseBedLine(a, bedFields, lineNum)) {
-
 				vector<BED> hits;
-				
-				bedB->binKeeperFind(bedB->bedMap[a.chrom], a.start, a.end, hits);
-
-				int numOverlaps = 0;
-				for (vector<BED>::iterator h = hits.begin(); h != hits.end(); ++h) {
-				
-					int s = max(a.start, h->start);
-					int e = min(a.end, h->end);
-				
-					if (s < e) {
-						// is there enough overlap (default ~ 1bp)
-						if ( ((float)(e-s) / (float)(a.end - a.start)) > this->overlapFraction ) { 
-							numOverlaps++;	
-							if (!anyHit && !noHit && !writeCount) {			
-								if (!writeB) {
-									if (writeA) {
-										reportA(a); cout << endl;
-									}
-									else {
-										reportAIntersect(a,s,e);  cout << endl;
-									}
-								}
-								else {
-									if (writeA) {
-										reportA(a); cout << "\t";
-										reportB(*h); cout << endl;
-									}
-									else {
-										reportAIntersect(a,s,e); cout << "\t";
-										reportB(*h); cout << endl;										
-									}
-								}
-							}
-						}
-					}
-				}
-				if (anyHit && (numOverlaps >= 1)) {
-					reportA(a); cout << endl;
-				}
-				else if (writeCount) {
-					reportA(a); cout << "\t" << numOverlaps << endl;
-				}
-				else if (noHit && (numOverlaps == 0)) {
-					reportA(a); cout << endl;
-				}	
+				FindOverlaps(a, hits);
 			}
 		}
 	}
 }
-// END Intersect BED3
+// END Intersect
 
 

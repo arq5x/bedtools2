@@ -34,7 +34,7 @@ public:
 	void reportA(const BED &);
 	void reportB(const BED &);
 
-
+	void FindOverlaps(BED &, vector<BED> &); 
 	void IntersectBed();
 	
 	
@@ -54,4 +54,5 @@ private:
 	BedFile *bedA, *bedB;
 
 };
+
 #endif /* INTERSECTBED_H */

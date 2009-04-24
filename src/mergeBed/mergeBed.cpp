@@ -1,3 +1,14 @@
+// 
+//  mergeBed.cpp
+//  BEDTools
+//  
+//  Created by Aaron Quinlan Spring 2009.
+//  Copyright 2009 Aaron Quinlan. All rights reserved.
+//
+//  Summary:  Combines overlapping BED entries into a single entry.
+//
+
+
 #include "mergeBed.h"
 
 //::::::::::::::::::::::::::::::::::

@@ -34,6 +34,7 @@ public:
 	void reportB(const BED &);
 
 	void WindowIntersectBed();
+	void FindWindowOverlaps(BED &, vector<BED> &);
 		
 private:
 

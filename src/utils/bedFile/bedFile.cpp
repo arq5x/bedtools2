@@ -1,4 +1,19 @@
+// 
+//  bedFile.cpp
+//  BEDTools
+//  
+//  Created by Aaron Quinlan Spring 2009.
+//  Copyright 2009 Aaron Quinlan. All rights reserved.
+//
+//  Summary:  Contains common functions for finding BED overlaps.
+//
+//  Acknowledgments: Much of the code herein is taken from Jim Kent's
+//                   BED processing code.  I am grateful for his elegant
+//					 genome binning algorithm and therefore use it extensively.
+					
+
 #include "bedFile.h"
+
 static int binOffsetsExtended[] =
 	{4096+512+64+8+1, 512+64+8+1, 64+8+1, 8+1, 1, 0};
 static int binOffsets[] = {512+64+8+1, 64+8+1, 8+1, 1, 0};

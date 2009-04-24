@@ -1,3 +1,13 @@
+// 
+//  fastaFromBed.cpp
+//  BEDTools
+//  
+//  Created by Aaron Quinlan Spring 2009.
+//  Copyright 2009 Aaron Quinlan. All rights reserved.
+//
+//  Summary:  Extract fasta sequences based on BED intervals.
+//
+
 #include "fastaFromBed.h"
 
 Bed2Fa::Bed2Fa(bool &useName, string &dbFile, string &bedFile, string &fastaOutFile) {

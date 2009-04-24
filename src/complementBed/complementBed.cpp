@@ -1,3 +1,13 @@
+// 
+//  complementBed.cpp
+//  BEDTools
+//  
+//  Created by Aaron Quinlan Spring 2009.
+//  Copyright 2009 Aaron Quinlan. All rights reserved.
+//
+//  Summary:  Return the intervals NOT spanned by a BED file.
+//
+
 #include "complementBed.h"
 
 //==========================

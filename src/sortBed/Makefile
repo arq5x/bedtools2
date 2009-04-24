@@ -1,6 +1,6 @@
 CXX = g++
 CXXFLAGS = -O3
-LDFLAGS = -m64 
+LDFLAGS = 
 
 UTILITIES_DIR = ../utils/
 OBJ_DIR = ../../obj/

@@ -1,3 +1,12 @@
+// 
+//  genomeCoverageBed.cpp
+//  BEDTools
+//  
+//  Created by Aaron Quinlan Spring 2009.
+//  Copyright 2009 Aaron Quinlan. All rights reserved.
+//
+//
+
 #include "genomeCoverageBed.h"
 
 /*

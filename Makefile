@@ -8,9 +8,6 @@ export OBJ_DIR = obj
 export BIN_DIR = bin
 export SRC_DIR = src
 
-# define our common source directories
-# export UTILITIES_DIR = CommonSource/Utilities
-
 # define some default flags
 export CFLAGS ?= -Wall -O3
 export CXXFLAGS ?= $(CFLAGS)

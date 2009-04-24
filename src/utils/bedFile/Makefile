@@ -1,6 +1,6 @@
 CXX = g++ -c
 CXXFLAGS = -O3
-LDFLAGS = -m64
+LDFLAGS = 
 OBJS = ../../../obj/
 
 bedFile: bedFile.cpp bedFile.h

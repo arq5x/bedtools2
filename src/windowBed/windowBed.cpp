@@ -92,6 +92,49 @@ void BedWindow::reportB(const BED &b) {
 
 
 
+void BedWindow::FindWindowOverlaps(BED &a, vector<BED> &hits) {
+	
+	// update the current feature's start and end
+	// according to the slop requested (slop = 0 by default)
+	int aFudgeStart = 0;
+	int aFudgeEnd;
+	if ((a.start - this->slop) > 0) {
+		aFudgeStart = a.start - this->slop;
+	}
+	else {
+		aFudgeEnd;
+	}
+	aFudgeEnd = a.end + this->slop;
+	
+	bedB->binKeeperFind(bedB->bedMap[a.chrom], aFudgeStart, aFudgeEnd, hits);
+
+	int numOverlaps = 0;
+	for (vector<BED>::iterator h = hits.begin(); h != hits.end(); ++h) {
+	
+		int s = max(aFudgeStart, h->start);
+		int e = min(aFudgeEnd, h->end);
+	
+		if (s < e) {
+			// is there enough overlap (default ~ 1bp)
+			if ( ((float)(e-s) / (float)(a.end - a.start)) > 0 ) { 
+				numOverlaps++;	
+				if (!anyHit && !noHit && !writeCount) {			
+					reportA(a); cout << "\t";
+					reportB(*h); cout << endl;
+				}
+			}
+		}
+	}
+	if (anyHit && (numOverlaps >= 1)) {
+		reportA(a); cout << endl;
+	}
+	else if (writeCount) {
+		reportA(a); cout << "\t" << numOverlaps << endl;
+	}
+	else if (noHit && (numOverlaps == 0)) {
+		reportA(a); cout << endl;
+	}
+}
 
  
 void BedWindow::WindowIntersectBed() {
@@ -122,49 +165,8 @@ void BedWindow::WindowIntersectBed() {
 
 			lineNum++;
 			if (bedA->parseBedLine(a, bedFields, lineNum)) {
-
 				vector<BED> hits;
-				
-				// update the current feature's start and end
-				// according to the slop requested (slop = 0 by default)
-				int aFudgeStart = 0;
-				int aFudgeEnd;
-				if ((a.start - this->slop) > 0) {
-					aFudgeStart = a.start - this->slop;
-				}
-				else {
-					aFudgeEnd;
-				}
-				aFudgeEnd = a.end + this->slop;
-				
-				bedB->binKeeperFind(bedB->bedMap[a.chrom], aFudgeStart, aFudgeEnd, hits);
-
-				int numOverlaps = 0;
-				for (vector<BED>::iterator h = hits.begin(); h != hits.end(); ++h) {
-				
-					int s = max(aFudgeStart, h->start);
-					int e = min(aFudgeEnd, h->end);
-				
-					if (s < e) {
-						// is there enough overlap (default ~ 1bp)
-						if ( ((float)(e-s) / (float)(a.end - a.start)) > 0 ) { 
-							numOverlaps++;	
-							if (!anyHit && !noHit && !writeCount) {			
-								reportA(a); cout << "\t";
-								reportB(*h); cout << endl;
-							}
-						}
-					}
-				}
-				if (anyHit && (numOverlaps >= 1)) {
-					reportA(a); cout << endl;
-				}
-				else if (writeCount) {
-					reportA(a); cout << "\t" << numOverlaps << endl;
-				}
-				else if (noHit && (numOverlaps == 0)) {
-					reportA(a); cout << endl;
-				}	
+				FindWindowOverlaps(a, hits);
 			}
 		}
 	}
@@ -181,47 +183,7 @@ void BedWindow::WindowIntersectBed() {
 			if (bedA->parseBedLine(a, bedFields, lineNum)) {
 
 				vector<BED> hits;
-				
-				// update the current feature's start and end
-				// according to the slop requested (slop = 0 by default)
-				int aFudgeStart = 0;
-				int aFudgeEnd;
-				if ((a.start - this->slop) > 0) {
-					aFudgeStart = a.start - this->slop;
-				}
-				else {
-					aFudgeEnd;
-				}
-				aFudgeEnd = a.end + this->slop;
-				
-				bedB->binKeeperFind(bedB->bedMap[a.chrom], aFudgeStart, aFudgeEnd, hits);
-
-				int numOverlaps = 0;
-				for (vector<BED>::iterator h = hits.begin(); h != hits.end(); ++h) {
-				
-					int s = max(aFudgeStart, h->start);
-					int e = min(aFudgeEnd, h->end);
-				
-					if (s < e) {
-						// is there enough overlap (default ~ 1bp)
-						if ( ((float)(e-s) / (float)(a.end - a.start)) > 0 ) { 
-							numOverlaps++;	
-							if (!anyHit && !noHit && !writeCount) {			
-								reportA(a); cout << "\t";
-								reportB(*h); cout << endl;
-							}
-						}
-					}
-				}
-				if (anyHit && (numOverlaps >= 1)) {
-					reportA(a); cout << endl;
-				}
-				else if (writeCount) {
-					reportA(a); cout << "\t" << numOverlaps << endl;
-				}
-				else if (noHit && (numOverlaps == 0)) {
-					reportA(a); cout << endl;
-				}	
+				FindWindowOverlaps(a, hits);				
 			}
 		}
 	}

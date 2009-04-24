@@ -1,6 +1,6 @@
 CXX = g++ -c
 CXXFLAGS = -O3
-LDFLAGS = -m64
+LDFLAGS = 
 OBJS = ../../../obj/
 
 sequenceUtils: sequenceUtils.cpp sequenceUtils.h

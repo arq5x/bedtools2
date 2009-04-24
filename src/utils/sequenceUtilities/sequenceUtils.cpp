@@ -1,3 +1,15 @@
+// 
+//  sequenceUtils.cpp
+//  BEDTools
+//  
+//  Created by Aaron Quinlan Spring 2009.
+//  Copyright 2009 Aaron Quinlan. All rights reserved.
+//
+//  Summary:  Contains common functions for finding BED overlaps.
+//
+//  Acknowledgment: I am grateful to Michael Stromberg for the code below to
+//                  reverse complement a sequence.
+
 #include "sequenceUtils.h"
 
 // Performs an in-place sequence reversal
