@@ -2,6 +2,8 @@
 #define SEQUENCEUTILS_H
 
 #include <string>
+#include <algorithm>
+
 using namespace std;
 
 // Performs an in-place sequence reversal

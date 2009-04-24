@@ -1,5 +1,5 @@
-#ifndef GRAPHBED_H
-#define GRAPHBED_H
+#ifndef	COVERAGEBED_H
+#define COVERAGEBED_H
 
 #include "bedFile.h"
 #include <vector>
@@ -7,6 +7,7 @@
 #include <list>
 #include <iostream>
 #include <fstream>
+#include <stdlib.h>
 
 using namespace std;
 
@@ -42,4 +43,4 @@ private:
 	BedFile *bedA, *bedB;
 
 };
-#endif /* GRAPHBED_H */
+#endif /* COVERAGEBED_H */

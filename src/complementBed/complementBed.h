@@ -5,7 +5,8 @@
 #include <list>
 #include <iostream>
 #include <fstream>
-#include <limits>
+#include <limits.h>
+#include <stdlib.h>
 
 using namespace std;
 

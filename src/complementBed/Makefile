@@ -1,6 +1,7 @@
 CXX = g++
 CXXFLAGS = -O3
 LDFLAGS = 
+LIBFLAGS = -lc
 
 UTILITIES_DIR = ../utils/
 OBJ_DIR = ../../obj/
@@ -28,7 +29,7 @@ all: $(PROGRAM)
 
 $(PROGRAM): $(BUILT_OBJECTS) $(EXT_OBJECTS)
 	@echo "  * linking $(PROGRAM)"
-	@$(CXX) $(LDFLAGS) $(CXXFLAGS) -o $(BIN_DIR)/$@ $^ $(LIBS)
+	@$(CXX) $(LIBFLAGS) $(CXXFLAGS) -o $(BIN_DIR)/$@ $^ $(LIBS)
 
 $(BUILT_OBJECTS): $(SOURCES)
 	@echo "  * compiling" $(*F).cpp

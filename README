@@ -35,9 +35,12 @@ available on the Galaxy website.  I merely found it too slow to do several itera
 especially with large sequencing datasets.  Regardless, I am grateful to the Galaxy team for creating such a
 useful site that is rapidly approaching ubiquity.
 
-4.  Ira Hall.
+4.  Ira Hall, UVa.
 Discussion between Ira and I are largely the motivation for these tools.  We are frequently tracking 
 down impromptu ideas and these tools were largely designed to facilitate tangents.
+
+5. Loyal Goff, CSAIL, Broad.
+Many thanks to Loyal for his assistance in making BED Tools "compilable" on the SUSE platform.  I appreciate your help and patience.
 
 
 ===Requests===
