@@ -12,16 +12,22 @@ intersecting genomic features in the UCSC Genome Browser BED format.
 
 
 ===Acknowledgments=== 
-1. Jim Kent, UCSC.  
+1.  Jim Kent, UCSC.  
 Much of the code herein is taken from Jim Kent's BED processing code.  
 I am grateful for his elegant genome binning algorithm and therefore use it extensively.
 
-2. Michael Stromberg, Boston College.
+2.  Michael Stromberg, Boston College.
 I learned much of what I know about C++ style from Michael Stromberg.  I was formerly a C and Perl 
 programmer and struggled to switch to C++.  The structure of BEDTools and much of the coding style
 emulates Michael's.  Thanks Mike.
 
-3.  Ira Hall.
+3.  Galaxy.  
+I had been using Galaxy for months prior to writing these tools.  Much of the functionality is based on what is
+available on the Galaxy website.  I merely found it too slow to do several iterations of queries on a website,
+especially with large sequencing datasets.  Regardless, I am grateful to the Galaxy team for creating such a
+useful site that is rapidly approaching ubiquity.
+
+4.  Ira Hall.
 Discussion between Ira and I are largely the motivation for these tools.  We are frequently tracking 
 down impromptu ideas and these tools were largely designed to facilitate tangents.
 
