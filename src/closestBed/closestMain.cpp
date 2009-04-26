@@ -23,9 +23,6 @@ int main(int argc, char* argv[]) {
 	string bedAFile;
 	string bedBFile;
 
-	// input arguments
-	int slop = 0;
-
 	bool haveBedA = false;
 	bool haveBedB = false;
 
