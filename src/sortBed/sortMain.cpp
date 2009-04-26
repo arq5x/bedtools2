@@ -43,11 +43,6 @@ int main(int argc, char* argv[]) {
 
 	if(showHelp) ShowHelp();
 
-	// was the file passed in via stdin?
-	if(argc == 1) {
-		haveBed = true;
-	}
-
 	// do some parsing (all of these parameters require 2 strings)
 	for(int i = 1; i < argc; i++) {
 
