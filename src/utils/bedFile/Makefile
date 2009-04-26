@@ -1,5 +1,5 @@
 CXX = g++ -c
-CXXFLAGS = -O3
+CXXFLAGS = -O3  -Wall
 LDFLAGS = 
 OBJS = ../../../obj/
 
