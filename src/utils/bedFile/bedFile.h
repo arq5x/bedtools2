@@ -59,6 +59,15 @@ std::string ToString(const T & value)
 
 void Tokenize(const string& str, vector<string>& tokens);
 
+// BED Sorting Methods 
+bool sortByChrom(BED const &, BED const &);	
+bool sortByStart(const BED &, const BED &);
+bool sortBySizeAsc(const BED &, const BED &);
+bool sortBySizeDesc(const BED &, const BED &);
+bool sortByScoreAsc(const BED &, const BED &);
+bool sortByScoreDesc(const BED &, const BED &);
+bool byChromThenStart(BED const &, BED const &);
+
 //*************************************************
 // Common typedefs
 //*************************************************

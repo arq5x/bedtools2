@@ -68,29 +68,6 @@ int max(const int a, int b) {
 	}
 }
 
-//*********************************************
-// Sorting functions
-//*********************************************
-bool sortByChrom(BED const & a, BED const & b){
-	if (a.chrom < b.chrom) return true;
-	else return false;
-};
-
-bool sortByStart(const BED &a, const BED &b){
-	if (a.start < b.start) return true;
-	else return false;
-};
-
-bool byChromThenStart(BED const & a, BED const & b){
-
-	if (a.chrom < b.chrom) return true;
-	else if (a.chrom > b.chrom) return false;
-
-	if (a.start < b.start) return true;
-	else if (a.start >= b.start) return false;
-
-};
-
 //************************************************
 // Exception checking
 //************************************************
@@ -120,7 +97,58 @@ static int getBin(int start, int end)
 	return 0;
 }
 
+//*********************************************
+// Sorting functions
+//*********************************************
+bool sortByChrom(BED const & a, BED const & b){
+	if (a.chrom < b.chrom) return true;
+	else return false;
+};
 
+bool sortByStart(const BED &a, const BED &b){
+	if (a.start < b.start) return true;
+	else return false;
+};
+
+bool sortBySizeAsc(const BED &a, const BED &b){
+	
+	unsigned int aLen = a.end - a.start;
+	unsigned int bLen = b.end - b.start;
+	
+	if (aLen < bLen) return true;
+	else return false;
+};
+
+bool sortBySizeDesc(const BED &a, const BED &b){
+	
+	unsigned int aLen = a.end - a.start;
+	unsigned int bLen = b.end - b.start;
+	
+	if (aLen > bLen) return true;
+	else return false;
+};
+
+bool sortByScoreAsc(const BED &a, const BED &b){
+	if (a.score < b.score) return true;
+	else return false;
+};
+
+bool sortByScoreDesc(const BED &a, const BED &b){
+	if (a.score > b.score) return true;
+	else return false;
+};
+
+
+bool byChromThenStart(BED const & a, BED const & b){
+
+	if (a.chrom < b.chrom) return true;
+	else if (a.chrom > b.chrom) return false;
+
+	if (a.start < b.start) return true;
+	else if (a.start >= b.start) return false;
+
+	return false;
+};
 
 void BedFile::binKeeperFind(map<int, vector<BED>, std::less<int> > &bk, const int start, const int end, vector<BED> &hits)
 /* 

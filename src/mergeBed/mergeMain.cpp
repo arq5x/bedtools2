@@ -48,7 +48,7 @@ int main(int argc, char* argv[]) {
 
 		int parameterLength = (int)strlen(argv[i]);
 
- 		if(PARAMETER_CHECK("-i", 2, parameterLength)) {
+		if(PARAMETER_CHECK("-i", 2, parameterLength)) {
 			haveBed = true;
 			bedFile = argv[i + 1];
 			i++;
@@ -57,25 +57,25 @@ int main(int argc, char* argv[]) {
 			numEntries = true;
 			i++;
 		}
-                else if(PARAMETER_CHECK("-d", 2, parameterLength)) {
-		  haveMaxDistance = true;
-		  maxDistance = atoi(argv[i + 1]);
-		  i++;
-                }
+		else if(PARAMETER_CHECK("-d", 2, parameterLength)) {
+			haveMaxDistance = true;
+			maxDistance = atoi(argv[i + 1]);
+			i++;
+		}
 		else {
-		  cerr << endl << "*****ERROR: Unrecognized parameter: " << argv[i] << " *****" << endl << endl;
+			cerr << endl << "*****ERROR: Unrecognized parameter: " << argv[i] << " *****" << endl << endl;
 			showHelp = true;
 		}		
 	}
 
 	// make sure we have both input files
 	if (!haveBed) {
-	  cerr << endl << "*****" << endl << "*****ERROR: Need -i BED file. " << endl << "*****" << endl;
-	  showHelp = true;
+		cerr << endl << "*****" << endl << "*****ERROR: Need -i BED file. " << endl << "*****" << endl;
+		showHelp = true;
 	}
-	
+
 	if (!showHelp) {
-	  BedMerge *bm = new BedMerge(bedFile, numEntries, maxDistance);
+		BedMerge *bm = new BedMerge(bedFile, numEntries, maxDistance);
 		bm->MergeBed();
 		return 0;
 	}
@@ -85,7 +85,7 @@ int main(int argc, char* argv[]) {
 }
 
 void ShowHelp(void) {
-	
+
 	cerr << "===============================================" << endl;
 	cerr << " " <<PROGRAM_NAME << " v" << VERSION << endl ;
 	cerr << " Aaron Quinlan, Ph.D. (aaronquinlan@gmail.com)  " << endl ;
@@ -94,7 +94,7 @@ void ShowHelp(void) {
 	cerr << "Description: Merges overlapping bed entries into a sinle interval." << endl << endl;
 
 	cerr << "Usage: " << PROGRAM_NAME << " [OPTIONS] -i <input.bed>" << endl << endl;
-	
+
 	cerr << "OPTIONS: " << endl;
 	cerr << "\t" << "-n\t\t\t"	<< "Report the number of BED entries that were merged. (=1 if no merging occured)" << endl << endl;
 	cerr << "\t" << "-d\t\t\t"      << "Maximum distance between features allowed for features to be merged. (Default=0)" << endl << endl;
@@ -105,5 +105,5 @@ void ShowHelp(void) {
 
 	// end the program here
 	exit(1);
-	
+
 }
