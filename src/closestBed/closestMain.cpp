@@ -82,14 +82,13 @@ void ShowHelp(void) {
 	cerr << "===============================================" << endl << endl;
 	cerr << "Description: For each feature in BED A, finds the closest feature (upstream or downstream) in BED B" << endl;
 
-	cerr << "***NOTE: Only BED3 - BED6 formats allowed.***"<< endl << endl;
-
 	cerr << "Usage: " << PROGRAM_NAME << " [OPTIONS] -a <a.bed> -b <b.bed>" << endl << endl;
 
 	cerr << "NOTES: " << endl;
-	cerr << "\t" << "-i stdin " << "allows closestBed to read BED A from stdin.  E.g.: cat a.bed | closestBed -a stdin -b B.bed" << endl << endl;
+	cerr << "\t" << "-i stdin\t\t" << "Allows BED file A to be read from stdin.  E.g.: cat a.bed | closestBed -a stdin -b B.bed" << endl << endl;
 	cerr << "\t" << "Reports \"none\" for chrom and \"-1\" for all other fields when a feature is not found in B on the same chromosome as the feature in A.  E.g. none -1 -1" << endl;
-
+	cerr << "\t***Only BED3 - BED6 formats allowed.***" << endl << endl;
+	
 	// end the program here
 	exit(1);
 

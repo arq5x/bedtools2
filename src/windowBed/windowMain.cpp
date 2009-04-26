@@ -24,7 +24,7 @@ int main(int argc, char* argv[]) {
 	string bedBFile;
 
 	// input arguments
-	int slop = 0;
+	int slop = 1000;
 
 	bool haveBedA = false;
 	bool haveBedB = false;
@@ -123,18 +123,18 @@ void ShowHelp(void) {
 	cerr << "Description: Examines a \"window\" around each feature in A.bed and" << endl;
 	cerr << "reports all features in B.bed that are within the window. For each overlap the entire entry in A and B are reported." 
 		 << endl << endl;
-	cerr << "***NOTE: Only BED3 - BED6 formats allowed.***"<< endl << endl;
 
 	cerr << "Usage: " << PROGRAM_NAME << " [OPTIONS] -a <a.bed> -b <b.bed>" << endl << endl;
 
 	cerr << "OPTIONS: " << endl;
-	cerr << "\t" << "-w (e.g. 100000)\t"	<< "Base pairs added before and after each entry in A when searching for overlaps in B (default=0)" << endl << endl;	
+	cerr << "\t" << "-w (def. 1000)\t\t"		<< "Base pairs added before and after each entry in A when searching for overlaps in B." << endl << endl;	
 	cerr << "\t" << "-u\t\t\t"            	<< "Write ORIGINAL a.bed entry ONCE if ANY overlap with B.bed." << endl << "\t\t\t\tIn other words, just report the fact >=1 hit was found." << endl << endl;
 	cerr << "\t" << "-v \t\t\t"             << "Only report those entries in A that have NO OVERLAP in B within the requested window." << endl << "\t\t\t\tSimilar to grep -v." << endl << endl;
 	cerr << "\t" << "-c \t\t\t"				<< "For each entry in A, report the number of hits in B within the requested window." << endl << "\t\t\t\tReports 0 for A entries that have no overlap with B." << endl << endl;
 
 	cerr << "NOTES: " << endl;
-	cerr << "\t" << "-i stdin\t\t"	<< "Allows windowBed to read BED from stdin.  E.g.: cat a.bed | windowBed -a stdin -b B.bed" << endl << endl;
+	cerr << "\t" << "-i stdin\t\t"	<< "Allows BED file A to be read from stdin.  E.g.: cat a.bed | windowBed -a stdin -b B.bed" << endl << endl;
+	cerr << "\t***Only BED3 - BED6 formats allowed.***"<< endl << endl;
 
 
 	// end the program here

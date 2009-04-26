@@ -85,12 +85,12 @@ void ShowHelp(void) {
 	cerr << " Hall Laboratory, University of Virginia" << endl;
 	cerr << "===============================================" << endl << endl;
 	cerr << "Description: Returns the base pair complement of a BED file." << endl << endl;
-	cerr << "***NOTE: Only BED3 - BED6 formats allowed.***"<< endl << endl;
 
 	cerr << "Usage: " << PROGRAM_NAME << " [OPTIONS] -i <input.bed> -g <genome.txt>" << endl << endl;
 	
 	cerr << "NOTES: " << endl;
-	cerr << "\t" << "-i stdin\t\t"	<< "Allows complementBed to read BED from stdin.  E.g.: cat a.bed | complementBed -i stdin" << endl << endl;
+	cerr << "\t" << "-i stdin\t\t"	<< "Allows BED file A to be read from stdin.  E.g.: cat a.bed | complementBed -a stdin -b B.bed" << endl << endl;
+	cerr << "\t***Only BED3 - BED6 formats allowed.***"<< endl << endl;
 
 	// end the program here
 	exit(1);

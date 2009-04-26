@@ -85,10 +85,11 @@ void ShowHelp(void) {
 	cerr << " Aaron Quinlan, Ph.D. (aaronquinlan@gmail.com)  " << endl ;
 	cerr << " Hall Laboratory, University of Virginia" << endl;
 	cerr << "===============================================" << endl << endl;
-	//cerr << "Description: Reportoverlaps between a.bed and b.bed." << endl << endl;
-	cerr << "***NOTE: Only BED3 - BED6 formats allowed.***"<< endl << endl;
 
 	cerr << "Usage: " << PROGRAM_NAME << " [OPTIONS] -a <a.bed> -b <b.bed>" << endl << endl;
+
+	cerr << "NOTES: " << endl;
+	cerr << "\t***Only BED3 - BED6 formats allowed.***"<< endl << endl;
 
 	//cerr << "OPTIONS: " << endl;
 	//cerr << "\t" << "-u\t\t\t"            	<< "Write ORIGINAL a.bed entry ONCE if ANY overlap bed." << endl << "\t\t\t\tIn other words, ignore multiple overlaps." << endl << endl;

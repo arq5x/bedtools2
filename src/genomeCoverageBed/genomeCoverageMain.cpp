@@ -117,10 +117,14 @@ void ShowHelp(void) {
 	cerr << "\tchr2\t181748087" << endl;
 	cerr << "\t..." << endl;
 	cerr << "\tchrY_random\t58682461" << endl << endl;
+	cerr << "\t***Only BED3 - BED6 formats allowed.***"<< endl << endl;	
+	
 	cerr << "TIPS:" << endl;
 	cerr << "\tOne can use the UCSC Genome Browser's MySQL database to extract chromosome sizes. For example, H. sapiens:" << endl << endl;
 	cerr << "\tmysql --user=genome --host=genome-mysql.cse.ucsc.edu -A -e \"select chrom, size from hg18.chromInfo\"  > hg18.genome" 
 		<< endl << endl;
+		
+	
 	// end the program here
 	exit(1);
 }

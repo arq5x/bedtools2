@@ -113,6 +113,9 @@ void ShowHelp(void) {
 
 	cerr << "\nHelp:" << endl;
 	cerr << "  -h                             shows this help text" << endl;
+	
+	cerr << "NOTES: " << endl;
+	cerr << "\t***Only BED3 - BED6 formats allowed.***"<< endl << endl;
 
 	// end the program here
 	exit(1);
