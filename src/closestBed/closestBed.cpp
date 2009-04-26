@@ -143,9 +143,14 @@ void BedClosest::FindWindowOverlaps(BED &a, vector<BED> &hits) {
 				aFudgeStart = a.start - slop;
 			}
 			else {
-				aFudgeEnd;
+				aFudgeStart = 0;
 			}
-			aFudgeEnd = a.end + slop;
+			if ((a.start + slop) < 2 * MAXSLOP) {
+				aFudgeEnd = a.end + slop;
+			}
+			else {
+				aFudgeEnd = 2 * MAXSLOP;
+			}
 		
 			bedB->binKeeperFind(bedB->bedMap[a.chrom], aFudgeStart, aFudgeEnd, hits);
 	

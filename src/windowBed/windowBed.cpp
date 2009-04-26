@@ -98,13 +98,15 @@ void BedWindow::FindWindowOverlaps(BED &a, vector<BED> &hits) {
 	// according to the slop requested (slop = 0 by default)
 	int aFudgeStart = 0;
 	int aFudgeEnd;
+
 	if ((a.start - this->slop) > 0) {
 		aFudgeStart = a.start - this->slop;
 	}
 	else {
-		aFudgeEnd;
+		aFudgeStart = 0;
 	}
 	aFudgeEnd = a.end + this->slop;
+
 	
 	bedB->binKeeperFind(bedB->bedMap[a.chrom], aFudgeStart, aFudgeEnd, hits);
 

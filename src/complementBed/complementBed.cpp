@@ -66,7 +66,7 @@ void BedComplement::ComplementBed() {
 		int minStart = INT_MAX;
 		int maxEnd = 0;
 		bool OIP = false;       // OIP = Overlap In Progress.  Lame, I realize.
-		int i;
+		unsigned int i;
 		int mergeCount = 1;
 		bool firstSegment = true;
 		// loop through the BED entries for this chromosome

@@ -83,7 +83,8 @@ int main(int argc, char* argv[]) {
 	if (!showHelp) {
 
 		Bed2Fa *b2f = new Bed2Fa(useNameOnly, fastaDbFile, bedFile, fastaOutFile);
-		 
+		b2f->ExtractDNA(); 
+
 		cerr << PROGRAM_NAME << " completed." << endl;
 		return 0;
 	}

@@ -22,7 +22,6 @@ Bed2Fa::Bed2Fa(bool &useName, string &dbFile, string &bedFile, string &fastaOutF
 	
 	this->bed = new BedFile(this->bedFile);
 	bed->loadBedFileIntoMapNoBin();
-	ExtractDNA();
 }
 
 
@@ -74,7 +73,7 @@ void Bed2Fa::ExtractDNA() {
 
 				// loop through each BED entry for this chrom and 
 				// print the sequence
-				for (int i = 0; i < bedList.size(); i++) {
+				for (unsigned int i = 0; i < bedList.size(); i++) {
 						
 					string dna = currDNA.substr(bedList[i].start, ((bedList[i].end - bedList[i].start)));
 				
@@ -104,7 +103,7 @@ void Bed2Fa::ExtractDNA() {
 
 		// loop through each BED entry for this chrom and 
 		// print the sequence.
-		for (int i = 0; i < bedList.size(); i++) {
+		for (unsigned int i = 0; i < bedList.size(); i++) {
 				
 			string dna = currDNA.substr(bedList[i].start, ((bedList[i].end - bedList[i].start)));
 		

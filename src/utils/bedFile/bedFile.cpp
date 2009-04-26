@@ -16,7 +16,7 @@
 
 static int binOffsetsExtended[] =
 	{4096+512+64+8+1, 512+64+8+1, 64+8+1, 8+1, 1, 0};
-static int binOffsets[] = {512+64+8+1, 64+8+1, 8+1, 1, 0};
+//static int binOffsets[] = {512+64+8+1, 64+8+1, 8+1, 1, 0};
 #define _binFirstShift 17/* How much to shift to get to finest bin. */
 #define _binNextShift 3/* How much to shift to get to next larger bin. */
 
@@ -288,6 +288,7 @@ bool BedFile::parseBedLine (BED &bed, const vector<string> &lineVector, const in
 		cerr << "TAB delimited BED file with at least 3 fields (chrom, start, end) is required.  Exiting..." << endl;
 		exit(1);
 	}
+	return false;
 }
 
 

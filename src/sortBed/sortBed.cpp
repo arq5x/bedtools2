@@ -39,7 +39,7 @@ void BedSort::SortBed() {
 		// bedList is already sorted by start position.
 		vector<BED> bedList = m->second; 
 
-		for (int i = 0; i < bedList.size(); ++i) {
+		for (unsigned int i = 0; i < bedList.size(); ++i) {
 			cout << bedList[i].chrom << "\t" << bedList[i].start << "\t" << bedList[i].end << endl;
 		}
 	}

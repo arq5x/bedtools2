@@ -25,7 +25,6 @@ int main(int argc, char* argv[]) {
 
 	// input arguments
 	float overlapFraction = 1E-9;
-	int slop = 0;
 
 	bool haveBedA = false;
 	bool haveBedB = false;
@@ -35,7 +34,6 @@ int main(int argc, char* argv[]) {
 	bool writeB = false;
 	bool writeCount = false;
 	bool haveFraction = false;
-	bool haveSlop = false;
 
 	// check to see if we should print out some help
 	if(argc <= 1) showHelp = true;

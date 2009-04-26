@@ -53,7 +53,7 @@ void BedMerge::MergeBed() {
 		int minStart = 999999999;
 		int maxEnd = 0;
 		bool OIP = false;       // OIP = Overlap In Progress.  Lame, I realize.
-		int i;
+		unsigned int i;
 		int mergeCount = 1;
 
 		// loop through the BED entries for this chromosome

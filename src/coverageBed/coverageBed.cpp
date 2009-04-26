@@ -63,7 +63,7 @@ void BedGraph::GraphBed() {
 		map<int, vector<BED> > bin2Beds = c->second;
 		for (map<int, vector<BED> >::iterator b = bin2Beds.begin(); b != bin2Beds.end(); ++b) {
 			vector<BED> beds = b->second;
-			for (int i = 0; i < beds.size(); i++) {
+			for (unsigned int i = 0; i < beds.size(); i++) {
 				cout << c->first << "\t" << beds[i].start << "\t" << beds[i].end << "\t" << beds[i].count << endl;
 			}
 		}

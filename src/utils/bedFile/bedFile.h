@@ -102,7 +102,7 @@ public:
 
 	// the bedfile with which this instance is associated
 	string bedFile;
-	short bedType;
+	unsigned int bedType;
 
 private:
 	// none
