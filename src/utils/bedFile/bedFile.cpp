@@ -10,7 +10,7 @@
 //  Acknowledgments: Much of the code herein is taken from Jim Kent's
 //                   BED processing code.  I am grateful for his elegant
 //					 genome binning algorithm and therefore use it extensively.
-					
+
 
 #include "bedFile.h"
 
@@ -26,20 +26,20 @@ static int binOffsets[] = {512+64+8+1, 64+8+1, 8+1, 1, 0};
 
 void Tokenize(const string& str, vector<string>& tokens)
 {
-    // Skip delimiters at beginning.
-    string::size_type lastPos = str.find_first_not_of("\t", 0);
-    // Find first "non-delimiter".
-    string::size_type pos     = str.find_first_of("\t", lastPos);
+	// Skip delimiters at beginning.
+	string::size_type lastPos = str.find_first_not_of("\t", 0);
+	// Find first "non-delimiter".
+	string::size_type pos     = str.find_first_of("\t", lastPos);
 
-    while (string::npos != pos || string::npos != lastPos)
-    {
-        // Found a token, add it to the vector.
-        tokens.push_back(str.substr(lastPos, pos - lastPos));
-        // Skip delimiters.  Note the "not_of"
-        lastPos = str.find_first_not_of("\t", pos);
-        // Find next "non-delimiter"
-        pos = str.find_first_of("\t", lastPos);
-    }
+	while (string::npos != pos || string::npos != lastPos)
+	{
+		// Found a token, add it to the vector.
+		tokens.push_back(str.substr(lastPos, pos - lastPos));
+		// Skip delimiters.  Note the "not_of"
+		lastPos = str.find_first_not_of("\t", pos);
+		// Find next "non-delimiter"
+		pos = str.find_first_of("\t", lastPos);
+	}
 }
 
 int overlaps(const int aS, const int aE, const int bS, const int bE) {
@@ -96,7 +96,10 @@ bool byChromThenStart(BED const & a, BED const & b){
 //************************************************
 
 static int getBin(int start, int end)
-/* Given start,end in chromosome coordinates assign it
+/* 
+	NOTE: Taken ~verbatim from kent source.
+	
+	Given start,end in chromosome coordinates assign it
 	* a bin.   There's a bin for each 128k segment, for each
 	* 1M segment, for each 8M segment, for each 64M segment,
 	* and for each chromosome (which is assumed to be less than
@@ -120,8 +123,12 @@ static int getBin(int start, int end)
 
 
 void BedFile::binKeeperFind(map<int, vector<BED>, std::less<int> > &bk, const int start, const int end, vector<BED> &hits)
-/* Return a list of all items in binKeeper that intersect range.
+/* 
+	NOTE: Taken ~verbatim from kent source.
+	Return a list of all items in binKeeper that intersect range.
+	
 	* Free this list with slFreeList. */
+	
 {
 	int startBin, endBin;
 	int i,j;
@@ -136,7 +143,6 @@ void BedFile::binKeeperFind(map<int, vector<BED>, std::less<int> > &bk, const in
 		{
 			for (vector<BED>::iterator el = bk[j].begin(); el != bk[j].end(); ++el) {
 				{
-					//if (leftOf(end, el->start)) {break;}
 					if (overlaps(el->start, el->end, start, end) > 0)
 					{
 						hits.push_back(*el);
@@ -167,7 +173,6 @@ void BedFile::countHits(map<int, vector<BED>, std::less<int> > &bk, const int st
 		{
 			for (vector<BED>::iterator el = bk[j].begin(); el != bk[j].end(); ++el) {
 				{
-					//if (leftOf(end, el->start)) {break;}
 					if (overlaps(el->start, el->end, start, end) > 0)
 					{
 						el->count++;
@@ -194,10 +199,10 @@ BedFile::~BedFile(void) {
 
 
 bool BedFile::parseBedLine (BED &bed, const vector<string> &lineVector, const int &lineNum) {
-	
+
 	if ((lineNum == 1) && (lineVector.size() >= 3)) {
 		this->bedType = lineVector.size();
-		
+
 		if (this->bedType == 3) {
 			bed.chrom = lineVector[0];
 			bed.start = atoi(lineVector[1].c_str());
@@ -230,7 +235,7 @@ bool BedFile::parseBedLine (BED &bed, const vector<string> &lineVector, const in
 		}
 	}
 	else if ( (lineNum > 1) && (lineVector.size() == this->bedType)) {
-		
+
 		if (this->bedType == 3) {
 			bed.chrom = lineVector[0];
 			bed.start = atoi(lineVector[1].c_str());
@@ -261,7 +266,7 @@ bool BedFile::parseBedLine (BED &bed, const vector<string> &lineVector, const in
 			bed.strand = lineVector[5];
 			return true;
 		}
-		
+
 		if (bed.start > bed.end) {
 			cerr << "Error: malformed BED entry at line " << lineNum << ". Start was greater than End. Ignoring it and moving on." << endl;
 			return false;
@@ -271,12 +276,16 @@ bool BedFile::parseBedLine (BED &bed, const vector<string> &lineVector, const in
 			return false;
 		}
 	}
+	else if (lineVector.size() == 1) {
+		cerr << "Only one BED field detected: " << lineNum << ".  Verify that your files are TAB-delimited.  Exiting..." << endl;
+		exit(1);		
+	}
 	else if (lineVector.size() != this->bedType) {
-		cerr << "Differing number of BED fields encountered at line: " << lineNum << ".  Exiting" << endl;
+		cerr << "Differing number of BED fields encountered at line: " << lineNum << ".  Exiting..." << endl;
 		exit(1);
 	}
 	else if (lineVector.size() < 3) {
-		cerr << "TAB delimited BED file with at least 3 fields (chrom, start, end) is required.  Exiting" << endl;
+		cerr << "TAB delimited BED file with at least 3 fields (chrom, start, end) is required.  Exiting..." << endl;
 		exit(1);
 	}
 }
@@ -297,7 +306,7 @@ void BedFile::loadBedFileIntoMap() {
 
 	//while (bed >> bedEntry.chrom >> bedEntry.start >> bedEntry.end) {
 	while (getline(bed, bedLine)) {
-		
+
 		vector<string> bedFields;
 		Tokenize(bedLine,bedFields);
 
@@ -314,7 +323,7 @@ void BedFile::loadBedFileIntoMap() {
 void BedFile::loadBedFileIntoMapNoBin() {
 
 	// Are we dealing with a BED file or a BED passed via stdin?
-	
+
 	// Case 1: Proper BED File.
 	if ( (this->bedFile != "") && (this->bedFile != "stdin") ) {
 
@@ -330,7 +339,7 @@ void BedFile::loadBedFileIntoMapNoBin() {
 		int lineNum = 0;
 
 		while (getline(bed, bedLine)) {
-		
+
 			vector<string> bedFields;
 			Tokenize(bedLine,bedFields);
 
@@ -347,7 +356,7 @@ void BedFile::loadBedFileIntoMapNoBin() {
 		string bedLine;
 		BED bedEntry;                                                                                                                        
 		int lineNum = 0;
-		
+
 		while (getline(cin, bedLine)) {
 
 			vector<string> bedFields;

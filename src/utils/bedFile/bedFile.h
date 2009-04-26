@@ -17,7 +17,7 @@ using namespace std;
 //*************************************************
 
 struct BED {
-	
+
 	// UCSC BED fields
 	string chrom;
 	int start;
@@ -25,7 +25,7 @@ struct BED {
 	string name;
 	unsigned short score;
 	string strand;
-	
+
 	// Additional fields
 	unsigned int count;			// count of number of intervals
 								// that overlap this feature
@@ -83,29 +83,29 @@ public:
 	// Methods
 	bool parseBedLine (BED &, const vector<string> &, const int &);
 
-    void loadBedFileIntoMap();
+	void loadBedFileIntoMap();
 	void loadBedFileIntoMapNoBin();	
-	
+
 	void binKeeperFind(map<int, vector<BED>, 
-						std::less<int> > &, const int, 
-						const int, vector<BED> &);
-						
-					void countHits(map<int, vector<BED>, std::less<int> > &, const int, const int);
-	
+		std::less<int> > &, const int, 
+		const int, vector<BED> &);
+
+	void countHits(map<int, vector<BED>, std::less<int> > &, const int, const int);
+
 	// a vector of the BED entries in the BED file.
 	vector<BED> bedVector;
 	masterBedMap bedMap;
 	masterBedMapNoBin bedMapNoBin;
-	 
+
 	map<string, int> minPosMap;
 	map<string, int> maxPosMap;
-	
+
 	// the bedfile with which this instance is associated
 	string bedFile;
 	short bedType;
-	
-private:
 
+private:
+	// none
 };
 
 #endif /* BEDFILE_H */
