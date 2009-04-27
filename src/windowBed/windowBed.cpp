@@ -17,12 +17,14 @@
 /*
 	Constructor
 */
-BedWindow::BedWindow(string &bedAFile, string &bedBFile, int &slop, bool &anyHit, bool &noHit, bool &writeCount) {
+BedWindow::BedWindow(string &bedAFile, string &bedBFile, int &leftSlop, int &rightSlop, bool &anyHit, bool &noHit, bool &writeCount) {
 
 	this->bedAFile = bedAFile;
 	this->bedBFile = bedBFile;
 
-	this->slop = slop;
+	this->leftSlop = leftSlop;
+	this->rightSlop = rightSlop;
+
 	this->anyHit = anyHit;
 	this->noHit = noHit;
 	this->writeCount = writeCount;
@@ -99,13 +101,13 @@ void BedWindow::FindWindowOverlaps(BED &a, vector<BED> &hits) {
 	int aFudgeStart = 0;
 	int aFudgeEnd;
 
-	if ((a.start - this->slop) > 0) {
-		aFudgeStart = a.start - this->slop;
+	if ((a.start - this->leftSlop) > 0) {
+		aFudgeStart = a.start - this->leftSlop;
 	}
 	else {
 		aFudgeStart = 0;
 	}
-	aFudgeEnd = a.end + this->slop;
+	aFudgeEnd = a.end + this->rightSlop;
 
 	
 	bedB->binKeeperFind(bedB->bedMap[a.chrom], aFudgeStart, aFudgeEnd, hits);

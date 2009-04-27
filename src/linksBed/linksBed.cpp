@@ -43,9 +43,31 @@ void BedLinks::WriteURL(BED &bed, string &base) {
 			cout << "</a>" << endl;
 		cout << "\t</td>" << endl;	
 
-		if (this->bed->bedType >= 4) {
+		if (this->bed->bedType == 4) {
 			cout << "\t<td>" << endl;
 			cout << bed.name << endl;
+			cout << "\t</td>" << endl;
+		}
+		else if (this->bed->bedType == 5) {
+			cout << "\t<td>" << endl;
+			cout << bed.name << endl;
+			cout << "\t</td>" << endl;
+			
+			cout << "\t<td>" << endl;
+			cout << bed.score << endl;
+			cout << "\t</td>" << endl;
+		}
+		else if (this->bed->bedType == 6) {
+			cout << "\t<td>" << endl;
+			cout << bed.name << endl;
+			cout << "\t</td>" << endl;
+			
+			cout << "\t<td>" << endl;
+			cout << bed.score << endl;
+			cout << "\t</td>" << endl;
+			
+			cout << "\t<td>" << endl;
+			cout << bed.strand << endl;
 			cout << "\t</td>" << endl;
 		}		
 		cout << "</tr>" << endl;
@@ -68,11 +90,12 @@ void BedLinks::LinksBed() {
 	// create the HTML header
 	cout << "<html>" << endl <<"\t<body>" << endl; 
 	cout << "<title>" << this->bedFile << "</title>" << endl;
+	
 	// start the table of entries
 	cout << "<br>Firefox users: Press and hold the \"apple\" or \"alt\" key and click link to open in new tab." << endl;
 	cout << "<p style=\"font-family:courier\">" << endl;
-	cout << "<table border=\"0\"" << endl;
-
+	cout << "<table border=\"0\" align=\"justify\"" << endl;
+	
 	
 	// Are we dealing with a BED file or a BED passed via stdin?
 

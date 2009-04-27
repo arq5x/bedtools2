@@ -6,7 +6,7 @@ using namespace std;
 #define PROGRAM_NAME "closestBed"
 
 // define the version
-#define VERSION "1.1.0"
+#define VERSION "1.2.0"
 
 // define our parameter checking macro
 #define PARAMETER_CHECK(param, paramLen, actualLen) (strncmp(argv[i], param, min(actualLen, paramLen))== 0) && (actualLen == paramLen)

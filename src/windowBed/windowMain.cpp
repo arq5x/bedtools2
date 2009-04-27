@@ -6,7 +6,7 @@ using namespace std;
 #define PROGRAM_NAME "windowBed"
 
 // define the version
-#define VERSION "1.1.0"
+#define VERSION "1.2.0"
 
 // define our parameter checking macro
 #define PARAMETER_CHECK(param, paramLen, actualLen) (strncmp(argv[i], param, min(actualLen, paramLen))== 0) && (actualLen == paramLen)
@@ -24,7 +24,8 @@ int main(int argc, char* argv[]) {
 	string bedBFile;
 
 	// input arguments
-	int slop = 1000;
+	int leftSlop = 1000;
+	int rightSlop = 1000;
 
 	bool haveBedA = false;
 	bool haveBedB = false;
@@ -32,6 +33,8 @@ int main(int argc, char* argv[]) {
 	bool anyHit = false;
 	bool writeCount = false;
 	bool haveSlop = false;
+	bool haveLeft = false;
+	bool haveRight = false;
 
 	// check to see if we should print out some help
 	if(argc <= 1) showHelp = true;
@@ -73,9 +76,20 @@ int main(int argc, char* argv[]) {
 		}
 		else if (PARAMETER_CHECK("-w", 2, parameterLength)) {
 			haveSlop = true;
-			slop = atoi(argv[i + 1]);
+			leftSlop = atoi(argv[i + 1]);
+			rightSlop = leftSlop;
 			i++;
 		}
+		else if (PARAMETER_CHECK("-l", 2, parameterLength)) {
+			haveLeft = true;
+			leftSlop = atoi(argv[i + 1]);
+			i++;
+		}
+		else if (PARAMETER_CHECK("-r", 2, parameterLength)) {
+			haveRight = true;
+			rightSlop = atoi(argv[i + 1]);
+			i++;
+		}		
 		else {
 			cerr << endl << "*****ERROR: Unrecognized parameter: " << argv[i] << " *****" << endl << endl;
 			showHelp = true;
@@ -97,14 +111,29 @@ int main(int argc, char* argv[]) {
 		cerr << endl << "*****" << endl << "*****ERROR: Request either -u OR -c, not both." << endl << "*****" << endl;
 		showHelp = true;
 	}
-	
-	if (haveSlop && (slop < 0)) {
-		cerr << endl << "*****" << endl << "*****ERROR: Slop (-s) must be positive." << endl << "*****" << endl;
+
+	if (haveLeft && (leftSlop < 0)) {
+		cerr << endl << "*****" << endl << "*****ERROR: Upstream window (-l) must be positive." << endl << "*****" << endl;
 		showHelp = true;
 	}
-
+	
+	if (haveRight && (rightSlop < 0)) {
+		cerr << endl << "*****" << endl << "*****ERROR: Downstream window (-r) must be positive." << endl << "*****" << endl;
+		showHelp = true;
+	}
+	
+	if (haveSlop && (haveLeft || haveRight)) {
+		cerr << endl << "*****" << endl << "*****ERROR: Cannot choose -w with -l or -r.  Either specify -l and -r or specify solely -w" << endl << "*****" << endl;
+		showHelp = true;		
+	}
+	
+	if ((haveLeft && !haveRight) || (haveRight && !haveLeft)) {
+		cerr << endl << "*****" << endl << "*****ERROR: Please specify both -l and -r." << endl << "*****" << endl;
+		showHelp = true;		
+	}
+	
 	if (!showHelp) {
-		BedWindow *bi = new BedWindow(bedAFile, bedBFile, slop, anyHit, noHit, writeCount);
+		BedWindow *bi = new BedWindow(bedAFile, bedBFile, leftSlop, rightSlop, anyHit, noHit, writeCount);
 		bi->WindowIntersectBed();
 		return 0;
 	}
@@ -127,7 +156,9 @@ void ShowHelp(void) {
 	cerr << "Usage: " << PROGRAM_NAME << " [OPTIONS] -a <a.bed> -b <b.bed>" << endl << endl;
 
 	cerr << "OPTIONS: " << endl;
-	cerr << "\t" << "-w (def. 1000)\t\t"		<< "Base pairs added before and after each entry in A when searching for overlaps in B." << endl << endl;	
+	cerr << "\t" << "-w (def. 1000)\t\t"		<< "Base pairs added upstream and downstream of each entry in A when searching for overlaps in B." << endl << endl;	
+	cerr << "\t" << "-l (def. 1000)\t\t"		<< "Base pairs added upstream (left of) of each entry in A when searching for overlaps in B." << endl << endl;	
+	cerr << "\t" << "-r (def. 1000)\t\t"		<< "Base pairs added downstream (right of) of each entry in A when searching for overlaps in B." << endl << endl;	
 	cerr << "\t" << "-u\t\t\t"            	<< "Write ORIGINAL a.bed entry ONCE if ANY overlap with B.bed." << endl << "\t\t\t\tIn other words, just report the fact >=1 hit was found." << endl << endl;
 	cerr << "\t" << "-v \t\t\t"             << "Only report those entries in A that have NO OVERLAP in B within the requested window." << endl << "\t\t\t\tSimilar to grep -v." << endl << endl;
 	cerr << "\t" << "-c \t\t\t"				<< "For each entry in A, report the number of hits in B within the requested window." << endl << "\t\t\t\tReports 0 for A entries that have no overlap with B." << endl << endl;

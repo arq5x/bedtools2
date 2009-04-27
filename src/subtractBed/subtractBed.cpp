@@ -97,7 +97,10 @@ void BedSubtract::FindOverlaps(BED &a, vector<BED> &hits) {
 	// find all of the overlaps between a and B.
 	bedB->binKeeperFind(bedB->bedMap[a.chrom], a.start, a.end, hits);
 	
-	int numOverlaps = 0;
+	//  is A completely spanned by an entry in B?
+	//  if so, A should not be reported.
+	int numConsumedByB = 0; 
+	
 	for (vector<BED>::iterator h = hits.begin(); h != hits.end(); ++h) {
 	
 		int s = max(a.start, h->start);
@@ -105,36 +108,68 @@ void BedSubtract::FindOverlaps(BED &a, vector<BED> &hits) {
 
 		if (s < e) {
 			
-			numOverlaps++;
-			
 			// is there enough overlap (default ~ 1bp)
 			float overlap = ((float)(e-s) / (float)(a.end - a.start));
-			
-			if ( overlap > this->overlapFraction ) { 
-				
-				if (overlap < 1.0) {			// if overlap = 1, then B consumes A and therefore,
-												// we won't report A.
-					// A	++++++++++++
-					// B            ----------
-					// Res. ========        			
-					if (h->start > a.start) {
-						int end = h->start + 1;
-						reportARemainder(a,a.start,end); cout << "\n";
-					}	
-					// A	      ++++++++++++
-					// B    ----------
-					// Res. ========
-					else {
-						reportARemainder(a,a.start,h->end); cout << "\n";					
-					}		
-				}
+			if (overlap >= 1.0) {
+				numConsumedByB++;
 			}
 		}
-		
 	}
-	if (numOverlaps == 0) {
-		// no overlap found, so just report A as-is.
-		reportA(a); cout << "\n";
+	
+	// report the subtraction with each entry in B
+	// if A was not "consumed" by any entry in B
+	if (numConsumedByB == 0) {
+		int numOverlaps = 0;
+		for (vector<BED>::iterator h = hits.begin(); h != hits.end(); ++h) {
+	
+			int s = max(a.start, h->start);
+			int e = min(a.end, h->end);
+
+			if (s < e) {
+			
+				numOverlaps++;
+			
+				// is there enough overlap (default ~ 1bp)
+				float overlap = ((float)(e-s) / (float)(a.end - a.start));
+			
+				if ( overlap > this->overlapFraction ) { 
+				
+					if (overlap < 1.0) {			// if overlap = 1, then B consumes A and therefore,
+													// we won't report A.
+						// A	++++++++++++
+						// B        ----
+						// Res. ====    ====					
+						if ( (h->start > a.start) && (h->end < a.end) ) {
+							reportARemainder(a,a.start,h->start); cout << "\n";
+							reportARemainder(a,h->end,a.end); cout << "\n";
+						}
+						// A	++++++++++++
+						// B    ----------
+						// Res.           ==        			
+						else if (h->start == a.start) {
+							reportARemainder(a,h->end,a.end); cout << "\n";
+						}	
+						// A	      ++++++++++++
+						// B    ----------
+						// Res.       ====
+						else if (h->start < a.start) {
+							reportARemainder(a,h->end,a.end); cout << "\n";					
+						}
+						// A	++++++++++++
+						// B           ----------
+						// Res. =======
+						else if (h->start > a.start) {
+							reportARemainder(a,a.start,h->start); cout << "\n";					
+						}
+					}
+				}
+			}
+		
+		}
+		if (numOverlaps == 0) {
+			// no overlap found, so just report A as-is.
+			reportA(a); cout << "\n";
+		}
 	}
 }
 

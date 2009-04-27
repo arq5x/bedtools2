@@ -7,7 +7,7 @@ using namespace std;
 #define PROGRAM_NAME "linksBed"
 
 // define the version
-#define VERSION "1.1.0"
+#define VERSION "1.2.0"
 
 // define our parameter checking macro
 #define PARAMETER_CHECK(param, paramLen, actualLen) (strncmp(argv[i], param, min(actualLen, paramLen))== 0) && (actualLen == paramLen)
@@ -24,6 +24,13 @@ int main(int argc, char* argv[]) {
 	string bedFile;
 	bool haveBed = false;
 
+	/* Defaults for Quinlan
+	//string org = "mouse";
+	//string db = "mm9";
+	//string base = "http://mirror.bioch.virginia.edu";
+	*/
+	
+	/* Defaults for everyone else */
 	string org = "human";
 	string db = "hg18";
 	string base = "http://genome.ucsc.edu";
@@ -91,19 +98,24 @@ void ShowHelp(void) {
 	cerr << " Hall Laboratory, University of Virginia" << endl;
 	cerr << "===============================================" << endl << endl;
 	cerr << "Description: Creates HTML links from a BED file." << endl << endl;
-	cerr << "Usage: " << PROGRAM_NAME << " [OPTIONS] -i <input.bed>" << endl << endl;
+	cerr << "Usage: " << PROGRAM_NAME << " [OPTIONS] -i <input.bed> > out.html" << endl << endl;
 
-	// cerr << "OPTIONS: " << endl;
-	// cerr << "\t" << "-sizeA\t\t"	<< "Sort the BED file by feature size in ascending order.  Sorts across all chromosomes." << endl << endl;
-	// cerr << "\t" << "-sizeD\t\t"	<< "Sort the BED file by feature size in descending order.  Sorts across all chromosomes." << endl << endl;
-	// cerr << "\t" << "-chrThenSizeA\t"	<< "Sort the BED file by chrom (ascending), then feature size in ascending order." << endl << endl;
-	// cerr << "\t" << "-chrThenSizeD\t"	<< "Sort the BED file by chrom (ascending), then feature size in descending order." << endl << endl;
-	// cerr << "\t" << "-chrThenScoreA\t"	<< "Sort the BED file by chrom (ascending), then score in ascending order." << endl << endl;
-	// cerr << "\t" << "-chrThenScoreD\t"	<< "Sort the BED file by chrom (ascending), then scor size in descending order." << endl << endl;
-	// 
+	cerr << "OPTIONS: " << endl;
+	cerr << "\t" << "-base\t\t"	<< "The browser basename.  Default: http://genome.ucsc.edu " << endl << endl;
+	cerr << "\t" << "-org\t\t"	<< "The organism. Default: human" << endl << endl;
+	cerr << "\t" << "-db\t\t"	<< "The build.  Default: hg18" << endl << endl;
+
 	cerr << "NOTES: " << endl;
-	cerr << "\t" << "-i stdin\t\t"	<< "Allows BED file A to be read from stdin.  E.g.: cat a.bed | sortBed -i stdin" << endl << endl;
+	cerr << "\t" << "-i stdin\t"	<< "Allows BED file A to be read from stdin.  E.g.: cat a.bed | linksBed -i stdin > out.html" << endl << endl;
 	cerr << "\t***Only BED3 - BED6 formats allowed.***"<< endl << endl;
+	
+	cerr << "EXAMPLE: " << endl;
+	cerr << "\t" << "By default, the links created will point to the human (hg18) UCSC browser.  If you have a local mirror, you can override this behavior";
+	cerr << "by supplying the -base, -org, and -db options."  << endl;
+	cerr << "\t" << "For example, if the main URL of your local mirror for mouse MM9 is called: http://mymirror.myuniversity.edu, then you would use the following parameters:" << endl;
+	cerr << "\t\t" << "-base http://mymirror.myuniversity.edu" << endl;
+	cerr << "\t\t" << "-org mouse" << endl; 
+	cerr << "\t\t" << "-db mm9" << endl;
 	// end the program here
 	exit(1);
 

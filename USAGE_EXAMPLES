@@ -1,5 +1,5 @@
 ============================
-=== BEDTools Version 1.1 ===
+=== BEDTools Version 1.2 ===
 ============================
 
 Created by Aaron Quinlan Spring 2009.
@@ -40,6 +40,24 @@ http://people.virginia.edu/~arq5x/bedtools.html
 			$ intersectBed -a genes.bed -b LINES.bed | intersectBed -a stdin -b SINEs.bed -v
 
 
+	closestBed. Very similar to intersectBed, but finds the closest (not necessarily overlapping) feature in B to each feature in A.
+				If multiple features in B overlap a feature in A, the one with the highest overlap with respect to A is reported. 
+
+			1. Find the closest ALU to each gene.
+			$ closestBed -a genes.bed -b ALUs.bed 
+
+			Allows input from stdin in the same manner as intersectBed (see #7).
+
+
+	subtractBed. For each feature in A, it returns the fraction of that feature that is not overlapped by B.  If a feature in A is entirely "spanned" by
+	 			 any feature in B, it will not be reported.
+
+			1. Remove introns from genes.
+			$ subtractBed -a genes.bed -b introns.bed 
+
+			Allows input from stdin in the same manner as intersectBed (see #7).
+
+
 	windowBed.  Very similar to intersectBed, but allows one to look for overlaps within a window flanking each A entry
 	
 			1. Report all genes that are within 10000 bp UPSTREAM and DOWNSTREAM of CNVs.
@@ -76,10 +94,15 @@ http://people.virginia.edu/~arq5x/bedtools.html
 			
 			Accepts input from stdin:
 			
-			$ cat scrambled.bed | sortBed > sorted.bed
-			
+			$ cat scrambled.bed | sortBed -i stdin > sorted.bed
 		
+
+	linksBed.  Creates HTML links from a BED file.
+
+			$ linksBed myRegions.bed > myRegions.html 
+
 			
+
 	coverageBed. Reports the number of entries in A that overlap with each feature in B. For example, one could use 
 				 BED B as say 10Kb "windows" across a genome. If BED A contained the coordinates of sequence alignments, 
 				 one could use coverageBed to count the number of reads that map to each window. This would be a preliminary step

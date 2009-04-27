@@ -25,7 +25,7 @@ class BedWindow {
 public:
 
 	// constructor 
-	BedWindow(string &, string &, int &, bool &, bool &, bool &);
+	BedWindow(string &, string &, int &, int &, bool &, bool &, bool &);
 
 	// destructor
 	~BedWindow(void);
@@ -42,7 +42,8 @@ private:
 	string bedBFile;
 	bool anyHit;
 	bool writeCount;
-	int slop;
+	int leftSlop;
+	int rightSlop;
 	bool noHit;
 
 	// instance of a bed file class.
