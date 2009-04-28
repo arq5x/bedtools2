@@ -12,6 +12,21 @@ Free for non-profit or academic use.
 BEDTools, prosaic as it may be, is a collection of utilities for comparing and 
 intersecting genomic features in the UCSC Genome Browser BED format. 
 
+
+===BEDTools===
+intersectBed  	 	--- returns overlaps between two BED files.
+closestBed 			--- returns the closest feature to each entry in a BED file.
+subtractBed 		--- removes the portion of an interval that is overlapped by another feature.
+windowBed 			--- returns overlaps between two BED files based on a user-defined window.
+mergeBed 			--- merges overlapping features into a single feature.
+complementBed 		--- returns all intervals _not_ spanned by the features in a BED file.
+fastaFromBed 		--- creates FASTA sequences based on intervals in a BED file.
+coverageBed 		--- creates a BED graph file based on the the overlaps of two BED files.
+genomeCoverageBed 	--- creates either a histogram or a "per base" report of genome coverage.
+sortBed 			--- sorts a BED file by chrom, then start position.
+linksBed 			--- creates an HTML file of links to the UCSC or a custom browser.
+
+
 ===Installation===
 1.  If you are reading this, you successfully downloaded and unzipped/unpacked the source tarball.  Great.
 2.  Type "make all" at the command line.
@@ -47,7 +62,7 @@ Royden is the resident UCSC browser expert.  He has helped me immensely by teach
 browser.  Also, the algorithmic concept behind the genomeCoverageBed program is Royden's.
 
 6.  Fitz Elliot, UVa
-Fitz kindly taught me the ways of version control with git.  For those of who that are constantly confused by CVS and SVN, try git. I think you'll be happy.  
+Fitz kindly taught me the ways of version control with git.  For those that are constantly confused by CVS and SVN, try git. I think you'll be happy.  
 
 7. Loyal Goff, CSAIL, Broad.
 Many thanks to Loyal for his assistance in making BED Tools "compilable" on the SUSE platform.  I appreciate your help and patience.
