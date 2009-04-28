@@ -6,41 +6,42 @@ Created by Aaron Quinlan Spring 2009.
 Copyright 2009 Aaron Quinlan. All rights reserved.
 http://people.virginia.edu/~arq5x/bedtools.html
 
-Free for non-profit or academic use.
+Free for non-profit or academic use. Please contact me for commercial use.
+
 
 ===Summary===  
-BEDTools, prosaic as it may be, is a collection of utilities for comparing and 
-intersecting genomic features in the UCSC Genome Browser BED format. 
+BEDTools is a collection of utilities for comparing, summarizing, and 
+intersecting genomic features in the ubiquitous UCSC Genome Browser BED format. 
 
 
 ===BEDTools===
-intersectBed  	 	--- returns overlaps between two BED files.
-closestBed 			--- returns the closest feature to each entry in a BED file.
-subtractBed 		--- removes the portion of an interval that is overlapped by another feature.
-windowBed 			--- returns overlaps between two BED files based on a user-defined window.
-mergeBed 			--- merges overlapping features into a single feature.
-complementBed 		--- returns all intervals _not_ spanned by the features in a BED file.
-fastaFromBed 		--- creates FASTA sequences based on intervals in a BED file.
-coverageBed 		--- creates a BED graph file based on the the overlaps of two BED files.
-genomeCoverageBed 	--- creates either a histogram or a "per base" report of genome coverage.
+intersectBed		--- returns overlaps between two BED files.
+closestBed			--- returns the closest feature to each entry in a BED file.
+subtractBed			--- removes the portion of an interval that is overlapped by another feature.
+windowBed			--- returns overlaps between two BED files based on a user-defined window.
+mergeBed			--- merges overlapping features into a single feature.
+complementBed		--- returns all intervals _not_ spanned by the features in a BED file.
+fastaFromBed		--- creates FASTA sequences based on intervals in a BED file.
+coverageBed			--- creates a BED graph file based on the the overlaps of two BED files.
+genomeCoverageBed	--- creates either a histogram or a "per base" report of genome coverage.
 sortBed 			--- sorts a BED file by chrom, then start position.
-linksBed 			--- creates an HTML file of links to the UCSC or a custom browser.
+linksBed			--- creates an HTML file of links to the UCSC or a custom browser.
 
 
 ===Installation===
-1.  If you are reading this, you successfully downloaded and unzipped/unpacked the source tarball.  Great.
-2.  cd into the new folder.
+1.  Unpack the source downloaded tarball.
+2.  cd into the expanded folder.
 3.  Type "make clean" and hit enter.
-3.  Type "make all" and hit enter.
-3.  If you encountered no errors, then all of the BED Tools should now be in bin/
-	If not, try to troubleshoot then email me: aaronquinlan@gmail.com
-4.  Copy the files in bin/ to ~/bin or if you have the privileges, to /usr/local/bin.
-5.  Use the tools.
+4.  Type "make all" and hit enter.
+5.  If you encountered no errors, then all of the BED Tools should now be in bin/
+	If not, try to troubleshoot then email me: aaronquinlan at gmail dot com
+6.  Copy the files in bin/ to ~/bin or if you have the privileges, to /usr/local/bin.
+7.  Use the tools.
 
 
 ===Acknowledgments=== 
 1.  Jim Kent, UCSC.  
-Much of the code herein is based upon the absurdly impressive code base that Jim Kent has developed for the UCSC Browser.  I am grateful for his elegant genome binning algorithm.  BEDTools uses it extensively.
+Much of the code herein is based upon the absurdly impressive code-base (really, it's nuts) that Jim Kent has developed for the UCSC Browser.  I am grateful for his elegant genome binning algorithm.  BEDTools uses it extensively.
 
 2.  Michael Stromberg, Boston College.
 I learned much of what I know about C++ style from Michael Stromberg.  I was formerly a C and Perl 
@@ -52,11 +53,11 @@ code base. Thanks Mike!
 I had been using Galaxy for months prior to writing these tools.  Much of the functionality is based on what is
 available on the Galaxy website.  I merely found it too slow to do several iterations of queries on a website,
 especially with large sequencing datasets.  Regardless, I am grateful to the Galaxy team for creating such a
-useful site that is rapidly approaching ubiquity.
+useful site.
 
 4.  Ira Hall, UVa.
 Discussions between Ira and I are largely the motivation for these tools.  We are frequently tracking 
-down impromptu ideas and these tools were originally designed to facilitate such tangents.
+down ad hoc ideas and these tools were originally designed to facilitate such tangents.
 
 5.  Royden Clark, UVa
 Royden is the resident UCSC browser expert.  He has helped me immensely by teaching me how to squeeze every last bit of functionality from the browser.  Also, the algorithmic concept behind the genomeCoverageBed program is Royden's.
