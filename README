@@ -40,8 +40,8 @@ linksBed 			--- creates an HTML file of links to the UCSC or a custom browser.
 
 ===Acknowledgments=== 
 1.  Jim Kent, UCSC.  
-Much of the code herein is taken from Jim Kent's BED processing code.  
-I am grateful for his elegant genome binning algorithm and therefore use it extensively.
+Much of the code herein is based upon the absurdly impressive code base that Jim Kent has developed for the UCSC Broswer.  
+I am grateful for his elegant genome binning algorithm.  BEDTools uses it extensively.
 
 2.  Michael Stromberg, Boston College.
 I learned much of what I know about C++ style from Michael Stromberg.  I was formerly a C and Perl 
