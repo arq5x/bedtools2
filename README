@@ -40,8 +40,7 @@ linksBed 			--- creates an HTML file of links to the UCSC or a custom browser.
 
 ===Acknowledgments=== 
 1.  Jim Kent, UCSC.  
-Much of the code herein is based upon the absurdly impressive code base that Jim Kent has developed for the UCSC Broswer.  
-I am grateful for his elegant genome binning algorithm.  BEDTools uses it extensively.
+Much of the code herein is based upon the absurdly impressive code base that Jim Kent has developed for the UCSC Browser.  I am grateful for his elegant genome binning algorithm.  BEDTools uses it extensively.
 
 2.  Michael Stromberg, Boston College.
 I learned much of what I know about C++ style from Michael Stromberg.  I was formerly a C and Perl 
@@ -60,8 +59,7 @@ Discussions between Ira and I are largely the motivation for these tools.  We ar
 down impromptu ideas and these tools were originally designed to facilitate such tangents.
 
 5.  Royden Clark, UVa
-Royden is the resident UCSC browser expert.  He has helped me immensely by teaching me how to squeeze every last bit of functionality from the 
-browser.  Also, the algorithmic concept behind the genomeCoverageBed program is Royden's.
+Royden is the resident UCSC browser expert.  He has helped me immensely by teaching me how to squeeze every last bit of functionality from the browser.  Also, the algorithmic concept behind the genomeCoverageBed program is Royden's.
 
 6.  Fitz Elliot, UVa
 Fitz kindly taught me the ways of version control with git.  For those that are constantly confused by CVS and SVN, try git. I think you'll be happy.  
