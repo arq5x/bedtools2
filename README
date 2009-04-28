@@ -29,7 +29,9 @@ linksBed 			--- creates an HTML file of links to the UCSC or a custom browser.
 
 ===Installation===
 1.  If you are reading this, you successfully downloaded and unzipped/unpacked the source tarball.  Great.
-2.  Type "make all" at the command line.
+2.  cd into the new folder.
+3.  Type "make clean" and hit enter.
+3.  Type "make all" and hit enter.
 3.  If you encountered no errors, then all of the BED Tools should now be in bin/
 	If not, try to troubleshoot then email me: aaronquinlan@gmail.com
 4.  Copy the files in bin/ to ~/bin or if you have the privileges, to /usr/local/bin.
