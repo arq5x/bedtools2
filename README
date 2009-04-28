@@ -6,6 +6,8 @@ Created by Aaron Quinlan Spring 2009.
 Copyright 2009 Aaron Quinlan. All rights reserved.
 http://people.virginia.edu/~arq5x/bedtools.html
 
+Free for non-profit or academic use.
+
 ===Summary===  
 BEDTools, prosaic as it may be, is a collection of utilities for comparing and 
 intersecting genomic features in the UCSC Genome Browser BED format. 
