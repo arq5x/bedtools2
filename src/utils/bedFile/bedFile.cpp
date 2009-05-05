@@ -11,7 +11,7 @@
 //                   BED processing code.  I am grateful for his elegant
 //					 genome binning algorithm and therefore use it extensively.
 
-
+#include "lineFileUtilities.h"
 #include "bedFile.h"
 
 static int binOffsetsExtended[] =
@@ -20,27 +20,6 @@ static int binOffsetsExtended[] =
 #define _binFirstShift 17/* How much to shift to get to finest bin. */
 #define _binNextShift 3/* How much to shift to get to next larger bin. */
 
-//***********************************************
-// Common functions
-//***********************************************
-
-void Tokenize(const string& str, vector<string>& tokens)
-{
-	// Skip delimiters at beginning.
-	string::size_type lastPos = str.find_first_not_of("\t", 0);
-	// Find first "non-delimiter".
-	string::size_type pos     = str.find_first_of("\t", lastPos);
-
-	while (string::npos != pos || string::npos != lastPos)
-	{
-		// Found a token, add it to the vector.
-		tokens.push_back(str.substr(lastPos, pos - lastPos));
-		// Skip delimiters.  Note the "not_of"
-		lastPos = str.find_first_not_of("\t", pos);
-		// Find next "non-delimiter"
-		pos = str.find_first_of("\t", lastPos);
-	}
-}
 
 int overlaps(const int aS, const int aE, const int bS, const int bE) {
 	return min(aE, bE) - max(aS, bS);
@@ -214,21 +193,71 @@ void BedFile::countHits(map<int, vector<BED>, std::less<int> > &bk, const int st
 }
 
 
-
-
 // Constructor
 BedFile::BedFile(string &bedFile) {
 	this->bedFile = bedFile;
 }
 
-// Destructorc
+// Destructor
 BedFile::~BedFile(void) {
 }
 
 
 bool BedFile::parseBedLine (BED &bed, const vector<string> &lineVector, const int &lineNum) {
 
-	if ((lineNum == 1) && (lineVector.size() >= 3)) {
+	if ( (lineNum > 1) && (lineVector.size() == this->bedType)) {
+
+		if (this->bedType == 3) {
+			bed.chrom = lineVector[0];
+			bed.start = atoi(lineVector[1].c_str());
+			bed.end = atoi(lineVector[2].c_str());
+			bed.name = "";
+			bed.score = 0;
+			bed.strand = "+";
+			return true;
+		}
+		else if (this->bedType == 4) {
+			bed.chrom = lineVector[0];
+			bed.start = atoi(lineVector[1].c_str());
+			bed.end = atoi(lineVector[2].c_str());
+			bed.name = lineVector[3];
+			bed.score = 0;
+			bed.strand = "+";
+			return true;
+		}
+		else if (this->bedType ==5) {
+			bed.chrom = lineVector[0];
+			bed.start = atoi(lineVector[1].c_str());
+			bed.end = atoi(lineVector[2].c_str());
+			bed.name = lineVector[3];
+			bed.score = atoi(lineVector[4].c_str());
+			bed.strand = "+";
+			return true;			
+		}
+		else if (this->bedType == 6) {
+			bed.chrom = lineVector[0];
+			bed.start = atoi(lineVector[1].c_str());
+			bed.end = atoi(lineVector[2].c_str());
+			bed.name = lineVector[3];
+			bed.score = atoi(lineVector[4].c_str());
+			bed.strand = lineVector[5];
+			return true;
+		}
+		else {
+			cerr << "Unexpected number of fields: " << lineNum << ".  Verify that your files are TAB-delimited and that your BED file has 3,4,5 or 6 fields.  Exiting..." << endl;
+			exit(1);
+		}
+		
+		if (bed.start > bed.end) {
+			cerr << "Error: malformed BED entry at line " << lineNum << ". Start was greater than End. Ignoring it and moving on." << endl;
+			return false;
+		}
+		else if ( (bed.start < 0) || (bed.end < 0) ) {
+			cerr << "Error: malformed BED entry at line " << lineNum << ". Coordinate <= 0. Ignoring it and moving on." << endl;
+			return false;
+		}
+	}
+	else if ((lineNum == 1) && (lineVector.size() >= 3)) {
 		this->bedType = lineVector.size();
 
 		if (this->bedType == 3) {
@@ -261,40 +290,11 @@ bool BedFile::parseBedLine (BED &bed, const vector<string> &lineVector, const in
 			bed.strand = lineVector[5];
 			return true;
 		}
-	}
-	else if ( (lineNum > 1) && (lineVector.size() == this->bedType)) {
-
-		if (this->bedType == 3) {
-			bed.chrom = lineVector[0];
-			bed.start = atoi(lineVector[1].c_str());
-			bed.end = atoi(lineVector[2].c_str());
-			return true;
+		else {
+			cerr << "Unexpected number of fields: " << lineNum << ".  Verify that your files are TAB-delimited and that your BED file has 3,4,5 or 6 fields.  Exiting..." << endl;
+			exit(1);
 		}
-		else if (this->bedType == 4) {
-			bed.chrom = lineVector[0];
-			bed.start = atoi(lineVector[1].c_str());
-			bed.end = atoi(lineVector[2].c_str());
-			bed.name = lineVector[3];
-			return true;
-		}
-		else if (this->bedType ==5) {
-			bed.chrom = lineVector[0];
-			bed.start = atoi(lineVector[1].c_str());
-			bed.end = atoi(lineVector[2].c_str());
-			bed.name = lineVector[3];
-			bed.score = atoi(lineVector[4].c_str());
-			return true;			
-		}
-		else if (this->bedType == 6) {
-			bed.chrom = lineVector[0];
-			bed.start = atoi(lineVector[1].c_str());
-			bed.end = atoi(lineVector[2].c_str());
-			bed.name = lineVector[3];
-			bed.score = atoi(lineVector[4].c_str());
-			bed.strand = lineVector[5];
-			return true;
-		}
-
+		
 		if (bed.start > bed.end) {
 			cerr << "Error: malformed BED entry at line " << lineNum << ". Start was greater than End. Ignoring it and moving on." << endl;
 			return false;
@@ -333,12 +333,12 @@ void BedFile::loadBedFileIntoMap() {
 	BED bedEntry;                                                                                                                        
 	int lineNum = 0;
 
-	//while (bed >> bedEntry.chrom >> bedEntry.start >> bedEntry.end) {
+	vector<string> bedFields;	// vector of strings for each column in BED file.
+	bedFields.reserve(6);		// reserve space for worst case (BED 6)
+
 	while (getline(bed, bedLine)) {
 
-		vector<string> bedFields;
 		Tokenize(bedLine,bedFields);
-
 		lineNum++;
 
 		if (parseBedLine(bedEntry, bedFields, lineNum)) {
@@ -346,12 +346,18 @@ void BedFile::loadBedFileIntoMap() {
 			bedEntry.count = 0;
 			this->bedMap[bedEntry.chrom][bin].push_back(bedEntry);	
 		}
+		bedFields.clear();
 	}
 }
 
 void BedFile::loadBedFileIntoMapNoBin() {
 
-	// Are we dealing with a BED file or a BED passed via stdin?
+	string bedLine;
+	BED bedEntry;                                                                                                                        
+	int lineNum = 0;
+
+	vector<string> bedFields;	// vector of strings for each column in BED file.
+	bedFields.reserve(6);		// reserve space for worst case (BED 6)
 
 	// Case 1: Proper BED File.
 	if ( (this->bedFile != "") && (this->bedFile != "stdin") ) {
@@ -363,13 +369,8 @@ void BedFile::loadBedFileIntoMapNoBin() {
 			exit (1);
 		}
 
-		string bedLine;
-		BED bedEntry;                                                                                                                        
-		int lineNum = 0;
-
 		while (getline(bed, bedLine)) {
 
-			vector<string> bedFields;
 			Tokenize(bedLine,bedFields);
 
 			lineNum++;
@@ -378,14 +379,12 @@ void BedFile::loadBedFileIntoMapNoBin() {
 				bedEntry.count = 0;
 				this->bedMapNoBin[bedEntry.chrom].push_back(bedEntry);	
 			}
+			bedFields.clear();
 		}
 	}
 	// Case 2: STDIN.
 	else {
-		string bedLine;
-		BED bedEntry;                                                                                                                        
-		int lineNum = 0;
-
+				
 		while (getline(cin, bedLine)) {
 
 			vector<string> bedFields;
@@ -397,6 +396,7 @@ void BedFile::loadBedFileIntoMapNoBin() {
 				bedEntry.count = 0;
 				this->bedMapNoBin[bedEntry.chrom].push_back(bedEntry);	
 			}
+			bedFields.clear();
 		}
 	}
 
@@ -408,5 +408,56 @@ void BedFile::loadBedFileIntoMapNoBin() {
 }
 
 
+/*
+	reportBed
+	
+	Writes the _original_ BED entry.
+	Works for BED3 - BED6.
+*/
+void BedFile::reportBed(const BED &bed) {
+	
+	if (this->bedType == 3) {
+		cout << bed.chrom << "\t" << bed.start << "\t" << bed.end;
+	}
+	else if (this->bedType == 4) {
+		cout << bed.chrom << "\t" << bed.start << "\t" << bed.end << "\t"
+		<< bed.name;
+	}
+	else if (this->bedType == 5) {
+		cout << bed.chrom << "\t" << bed.start << "\t" << bed.end << "\t"
+		<< bed.name << "\t" << bed.score;
+	}
+	else if (this->bedType == 6) {
+		cout << bed.chrom << "\t" << bed.start << "\t" << bed.end << "\t" 
+		<< bed.name << "\t" << bed.score << "\t" << bed.strand;
+	}
+}
+
+
+/*
+	reportBedRange
+	
+	Writes a custom start->end for a BED entry.
+	Works for BED3 - BED6.
+*/
+void BedFile::reportBedRange(const BED &bed, int &start, int &end) {
+
+	if (this->bedType == 3) {
+		cout << bed.chrom << "\t" << start << "\t" << end;
+	}
+	else if (this->bedType == 4) {
+		cout << bed.chrom << "\t" << start << "\t" << end << "\t"
+		<< bed.name;
+	}
+	else if (this->bedType == 5) {
+		cout << bed.chrom << "\t" << start << "\t" << end << "\t"
+		<< bed.name << "\t" << bed.score;
+	}
+	else if (this->bedType == 6) {
+		cout << bed.chrom << "\t" << start << "\t" << end << "\t" 
+		<< bed.name << "\t" << bed.score << "\t" << bed.strand;
+	}
+	
+}
 
 

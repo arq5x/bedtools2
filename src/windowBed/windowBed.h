@@ -3,19 +3,10 @@
 
 #include "bedFile.h"
 #include <vector>
-#include <map>
-#include <list>
 #include <iostream>
 #include <fstream>
 
 using namespace std;
-
-
-//***********************************************
-// Typedefs
-//***********************************************
-typedef list<BED> bedList;
-
 
 //************************************************
 // Class methods and elements
@@ -25,7 +16,7 @@ class BedWindow {
 public:
 
 	// constructor 
-	BedWindow(string &, string &, int &, int &, bool &, bool &, bool &);
+	BedWindow(string &, string &, int &, int &, bool &, bool &, bool &, bool &);
 
 	// destructor
 	~BedWindow(void);
@@ -45,6 +36,7 @@ private:
 	int leftSlop;
 	int rightSlop;
 	bool noHit;
+	bool forceStrand;
 
 	// instance of a bed file class.
 	BedFile *bedA, *bedB;

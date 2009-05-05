@@ -3,19 +3,10 @@
 
 #include "bedFile.h"
 #include <vector>
-#include <map>
-#include <list>
 #include <iostream>
 #include <fstream>
 
 using namespace std;
-
-
-//***********************************************
-// Typedefs
-//***********************************************
-typedef list<BED> bedList;
-
 
 //************************************************
 // Class methods and elements
@@ -25,7 +16,7 @@ class BedIntersect {
 public:
 
 	// constructor 
-	BedIntersect(string &, string &, bool &, bool &, bool &, float &, bool &, bool &);
+	BedIntersect(string &, string &, bool &, bool &, bool &, float &, bool &, bool &, bool &);
 
 	// destructor
 	~BedIntersect(void);
@@ -47,6 +38,7 @@ private:
 	bool writeA;
 	bool writeB;
 	bool writeCount;
+	bool forceStrand;
 	float overlapFraction;
 	bool noHit;
 

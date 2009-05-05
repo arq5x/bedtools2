@@ -1,19 +1,12 @@
 #include "bedFile.h"
 #include <vector>
 #include <algorithm>
-#include <map>
-#include <list>
 #include <iostream>
 #include <fstream>
+#include <limits.h>
+#include <stdlib.h>
 
 using namespace std;
-
-
-//***********************************************
-// Typedefs
-//***********************************************
-typedef list<BED> bedList;
-
 
 //************************************************
 // Class methods and elements
@@ -23,17 +16,19 @@ class BedMerge {
 public:
 
   // constructor 
-  BedMerge(string &, bool &, int&);
+  BedMerge(string &, bool &, int&, bool &);
 
   // destructor
   ~BedMerge(void);
 
   void MergeBed();
+  void MergeBedStranded();
 
 private:
 	
 	string bedFile;
 	bool numEntries;
+	bool forceStrand;
 	int maxDistance;
 	// instance of a bed file class.
 	BedFile *bed;

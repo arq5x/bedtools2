@@ -28,6 +28,7 @@ int main(int argc, char* argv[]) {
 	bool numEntries = false;
 	bool haveMaxDistance = false;
 	bool haveBed = false;
+	bool forceStrand = false;
 
 	// check to see if we should print out some help
 	if(argc <= 1) showHelp = true;
@@ -55,12 +56,14 @@ int main(int argc, char* argv[]) {
 		}
 		else if(PARAMETER_CHECK("-n", 2, parameterLength)) {
 			numEntries = true;
-			i++;
 		}
 		else if(PARAMETER_CHECK("-d", 2, parameterLength)) {
 			haveMaxDistance = true;
 			maxDistance = atoi(argv[i + 1]);
 			i++;
+		}
+		else if (PARAMETER_CHECK("-s", 2, parameterLength)) {
+			forceStrand = true;
 		}
 		else {
 			cerr << endl << "*****ERROR: Unrecognized parameter: " << argv[i] << " *****" << endl << endl;
@@ -75,8 +78,14 @@ int main(int argc, char* argv[]) {
 	}
 
 	if (!showHelp) {
-		BedMerge *bm = new BedMerge(bedFile, numEntries, maxDistance);
-		bm->MergeBed();
+		BedMerge *bm = new BedMerge(bedFile, numEntries, maxDistance, forceStrand);
+		
+		if (!forceStrand) {
+			bm->MergeBed();
+		}
+		else {
+			bm->MergeBedStranded();			
+		}
 		return 0;
 	}
 	else {
@@ -96,8 +105,9 @@ void ShowHelp(void) {
 	cerr << "Usage: " << PROGRAM_NAME << " [OPTIONS] -i <input.bed>" << endl << endl;
 
 	cerr << "OPTIONS: " << endl;
+	cerr << "\t" << "-s\t\t\t"  << "Force strandedness.  Only report hits in B that overlap A on the same strand." << endl << "\t\t\t\tBy default, overlaps are reported without respect to strand." << endl << endl;	
 	cerr << "\t" << "-n\t\t\t"	<< "Report the number of BED entries that were merged. (=1 if no merging occured)" << endl << endl;
-	cerr << "\t" << "-d\t\t\t"      << "Maximum distance between features allowed for features to be merged. (Default=0)" << endl << endl;
+	cerr << "\t" << "-d\t\t\t"  << "Maximum distance between features allowed for features to be merged. (Default=0)" << endl << endl;
 
 	cerr << "NOTES: " << endl;
 	cerr << "\t" << "-i stdin\t\t"	<< "Allows BED file A to be read from stdin.  E.g.: cat a.bed | mergeBed -a stdin -b B.bed" << endl << endl;

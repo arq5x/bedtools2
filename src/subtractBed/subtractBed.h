@@ -3,19 +3,10 @@
 
 #include "bedFile.h"
 #include <vector>
-#include <map>
-#include <list>
 #include <iostream>
 #include <fstream>
 
 using namespace std;
-
-
-//***********************************************
-// Typedefs
-//***********************************************
-typedef list<BED> bedList;
-
 
 //************************************************
 // Class methods and elements
@@ -25,7 +16,7 @@ class BedSubtract {
 public:
 
 	// constructor 
-	BedSubtract(string &, string &, float &);
+	BedSubtract(string &, string &, float &, bool &);
 
 	// destructor
 	~BedSubtract(void);
@@ -43,7 +34,8 @@ private:
 	string bedBFile;
 	float overlapFraction;
 	bool noHit;
-
+	bool forceStrand;
+	
 	// instance of a bed file class.
 	BedFile *bedA, *bedB;
 

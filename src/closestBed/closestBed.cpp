@@ -7,10 +7,7 @@
 //
 //  Summary:  Looks for the closest features in two BED files.
 //
-
-/*
-	Includes
-*/
+#include "lineFileUtilities.h"
 #include "closestBed.h"
 
 const int MAXSLOP = 256000000;  // 2*MAXSLOP = 512 megabases.
@@ -22,13 +19,15 @@ const int SLOPGROWTH = 2048000;
 /*
 	Constructor
 */
-BedClosest::BedClosest(string &bedAFile, string &bedBFile) {
+BedClosest::BedClosest(string &bedAFile, string &bedBFile, bool &forceStrand) {
 
 	this->bedAFile = bedAFile;
 	this->bedBFile = bedBFile;
+	this->forceStrand = forceStrand;
 
 	this->bedA = new BedFile(bedAFile);
 	this->bedB = new BedFile(bedBFile);
+	
 }
 
 /*
@@ -36,61 +35,6 @@ BedClosest::BedClosest(string &bedAFile, string &bedBFile) {
 */
 BedClosest::~BedClosest(void) {
 }
-
-
-
-/*
-	reportA
-	
-	Writes the _original_ BED entry for A.
-	Works for BED3 - BED6.
-*/
-void BedClosest::reportA(const BED &a) {
-	
-	if (bedA->bedType == 3) {
-		cout << a.chrom << "\t" << a.start << "\t" << a.end;
-	}
-	else if (bedA->bedType == 4) {
-		cout << a.chrom << "\t" << a.start << "\t" << a.end << "\t"
-		<< a.name;
-	}
-	else if (bedA->bedType == 5) {
-		cout << a.chrom << "\t" << a.start << "\t" << a.end << "\t"
-		<< a.name << "\t" << a.score;
-	}
-	else if (bedA->bedType == 6) {
-		cout << a.chrom << "\t" << a.start << "\t" << a.end << "\t" 
-		<< a.name << "\t" << a.score << "\t" << a.strand;
-	}
-}
-
-
-
-/*
-	reportB
-	
-	Writes the _original_ BED entry for B.
-	Works for BED3 - BED6.
-*/
-void BedClosest::reportB(const BED &b) {
-	if (bedB->bedType == 3) {
-		cout << b.chrom << "\t" << b.start << "\t" << b.end;
-	}
-	else if (bedB->bedType == 4) {
-		cout << b.chrom << "\t" << b.start << "\t" << b.end << "\t"
-		<< b.name;
-	}
-	else if (bedB->bedType == 5) {
-		cout << b.chrom << "\t" << b.start << "\t" << b.end << "\t"
-		<< b.name << "\t" << b.score;
-	}
-	else if (bedB->bedType == 6) {
-		cout << b.chrom << "\t" << b.start << "\t" << b.end << "\t" 
-		<< b.name << "\t" << b.score << "\t" << b.strand;
-	}
-}
-
-
 
 
 /*
@@ -155,6 +99,12 @@ void BedClosest::FindWindowOverlaps(BED &a, vector<BED> &hits) {
 			bedB->binKeeperFind(bedB->bedMap[a.chrom], aFudgeStart, aFudgeEnd, hits);
 	
 			for (vector<BED>::iterator h = hits.begin(); h != hits.end(); ++h) {
+				
+				// if forcing strandedness, move on if the hit
+				// is not on the same strand as A.
+				if ((this->forceStrand) && (a.strand != h->strand)) {
+					continue;		// continue force the next iteration of the for loop.
+				}
 		
 				numOverlaps++;
 
@@ -190,21 +140,24 @@ void BedClosest::FindWindowOverlaps(BED &a, vector<BED> &hits) {
 				}
 				
 			}
-			slop += SLOPGROWTH;	// if there were no overlaps, 
-						// we'll widen the range by 64Kb in each direction	
+			/* if no overlaps were found, we'll 
+			   widen the range by in each direction
+			   and search again.
+			*/
+			slop += SLOPGROWTH;
 		}
 	}
 	else {
-		reportA(a);
+		bedA->reportBed(a);
 		cout << "\t";
 		reportNullB();
 		cout << "\n"; 
 	}
 
 	if (numOverlaps > 0) {
-		reportA(a); 
+		bedA->reportBed(a); 
 		cout << "\t"; 
-		reportB(closestB);
+		bedB->reportBed(closestB);
 		cout << "\n";
 	}
 }

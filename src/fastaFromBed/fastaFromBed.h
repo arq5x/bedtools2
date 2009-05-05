@@ -1,5 +1,6 @@
 #ifndef FASTAFROMBED_H
 #define FASTAFROMBED_H
+
 #include "bedFile.h"
 #include "sequenceUtils.h"
 #include <vector>

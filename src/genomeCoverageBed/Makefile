@@ -9,14 +9,14 @@ BIN_DIR = ../../bin/
 # -------------------
 # define our includes
 # -------------------
-INCLUDES = -I$(UTILITIES_DIR)/bedFile/
+INCLUDES = -I$(UTILITIES_DIR)/bedFile/ -I$(UTILITIES_DIR)/lineFileUtilities/
 
 # ----------------------------------
 # define our source and object files
 # ----------------------------------
 SOURCES= genomeCoverageMain.cpp genomeCoverageBed.cpp
 OBJECTS= $(SOURCES:.cpp=.o)
-_EXT_OBJECTS=bedFile.o
+_EXT_OBJECTS=bedFile.o lineFileUtilities.o
 EXT_OBJECTS=$(patsubst %,$(OBJ_DIR)/%,$(_EXT_OBJECTS))
 BUILT_OBJECTS= $(patsubst %,$(OBJ_DIR)/%,$(OBJECTS))
 PROGRAM= genomeCoverageBed
@@ -35,8 +35,9 @@ $(BUILT_OBJECTS): $(SOURCES)
 	@$(CXX) -c -o $@ $(*F).cpp $(LDFLAGS) $(CXXFLAGS) $(INCLUDES)
 
 $(EXT_OBJECTS):
+	@$(MAKE) --no-print-directory -C $(UTILITIES_DIR)/lineFileUtilities/
 	@$(MAKE) --no-print-directory -C $(UTILITIES_DIR)/bedFile/
-
+	
 clean:
 	@echo "Cleaning up."
 	@rm -f $(OBJ_DIR)/* $(BIN_DIR)/*

@@ -6,7 +6,7 @@
 //  Copyright 2009 Aaron Quinlan. All rights reserved.
 //
 //
-
+#include "lineFileUtilities.h"
 #include "coverageBed.h"
 
 
@@ -68,7 +68,6 @@ void BedGraph::GraphBed() {
 			}
 		}
 	}
-	
 }
 
 

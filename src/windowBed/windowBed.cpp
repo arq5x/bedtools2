@@ -7,17 +7,14 @@
 //
 //  Summary:  Looks for overlaps between features in two BED files.
 //
-
-/*
-	Includes
-*/
+#include "lineFileUtilities.h"
 #include "windowBed.h"
 
 
 /*
 	Constructor
 */
-BedWindow::BedWindow(string &bedAFile, string &bedBFile, int &leftSlop, int &rightSlop, bool &anyHit, bool &noHit, bool &writeCount) {
+BedWindow::BedWindow(string &bedAFile, string &bedBFile, int &leftSlop, int &rightSlop, bool &anyHit, bool &noHit, bool &writeCount, bool &forceStrand) {
 
 	this->bedAFile = bedAFile;
 	this->bedBFile = bedBFile;
@@ -28,68 +25,18 @@ BedWindow::BedWindow(string &bedAFile, string &bedBFile, int &leftSlop, int &rig
 	this->anyHit = anyHit;
 	this->noHit = noHit;
 	this->writeCount = writeCount;
+	this->forceStrand = forceStrand;	
 	
 	this->bedA = new BedFile(bedAFile);
 	this->bedB = new BedFile(bedBFile);
 }
 
+
+
 /*
 	Destructor
 */
 BedWindow::~BedWindow(void) {
-}
-
-
-
-/*
-	reportA
-	
-	Writes the _original_ BED entry for A.
-	Works for BED3 - BED6.
-*/
-void BedWindow::reportA(const BED &a) {
-	
-	if (bedA->bedType == 3) {
-		cout << a.chrom << "\t" << a.start << "\t" << a.end;
-	}
-	else if (bedA->bedType == 4) {
-		cout << a.chrom << "\t" << a.start << "\t" << a.end << "\t"
-		<< a.name;
-	}
-	else if (bedA->bedType == 5) {
-		cout << a.chrom << "\t" << a.start << "\t" << a.end << "\t"
-		<< a.name << "\t" << a.score;
-	}
-	else if (bedA->bedType == 6) {
-		cout << a.chrom << "\t" << a.start << "\t" << a.end << "\t" 
-		<< a.name << "\t" << a.score << "\t" << a.strand;
-	}
-}
-
-
-
-/*
-	reportB
-	
-	Writes the _original_ BED entry for B.
-	Works for BED3 - BED6.
-*/
-void BedWindow::reportB(const BED &b) {
-	if (bedB->bedType == 3) {
-		cout << b.chrom << "\t" << b.start << "\t" << b.end;
-	}
-	else if (bedB->bedType == 4) {
-		cout << b.chrom << "\t" << b.start << "\t" << b.end << "\t"
-		<< b.name;
-	}
-	else if (bedB->bedType == 5) {
-		cout << b.chrom << "\t" << b.start << "\t" << b.end << "\t"
-		<< b.name << "\t" << b.score;
-	}
-	else if (bedB->bedType == 6) {
-		cout << b.chrom << "\t" << b.start << "\t" << b.end << "\t" 
-		<< b.name << "\t" << b.score << "\t" << b.strand;
-	}
 }
 
 
@@ -115,6 +62,12 @@ void BedWindow::FindWindowOverlaps(BED &a, vector<BED> &hits) {
 	int numOverlaps = 0;
 	for (vector<BED>::iterator h = hits.begin(); h != hits.end(); ++h) {
 	
+		// if forcing strandedness, move on if the hit
+		// is not on the same strand as A.
+		if ((this->forceStrand) && (a.strand != h->strand)) {
+			continue;		// continue force the next iteration of the for loop.
+		}
+	
 		int s = max(aFudgeStart, h->start);
 		int e = min(aFudgeEnd, h->end);
 	
@@ -123,20 +76,20 @@ void BedWindow::FindWindowOverlaps(BED &a, vector<BED> &hits) {
 			if ( ((float)(e-s) / (float)(a.end - a.start)) > 0 ) { 
 				numOverlaps++;	
 				if (!anyHit && !noHit && !writeCount) {			
-					reportA(a); cout << "\t";
-					reportB(*h); cout << endl;
+					bedA->reportBed(a); cout << "\t";
+					bedB->reportBed(*h); cout << endl;
 				}
 			}
 		}
 	}
 	if (anyHit && (numOverlaps >= 1)) {
-		reportA(a); cout << endl;
+		bedA->reportBed(a); cout << endl;
 	}
 	else if (writeCount) {
-		reportA(a); cout << "\t" << numOverlaps << endl;
+		bedA->reportBed(a); cout << "\t" << numOverlaps << endl;
 	}
 	else if (noHit && (numOverlaps == 0)) {
-		reportA(a); cout << endl;
+		bedA->reportBed(a); cout << endl;
 	}
 }
 

@@ -8,6 +8,7 @@
 //  Summary:  Return the intervals NOT spanned by a BED file.
 //
 
+#include "lineFileUtilities.h"
 #include "complementBed.h"
 
 //==========================

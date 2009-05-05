@@ -16,6 +16,9 @@ using namespace std;
 // Common data structures
 //*************************************************
 
+/*
+	Structure for regular BED3-BED6 records
+*/
 struct BED {
 
 	// UCSC BED fields
@@ -57,7 +60,6 @@ std::string ToString(const T & value)
 	return ss.str();
 }
 
-void Tokenize(const string& str, vector<string>& tokens);
 
 // BED Sorting Methods 
 bool sortByChrom(BED const &, BED const &);	
@@ -73,7 +75,6 @@ bool byChromThenStart(BED const &, BED const &);
 //*************************************************
 typedef std::map<string, map<int, vector<BED>, std::less<int> >, std::less<string> > masterBedMap;
 typedef std::map<string, vector<BED>, std::less<string> > masterBedMapNoBin;
-
 
 
 //************************************************
@@ -100,6 +101,8 @@ public:
 		const int, vector<BED> &);
 
 	void countHits(map<int, vector<BED>, std::less<int> > &, const int, const int);
+	void reportBed(const BED &);
+	void reportBedRange(const BED &, int &, int &);
 
 	// a vector of the BED entries in the BED file.
 	vector<BED> bedVector;

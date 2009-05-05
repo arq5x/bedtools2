@@ -7,7 +7,7 @@
 //
 //  Summary:  Creates HTML or UCSC browser coordinates from a BED file.
 //
-
+#include "lineFileUtilities.h"
 #include "linksBed.h"
 
 //

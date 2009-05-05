@@ -1,0 +1,18 @@
+VERSION 2.0
+1.  Sped up the file parsing.  ~10-20% increase in speed.
+2.  Created reportBed() as a common method in the bedFile class.  Cleans up the code quite nicely.
+3.  Added the ability to compare BED files accounting for strandedness.
+4.  Paired-end intersect.
+5.  Fixed bug that prevented overlaps from being reported when the overlap fraction requested is 1.0
+
+
+VERSION 1.2, 04/27/2009. (1eb06115bdf3c49e75793f764a70c3501bb53f33)
+1.  Added subtractBed.
+	A. Fixed bug that prevented "split" overlaps from being reported.
+	B. Prevented A from being reported if >=1 feature in B completely spans it.
+2.  Added linksBed.
+3.  Added the ability to define separate windows for upstream and downstream to windowBed.
+
+
+VERSION 1.1, 04/23/2009. (b74eb1afddca9b70bfa90ba763d4f2981a56f432)
+Initial release.

@@ -1,20 +1,12 @@
 #include "bedFile.h"
 #include <vector>
 #include <algorithm>
-#include <map>
-#include <list>
 #include <iostream>
 #include <fstream>
 #include <limits.h>
 #include <stdlib.h>
 
 using namespace std;
-
-
-//***********************************************
-// Typedefs
-//***********************************************
-typedef list<BED> bedList;
 
 
 //************************************************

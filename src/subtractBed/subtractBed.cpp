@@ -7,88 +7,30 @@
 //
 //  Summary:  Removes overlapping segments from a BED entry.
 //
-
-/*
-	Includes
-*/
+#include "lineFileUtilities.h"
 #include "subtractBed.h"
 
 
 /*
 	Constructor
 */
-BedSubtract::BedSubtract(string &bedAFile, string &bedBFile, float &overlapFraction) {
+BedSubtract::BedSubtract(string &bedAFile, string &bedBFile, float &overlapFraction, bool &forceStrand) {
 
 	this->bedAFile = bedAFile;
 	this->bedBFile = bedBFile;
 	this->overlapFraction = overlapFraction;
+	this->forceStrand = forceStrand;
 
 	this->bedA = new BedFile(bedAFile);
 	this->bedB = new BedFile(bedBFile);
 }
+
 
 /*
 	Destructor
 */
 BedSubtract::~BedSubtract(void) {
 }
-
-
-
-/*
-	reportA
-	
-	Writes the _original_ BED entry for A.
-	Works for BED3 - BED6.
-*/
-void BedSubtract::reportA(BED &a) {
-	
-	if (bedA->bedType == 3) {
-		cout << a.chrom << "\t" << a.start << "\t" << a.end;
-	}
-	else if (bedA->bedType == 4) {
-		cout << a.chrom << "\t" << a.start << "\t" << a.end << "\t"
-		<< a.name;
-	}
-	else if (bedA->bedType == 5) {
-		cout << a.chrom << "\t" << a.start << "\t" << a.end << "\t"
-		<< a.name << "\t" << a.score;
-	}
-	else if (bedA->bedType == 6) {
-		cout << a.chrom << "\t" << a.start << "\t" << a.end << "\t" 
-		<< a.name << "\t" << a.score << "\t" << a.strand;
-	}
-}
-
-
-/*
-	reportARemainder
-	
-	Writes the base-pair remainder for a BED entry in A after an overlap 
-	with B has been subtracted.
-	
-	Works for BED3 - BED6.
-*/
-void BedSubtract::reportARemainder(BED &a, int &start, int &end) {
-
-	if (bedA->bedType == 3) {
-		cout << a.chrom << "\t" << start << "\t" << end;
-	}
-	else if (bedA->bedType == 4) {
-		cout << a.chrom << "\t" << start << "\t" << end << "\t"
-		<< a.name;
-	}
-	else if (bedA->bedType == 5) {
-		cout << a.chrom << "\t" << start << "\t" << end << "\t"
-		<< a.name << "\t" << a.score;
-	}
-	else if (bedA->bedType == 6) {
-		cout << a.chrom << "\t" << start << "\t" << end << "\t" 
-		<< a.name << "\t" << a.score << "\t" << a.strand;
-	}
-	
-}
-
 
 
 
@@ -102,6 +44,12 @@ void BedSubtract::FindOverlaps(BED &a, vector<BED> &hits) {
 	int numConsumedByB = 0; 
 	
 	for (vector<BED>::iterator h = hits.begin(); h != hits.end(); ++h) {
+		
+		// if forcing strandedness, move on if the hit
+		// is not on the same strand as A.
+		if ((this->forceStrand) && (a.strand != h->strand)) {
+			continue;		// continue force the next iteration of the for loop.
+		}
 	
 		int s = max(a.start, h->start);
 		int e = min(a.end, h->end);
@@ -119,9 +67,16 @@ void BedSubtract::FindOverlaps(BED &a, vector<BED> &hits) {
 	// report the subtraction with each entry in B
 	// if A was not "consumed" by any entry in B
 	if (numConsumedByB == 0) {
+		
 		int numOverlaps = 0;
 		for (vector<BED>::iterator h = hits.begin(); h != hits.end(); ++h) {
 	
+			// if forcing strandedness, move on if the hit
+			// is not on the same strand as A.
+			if ((this->forceStrand) && (a.strand != h->strand)) {
+				continue;		// continue force the next iteration of the for loop.
+			}
+			
 			int s = max(a.start, h->start);
 			int e = min(a.end, h->end);
 
@@ -132,7 +87,7 @@ void BedSubtract::FindOverlaps(BED &a, vector<BED> &hits) {
 				// is there enough overlap (default ~ 1bp)
 				float overlap = ((float)(e-s) / (float)(a.end - a.start));
 			
-				if ( overlap > this->overlapFraction ) { 
+				if ( overlap >= this->overlapFraction ) { 
 				
 					if (overlap < 1.0) {			// if overlap = 1, then B consumes A and therefore,
 													// we won't report A.
@@ -140,26 +95,26 @@ void BedSubtract::FindOverlaps(BED &a, vector<BED> &hits) {
 						// B        ----
 						// Res. ====    ====					
 						if ( (h->start > a.start) && (h->end < a.end) ) {
-							reportARemainder(a,a.start,h->start); cout << "\n";
-							reportARemainder(a,h->end,a.end); cout << "\n";
+							bedA->reportBedRange(a,a.start,h->start); cout << "\n";
+							bedA->reportBedRange(a,h->end,a.end); cout << "\n";
 						}
 						// A	++++++++++++
 						// B    ----------
 						// Res.           ==        			
 						else if (h->start == a.start) {
-							reportARemainder(a,h->end,a.end); cout << "\n";
+							bedA->reportBedRange(a,h->end,a.end); cout << "\n";
 						}	
 						// A	      ++++++++++++
 						// B    ----------
 						// Res.       ====
 						else if (h->start < a.start) {
-							reportARemainder(a,h->end,a.end); cout << "\n";					
+							bedA->reportBedRange(a,h->end,a.end); cout << "\n";					
 						}
 						// A	++++++++++++
 						// B           ----------
 						// Res. =======
 						else if (h->start > a.start) {
-							reportARemainder(a,a.start,h->start); cout << "\n";					
+							bedA->reportBedRange(a,a.start,h->start); cout << "\n";					
 						}
 					}
 				}
@@ -168,7 +123,7 @@ void BedSubtract::FindOverlaps(BED &a, vector<BED> &hits) {
 		}
 		if (numOverlaps == 0) {
 			// no overlap found, so just report A as-is.
-			reportA(a); cout << "\n";
+			bedA->reportBed(a); cout << "\n";
 		}
 	}
 }

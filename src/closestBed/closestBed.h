@@ -3,19 +3,10 @@
 
 #include "bedFile.h"
 #include <vector>
-#include <map>
-#include <list>
 #include <iostream>
 #include <fstream>
 
 using namespace std;
-
-
-//***********************************************
-// Typedefs
-//***********************************************
-typedef list<BED> bedList;
-
 
 //************************************************
 // Class methods and elements
@@ -25,7 +16,7 @@ class BedClosest {
 public:
 
 	// constructor 
-	BedClosest(string &, string &);
+	BedClosest(string &, string &, bool &);
 
 	// destructor
 	~BedClosest(void);
@@ -41,7 +32,8 @@ private:
 
 	string bedAFile;
 	string bedBFile;
-
+	bool forceStrand;
+	
 	// instance of a bed file class.
 	BedFile *bedA, *bedB;
 

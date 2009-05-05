@@ -7,7 +7,7 @@
 //
 //  Summary:  Extract fasta sequences based on BED intervals.
 //
-
+#include "lineFileUtilities.h"
 #include "fastaFromBed.h"
 
 Bed2Fa::Bed2Fa(bool &useName, string &dbFile, string &bedFile, string &fastaOutFile) {

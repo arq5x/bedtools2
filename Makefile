@@ -19,7 +19,7 @@ export CXX ?= g++
 #include includes/$(BLD_PLATFORM).inc
 
 # define our source subdirectories
-SUBDIRS = $(SRC_DIR)/closestBed $(SRC_DIR)/complementBed $(SRC_DIR)/coverageBed $(SRC_DIR)/intersectBed $(SRC_DIR)/mergeBed $(SRC_DIR)/genomeCoverageBed $(SRC_DIR)/fastaFromBed $(SRC_DIR)/sortBed $(SRC_DIR)/windowBed $(SRC_DIR)/subtractBed $(SRC_DIR)/linksBed
+SUBDIRS = $(SRC_DIR)/closestBed $(SRC_DIR)/complementBed $(SRC_DIR)/coverageBed $(SRC_DIR)/intersectBed $(SRC_DIR)/mergeBed $(SRC_DIR)/genomeCoverageBed $(SRC_DIR)/fastaFromBed $(SRC_DIR)/sortBed $(SRC_DIR)/windowBed $(SRC_DIR)/subtractBed $(SRC_DIR)/linksBed $(SRC_DIR)/peIntersectBed
 
 UTIL_SUBDIRS = $(SRC_DIR)/utils/bedFile $(SRC_DIR)/utils/sequenceUtilities
 all:

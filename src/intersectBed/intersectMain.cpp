@@ -34,6 +34,7 @@ int main(int argc, char* argv[]) {
 	bool writeB = false;
 	bool writeCount = false;
 	bool haveFraction = false;
+	bool forceStrand = false;
 
 	// check to see if we should print out some help
 	if(argc <= 1) showHelp = true;
@@ -88,6 +89,9 @@ int main(int argc, char* argv[]) {
 		else if (PARAMETER_CHECK("-v", 2, parameterLength)) {
 			noHit = true;
 		}
+		else if (PARAMETER_CHECK("-s", 2, parameterLength)) {
+			forceStrand = true;
+		}
 		else {
 			cerr << endl << "*****ERROR: Unrecognized parameter: " << argv[i] << " *****" << endl << endl;
 			showHelp = true;
@@ -117,7 +121,7 @@ int main(int argc, char* argv[]) {
 
 	if (!showHelp) {
 
-		BedIntersect *bi = new BedIntersect(bedAFile, bedBFile, anyHit, writeA, writeB, overlapFraction, noHit,  writeCount);
+		BedIntersect *bi = new BedIntersect(bedAFile, bedBFile, anyHit, writeA, writeB, overlapFraction, noHit, writeCount, forceStrand);
 		bi->IntersectBed();
 		return 0;
 	}
@@ -138,6 +142,7 @@ void ShowHelp(void) {
 	cerr << "Usage: " << PROGRAM_NAME << " [OPTIONS] -a <a.bed> -b <b.bed>" << endl << endl;
 
 	cerr << "OPTIONS: " << endl;
+	cerr << "\t" << "-s\t\t\t"            	<< "Force strandedness.  Only report hits in B that overlap A on the same strand." << endl << "\t\t\t\tBy default, overlaps are reported without respect to strand." << endl << endl;
 	cerr << "\t" << "-u\t\t\t"            	<< "Write ORIGINAL a.bed entry ONCE if ANY overlap with B.bed." << endl << "\t\t\t\tIn other words, just report the fact >=1 hit was found." << endl << endl;
 	cerr << "\t" << "-v \t\t\t"             << "Only report those entries in A that have NO OVERLAP in B." << endl << "\t\t\t\tSimilar to grep -v." << endl << endl;
 	cerr << "\t" << "-f (e.g. 0.05)\t\t"	<< "Minimum overlap req'd as fraction of a.bed." << endl << "\t\t\t\tDefault is 1E-9 (effectively 1bp)." << endl << endl;

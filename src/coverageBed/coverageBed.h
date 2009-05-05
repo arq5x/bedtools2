@@ -3,20 +3,11 @@
 
 #include "bedFile.h"
 #include <vector>
-#include <map>
-#include <list>
 #include <iostream>
 #include <fstream>
 #include <stdlib.h>
 
 using namespace std;
-
-
-//***********************************************
-// Typedefs
-//***********************************************
-typedef list<BED> bedList;
-
 
 //************************************************
 // Class methods and elements

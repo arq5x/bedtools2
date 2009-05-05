@@ -7,7 +7,7 @@
 //
 //  Summary:  Sorts a BED file in ascending order by chrom then by start position.
 //
-
+#include "lineFileUtilities.h"
 #include "sortBed.h"
 
 //
@@ -25,31 +25,6 @@ BedSort::~BedSort(void) {
 }
 
 
-/*
-	reportBed
-	
-	Writes the _original_ BED entry for A.
-	Works for BED3 - BED6.
-*/
-void BedSort::reportBed(const BED &a) {
-	
-	if (bed->bedType == 3) {
-		cout << a.chrom << "\t" << a.start << "\t" << a.end;
-	}
-	else if (bed->bedType == 4) {
-		cout << a.chrom << "\t" << a.start << "\t" << a.end << "\t"
-		<< a.name;
-	}
-	else if (bed->bedType == 5) {
-		cout << a.chrom << "\t" << a.start << "\t" << a.end << "\t"
-		<< a.name << "\t" << a.score;
-	}
-	else if (bed->bedType == 6) {
-		cout << a.chrom << "\t" << a.start << "\t" << a.end << "\t" 
-		<< a.name << "\t" << a.score << "\t" << a.strand;
-	}
-}
-
 void BedSort::SortBed() {
 
 	// load the "B" bed file into a map so
@@ -63,8 +38,7 @@ void BedSort::SortBed() {
 		vector<BED> bedList = m->second; 
 
 		for (unsigned int i = 0; i < bedList.size(); ++i) {
-			reportBed(bedList[i]); cout << "\n";
-			///cout << bedList[i].chrom << "\t" << bedList[i].start << "\t" << bedList[i].end << endl;
+			bed->reportBed(bedList[i]); cout << "\n";
 		}
 	}
 }
@@ -96,8 +70,7 @@ void BedSort::SortBedBySizeAsc() {
 	
 	// report the entries in ascending order
 	for (unsigned int i = 0; i < masterList.size(); ++i) {
-		reportBed(masterList[i]); cout << "\n";
-		//cout << masterList[i].chrom << "\t" << masterList[i].start << "\t" << masterList[i].end << endl;
+		bed->reportBed(masterList[i]); cout << "\n";
 	}
 }
 
@@ -128,8 +101,7 @@ void BedSort::SortBedBySizeDesc() {
 	
 	// report the entries in ascending order
 	for (unsigned int i = 0; i < masterList.size(); ++i) {
-		reportBed(masterList[i]); cout << "\n";
-		//cout << masterList[i].chrom << "\t" << masterList[i].start << "\t" << masterList[i].end << endl;
+		bed->reportBed(masterList[i]); cout << "\n";
 	}
 }
 
@@ -147,8 +119,7 @@ void BedSort::SortBedByChromThenSizeAsc() {
 		sort(bedList.begin(), bedList.end(), sortBySizeAsc);
 		
 		for (unsigned int i = 0; i < bedList.size(); ++i) {
-			reportBed(bedList[i]); cout << "\n";
-			//cout << bedList[i].chrom << "\t" << bedList[i].start << "\t" << bedList[i].end << endl;
+			bed->reportBed(bedList[i]); cout << "\n";
 		}
 	}
 }
@@ -169,8 +140,7 @@ void BedSort::SortBedByChromThenSizeDesc() {
 		sort(bedList.begin(), bedList.end(), sortBySizeDesc);
 		
 		for (unsigned int i = 0; i < bedList.size(); ++i) {
-			reportBed(bedList[i]); cout << "\n";
-			//cout << bedList[i].chrom << "\t" << bedList[i].start << "\t" << bedList[i].end << endl;
+			bed->reportBed(bedList[i]); cout << "\n";
 		}
 	}
 }
@@ -191,8 +161,7 @@ void BedSort::SortBedByChromThenScoreAsc() {
 			sort(bedList.begin(), bedList.end(), sortByScoreAsc);
 			
 			for (unsigned int i = 0; i < bedList.size(); ++i) {
-				reportBed(bedList[i]); cout << "\n";
-				//cout << bedList[i].chrom << "\t" << bedList[i].start << "\t" << bedList[i].end << endl;
+				bed->reportBed(bedList[i]); cout << "\n";
 			}
 		}
 	}
@@ -218,8 +187,7 @@ void BedSort::SortBedByChromThenScoreDesc() {
 			sort(bedList.begin(), bedList.end(), sortByScoreDesc);
 		
 			for (unsigned int i = 0; i < bedList.size(); ++i) {
-				reportBed(bedList[i]); cout << "\n";
-				//cout << bedList[i].chrom << "\t" << bedList[i].start << "\t" << bedList[i].end << endl;
+				bed->reportBed(bedList[i]); cout << "\n";
 			}
 		}
 	}

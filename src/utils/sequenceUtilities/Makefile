@@ -1,11 +1,32 @@
 CXX = g++ -c
 CXXFLAGS = -O3  -Wall
 LDFLAGS = 
-OBJS = ../../../obj/
+OBJ_DIR = ../../../obj/
+BIN_DIR = ../../../bin/
+UTILITIES_DIR = ../../utils/
+# -------------------
+# define our includes
+# -------------------
+INCLUDES = 
 
-sequenceUtils: sequenceUtils.cpp sequenceUtils.h
-	$(CXX) $(CXXFLAGS) $(LDFLAGS) sequenceUtils.cpp -o $(OBJS)sequenceUtils.o
+# ----------------------------------
+# define our source and object files
+# ----------------------------------
+SOURCES= sequenceUtils.cpp
+OBJECTS= $(SOURCES:.cpp=.o)
+_EXT_OBJECTS =
+EXT_OBJECTS=$(patsubst %,$(OBJ_DIR)/%,$(_EXT_OBJECTS))
+BUILT_OBJECTS= $(patsubst %,$(OBJ_DIR)/%,$(OBJECTS))
+
+$(BUILT_OBJECTS): $(SOURCES)
+	@echo "  * compiling" $(*F).cpp
+	@$(CXX) -c -o $@ $(*F).cpp $(LDFLAGS) $(CXXFLAGS) $(INCLUDES)
+
+$(EXT_OBJECTS):
+	@$(MAKE) --no-print-directory -C $(INCLUDES)
 
 clean:
-	rm $(OBJS) sequenceUtils.o
-	rm sequenceUtils.o
+	@echo "Cleaning up."
+	@rm -f $(OBJ_DIR)/* $(BIN_DIR)/*
+
+.PHONY: clean

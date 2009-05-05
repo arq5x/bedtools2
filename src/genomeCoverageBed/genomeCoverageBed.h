@@ -1,7 +1,5 @@
 #include "bedFile.h"
 #include <vector>
-#include <map>
-#include <list>
 #include <iostream>
 #include <fstream>
 
@@ -10,8 +8,6 @@ using namespace std;
 //***********************************************
 // Typedefs
 //***********************************************
-typedef list<BED> bedList;
-
 typedef map<int, int, less<int> > depthMap;
 typedef map<string, depthMap, less<string> > chromDepthMap;
 

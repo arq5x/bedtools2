@@ -29,6 +29,7 @@ int main(int argc, char* argv[]) {
 	bool haveBedA = false;
 	bool haveBedB = false;
 	bool haveFraction = false;
+	bool forceStrand = false;
 
 	// check to see if we should print out some help
 	if(argc <= 1) showHelp = true;
@@ -68,6 +69,9 @@ int main(int argc, char* argv[]) {
 			overlapFraction = atof(argv[i + 1]);
 			i++;
 		}
+		else if (PARAMETER_CHECK("-s", 2, parameterLength)) {
+			forceStrand = true;
+		}
 		else {
 			cerr << endl << "*****ERROR: Unrecognized parameter: " << argv[i] << " *****" << endl << endl;
 			showHelp = true;
@@ -82,7 +86,7 @@ int main(int argc, char* argv[]) {
 
 	if (!showHelp) {
 
-		BedSubtract *bs = new BedSubtract(bedAFile, bedBFile, overlapFraction);
+		BedSubtract *bs = new BedSubtract(bedAFile, bedBFile, overlapFraction, forceStrand);
 		bs->SubtractBed();
 		return 0;
 	}
@@ -103,6 +107,7 @@ void ShowHelp(void) {
 	cerr << "Usage: " << PROGRAM_NAME << " [OPTIONS] -a <a.bed> -b <b.bed>" << endl << endl;
 
 	cerr << "OPTIONS: " << endl;
+	cerr << "\t" << "-s\t\t\t"            	<< "Force strandedness.  Only report hits in B that overlap A on the same strand." << endl << "\t\t\t\tBy default, overlaps are reported without respect to strand." << endl << endl;
 	cerr << "\t" << "-f (e.g. 0.05)\t\t"	<< "Minimum overlap req'd as fraction of a.bed." << endl << "\t\t\t\tDefault is 1E-9 (effectively 1bp)." << endl << endl;
 
 	cerr << "NOTES: " << endl;

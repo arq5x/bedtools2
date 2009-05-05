@@ -9,14 +9,14 @@ BIN_DIR = ../../bin/
 # -------------------
 # define our includes
 # -------------------
-INCLUDES = -I$(UTILITIES_DIR)/bedFile/
+INCLUDES = -I$(UTILITIES_DIR)/bedFile/ -I$(UTILITIES_DIR)/lineFileUtilities/
 
 # ----------------------------------
 # define our source and object files
 # ----------------------------------
 SOURCES= windowMain.cpp windowBed.cpp
 OBJECTS= $(SOURCES:.cpp=.o)
-_EXT_OBJECTS=bedFile.o
+_EXT_OBJECTS=bedFile.o lineFileUtilities.o
 EXT_OBJECTS=$(patsubst %,$(OBJ_DIR)/%,$(_EXT_OBJECTS))
 BUILT_OBJECTS= $(patsubst %,$(OBJ_DIR)/%,$(OBJECTS))
 PROGRAM= windowBed
@@ -36,7 +36,8 @@ $(BUILT_OBJECTS): $(SOURCES)
 
 $(EXT_OBJECTS):
 	@$(MAKE) --no-print-directory -C $(UTILITIES_DIR)/bedFile/
-
+	@$(MAKE) --no-print-directory -C $(UTILITIES_DIR)/lineFileUtilities/
+	
 clean:
 	@echo "Cleaning up."
 	@rm -f $(OBJ_DIR)/* $(BIN_DIR)/*

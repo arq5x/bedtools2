@@ -25,6 +25,7 @@ int main(int argc, char* argv[]) {
 
 	bool haveBedA = false;
 	bool haveBedB = false;
+	bool forceStrand = false;
 
 	// check to see if we should print out some help
 	if(argc <= 1) showHelp = true;
@@ -54,6 +55,9 @@ int main(int argc, char* argv[]) {
 			haveBedB = true;
 			bedBFile = argv[i + 1];
 			i++;
+		}
+		else if (PARAMETER_CHECK("-s", 2, parameterLength)) {
+			forceStrand = true;
 		}	
 	}
 
@@ -64,7 +68,7 @@ int main(int argc, char* argv[]) {
 	}
 
 	if (!showHelp) {
-		BedClosest *bc = new BedClosest(bedAFile, bedBFile);
+		BedClosest *bc = new BedClosest(bedAFile, bedBFile, forceStrand);
 		bc->ClosestBed();
 		return 0;
 	}
@@ -84,9 +88,13 @@ void ShowHelp(void) {
 
 	cerr << "Usage: " << PROGRAM_NAME << " [OPTIONS] -a <a.bed> -b <b.bed>" << endl << endl;
 
+	cerr << "OPTIONS: " << endl;
+	cerr << "\t" << "-s\t\t\t"            	<< "Force strandedness.  Only report hits in B that overlap A on the same strand." << endl << "\t\t\t\tBy default, overlaps are reported without respect to strand." << endl << endl;
+
 	cerr << "NOTES: " << endl;
 	cerr << "\t" << "-i stdin\t\t" << "Allows BED file A to be read from stdin.  E.g.: cat a.bed | closestBed -a stdin -b B.bed" << endl << endl;
-	cerr << "\t" << "Reports \"none\" for chrom and \"-1\" for all other fields when a feature is not found in B on the same chromosome as the feature in A.  E.g. none -1 -1" << endl;
+	cerr << "\t" << "Reports \"none\" for chrom and \"-1\" for all other fields when a feature is not found in B on the same chromosome" << endl;
+	cerr << "\t" << "as the feature in A.  E.g. none\t-1\t-1" << endl << endl;
 	cerr << "\t***Only BED3 - BED6 formats allowed.***" << endl << endl;
 	
 	// end the program here
