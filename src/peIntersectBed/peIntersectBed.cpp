@@ -223,7 +223,7 @@ void BedIntersectPE::IntersectBedPE() {
 					vector<BED> hits1, hits2;
 					FindOverlaps(a, hits1, hits2, this->searchType);
 				}
-								
+				
 			}
 		}
 	}

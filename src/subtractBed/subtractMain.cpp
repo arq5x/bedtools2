@@ -1,12 +1,11 @@
 #include "subtractBed.h"
+#include "version.h"
 
 using namespace std;
 
 // define our program name
 #define PROGRAM_NAME "subtractBed"
 
-// define the version
-#define VERSION "1.2.0"
 
 // define our parameter checking macro
 #define PARAMETER_CHECK(param, paramLen, actualLen) (strncmp(argv[i], param, min(actualLen, paramLen))== 0) && (actualLen == paramLen)
