@@ -158,17 +158,31 @@ void BedIntersectPE::FindSpanningOverlaps(BEDPE &a, vector<BED> &hits, string &t
 	
 	In other words, find the hits between the "span" of the pair
 	*/
-	bedB->binKeeperFind(bedB->bedMap[a.chrom1], a.end1, a.start2, hits);
+	
+	int spanStart = 0;
+	int spanEnd = 0;
+	int spanLength = 0;
+	if (type == "inspan") {
+		spanStart = a.end1;
+		spanEnd = a.start2;
+	}
+	else if (type == "outspan") {
+		spanStart = a.start1;
+		spanEnd = a.end2;		
+	}
+	spanLength = spanEnd - spanStart;
+	
+	bedB->binKeeperFind(bedB->bedMap[a.chrom1], spanStart, spanEnd, hits);
 	
 	for (vector<BED>::iterator h = hits.begin(); h != hits.end(); ++h) {
 	
-		int s = max(a.end1, h->start);
-		int e = min(a.start2, h->end);
+		int s = max(spanStart, h->start);
+		int e = min(spanEnd, h->end);
 
 		if (s < e) {
 			
 			// is there enough overlap (default ~ 1bp)
-			if ( ((float)(e-s) / (float)(a.start2 - a.end1)) >= this->overlapFraction ) { 
+			if ( (float)(e-s) / (float) spanLength >= this->overlapFraction ) { 
 				numOverlaps++;
 
 				bedA->reportBedPE(a); cout << "\t";
@@ -213,7 +227,7 @@ void BedIntersectPE::IntersectBedPE() {
 			// find the overlaps with B if it's a valid BED entry. 
 			if (bedA->parseBedPELine(a, bedFields, lineNum)) {
 				
-				if (this->searchType == "span") {
+				if ((this->searchType == "inspan") || (this->searchType == "outspan")) {
 					vector<BED> hits;
 					if (a.chrom1 == a.chrom2) {
 						FindSpanningOverlaps(a, hits, this->searchType);

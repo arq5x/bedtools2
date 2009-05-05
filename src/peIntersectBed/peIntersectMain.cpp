@@ -70,26 +70,11 @@ int main(int argc, char* argv[]) {
 			}
 			i++;
 		}
-		//else if(PARAMETER_CHECK("-u", 2, parameterLength)) {
-		//	anyHit = true;
-		//}
 		else if(PARAMETER_CHECK("-f", 2, parameterLength)) {
 			haveFraction = true;
 			overlapFraction = atof(argv[i + 1]);
 			i++;
 		}
-		//else if(PARAMETER_CHECK("-wa", 3, parameterLength)) {
-		//	writeA = true;
-		//}
-		//else if(PARAMETER_CHECK("-wb", 3, parameterLength)) {
-		//	writeB = true;
-		//}
-		//else if(PARAMETER_CHECK("-c", 2, parameterLength)) {
-		//	writeCount = true;
-		//}
-		//else if (PARAMETER_CHECK("-v", 2, parameterLength)) {
-		//	noHit = true;
-		//}
 		else {
 			cerr << endl << "*****ERROR: Unrecognized parameter: " << argv[i] << " *****" << endl << endl;
 			showHelp = true;
@@ -102,8 +87,9 @@ int main(int argc, char* argv[]) {
 		showHelp = true;
 	}
 	
-	if (haveSearchType && (searchType != "either") && (searchType != "neither") && (searchType != "both") && (searchType != "xor") && (searchType != "span")) {
-		cerr << endl << "*****" << endl << "*****ERROR: Request \"either\" or \"both\" or \"neither\" or \"xor\" or \"span\"" << endl << "*****" << endl;
+	if (haveSearchType && (searchType != "either") && (searchType != "neither") && (searchType != "both") 
+					    && (searchType != "xor") && (searchType != "inspan") && (searchType != "outspan")) {
+		cerr << endl << "*****" << endl << "*****ERROR: Request \"either\" or \"both\" or \"neither\" or \"xor\" or \"inspan\" or \"inspan\"" << endl << "*****" << endl;
 		showHelp = true;		
 	}
 
@@ -130,20 +116,20 @@ void ShowHelp(void) {
 	cerr << "Usage: " << PROGRAM_NAME << " [OPTIONS] -a <a.bed> -b <b.bed>" << endl << endl;
 
 	cerr << "OPTIONS: " << endl;
-	cerr << "\t" << "-u\t\t\t"            	    << "Write ORIGINAL a.bed entry ONCE if ANY overlap with B.bed." << endl << "\t\t\t\tIn other words, just report the fact >=1 hit was found." << endl << endl;
-	cerr << "\t" << "-c \t\t\t"					<< "For each entry in A, report the number of hits in B while restricting to -f and -type." << endl << "\t\t\t\tReports 0 for A entries that have no overlap with B." << endl << endl;
-	cerr << "\t" << "-f (e.g. 0.05)\t\t"	    << "Minimum overlap req'd as fraction of a.bed." << endl << "\t\t\t\tDefault is 1E-9 (effectively 1bp)." << endl << endl;
-	cerr << "\t" << "-type \t\t\t"				<< "either (default)\tReport overlaps if _either_ end of BEDPE (A) overlaps BED B." << endl;
-	cerr 										<< "\t\t\t\tneither\t\t\tReport overlaps if _neither_ end of BEDPE (A) overlaps BED B." << endl;
-	cerr 	 									<< "\t\t\t\tboth\t\t\tReport overlaps if _both_ ends of BEDPE (A) overlap BED B." << endl;
-	cerr										<< "\t\t\t\txor\t\t\tReport overlaps if _one and only one_ end of BEDPE (A) overlap BED B." << endl;
-	cerr										<< "\t\t\t\tspan\t\t\tReport overlaps start1:end2 of BEDPE (A) overlaps BED B." << endl;
-	cerr										<< "\t\t\t\t\t\t\tNOTE: Will only report overlaps for BEDPE entries with chrom1 = chrom2" << endl << endl;
+	cerr << "\t" << "-u\t\t"            	    << "Write ORIGINAL a.bed entry ONCE if ANY overlap with B.bed." << endl << "\t\t\tIn other words, just report the fact >=1 hit was found." << endl << endl;
+	cerr << "\t" << "-c \t\t"					<< "For each entry in A, report the number of hits in B while restricting to -f and -type." << endl << "\t\t\tReports 0 for A entries that have no overlap with B." << endl << endl;
+	cerr << "\t" << "-f\t\t"	    			<< "Minimum overlap req'd as fraction of a.bed (e.g. 0.05)." << endl << "\t\t\tDefault is 1E-9 (effectively 1bp)." << endl << endl;
+	cerr << "\t" << "-type \t\t"				<< "either (default)\tReport overlaps if _either_ end of BEDPE (A) overlaps BED B." << endl;
+	cerr 										<< "\t\t\tneither\t\t\tReport overlaps if _neither_ end of BEDPE (A) overlaps BED B." << endl;
+	cerr 	 									<< "\t\t\tboth\t\t\tReport overlaps if _both_ ends of BEDPE (A) overlap BED B." << endl;
+	cerr										<< "\t\t\txor\t\t\tReport overlaps if _one and only one_ end of BEDPE (A) overlap BED B." << endl;
+	cerr										<< "\t\t\tinspan\t\t\tReport overlaps between [end1, start2] of BEDPE (A) and BED B." << endl << "\t\t\t\t\t\tNOTE: chrom1 must equal chrom2, otherwise entry is ignored." << endl;
+	cerr										<< "\t\t\toutspan\t\t\tReport overlaps between [start1, end2] of BEDPE (A) and BED B." << endl << "\t\t\t\t\t\tNOTE: chrom1 must equal chrom2, otherwise entry is ignored." << endl;
 	
 	
 	cerr << "NOTES: " << endl;
-	cerr << "\t" << "-i stdin\t\t"	<< "Allows BEDPE file A to be read from stdin.  E.g.: cat a.bedpe | peIntersectBed -a stdin -b B.bed" << endl << endl;
-	cerr << "\t***Only BEDPE formats allowed (6,7,8, or 10 column format.  See below) for -a.***"<< endl << endl;
+	cerr << "\t" << "-i stdin\t"	<< "Allows BEDPE file A to be read from stdin.  E.g.: cat a.bedpe | peIntersectBed -a stdin -b B.bed" << endl << endl;
+	cerr << "\t***Only BEDPE formats allowed for -a (6,7,8, or 10 column format.  See below).***"<< endl << endl;
 	cerr << "\t***Only BED3 - BED6 formats allowed for -b.***"<< endl << endl;
 	
 	cerr << "BEDPE FORMAT (tab-delimited): " << endl;
