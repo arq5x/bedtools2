@@ -42,6 +42,37 @@ Free for non-profit or academic use. Please contact me for commercial use.
 			$ intersectBed -a genes.bed -b LINES.bed | intersectBed -a stdin -b SINEs.bed -v
 
 
+	peIntersectBed.  Reports overlaps between features in a "paired-end" BEDPE file and a regular BED feature file.
+	
+	OVERLAPS WITH PAIRED-END "ENDS"
+			1. Which paired-end reads overlap with a repeat on EITHER end?
+			$ peIntersectBed -a reads.bedpe -b repeatMasked.bed -type either
+			
+			2. Which structural variations overlap with a repeat on BOTH ends?
+			$ peIntersectBed -a reads.bedpe -b repeatMasked.bed -type both
+
+			3. Which paired-end reads DO NOT overlap with a repeat on either end?
+			$ peIntersectBed -a reads.bedpe -b repeatMasked.bed -type NEITHER
+
+			4. Which structural variations overlap with a repeat on ONE and ONLY ONE end?
+			$ peIntersectBed -a reads.bedpe -b repeatMasked.bed -type xor
+			
+	OVERLAPS WITH THE "SPAN" OF THE PAIRED-END READ OR EVENT
+			1. Which pair-end reads overlap span a gap based on the "inner-span"?			
+			E.g.   Pair	=====....................=====
+				   Gap			0000000000000000
+			
+			$ peIntersectBed -a reads.bedpe -b gaps.bed -type inspan
+			
+			
+			2. Which pair-end reads overlap span a gene based on the "inner-span"?			
+			E.g.   Pair	=====....................=====
+				   Gene		00000000000000000000000
+			
+			$ peIntersectBed -a reads.bedpe -b genes.bed -type outspan
+			
+
+
 	closestBed. Very similar to intersectBed, but finds the closest (not necessarily overlapping) feature in B to each feature in A.
 				If multiple features in B overlap a feature in A, the one with the highest overlap with respect to A is reported. 
 
@@ -51,8 +82,8 @@ Free for non-profit or academic use. Please contact me for commercial use.
 			Allows input from stdin in the same manner as intersectBed (see #7).
 
 
-	subtractBed. For each feature in A, it returns the fraction of that feature that is not overlapped by B.  If a feature in A is entirely "spanned" by
-	 			 any feature in B, it will not be reported.
+	subtractBed. For each feature in A, it returns the fraction of that feature that is not overlapped by B.  If a feature in A is entirely
+				"spanned" by any feature in B, it will not be reported.
 
 			1. Remove introns from genes.
 			$ subtractBed -a genes.bed -b introns.bed 
