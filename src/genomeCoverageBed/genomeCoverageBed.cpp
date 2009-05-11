@@ -117,6 +117,9 @@ void BedCoverage::CoverageBeds() {
 						depth += this->chromCov[chrom][pos];
 						this->chromCov[chrom][pos] = depth;
 					}
+					else {
+						this->chromCov[chrom][pos] = depth;
+					}
 					
 					// report the depth for this position.
 					cout << chrom << "\t" << pos+1 << "\t" << this->chromCov[chrom][pos] << endl; 

@@ -25,6 +25,7 @@ int main(int argc, char* argv[]) {
 	float overlapFraction = 1E-9;
 	string searchType = "either";
 
+	// flags to track parameters
 	bool haveBedA = false;
 	bool haveBedB = false;
 	bool haveSearchType = false;
@@ -80,6 +81,7 @@ int main(int argc, char* argv[]) {
 			showHelp = true;
 		}		
 	}
+
 
 	// make sure we have both input files
 	if (!haveBedA || !haveBedB) {

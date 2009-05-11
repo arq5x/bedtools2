@@ -62,10 +62,10 @@ int main(int argc, char* argv[]) {
 			eachBase = true;
 			i++;
 		}
-		else if(PARAMETER_CHECK("-s", 2, parameterLength)) {
-			startSites = true;
-			i++;
-		}
+		//else if(PARAMETER_CHECK("-s", 2, parameterLength)) {
+		//	startSites = true;
+		//	i++;
+		//}
 		else if(PARAMETER_CHECK("-max", 4, parameterLength)) {
 			max = atoi(argv[i + 1]);
 			i++;
@@ -108,7 +108,7 @@ void ShowHelp(void) {
 	
 	cerr << "OPTIONS: " << endl;
 	cerr << "\t" << "-d\t\t\t"            	<< "Report the depth at each genome position." << endl << "\t\t\t\tDefault behavior is to report a histogram." << endl << endl;
-	cerr << "\t" << "-s \t\t\t"             << "Report depth based on start sites." << endl << endl;
+	//	cerr << "\t" << "-s \t\t\t"             << "Report depth based on start sites." << endl << endl;
 	cerr << "\t" << "-max\t\t\t"            << "Combine all positions with a depth > max into a single bin in the histogram." << endl << endl;
 	cerr << "NOTES: " << endl;
 	cerr << "\tThe genome file should tab delimited and structured as follows: <chr><TAB><size>. For example, Mus musculus:" << endl;

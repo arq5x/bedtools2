@@ -23,7 +23,7 @@ $(BUILT_OBJECTS): $(SOURCES)
 	@$(CXX) -c -o $@ $(*F).cpp $(LDFLAGS) $(CXXFLAGS) $(INCLUDES)
 
 $(EXT_OBJECTS):
-	@$(MAKE) --no-print-directory -C $(INCLUDES)
+	@$(MAKE) --no-print-directory -C -W $(INCLUDES)
 
 clean:
 	@echo "Cleaning up."

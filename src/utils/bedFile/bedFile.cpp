@@ -16,19 +16,23 @@
 
 static int binOffsetsExtended[] =
 	{4096+512+64+8+1, 512+64+8+1, 64+8+1, 8+1, 1, 0};
-//static int binOffsets[] = {512+64+8+1, 64+8+1, 8+1, 1, 0};
-#define _binFirstShift 17/* How much to shift to get to finest bin. */
-#define _binNextShift 3/* How much to shift to get to next larger bin. */
+
+	
+#define _binFirstShift 17	/* How much to shift to get to finest bin. */
+#define _binNextShift 3		/* How much to shift to get to next larger bin. */
 
 
+// return the amount of overlap between two features.  Negative if none.
 int overlaps(const int aS, const int aE, const int bS, const int bE) {
 	return min(aE, bE) - max(aS, bS);
 }
+
 
 bool leftOf(const int a, const int b) {
 	return (a < b);
 }
 
+// return the lesser of two values.
 int min(const int a, int b) {
 	if (a <= b) {
 		return a;
@@ -38,6 +42,7 @@ int min(const int a, int b) {
 	}
 }
 
+// return the greater of two values.
 int max(const int a, int b) {
 	if (a >= b) {
 		return a;
@@ -47,9 +52,6 @@ int max(const int a, int b) {
 	}
 }
 
-//************************************************
-// Exception checking
-//************************************************
 
 static int getBin(int start, int end)
 /* 
@@ -64,14 +66,15 @@ static int getBin(int start, int end)
 	int startBin = start, endBin = end-1, i;
 	startBin >>= _binFirstShift;
 	endBin >>= _binFirstShift;
-	for (i=0; i<6; ++i)
-	{
+	
+	for (i=0; i<6; ++i) {
 		if (startBin == endBin) {
 			return binOffsetsExtended[i] + startBin;
 		}
 		startBin >>= _binNextShift;
 		endBin >>= _binNextShift;
 	}
+	
 	cerr << "start " << start << ", end " << end << " out of range in findBin (max is 512M)" << endl;
 	return 0;
 }
@@ -129,31 +132,27 @@ bool byChromThenStart(BED const & a, BED const & b){
 	return false;
 };
 
-void BedFile::binKeeperFind(map<int, vector<BED>, std::less<int> > &bk, const int start, const int end, vector<BED> &hits)
-/* 
+
+/*
 	NOTE: Taken ~verbatim from kent source.
 	Return a list of all items in binKeeper that intersect range.
 	
-	* Free this list with slFreeList. */
-	
-{
+	Free this list with slFreeList.
+*/
+void BedFile::binKeeperFind(map<int, vector<BED>, std::less<int> > &bk, const int start, const int end, vector<BED> &hits) {
+
 	int startBin, endBin;
 	int i,j;
 
 	startBin = (start>>_binFirstShift);
 	endBin = ((end-1)>>_binFirstShift);
-	for (i=0; i<6; ++i)
-	{
+	for (i=0; i<6; ++i) {
 		int offset = binOffsetsExtended[i];
 
-		for (j=(startBin+offset); j<=(endBin+offset); ++j)  
-		{
+		for (j = (startBin+offset); j <= (endBin+offset); ++j)  {
 			for (vector<BED>::iterator el = bk[j].begin(); el != bk[j].end(); ++el) {
-				{
-					if (overlaps(el->start, el->end, start, end) > 0)
-					{
-						hits.push_back(*el);
-					}
+				if (overlaps(el->start, el->end, start, end) > 0) {
+					hits.push_back(*el);
 				}
 			}
 		}
@@ -163,27 +162,19 @@ void BedFile::binKeeperFind(map<int, vector<BED>, std::less<int> > &bk, const in
 }
 
 
-void BedFile::countHits(map<int, vector<BED>, std::less<int> > &bk, const int start, const int end)
-/* Return a list of all items in binKeeper that intersect range.
-	* Free this list with slFreeList. */
-{
+void BedFile::countHits(map<int, vector<BED>, std::less<int> > &bk, const int start, const int end) {
 	int startBin, endBin;
 	int i,j;
 
 	startBin = (start>>_binFirstShift);
 	endBin = ((end-1)>>_binFirstShift);
-	for (i=0; i<6; ++i)
-	{
+	for (i=0; i<6; ++i) {
 		int offset = binOffsetsExtended[i];
 
-		for (j=(startBin+offset); j<=(endBin+offset); ++j)  
-		{
+		for (j = (startBin+offset); j <= (endBin+offset); ++j) {
 			for (vector<BED>::iterator el = bk[j].begin(); el != bk[j].end(); ++el) {
-				{
-					if (overlaps(el->start, el->end, start, end) > 0)
-					{
-						el->count++;
-					}
+				if (overlaps(el->start, el->end, start, end) > 0) {
+					el->count++;
 				}
 			}
 		}
@@ -349,6 +340,7 @@ void BedFile::loadBedFileIntoMap() {
 		bedFields.clear();
 	}
 }
+
 
 void BedFile::loadBedFileIntoMapNoBin() {
 

@@ -179,6 +179,7 @@ void BedIntersectPE::FindSpanningOverlaps(BEDPE &a, vector<BED> &hits, string &t
 		int s = max(spanStart, h->start);
 		int e = min(spanEnd, h->end);
 
+		// overlap if s < e
 		if (s < e) {
 			
 			// is there enough overlap (default ~ 1bp)
