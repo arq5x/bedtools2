@@ -37,8 +37,8 @@ int main(int argc, char* argv[]) {
 	for(int i = 1; i < argc; i++) {
 		int parameterLength = (int)strlen(argv[i]);
 
-		if(PARAMETER_CHECK("-h", 2, parameterLength) || 
-		PARAMETER_CHECK("--help", 5, parameterLength)) {
+		if((PARAMETER_CHECK("-h", 2, parameterLength)) || 
+		(PARAMETER_CHECK("--help", 5, parameterLength))) {
 			showHelp = true;
 		}
 	}
