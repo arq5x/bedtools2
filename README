@@ -1,5 +1,5 @@
 ============================
-=== BEDTools Version 1.2 ===
+=== BEDTools Version 2.0 ===
 ============================
 
 Created by Aaron Quinlan Spring 2009.
@@ -16,6 +16,7 @@ intersecting genomic features in the ubiquitous UCSC Genome Browser BED format.
 
 ===BEDTools===
 intersectBed		--- returns overlaps between two BED files.
+peIntersectBed		--- returns overlaps between a paired-end BED file and a regular BED file.
 closestBed			--- returns the closest feature to each entry in a BED file.
 subtractBed			--- removes the portion of an interval that is overlapped by another feature.
 windowBed			--- returns overlaps between two BED files based on a user-defined window.
