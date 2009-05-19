@@ -117,13 +117,19 @@ void BedWindow::WindowIntersectBed() {
 		BED a;
 		while (getline(bed, bedLine)) {
 			
-			vector<string> bedFields;
-			Tokenize(bedLine,bedFields);
+			if ((bedLine.find_first_of("track") == 1) || (bedLine.find_first_of("browser") == 1)) {
+				continue;
+			}
+			else {	
 
-			lineNum++;
-			if (bedA->parseBedLine(a, bedFields, lineNum)) {
-				vector<BED> hits;
-				FindWindowOverlaps(a, hits);
+				vector<string> bedFields;
+				Tokenize(bedLine,bedFields);
+
+				lineNum++;
+				if (bedA->parseBedLine(a, bedFields, lineNum)) {
+					vector<BED> hits;
+					FindWindowOverlaps(a, hits);
+				}
 			}
 		}
 	}
@@ -133,14 +139,19 @@ void BedWindow::WindowIntersectBed() {
 		BED a;
 		while (getline(cin, bedLine)) {
 
-			vector<string> bedFields;
-			Tokenize(bedLine,bedFields);
+			if ((bedLine.find_first_of("track") == 1) || (bedLine.find_first_of("browser") == 1)) {
+				continue;
+			}
+			else {	
 
-			lineNum++;
-			if (bedA->parseBedLine(a, bedFields, lineNum)) {
+				vector<string> bedFields;
+				Tokenize(bedLine,bedFields);
 
-				vector<BED> hits;
-				FindWindowOverlaps(a, hits);				
+				lineNum++;
+				if (bedA->parseBedLine(a, bedFields, lineNum)) {
+					vector<BED> hits;
+					FindWindowOverlaps(a, hits);
+				}
 			}
 		}
 	}

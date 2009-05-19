@@ -117,14 +117,19 @@ void BedLinks::LinksBed() {
 
 		while (getline(bed, bedLine)) {
 
-			vector<string> bedFields;
-			Tokenize(bedLine,bedFields);
+			if ((bedLine.find_first_of("track") == 1) || (bedLine.find_first_of("browser") == 1)) {
+				continue;
+			}
+			else {
+				vector<string> bedFields;
+				Tokenize(bedLine,bedFields);
 
-			lineNum++;
+				lineNum++;
 			
-			if (this->bed->parseBedLine(bedEntry, bedFields, lineNum)) {
-				bedEntry.count = 0; 
-				WriteURL(bedEntry, base);
+				if (this->bed->parseBedLine(bedEntry, bedFields, lineNum)) {
+					bedEntry.count = 0; 
+					WriteURL(bedEntry, base);
+				}
 			}
 		}
 		cout << "</table>" << endl;

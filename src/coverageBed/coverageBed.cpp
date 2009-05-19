@@ -46,15 +46,20 @@ void BedGraph::GraphBed() {
 	BED a;
 	while (getline(bed, bedLine)) {
 		
-		vector<string> bedFields;
-		Tokenize(bedLine,bedFields);
-		lineNum++;
-		// process the feature in A IFF it's valid.
-		if (bedA->parseBedLine(a, bedFields, lineNum)) {
+		if ((bedLine.find_first_of("track") == 1) || (bedLine.find_first_of("browser") == 1)) {
+			continue;
+		}
+		else {
+			vector<string> bedFields;
+			Tokenize(bedLine,bedFields);
+			lineNum++;
+			// process the feature in A IFF it's valid.
+			if (bedA->parseBedLine(a, bedFields, lineNum)) {
 			
-			// increment the count of overlaps for each feature in B that
-			// overlaps the current A interval
-			bedB->countHits(bedB->bedMap[a.chrom], a.start, a.end);
+				// increment the count of overlaps for each feature in B that
+				// overlaps the current A interval
+				bedB->countHits(bedB->bedMap[a.chrom], a.start, a.end);
+			}
 		}
 	}
 	

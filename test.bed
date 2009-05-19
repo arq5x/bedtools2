@@ -1,0 +1,6 @@
+browser test
+chr2L	1	30	a	10	+
+chr2L	5	36	b	10	+
+chr2L	1001	1030	c	10	-
+chr2L	1010	1039	d	10	+
+chr2L	1049	1059	d	10	-

@@ -1,3 +1,6 @@
+VERSION 2.0.1
+1. Added the ability to retain UCSC browser track/browser headers in BED files.
+
 VERSION 2.0
 1.  Sped up the file parsing.  ~10-20% increase in speed.
 2.  Created reportBed() as a common method in the bedFile class.  Cleans up the code quite nicely.

@@ -57,12 +57,12 @@ void BedMerge::MergeBed() {
 
 		// loop through the BED entries for this chromosome
 		// and look for overlaps
-		for (curr = 0; curr < bedList.size(); ++curr) {
+		for (curr = 1; curr < bedList.size(); ++curr) {
 			
 			// Is there an overlap between the current and previous entries?		
 			if ( overlaps(bedList[prev].start, bedList[prev].end, 
 			 			bedList[curr].start, bedList[curr].end) >= this->maxDistance) {
-
+				
 				OIP = true;
 				mergeCount++;
 				minStart = min(bedList[prev].start, min(minStart, bedList[curr].start));
@@ -71,7 +71,6 @@ void BedMerge::MergeBed() {
 			}
 			else if ( overlaps(minStart, maxEnd, 
 							bedList[curr].start, bedList[curr].end) >= this->maxDistance) {
-
 				mergeCount++;
 				minStart = min(minStart, bedList[curr].start);
 				maxEnd = max(maxEnd, bedList[curr].end);
@@ -103,6 +102,7 @@ void BedMerge::MergeBed() {
 				maxEnd = 0;
 
 			}
+			prev = curr;
 		}
 
 		// clean up based on the last entry for the current chromosome
@@ -122,7 +122,6 @@ void BedMerge::MergeBed() {
 				cout << bedList[prev].chrom << "\t" << bedList[prev].start << "\t" << bedList[prev].end << endl;	
 			}
 		}
-		prev = curr;
 	}
 }
 
@@ -164,6 +163,7 @@ void BedMerge::MergeBedStranded() {
 
 				// if forcing strandedness, move on if the hit
 				// is not on the current strand.
+				
 				if (bedList[curr].strand != strands[s]) {
 					continue;		// continue force the next iteration of the for loop.
 				}
@@ -180,9 +180,10 @@ void BedMerge::MergeBedStranded() {
 					continue;
 				}
 
+				
 				if ( overlaps(bedList[prev].start, bedList[prev].end, 
 				 			bedList[curr].start, bedList[curr].end) >= this->maxDistance) {
-
+					
 					OIP = true;
 					mergeCount++;
 					minStart = min(bedList[prev].start, min(minStart, bedList[curr].start));
@@ -222,6 +223,7 @@ void BedMerge::MergeBedStranded() {
 					minStart = INT_MAX;
 					maxEnd = 0;
 				}
+				prev = curr;
 			}
 
 			// clean up based on the last entry for the current chromosome
@@ -241,7 +243,6 @@ void BedMerge::MergeBedStranded() {
 					cout << bedList[prev].chrom << "\t" << bedList[prev].start << "\t" << bedList[prev].end << "\t" << strands[s] << endl;
 				}
 			}
-			prev = curr;
 		}
 	}
 }

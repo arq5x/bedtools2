@@ -329,15 +329,20 @@ void BedFile::loadBedFileIntoMap() {
 
 	while (getline(bed, bedLine)) {
 
-		Tokenize(bedLine,bedFields);
-		lineNum++;
-
-		if (parseBedLine(bedEntry, bedFields, lineNum)) {
-			int bin = getBin(bedEntry.start, bedEntry.end);
-			bedEntry.count = 0;
-			this->bedMap[bedEntry.chrom][bin].push_back(bedEntry);	
+		if ((bedLine.find_first_of("track") == 1) || (bedLine.find_first_of("browser") == 1)) {
+			continue;
 		}
-		bedFields.clear();
+		else {
+			Tokenize(bedLine,bedFields);
+			lineNum++;
+
+			if (parseBedLine(bedEntry, bedFields, lineNum)) {
+				int bin = getBin(bedEntry.start, bedEntry.end);
+				bedEntry.count = 0;
+				this->bedMap[bedEntry.chrom][bin].push_back(bedEntry);	
+			}
+			bedFields.clear();
+		}
 	}
 }
 
@@ -363,15 +368,20 @@ void BedFile::loadBedFileIntoMapNoBin() {
 
 		while (getline(bed, bedLine)) {
 
-			Tokenize(bedLine,bedFields);
-
-			lineNum++;
-
-			if (parseBedLine(bedEntry, bedFields, lineNum)) {
-				bedEntry.count = 0;
-				this->bedMapNoBin[bedEntry.chrom].push_back(bedEntry);	
+			if ((bedLine.find_first_of("track") == 1) || (bedLine.find_first_of("browser") == 1)) {
+				continue;
 			}
-			bedFields.clear();
+			else {
+				Tokenize(bedLine,bedFields);
+
+				lineNum++;
+
+				if (parseBedLine(bedEntry, bedFields, lineNum)) {
+					bedEntry.count = 0;
+					this->bedMapNoBin[bedEntry.chrom].push_back(bedEntry);	
+				}
+				bedFields.clear();
+			}
 		}
 	}
 	// Case 2: STDIN.
@@ -379,16 +389,21 @@ void BedFile::loadBedFileIntoMapNoBin() {
 				
 		while (getline(cin, bedLine)) {
 
-			vector<string> bedFields;
-			Tokenize(bedLine,bedFields);
-
-			lineNum++;
-
-			if (parseBedLine(bedEntry, bedFields, lineNum)) {
-				bedEntry.count = 0;
-				this->bedMapNoBin[bedEntry.chrom].push_back(bedEntry);	
+			if ((bedLine.find_first_of("track") == 1) || (bedLine.find_first_of("browser") == 1)) {
+				continue;
 			}
-			bedFields.clear();
+			else {
+				vector<string> bedFields;
+				Tokenize(bedLine,bedFields);
+
+				lineNum++;
+
+				if (parseBedLine(bedEntry, bedFields, lineNum)) {
+					bedEntry.count = 0;
+					this->bedMapNoBin[bedEntry.chrom].push_back(bedEntry);	
+				}
+				bedFields.clear();
+			}
 		}
 	}
 

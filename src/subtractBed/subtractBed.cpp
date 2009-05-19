@@ -154,16 +154,21 @@ void BedSubtract::SubtractBed() {
 		// process each entry in A
 		while (getline(bed, bedLine)) {
 			
-			// split the current line into ditinct fields
-			vector<string> bedFields;
-			Tokenize(bedLine,bedFields);
+			if ((bedLine.find_first_of("track") == 1) || (bedLine.find_first_of("browser") == 1)) {
+				continue;
+			}
+			else {	
+				// split the current line into ditinct fields
+				vector<string> bedFields;
+				Tokenize(bedLine,bedFields);
 
-			lineNum++;
+				lineNum++;
 			
-			// find the overlaps with B if it's a valid BED entry. 
-			if (bedA->parseBedLine(a, bedFields, lineNum)) {
-				vector<BED> hits;
-				FindOverlaps(a, hits);
+				// find the overlaps with B if it's a valid BED entry. 
+				if (bedA->parseBedLine(a, bedFields, lineNum)) {
+					vector<BED> hits;
+					FindOverlaps(a, hits);
+				}
 			}
 		}
 	}
@@ -174,16 +179,21 @@ void BedSubtract::SubtractBed() {
 		// process each entry in A
 		while (getline(cin, bedLine)) {
 
-			// split the current line into ditinct fields
-			vector<string> bedFields;
-			Tokenize(bedLine,bedFields);
+			if ((bedLine.find_first_of("track") == 1) || (bedLine.find_first_of("browser") == 1)) {
+				continue;
+			}
+			else {	
+				// split the current line into ditinct fields
+				vector<string> bedFields;
+				Tokenize(bedLine,bedFields);
 
-			lineNum++;
+				lineNum++;
 			
-			// find the overlaps with B if it's a valid BED entry. 
-			if (bedA->parseBedLine(a, bedFields, lineNum)) {
-				vector<BED> hits;
-				FindOverlaps(a, hits);
+				// find the overlaps with B if it's a valid BED entry. 
+				if (bedA->parseBedLine(a, bedFields, lineNum)) {
+					vector<BED> hits;
+					FindOverlaps(a, hits);
+				}
 			}
 		}
 	}
