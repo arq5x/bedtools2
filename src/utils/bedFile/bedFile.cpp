@@ -299,12 +299,12 @@ bool BedFile::parseBedLine (BED &bed, const vector<string> &lineVector, const in
 		cerr << "Only one BED field detected: " << lineNum << ".  Verify that your files are TAB-delimited.  Exiting..." << endl;
 		exit(1);		
 	}
-	else if (lineVector.size() != this->bedType) {
+	else if ((lineVector.size() != this->bedType) && (lineVector.size() != 0)) {
 		cerr << "Differing number of BED fields encountered at line: " << lineNum << ".  Exiting..." << endl;
 		exit(1);
 	}
-	else if (lineVector.size() < 3) {
-		cerr << "TAB delimited BED file with at least 3 fields (chrom, start, end) is required.  Exiting..." << endl;
+	else if ((lineVector.size() < 3) && (lineVector.size() != 0)) {
+		cerr << "TAB delimited BED file with at least 3 fields (chrom, start, end) is required at line: "<< lineNum << ".  Exiting..." << endl;
 		exit(1);
 	}
 	return false;
