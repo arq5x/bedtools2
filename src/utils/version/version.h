@@ -2,6 +2,6 @@
 #define VERSION_H
 
 // define the version
-#define VERSION "2.0.0"
+#define VERSION "2.0.1"
 
 #endif /* VERSION_H */
