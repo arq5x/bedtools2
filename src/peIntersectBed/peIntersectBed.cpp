@@ -258,7 +258,7 @@ void BedIntersectPE::IntersectBedPE() {
 			// find the overlaps with B if it's a valid BED entry. 
 			if (bedA->parseBedPELine(a, bedFields, lineNum)) {
 
-				if (this->searchType == "span") {
+				if ((this->searchType == "inspan") || (this->searchType == "outspan")) {
 					vector<BED> hits;
 					if (a.chrom1 == a.chrom2) {
 						FindSpanningOverlaps(a, hits, this->searchType);
