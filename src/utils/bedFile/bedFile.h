@@ -16,6 +16,11 @@ using namespace std;
 // Common data structures
 //*************************************************
 
+struct DEPTH {
+	unsigned int starts;
+	unsigned int ends;
+};
+
 /*
 	Structure for regular BED3-BED6 records
 */
@@ -32,7 +37,11 @@ struct BED {
 	// Additional fields
 	unsigned int count;			// count of number of intervals
 								// that overlap this feature
+								
+	map<unsigned int, DEPTH> depthMap;
+	int minOverlapStart;
 };
+
 
 
 //*************************************************

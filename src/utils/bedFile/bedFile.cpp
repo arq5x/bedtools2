@@ -172,9 +172,16 @@ void BedFile::countHits(map<int, vector<BED>, std::less<int> > &bk, const int st
 		int offset = binOffsetsExtended[i];
 
 		for (j = (startBin+offset); j <= (endBin+offset); ++j) {
+			
 			for (vector<BED>::iterator el = bk[j].begin(); el != bk[j].end(); ++el) {
 				if (overlaps(el->start, el->end, start, end) > 0) {
 					el->count++;
+					el->depthMap[start+1].starts++;
+					el->depthMap[end].ends++;
+					
+					if (start < el->minOverlapStart) {
+						el->minOverlapStart = start;
+					}
 				}
 			}
 		}
@@ -339,6 +346,7 @@ void BedFile::loadBedFileIntoMap() {
 			if (parseBedLine(bedEntry, bedFields, lineNum)) {
 				int bin = getBin(bedEntry.start, bedEntry.end);
 				bedEntry.count = 0;
+				bedEntry.minOverlapStart = INT_MAX;
 				this->bedMap[bedEntry.chrom][bin].push_back(bedEntry);	
 			}
 			bedFields.clear();
@@ -378,6 +386,7 @@ void BedFile::loadBedFileIntoMapNoBin() {
 
 				if (parseBedLine(bedEntry, bedFields, lineNum)) {
 					bedEntry.count = 0;
+					bedEntry.minOverlapStart = INT_MAX;
 					this->bedMapNoBin[bedEntry.chrom].push_back(bedEntry);	
 				}
 				bedFields.clear();

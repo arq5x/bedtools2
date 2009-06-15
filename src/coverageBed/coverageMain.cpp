@@ -77,6 +77,8 @@ int main(int argc, char* argv[]) {
 }
 
 void ShowHelp(void) {
+	
+	//cout << "\t" << beds[i].count << "\t" << (length-zeroDepthCount) << "\t" << length << "\t" << (float) (length-zeroDepthCount)/length << endl;
 
 	cerr << "===============================================" << endl;
 	cerr << " " <<PROGRAM_NAME << " v" << VERSION << endl ;
@@ -87,15 +89,16 @@ void ShowHelp(void) {
 	cerr << "Usage: " << PROGRAM_NAME << " [OPTIONS] -a <a.bed> -b <b.bed>" << endl << endl;
 
 	cerr << "NOTES: " << endl;
+	cerr << "\t" << "-i stdin\t\t"	<< "Allows BED file A to be read from stdin.  E.g.: cat a.bed | intersectBed -a stdin -b B.bed" << endl << endl;
 	cerr << "\t***Only BED3 - BED6 formats allowed.***"<< endl << endl;
 
-	//cerr << "OPTIONS: " << endl;
-	//cerr << "\t" << "-u\t\t\t"            	<< "Write ORIGINAL a.bed entry ONCE if ANY overlap bed." << endl << "\t\t\t\tIn other words, ignore multiple overlaps." << endl << endl;
-	//cerr << "\t" << "-v \t\t\t"             << "Only report those entries in A that have NO OVERLAP in B." << endl << "\t\t\t\tSimilar to grep -v." << endl << endl;
-	//cerr << "\t" << "-f (e.g. 0.05)\t\t"	<< "Minimum overlap req'd as fraction of a.bed." << endl << "\t\t\t\tDefault is 1E-9 (effectively 1bp)." << endl << endl;
-	//cerr << "\t" << "-c \t\t\t"				<< "For each entry in A, report the number of hits in B while restricting to -f." << endl << "\t\t\t\tReports 0 for A entries that have no overlap with B." << endl << endl;
-	//cerr << "\t" << "-wb \t\t\t"			<< "Write the entry in B for each overlap." << endl << "\t\t\t\tUseful for knowing _what_ A overlaps. Restricted by -f." << endl << endl;
-	// end the program here
+	cerr << "OUTPUT: " << endl;
+	cerr << "\t" << "After each entry in B, reports: " << endl; 
+	cerr << "\t  1) The number of overlapping entries in A." << endl;
+	cerr << "\t  2) The number of bases in B that had non-zero coverage." << endl;
+	cerr << "\t  3) The length of the entry in B." << endl;
+	cerr << "\t  4) The fraction of bases in B that had non-zero coverage." << endl;
+	
 	exit(1);
 
 }

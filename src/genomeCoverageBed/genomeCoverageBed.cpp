@@ -91,8 +91,8 @@ void BedCoverage::CoverageBeds() {
 		lineNum++;
 	
 		if (this->bed->parseBedLine(bedEntry, bedFields, lineNum)) {
-			this->chromCov[bedEntry.chrom][bedEntry.start]++;
-			this->chromCov[bedEntry.chrom][bedEntry.end]--;
+			this->chromCov[bedEntry.chrom][bedEntry.start+1].starts++;
+			this->chromCov[bedEntry.chrom][bedEntry.end].ends++;
 		}
 	}
 
@@ -108,36 +108,36 @@ void BedCoverage::CoverageBeds() {
 			if (this->eachBase) {
 				int depth = 0;  // initialize the depth
 				
-				for (int pos = 0; pos < chromSizes[chrom]; pos++) {
+				for (int pos = 1; pos < chromSizes[chrom]; pos++) {
 
 					// is there an entry in chromCov for this position?
 					// if so, adjust the depth at the position by the number
 					// of feature starts and ends
 					if (this->chromCov[chrom].find(pos) != this->chromCov[chrom].end()) {
-						depth += this->chromCov[chrom][pos];
-						this->chromCov[chrom][pos] = depth;
+						depth += this->chromCov[chrom][pos].starts;
+						
+						// report the depth for this position.
+						cout << chrom << "\t" << pos << "\t" << depth << endl;
+						
+						depth = depth - this->chromCov[chrom][pos].ends;
 					}
 					else {
-						this->chromCov[chrom][pos] = depth;
+						cout << chrom << "\t" << pos << "\t" << depth << endl;
 					}
-					
-					// report the depth for this position.
-					cout << chrom << "\t" << pos+1 << "\t" << this->chromCov[chrom][pos] << endl; 
 				}
 			}
 			// the user wants to create a histogram of coverage.
 			else {
 				int depth = 0;  // initialize the depth
 				
-				for (int pos = 0; pos < chromSizes[chrom]; pos++) {
+				for (int pos = 1; pos < chromSizes[chrom]; pos++) {
 
 					// is there an entry in chromCov for this position?
 					// if so, adjust the depth at the position by the number
 					// of feature starts and ends
 					if (this->chromCov[chrom].find(pos) != this->chromCov[chrom].end()) {
 
-						depth += this->chromCov[chrom][pos];
-						this->chromCov[chrom][pos] = depth;
+						depth += this->chromCov[chrom][pos].starts;
 					
 						// add the depth at this position to the depth histogram
 						// for this chromosome.  if the depth is greater than the
@@ -159,6 +159,7 @@ void BedCoverage::CoverageBeds() {
 							chromDepthHist[chrom][depth]++;
 						}
 					}
+					depth = depth - this->chromCov[chrom][pos].ends;
 				}
 				
 				// report the histogram for each chromosome

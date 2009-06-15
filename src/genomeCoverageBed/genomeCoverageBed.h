@@ -5,10 +5,11 @@
 
 using namespace std;
 
+
 //***********************************************
 // Typedefs
 //***********************************************
-typedef map<int, int, less<int> > depthMap;
+typedef map<int, DEPTH, less<int> > depthMap;
 typedef map<string, depthMap, less<string> > chromDepthMap;
 
 typedef map<int, unsigned int, less<int> > histMap;

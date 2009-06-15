@@ -59,7 +59,6 @@ int main(int argc, char* argv[]) {
 		}	
 		else if(PARAMETER_CHECK("-d", 2, parameterLength)) {
 			eachBase = true;
-			i++;
 		}
 		//else if(PARAMETER_CHECK("-s", 2, parameterLength)) {
 		//	startSites = true;
