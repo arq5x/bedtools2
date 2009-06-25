@@ -31,7 +31,7 @@ struct BEDPE {
 	int end2;
 	 
 	string name;
-	unsigned short score;
+	int score;
 	
 	string strand1;
 	string strand2;
