@@ -31,7 +31,7 @@ struct BED {
 	int start;
 	int end; 
 	string name;
-	unsigned short score;
+	int score;
 	string strand;
 
 	// Additional fields
