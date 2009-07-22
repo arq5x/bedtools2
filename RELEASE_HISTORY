@@ -1,3 +1,7 @@
+VERSION 2.1.1
+1. Added limits.h to bedFile.h to fix compilation issues on some systems.
+2. Fized bug in testing for "track" or "browser" lines.
+
 VERSION 2.1.0
 1. Fixed a bug in peIntersectBed that prevented -a from being correctly handled when passed via stdin.
 2. Added new functionality to coverageBed that calculates the density of coverage.
