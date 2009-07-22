@@ -9,6 +9,7 @@
 #include <sstream>
 #include <cstring>
 #include <algorithm>
+#include <limits.h>
 
 using namespace std;
 
