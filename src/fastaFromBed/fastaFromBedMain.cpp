@@ -83,8 +83,6 @@ int main(int argc, char* argv[]) {
 
 		Bed2Fa *b2f = new Bed2Fa(useNameOnly, fastaDbFile, bedFile, fastaOutFile);
 		b2f->ExtractDNA(); 
-
-		cerr << PROGRAM_NAME << " completed." << endl;
 		return 0;
 	}
 	else {
@@ -101,7 +99,7 @@ void ShowHelp(void) {
 	cerr << "===============================================" << endl << endl;
 	cerr << "Description: Extract DNA sequences into a fasta file based on BED coordinates." << endl << endl;
 
-	cerr << "Usage: " << PROGRAM_NAME << " -db <fasta db file> -bed <bed coordinates file> -fo <output fasta file w/ requested DNA>" << endl << endl;
+	cerr << "Usage: " << PROGRAM_NAME << " -db -bed -fo -name" << endl << endl;
 
 	cerr << "Input Files:" << endl;
 	cerr << "  -db   <FASTA db file>          " << endl;
@@ -110,6 +108,9 @@ void ShowHelp(void) {
 	cerr << "Output Files:" << endl;
 	cerr << "  -fo <FASTA output file>                           " << endl;
 
+	cerr << "Options:" << endl;
+	cerr << "  -name  Use the BED name field (#4) for the FASTA header          " << endl;
+	
 	cerr << "\nHelp:" << endl;
 	cerr << "  -h                             shows this help text" << endl;
 	
