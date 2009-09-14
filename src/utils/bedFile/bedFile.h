@@ -32,7 +32,7 @@ struct BED {
 	int start;
 	int end; 
 	string name;
-	int score;
+	string score;
 	string strand;
 
 	// Additional fields
