@@ -211,7 +211,7 @@ bool BedFile::parseBedLine (BED &bed, const vector<string> &lineVector, const in
 			bed.end = atoi(lineVector[2].c_str());
 			bed.name = "";
 			bed.score = "";
-			bed.strand = "+";
+			bed.strand = "";
 			return true;
 		}
 		else if (this->bedType == 4) {
@@ -220,7 +220,7 @@ bool BedFile::parseBedLine (BED &bed, const vector<string> &lineVector, const in
 			bed.end = atoi(lineVector[2].c_str());
 			bed.name = lineVector[3];
 			bed.score = "";
-			bed.strand = "+";
+			bed.strand = "";
 			return true;
 		}
 		else if (this->bedType ==5) {
@@ -229,7 +229,7 @@ bool BedFile::parseBedLine (BED &bed, const vector<string> &lineVector, const in
 			bed.end = atoi(lineVector[2].c_str());
 			bed.name = lineVector[3];
 			bed.score = lineVector[4];
-			bed.strand = "+";
+			bed.strand = "";
 			return true;			
 		}
 		else if (this->bedType == 6) {
@@ -262,6 +262,9 @@ bool BedFile::parseBedLine (BED &bed, const vector<string> &lineVector, const in
 			bed.chrom = lineVector[0];
 			bed.start = atoi(lineVector[1].c_str());
 			bed.end = atoi(lineVector[2].c_str());
+			bed.name = "";
+			bed.score = "";
+			bed.strand = "";
 			return true;
 		}
 		else if (this->bedType == 4) {
@@ -269,6 +272,8 @@ bool BedFile::parseBedLine (BED &bed, const vector<string> &lineVector, const in
 			bed.start = atoi(lineVector[1].c_str());
 			bed.end = atoi(lineVector[2].c_str());
 			bed.name = lineVector[3];
+			bed.score = "";
+			bed.strand = "+";
 			return true;
 		}
 		else if (this->bedType ==5) {
@@ -276,7 +281,8 @@ bool BedFile::parseBedLine (BED &bed, const vector<string> &lineVector, const in
 			bed.start = atoi(lineVector[1].c_str());
 			bed.end = atoi(lineVector[2].c_str());
 			bed.name = lineVector[3];
-			bed.score = atoi(lineVector[4].c_str());
+			bed.score = lineVector[4];
+			bed.strand = "";
 			return true;			
 		}
 		else if (this->bedType == 6) {
@@ -284,7 +290,7 @@ bool BedFile::parseBedLine (BED &bed, const vector<string> &lineVector, const in
 			bed.start = atoi(lineVector[1].c_str());
 			bed.end = atoi(lineVector[2].c_str());
 			bed.name = lineVector[3];
-			bed.score = atoi(lineVector[4].c_str());
+			bed.score = lineVector[4];
 			bed.strand = lineVector[5];
 			return true;
 		}
