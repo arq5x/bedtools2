@@ -1,6 +1,11 @@
+VERSION 2.1.2
+1. Fixed yet another bug in the parsing of "track" or "browser" lines.  Sigh...
+2. Change the "score" column (i.e. column 5) to b stored as a string.  While this deviates
+   from the UCSC convention, it allows significantly more information to be packed into the column.
+
 VERSION 2.1.1
 1. Added limits.h to bedFile.h to fix compilation issues on some systems.
-2. Fized bug in testing for "track" or "browser" lines.
+2. Fixed bug in testing for "track" or "browser" lines.
 
 VERSION 2.1.0
 1. Fixed a bug in peIntersectBed that prevented -a from being correctly handled when passed via stdin.

@@ -117,7 +117,7 @@ void BedLinks::LinksBed() {
 
 		while (getline(bed, bedLine)) {
 
-			if ((bedLine.find_first_of("track") == 1) || (bedLine.find_first_of("browser") == 1)) {
+			if ((bedLine.find("track") != string::npos) || (bedLine.find("browser") != string::npos)) {
 				continue;
 			}
 			else {
@@ -146,13 +146,18 @@ void BedLinks::LinksBed() {
 
 		while (getline(cin, bedLine)) {
 
-			vector<string> bedFields;
-			Tokenize(bedLine,bedFields);
+			if ((bedLine.find("track") != string::npos) || (bedLine.find("browser") != string::npos)) {
+				continue;
+			}
+			else {
+				vector<string> bedFields;
+				Tokenize(bedLine,bedFields);
 
-			lineNum++;
-			if (this->bed->parseBedLine(bedEntry, bedFields, lineNum)) {
-				bedEntry.count = 0;
-				WriteURL(bedEntry, base);
+				lineNum++;
+				if (this->bed->parseBedLine(bedEntry, bedFields, lineNum)) {
+					bedEntry.count = 0;
+					WriteURL(bedEntry, base);
+				}
 			}
 		}
 		cout << "</table>" << endl;

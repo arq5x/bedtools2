@@ -127,7 +127,7 @@ void BedIntersect::IntersectBed() {
 		// process each entry in A
 		while (getline(bed, bedLine)) {
 	
-			if ((bedLine.find_first_of("track") == 1) || (bedLine.find_first_of("browser") == 1)) {
+			if ((bedLine.find("track") != string::npos) || (bedLine.find("browser") != string::npos)) {
 				continue;
 			}
 			else {			
@@ -152,11 +152,11 @@ void BedIntersect::IntersectBed() {
 		// process each entry in A
 		while (getline(cin, bedLine)) {
 
-			if ((bedLine.find_first_of("track") == 1) || (bedLine.find_first_of("browser") == 1)) {
+			if ((bedLine.find("track") != string::npos) || (bedLine.find("browser") != string::npos)) {
 				continue;
 			}
 			else {			
-				// split the current line into ditinct fields
+				// split the current line into distinct fields
 				vector<string> bedFields;
 				Tokenize(bedLine,bedFields);
 
