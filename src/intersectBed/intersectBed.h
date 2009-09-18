@@ -16,7 +16,7 @@ class BedIntersect {
 public:
 
 	// constructor 
-	BedIntersect(string &, string &, bool &, bool &, bool &, float &, bool &, bool &, bool &);
+	BedIntersect(string &, string &, bool &, bool &, bool &, float &, bool &, bool &, bool &, bool &);
 
 	// destructor
 	~BedIntersect(void);
@@ -39,6 +39,7 @@ private:
 	bool writeB;
 	bool writeCount;
 	bool forceStrand;
+	bool reciprocal;
 	float overlapFraction;
 	bool noHit;
 

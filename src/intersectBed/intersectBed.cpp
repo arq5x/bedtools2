@@ -16,7 +16,7 @@
 */
 BedIntersect::BedIntersect(string &bedAFile, string &bedBFile, bool &anyHit, 
 						   bool &writeA, bool &writeB, float &overlapFraction, 
-						   bool &noHit, bool &writeCount, bool &forceStrand) {
+						   bool &noHit, bool &writeCount, bool &forceStrand, bool &reciprocal) {
 
 	this->bedAFile = bedAFile;
 	this->bedBFile = bedBFile;
@@ -27,6 +27,7 @@ BedIntersect::BedIntersect(string &bedAFile, string &bedBFile, bool &anyHit,
 	this->writeCount = writeCount;
 	this->overlapFraction = overlapFraction;
 	this->forceStrand = forceStrand;
+	this->reciprocal = reciprocal;
 
 	this->bedA = new BedFile(bedAFile);
 	this->bedB = new BedFile(bedBFile);
@@ -47,6 +48,13 @@ void BedIntersect::FindOverlaps(BED &a, vector<BED> &hits) {
 
 	int numOverlaps = 0;
 	
+	// should we print each overlap, or does the 
+	// user want summary information?
+	bool printable = true;			
+	if (anyHit || noHit || writeCount) {
+		printable = false;
+	}
+	
 	for (vector<BED>::iterator h = hits.begin(); h != hits.end(); ++h) {
 	
 		// if forcing strandedness, move on if the hit
@@ -54,20 +62,21 @@ void BedIntersect::FindOverlaps(BED &a, vector<BED> &hits) {
 		if ((this->forceStrand) && (a.strand != h->strand)) {
 			continue;		// continue force the next iteration of the for loop.
 		}
-	
-		int s = max(a.start, h->start);
-		int e = min(a.end, h->end);
-
-		if (s < e) {
+		else {
+			int s = max(a.start, h->start);
+			int e = min(a.end, h->end);
 			
 			// is there enough overlap relative to the user's request?
 			// (default ~ 1bp)
 			if ( ((float)(e-s) / (float)(a.end - a.start)) >= this->overlapFraction ) { 
+			
+				// Report the hit if the user doesn't care about reciprocal overlap
+				// between A and B.
+				if (!reciprocal) {
 				
-				numOverlaps++;	
+					numOverlaps++;		// we have another hit for A
 				
-				if (!anyHit && !noHit && !writeCount) {			
-					if (!writeB) {
+					if (!writeB && printable) {
 						if (writeA) {
 							bedA->reportBed(a); cout << endl;
 						}
@@ -75,7 +84,7 @@ void BedIntersect::FindOverlaps(BED &a, vector<BED> &hits) {
 							bedA->reportBedRange(a,s,e);  cout << endl;
 						}
 					}
-					else {
+					else if (printable) {
 						if (writeA) {
 							bedA->reportBed(a); cout << "\t";
 							bedB->reportBed(*h); cout << endl;
@@ -86,7 +95,34 @@ void BedIntersect::FindOverlaps(BED &a, vector<BED> &hits) {
 						}
 					}
 				}
+				else {
 				
+					float bOverlap = ((float)(e-s) / (float)(h->end - h->start));
+				
+					if (bOverlap >= this->overlapFraction) {
+					
+						numOverlaps++;		// we have another hit for A
+					
+						if (!writeB && printable) {
+							if (writeA) {
+								bedA->reportBed(a); cout << endl;
+							}
+							else {
+								bedA->reportBedRange(a,s,e);  cout << endl;
+							}
+						}
+						else if (printable) {
+							if (writeA) {
+								bedA->reportBed(a); cout << "\t";
+								bedB->reportBed(*h); cout << endl;
+							}
+							else {
+								bedA->reportBedRange(a,s,e); cout << "\t";
+								bedB->reportBed(*h); cout << endl;										
+							}
+						}
+					}
+				}
 			}
 		}
 	}

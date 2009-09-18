@@ -20,9 +20,11 @@ int main(int argc, char* argv[]) {
 	// input files
 	string bedAFile;
 	string bedBFile;
+	bool forceStrand = false;
 
 	bool haveBedA = false;
 	bool haveBedB = false;
+
 
 	// check to see if we should print out some help
 	if(argc <= 1) showHelp = true;
@@ -52,6 +54,9 @@ int main(int argc, char* argv[]) {
 			haveBedB = true;
 			bedBFile = argv[i + 1];
 			i++;
+		}
+		else if (PARAMETER_CHECK("-s", 2, parameterLength)) {
+			forceStrand = true;
 		}	
 		else {
 			cerr << endl << "*****ERROR: Unrecognized parameter: " << argv[i] << " *****" << endl << endl;
@@ -67,7 +72,7 @@ int main(int argc, char* argv[]) {
 
 	if (!showHelp) {
 
-		BedGraph *bg = new BedGraph(bedAFile, bedBFile);
+		BedGraph *bg = new BedGraph(bedAFile, bedBFile, forceStrand);
 		bg->GraphBed();
 		return 0;
 	}

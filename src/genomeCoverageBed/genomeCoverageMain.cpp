@@ -4,7 +4,7 @@
 using namespace std;
 
 // define our program name
-#define PROGRAM_NAME "coverageBed"
+#define PROGRAM_NAME "genomeCoverageBed"
 
 
 // define our parameter checking macro

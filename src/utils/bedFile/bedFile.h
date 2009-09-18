@@ -110,7 +110,7 @@ public:
 		std::less<int> > &, const int, 
 		const int, vector<BED> &);
 
-	void countHits(map<int, vector<BED>, std::less<int> > &, const int, const int);
+	void countHits(map<int, vector<BED>, std::less<int> > &, BED &, bool &);
 	void reportBed(const BED &);
 	void reportBedRange(const BED &, int &, int &);
 

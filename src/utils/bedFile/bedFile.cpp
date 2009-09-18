@@ -151,9 +151,11 @@ void BedFile::binKeeperFind(map<int, vector<BED>, std::less<int> > &bk, const in
 
 		for (j = (startBin+offset); j <= (endBin+offset); ++j)  {
 			for (vector<BED>::iterator el = bk[j].begin(); el != bk[j].end(); ++el) {
+				
 				if (overlaps(el->start, el->end, start, end) > 0) {
 					hits.push_back(*el);
 				}
+				
 			}
 		}
 		startBin >>= _binNextShift;
@@ -162,27 +164,34 @@ void BedFile::binKeeperFind(map<int, vector<BED>, std::less<int> > &bk, const in
 }
 
 
-void BedFile::countHits(map<int, vector<BED>, std::less<int> > &bk, const int start, const int end) {
+
+void BedFile::countHits(map<int, vector<BED>, std::less<int> > &bk, BED &a, bool &forceStrand) {
 	int startBin, endBin;
 	int i,j;
 
-	startBin = (start>>_binFirstShift);
-	endBin = ((end-1)>>_binFirstShift);
+	startBin = (a.start>>_binFirstShift);
+	endBin = ((a.end-1)>>_binFirstShift);
 	for (i=0; i<6; ++i) {
 		int offset = binOffsetsExtended[i];
 
 		for (j = (startBin+offset); j <= (endBin+offset); ++j) {
 			
 			for (vector<BED>::iterator el = bk[j].begin(); el != bk[j].end(); ++el) {
-				if (overlaps(el->start, el->end, start, end) > 0) {
-					el->count++;
-					el->depthMap[start+1].starts++;
-					el->depthMap[end].ends++;
-					
-					if (start < el->minOverlapStart) {
-						el->minOverlapStart = start;
-					}
+				
+				if (forceStrand && (a.strand != el->strand)) {
+					continue;		// continue force the next iteration of the for loop.
 				}
+				else if (overlaps(el->start, el->end, a.start, a.end) > 0) {
+					
+					el->count++;
+					el->depthMap[a.start+1].starts++;
+					el->depthMap[a.end].ends++;
+					
+					if (a.start < el->minOverlapStart) {
+						el->minOverlapStart = a.start;
+					}					
+				}
+				
 			}
 		}
 		startBin >>= _binNextShift;
@@ -273,7 +282,7 @@ bool BedFile::parseBedLine (BED &bed, const vector<string> &lineVector, const in
 			bed.end = atoi(lineVector[2].c_str());
 			bed.name = lineVector[3];
 			bed.score = "";
-			bed.strand = "+";
+			bed.strand = "";
 			return true;
 		}
 		else if (this->bedType ==5) {

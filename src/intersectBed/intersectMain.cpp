@@ -33,6 +33,7 @@ int main(int argc, char* argv[]) {
 	bool writeB = false;
 	bool writeCount = false;
 	bool haveFraction = false;
+	bool reciprocalFraction = false;
 	bool forceStrand = false;
 
 	// check to see if we should print out some help
@@ -85,6 +86,9 @@ int main(int argc, char* argv[]) {
 		else if(PARAMETER_CHECK("-c", 2, parameterLength)) {
 			writeCount = true;
 		}
+		else if(PARAMETER_CHECK("-r", 2, parameterLength)) {
+			reciprocalFraction = true;
+		}
 		else if (PARAMETER_CHECK("-v", 2, parameterLength)) {
 			noHit = true;
 		}
@@ -112,6 +116,11 @@ int main(int argc, char* argv[]) {
 		cerr << endl << "*****" << endl << "*****ERROR: Request either -wb OR -c, not both." << endl << "*****" << endl;
 		showHelp = true;
 	}
+
+	if (reciprocalFraction && !haveFraction) {
+		cerr << endl << "*****" << endl << "*****ERROR: If using -r, you need to define -f." << endl << "*****" << endl;
+		showHelp = true;
+	}
 	
 	if (anyHit && writeCount) {
 		cerr << endl << "*****" << endl << "*****ERROR: Request either -u OR -c, not both." << endl << "*****" << endl;
@@ -120,7 +129,7 @@ int main(int argc, char* argv[]) {
 
 	if (!showHelp) {
 
-		BedIntersect *bi = new BedIntersect(bedAFile, bedBFile, anyHit, writeA, writeB, overlapFraction, noHit, writeCount, forceStrand);
+		BedIntersect *bi = new BedIntersect(bedAFile, bedBFile, anyHit, writeA, writeB, overlapFraction, noHit, writeCount, forceStrand, reciprocalFraction);
 		bi->IntersectBed();
 		return 0;
 	}
@@ -145,6 +154,7 @@ void ShowHelp(void) {
 	cerr << "\t" << "-u\t\t\t"            	<< "Write ORIGINAL a.bed entry ONCE if ANY overlap with B.bed." << endl << "\t\t\t\tIn other words, just report the fact >=1 hit was found." << endl << endl;
 	cerr << "\t" << "-v \t\t\t"             << "Only report those entries in A that have NO OVERLAP in B." << endl << "\t\t\t\tSimilar to grep -v." << endl << endl;
 	cerr << "\t" << "-f (e.g. 0.05)\t\t"	<< "Minimum overlap req'd as fraction of a.bed." << endl << "\t\t\t\tDefault is 1E-9 (effectively 1bp)." << endl << endl;
+	cerr << "\t" << "-r \t\t\t"				<< "Require that the fraction overlap be reciprocal for A and B."   << endl << "\t\t\t\tIn other words, if -f is 0.90 and -r is used, this requires that" << endl << "\t\t\t\tB overlap 90% of A and A _also_ overlaps 90% of B." << endl << endl;
 	cerr << "\t" << "-c \t\t\t"				<< "For each entry in A, report the number of hits in B while restricting to -f." << endl << "\t\t\t\tReports 0 for A entries that have no overlap with B." << endl << endl;
 	cerr << "\t" << "-wa \t\t\t"			<< "Write the original entry in A for each overlap." << endl << endl;
 	cerr << "\t" << "-wb \t\t\t"			<< "Write the original entry in B for each overlap." << endl << "\t\t\t\tUseful for knowing _what_ A overlaps. Restricted by -f." << endl << endl;

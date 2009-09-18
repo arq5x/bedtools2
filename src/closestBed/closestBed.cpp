@@ -19,11 +19,12 @@ const int SLOPGROWTH = 2048000;
 /*
 	Constructor
 */
-BedClosest::BedClosest(string &bedAFile, string &bedBFile, bool &forceStrand) {
+BedClosest::BedClosest(string &bedAFile, string &bedBFile, bool &forceStrand, string &tieMode) {
 
 	this->bedAFile = bedAFile;
 	this->bedBFile = bedBFile;
 	this->forceStrand = forceStrand;
+	this->tieMode = tieMode;
 
 	this->bedA = new BedFile(bedAFile);
 	this->bedB = new BedFile(bedBFile);
@@ -66,15 +67,15 @@ void BedClosest::reportNullB() {
 
 void BedClosest::FindWindowOverlaps(BED &a, vector<BED> &hits) {
 	
-	int slop = SLOPGROWTH;  // start out just looking for overlaps 
-		       // within the current bin (~128Kb)	
+	int slop = 0;  // start out just looking for overlaps 
+		       	   // within the current bin (~128Kb)	
 
 	// update the current feature's start and end
 
 	int aFudgeStart = 0;
 	int aFudgeEnd;
 	int numOverlaps = 0;
-	BED closestB;
+	vector<BED> closestB;
 	float maxOverlap = 0;
 	int minDistance = 999999999;
 
@@ -121,20 +122,24 @@ void BedClosest::FindWindowOverlaps(BED &a, vector<BED> &hits) {
 					
 						// is this hit the closest?
 						if (overlap > maxOverlap) {
-							closestB = *h;
+							closestB.clear();
+							closestB.push_back(*h);
 							maxOverlap = overlap;
+						}
+						else if (overlap == maxOverlap) {
+							closestB.push_back(*h);
 						}
 					}
 				}
 				else if (h->end < a.start){
-					if ((a.start - h->end) < minDistance) {
-						closestB = *h;
+					if ((a.start - h->end) <= minDistance) {
+						closestB.push_back(*h);
 						minDistance = a.start - h->end;
 					}	
 				}
 				else {
-					if ((h->start - a.end) < minDistance) {
-						closestB = *h;
+					if ((h->start - a.end) <= minDistance) {
+						closestB.push_back(*h);
 						minDistance = h->start - a.end;
 					}	
 				}
@@ -155,10 +160,35 @@ void BedClosest::FindWindowOverlaps(BED &a, vector<BED> &hits) {
 	}
 
 	if (numOverlaps > 0) {
-		bedA->reportBed(a); 
-		cout << "\t"; 
-		bedB->reportBed(closestB);
-		cout << "\n";
+		
+		if (closestB.size() == 1) {
+			bedA->reportBed(a); 
+			cout << "\t"; 
+			bedB->reportBed(closestB[0]);
+			cout << "\n";
+		}
+		else {
+			if (this->tieMode == "all") {
+				for (vector<BED>::iterator b = closestB.begin(); b != closestB.end(); ++b) {
+					bedA->reportBed(a); 
+					cout << "\t";
+					bedB->reportBed(*b);
+					cout << "\n";
+				}
+			}
+			else if (this->tieMode == "first") {
+				bedA->reportBed(a); 
+				cout << "\t"; 
+				bedB->reportBed(closestB[0]);
+				cout << "\n";
+			}
+			else if (this->tieMode == "last") {
+				bedA->reportBed(a); 
+				cout << "\t"; 
+				bedB->reportBed(closestB[closestB.size()-1]);
+				cout << "\n";
+			}
+		}
 	}
 }
 

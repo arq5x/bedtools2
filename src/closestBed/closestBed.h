@@ -16,7 +16,7 @@ class BedClosest {
 public:
 
 	// constructor 
-	BedClosest(string &, string &, bool &);
+	BedClosest(string &, string &, bool &, string &);
 
 	// destructor
 	~BedClosest(void);
@@ -32,6 +32,7 @@ private:
 
 	string bedAFile;
 	string bedBFile;
+	string tieMode;
 	bool forceStrand;
 	
 	// instance of a bed file class.

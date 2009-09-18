@@ -1,3 +1,57 @@
+Version 2.2.0
+
+=== Notable changes in this release ===
+1.  coverageBed will optionally only count features in BED file A (e.g. sequencing reads) that overlap with 
+	the intervals/windows in BED file B.  This has been requested several times recently and facilitates CHiP-Seq and 
+	RNA-Seq experiments.
+
+2.  intersectBed can now require a minimum __reciprocal__ overlap between intervals in BED A and BED B.  For example,
+	previously, if one used -f 0.90, it required that a feature in B overlap 90% of the feature in A for the "hit"
+	to be reported.  If one adds the -r (reciprocal) option, the hit must also cover 90% of the feature in B.  This helps
+	to exclude overlaps between say small features in A and large features in B:
+
+	A ==========
+	B  **********************************************************
+		
+	-f 0.50 (Reported), whereas -f 0.50 -r (Not reported)
+
+3.  The score field has been changed to be a string.  While this deviates from the UCSC definition, it allows one to track
+	much more meaningful information about a feature/interval.  For example, score could now be:
+	
+	7.31E-05  (a p-value)
+	0.334577  (mean enrichment)
+	2:2.2:40:2 (several values encoded in a string)
+	
+4.  closestBed now, by default, reports __all__ intervals in B that overlap equally with an interval in A.  Previously, it
+	merely reported the first such feature that appeared in B.  Here's a cartoon explaining the difference.
+	
+	**Prior behavior**
+	
+	A	 ==============
+	B.1        				++++++++++++++
+	B.2       				++++++++++++++
+	B.3               				+++++++++
+
+	-----------------------------------------
+	Result = B.1 			++++++++++++++
+	
+	
+	**Current behavior**
+	
+	A	 ==============
+	B.1        				++++++++++++++
+	B.2       				++++++++++++++
+	B.3               				+++++++++
+
+	-----------------------------------------
+	Result = B.1 			++++++++++++++
+			 B.2 			++++++++++++++
+
+	Using the -t option, one can also choose to report either the first or the last entry in B in the event of a tie.
+
+5.  Several other minor changes to the algorithms have been made to increase speed a bit.
+
+
 VERSION 2.1.2
 1. Fixed yet another bug in the parsing of "track" or "browser" lines.  Sigh...
 2. Change the "score" column (i.e. column 5) to b stored as a string.  While this deviates

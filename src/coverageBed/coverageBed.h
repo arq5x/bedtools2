@@ -17,7 +17,7 @@ class BedGraph {
 public:
 
 	// constructor 
-	BedGraph(string &, string &);
+	BedGraph(string &, string &, bool &);
 
 	// destructor
 	~BedGraph(void);
@@ -32,6 +32,8 @@ private:
 
 	// instance of a bed file class.
 	BedFile *bedA, *bedB;
+	
+	bool forceStrand;
 
 };
 #endif /* COVERAGEBED_H */

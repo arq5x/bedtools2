@@ -10,13 +10,15 @@
 #include "coverageBed.h"
 
 
-BedGraph::BedGraph(string &bedAFile, string &bedBFile) {
+BedGraph::BedGraph(string &bedAFile, string &bedBFile, bool &forceStrand) {
 
 	this->bedAFile = bedAFile;
 	this->bedBFile = bedBFile;
 	
 	this->bedA = new BedFile(bedAFile);
 	this->bedB = new BedFile(bedBFile);
+	
+	this->forceStrand = forceStrand;
 }
 
 
@@ -61,7 +63,7 @@ void BedGraph::GraphBed() {
 			
 					// increment the count of overlaps for each feature in B that
 					// overlaps the current A interval
-					bedB->countHits(bedB->bedMap[a.chrom], a.start, a.end);
+					bedB->countHits(bedB->bedMap[a.chrom], a, this->forceStrand);
 				}
 			}
 		}
@@ -84,7 +86,7 @@ void BedGraph::GraphBed() {
 			
 					// increment the count of overlaps for each feature in B that
 					// overlaps the current A interval
-					bedB->countHits(bedB->bedMap[a.chrom], a.start, a.end);
+					bedB->countHits(bedB->bedMap[a.chrom], a, this->forceStrand);
 				}
 			}
 		}

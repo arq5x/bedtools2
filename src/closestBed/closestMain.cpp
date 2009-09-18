@@ -20,10 +20,13 @@ int main(int argc, char* argv[]) {
 	// input files
 	string bedAFile;
 	string bedBFile;
-
+	string tieMode = "all";
+	
 	bool haveBedA = false;
 	bool haveBedB = false;
+	bool haveTieMode = false;
 	bool forceStrand = false;
+
 
 	// check to see if we should print out some help
 	if(argc <= 1) showHelp = true;
@@ -56,6 +59,11 @@ int main(int argc, char* argv[]) {
 		}
 		else if (PARAMETER_CHECK("-s", 2, parameterLength)) {
 			forceStrand = true;
+		}
+		else if (PARAMETER_CHECK("-t", 2, parameterLength)) {
+			haveTieMode = true;
+			tieMode = argv[i + 1];
+			i++;
 		}	
 	}
 
@@ -64,9 +72,15 @@ int main(int argc, char* argv[]) {
 		cerr << endl << "*****" << endl << "*****ERROR: Need -a and -b files. " << endl << "*****" << endl;
 		showHelp = true;
 	}
-
+	
+	if (haveTieMode && (tieMode != "all") && (tieMode != "first") 
+					&& (tieMode != "last")) {
+		cerr << endl << "*****" << endl << "*****ERROR: Request \"all\" or \"first\" or \"last\" for Tie Mode (-t)" << endl << "*****" << endl;
+		showHelp = true;		
+	}
+	
 	if (!showHelp) {
-		BedClosest *bc = new BedClosest(bedAFile, bedBFile, forceStrand);
+		BedClosest *bc = new BedClosest(bedAFile, bedBFile, forceStrand, tieMode);
 		bc->ClosestBed();
 		return 0;
 	}
@@ -88,7 +102,13 @@ void ShowHelp(void) {
 
 	cerr << "OPTIONS: " << endl;
 	cerr << "\t" << "-s\t\t\t"            	<< "Force strandedness.  Only report hits in B that overlap A on the same strand." << endl << "\t\t\t\tBy default, overlaps are reported without respect to strand." << endl << endl;
+	cerr << "\t" << "-t\t\t\t"            	<< "How to handle ties for closest features.  This occurs when two features in B have exactly the" << endl;
+	cerr << "\t\t\t\t"						<< "same overlap with a feature in A.  By default, all such features in B are reported.  Here are all the options:" << endl;
+	cerr << "\t\t\t\t\t"						<< "all\t\tReport all ties (default)." << endl;
+	cerr << "\t\t\t\t\t"						<< "first\t\tReport the first tie that occurred in the B file." << endl;
+	cerr << "\t\t\t\t\t"						<< "last\t\tReport the last tie that occurred in the B file." << endl;
 
+	
 	cerr << "NOTES: " << endl;
 	cerr << "\t" << "-i stdin\t\t" << "Allows BED file A to be read from stdin.  E.g.: cat a.bed | closestBed -a stdin -b B.bed" << endl << endl;
 	cerr << "\t" << "Reports \"none\" for chrom and \"-1\" for all other fields when a feature is not found in B on the same chromosome" << endl;
