@@ -27,6 +27,7 @@ int main(int argc, char* argv[]) {
 	bool haveMaxDistance = false;
 	bool haveBed = false;
 	bool forceStrand = false;
+	bool reportNames = false;
 
 	// check to see if we should print out some help
 	if(argc <= 1) showHelp = true;
@@ -63,6 +64,9 @@ int main(int argc, char* argv[]) {
 		else if (PARAMETER_CHECK("-s", 2, parameterLength)) {
 			forceStrand = true;
 		}
+		else if (PARAMETER_CHECK("-names", 6, parameterLength)) {
+			reportNames = true;
+		}
 		else {
 			cerr << endl << "*****ERROR: Unrecognized parameter: " << argv[i] << " *****" << endl << endl;
 			showHelp = true;
@@ -76,7 +80,7 @@ int main(int argc, char* argv[]) {
 	}
 
 	if (!showHelp) {
-		BedMerge *bm = new BedMerge(bedFile, numEntries, maxDistance, forceStrand);
+		BedMerge *bm = new BedMerge(bedFile, numEntries, maxDistance, forceStrand, reportNames);
 		
 		if (!forceStrand) {
 			bm->MergeBed();

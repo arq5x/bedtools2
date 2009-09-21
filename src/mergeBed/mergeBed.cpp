@@ -13,12 +13,13 @@
 // ===============
 // = Constructor =
 // ===============
-BedMerge::BedMerge(string &bedFile, bool &numEntries, int &maxDistance, bool &forceStrand) {
+BedMerge::BedMerge(string &bedFile, bool &numEntries, int &maxDistance, bool &forceStrand, bool &reportNames) {
 
 	this->bedFile = bedFile;
 	this->numEntries = numEntries;
 	this->maxDistance = -1 * maxDistance;
 	this->forceStrand = forceStrand;
+	this->reportNames = reportNames;
 	
 	this->bed = new BedFile(bedFile);
 
@@ -53,7 +54,7 @@ void BedMerge::MergeBed() {
 		unsigned int prev = 0;
 		unsigned int curr = 0;
 		int mergeCount = 1;
-
+		vector<string> names;
 
 		// loop through the BED entries for this chromosome
 		// and look for overlaps
@@ -67,13 +68,17 @@ void BedMerge::MergeBed() {
 				mergeCount++;
 				minStart = min(bedList[prev].start, min(minStart, bedList[curr].start));
 				maxEnd = max(bedList[prev].end, max(maxEnd, bedList[curr].end));
-
+				
+				names.push_back(bedList[prev].name);
+				names.push_back(bedList[curr].name);
 			}
 			else if ( overlaps(minStart, maxEnd, 
 							bedList[curr].start, bedList[curr].end) >= this->maxDistance) {
 				mergeCount++;
 				minStart = min(minStart, bedList[curr].start);
 				maxEnd = max(maxEnd, bedList[curr].end);
+				
+				names.push_back(bedList[curr].name);
 			}
 			else {
 
@@ -82,6 +87,14 @@ void BedMerge::MergeBed() {
 					if (this->numEntries) {
 						cout << bedList[prev].chrom << "\t" << minStart << "\t" << maxEnd << "\t" << mergeCount << endl;
 					}
+					else if (this->reportNames) {
+						cout << bedList[prev].chrom << "\t" << minStart << "\t" << maxEnd << "\t";
+						for (unsigned int n = 0; n < names.size(); ++n) {
+							if (n < (names.size() - 1)) {cout << names[n] << ";";}
+							else {cout << names[n];}
+						}
+						cout << endl;
+					}
 					else {
 						cout << bedList[prev].chrom << "\t" << minStart << "\t" << maxEnd << endl;
 					}
@@ -89,6 +102,9 @@ void BedMerge::MergeBed() {
 				else {
 					if (this->numEntries) {
 						cout << bedList[prev].chrom << "\t" << bedList[prev].start << "\t" << bedList[prev].end << "\t" << mergeCount << endl;
+					}
+					else if (this->reportNames) {
+						cout << bedList[prev].chrom << "\t" << bedList[prev].start << "\t" << bedList[prev].end << "\t" << bedList[prev].name << endl;
 					}
 					else {
 						cout << bedList[prev].chrom << "\t" << bedList[prev].start << "\t" << bedList[prev].end << endl;
@@ -100,6 +116,7 @@ void BedMerge::MergeBed() {
 				mergeCount = 1;			
 				minStart = INT_MAX;
 				maxEnd = 0;
+				names.clear();
 
 			}
 			prev = curr;
@@ -110,6 +127,14 @@ void BedMerge::MergeBed() {
 			if (this->numEntries) {
 				cout << bedList[prev].chrom << "\t" << minStart << "\t" << maxEnd << "\t" << mergeCount << endl;
 			}
+			else if (this->reportNames) {
+				cout << bedList[prev].chrom << "\t" << minStart << "\t" << maxEnd << "\t";
+				for (unsigned int n = 0; n < names.size(); ++n) {
+					if (n < (names.size() - 1)) {cout << names[n] << ";";}
+					else {cout << names[n];}
+				}
+				cout << endl;
+			}
 			else {
 				cout << bedList[prev].chrom << "\t" << minStart << "\t" << maxEnd << endl;
 			}
@@ -117,6 +142,9 @@ void BedMerge::MergeBed() {
 		else {
 			if (this->numEntries) {
 				cout << bedList[prev].chrom << "\t" << bedList[prev].start << "\t" << bedList[prev].end  << "\t" << mergeCount << endl;
+			}
+			else if (this->reportNames) {
+				cout << bedList[prev].chrom << "\t" << bedList[prev].start << "\t" << bedList[prev].end << "\t" << bedList[prev].name << endl;
 			}
 			else {
 				cout << bedList[prev].chrom << "\t" << bedList[prev].start << "\t" << bedList[prev].end << endl;	
@@ -156,7 +184,8 @@ void BedMerge::MergeBedStranded() {
 			unsigned int curr = 0;
 			int mergeCount = 1;
 			int numOnStrand = 0;
-				
+			vector<string> names;	
+			
 			// loop through the BED entries for this chromosome
 			// and look for overlaps
 			for (curr = 0; curr < bedList.size(); ++curr) {
@@ -189,6 +218,8 @@ void BedMerge::MergeBedStranded() {
 					minStart = min(bedList[prev].start, min(minStart, bedList[curr].start));
 					maxEnd = max(bedList[prev].end, max(maxEnd, bedList[curr].end));
 
+					names.push_back(bedList[prev].name);
+					names.push_back(bedList[curr].name);
 				}
 				else if ( overlaps(minStart, maxEnd, 
 								bedList[curr].start, bedList[curr].end) >= this->maxDistance) {
@@ -196,6 +227,8 @@ void BedMerge::MergeBedStranded() {
 					mergeCount++;
 					minStart = min(minStart, bedList[curr].start);
 					maxEnd = max(maxEnd, bedList[curr].end);
+					
+					names.push_back(bedList[curr].name);
 				}
 				else {
 
@@ -204,6 +237,14 @@ void BedMerge::MergeBedStranded() {
 						if (this->numEntries) {
 							cout << bedList[prev].chrom << "\t" << minStart << "\t" << maxEnd << "\t" << mergeCount << "\t" << strands[s] << endl;
 						}
+						else if (this->reportNames) {
+							cout << bedList[prev].chrom << "\t" << minStart << "\t" << maxEnd << "\t";
+							for (unsigned int n = 0; n < names.size(); ++n) {
+								if (n < (names.size() - 1)) {cout << names[n] << ";";}
+								else {cout << names[n];}
+							}
+							cout << endl;
+						}
 						else {
 							cout << bedList[prev].chrom << "\t" << minStart << "\t" << maxEnd << "\t" << strands[s] << endl;
 						}
@@ -211,6 +252,9 @@ void BedMerge::MergeBedStranded() {
 					else {
 						if ((this->numEntries) && (numOnStrand > 0)) {
 							cout << bedList[prev].chrom << "\t" << bedList[prev].start << "\t" << bedList[prev].end << "\t" << mergeCount << "\t" << strands[s] << endl;
+						}
+						else if (this->reportNames) {
+							cout << bedList[prev].chrom << "\t" << bedList[prev].start << "\t" << bedList[prev].end << "\t" << bedList[prev].name << endl;
 						}
 						else if (numOnStrand > 0) {
 							cout << bedList[prev].chrom << "\t" << bedList[prev].start << "\t" << bedList[prev].end << "\t" << strands[s] << endl;
@@ -222,6 +266,7 @@ void BedMerge::MergeBedStranded() {
 					mergeCount = 1;			
 					minStart = INT_MAX;
 					maxEnd = 0;
+					names.clear();
 				}
 				prev = curr;
 			}
@@ -231,6 +276,14 @@ void BedMerge::MergeBedStranded() {
 				if (this->numEntries) {
 					cout << bedList[prev].chrom << "\t" << minStart << "\t" << maxEnd << "\t" << mergeCount << "\t" << strands[s] << endl;
 				}
+				else if (this->reportNames) {
+					cout << bedList[prev].chrom << "\t" << minStart << "\t" << maxEnd << "\t";
+					for (unsigned int n = 0; n < names.size(); ++n) {
+						if (n < (names.size() - 1)) {cout << names[n] << ";";}
+						else {cout << names[n];}
+					}
+					cout << endl;
+				}
 				else {
 					cout << bedList[prev].chrom << "\t" << minStart << "\t" << maxEnd << "\t" << strands[s] << endl;
 				}
@@ -238,6 +291,9 @@ void BedMerge::MergeBedStranded() {
 			else {
 				if ((this->numEntries) && (numOnStrand > 0)) {
 					cout << bedList[prev].chrom << "\t" << bedList[prev].start << "\t" << bedList[prev].end << "\t" << mergeCount << "\t" << strands[s] << endl;
+				}
+				else if (this->reportNames) {
+					cout << bedList[prev].chrom << "\t" << bedList[prev].start << "\t" << bedList[prev].end << "\t" << bedList[prev].name << endl;
 				}
 				else if (numOnStrand > 0) {
 					cout << bedList[prev].chrom << "\t" << bedList[prev].start << "\t" << bedList[prev].end << "\t" << strands[s] << endl;
