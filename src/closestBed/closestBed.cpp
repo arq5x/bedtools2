@@ -146,7 +146,7 @@ void BedClosest::FindWindowOverlaps(BED &a, vector<BED> &hits) {
 				
 			}
 			/* if no overlaps were found, we'll 
-			   widen the range by in each direction
+			   widen the range by SLOPGROWTH in each direction
 			   and search again.
 			*/
 			slop += SLOPGROWTH;
