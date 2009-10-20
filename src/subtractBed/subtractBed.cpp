@@ -42,6 +42,8 @@ void BedSubtract::FindOverlaps(BED &a, vector<BED> &hits) {
 	//  is A completely spanned by an entry in B?
 	//  if so, A should not be reported.
 	int numConsumedByB = 0; 
+	int numOverlaps = 0;
+	vector<BED> bOverlaps;	// list of hits in B.  Special processing if there are multiple.
 	
 	for (vector<BED>::iterator h = hits.begin(); h != hits.end(); ++h) {
 		
@@ -61,69 +63,82 @@ void BedSubtract::FindOverlaps(BED &a, vector<BED> &hits) {
 			if (overlap >= 1.0) {
 				numConsumedByB++;
 			}
+			else if ( overlap >= this->overlapFraction ) {
+				numOverlaps++;
+				bOverlaps.push_back(*h);
+			}
 		}
 	}
 	
-	// report the subtraction with each entry in B
-	// if A was not "consumed" by any entry in B
-	if (numConsumedByB == 0) {
+	if (numOverlaps == 0) {
+		// no overlap found, so just report A as-is.
+		bedA->reportBed(a); cout << "\n";
+	}
+	else if (numOverlaps == 1) {
+		// one overlap found.  only need to look at the single
+		// entry in bOverlaps.
 		
-		int numOverlaps = 0;
-		for (vector<BED>::iterator h = hits.begin(); h != hits.end(); ++h) {
-	
-			// if forcing strandedness, move on if the hit
-			// is not on the same strand as A.
-			if ((this->forceStrand) && (a.strand != h->strand)) {
-				continue;		// continue force the next iteration of the for loop.
-			}
+		// if A was not "consumed" by any entry in B
+		if (numConsumedByB == 0) {
 			
-			int s = max(a.start, h->start);
-			int e = min(a.end, h->end);
+			BED theHit = bOverlaps[0];
 
-			if (s < e) {
-			
-				numOverlaps++;
-			
-				// is there enough overlap (default ~ 1bp)
-				float overlap = ((float)(e-s) / (float)(a.end - a.start));
-			
-				if ( overlap >= this->overlapFraction ) { 
+			// A	++++++++++++
+			// B        ----
+			// Res. ====    ====					
+			if ( (theHit.start > a.start) && (theHit.end < a.end) ) {
+				bedA->reportBedRange(a,a.start,theHit.start); cout << "\n";
+				bedA->reportBedRange(a,theHit.end,a.end); cout << "\n";
+			}
+			// A	++++++++++++
+			// B    ----------
+			// Res.           ==        			
+			else if (theHit.start == a.start) {
+				bedA->reportBedRange(a,theHit.end,a.end); cout << "\n";
+			}	
+			// A	      ++++++++++++
+			// B    ----------
+			// Res.       ====
+			else if (theHit.start < a.start) {
+				bedA->reportBedRange(a,theHit.end,a.end); cout << "\n";					
+			}
+			// A	++++++++++++
+			// B           ----------
+			// Res. =======
+			else if (theHit.start > a.start) {
+				bedA->reportBedRange(a,a.start,theHit.start); cout << "\n";					
+			}
+		}
+	}
+	else if (numOverlaps > 1) {
+		// multiple overlapz found.  look at all the hits
+		// and figure out which bases in A survived.  then 
+		// report the contigous intervals that survived.
+		
+		vector<bool> aKeep(a.end - a.start, true);
+		
+		if (numConsumedByB == 0) {
+			// track the number of hit starts and ends at each position in A
+			for (vector<BED>::iterator h = bOverlaps.begin(); h != bOverlaps.end(); ++h) {
+				int s = max(a.start, h->start);
+				int e = min(a.end, h->end);
 				
-					if (overlap < 1.0) {			// if overlap = 1, then B consumes A and therefore,
-													// we won't report A.
-						// A	++++++++++++
-						// B        ----
-						// Res. ====    ====					
-						if ( (h->start > a.start) && (h->end < a.end) ) {
-							bedA->reportBedRange(a,a.start,h->start); cout << "\n";
-							bedA->reportBedRange(a,h->end,a.end); cout << "\n";
-						}
-						// A	++++++++++++
-						// B    ----------
-						// Res.           ==        			
-						else if (h->start == a.start) {
-							bedA->reportBedRange(a,h->end,a.end); cout << "\n";
-						}	
-						// A	      ++++++++++++
-						// B    ----------
-						// Res.       ====
-						else if (h->start < a.start) {
-							bedA->reportBedRange(a,h->end,a.end); cout << "\n";					
-						}
-						// A	++++++++++++
-						// B           ----------
-						// Res. =======
-						else if (h->start > a.start) {
-							bedA->reportBedRange(a,a.start,h->start); cout << "\n";					
-						}
-					}
+				for (int i = s+1; i <= e; ++i) {
+					aKeep[i-a.start-1] = false;
 				}
 			}
-		
-		}
-		if (numOverlaps == 0) {
-			// no overlap found, so just report A as-is.
-			bedA->reportBed(a); cout << "\n";
+			// report the remaining blocks.
+			for (int i = 0; i < aKeep.size(); ++i) {
+				if (aKeep[i] == true) {
+					int blockStart = i + a.start;
+					while ((aKeep[i] == true) && (i < aKeep.size())) {
+						i++;
+					}
+					int blockEnd = i + a.start;
+					blockEnd = min(a.end, blockEnd);
+					bedA->reportBedRange(a,blockStart,blockEnd); cout << "\n";	
+				}
+			}
 		}
 	}
 }
