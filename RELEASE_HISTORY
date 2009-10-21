@@ -1,3 +1,6 @@
+Version 2.2.2 (10/20/2009)
+1. Improved the speed of genomeCoverageBed by roughly 100 fold.  The memory usage is now less than 2.0 Gb.
+
 Version 2.2.1
 1. Fixed a very obvious bug in subtractBed that caused improper behavior when a feature in A was overlapped by more than one feature in B.
 Many thanks to folks in the Hannon lab at CSHL for pointing this out.

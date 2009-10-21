@@ -29,7 +29,8 @@ public:
   ~BedCoverage(void);
 
   void CoverageBeds();
-
+  void ReportChromCoverage(vector<DEPTH> &, int &, string &, chromHistMap&);
+  void ReportGenomeCoverage(map<string, int> &, chromHistMap&);
 private:
 	
 	string bedFile;
@@ -38,9 +39,8 @@ private:
 	bool startSites;
 	int max;
 
-	// instance of a bed file class.
+	// The BED file from which to compute coverage.
 	BedFile *bed;
-	
 	chromDepthMap chromCov;
 
 };

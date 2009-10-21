@@ -128,7 +128,7 @@ void BedSubtract::FindOverlaps(BED &a, vector<BED> &hits) {
 				}
 			}
 			// report the remaining blocks.
-			for (int i = 0; i < aKeep.size(); ++i) {
+			for (unsigned int i = 0; i < aKeep.size(); ++i) {
 				if (aKeep[i] == true) {
 					int blockStart = i + a.start;
 					while ((aKeep[i] == true) && (i < aKeep.size())) {
