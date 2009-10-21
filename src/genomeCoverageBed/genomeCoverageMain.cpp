@@ -100,7 +100,8 @@ void ShowHelp(void) {
 	cerr << " Hall Laboratory, University of Virginia" << endl;
 	cerr << "===============================================" << endl << endl;
 	cerr << "Description: Compute the coverage of a BED (-i) file on genome (-g) file." << endl << endl;
-	cerr << "***NOTE: Only BED3 - BED6 formats allowed.***"<< endl << endl;
+	cerr << "***NOTE: Only BED3 - BED6 formats allowed.***"<< endl;
+	cerr << "***NOTE: Input BED file must be grouped by chromosome.  A simple UNIX sort will suffice.***"<< endl << endl;
 
 	cerr << "Usage: " << PROGRAM_NAME << " [OPTIONS] -g <genome> -i <bed>" << endl << endl;
 	
@@ -114,7 +115,6 @@ void ShowHelp(void) {
 	cerr << "\tchr2\t181748087" << endl;
 	cerr << "\t..." << endl;
 	cerr << "\tchrY_random\t58682461" << endl << endl;
-	cerr << "\t***Only BED3 - BED6 formats allowed.***"<< endl << endl;	
 	
 	cerr << "TIPS:" << endl;
 	cerr << "\tOne can use the UCSC Genome Browser's MySQL database to extract chromosome sizes. For example, H. sapiens:" << endl << endl;
