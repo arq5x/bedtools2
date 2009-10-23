@@ -34,7 +34,8 @@ int main(int argc, char* argv[]) {
 	bool haveSlop = false;
 	bool haveLeft = false;
 	bool haveRight = false;
-	bool forceStrand = false;
+	bool strandWindows = false;
+	bool matchOnStrand = false;
 
 	// check to see if we should print out some help
 	if(argc <= 1) showHelp = true;
@@ -74,8 +75,11 @@ int main(int argc, char* argv[]) {
 		else if (PARAMETER_CHECK("-v", 2, parameterLength)) {
 			noHit = true;
 		}
-		else if (PARAMETER_CHECK("-s", 2, parameterLength)) {
-			forceStrand = true;
+		else if (PARAMETER_CHECK("-sw", 3, parameterLength)) {
+			strandWindows = true;
+		}
+		else if (PARAMETER_CHECK("-sm", 3, parameterLength)) {
+			matchOnStrand = true;
 		}
 		else if (PARAMETER_CHECK("-w", 2, parameterLength)) {
 			haveSlop = true;
@@ -136,7 +140,7 @@ int main(int argc, char* argv[]) {
 	}
 	
 	if (!showHelp) {
-		BedWindow *bi = new BedWindow(bedAFile, bedBFile, leftSlop, rightSlop, anyHit, noHit, writeCount, forceStrand);
+		BedWindow *bi = new BedWindow(bedAFile, bedBFile, leftSlop, rightSlop, anyHit, noHit, writeCount, strandWindows, matchOnStrand);
 		bi->WindowIntersectBed();
 		return 0;
 	}
@@ -159,10 +163,11 @@ void ShowHelp(void) {
 	cerr << "Usage: " << PROGRAM_NAME << " [OPTIONS] -a <a.bed> -b <b.bed>" << endl << endl;
 
 	cerr << "OPTIONS: " << endl;
-	cerr << "\t" << "-s\t\t\t"            	<< "Force strandedness.  Only report hits in B that overlap A on the same strand." << endl << "\t\t\t\tBy default, overlaps are reported without respect to strand." << endl << endl;	
 	cerr << "\t" << "-w (def. 1000)\t\t"	<< "Base pairs added upstream and downstream of each entry in A when searching for overlaps in B." << endl << endl;	
 	cerr << "\t" << "-l (def. 1000)\t\t"	<< "Base pairs added upstream (left of) of each entry in A when searching for overlaps in B." << endl << endl;	
 	cerr << "\t" << "-r (def. 1000)\t\t"	<< "Base pairs added downstream (right of) of each entry in A when searching for overlaps in B." << endl << endl;	
+	cerr << "\t" << "-sw\t\t\t"            	<< "Define -l and -r based on strand.  E.g. if used, -l 500 for a negative-stranded feature will add 500 bp downstream.  Default = false." << endl << "\t\t\t\tBy default, overlaps are reported without respect to strand." << endl << endl;	
+	cerr << "\t" << "-sm\t\t\t"            	<< "Only report hits in B that overlap A on the same strand." << endl << "\t\t\t\tBy default, overlaps are reported without respect to strand." << endl << endl;	
 	cerr << "\t" << "-u\t\t\t"            	<< "Write ORIGINAL a.bed entry ONCE if ANY overlap with B.bed." << endl << "\t\t\t\tIn other words, just report the fact >=1 hit was found." << endl << endl;
 	cerr << "\t" << "-v \t\t\t"             << "Only report those entries in A that have NO OVERLAP in B within the requested window." << endl << "\t\t\t\tSimilar to grep -v." << endl << endl;
 	cerr << "\t" << "-c \t\t\t"				<< "For each entry in A, report the number of hits in B within the requested window." << endl << "\t\t\t\tReports 0 for A entries that have no overlap with B." << endl << endl;

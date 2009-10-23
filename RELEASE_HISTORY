@@ -1,5 +1,18 @@
+Version 2.2.3 (10/23/2009)
+1. Changed windowBed to optionally define "left" and "right" windows based on strand.  For example by default, -l 100 and -r 500 will
+add 100 bases to the left (lower coordinates) of a feature in A when scanning for hits in B and 500 bases to the right (higher coordinates).
+
+However if one chooses the -sw option (windows bases on strandedness), the behavior changes.  Assume the above example except that a feature in A
+is on the negative strand ("-").  In this case, -l 100, -r 500 and -sw will add 100 bases to the right (higher coordinates) and 500 bases to the left (lower coordinates).
+
+In addition, there is a separate option (-sm) that can optionally force hits in B to only be tracked if they are on the same strand as A.  
+
+***NOTE: This replaces the previous -s option and may affect existing pipelines***.
+
+
 Version 2.2.2 (10/20/2009)
 1. Improved the speed of genomeCoverageBed by roughly 100 fold.  The memory usage is now less than 2.0 Gb.
+
 
 Version 2.2.1
 1. Fixed a very obvious bug in subtractBed that caused improper behavior when a feature in A was overlapped by more than one feature in B.
@@ -7,11 +20,10 @@ Many thanks to folks in the Hannon lab at CSHL for pointing this out.
 
 
 Version 2.2.0
-
 === Notable changes in this release ===
 1.  coverageBed will optionally only count features in BED file A (e.g. sequencing reads) that overlap with 
-	the intervals/windows in BED file B.  This has been requested several times recently and facilitates CHiP-Seq and 
-	RNA-Seq experiments.
+	the intervals/windows in BED file B on the same strand.  This has been requested several times recently 
+	and facilitates CHiP-Seq and RNA-Seq experiments.
 
 2.  intersectBed can now require a minimum __reciprocal__ overlap between intervals in BED A and BED B.  For example,
 	previously, if one used -f 0.90, it required that a feature in B overlap 90% of the feature in A for the "hit"
@@ -65,17 +77,21 @@ VERSION 2.1.2
 2. Change the "score" column (i.e. column 5) to b stored as a string.  While this deviates
    from the UCSC convention, it allows significantly more information to be packed into the column.
 
+
 VERSION 2.1.1
 1. Added limits.h to bedFile.h to fix compilation issues on some systems.
 2. Fixed bug in testing for "track" or "browser" lines.
+
 
 VERSION 2.1.0
 1. Fixed a bug in peIntersectBed that prevented -a from being correctly handled when passed via stdin.
 2. Added new functionality to coverageBed that calculates the density of coverage.
 3. Fixed bug in geneomCoverageBed.
 
+
 VERSION 2.0.1
 1. Added the ability to retain UCSC browser track/browser headers in BED files.
+
 
 VERSION 2.0
 1.  Sped up the file parsing.  ~10-20% increase in speed.
@@ -83,6 +99,7 @@ VERSION 2.0
 3.  Added the ability to compare BED files accounting for strandedness.
 4.  Paired-end intersect.
 5.  Fixed bug that prevented overlaps from being reported when the overlap fraction requested is 1.0
+
 
 
 VERSION 1.2, 04/27/2009. (1eb06115bdf3c49e75793f764a70c3501bb53f33)

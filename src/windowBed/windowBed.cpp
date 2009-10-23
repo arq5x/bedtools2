@@ -14,7 +14,8 @@
 /*
 	Constructor
 */
-BedWindow::BedWindow(string &bedAFile, string &bedBFile, int &leftSlop, int &rightSlop, bool &anyHit, bool &noHit, bool &writeCount, bool &forceStrand) {
+BedWindow::BedWindow(string &bedAFile, string &bedBFile, int &leftSlop, int &rightSlop, bool &anyHit, bool &noHit, 
+					bool &writeCount, bool &strandWindows, bool &matchOnStrand) {
 
 	this->bedAFile = bedAFile;
 	this->bedBFile = bedBFile;
@@ -25,8 +26,9 @@ BedWindow::BedWindow(string &bedAFile, string &bedBFile, int &leftSlop, int &rig
 	this->anyHit = anyHit;
 	this->noHit = noHit;
 	this->writeCount = writeCount;
-	this->forceStrand = forceStrand;	
-	
+	this->strandWindows = strandWindows;	
+	this->matchOnStrand = matchOnStrand;
+		
 	this->bedA = new BedFile(bedAFile);
 	this->bedB = new BedFile(bedBFile);
 }
@@ -48,14 +50,41 @@ void BedWindow::FindWindowOverlaps(BED &a, vector<BED> &hits) {
 	int aFudgeStart = 0;
 	int aFudgeEnd;
 
-	if ((a.start - this->leftSlop) > 0) {
-		aFudgeStart = a.start - this->leftSlop;
+
+	// Does the user want to treat the windows based on strand?
+	// If so, 
+	// if "+", then left is left and right is right
+	// if "-", the left is right and right is left.
+	if (this->strandWindows) {
+		
+		if (a.strand == "+") {
+			if ((a.start - this->leftSlop) > 0) {
+				aFudgeStart = a.start - this->leftSlop;
+			}
+			else {
+				aFudgeStart = 0;
+			}
+			aFudgeEnd = a.end + this->rightSlop;
+		}
+		else {
+			if ((a.start - this->rightSlop) > 0) {
+				aFudgeStart = a.start - this->rightSlop;
+			}
+			else {
+				aFudgeStart = 0;
+			}
+			aFudgeEnd = a.end + this->leftSlop;
+		}
 	}
 	else {
-		aFudgeStart = 0;
+		if ((a.start - this->leftSlop) > 0) {
+			aFudgeStart = a.start - this->leftSlop;
+		}
+		else {
+			aFudgeStart = 0;
+		}
+		aFudgeEnd = a.end + this->rightSlop;
 	}
-	aFudgeEnd = a.end + this->rightSlop;
-
 	
 	bedB->binKeeperFind(bedB->bedMap[a.chrom], aFudgeStart, aFudgeEnd, hits);
 
@@ -64,7 +93,7 @@ void BedWindow::FindWindowOverlaps(BED &a, vector<BED> &hits) {
 	
 		// if forcing strandedness, move on if the hit
 		// is not on the same strand as A.
-		if ((this->forceStrand) && (a.strand != h->strand)) {
+		if ((this->matchOnStrand) && (a.strand != h->strand)) {
 			continue;		// continue force the next iteration of the for loop.
 		}
 	
