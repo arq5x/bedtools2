@@ -166,7 +166,7 @@ void ShowHelp(void) {
 	cerr << "\t" << "-w (def. 1000)\t\t"	<< "Base pairs added upstream and downstream of each entry in A when searching for overlaps in B." << endl << endl;	
 	cerr << "\t" << "-l (def. 1000)\t\t"	<< "Base pairs added upstream (left of) of each entry in A when searching for overlaps in B." << endl << endl;	
 	cerr << "\t" << "-r (def. 1000)\t\t"	<< "Base pairs added downstream (right of) of each entry in A when searching for overlaps in B." << endl << endl;	
-	cerr << "\t" << "-sw\t\t\t"            	<< "Define -l and -r based on strand.  E.g. if used, -l 500 for a negative-stranded feature will add 500 bp downstream.  Default = false." << endl << "\t\t\t\tBy default, overlaps are reported without respect to strand." << endl << endl;	
+	cerr << "\t" << "-sw\t\t\t"            	<< "Define -l and -r based on strand.  E.g. if used, -l 500 for a negative-stranded " << endl << "\t\t\t\tfeature will add 500 bp downstream.  Default = false." << endl << endl;	
 	cerr << "\t" << "-sm\t\t\t"            	<< "Only report hits in B that overlap A on the same strand." << endl << "\t\t\t\tBy default, overlaps are reported without respect to strand." << endl << endl;	
 	cerr << "\t" << "-u\t\t\t"            	<< "Write ORIGINAL a.bed entry ONCE if ANY overlap with B.bed." << endl << "\t\t\t\tIn other words, just report the fact >=1 hit was found." << endl << endl;
 	cerr << "\t" << "-v \t\t\t"             << "Only report those entries in A that have NO OVERLAP in B within the requested window." << endl << "\t\t\t\tSimilar to grep -v." << endl << endl;
