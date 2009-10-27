@@ -105,7 +105,7 @@ void ShowHelp(void) {
 
 	cerr << "NOTES: " << endl;
 	cerr << "\t" << "-i stdin\t"	<< "Allows BED file A to be read from stdin.  E.g.: cat a.bed | linksBed -i stdin > out.html" << endl << endl;
-	cerr << "\t***Only BED3 - BED6 formats allowed.***"<< endl << endl;
+	cerr << "\t***Only tab-delimited BED3 - BED6 formats allowed.***"<< endl << endl;
 	
 	cerr << "EXAMPLE: " << endl;
 	cerr << "\t" << "By default, the links created will point to the human (hg18) UCSC browser.  If you have a local mirror, you can override this behavior";

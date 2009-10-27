@@ -132,7 +132,7 @@ void ShowHelp(void) {
 	cerr << "NOTES: " << endl;
 	cerr << "\t" << "-i stdin\t"	<< "Allows BEDPE file A to be read from stdin.  E.g.: cat a.bedpe | peIntersectBed -a stdin -b B.bed" << endl << endl;
 	cerr << "\t***Only BEDPE formats allowed for -a (6,7,8, or 10 column format.  See below).***"<< endl << endl;
-	cerr << "\t***Only BED3 - BED6 formats allowed for -b.***"<< endl << endl;
+	cerr << "\t***Only tab-delimited BED3 - BED6 formats allowed for -b.***"<< endl << endl;
 	
 	cerr << "BEDPE FORMAT (tab-delimited): " << endl;
 	cerr << "\t" << "1. chrom for end 1 (req'd)" << endl; 

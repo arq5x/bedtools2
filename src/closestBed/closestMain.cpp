@@ -113,7 +113,7 @@ void ShowHelp(void) {
 	cerr << "\t" << "-i stdin\t\t" << "Allows BED file A to be read from stdin.  E.g.: cat a.bed | closestBed -a stdin -b B.bed" << endl << endl;
 	cerr << "\t" << "Reports \"none\" for chrom and \"-1\" for all other fields when a feature is not found in B on the same chromosome" << endl;
 	cerr << "\t" << "as the feature in A.  E.g. none\t-1\t-1" << endl << endl;
-	cerr << "\t***Only BED3 - BED6 formats allowed.***" << endl << endl;
+	cerr << "\t***Only tab-delimited  BED3 - BED6 formats allowed.***" << endl << endl;
 	
 	// end the program here
 	exit(1);

@@ -1,3 +1,8 @@
+Version 2.2.4 (10/27/2009)
+1. Updated the mergeBed documentation to describe the -names option which allows one to report the names of the
+features that were merged (separated by semicolons).
+
+
 Version 2.2.3 (10/23/2009)
 1. Changed windowBed to optionally define "left" and "right" windows based on strand.  For example by default, -l 100 and -r 500 will
 add 100 bases to the left (lower coordinates) of a feature in A when scanning for hits in B and 500 bases to the right (higher coordinates).

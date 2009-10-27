@@ -102,7 +102,7 @@ void ShowHelp(void) {
 	cerr << " Aaron Quinlan, Ph.D. (aaronquinlan@gmail.com)  " << endl ;
 	cerr << " Hall Laboratory, University of Virginia" << endl;
 	cerr << "===============================================" << endl << endl;
-	cerr << "Description: Merges overlapping bed entries into a sinle interval." << endl << endl;
+	cerr << "Description: Merges overlapping bed entries into a single interval." << endl << endl;
 
 	cerr << "Usage: " << PROGRAM_NAME << " [OPTIONS] -i <input.bed>" << endl << endl;
 
@@ -110,10 +110,12 @@ void ShowHelp(void) {
 	cerr << "\t" << "-s\t\t\t"  << "Force strandedness.  Only report hits in B that overlap A on the same strand." << endl << "\t\t\t\tBy default, overlaps are reported without respect to strand." << endl << endl;	
 	cerr << "\t" << "-n\t\t\t"	<< "Report the number of BED entries that were merged. (=1 if no merging occured)" << endl << endl;
 	cerr << "\t" << "-d\t\t\t"  << "Maximum distance between features allowed for features to be merged. (Default=0)" << endl << endl;
+	cerr << "\t" << "-names\t\t\t"  << "Report the names of the merged features separated by semicolons." << endl << endl;
+	
 
 	cerr << "NOTES: " << endl;
 	cerr << "\t" << "-i stdin\t\t"	<< "Allows BED file A to be read from stdin.  E.g.: cat a.bed | mergeBed -a stdin -b B.bed" << endl << endl;
-	cerr << "\t***Only BED3 - BED6 formats allowed.***"<< endl << endl;
+	cerr << "\t***Only tab-delimited BED3 - BED6 formats allowed.***"<< endl << endl;
 
 	// end the program here
 	exit(1);

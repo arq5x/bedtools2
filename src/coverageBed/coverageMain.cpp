@@ -95,7 +95,7 @@ void ShowHelp(void) {
 
 	cerr << "NOTES: " << endl;
 	cerr << "\t" << "-i stdin\t\t"	<< "Allows BED file A to be read from stdin.  E.g.: cat a.bed | intersectBed -a stdin -b B.bed" << endl << endl;
-	cerr << "\t***Only BED3 - BED6 formats allowed.***"<< endl << endl;
+	cerr << "\t***Only tab-delimited BED3 - BED6 formats allowed.***"<< endl << endl;
 
 	cerr << "OUTPUT: " << endl;
 	cerr << "\t" << "After each entry in B, reports: " << endl; 

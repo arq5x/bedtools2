@@ -100,7 +100,7 @@ void ShowHelp(void) {
 	cerr << " Hall Laboratory, University of Virginia" << endl;
 	cerr << "===============================================" << endl << endl;
 	cerr << "Description: Compute the coverage of a BED (-i) file on genome (-g) file." << endl << endl;
-	cerr << "***NOTE: Only BED3 - BED6 formats allowed.***"<< endl;
+	cerr << "***NOTE: Only tab-delimited BED3 - BED6 formats allowed.***"<< endl;
 	cerr << "***NOTE: Input BED file must be grouped by chromosome.  A simple UNIX sort will suffice.***"<< endl << endl;
 
 	cerr << "Usage: " << PROGRAM_NAME << " [OPTIONS] -g <genome> -i <bed>" << endl << endl;
