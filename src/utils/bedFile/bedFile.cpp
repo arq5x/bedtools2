@@ -251,17 +251,17 @@ bool BedFile::parseBedLine (BED &bed, const vector<string> &lineVector, const in
 			return true;
 		}
 		else {
-			cerr << "Unexpected number of fields: " << lineNum << ".  Verify that your files are TAB-delimited and that your BED file has 3,4,5 or 6 fields.  Exiting..." << endl;
+			cerr << "Error: unexpected number of fields: " << lineNum << ".  Verify that your files are TAB-delimited and that your BED file has 3,4,5 or 6 fields.  Exiting..." << endl;
 			exit(1);
 		}
 		
 		if (bed.start > bed.end) {
-			cerr << "Error: malformed BED entry at line " << lineNum << ". Start was greater than End. Ignoring it and moving on." << endl;
-			return false;
+			cerr << "Error: malformed BED entry at line " << lineNum << ". Start was greater than end. Exiting." << endl;
+			exit(1);
 		}
-		else if ( (bed.start < 0) || (bed.end < 0) ) {
-			cerr << "Error: malformed BED entry at line " << lineNum << ". Coordinate <= 0. Ignoring it and moving on." << endl;
-			return false;
+		if ( (bed.start < 0) || (bed.end < 0) ) {
+			cerr << "Error: malformed BED entry at line " << lineNum << ". Coordinate detected that is < 0. Exiting." << endl;
+			exit(1);
 		}
 	}
 	else if ((lineNum == 1) && (lineVector.size() >= 3)) {
@@ -304,17 +304,17 @@ bool BedFile::parseBedLine (BED &bed, const vector<string> &lineVector, const in
 			return true;
 		}
 		else {
-			cerr << "Unexpected number of fields: " << lineNum << ".  Verify that your files are TAB-delimited and that your BED file has 3,4,5 or 6 fields.  Exiting..." << endl;
+			cerr << "Error: unexpected number of fields: " << lineNum << ".  Verify that your files are TAB-delimited and that your BED file has 3,4,5 or 6 fields.  Exiting..." << endl;
 			exit(1);
 		}
 		
 		if (bed.start > bed.end) {
-			cerr << "Error: malformed BED entry at line " << lineNum << ". Start was greater than End. Ignoring it and moving on." << endl;
-			return false;
+			cerr << "Error: malformed BED entry at line " << lineNum << ". Start was greater than end. Exiting." << endl;
+			exit(1);
 		}
-		else if ( (bed.start < 0) || (bed.end < 0) ) {
-			cerr << "Error: malformed BED entry at line " << lineNum << ". Coordinate <= 0. Ignoring it and moving on." << endl;
-			return false;
+		if ( (bed.start < 0) || (bed.end < 0) ) {
+			cerr << "Error: malformed BED entry at line " << lineNum << ". Coordinate detected that is < 0. Exiting." << endl;
+			exit(1);
 		}
 	}
 	else if (lineVector.size() == 1) {
@@ -487,7 +487,6 @@ void BedFile::reportBedRange(const BED &bed, int &start, int &end) {
 		cout << bed.chrom << "\t" << start << "\t" << end << "\t" 
 		<< bed.name << "\t" << bed.score << "\t" << bed.strand;
 	}
-	
 }
 
 
