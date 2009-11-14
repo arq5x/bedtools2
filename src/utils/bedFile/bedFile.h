@@ -10,6 +10,7 @@
 #include <cstring>
 #include <algorithm>
 #include <limits.h>
+#include <cstdio>
 
 using namespace std;
 
@@ -101,7 +102,7 @@ public:
 	~BedFile(void);
 
 	// Methods
-	bool parseBedLine (BED &, const vector<string> &, const int &);
+	bool parseBedLine (BED &, const vector<string> &, int);
 
 	void loadBedFileIntoMap();
 	void loadBedFileIntoMapNoBin();	
@@ -111,9 +112,14 @@ public:
 		const int, vector<BED> &);
 
 	void countHits(map<int, vector<BED>, std::less<int> > &, BED &, bool &);
-	void reportBed(const BED &);
-	void reportBedRange(const BED &, int &, int &);
 
+	// printing methods
+	void reportBedTab(BED);
+	void reportBedNewLine(BED);
+		
+	void reportBedRangeTab(BED, int, int);
+	void reportBedRangeNewLine(BED, int, int);
+	
 	// a vector of the BED entries in the BED file.
 	vector<BED> bedVector;
 	masterBedMap bedMap;

@@ -60,15 +60,12 @@ void Bed2Fa::ExtractDNA() {
 	
 	while (getline(faDb,fastaDbLine)) {
 		
-		if (fastaDbLine.find(">chr",0) != 0 ) {
+		if (fastaDbLine.find(">",0) != 0 ) {
 			currDNA += fastaDbLine;
 		}
 		else {
 			if (currDNA.size() > 0) {
 
-				// retive the vecvtor of BED elements that come from the current 
-				// chromosome that we are processing in the fasta "database".
-						
 				vector<BED> bedList = bed->bedMapNoBin[currChrom];
 
 				// loop through each BED entry for this chrom and 
@@ -95,9 +92,6 @@ void Bed2Fa::ExtractDNA() {
 	
 	// process the last chromosome in the fasta file.
 	if (currDNA.size() > 0) {
-
-		// retrieve the vector of BED elements that come from the current 
-		// chromosome that we are processing in the fasta "database".
 		
 		vector<BED> bedList = bed->bedMapNoBin[currChrom];
 

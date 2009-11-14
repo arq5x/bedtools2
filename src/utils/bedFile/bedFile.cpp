@@ -63,11 +63,12 @@ static int getBin(int start, int end)
 	* and for each chromosome (which is assumed to be less than
 	* 512M.)  A range goes into the smallest bin it will fit in. */
 {
-	int startBin = start, endBin = end-1, i;
+	int startBin = start;
+	int endBin = end-1;
 	startBin >>= _binFirstShift;
 	endBin >>= _binFirstShift;
 	
-	for (i=0; i<6; ++i) {
+	for (int i=0; i<6; ++i) {
 		if (startBin == endBin) {
 			return binOffsetsExtended[i] + startBin;
 		}
@@ -142,15 +143,14 @@ bool byChromThenStart(BED const & a, BED const & b){
 void BedFile::binKeeperFind(map<int, vector<BED>, std::less<int> > &bk, const int start, const int end, vector<BED> &hits) {
 
 	int startBin, endBin;
-	int i,j;
-
-	startBin = (start>>_binFirstShift);
-	endBin = ((end-1)>>_binFirstShift);
-	for (i=0; i<6; ++i) {
+	startBin = (start >>_binFirstShift);
+	endBin = ((end-1) >>_binFirstShift);
+	
+	for (int i = 0; i < 6; ++i) {
 		int offset = binOffsetsExtended[i];
 
-		for (j = (startBin+offset); j <= (endBin+offset); ++j)  {
-			for (vector<BED>::iterator el = bk[j].begin(); el != bk[j].end(); ++el) {
+		for (int j = (startBin+offset); j <= (endBin+offset); ++j)  {
+			for (vector<BED>::const_iterator el = bk[j].begin(); el != bk[j].end(); ++el) {
 				
 				if (overlaps(el->start, el->end, start, end) > 0) {
 					hits.push_back(*el);
@@ -210,7 +210,7 @@ BedFile::~BedFile(void) {
 }
 
 
-bool BedFile::parseBedLine (BED &bed, const vector<string> &lineVector, const int &lineNum) {
+bool BedFile::parseBedLine (BED &bed, const vector<string> &lineVector, int lineNum) {
 
 	if ( (lineNum > 1) && (lineVector.size() == this->bedType)) {
 
@@ -350,13 +350,11 @@ void BedFile::loadBedFileIntoMap() {
 	bedFields.reserve(6);		// reserve space for worst case (BED 6)
 
 	while (getline(bed, bedLine)) {
+		lineNum++;
+		
+		if (lineNum > 1) {
 
-		if ((bedLine.find("track") != string::npos) || (bedLine.find("browser") != string::npos)) {
-			continue;
-		}
-		else {
 			Tokenize(bedLine,bedFields);
-			lineNum++;
 
 			if (parseBedLine(bedEntry, bedFields, lineNum)) {
 				int bin = getBin(bedEntry.start, bedEntry.end);
@@ -365,6 +363,22 @@ void BedFile::loadBedFileIntoMap() {
 				this->bedMap[bedEntry.chrom][bin].push_back(bedEntry);	
 			}
 			bedFields.clear();
+		}
+		else {
+			if ((bedLine.find("track") != string::npos) || (bedLine.find("browser") != string::npos)) {
+				continue;
+			}
+			else {
+				Tokenize(bedLine,bedFields);
+
+				if (parseBedLine(bedEntry, bedFields, lineNum)) {
+					int bin = getBin(bedEntry.start, bedEntry.end);
+					bedEntry.count = 0;
+					bedEntry.minOverlapStart = INT_MAX;
+					this->bedMap[bedEntry.chrom][bin].push_back(bedEntry);	
+				}
+				bedFields.clear();
+			}
 		}
 	}
 }
@@ -439,54 +453,109 @@ void BedFile::loadBedFileIntoMapNoBin() {
 
 
 /*
-	reportBed
+	reportBedTab
 	
-	Writes the _original_ BED entry.
+	Writes the _original_ BED entry with a TAB
+	at the end of the line.
 	Works for BED3 - BED6.
 */
-void BedFile::reportBed(const BED &bed) {
+void BedFile::reportBedTab(BED bed) {
 	
 	if (this->bedType == 3) {
-		cout << bed.chrom << "\t" << bed.start << "\t" << bed.end;
+		printf ("%s\t%d\t%d\t", bed.chrom.c_str(), bed.start, bed.end);
 	}
 	else if (this->bedType == 4) {
-		cout << bed.chrom << "\t" << bed.start << "\t" << bed.end << "\t"
-		<< bed.name;
+		printf ("%s\t%d\t%d\t%s\t", bed.chrom.c_str(), bed.start, bed.end, bed.name.c_str());
 	}
 	else if (this->bedType == 5) {
-		cout << bed.chrom << "\t" << bed.start << "\t" << bed.end << "\t"
-		<< bed.name << "\t" << bed.score;
+		printf ("%s\t%d\t%d\t%s\t%s\t", bed.chrom.c_str(), bed.start, bed.end, bed.name.c_str(), 
+										bed.score.c_str());
 	}
 	else if (this->bedType == 6) {
-		cout << bed.chrom << "\t" << bed.start << "\t" << bed.end << "\t" 
-		<< bed.name << "\t" << bed.score << "\t" << bed.strand;
+		printf ("%s\t%d\t%d\t%s\t%s\t%s\t", bed.chrom.c_str(), bed.start, bed.end, bed.name.c_str(), 
+											bed.score.c_str(), bed.strand.c_str());
 	}
 }
+
 
 
 /*
-	reportBedRange
+	reportBedNewLine
 	
-	Writes a custom start->end for a BED entry.
+	Writes the _original_ BED entry with a NEWLINE
+	at the end of the line.
 	Works for BED3 - BED6.
 */
-void BedFile::reportBedRange(const BED &bed, int &start, int &end) {
-
+void BedFile::reportBedNewLine(BED bed) {
+	
 	if (this->bedType == 3) {
-		cout << bed.chrom << "\t" << start << "\t" << end;
+		printf ("%s\t%d\t%d\n", bed.chrom.c_str(), bed.start, bed.end);
 	}
 	else if (this->bedType == 4) {
-		cout << bed.chrom << "\t" << start << "\t" << end << "\t"
-		<< bed.name;
+		printf ("%s\t%d\t%d\t%s\n", bed.chrom.c_str(), bed.start, bed.end, bed.name.c_str());
 	}
 	else if (this->bedType == 5) {
-		cout << bed.chrom << "\t" << start << "\t" << end << "\t"
-		<< bed.name << "\t" << bed.score;
+		printf ("%s\t%d\t%d\t%s\t%s\n", bed.chrom.c_str(), bed.start, bed.end, bed.name.c_str(), 
+										bed.score.c_str());
 	}
 	else if (this->bedType == 6) {
-		cout << bed.chrom << "\t" << start << "\t" << end << "\t" 
-		<< bed.name << "\t" << bed.score << "\t" << bed.strand;
+		printf ("%s\t%d\t%d\t%s\t%s\t%s\n", bed.chrom.c_str(), bed.start, bed.end, bed.name.c_str(), 
+											bed.score.c_str(), bed.strand.c_str());
 	}
 }
 
 
+
+/*
+	reportBedRangeNewLine
+	
+	Writes a custom start->end for a BED entry
+	with a NEWLINE at the end of the line.
+
+	Works for BED3 - BED6.
+*/
+void BedFile::reportBedRangeTab(BED bed, int start, int end) {
+
+	if (this->bedType == 3) {
+		printf ("%s\t%d\t%d\t", bed.chrom.c_str(), start, end);
+	}
+	else if (this->bedType == 4) {
+		printf ("%s\t%d\t%d\t%s\t", bed.chrom.c_str(), start, end, bed.name.c_str());
+	}
+	else if (this->bedType == 5) {
+		printf ("%s\t%d\t%d\t%s\t%s\t", bed.chrom.c_str(), start, end, bed.name.c_str(), 
+										bed.score.c_str());
+	}
+	else if (this->bedType == 6) {
+		printf ("%s\t%d\t%d\t%s\t%s\t%s\t", bed.chrom.c_str(), start, end, bed.name.c_str(), 
+											bed.score.c_str(), bed.strand.c_str());
+	}
+}
+
+
+
+/*
+	reportBedRangeTab
+	
+	Writes a custom start->end for a BED entry 
+	with a TAB at the end of the line.
+	
+	Works for BED3 - BED6.
+*/
+void BedFile::reportBedRangeNewLine(BED bed, int start, int end) {
+
+	if (this->bedType == 3) {
+		printf ("%s\t%d\t%d\n", bed.chrom.c_str(), start, end);
+	}
+	else if (this->bedType == 4) {
+		printf ("%s\t%d\t%d\t%s\n", bed.chrom.c_str(), start, end, bed.name.c_str());
+	}
+	else if (this->bedType == 5) {
+		printf ("%s\t%d\t%d\t%s\t%s\n", bed.chrom.c_str(), start, end, bed.name.c_str(), 
+										bed.score.c_str());
+	}
+	else if (this->bedType == 6) {
+		printf ("%s\t%d\t%d\t%s\t%s\t%s\n", bed.chrom.c_str(), start, end, bed.name.c_str(), 
+											bed.score.c_str(), bed.strand.c_str());
+	}
+}

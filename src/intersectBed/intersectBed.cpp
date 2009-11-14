@@ -55,7 +55,7 @@ void BedIntersect::FindOverlaps(BED &a, vector<BED> &hits) {
 		printable = false;
 	}
 	
-	for (vector<BED>::iterator h = hits.begin(); h != hits.end(); ++h) {
+	for (vector<BED>::const_iterator h = hits.begin(); h != hits.end(); ++h) {
 	
 		// if forcing strandedness, move on if the hit
 		// is not on the same strand as A.
@@ -78,20 +78,20 @@ void BedIntersect::FindOverlaps(BED &a, vector<BED> &hits) {
 				
 					if (!writeB && printable) {
 						if (writeA) {
-							bedA->reportBed(a); cout << endl;
+							bedA->reportBedNewLine(a);
 						}
 						else {
-							bedA->reportBedRange(a,s,e);  cout << endl;
+							bedA->reportBedRangeNewLine(a,s,e);
 						}
 					}
 					else if (printable) {
 						if (writeA) {
-							bedA->reportBed(a); cout << "\t";
-							bedB->reportBed(*h); cout << endl;
+							bedA->reportBedTab(a);
+							bedB->reportBedNewLine(*h);
 						}
 						else {
-							bedA->reportBedRange(a,s,e); cout << "\t";
-							bedB->reportBed(*h); cout << endl;										
+							bedA->reportBedRangeTab(a,s,e);
+							bedB->reportBedNewLine(*h);									
 						}
 					}
 				}
@@ -105,20 +105,20 @@ void BedIntersect::FindOverlaps(BED &a, vector<BED> &hits) {
 					
 						if (!writeB && printable) {
 							if (writeA) {
-								bedA->reportBed(a); cout << endl;
+								bedA->reportBedNewLine(a);
 							}
 							else {
-								bedA->reportBedRange(a,s,e);  cout << endl;
+								bedA->reportBedRangeNewLine(a,s,e);
 							}
 						}
 						else if (printable) {
 							if (writeA) {
-								bedA->reportBed(a); cout << "\t";
-								bedB->reportBed(*h); cout << endl;
+								bedA->reportBedTab(a);
+								bedB->reportBedNewLine(*h);
 							}
 							else {
-								bedA->reportBedRange(a,s,e); cout << "\t";
-								bedB->reportBed(*h); cout << endl;										
+								bedA->reportBedRangeTab(a,s,e);
+								bedB->reportBedNewLine(*h);									
 							}
 						}
 					}
@@ -127,13 +127,14 @@ void BedIntersect::FindOverlaps(BED &a, vector<BED> &hits) {
 		}
 	}
 	if (anyHit && (numOverlaps >= 1)) {
-		bedA->reportBed(a); cout << endl;
+		bedA->reportBedNewLine(a);
 	}
 	else if (writeCount) {
-		bedA->reportBed(a); cout << "\t" << numOverlaps << endl;
+		bedA->reportBedTab(a); 
+		printf("%d\n", numOverlaps);
 	}
 	else if (noHit && (numOverlaps == 0)) {
-		bedA->reportBed(a); cout << endl;
+		bedA->reportBedNewLine(a);
 	}
 }
 
@@ -148,7 +149,13 @@ void BedIntersect::IntersectBed() {
 	string bedLine;
 	BED bedEntry;                                                                                                                        
 	int lineNum = 0;
-
+	vector<BED> hits;					// vector or potential hits
+	vector<string> bedFields;	// vector for a BED entry
+	
+	// reserve some space
+	hits.reserve(100);
+	bedFields.reserve(6);	
+	
 	// are we dealing with a file?
 	if (bedA->bedFile != "stdin") {
 
@@ -163,20 +170,30 @@ void BedIntersect::IntersectBed() {
 		// process each entry in A
 		while (getline(bed, bedLine)) {
 	
-			if ((bedLine.find("track") != string::npos) || (bedLine.find("browser") != string::npos)) {
-				continue;
-			}
-			else {			
-				// split the current line into ditinct fields
-				vector<string> bedFields;
+			lineNum++;
+			
+			if (lineNum > 1) {
 				Tokenize(bedLine,bedFields);
 
-				lineNum++;
-			
 				// find the overlaps with B if it's a valid BED entry. 
 				if (bedA->parseBedLine(a, bedFields, lineNum)) {
-					vector<BED> hits;
 					FindOverlaps(a, hits);
+					hits.clear();
+				}
+				bedFields.clear();
+			}
+			else {
+				if ((bedLine.find("track") != string::npos) || (bedLine.find("browser") != string::npos)) {
+					continue;
+				}
+				else {
+					Tokenize(bedLine,bedFields);
+					// find the overlaps with B if it's a valid BED entry. 
+					if (bedA->parseBedLine(a, bedFields, lineNum)) {
+						FindOverlaps(a, hits);
+						hits.clear();
+					}
+					bedFields.clear();
 				}
 			}
 		}
@@ -188,20 +205,30 @@ void BedIntersect::IntersectBed() {
 		// process each entry in A
 		while (getline(cin, bedLine)) {
 
-			if ((bedLine.find("track") != string::npos) || (bedLine.find("browser") != string::npos)) {
-				continue;
-			}
-			else {			
-				// split the current line into distinct fields
-				vector<string> bedFields;
+			lineNum++;
+			
+			if (lineNum > 1) {
 				Tokenize(bedLine,bedFields);
 
-				lineNum++;
-			
 				// find the overlaps with B if it's a valid BED entry. 
 				if (bedA->parseBedLine(a, bedFields, lineNum)) {
-					vector<BED> hits;
 					FindOverlaps(a, hits);
+					hits.clear();
+				}
+				bedFields.clear();
+			}
+			else {
+				if ((bedLine.find("track") != string::npos) || (bedLine.find("browser") != string::npos)) {
+					continue;
+				}
+				else {
+					Tokenize(bedLine,bedFields);
+					// find the overlaps with B if it's a valid BED entry. 
+					if (bedA->parseBedLine(a, bedFields, lineNum)) {
+						FindOverlaps(a, hits);
+						hits.clear();
+					}
+					bedFields.clear();
 				}
 			}
 		}
