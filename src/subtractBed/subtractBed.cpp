@@ -72,7 +72,7 @@ void BedSubtract::FindOverlaps(BED &a, vector<BED> &hits) {
 	
 	if (numOverlaps == 0) {
 		// no overlap found, so just report A as-is.
-		bedA->reportBed(a); cout << "\n";
+		bedA->reportBedNewLine(a);
 	}
 	else if (numOverlaps == 1) {
 		// one overlap found.  only need to look at the single
@@ -87,26 +87,26 @@ void BedSubtract::FindOverlaps(BED &a, vector<BED> &hits) {
 			// B        ----
 			// Res. ====    ====					
 			if ( (theHit.start > a.start) && (theHit.end < a.end) ) {
-				bedA->reportBedRange(a,a.start,theHit.start); cout << "\n";
-				bedA->reportBedRange(a,theHit.end,a.end); cout << "\n";
+				bedA->reportBedRangeNewLine(a,a.start,theHit.start);
+				bedA->reportBedRangeNewLine(a,theHit.end,a.end);
 			}
 			// A	++++++++++++
 			// B    ----------
 			// Res.           ==        			
 			else if (theHit.start == a.start) {
-				bedA->reportBedRange(a,theHit.end,a.end); cout << "\n";
+				bedA->reportBedRangeNewLine(a,theHit.end,a.end);
 			}	
 			// A	      ++++++++++++
 			// B    ----------
 			// Res.       ====
 			else if (theHit.start < a.start) {
-				bedA->reportBedRange(a,theHit.end,a.end); cout << "\n";					
+				bedA->reportBedRangeNewLine(a,theHit.end,a.end);
 			}
 			// A	++++++++++++
 			// B           ----------
 			// Res. =======
 			else if (theHit.start > a.start) {
-				bedA->reportBedRange(a,a.start,theHit.start); cout << "\n";					
+				bedA->reportBedRangeNewLine(a,a.start,theHit.start);	
 			}
 		}
 	}
@@ -136,7 +136,7 @@ void BedSubtract::FindOverlaps(BED &a, vector<BED> &hits) {
 					}
 					int blockEnd = i + a.start;
 					blockEnd = min(a.end, blockEnd);
-					bedA->reportBedRange(a,blockStart,blockEnd); cout << "\n";	
+					bedA->reportBedRangeNewLine(a,blockStart,blockEnd);
 				}
 			}
 		}

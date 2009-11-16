@@ -363,6 +363,7 @@ void BedFile::loadBedFileIntoMap() {
 				this->bedMap[bedEntry.chrom][bin].push_back(bedEntry);	
 			}
 			bedFields.clear();
+
 		}
 		else {
 			if ((bedLine.find("track") != string::npos) || (bedLine.find("browser") != string::npos)) {
@@ -377,7 +378,7 @@ void BedFile::loadBedFileIntoMap() {
 					bedEntry.minOverlapStart = INT_MAX;
 					this->bedMap[bedEntry.chrom][bin].push_back(bedEntry);	
 				}
-				bedFields.clear();
+				bedFields.clear();			
 			}
 		}
 	}

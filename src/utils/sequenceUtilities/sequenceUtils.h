@@ -7,9 +7,15 @@
 using namespace std;
 
 // Performs an in-place sequence reversal
-void ReverseSequence(string &);
+void reverseSequence(string &);
 
 // Performs an in-place reverse complement conversion
-void ReverseComplement(string &);
+void reverseComplement(string &);
+
+// Converts every character in a string to lowercase
+void toLowerCase(string &);
+
+// Converts every character in a string to uppercase
+void toUpperCase(string &);
 
 #endif	

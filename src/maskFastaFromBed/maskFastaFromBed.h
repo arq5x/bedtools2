@@ -6,6 +6,7 @@
 #include <vector>
 #include <iostream>
 #include <fstream>
+#include <cctype>	/* for tolower */
 
 using namespace std;
 
@@ -23,6 +24,8 @@ public:
 	~MaskFastaFromBed(void);
 
 	void MaskFasta();
+	
+	void PrettyPrintChrom(ofstream &, string , const string &, int);
 	
 private:
 	

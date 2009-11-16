@@ -130,8 +130,8 @@ void BedGraph::GraphBed() {
 				// Report the coverage for the current interval.
 				int length = beds[i].end - beds[i].start;
 
-				bedB->reportBed(beds[i]);
-				cout << "\t" << beds[i].count << "\t" << (length-zeroDepthCount) << "\t" << length << "\t" << (float) (length-zeroDepthCount)/length << endl;
+				bedB->reportBedTab(beds[i]);
+				printf("\t%d\t%d\t%d\t%f\n", beds[i].count, (length-zeroDepthCount), length, (float) (length-zeroDepthCount)/length);
 			}
 		}
 	}

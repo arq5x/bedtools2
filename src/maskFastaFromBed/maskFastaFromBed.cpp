@@ -10,6 +10,7 @@
 #include "lineFileUtilities.h"
 #include "maskFastaFromBed.h"
 
+
 MaskFastaFromBed::MaskFastaFromBed(string &fastaInFile, string &bedFile, string &fastaOutFile, bool &softMask) {
 
 	this->softMask = false;
@@ -58,50 +59,96 @@ void MaskFastaFromBed::MaskFasta() {
 	string currChrom;
 	string currDNA = "";
 	currDNA.reserve(500000000);
+	int fastaWidth = -1;
+	bool widthSet  = false;
+	int start, end, length;
+	string replacement;
 	
 	while (getline(fa,fastaInLine)) {
 		
 		if (fastaInLine.find(">",0) != 0 ) {
-			currDNA += fastaDbLine;
+			if (widthSet == false) {
+				fastaWidth = fastaInLine.size();
+				widthSet = true;
+			}
+			currDNA += fastaInLine;
 		}
 		else {
 			if (currDNA.size() > 0) {
 
 				vector<BED> bedList = bed->bedMapNoBin[currChrom];
 
-				// loop through each BED entry for this chrom and 
-				// mask the requested sequence in the FASTA file.
+				/*
+					loop through each BED entry for this chrom and 
+					mask the requested sequence in the FASTA file.
+				*/
 				for (unsigned int i = 0; i < bedList.size(); i++) {
+					start = bedList[i].start;
+					end = bedList[i].end;
+					length = end - start;
+					
+					/* 
+					   (1) if soft masking, extract the sequence, lowercase it,
+					       then put it back
+					    (2) otherwise replace with Ns
+					*/
 					if (this->softMask) {
-						//currDNA.replace(bedList[i].start, ((bedList[i].end - bedList[i].start)));
+						replacement = currDNA.substr(start, length);
+						toLowerCase(replacement);
+						currDNA.replace(start, length, replacement);
 					}
 					else {
-						//currDNA.replace(bedList[i].start, ((bedList[i].end - bedList[i].start)));
+						string hardmask(length, 'N');
+						currDNA.replace(start, length, hardmask);
 					}
 				}
-				faOut << ">" << currChrom << endl << currDna << endl;
+				// write the masked chrom to the output file
+				PrettyPrintChrom(faOut, currChrom, currDNA, fastaWidth);
 			}
+			
+			// reset for the next chromosome.
 			currChrom = fastaInLine.substr(1, fastaInLine.find_first_of(" ")-1);
 			currDNA = "";
 		}
 	}
 	
 	// process the last chromosome.
+	// exact same logic as in the main loop.
 	if (currDNA.size() > 0) {
 
 		vector<BED> bedList = bed->bedMapNoBin[currChrom];
 
-		// loop through each BED entry for this chrom and 
-		// mask the requested sequence in the FASTA file.
 		for (unsigned int i = 0; i < bedList.size(); i++) {
+			start = bedList[i].start;
+			end = bedList[i].end;
+			length = end - start;
+			
 			if (this->softMask) {
-				currDNA.replace(bedList[i].start, ((bedList[i].end - bedList[i].start)));
+				replacement = currDNA.substr(start, length);
+				toLowerCase(replacement);
+				currDNA.replace(start, length, replacement);
 			}
 			else {
-				currDNA.replace(bedList[i].start, ((bedList[i].end - bedList[i].start)));
+				string hardmask(length, 'N');
+				currDNA.replace(start, length, hardmask);
 			}
 		}
-		faOut << ">" << currChrom << endl << currDna << endl;
+		PrettyPrintChrom(faOut, currChrom, currDNA, fastaWidth);
+	}
+	
+	fa.close();
+	faOut.close();
+}
+
+void MaskFastaFromBed::PrettyPrintChrom(ofstream &out, string chrom, const string &sequence, int width) {
+	
+	int seqLength = sequence.size();
+	 
+	out << ">" << chrom << endl;
+	for(int i=0; i < seqLength; i+=width)
+	{
+		if (i+width < seqLength) out << sequence.substr(i, width) << endl;
+		else out << sequence.substr(i, seqLength-i) << endl;
 	}
 }
 

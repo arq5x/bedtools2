@@ -101,9 +101,9 @@ void Bed2Fa::ExtractDNA() {
 				
 			string dna = currDNA.substr(bedList[i].start, ((bedList[i].end - bedList[i].start)));
 		
-			if (bedList[i].strand == "-")  {
-				ReverseComplement(dna);
-			}
+			//if (bedList[i].strand == "-")  {
+			//	ReverseComplement(dna);
+			//}
 			if (!(this->useName)) {
 		    	faOut << ">" << currChrom << ":"
 			  		<< bedList[i].start << "-" << bedList[i].end

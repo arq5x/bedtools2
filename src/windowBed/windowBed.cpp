@@ -105,20 +105,19 @@ void BedWindow::FindWindowOverlaps(BED &a, vector<BED> &hits) {
 			if ( ((float)(e-s) / (float)(a.end - a.start)) > 0 ) { 
 				numOverlaps++;	
 				if (!anyHit && !noHit && !writeCount) {			
-					bedA->reportBed(a); cout << "\t";
-					bedB->reportBed(*h); cout << endl;
+					bedA->reportBedTab(a);
+					bedB->reportBedNewLine(*h);
 				}
 			}
 		}
 	}
 	if (anyHit && (numOverlaps >= 1)) {
-		bedA->reportBed(a); cout << endl;
-	}
+		bedA->reportBedNewLine(a);	}
 	else if (writeCount) {
-		bedA->reportBed(a); cout << "\t" << numOverlaps << endl;
+		bedA->reportBedTab(a); printf("\t%d\n", numOverlaps);
 	}
 	else if (noHit && (numOverlaps == 0)) {
-		bedA->reportBed(a); cout << endl;
+		bedA->reportBedNewLine(a);
 	}
 }
 

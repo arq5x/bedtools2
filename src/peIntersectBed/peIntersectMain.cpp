@@ -118,8 +118,8 @@ void ShowHelp(void) {
 	cerr << "Usage: " << PROGRAM_NAME << " [OPTIONS] -a <a.bed> -b <b.bed>" << endl << endl;
 
 	cerr << "OPTIONS: " << endl;
-	cerr << "\t" << "-u\t\t"            	    << "Write ORIGINAL a.bed entry ONCE if ANY overlap with B.bed." << endl << "\t\t\tIn other words, just report the fact >=1 hit was found." << endl << endl;
-	cerr << "\t" << "-c \t\t"					<< "For each entry in A, report the number of hits in B while restricting to -f and -type." << endl << "\t\t\tReports 0 for A entries that have no overlap with B." << endl << endl;
+	//cerr << "\t" << "-u\t\t"            	    << "Write ORIGINAL a.bed entry ONCE if ANY overlap with B.bed." << endl << "\t\t\tIn other words, just report the fact >=1 hit was found." << endl << endl;
+	//cerr << "\t" << "-c \t\t"					<< "For each entry in A, report the number of hits in B while restricting to -f and -type." << endl << "\t\t\tReports 0 for A entries that have no overlap with B." << endl << endl;
 	cerr << "\t" << "-f\t\t"	    			<< "Minimum overlap req'd as fraction of a.bed (e.g. 0.05)." << endl << "\t\t\tDefault is 1E-9 (effectively 1bp)." << endl << endl;
 	cerr << "\t" << "-type \t\t"				<< "either (default)\tReport overlaps if _either_ end of BEDPE (A) overlaps BED B." << endl;
 	cerr 										<< "\t\t\tneither\t\t\tReport overlaps if _neither_ end of BEDPE (A) overlaps BED B." << endl;

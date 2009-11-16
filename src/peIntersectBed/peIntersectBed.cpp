@@ -67,8 +67,8 @@ void BedIntersectPE::FindOverlaps(BEDPE &a, vector<BED> &hits1, vector<BED> &hit
 				numOverlapsEnd1++;
 				
 				if (type == "either") {
-					bedA->reportBedPE(a); cout << "\t";
-					bedB->reportBed(*h); cout << endl;
+					bedA->reportBedPETab(a);
+					bedB->reportBedNewLine(*h); cout << endl;
 				}
 				else {
 					qualityHits1.push_back(*h);
@@ -95,8 +95,8 @@ void BedIntersectPE::FindOverlaps(BEDPE &a, vector<BED> &hits1, vector<BED> &hit
 				numOverlapsEnd2++;
 				
 				if (type == "either") {
-					bedA->reportBedPE(a); cout << "\t";
-					bedB->reportBed(*h); cout << endl;
+					bedA->reportBedPETab(a);
+					bedB->reportBedNewLine(*h);
 				}
 				else {
 					qualityHits2.push_back(*h);
@@ -111,32 +111,32 @@ void BedIntersectPE::FindOverlaps(BEDPE &a, vector<BED> &hits1, vector<BED> &hit
 	*/
 	if (type == "neither") {
 		if ( (numOverlapsEnd1 == 0) && (numOverlapsEnd2 == 0) ) {
-			bedA->reportBedPE(a); cout << endl;
+			bedA->reportBedPENewLine(a); 
 		}
 	}
 	else if (type == "xor") {
 		if ( (numOverlapsEnd1 > 0) && (numOverlapsEnd2 == 0) ) {
 			for (vector<BED>::iterator q = qualityHits1.begin(); q != qualityHits1.end(); ++q) {
-				bedA->reportBedPE(a); cout << "\t";
-				bedB->reportBed(*q); cout << endl;
+				bedA->reportBedPETab(a);
+				bedB->reportBedNewLine(*q);
 			}
 		}
 		else if ( (numOverlapsEnd1 == 0) && (numOverlapsEnd2 > 0) ) {
 			for (vector<BED>::iterator q = qualityHits2.begin(); q != qualityHits2.end(); ++q) {
-				bedA->reportBedPE(a); cout << "\t";
-				bedB->reportBed(*q); cout << endl;
+				bedA->reportBedPETab(a);
+				bedB->reportBedNewLine(*q);
 			}
 		}
 	}
 	else if (type == "both") {
 		if ( (numOverlapsEnd1 > 0) && (numOverlapsEnd2 > 0) ) {
 			for (vector<BED>::iterator q = qualityHits1.begin(); q != qualityHits1.end(); ++q) {
-				bedA->reportBedPE(a); cout << "\t";
-				bedB->reportBed(*q); cout << endl;
+				bedA->reportBedPETab(a);
+				bedB->reportBedNewLine(*q);
 			}
 			for (vector<BED>::iterator q = qualityHits2.begin(); q != qualityHits2.end(); ++q) {
-				bedA->reportBedPE(a); cout << "\t";
-				bedB->reportBed(*q); cout << endl;
+				bedA->reportBedPETab(a);
+				bedB->reportBedNewLine(*q);
 			}
 		}
 	}
@@ -185,9 +185,8 @@ void BedIntersectPE::FindSpanningOverlaps(BEDPE &a, vector<BED> &hits, string &t
 			// is there enough overlap (default ~ 1bp)
 			if ( (float)(e-s) / (float) spanLength >= this->overlapFraction ) { 
 				numOverlaps++;
-
-				bedA->reportBedPE(a); cout << "\t";
-				bedB->reportBed(*h); cout << endl;
+				bedA->reportBedPETab(a);
+				bedB->reportBedNewLine(*h);
 			}
 		}
 	}

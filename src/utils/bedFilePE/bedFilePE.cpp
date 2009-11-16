@@ -27,34 +27,68 @@ BedFilePE::BedFilePE(string &bedFile) {
 BedFilePE::~BedFilePE(void) {
 }
 
+
 /*
-	reportBedPE
+	reportBedPETab
 	
 	Writes the _original_ BED entry for A.
 	Works for BEDPE only.
 */
-void BedFilePE::reportBedPE(const BEDPE &a) {
+void BedFilePE::reportBedPETab(const BEDPE &a) {
 
 	if (this->bedType == 6) {
-		cout << a.chrom1 << "\t" << a.start1 << "\t" << a.end1 << "\t"
-			 << a.chrom2 << "\t" << a.start2 << "\t" << a.end2;
+		printf("%s\t%d\t%d\t%s\t%d\t%d\t", a.chrom1.c_str(), a.start1, a.end1,
+		 									a.chrom2.c_str(), a.start2, a.end2);
 	}
 	else if (this->bedType == 7) {
-		cout << a.chrom1 << "\t" << a.start1 << "\t" << a.end1 << "\t"
-			 << a.chrom2 << "\t" << a.start2 << "\t" << a.end2 << "\t" 
-			 << a.name;
+		printf("%s\t%d\t%d\t%s\t%d\t%d\t%s\t", a.chrom1.c_str(), a.start1, a.end1,
+		 									a.chrom2.c_str(), a.start2, a.end2,
+											a.name.c_str());
 	}	
 	else if (this->bedType == 8) {
-		cout << a.chrom1 << "\t" << a.start1 << "\t" << a.end1 << "\t"
-			 << a.chrom2 << "\t" << a.start2 << "\t" << a.end2 << "\t" 
-			 << a.name << "\t" << a.score;
+		printf("%s\t%d\t%d\t%s\t%d\t%d\t%s\t%d\t", a.chrom1.c_str(), a.start1, a.end1,
+		 									a.chrom2.c_str(), a.start2, a.end2,
+											a.name.c_str(), a.score);
 	}
 	else if (this->bedType == 10) {
-		cout << a.chrom1 << "\t" << a.start1 << "\t" << a.end1 << "\t" 
-			 << a.chrom2 << "\t" << a.start2 << "\t" << a.end2 << "\t"
-			 << a.name << "\t" << a.score << "\t" << a.strand1 << "\t" << a.strand2;
+		printf("%s\t%d\t%d\t%s\t%d\t%d\t%s\t%d\t%s\t%s\t", a.chrom1.c_str(), a.start1, a.end1,
+		 									a.chrom2.c_str(), a.start2, a.end2,
+											a.name.c_str(), a.score, a.strand1.c_str(), a.strand2.c_str());
 	}
 }
+
+
+
+/*
+	reportBedPENewLine
+	
+	Writes the _original_ BED entry for A.
+	Works for BEDPE only.
+*/
+void BedFilePE::reportBedPENewLine(const BEDPE &a) {
+
+	if (this->bedType == 6) {
+		printf("%s\t%d\t%d\t%s\t%d\t%d\n", a.chrom1.c_str(), a.start1, a.end1,
+		 									a.chrom2.c_str(), a.start2, a.end2);
+	}
+	else if (this->bedType == 7) {
+		printf("%s\t%d\t%d\t%s\t%d\t%d\t%s\n", a.chrom1.c_str(), a.start1, a.end1,
+		 									a.chrom2.c_str(), a.start2, a.end2,
+											a.name.c_str());
+	}	
+	else if (this->bedType == 8) {
+		printf("%s\t%d\t%d\t%s\t%d\t%d\t%s\t%d\n", a.chrom1.c_str(), a.start1, a.end1,
+		 									a.chrom2.c_str(), a.start2, a.end2,
+											a.name.c_str(), a.score);
+	}
+	else if (this->bedType == 10) {
+		printf("%s\t%d\t%d\t%s\t%d\t%d\t%s\t%d\t%s\t%s\n", a.chrom1.c_str(), a.start1, a.end1,
+		 									a.chrom2.c_str(), a.start2, a.end2,
+											a.name.c_str(), a.score, a.strand1.c_str(), a.strand2.c_str());
+	}
+}
+
+
 
 bool BedFilePE::parseBedPELine (BEDPE &bed, const vector<string> &lineVector, const int &lineNum) {
 

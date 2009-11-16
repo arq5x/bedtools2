@@ -12,9 +12,6 @@
 
 using namespace std;
 
-//*************************************************
-// Common data structures
-//*************************************************
 
 /*
 	Structure for paired-end records
@@ -54,8 +51,10 @@ public:
 
 	// Methods
 	bool parseBedPELine (BEDPE &, const vector<string> &, const int &);
-	void reportBedPE(const BEDPE &);
-	 
+	void reportBedPETab(const BEDPE &);
+	void reportBedPENewLine(const BEDPE &);
+	
+		 
 	string bedFile;
 	unsigned int bedType;
 

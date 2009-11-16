@@ -234,6 +234,5 @@ void BedIntersect::IntersectBed() {
 		}
 	}
 }
-// END Intersect
 
 

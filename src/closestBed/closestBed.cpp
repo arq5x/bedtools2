@@ -46,19 +46,16 @@ BedClosest::~BedClosest(void) {
 */
 void BedClosest::reportNullB() {
 	if (bedB->bedType == 3) {
-		cout << "none" << "\t" << "-1" << "\t" << "-1";
+		printf("none\t-1\t-1\n");
 	}
 	else if (bedB->bedType == 4) {
-		cout << "none" << "\t" << "-1" << "\t" << "-1" << "\t"
-		<< "-1";
+		printf("none\t-1\t-1\t-1\n");
 	}
 	else if (bedB->bedType == 5) {
-		cout << "none" << "\t" << "-1" << "\t" << "-1" << "\t"
-		<< "-1" << "\t" << "-1";
+		printf("none\t-1\t-1\t-1\t-1\n");
 	}
 	else if (bedB->bedType == 6) {
-		cout << "none" << "\t" << "-1" << "\t" << "-1" << "\t" 
-		<< "-1" << "\t" << "-1" << "\t" << "-1";
+		printf("none\t-1\t-1\t-1\t-1\t-1\n");
 	}
 }
 
@@ -153,40 +150,30 @@ void BedClosest::FindWindowOverlaps(BED &a, vector<BED> &hits) {
 		}
 	}
 	else {
-		bedA->reportBed(a);
-		cout << "\t";
-		reportNullB();
-		cout << "\n"; 
+		bedA->reportBedTab(a);
+		reportNullB(); 
 	}
 
 	if (numOverlaps > 0) {
 		
 		if (closestB.size() == 1) {
-			bedA->reportBed(a); 
-			cout << "\t"; 
-			bedB->reportBed(closestB[0]);
-			cout << "\n";
+			bedA->reportBedTab(a); 
+			bedB->reportBedNewLine(closestB[0]);
 		}
 		else {
 			if (this->tieMode == "all") {
 				for (vector<BED>::iterator b = closestB.begin(); b != closestB.end(); ++b) {
-					bedA->reportBed(a); 
-					cout << "\t";
-					bedB->reportBed(*b);
-					cout << "\n";
+					bedA->reportBedTab(a); 
+					bedB->reportBedNewLine(*b);
 				}
 			}
 			else if (this->tieMode == "first") {
-				bedA->reportBed(a); 
-				cout << "\t"; 
-				bedB->reportBed(closestB[0]);
-				cout << "\n";
+				bedA->reportBedTab(a); 
+				bedB->reportBedNewLine(closestB[0]);
 			}
 			else if (this->tieMode == "last") {
-				bedA->reportBed(a); 
-				cout << "\t"; 
-				bedB->reportBed(closestB[closestB.size()-1]);
-				cout << "\n";
+				bedA->reportBedTab(a); 
+				bedB->reportBedNewLine(closestB[closestB.size()-1]);
 			}
 		}
 	}
