@@ -1,4 +1,4 @@
-#include "peIntersectBed.h"
+#include "pairToPair.h"
 #include "version.h"
 
 using namespace std;
@@ -23,7 +23,7 @@ int main(int argc, char* argv[]) {
 	
 	// input arguments
 	float overlapFraction = 1E-9;
-	string searchType = "either";
+	string searchType = "both";
 
 	// flags to track parameters
 	bool haveBedA = false;
@@ -89,16 +89,15 @@ int main(int argc, char* argv[]) {
 		showHelp = true;
 	}
 	
-	if (haveSearchType && (searchType != "either") && (searchType != "neither") && (searchType != "both") 
-					    && (searchType != "xor") && (searchType != "inspan") && (searchType != "outspan")) {
-		cerr << endl << "*****" << endl << "*****ERROR: Request \"either\" or \"both\" or \"neither\" or \"xor\" or \"inspan\" or \"inspan\"" << endl << "*****" << endl;
+	if (haveSearchType && (searchType != "neither") && (searchType != "both")) {
+		cerr << endl << "*****" << endl << "*****ERROR: Request \"both\" or \"neither\"" << endl << "*****" << endl;
 		showHelp = true;		
 	}
 
 	if (!showHelp) {
 
-		BedIntersectPE *bi = new BedIntersectPE(bedAFile, bedBFile, overlapFraction, searchType);
-		bi->IntersectBedPE();
+		PairToPair *bi = new PairToPair(bedAFile, bedBFile, overlapFraction, searchType);
+		bi->IntersectPairs();
 		return 0;
 	}
 	else {
@@ -113,38 +112,31 @@ void ShowHelp(void) {
 	cerr << " Aaron Quinlan, Ph.D. (aaronquinlan@gmail.com)  " << endl ;
 	cerr << " Hall Laboratory, University of Virginia" << endl;
 	cerr << "===============================================" << endl << endl;
-	cerr << "Description: Report overlaps between a.bedpe and b.bed." << endl << endl;
+	cerr << "Description: Report overlaps between a.bedpe and b.bedpe." << endl << endl;
 
-	cerr << "Usage: " << PROGRAM_NAME << " [OPTIONS] -a <a.bedpe> -b <b.bed>" << endl << endl;
+	cerr << "Usage: " << PROGRAM_NAME << " [OPTIONS] -a <a.bedpe> -b <b.bedpe>" << endl << endl;
 
 	cerr << "OPTIONS: " << endl;
-	//cerr << "\t" << "-u\t\t"            	    << "Write ORIGINAL a.bed entry ONCE if ANY overlap with B.bed." << endl << "\t\t\tIn other words, just report the fact >=1 hit was found." << endl << endl;
-	//cerr << "\t" << "-c \t\t"					<< "For each entry in A, report the number of hits in B while restricting to -f and -type." << endl << "\t\t\tReports 0 for A entries that have no overlap with B." << endl << endl;
 	cerr << "\t" << "-f\t\t"	    			<< "Minimum overlap req'd as fraction of a.bed (e.g. 0.05)." << endl << "\t\t\tDefault is 1E-9 (effectively 1bp)." << endl << endl;
-	cerr << "\t" << "-type \t\t"				<< "either (default)\tReport overlaps if _either_ end of BEDPE (A) overlaps BED B." << endl;
-	cerr 										<< "\t\t\tneither\t\t\tReport overlaps if _neither_ end of BEDPE (A) overlaps BED B." << endl;
-	cerr 	 									<< "\t\t\tboth\t\t\tReport overlaps if _both_ ends of BEDPE (A) overlap BED B." << endl;
-	cerr										<< "\t\t\txor\t\t\tReport overlaps if _one and only one_ end of BEDPE (A) overlap BED B." << endl;
-	cerr										<< "\t\t\tinspan\t\t\tReport overlaps between [end1, start2] of BEDPE (A) and BED B." << endl << "\t\t\t\t\t\tNOTE: chrom1 must equal chrom2, otherwise entry is ignored." << endl;
-	cerr										<< "\t\t\toutspan\t\t\tReport overlaps between [start1, end2] of BEDPE (A) and BED B." << endl << "\t\t\t\t\t\tNOTE: chrom1 must equal chrom2, otherwise entry is ignored." << endl;
+	cerr << "\t" << "-type \t\t"				<< "neither\t\t\tReport overlaps if _neither_ end of BEDPE (A) overlaps BEDPE B." << endl;
+	cerr 	 									<< "\t\t\tboth\t\t\tReport overlaps if _both_ ends of BEDPE (A) overlap BEDPE B." << endl;
 	
 	
 	cerr << "NOTES: " << endl;
 	cerr << "\t" << "-i stdin\t"	<< "Allows BEDPE file A to be read from stdin.  E.g.: cat a.bedpe | peIntersectBed -a stdin -b B.bed" << endl << endl;
-	cerr << "\t***Only BEDPE formats allowed for -a (6,7,8, or 10 column format.  See below).***"<< endl << endl;
-	cerr << "\t***Only tab-delimited BED3 - BED6 formats allowed for -b.***"<< endl << endl;
+	cerr << "\t***Only 10 columns BEDPE formats allowed.  See below).***"<< endl << endl;
 	
 	cerr << "BEDPE FORMAT (tab-delimited): " << endl;
-	cerr << "\t" << "1. chrom for end 1 (req'd)" << endl; 
-	cerr << "\t" << "2. start for end 1 (req'd)" << endl;
-	cerr << "\t" << "3. end for end 1 (req'd)" << endl;
-	cerr << "\t" << "4. chrom for end 2 (req'd)" << endl; 
-	cerr << "\t" << "5. start for end 2 (req'd)" << endl;
-	cerr << "\t" << "6. end for end 2 (req'd)" << endl;
-	cerr << "\t" << "7. name (opt.)" << endl; 
-	cerr << "\t" << "8. score (opt.)" << endl;
-	cerr << "\t" << "9. strand for end 1 (opt.)" << endl;
-	cerr << "\t" << "10. strand for end 2 (opt.)" << endl;
+	cerr << "\t" << "1. chrom for end 1" << endl; 
+	cerr << "\t" << "2. start for end 1" << endl;
+	cerr << "\t" << "3. end for end 1" << endl;
+	cerr << "\t" << "4. chrom for end 2" << endl; 
+	cerr << "\t" << "5. start for end 2" << endl;
+	cerr << "\t" << "6. end for end 2" << endl;
+	cerr << "\t" << "7. name" << endl; 
+	cerr << "\t" << "8. score" << endl;
+	cerr << "\t" << "9. strand for end 1" << endl;
+	cerr << "\t" << "10. strand for end 2" << endl;
 	cerr << "\t" << "Note: Strands for each end must be provided if you choose to include strand information." << endl << endl;
 
 	cerr << "Example BEDPE record:" << endl;

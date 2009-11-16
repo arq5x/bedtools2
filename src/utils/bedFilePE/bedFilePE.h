@@ -9,6 +9,8 @@
 #include <sstream>
 #include <cstring>
 #include <algorithm>
+#include "bedFile.h"
+#include "lineFileUtilities.h"
 
 using namespace std;
 
@@ -28,11 +30,12 @@ struct BEDPE {
 	int end2;
 	 
 	string name;
-	int score;
+	string score;
 	
 	string strand1;
 	string strand2;
 };
+
 
 
 
@@ -53,11 +56,19 @@ public:
 	bool parseBedPELine (BEDPE &, const vector<string> &, const int &);
 	void reportBedPETab(const BEDPE &);
 	void reportBedPENewLine(const BEDPE &);
-	
+	void loadBedPEFileIntoMap();
+	void splitBedPEIntoBeds(const BEDPE &, unsigned int, BED &, BED &);
 		 
+	void binKeeperFind(map<int, vector<BED>, 
+		std::less<int> > &, const int, 
+		const int, vector<BED> &);	
+		
 	string bedFile;
 	unsigned int bedType;
-
+	
+	masterBedMap bedMapEnd1;
+	masterBedMap bedMapEnd2;
+	
 private:
 	// none
 };
