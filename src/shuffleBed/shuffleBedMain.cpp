@@ -108,7 +108,7 @@ void ShowHelp(void) {
 	cerr << " Aaron Quinlan, Ph.D. (aaronquinlan@gmail.com)  " << endl ;
 	cerr << " Hall Laboratory, University of Virginia" << endl;
 	cerr << "===============================================" << endl << endl;
-	cerr << "Description: Randomly shuffle the locations of a BED (-i) file among a genome." << endl << endl;
+	cerr << "Description: Randomly shuffle the locations of a BED (-i) file among a genome (-g)." << endl << endl;
 	cerr << "***NOTE: Only tab-delimited BED3 - BED6 formats allowed.***"<< endl;
 
 	cerr << "Usage: " << PROGRAM_NAME << " [OPTIONS] -g <genome> -i <bed>" << endl << endl;
@@ -121,10 +121,10 @@ void ShowHelp(void) {
 
 	cerr << "NOTES: " << endl;
 	cerr << "\tThe genome file should tab delimited and structured as follows: <chr><TAB><size>. For example, Mus musculus:" << endl;
-	cerr << "\tchr1\t197195432" << endl;
-	cerr << "\tchr2\t181748087" << endl;
-	cerr << "\t..." << endl;
-	cerr << "\tchrY_random\t58682461" << endl << endl;
+	cerr << "\t\tchr1\t197195432" << endl;
+	cerr << "\t\tchr2\t181748087" << endl;
+	cerr << "\t\t..." << endl;
+	cerr << "\t\tchrY_random\t58682461" << endl << endl;
 	
 	cerr << "TIPS:" << endl;
 	cerr << "\tOne can use the UCSC Genome Browser's MySQL database to extract chromosome sizes. For example, H. sapiens:" << endl << endl;

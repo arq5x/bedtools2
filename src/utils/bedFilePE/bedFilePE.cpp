@@ -14,20 +14,7 @@
 
 #include "bedFilePE.h"
 
-static int binOffsetsExtended[] =
-	{4096+512+64+8+1, 512+64+8+1, 64+8+1, 8+1, 1, 0};
 
-	
-#define _binFirstShift 17	/* How much to shift to get to finest bin. */
-#define _binNextShift 3		/* How much to shift to get to next larger bin. */
-
-
-/*
-	NOTE: Taken ~verbatim from kent source.
-	Return a list of all items in binKeeper that intersect range.
-	
-	Free this list with slFreeList.
-*/
 void BedFilePE::binKeeperFind(map<int, vector<BED>, std::less<int> > &bk, const int start, const int end, vector<BED> &hits) {
 
 	int startBin, endBin;
@@ -52,36 +39,6 @@ void BedFilePE::binKeeperFind(map<int, vector<BED>, std::less<int> > &bk, const 
 }
 
 
-
-static int getBin(int start, int end)
-/* 
-	NOTE: Taken ~verbatim from kent source.
-	
-	Given start,end in chromosome coordinates assign it
-	* a bin.   There's a bin for each 128k segment, for each
-	* 1M segment, for each 8M segment, for each 64M segment,
-	* and for each chromosome (which is assumed to be less than
-	* 512M.)  A range goes into the smallest bin it will fit in. */
-{
-	int startBin = start;
-	int endBin = end-1;
-	startBin >>= _binFirstShift;
-	endBin >>= _binFirstShift;
-	
-	for (int i=0; i<6; ++i) {
-		if (startBin == endBin) {
-			return binOffsetsExtended[i] + startBin;
-		}
-		startBin >>= _binNextShift;
-		endBin >>= _binNextShift;
-	}
-	
-	cerr << "start " << start << ", end " << end << " out of range in findBin (max is 512M)" << endl;
-	return 0;
-}
-
-
-
 //***********************************************
 // Common functions
 //***********************************************
@@ -91,7 +48,7 @@ BedFilePE::BedFilePE(string &bedFile) {
 	this->bedFile = bedFile;
 }
 
-// Destructorc
+// Destructor
 BedFilePE::~BedFilePE(void) {
 }
 
@@ -197,7 +154,7 @@ bool BedFilePE::parseBedPELine (BEDPE &bed, const vector<string> &lineVector, co
 			bed.end2 = atoi(lineVector[5].c_str());
 
 			bed.name = lineVector[6];
-			bed.score = atoi(lineVector[7].c_str());
+			bed.score = lineVector[7].c_str();
 			return true;
 		}	
 		else if (this->bedType == 10) {
@@ -210,7 +167,7 @@ bool BedFilePE::parseBedPELine (BEDPE &bed, const vector<string> &lineVector, co
 			bed.end2 = atoi(lineVector[5].c_str());
 
 			bed.name = lineVector[6];
-			bed.score = atoi(lineVector[7].c_str());
+			bed.score = lineVector[7].c_str();
 
 			bed.strand1 = lineVector[8];
 			bed.strand2 = lineVector[9];
@@ -270,7 +227,7 @@ bool BedFilePE::parseBedPELine (BEDPE &bed, const vector<string> &lineVector, co
 			bed.end2 = atoi(lineVector[5].c_str());
 
 			bed.name = lineVector[6];
-			bed.score = atoi(lineVector[7].c_str());
+			bed.score = lineVector[7].c_str();
 			return true;
 		}	
 		else if (this->bedType == 10) {
@@ -283,7 +240,7 @@ bool BedFilePE::parseBedPELine (BEDPE &bed, const vector<string> &lineVector, co
 			bed.end2 = atoi(lineVector[5].c_str());
 
 			bed.name = lineVector[6];
-			bed.score = atoi(lineVector[7].c_str());
+			bed.score = lineVector[7].c_str();
 
 			bed.strand1 = lineVector[8];
 			bed.strand2 = lineVector[9];
@@ -312,12 +269,12 @@ bool BedFilePE::parseBedPELine (BEDPE &bed, const vector<string> &lineVector, co
 		cerr << "Only one BED field detected: " << lineNum << ".  Verify that your files are TAB-delimited.  Exiting..." << endl;
 		exit(1);		
 	}
-	else if (lineVector.size() != this->bedType) {
-		cerr << "Differing number of BED fields encountered at line: " << lineNum << ".  Exiting..." << endl;
+	else if ((lineVector.size() != this->bedType) && (lineVector.size() != 0)) {
+		cerr << "Differing number of BEDPE fields encountered at line: " << lineNum << ".  Exiting..." << endl;
 		exit(1);
 	}
-	else if (lineVector.size() < 8) {
-		cerr << "TAB delimited BED file with 10 fields (chrom1, start1, end1, strand1, chrom2, start2, end2, strand2) is required.  Exiting..." << endl;
+	else if ((lineVector.size() < 6) && (lineVector.size() != 0)) {
+		cerr << "TAB delimited BEDPE file with at least 6 fields (chrom1, start1, end1, chrom2, start2, end2) is required at line: "<< lineNum << ".  Exiting..." << endl;
 		exit(1);
 	}
 	return false;

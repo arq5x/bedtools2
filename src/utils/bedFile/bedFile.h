@@ -15,6 +15,17 @@
 using namespace std;
 
 //*************************************************
+// Genome binning constants
+//*************************************************
+const int binOffsetsExtended[] =
+	{4096+512+64+8+1, 512+64+8+1, 64+8+1, 8+1, 1, 0};
+
+	
+const int _binFirstShift = 17;	    /* How much to shift to get to finest bin. */
+const int _binNextShift  = 3;		/* How much to shift to get to next larger bin. */
+
+
+//*************************************************
 // Common data structures
 //*************************************************
 
@@ -50,6 +61,8 @@ struct BED {
 // Common functions
 //*************************************************
 
+int getBin(int, int);
+	
 // BED sorting
 bool sortByChrom(BED const &, BED const &);
 bool sortByStart(const BED &, const BED &);

@@ -90,11 +90,13 @@ void ShowHelp(void) {
 	cerr << " Aaron Quinlan, Ph.D. (aaronquinlan@gmail.com)  " << endl ;
 	cerr << " Hall Laboratory, University of Virginia" << endl;
 	cerr << "===============================================" << endl << endl;
-
+	cerr << "Description: Returns the depth and breadth of coverage of features from A" << endl;
+	cerr << "on the intervals in B." << endl << endl;
+	
 	cerr << "Usage: " << PROGRAM_NAME << " [OPTIONS] -a <a.bed> -b <b.bed>" << endl << endl;
 
 	cerr << "NOTES: " << endl;
-	cerr << "\t" << "-i stdin\t\t"	<< "Allows BED file A to be read from stdin.  E.g.: cat a.bed | intersectBed -a stdin -b B.bed" << endl << endl;
+	cerr << "\t" << "-i stdin\t\t"	<< "Allows BED file A to be read from stdin.  E.g.: cat a.bed | coverageBed -a stdin -b B.bed" << endl << endl;
 	cerr << "\t***Only tab-delimited BED3 - BED6 formats allowed.***"<< endl << endl;
 
 	cerr << "OUTPUT: " << endl;

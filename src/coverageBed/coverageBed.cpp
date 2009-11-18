@@ -131,7 +131,7 @@ void BedGraph::GraphBed() {
 				int length = beds[i].end - beds[i].start;
 
 				bedB->reportBedTab(beds[i]);
-				printf("\t%d\t%d\t%d\t%f\n", beds[i].count, (length-zeroDepthCount), length, (float) (length-zeroDepthCount)/length);
+				printf("%d\t%d\t%d\t%0.7f\n", beds[i].count, (length-zeroDepthCount), length, (float) (length-zeroDepthCount)/length);
 			}
 		}
 	}

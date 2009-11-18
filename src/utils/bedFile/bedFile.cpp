@@ -14,13 +14,6 @@
 #include "lineFileUtilities.h"
 #include "bedFile.h"
 
-static int binOffsetsExtended[] =
-	{4096+512+64+8+1, 512+64+8+1, 64+8+1, 8+1, 1, 0};
-
-	
-#define _binFirstShift 17	/* How much to shift to get to finest bin. */
-#define _binNextShift 3		/* How much to shift to get to next larger bin. */
-
 
 // return the amount of overlap between two features.  Negative if none.
 int overlaps(const int aS, const int aE, const int bS, const int bE) {
@@ -53,7 +46,7 @@ int max(const int a, int b) {
 }
 
 
-static int getBin(int start, int end)
+int getBin(int start, int end)
 /* 
 	NOTE: Taken ~verbatim from kent source.
 	

@@ -17,7 +17,7 @@ class PairToPair {
 public:
 
 	// constructor 
-	PairToPair(string &, string &, float &, string &);
+	PairToPair(string &, string &, float &, string, bool);
 
 	// destructor
 	~PairToPair(void);
@@ -27,6 +27,9 @@ public:
 	void FindOverlaps(BEDPE &, vector<BED> &, vector<BED> &, vector<BED> &, vector<BED> &, string &);	
 
 	void FindQualityHitsBetweenEnds(BEDPE, int, vector<BED> &, vector<BED> &, int &);
+	
+	void FindHitsOnBothEnds(const BEDPE &, const vector<BED> &, const vector<BED> &, int &);
+	
 		
 private:
 
@@ -35,6 +38,7 @@ private:
 	
 	float overlapFraction;
 	string searchType;
+	bool ignoreStrand;
 
 	// instance of a paired-end bed file class.
 	BedFilePE *bedA;

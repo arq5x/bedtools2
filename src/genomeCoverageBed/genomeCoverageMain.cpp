@@ -111,10 +111,11 @@ void ShowHelp(void) {
 	cerr << "\t" << "-max\t\t\t"            << "Combine all positions with a depth > max into a single bin in the histogram." << endl << endl;
 	cerr << "NOTES: " << endl;
 	cerr << "\tThe genome file should tab delimited and structured as follows: <chr><TAB><size>. For example, Mus musculus:" << endl;
-	cerr << "\tchr1\t197195432" << endl;
-	cerr << "\tchr2\t181748087" << endl;
-	cerr << "\t..." << endl;
-	cerr << "\tchrY_random\t58682461" << endl << endl;
+	cerr << "\t\tchr1\t197195432" << endl;
+	cerr << "\t\tchr2\t181748087" << endl;
+	cerr << "\t\t..." << endl;
+	cerr << "\t\tchrY_random\t58682461" << endl << endl;
+
 	
 	cerr << "TIPS:" << endl;
 	cerr << "\tOne can use the UCSC Genome Browser's MySQL database to extract chromosome sizes. For example, H. sapiens:" << endl << endl;

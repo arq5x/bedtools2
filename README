@@ -1,13 +1,12 @@
 ==============================
-=== BEDTools Version 2.2.0 ===
+===        BEDTools        ===
 ==============================
 
 Created by Aaron Quinlan Spring 2009.
 Copyright 2009 Aaron Quinlan. All rights reserved.
-http://people.virginia.edu/~arq5x/bedtools.html
+http://code.google.com/p/bedtools
 
-Free for non-profit or academic use. Please contact me for commercial use.
-
+Released under GNU public license version 2 (GPL v2).
 
 ===Summary===  
 BEDTools is a collection of utilities for comparing, summarizing, and 
@@ -15,18 +14,23 @@ intersecting genomic features in the ubiquitous UCSC Genome Browser BED format.
 
 
 ===BEDTools===
-intersectBed		--- returns overlaps between two BED files.
-peIntersectBed		--- returns overlaps between a paired-end BED file and a regular BED file.
-closestBed			--- returns the closest feature to each entry in a BED file.
-subtractBed			--- removes the portion of an interval that is overlapped by another feature.
-windowBed			--- returns overlaps between two BED files based on a user-defined window.
-mergeBed			--- merges overlapping features into a single feature.
-complementBed		--- returns all intervals _not_ spanned by the features in a BED file.
-fastaFromBed		--- creates FASTA sequences based on intervals in a BED file.
-coverageBed			--- creates a BED graph file based on the the overlaps of two BED files.
-genomeCoverageBed	--- creates either a histogram or a "per base" report of genome coverage.
-sortBed 			--- sorts a BED file by chrom, then start position.
-linksBed			--- creates an HTML file of links to the UCSC or a custom browser.
+
+intersectBed			Returns overlaps between two BED files.
+pairToBed				Returns overlaps between a paired-end BED file and a regular BED file.
+pairToPair				Returns overlaps between two paired-end BED files.
+windowBed				Returns overlaps between two BED files within a user-defined window.
+closestBed				Returns the closest feature to each entry in a BED file.
+subtractBed				Removes the portion of an interval that is overlapped by another feature.
+mergeBed				Merges overlapping features into a single feature.
+coverageBed				Summarizes the depth and breadth of coverage of features in one BED file versus genomic intervals defined in another.
+genomeCoverageBed		Creates either a histogram or a "per base" report of genome coverage.
+fastaFromBed			Creates FASTA sequences from intervals define in a BED file.
+maskFastaFromBed		Mask a fasta file based on BED coordinates.
+shuffleBed				Randomly permute the locations of a BED (-i) file among a genome.
+slopBed					Adjust each BED entry by a requested number of base pairs.
+sortBed					Sorts a BED file by genomic position or size.
+linksBed				Creates an HTML file of links to the UCSC or a custom browser.
+complementBed			Returns all genomic intervals not spanned by the features in a BED file.
 
 
 ===Installation===

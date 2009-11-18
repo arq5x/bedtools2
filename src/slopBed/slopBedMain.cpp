@@ -123,7 +123,6 @@ void ShowHelp(void) {
 	cerr << " Hall Laboratory, University of Virginia" << endl;
 	cerr << "===============================================" << endl << endl;
 	cerr << "Description: Add requested base pairs of \"slop\" to each BED entry." << endl << endl;
-	cerr << "***NOTE: Only tab-delimited BED3 - BED6 formats allowed.***"<< endl;
 
 	cerr << "Usage: " << PROGRAM_NAME << " [OPTIONS] -g <genome> -i <bed>" << endl << endl;
 	
@@ -134,14 +133,15 @@ void ShowHelp(void) {
 	cerr << "\t" << "-s\t\t\t"            	<< "Define -l and -r based on strand.  E.g. if used, -l 500 for a negative-stranded " << endl << "\t\t\t\tfeature, it will add 500 bp downstream.  Default = false." << endl << endl;	
 
 	cerr << "NOTES: " << endl;
-	cerr << "\t(1.) Starts will be corrected to 0 if the requested slop would force it below 0." << endl;
-	cerr << "\t(2.) Ends will be corrected to the chromosome length if the requested slop would force it above the max chrom length." << endl << endl;
-	cerr << "\t(3.) The genome file should tab delimited and structured as follows: <chr><TAB><size>. For example, Mus musculus:" << endl;
-	cerr << "\tchr1\t197195432" << endl;
-	cerr << "\tchr2\t181748087" << endl;
-	cerr << "\t..." << endl;
-	cerr << "\tchrY_random\t58682461" << endl << endl;
-	
+	cerr << "\t1.  Starts will be corrected to 0 if the requested slop would force it below 0." << endl;
+	cerr << "\t2.  Ends will be corrected to the chromosome length if the requested slop would force it above the max chrom length." << endl << endl;
+	cerr << "\t3.  The genome file should tab delimited and structured as follows: <chr><TAB><size>. For example, Mus musculus:" << endl;
+	cerr << "\t\tchr1\t197195432" << endl;
+	cerr << "\t\tchr2\t181748087" << endl;
+	cerr << "\t\t..." << endl;
+	cerr << "\t\tchrY_random\t58682461" << endl << endl;
+	cerr << "\t4.  ***Only tab-delimited BED3 - BED6 formats allowed.***"<< endl << endl;
+
 	cerr << "TIPS:" << endl;
 	cerr << "\tOne can use the UCSC Genome Browser's MySQL database to extract chromosome sizes. For example, H. sapiens:" << endl << endl;
 	cerr << "\tmysql --user=genome --host=genome-mysql.cse.ucsc.edu -A -e \"select chrom, size from hg18.chromInfo\"  > hg18.genome" 

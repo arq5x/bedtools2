@@ -55,7 +55,7 @@ int main(int argc, char* argv[]) {
 			fastaInFile = argv[i + 1];
 			i++;
 		} 
-		else if(PARAMETER_CHECK("-out", 4, parameterLength)) {
+		else if(PARAMETER_CHECK("-fo", 3, parameterLength)) {
 			haveFastaOut = true;
 			fastaOutFile = argv[i + 1];
 			i++;
@@ -91,6 +91,7 @@ int main(int argc, char* argv[]) {
 }
 
 void ShowHelp(void) {
+
 	
 	cerr << "===============================================" << endl;
 	cerr << " " <<PROGRAM_NAME << " v" << VERSION << endl ;
@@ -101,18 +102,12 @@ void ShowHelp(void) {
 
 	cerr << "Usage: " << PROGRAM_NAME << " -in -out -bed (-soft)" << endl << endl;
 
-	cerr << "Input Files:" << endl;
-	cerr << "  -in   <FASTA input file>          " << endl;
-	cerr << "  -bed  <BED coordinates file>          " << endl;
-
-	cerr << "Output Files:" << endl;
-	cerr << "  -out <FASTA output file>                           " << endl;
-
-	cerr << "Options:" << endl;
-	cerr << "  -soft  Enforce \"soft\" masking.  That is, instead of masking with Ns, mask with lower-case bases." << endl;
-	
-	cerr << "\nHelp:" << endl;
-	cerr << "  -h                             shows this help text" << endl;
+	cerr << "OPTIONS:" << endl;
+	cerr << "\t-in\t\t<FASTA input file>          " << endl;
+	cerr << "\t-bed\t\t<BED coordinates file>          " << endl;
+	cerr << "\t-fo\t\t<FASTA output file>                           " << endl;
+	cerr << "\t-soft\t\tEnforce \"soft\" masking.  That is, instead of masking with Ns," << endl;
+	cerr << "\t\t\tmask with lower-case bases." << endl;
 	
 	cerr << "NOTES: " << endl;
 	cerr << "\t***Only tab-delimited BED3 - BED6 formats allowed.***"<< endl << endl;

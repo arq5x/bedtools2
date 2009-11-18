@@ -90,6 +90,11 @@ void ShowHelp(void) {
 	cerr << "\t" << "-i stdin\t\t"	<< "Allows BED file A to be read from stdin.  E.g.: cat a.bed | complementBed -a stdin -b B.bed" << endl << endl;
 	cerr << "\t***Only tab-delimited BED3 - BED6 formats allowed.***"<< endl << endl;
 
+	cerr << "\tThe genome file should tab delimited and structured as follows: <chr><TAB><size>. For example, Mus musculus:" << endl;
+	cerr << "\t\tchr1\t197195432" << endl;
+	cerr << "\t\tchr2\t181748087" << endl;
+	cerr << "\t\t..." << endl;
+	cerr << "\t\tchrY_random\t58682461" << endl << endl;
 	// end the program here
 	exit(1);
 	

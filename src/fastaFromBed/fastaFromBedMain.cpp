@@ -50,7 +50,7 @@ int main(int argc, char* argv[]) {
 
 		int parameterLength = (int)strlen(argv[i]);
 
-		if(PARAMETER_CHECK("-db", 3, parameterLength)) {
+		if(PARAMETER_CHECK("-in", 3, parameterLength)) {
 			haveFastaDb = true;
 			fastaDbFile = argv[i + 1];
 			i++;
@@ -101,18 +101,11 @@ void ShowHelp(void) {
 
 	cerr << "Usage: " << PROGRAM_NAME << " -db -bed -fo -name" << endl << endl;
 
-	cerr << "Input Files:" << endl;
-	cerr << "  -db   <FASTA db file>          " << endl;
-	cerr << "  -bed  <BED coordinates file>          " << endl;
-
-	cerr << "Output Files:" << endl;
-	cerr << "  -fo <FASTA output file>                           " << endl;
-
-	cerr << "Options:" << endl;
-	cerr << "  -name  Use the BED name field (#4) for the FASTA header          " << endl;
-	
-	cerr << "\nHelp:" << endl;
-	cerr << "  -h                             shows this help text" << endl;
+	cerr << "OPTIONS:" << endl;
+	cerr << "\t-in\t\t<FASTA file for input>" << endl;
+	cerr << "\t-bed\t\t<BED coordinates file>" << endl;
+	cerr << "\t-fo\t\t<FASTA output file>" << endl;
+	cerr << "\t-name\t\tUse the BED name field (#4) for the FASTA header" << endl;
 	
 	cerr << "NOTES: " << endl;
 	cerr << "\t***Only tab-delimited BED3 - BED6 formats allowed.***"<< endl << endl;

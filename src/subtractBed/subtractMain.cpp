@@ -101,7 +101,7 @@ void ShowHelp(void) {
 	cerr << " Aaron Quinlan, Ph.D. (aaronquinlan@gmail.com)  " << endl ;
 	cerr << " Hall Laboratory, University of Virginia" << endl;
 	cerr << "===============================================" << endl << endl;
-	cerr << "Description: Report overlaps between a.bed and b.bed." << endl << endl;
+	cerr << "Description: Removes the portion(s) of an interval that is overlapped by another feature(s). " << endl << endl;
 
 	cerr << "Usage: " << PROGRAM_NAME << " [OPTIONS] -a <a.bed> -b <b.bed>" << endl << endl;
 
