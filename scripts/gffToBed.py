@@ -15,9 +15,9 @@ import re
 
 help_message = '''
 
-gffToBed -g <gff>
-	
-OPTIONS:
+gffToBed.py -g <gff>
+
+ABSTRACT: Converts genome annotations in GFF format to BED format.	
 '''
 
 """

@@ -1,3 +1,16 @@
+Version 2.3.0 (11/18/2009)
+1. Added four new tools:
+	- shuffleBed. 			Randomly permutes the locations of a BED file among a genome.  Useful for testing for significant overlap enrichments.
+	- slopBed.    			Adds a requested number of base pairs to each end of a BED feature.  Constrained by the size of each chromosome.
+	- maskFastaFromBed. 	Masks a FASTA file based on BED coordinates.  Useful making custom genome files from targeted capture experiment, etc.
+	- pairToPair.			Returns overlaps between two paired-end BED files.  This is great for finding structural variants that are 
+							private or shared among samples.
+							
+2. Increased the speed of intersectBed by nearly 50%.
+3. Improved /corrected some of the help messages.
+4. Improved sanity checking for BED entries.
+
+
 Version 2.2.4 (10/27/2009)
 1. Updated the mergeBed documentation to describe the -names option which allows one to report the names of the
 features that were merged (separated by semicolons).

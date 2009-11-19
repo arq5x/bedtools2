@@ -16,14 +16,29 @@ import re
 
 help_message = '''
 
-samToBed -s <sam> -t <alignment type>
+samToBed.py -s <sam> -t <alignment type>
+
+ABSTRACT: Converts aligned reads in SAM format to BED format.
 	
 OPTIONS:
-	-s	The SAM file to be converted to BED
+	-s	The SAM file to be converted to BED (use "stdin" for piped input)
 	-t	What types of alignments should be reported?
 			"all"	all aligned reads will be reported (Default)
 			"con"	only concordant pairs will be reported
 			"dis"	only discordant pairs will be reported
+
+EXAMPLE:
+	Can be used with samtools to extract alignments and compare them to BED
+	annotations.
+	
+	(1) Land a BED file first.
+	$ samtools view reads.sorted.bam > read.sorted.sam
+	$ samToBed.py -s reads.sorted.sam -t all > reads.sorted.bed
+	$ intersectBed -a reads.sorted.bed -b refseq.bed > reads.intersect.refseq.bed
+
+	(2) "One-liner.
+	$ samtools view reads.sorted.bam | samToBed.py -s stdin -t all | \ 
+	  intersectBed -a stdin -b refseq.bed > reads.intersect.refseq.bed
 
 '''
 
@@ -35,15 +50,17 @@ class Usage(Exception):
 
 def processSAM(file, alignType):
 	"""
-		Load a SAM file and convert each line to BED format.
-		
-		We avoid readlines() in this case, as SAM files can 
-		be HUGE, and thus loading it into memory could be painful.
-	"""		
-	for line in open(file,'r'):
-		samLine = splitLine(line.strip())
-		makeBED(samLine, alignType)
-	f.close()	
+		Read a SAM file (or stdin) and convert each line to BED format.
+	"""	
+	if (file != "stdin"):	
+		for line in open(file,'r'):
+			samLine = splitLine(line.strip())
+			makeBED(samLine, alignType)
+		f.close()
+	else:
+		for line in sys.stdin:
+			samLine = splitLine(line.strip())
+			makeBED(samLine, alignType)		
 	
 					
 def makeBED(samFields, aType):
@@ -116,17 +133,18 @@ def main(argv=None):
 				samFile = value
 			if option in ("-t", "--type"):
 				aType = value
-				
-		try:
-		   f = open(samFile, 'r')
-		except IOError, msg:
-			raise Usage(help_message)
-				
+	
+		if (samFile != "stdin"):
+			try:
+			   f = open(samFile, 'r')
+			except IOError, msg:
+				raise Usage(help_message)
+					
 	except Usage, err:
-		print >> sys.stderr, sys.argv[0].split("/")[-1] + ": " + str(err.msg)
+		print >> sys.stderr, str(err.msg)
 		return 2	
 
-	# make a BED file of the SAM file.
+
 	processSAM(samFile, aType)
 
 if __name__ == "__main__":
