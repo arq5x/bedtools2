@@ -115,7 +115,7 @@ void BedClosest::FindWindowOverlaps(BED &a, vector<BED> &hits) {
 					// is there enough overlap (default ~ 1bp)
 					float overlap = (float)(e-s) / (float)(a.end - a.start);
 	
-					if ( overlap > 0 ) {	
+					if ( overlap > 0 ) {
 					
 						// is this hit the closest?
 						if (overlap > maxOverlap) {
@@ -130,12 +130,14 @@ void BedClosest::FindWindowOverlaps(BED &a, vector<BED> &hits) {
 				}
 				else if (h->end < a.start){
 					if ((a.start - h->end) <= minDistance) {
+						closestB.clear();
 						closestB.push_back(*h);
 						minDistance = a.start - h->end;
 					}	
 				}
 				else {
 					if ((h->start - a.end) <= minDistance) {
+						closestB.clear();
 						closestB.push_back(*h);
 						minDistance = h->start - a.end;
 					}	
