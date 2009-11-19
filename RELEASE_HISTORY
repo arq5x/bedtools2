@@ -1,3 +1,7 @@
+Version 2.3.1 (11/19/2009)
+Fixed a typo in closestBed that caused all nearby features to be returned instead of just the closest one.
+
+
 Version 2.3.0 (11/18/2009)
 1. Added four new tools:
 	- shuffleBed. 			Randomly permutes the locations of a BED file among a genome.  Useful for testing for significant overlap enrichments.

@@ -129,17 +129,23 @@ void BedClosest::FindWindowOverlaps(BED &a, vector<BED> &hits) {
 					}
 				}
 				else if (h->end < a.start){
-					if ((a.start - h->end) <= minDistance) {
+					if ((a.start - h->end) < minDistance) {
 						closestB.clear();
 						closestB.push_back(*h);
 						minDistance = a.start - h->end;
-					}	
+					}
+					else if ((a.start - h->end) == minDistance) {
+						closestB.push_back(*h);
+					}
 				}
 				else {
-					if ((h->start - a.end) <= minDistance) {
+					if ((h->start - a.end) < minDistance) {
 						closestB.clear();
 						closestB.push_back(*h);
 						minDistance = h->start - a.end;
+					}
+					else if ((h->start - a.end) == minDistance) {
+						closestB.push_back(*h);
 					}	
 				}
 				
@@ -158,7 +164,7 @@ void BedClosest::FindWindowOverlaps(BED &a, vector<BED> &hits) {
 
 	if (numOverlaps > 0) {
 		
-		if (closestB.size() == 1) {
+		if (closestB.size() == 1) {		
 			bedA->reportBedTab(a); 
 			bedB->reportBedNewLine(closestB[0]);
 		}
