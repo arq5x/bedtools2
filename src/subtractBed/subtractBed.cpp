@@ -60,7 +60,9 @@ void BedSubtract::FindOverlaps(BED &a, vector<BED> &hits) {
 			
 			// is there enough overlap (default ~ 1bp)
 			float overlap = ((float)(e-s) / (float)(a.end - a.start));
+			
 			if (overlap >= 1.0) {
+				numOverlaps++;
 				numConsumedByB++;
 			}
 			else if ( overlap >= this->overlapFraction ) {
