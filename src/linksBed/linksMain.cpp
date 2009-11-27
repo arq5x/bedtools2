@@ -104,7 +104,7 @@ void ShowHelp(void) {
 	cerr << "\t" << "-db\t\t"	<< "The build.  Default: hg18" << endl << endl;
 
 	cerr << "NOTES: " << endl;
-	cerr << "\t" << "-i stdin\t"	<< "Allows BED file A to be read from stdin.  E.g.: cat a.bed | linksBed -i stdin > out.html" << endl << endl;
+	cerr << "\t" << "-i stdin\t"	<< "Allows BED file to be read from stdin.  E.g.: cat a.bed | linksBed -i stdin > out.html" << endl << endl;
 	cerr << "\t***Only tab-delimited BED3 - BED6 formats allowed.***"<< endl << endl;
 	
 	cerr << "EXAMPLE: " << endl;

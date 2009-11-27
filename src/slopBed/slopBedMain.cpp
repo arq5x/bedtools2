@@ -106,7 +106,7 @@ int main(int argc, char* argv[]) {
 	}	
 	if (!showHelp) {
 		BedSlop *bc = new BedSlop(bedFile, genomeFile, forceStrand, leftSlop, rightSlop);
-		bc->ProcessBed();		
+		bc->DetermineBedInput();		
 		
 		return 0;
 	}
@@ -134,13 +134,14 @@ void ShowHelp(void) {
 
 	cerr << "NOTES: " << endl;
 	cerr << "\t1.  Starts will be corrected to 0 if the requested slop would force it below 0." << endl;
-	cerr << "\t2.  Ends will be corrected to the chromosome length if the requested slop would force it above the max chrom length." << endl << endl;
+	cerr << "\t2.  Ends will be corrected to the chromosome length if the requested slop would force it above the max chrom length." << endl;
 	cerr << "\t3.  The genome file should tab delimited and structured as follows: <chr><TAB><size>. For example, Mus musculus:" << endl;
 	cerr << "\t\tchr1\t197195432" << endl;
 	cerr << "\t\tchr2\t181748087" << endl;
 	cerr << "\t\t..." << endl;
-	cerr << "\t\tchrY_random\t58682461" << endl << endl;
-	cerr << "\t4.  ***Only tab-delimited BED3 - BED6 formats allowed.***"<< endl << endl;
+	cerr << "\t\tchrY_random\t58682461" << endl;
+	cerr << "\t4.  -i stdin\t"	<< "Allows BED file to be read from stdin.  E.g.: cat a.bed | slopBed -i stdin" << endl;
+	cerr << "\t5.  ***Only tab-delimited BED3 - BED6 formats allowed.***"<< endl << endl;
 
 	cerr << "TIPS:" << endl;
 	cerr << "\tOne can use the UCSC Genome Browser's MySQL database to extract chromosome sizes. For example, H. sapiens:" << endl << endl;

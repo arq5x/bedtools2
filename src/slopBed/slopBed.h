@@ -22,8 +22,10 @@ public:
 	// destructor
 	~BedSlop(void);
 
-	void ProcessBed();
-	
+	void DetermineBedInput();
+
+	void ProcessBed(istream &bedInput);
+		
 	// method to add requested "slop" to each BED entry
 	void AddSlop(BED &);
 	

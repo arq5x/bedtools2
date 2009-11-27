@@ -34,7 +34,7 @@ BedSlop::~BedSlop(void) {
 
 
 
-void BedSlop::ProcessBed() {
+void BedSlop::DetermineBedInput() {
 
 
 	/* open the GENOME file for reading.
@@ -57,17 +57,27 @@ void BedSlop::ProcessBed() {
 		}
 	}
 
-	ifstream beds(this->bedFile.c_str(), ios::in);
-	if ( !beds ) {
-		cerr << "Error: The requested bed file (" <<this->bedFile << ") could not be opened. Exiting!" << endl;
-		exit (1);
+	if (this->bedFile != "stdin") {   // process a file
+		ifstream beds(this->bedFile.c_str(), ios::in);
+		if ( !beds ) {
+			cerr << "Error: The requested bed file (" << this->bedFile << ") could not be opened. Exiting!" << endl;
+			exit (1);
+		}
+		ProcessBed(beds);
 	}
+	else {   // process stdin
+		ProcessBed(cin);		
+	}
+}
+
+
+void BedSlop::ProcessBed(istream &bedInput) {
 	
 	BED bedEntry;     // used to store the current BED line from the BED file.
 	int lineNum = 0;
 	string bedLine;	  // used to store the current (unparsed) line from the BED file.
 		
-	while (getline(beds, bedLine)) {
+	while (getline(bedInput, bedLine)) {
 		
 		vector<string> bedFields;
 		Tokenize(bedLine,bedFields);
