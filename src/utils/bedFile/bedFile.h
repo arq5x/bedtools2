@@ -46,6 +46,8 @@ struct BED {
 	string name;
 	string score;
 	string strand;
+	
+	vector<string> otherFields;
 
 	// Additional fields
 	unsigned int count;			// count of number of intervals
@@ -143,7 +145,8 @@ public:
 
 	// the bedfile with which this instance is associated
 	string bedFile;
-	unsigned int bedType;
+	unsigned int bedType;  // 3 -6 for BED
+						   // 9 for GFF
 
 private:
 	// none

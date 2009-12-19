@@ -243,6 +243,19 @@ bool BedFile::parseBedLine (BED &bed, const vector<string> &lineVector, int line
 			bed.strand = lineVector[5];
 			return true;
 		}
+		else if (this->bedType > 6) {
+			bed.chrom = lineVector[0];
+			bed.start = atoi(lineVector[1].c_str());
+			bed.end = atoi(lineVector[2].c_str());
+			bed.name = lineVector[3];
+			bed.score = lineVector[4];
+			bed.strand = lineVector[5];
+			
+			for (unsigned int i = 6; i < lineVector.size(); ++i) {
+				bed.otherFields.push_back(lineVector[i]); 
+			}
+			return true;
+		}
 		else {
 			cerr << "Error: unexpected number of fields: " << lineNum << ".  Verify that your files are TAB-delimited and that your BED file has 3,4,5 or 6 fields.  Exiting..." << endl;
 			exit(1);
@@ -296,6 +309,19 @@ bool BedFile::parseBedLine (BED &bed, const vector<string> &lineVector, int line
 			bed.strand = lineVector[5];
 			return true;
 		}
+		else if (this->bedType > 6) {
+			bed.chrom = lineVector[0];
+			bed.start = atoi(lineVector[1].c_str());
+			bed.end = atoi(lineVector[2].c_str());
+			bed.name = lineVector[3];
+			bed.score = lineVector[4];
+			bed.strand = lineVector[5];
+			
+			for (unsigned int i = 6; i < lineVector.size(); ++i) {
+				bed.otherFields.push_back(lineVector[i]); 
+			}
+			return true;
+		}
 		else {
 			cerr << "Error: unexpected number of fields: " << lineNum << ".  Verify that your files are TAB-delimited and that your BED file has 3,4,5 or 6 fields.  Exiting..." << endl;
 			exit(1);
@@ -324,6 +350,36 @@ bool BedFile::parseBedLine (BED &bed, const vector<string> &lineVector, int line
 	}
 	return false;
 }
+
+
+bool BedFile::parseGffLine (BED &bed, const vector<string> &lineVector, int lineNum) {
+
+/*
+1.  seqname - The name of the sequence. Must be a chromosome or scaffold.
+2. source - The program that generated this feature.
+3. feature - The name of this type of feature. Some examples of standard feature types are "CDS", "start_codon", "stop_codon", and "exon".
+4. start - The starting position of the feature in the sequence. The first base is numbered 1.
+5. end - The ending position of the feature (inclusive).
+6. score - A score between 0 and 1000. If the track line useScore attribute is set to 1 for this annotation data set, the score value will determine the level of gray in which this feature is displayed (higher numbers = darker gray). If there is no score value, enter ".".
+7. strand - Valid entries include '+', '-', or '.' (for don't know/don't care).
+8. frame - If the feature is a coding exon, frame should be a number between 0-2 that represents the reading frame of the first base. If the feature is not a coding exon, the value should be '.'.
+9. group - All lines with the same group are linked together into a single item.
+*/
+
+	if ( (lineNum > 1) && (lineVector.size() == this->bedType)) {
+		bed.chrom = lineVector[0];
+		bed.start = atoi(lineVector[1].c_str());
+		bed.end = atoi(lineVector[2].c_str());
+		bed.name = "";
+		bed.score = "";
+		bed.strand = "";
+		return true;
+	}
+	else if ((lineNum == 1) && (lineVector.size() == 9)) {
+		this->bedType = lineVector.size();
+	}
+}
+
 
 
 void BedFile::loadBedFileIntoMap() {
@@ -469,6 +525,16 @@ void BedFile::reportBedTab(BED bed) {
 		printf ("%s\t%d\t%d\t%s\t%s\t%s\t", bed.chrom.c_str(), bed.start, bed.end, bed.name.c_str(), 
 											bed.score.c_str(), bed.strand.c_str());
 	}
+	else if (this->bedType > 6) {
+		printf ("%s\t%d\t%d\t%s\t%s\t%s\t", bed.chrom.c_str(), bed.start, bed.end, bed.name.c_str(), 
+											bed.score.c_str(), bed.strand.c_str());
+		
+		vector<string>::const_iterator othIt = bed.otherFields.begin(); 
+		vector<string>::const_iterator othEnd = bed.otherFields.end(); 
+		for ( ; othIt != othEnd; ++othIt) {
+			printf("%s\t", othIt->c_str());
+		}
+	}
 }
 
 
@@ -495,6 +561,17 @@ void BedFile::reportBedNewLine(BED bed) {
 	else if (this->bedType == 6) {
 		printf ("%s\t%d\t%d\t%s\t%s\t%s\n", bed.chrom.c_str(), bed.start, bed.end, bed.name.c_str(), 
 											bed.score.c_str(), bed.strand.c_str());
+	}
+	else if (this->bedType > 6) {
+		printf ("%s\t%d\t%d\t%s\t%s\t%s\t", bed.chrom.c_str(), bed.start, bed.end, bed.name.c_str(), 
+											bed.score.c_str(), bed.strand.c_str());
+		
+		vector<string>::const_iterator othIt = bed.otherFields.begin(); 
+		vector<string>::const_iterator othEnd = bed.otherFields.end(); 
+		for ( ; othIt != othEnd; ++othIt) {
+			printf("%s\t", othIt->c_str());
+		}
+		printf("\n");
 	}
 }
 
@@ -524,6 +601,16 @@ void BedFile::reportBedRangeTab(BED bed, int start, int end) {
 		printf ("%s\t%d\t%d\t%s\t%s\t%s\t", bed.chrom.c_str(), start, end, bed.name.c_str(), 
 											bed.score.c_str(), bed.strand.c_str());
 	}
+	else if (this->bedType > 6) {
+		printf ("%s\t%d\t%d\t%s\t%s\t%s\t", bed.chrom.c_str(), start, end, bed.name.c_str(), 
+											bed.score.c_str(), bed.strand.c_str());
+		
+		vector<string>::const_iterator othIt = bed.otherFields.begin(); 
+		vector<string>::const_iterator othEnd = bed.otherFields.end(); 
+		for ( ; othIt != othEnd; ++othIt) {
+			printf("%s\t", othIt->c_str());
+		}
+	}
 }
 
 
@@ -551,5 +638,16 @@ void BedFile::reportBedRangeNewLine(BED bed, int start, int end) {
 	else if (this->bedType == 6) {
 		printf ("%s\t%d\t%d\t%s\t%s\t%s\n", bed.chrom.c_str(), start, end, bed.name.c_str(), 
 											bed.score.c_str(), bed.strand.c_str());
+	}
+	else if (this->bedType > 6) {
+		printf ("%s\t%d\t%d\t%s\t%s\t%s\t", bed.chrom.c_str(), start, end, bed.name.c_str(), 
+											bed.score.c_str(), bed.strand.c_str());
+		
+		vector<string>::const_iterator othIt = bed.otherFields.begin(); 
+		vector<string>::const_iterator othEnd = bed.otherFields.end(); 
+		for ( ; othIt != othEnd; ++othIt) {
+			printf("%s\t", othIt->c_str());
+		}
+		printf("\n");
 	}
 }
