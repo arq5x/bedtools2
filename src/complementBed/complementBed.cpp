@@ -28,7 +28,6 @@ BedComplement::~BedComplement(void) {
 }
 
 
-
 //
 // Merge overlapping BED entries into a single entry 
 //
@@ -53,7 +52,8 @@ void BedComplement::ComplementBed() {
 	// load the "B" bed file into a map so
 	// that we can easily compare "A" to it for overlaps
 	bed->loadBedFileIntoMapNoBin();
-
+	
+	vector<short> chromMasks;
 	string currChrom;
 	
 	// loop through each chromosome and merge their BED entries
@@ -62,96 +62,43 @@ void BedComplement::ComplementBed() {
 		currChrom = m->first;
 		// bedList is already sorted by start position.
 		vector<BED> bedList = m->second; 
-
-		int minStart = INT_MAX;
-		int maxEnd = 0;
-		bool OIP = false;       // OIP = Overlap In Progress.  Lame, I realize.
-		unsigned int i;
-		int mergeCount = 1;
-		bool firstSegment = true;
-		// loop through the BED entries for this chromosome
-		// and look for overlaps
-		for (i = 1; i < bedList.size(); ++i) {
+		
+		// create a flag for every base on the chrom.
+		vector<short> chromMasks(chromSizes[currChrom], 0);
+		
+		vector<BED>::const_iterator bIt = bedList.begin();
+		vector<BED>::const_iterator bEnd = bedList.end();
+		for ( ; bIt != bEnd; ++bIt) {
 			
-			// Are the current and previous entries within the maximum distance allowed by the user?
-			// By default, maxDistance is 0, which allows for the following to be reported:
-			//          OVERLAP                        BOOK-END
-			// 		********                ***************
-			//      	   *******		                   ***************
-			// Ans. **************          ******************************
-			if ( overlaps(bedList[i-1].start, bedList[i-1].end, 
-						  bedList[i].start, bedList[i].end) 
-						>= 0 ) {
-
-				OIP = true;
-				mergeCount++;
-				minStart = min(bedList[i-1].start, min(minStart, bedList[i].start));
-				maxEnd = max(bedList[i-1].end, max(maxEnd, bedList[i].end));
-
+			// sanity check the end of the bed entry
+			if (bIt->end > chromSizes[currChrom]) {
+				cout << "End of BED entry exceeds chromosome length. Please correct." << endl;
+				bed->reportBedNewLine(*bIt);
+				exit(1);
 			}
-			else if ( overlaps(minStart, maxEnd, 
-							   bedList[i].start, bedList[i].end) 
-							>= 0 ) {
-
-				mergeCount++;
-				minStart = min(minStart, bedList[i].start);
-				maxEnd = max(maxEnd, bedList[i].end);
-
+			
+			// mask all of the positions spanned by this BED entry.
+			for (int b = bIt->start; b <= bIt->end; b++) {
+				chromMasks[b] = 1;
 			}
-			// either an overlap was broken or we have an 
-			// interstice between two non-overlapping features
-			else {
-
-				// was there an overlap before the current entry broke it?
-				// if so, report the complement as the position after the end of the
-				// merged segment to the position before the start of the current segment.
-				// For example:
-				// *****************                  *******************
-				//        ******************
-				// Complement:              !!!!!!!!!!
-				if (OIP) {
-					if (firstSegment) {
-						cout << currChrom << "\t" << 0 << "\t" << minStart << endl;
-						firstSegment = false;
-					}
-					cout << currChrom << "\t" << maxEnd << "\t" << bedList[i].start << endl;
+		}
+		
+		unsigned int i = 0;
+		unsigned int start;
+		while (i < chromMasks.size()) {
+			if (chromMasks[i] == 0) {
+				start = i;
+				while ((chromMasks[i] == 0) && (i < chromMasks.size())) {
+					i++;
 				}
-				// otherwise report the interstice between the current and previous feature.
-				// For example:
-				// *****************                  *******************
-				// Complement:      !!!!!!!!!!!!!!!!!!
+				if (start > 0) {
+					cout << currChrom << "\t" << start -1 << "\t" << i << endl;
+				}
 				else {
-					if (firstSegment) {
-						cout << currChrom << "\t" << 0 << "\t" << bedList[i-1].start << endl;
-						firstSegment = false;
-					}
-					cout << currChrom << "\t" << bedList[i-1].end << "\t" << bedList[i].start << endl;
+					cout << currChrom << "\t" << 0 << "\t" << i << endl;
 				}
-
-				// reset things for the next overlapping "block"
-				OIP = false;
-				mergeCount = 1;
-				minStart = INT_MAX;
-				maxEnd = 0;
-
 			}
-		}
-
-		// clean up based on the last entry for the current chromosome
-		// same as above code...
-		if (OIP) {
-			if (firstSegment) {
-				cout << currChrom << "\t" << 0 << "\t" << minStart << endl;
-				firstSegment = false;
-			}
-			cout << currChrom << "\t" << maxEnd << "\t" << chromSizes[currChrom] << endl;
-		}
-		else {
-			if (firstSegment) {
-				cout << currChrom << "\t" << 0 << "\t" << bedList[i-1].start-1 << endl;
-				firstSegment = false;
-			}
-			cout << currChrom << "\t" << bedList[i-1].end << "\t" << chromSizes[currChrom] << endl;
+			i++;
 		}
 	}
 }

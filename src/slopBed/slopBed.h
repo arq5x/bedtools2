@@ -26,8 +26,8 @@ public:
 
 	void ProcessBed(istream &bedInput);
 		
-	// method to add requested "slop" to each BED entry
-	void AddSlop(BED &);
+	// method to add requested "slop" to a single BED entry
+	void AddSlop(BED &bed);
 	
 private:
 

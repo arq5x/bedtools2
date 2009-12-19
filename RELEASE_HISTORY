@@ -1,3 +1,6 @@
+Version 2.3.3 (12/17/2009)
+Rewrote complementBed to use a slower but much simpler approach.  This resolves several bugs with the previous logic.
+
 Version 2.3.2 (11/25/2009)
 Fixed a bug in subtractBed that prevent a file from subtracting itself when the following is used:
 	$ subtractBed -a test.bed -b test.bed
