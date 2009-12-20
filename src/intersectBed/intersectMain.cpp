@@ -130,7 +130,7 @@ int main(int argc, char* argv[]) {
 	if (!showHelp) {
 
 		BedIntersect *bi = new BedIntersect(bedAFile, bedBFile, anyHit, writeA, writeB, overlapFraction, noHit, writeCount, forceStrand, reciprocalFraction);
-		bi->IntersectBed();
+		bi->DetermineBedInput();
 		return 0;
 	}
 	else {

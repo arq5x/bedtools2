@@ -92,9 +92,6 @@ void BedGraph::GraphBed() {
 		}
 	}
 	
-	
-	
-	
 	// now, report the count of hist for each feature in B.
 	for (masterBedMap::iterator c = bedB->bedMap.begin(); c != bedB->bedMap.end(); ++c) {
 		map<int, vector<BED> > bin2Beds = c->second;

@@ -7,7 +7,8 @@
 //
 //  Summary:  Contains common functions for processing text files.
 //
-
+#include <sstream>
+#include <iostream>
 #include "lineFileUtilities.h"
 //***********************************************
 // lineFileUtilities:
@@ -17,6 +18,16 @@
 void Tokenize(const string& str, vector<string>& tokens)
 {
 
+	/* method to tokenize on any whitespace
+	
+    string buf; // Have a buffer string
+    stringstream ss(str); // Insert the string into a stream
+    while (ss >> buf)
+		cout << buf << endl;
+        tokens.push_back(buf);
+	*/
+
+	
 	// Skip delimiters at beginning.
 	string::size_type lastPos = str.find_first_not_of("\t", 0);
 	// Find first "non-delimiter".
@@ -31,6 +42,7 @@ void Tokenize(const string& str, vector<string>& tokens)
 		// Find next "non-delimiter"
 		pos = str.find_first_of("\t", lastPos);
 	}
+
 }
 
 

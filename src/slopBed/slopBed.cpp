@@ -71,7 +71,7 @@ void BedSlop::DetermineBedInput() {
 }
 
 
-void BedSlop::ProcessBed(istream &bedInput) {
+void BedSlop::SlopBed(istream &bedInput) {
 	
 	BED bedEntry;     // used to store the current BED line from the BED file.
 	int lineNum = 0;

@@ -116,9 +116,13 @@ public:
 	// Destructor
 	~BedFile(void);
 
-	// Methods
-	bool parseBedLine (BED &, const vector<string> &, int);
-
+	// parse an input line and determine how it should be handled
+	bool parseLine (BED &bed, const vector<string> &lineVector, int &lineNum);
+	// parse a BED line
+	bool parseBedLine (BED &bed, const vector<string> &lineVector, int lineNum);
+	// parse a GFF line
+	bool parseGffLine (BED &bed, const vector<string> &lineVector, int lineNum);
+	
 	void loadBedFileIntoMap();
 	void loadBedFileIntoMapNoBin();	
 
@@ -129,11 +133,11 @@ public:
 	void countHits(map<int, vector<BED>, std::less<int> > &, BED &, bool &);
 
 	// printing methods
-	void reportBedTab(BED);
-	void reportBedNewLine(BED);
+	void reportBedTab(const BED &);
+	void reportBedNewLine(const BED &);
 		
-	void reportBedRangeTab(BED, int, int);
-	void reportBedRangeNewLine(BED, int, int);
+	void reportBedRangeTab(const BED &bed, int start, int end);
+	void reportBedRangeNewLine(const BED &bed, int start, int end);
 	
 	// a vector of the BED entries in the BED file.
 	vector<BED> bedVector;

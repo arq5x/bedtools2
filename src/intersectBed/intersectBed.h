@@ -26,7 +26,8 @@ public:
 	void reportB(const BED &);
 
 	void FindOverlaps(BED &, vector<BED> &); 
-	void IntersectBed();
+	void IntersectBed(istream &bedInput);
+	void DetermineBedInput();
 	
 	
 private:
