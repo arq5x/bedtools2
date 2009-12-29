@@ -168,44 +168,44 @@ void ShowHelp(void) {
 	cerr << " Hall Laboratory, University of Virginia" << endl;
 	cerr << "===============================================" << endl << endl;
 	cerr << "SUMMARY: Examines a \"window\" around each feature in A and" << endl;
-	cerr << "  reports all features in B that overlap the window. For each" << endl;
-	cerr << "  overlap the entire entry in A and B are reported." << endl << endl;
+	cerr << "\t reports all features in B that overlap the window. For each" << endl;
+	cerr << "\t overlap the entire entry in A and B are reported." << endl << endl;
 
-	cerr << "USAGE: " << PROGRAM_NAME << " [OPTIONS] -a <a.bed> -b <b.bed>" << endl << endl;
+	cerr << "USAGE:   " << PROGRAM_NAME << " [OPTIONS] -a <a.bed> -b <b.bed>" << endl << endl;
 
 	cerr << "OPTIONS: " << endl;
 	cerr << "  " << "-w\t"		<< "Base pairs added upstream and downstream of each entry" << endl;
 	cerr						<< "\tin A when searching for overlaps in B." << endl;
-	cerr						<< "\t  - Creates symterical \"windows\" around A." << endl;		
-	cerr						<< "\t  - Default is 1000 bp." << endl << endl;
+	cerr						<< "\t- Creates symterical \"windows\" around A." << endl;		
+	cerr						<< "\t- Default is 1000 bp." << endl << endl;
 	
 	cerr << "  " << "-l\t"		<< "Base pairs added upstream (left of) of each entry" << endl;
 	cerr						<< "\tin A when searching for overlaps in B." << endl;	
-	cerr						<< "\t  - Allows one to define assymterical \"windows\"." << endl;
-	cerr						<< "\t  - Default is 1000 bp." << endl << endl;
+	cerr						<< "\t- Allows one to define assymterical \"windows\"." << endl;
+	cerr						<< "\t- Default is 1000 bp." << endl << endl;
 
 	cerr << "  " << "-r\t"		<< "Base pairs added downstream (right of) of each entry" << endl;
 	cerr						<< "\tin A when searching for overlaps in B." << endl;	
-	cerr						<< "\t  - Allows one to define assymterical \"windows\"." << endl;
-	cerr						<< "\t  - Default is 1000 bp." << endl << endl;
+	cerr						<< "\t- Allows one to define assymterical \"windows\"." << endl;
+	cerr						<< "\t- Default is 1000 bp." << endl << endl;
 		
 
 	cerr << "  " << "-sw\t"     << "Define -l and -r based on strand.  For example if used, -l 500" << endl;
 	cerr 						<< "\tfor a negative-stranded feature will add 500 bp downstream." << endl;
-	cerr						<< "\t  - Default = disabled." << endl << endl;	
+	cerr						<< "\t- Default = disabled." << endl << endl;	
 
 	cerr << "  " << "-sm\t"     << "Only report hits in B that overlap A on the same strand." << endl;
-	cerr						<< "\t  - By default, overlaps are reported without respect to strand." << endl << endl;	
+	cerr						<< "\t- By default, overlaps are reported without respect to strand." << endl << endl;	
 
 	cerr << "  " << "-u\t"      << "Write the original A entry _once_ if _any_ overlaps found in B." << endl;
-	cerr 						<< "\t  - In other words, just report the fact >=1 hit was found." << endl << endl;
+	cerr 						<< "\t- In other words, just report the fact >=1 hit was found." << endl << endl;
 
 	cerr << "  " << "-c\t"		<< "For each entry in A, report the number of overlaps with B." << endl; 
-	cerr 						<< "\t  - Reports 0 for A entries that have no overlap with B." << endl;
-	cerr						<< "\t  - Overlaps restricted by -f." << endl << endl;
+	cerr 						<< "\t- Reports 0 for A entries that have no overlap with B." << endl;
+	cerr						<< "\t- Overlaps restricted by -f." << endl << endl;
 
 	cerr << "  " << "-v\t"      << "Only report those entries in A that have _no overlaps_ with B." << endl;
-	cerr 						<< "\t  - Similar to \"grep -v.\"" << endl << endl;
+	cerr 						<< "\t- Similar to \"grep -v.\"" << endl << endl;
 
 	// end the program here
 	exit(1);

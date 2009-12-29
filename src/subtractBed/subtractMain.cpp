@@ -1,3 +1,14 @@
+/*****************************************************************************
+  subtractMain.cpp
+
+  (c) 2009 - Aaron Quinlan
+  Hall Laboratory
+  Department of Biochemistry and Molecular Genetics
+  University of Virginia
+  aaronquinlan@gmail.com
+
+  Licenced under the GNU General Public License 2.0+ license.
+******************************************************************************/
 #include "subtractBed.h"
 #include "version.h"
 
@@ -86,7 +97,7 @@ int main(int argc, char* argv[]) {
 	if (!showHelp) {
 
 		BedSubtract *bs = new BedSubtract(bedAFile, bedBFile, overlapFraction, forceStrand);
-		bs->SubtractBed();
+		bs->DetermineBedInput();
 		return 0;
 	}
 	else {
@@ -101,17 +112,19 @@ void ShowHelp(void) {
 	cerr << " Aaron Quinlan, Ph.D. (aaronquinlan@gmail.com)  " << endl ;
 	cerr << " Hall Laboratory, University of Virginia" << endl;
 	cerr << "===============================================" << endl << endl;
-	cerr << "Description: Removes the portion(s) of an interval that is overlapped by another feature(s). " << endl << endl;
+	cerr << "SUMMARY: Removes the portion(s) of an interval that is overlapped" << endl;
+	cerr << "\t by another feature(s)." << endl << endl;
 
-	cerr << "Usage: " << PROGRAM_NAME << " [OPTIONS] -a <a.bed> -b <b.bed>" << endl << endl;
+	cerr << "USAGE:   " << PROGRAM_NAME << " [OPTIONS] -a <a.bed> -b <b.bed>" << endl << endl;
 
 	cerr << "OPTIONS: " << endl;
-	cerr << "\t" << "-s\t\t\t"            	<< "Force strandedness.  Only report hits in B that overlap A on the same strand." << endl << "\t\t\t\tBy default, overlaps are reported without respect to strand." << endl << endl;
-	cerr << "\t" << "-f (e.g. 0.05)\t\t"	<< "Minimum overlap req'd as fraction of a.bed." << endl << "\t\t\t\tDefault is 1E-9 (effectively 1bp)." << endl << endl;
+	cerr << "  " << "-f\t"		<< "Minimum overlap required as a fraction of A." << endl;
+	cerr 						<< "\t- Default is 1E-9 (i.e., 1bp)." << endl << endl;
 
-	cerr << "NOTES: " << endl;
-	cerr << "\t" << "-i stdin\t\t"	<< "Allows BED file A to be read from stdin.  E.g.: cat a.bed | subtractBed -a stdin -b B.bed" << endl << endl;
-	cerr << "\t***Only tab-delimited BED3 - BED6 formats allowed.***"<< endl << endl;
+	cerr << "  " << "-s\t"      << "Force strandedness.  That is, only report hits in B that" << endl;
+	cerr						<< "\toverlap A on the same strand." << endl;
+	cerr						<< "\t- By default, overlaps are reported without respect to strand." << endl << endl;
+
 
 	// end the program here
 	exit(1);

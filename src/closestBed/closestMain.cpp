@@ -108,22 +108,22 @@ void ShowHelp(void) {
 	cerr << " Hall Laboratory, University of Virginia" << endl;
 	cerr << "===============================================" << endl << endl;
 	cerr << "SUMMARY: For each feature in BED A, finds the closest " << endl;
-	cerr << "  feature (upstream or downstream) in BED B." << endl << endl;
+	cerr << "\t feature (upstream or downstream) in BED B." << endl << endl;
 
-	cerr << "USAGE: " << PROGRAM_NAME << " [OPTIONS] -a <a.bed> -b <b.bed>" << endl << endl;
+	cerr << "USAGE:   " << PROGRAM_NAME << " [OPTIONS] -a <a.bed> -b <b.bed>" << endl << endl;
 
 	cerr << "OPTIONS: " << endl;
 	cerr << "  " << "-s\t"      << "Force strandedness.  That is, find the closest feature in B that" << endl;
 	cerr						<< "\toverlaps A on the same strand." << endl;
-	cerr						<< "\t  - By default, overlaps are reported without respect to strand." << endl << endl;
+	cerr						<< "\t- By default, overlaps are reported without respect to strand." << endl << endl;
 
 	cerr << "  " << "-t\t"     	<< "How ties for closest feature are handled.  This occurs when two" << endl;
 	cerr 						<< "\tfeatures in B have exactly the same overlap with a feature in A." << endl;
 	cerr						<< "\tBy default, all such features in B are reported." << endl;
 	cerr						<< "\tHere are all the options:" << endl;
-	cerr 						<< "\t  - \"all\"  Report all ties (default)." << endl;
-	cerr 						<< "\t  - \"first\"  Report the first tie that occurred in the B file." << endl;
-	cerr 						<< "\t  - \"last\"  Report the last tie that occurred in the B file." << endl << endl;
+	cerr 						<< "\t- \"all\"  Report all ties (default)." << endl;
+	cerr 						<< "\t- \"first\"  Report the first tie that occurred in the B file." << endl;
+	cerr 						<< "\t- \"last\"  Report the last tie that occurred in the B file." << endl << endl;
 
 	
 	cerr << "NOTES: " << endl;

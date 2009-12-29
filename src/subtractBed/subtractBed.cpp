@@ -1,12 +1,14 @@
-// 
-//  subtractBed.cpp
-//  BEDTools
-//  
-//  Created by Aaron Quinlan Spring 2009.
-//  Copyright 2009 Aaron Quinlan. All rights reserved.
-//
-//  Summary:  Removes overlapping segments from a BED entry.
-//
+/*****************************************************************************
+  subtractBed.cpp
+
+  (c) 2009 - Aaron Quinlan
+  Hall Laboratory
+  Department of Biochemistry and Molecular Genetics
+  University of Virginia
+  aaronquinlan@gmail.com
+
+  Licenced under the GNU General Public License 2.0+ license.
+******************************************************************************/
 #include "lineFileUtilities.h"
 #include "subtractBed.h"
 
@@ -60,7 +62,7 @@ void BedSubtract::FindOverlaps(BED &a, vector<BED> &hits) {
 			
 			// is there enough overlap (default ~ 1bp)
 			float overlap = ((float)(e-s) / (float)(a.end - a.start));
-			
+
 			if (overlap >= 1.0) {
 				numOverlaps++;
 				numConsumedByB++;
@@ -147,74 +149,52 @@ void BedSubtract::FindOverlaps(BED &a, vector<BED> &hits) {
 
  
 
-void BedSubtract::SubtractBed() {
+void BedSubtract::SubtractBed(istream &bedInput) {
 
 	// load the "B" bed file into a map so
 	// that we can easily compare "A" to it for overlaps
 	bedB->loadBedFileIntoMap();
 
-	string bedLine;
-	BED bedEntry;                                                                                                                        
-	int lineNum = 0;
+	string bedLine;                                                                                                                    
+	int lineNum = 0;					// current input line number
+	vector<BED> hits;					// vector of potential hits
+	vector<string> bedFields;			// vector for a BED entry
+	
+	// reserve some space
+	hits.reserve(100);
+	bedFields.reserve(12);	
+		
+	BED a;
+	// process each entry in A
+	while (getline(bedInput, bedLine)) {
 
-	// are we dealing with a file?
-	if (bedA->bedFile != "stdin") {
-
-		// open the BED file for reading
-		ifstream bed(bedA->bedFile.c_str(), ios::in);
-		if ( !bed ) {
-			cerr << "Error: The requested bed file (" <<bedA->bedFile << ") could not be opened. Exiting!" << endl;
-			exit (1);
+		lineNum++;
+		Tokenize(bedLine,bedFields);
+	
+		// find the overlaps with B if it's a valid BED entry. 
+		if (bedA->parseLine(a, bedFields, lineNum)) {
+			FindOverlaps(a, hits);
+			hits.clear();
 		}
 		
-		BED a;
-		// process each entry in A
-		while (getline(bed, bedLine)) {
-			
-			if ((bedLine.find("track") != string::npos) || (bedLine.find("browser") != string::npos)) {
-				continue;
-			}
-			else {	
-				// split the current line into ditinct fields
-				vector<string> bedFields;
-				Tokenize(bedLine,bedFields);
-
-				lineNum++;
-			
-				// find the overlaps with B if it's a valid BED entry. 
-				if (bedA->parseBedLine(a, bedFields, lineNum)) {
-					vector<BED> hits;
-					FindOverlaps(a, hits);
-				}
-			}
-		}
-	}
-	// "A" is being passed via STDIN.
-	else {
-		
-		BED a;
-		// process each entry in A
-		while (getline(cin, bedLine)) {
-
-			if ((bedLine.find("track") != string::npos) || (bedLine.find("browser") != string::npos)) {
-				continue;
-			}
-			else {	
-				// split the current line into ditinct fields
-				vector<string> bedFields;
-				Tokenize(bedLine,bedFields);
-
-				lineNum++;
-			
-				// find the overlaps with B if it's a valid BED entry. 
-				if (bedA->parseBedLine(a, bedFields, lineNum)) {
-					vector<BED> hits;
-					FindOverlaps(a, hits);
-				}
-			}
-		}
+		// reset for the next input line
+		bedFields.clear();
 	}
 }
 // END Intersect
 
+
+void BedSubtract::DetermineBedInput() {
+	if (bedA->bedFile != "stdin") {   // process a file
+		ifstream beds(bedA->bedFile.c_str(), ios::in);
+		if ( !beds ) {
+			cerr << "Error: The requested bed file (" << bedA->bedFile << ") could not be opened. Exiting!" << endl;
+			exit (1);
+		}
+		SubtractBed(beds);
+	}
+	else {   						// process stdin
+		SubtractBed(cin);		
+	}
+}
 
