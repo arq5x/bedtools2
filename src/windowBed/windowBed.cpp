@@ -1,12 +1,14 @@
-// 
-//  windowBed.cpp
-//  BEDTools
-//  
-//  Created by Aaron Quinlan Spring 2009.
-//  Copyright 2009 Aaron Quinlan. All rights reserved.
-//
-//  Summary:  Looks for overlaps between features in two BED files.
-//
+/*****************************************************************************
+  windowBed.cpp
+
+  (c) 2009 - Aaron Quinlan
+  Hall Laboratory
+  Department of Biochemistry and Molecular Genetics
+  University of Virginia
+  aaronquinlan@gmail.com
+
+  Licenced under the GNU General Public License 2.0+ license.
+******************************************************************************/
 #include "lineFileUtilities.h"
 #include "windowBed.h"
 
@@ -122,68 +124,52 @@ void BedWindow::FindWindowOverlaps(BED &a, vector<BED> &hits) {
 }
 
  
-void BedWindow::WindowIntersectBed() {
+void BedWindow::WindowIntersectBed(istream &bedInput) {
 
 	// load the "B" bed file into a map so
 	// that we can easily compare "A" to it for overlaps
 	bedB->loadBedFileIntoMap();
 
+	string bedLine;                                                                                                                    
+	int lineNum = 0;					// current input line number
+	vector<BED> hits;					// vector of potential hits
+	vector<string> bedFields;			// vector for a BED entry
+	
+	// reserve some space
+	hits.reserve(100);
+	bedFields.reserve(12);	
+		
+	BED a;
+	// process each entry in A
+	while (getline(bedInput, bedLine)) {
 
-	string bedLine;
-	BED bedEntry;                                                                                                                        
-	int lineNum = 0;
-
-	// open the BED file for reading
-	if (bedA->bedFile != "stdin") {
-
-		ifstream bed(bedA->bedFile.c_str(), ios::in);
-		if ( !bed ) {
-			cerr << "Error: The requested bed file (" <<bedA->bedFile << ") could not be opened. Exiting!" << endl;
-			exit (1);
+		lineNum++;
+		Tokenize(bedLine,bedFields);
+	
+		// find the overlaps with B if it's a valid BED entry. 
+		if (bedA->parseLine(a, bedFields, lineNum)) {
+			FindWindowOverlaps(a, hits);
+			hits.clear();
 		}
 		
-		BED a;
-		while (getline(bed, bedLine)) {
-			
-			if ((bedLine.find("track") != string::npos) || (bedLine.find("browser") != string::npos)) {
-				continue;
-			}
-			else {	
-
-				vector<string> bedFields;
-				Tokenize(bedLine,bedFields);
-
-				lineNum++;
-				if (bedA->parseBedLine(a, bedFields, lineNum)) {
-					vector<BED> hits;
-					FindWindowOverlaps(a, hits);
-				}
-			}
-		}
-	}
-	// "A" is being passed via STDIN.
-	else {
-		
-		BED a;
-		while (getline(cin, bedLine)) {
-
-			if ((bedLine.find("track") != string::npos) || (bedLine.find("browser") != string::npos)) {
-				continue;
-			}
-			else {	
-
-				vector<string> bedFields;
-				Tokenize(bedLine,bedFields);
-
-				lineNum++;
-				if (bedA->parseBedLine(a, bedFields, lineNum)) {
-					vector<BED> hits;
-					FindWindowOverlaps(a, hits);
-				}
-			}
-		}
+		// reset for the next input line
+		bedFields.clear();
 	}
 }
 // END WindowIntersectBed
 
+
+void BedWindow::DetermineBedInput() {
+	if (bedA->bedFile != "stdin") {   // process a file
+		ifstream beds(bedA->bedFile.c_str(), ios::in);
+		if ( !beds ) {
+			cerr << "Error: The requested bed file (" << bedA->bedFile << ") could not be opened. Exiting!" << endl;
+			exit (1);
+		}
+		WindowIntersectBed(beds);
+	}
+	else {   						// process stdin
+		WindowIntersectBed(cin);		
+	}
+}
 
