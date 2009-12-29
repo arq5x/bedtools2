@@ -149,19 +149,32 @@ void ShowHelp(void) {
 
 	cerr << "Usage: " << PROGRAM_NAME << " [OPTIONS] -a <a.bed> -b <b.bed>" << endl << endl;
 
-	cerr << "OPTIONS: " << endl;
-	cerr << "\t" << "-s\t\t\t"            	<< "Force strandedness.  Only report hits in B that overlap A on the same strand." << endl << "\t\t\t\tBy default, overlaps are reported without respect to strand." << endl << endl;
-	cerr << "\t" << "-u\t\t\t"            	<< "Write ORIGINAL a.bed entry ONCE if ANY overlap with B.bed." << endl << "\t\t\t\tIn other words, just report the fact >=1 hit was found." << endl << endl;
-	cerr << "\t" << "-v \t\t\t"             << "Only report those entries in A that have NO OVERLAP in B." << endl << "\t\t\t\tSimilar to grep -v." << endl << endl;
-	cerr << "\t" << "-f (e.g. 0.05)\t\t"	<< "Minimum overlap req'd as fraction of a.bed." << endl << "\t\t\t\tDefault is 1E-9 (effectively 1bp)." << endl << endl;
-	cerr << "\t" << "-r \t\t\t"				<< "Require that the fraction overlap be reciprocal for A and B."   << endl << "\t\t\t\tIn other words, if -f is 0.90 and -r is used, this requires that" << endl << "\t\t\t\tB overlap 90% of A and A _also_ overlaps 90% of B." << endl << endl;
-	cerr << "\t" << "-c \t\t\t"				<< "For each entry in A, report the number of hits in B while restricting to -f." << endl << "\t\t\t\tReports 0 for A entries that have no overlap with B." << endl << endl;
-	cerr << "\t" << "-wa \t\t\t"			<< "Write the original entry in A for each overlap." << endl << endl;
-	cerr << "\t" << "-wb \t\t\t"			<< "Write the original entry in B for each overlap." << endl << "\t\t\t\tUseful for knowing _what_ A overlaps. Restricted by -f." << endl << endl;
+	cerr << "Options: " << endl;
+	cerr << "  " << "-wa\t"		<< "Write the original entry in A for each overlap." << endl << endl;
+	cerr << "  " << "-wb\t"		<< "Write the original entry in B for each overlap." << endl;
+	cerr 						<< "\t  - Useful for knowing _what_ A overlaps. Restricted by -f." << endl << endl;
 
-	cerr << "NOTES: " << endl;
-	cerr << "\t" << "-i stdin\t\t"	<< "Allows BED file A to be read from stdin.  E.g.: cat a.bed | intersectBed -a stdin -b B.bed" << endl << endl;
-	cerr << "\t***Only tab-delimited BED3 - BED6 formats allowed.***"<< endl << endl;
+	cerr << "  " << "-u\t"      << "Write the original A entry _once_ if _any_ overlaps found in B." << endl;
+	cerr 						<< "\t  - In other words, just report the fact >=1 hit was found." << endl << endl;
+
+	cerr << "  " << "-c\t"		<< "For each entry in A, report the number of overlaps with B." << endl; 
+	cerr 						<< "\t  - Reports 0 for A entries that have no overlap with B." << endl;
+	cerr						<< "\t  - Overlaps restricted by -f." << endl << endl;
+
+	cerr << "  " << "-v\t"      << "Only report those entries in A that have _no overlaps_ with B." << endl;
+	cerr 						<< "\t  - Similar to \"grep -v.\"" << endl << endl;
+
+	cerr << "  " << "-f\t"		<< "Minimum overlap required as a fraction of A." << endl;
+	cerr 						<< "\t  - Default is 1E-9 (i.e., 1bp)." << endl << endl;
+
+	cerr << "  " << "-r\t"		<< "Require that the fraction overlap be reciprocal for A and B." << endl;
+	cerr 						<< "\t  - In other words, if -f is 0.90 and -r is used, this requires" << endl;
+	cerr						<< "\t    that B overlap 90% of A and A _also_ overlaps 90% of B." << endl << endl;
+
+	
+	cerr << "  " << "-s\t"      << "Force strandedness.  That is, only report hits in B that" << endl;
+	cerr						<< "\toverlap A on the same strand." << endl;
+	cerr						<< "\t  - By default, overlaps are reported without respect to strand." << endl << endl;
 
 	// end the program here
 	exit(1);
