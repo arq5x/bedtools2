@@ -162,11 +162,10 @@ int main(int argc, char* argv[]) {
 
 void ShowHelp(void) {
 
-	cerr << "===============================================" << endl;
-	cerr << " " <<PROGRAM_NAME << " v" << VERSION << endl ;
-	cerr << " Aaron Quinlan, Ph.D. (aaronquinlan@gmail.com)  " << endl ;
-	cerr << " Hall Laboratory, University of Virginia" << endl;
-	cerr << "===============================================" << endl << endl;
+	cerr << endl << "PROGRAM: " << PROGRAM_NAME << " (v" << VERSION << ")" << endl << endl;
+	
+	cerr << "AUTHOR:  Aaron Quinlan (aaronquinlan@gmail.com)" << endl << endl ;
+
 	cerr << "SUMMARY: Examines a \"window\" around each feature in A and" << endl;
 	cerr << "\t reports all features in B that overlap the window. For each" << endl;
 	cerr << "\t overlap the entire entry in A and B are reported." << endl << endl;
@@ -177,17 +176,20 @@ void ShowHelp(void) {
 	cerr << "  " << "-w\t"		<< "Base pairs added upstream and downstream of each entry" << endl;
 	cerr						<< "\tin A when searching for overlaps in B." << endl;
 	cerr						<< "\t- Creates symterical \"windows\" around A." << endl;		
-	cerr						<< "\t- Default is 1000 bp." << endl << endl;
-	
+	cerr						<< "\t- Default is 1000 bp." << endl;
+	cerr						<< "\t- INTEGER" << endl << endl;
+		
 	cerr << "  " << "-l\t"		<< "Base pairs added upstream (left of) of each entry" << endl;
 	cerr						<< "\tin A when searching for overlaps in B." << endl;	
 	cerr						<< "\t- Allows one to define assymterical \"windows\"." << endl;
-	cerr						<< "\t- Default is 1000 bp." << endl << endl;
+	cerr						<< "\t- Default is 1000 bp." << endl;
+	cerr						<< "\t- INTEGER" << endl << endl;	
 
 	cerr << "  " << "-r\t"		<< "Base pairs added downstream (right of) of each entry" << endl;
 	cerr						<< "\tin A when searching for overlaps in B." << endl;	
 	cerr						<< "\t- Allows one to define assymterical \"windows\"." << endl;
-	cerr						<< "\t- Default is 1000 bp." << endl << endl;
+	cerr						<< "\t- Default is 1000 bp." << endl;
+	cerr						<< "\t- INTEGER" << endl << endl;
 		
 
 	cerr << "  " << "-sw\t"     << "Define -l and -r based on strand.  For example if used, -l 500" << endl;

@@ -151,11 +151,10 @@ int main(int argc, char* argv[]) {
 
 void ShowHelp(void) {
 
-	cerr << "===============================================" << endl;
-	cerr << " " <<PROGRAM_NAME << " v" << VERSION << endl ;
-	cerr << " Aaron Quinlan, Ph.D. (aaronquinlan@gmail.com)  " << endl ;
-	cerr << " Hall Laboratory, University of Virginia" << endl;
-	cerr << "===============================================" << endl << endl;
+	cerr << endl << "PROGRAM: " << PROGRAM_NAME << " (v" << VERSION << ")" << endl << endl;
+	
+	cerr << "AUTHOR:  Aaron Quinlan (aaronquinlan@gmail.com)" << endl << endl ;
+
 	cerr << "SUMMARY: Report overlaps between a.bed and b.bed." << endl << endl;
 
 	cerr << "USAGE:   " << PROGRAM_NAME << " [OPTIONS] -a <a.bed> -b <b.bed>" << endl << endl;
@@ -176,7 +175,8 @@ void ShowHelp(void) {
 	cerr 						<< "\t- Similar to \"grep -v.\"" << endl << endl;
 
 	cerr << "  " << "-f\t"		<< "Minimum overlap required as a fraction of A." << endl;
-	cerr 						<< "\t- Default is 1E-9 (i.e., 1bp)." << endl << endl;
+	cerr 						<< "\t- Default is 1E-9 (i.e., 1bp)." << endl;
+	cerr						<< "\t- FLOAT (e.g. 0.50)" << endl << endl;
 
 	cerr << "  " << "-r\t"		<< "Require that the fraction overlap be reciprocal for A and B." << endl;
 	cerr 						<< "\t- In other words, if -f is 0.90 and -r is used, this requires" << endl;

@@ -102,11 +102,10 @@ int main(int argc, char* argv[]) {
 
 void ShowHelp(void) {
 
-	cerr << "===============================================" << endl;
-	cerr << " " <<PROGRAM_NAME << " v" << VERSION << endl ;
-	cerr << " Aaron Quinlan, Ph.D. (aaronquinlan@gmail.com)  " << endl ;
-	cerr << " Hall Laboratory, University of Virginia" << endl;
-	cerr << "===============================================" << endl << endl;
+	cerr << endl << "PROGRAM: " << PROGRAM_NAME << " (v" << VERSION << ")" << endl << endl;
+	
+	cerr << "AUTHOR:  Aaron Quinlan (aaronquinlan@gmail.com)" << endl << endl ;
+
 	cerr << "SUMMARY: For each feature in BED A, finds the closest " << endl;
 	cerr << "\t feature (upstream or downstream) in BED B." << endl << endl;
 

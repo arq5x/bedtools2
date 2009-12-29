@@ -107,11 +107,10 @@ int main(int argc, char* argv[]) {
 
 void ShowHelp(void) {
 
-	cerr << "===============================================" << endl;
-	cerr << " " <<PROGRAM_NAME << " v" << VERSION << endl ;
-	cerr << " Aaron Quinlan, Ph.D. (aaronquinlan@gmail.com)  " << endl ;
-	cerr << " Hall Laboratory, University of Virginia" << endl;
-	cerr << "===============================================" << endl << endl;
+	cerr << endl << "PROGRAM: " << PROGRAM_NAME << " (v" << VERSION << ")" << endl << endl;
+	
+	cerr << "AUTHOR:  Aaron Quinlan (aaronquinlan@gmail.com)" << endl << endl ;
+
 	cerr << "SUMMARY: Removes the portion(s) of an interval that is overlapped" << endl;
 	cerr << "\t by another feature(s)." << endl << endl;
 
@@ -119,7 +118,8 @@ void ShowHelp(void) {
 
 	cerr << "OPTIONS: " << endl;
 	cerr << "  " << "-f\t"		<< "Minimum overlap required as a fraction of A." << endl;
-	cerr 						<< "\t- Default is 1E-9 (i.e., 1bp)." << endl << endl;
+	cerr 						<< "\t- Default is 1E-9 (i.e., 1bp)." << endl;
+	cerr						<< "\t- FLOAT (e.g. 0.50)" << endl << endl;
 
 	cerr << "  " << "-s\t"      << "Force strandedness.  That is, only report hits in B that" << endl;
 	cerr						<< "\toverlap A on the same strand." << endl;

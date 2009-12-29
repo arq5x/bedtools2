@@ -545,20 +545,19 @@ void BedFile::loadBedFileIntoMapNoBin() {
 	}
 	// Case 2: STDIN.
 	else {
-				
+
 		while (getline(cin, bedLine)) {
 
 			if ((bedLine.find("track") != string::npos) || (bedLine.find("browser") != string::npos)) {
 				continue;
 			}
 			else {
-				vector<string> bedFields;
 				Tokenize(bedLine,bedFields);
-
 				lineNum++;
 
 				if (parseLine(bedEntry, bedFields, lineNum)) {
 					bedEntry.count = 0;
+					bedEntry.minOverlapStart = INT_MAX;
 					this->bedMapNoBin[bedEntry.chrom].push_back(bedEntry);	
 				}
 				bedFields.clear();

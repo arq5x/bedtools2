@@ -1,3 +1,14 @@
+/*****************************************************************************
+  mergeMain.cpp
+
+  (c) 2009 - Aaron Quinlan
+  Hall Laboratory
+  Department of Biochemistry and Molecular Genetics
+  University of Virginia
+  aaronquinlan@gmail.com
+
+  Licenced under the GNU General Public License 2.0+ license.
+******************************************************************************/
 #include "mergeBed.h"
 #include "version.h"
 
@@ -64,7 +75,7 @@ int main(int argc, char* argv[]) {
 		else if (PARAMETER_CHECK("-s", 2, parameterLength)) {
 			forceStrand = true;
 		}
-		else if (PARAMETER_CHECK("-names", 6, parameterLength)) {
+		else if (PARAMETER_CHECK("-nms", 4, parameterLength)) {
 			reportNames = true;
 		}
 		else {
@@ -97,25 +108,29 @@ int main(int argc, char* argv[]) {
 
 void ShowHelp(void) {
 
-	cerr << "===============================================" << endl;
-	cerr << " " <<PROGRAM_NAME << " v" << VERSION << endl ;
-	cerr << " Aaron Quinlan, Ph.D. (aaronquinlan@gmail.com)  " << endl ;
-	cerr << " Hall Laboratory, University of Virginia" << endl;
-	cerr << "===============================================" << endl << endl;
-	cerr << "Description: Merges overlapping bed entries into a single interval." << endl << endl;
+	cerr << endl << "PROGRAM: " << PROGRAM_NAME << " (v" << VERSION << ")" << endl << endl;
+	
+	cerr << "AUTHOR:  Aaron Quinlan (aaronquinlan@gmail.com)" << endl << endl ;
+	
+	cerr << "SUMMARY: Merges overlapping BED entries into a single interval." << endl << endl;
 
-	cerr << "Usage: " << PROGRAM_NAME << " [OPTIONS] -i <input.bed>" << endl << endl;
+	cerr << "USAGE:   " << PROGRAM_NAME << " [OPTIONS] -i <input.bed>" << endl << endl;
 
 	cerr << "OPTIONS: " << endl;
-	cerr << "\t" << "-s\t\t"  << "Force strandedness.  Only report hits in B that overlap A on the same strand." << endl << "\t\t\tBy default, overlaps are reported without respect to strand." << endl << endl;	
-	cerr << "\t" << "-n\t\t"	<< "Report the number of BED entries that were merged. (=1 if no merging occured)" << endl << endl;
-	cerr << "\t" << "-d\t\t"  << "Maximum distance between features allowed for features to be merged. (Default=0)" << endl << endl;
-	cerr << "\t" << "-names\t\t"  << "Report the names of the merged features separated by semicolons." << endl << endl;
-	
+	cerr << "  " << "-s\t"      << "Force strandedness.  That is, only merge features" << endl;
+	cerr						<< "\tthat are the same strand." << endl;
+	cerr						<< "\t- By default, merging is done without respect to strand." << endl << endl;
 
-	cerr << "NOTES: " << endl;
-	cerr << "\t" << "-i stdin\t"	<< "Allows BED file A to be read from stdin.  E.g.: cat a.bed | mergeBed -a stdin -b B.bed" << endl << endl;
-	cerr << "\t***Only tab-delimited BED3 - BED6 formats allowed.***"<< endl << endl;
+	cerr << "  " << "-n\t"		<< "Report the number of BED entries that were merged." << endl;
+	cerr						<< "\t- Note: \"1\" is reported if no merging occured." << endl << endl;
+
+
+	cerr << "  " << "-d\t"  	<< "Maximum distance between features allowed for features to be merged." << endl;
+	cerr 	 					<< "\t- Def. 0. That is, overlapping and/or book-ended features are merged." << endl;
+	cerr						<< "\t- INTEGER" << endl << endl;
+	
+	cerr << "  " << "-nms\t"  	<< "Report the names of the merged features separated by semicolons." << endl << endl;
+	
 
 	// end the program here
 	exit(1);

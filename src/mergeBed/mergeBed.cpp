@@ -1,12 +1,14 @@
-// 
-//  mergeBed.cpp
-//  BEDTools
-//  
-//  Created by Aaron Quinlan Spring 2009.
-//  Copyright 2009 Aaron Quinlan. All rights reserved.
-//
-//  Summary:  Combines overlapping BED entries into a single entry.
-//
+/*****************************************************************************
+  mergeBed.cpp
+
+  (c) 2009 - Aaron Quinlan
+  Hall Laboratory
+  Department of Biochemistry and Molecular Genetics
+  University of Virginia
+  aaronquinlan@gmail.com
+
+  Licenced under the GNU General Public License 2.0+ license.
+******************************************************************************/
 #include "lineFileUtilities.h"
 #include "mergeBed.h"
 
@@ -22,7 +24,6 @@ BedMerge::BedMerge(string &bedFile, bool &numEntries, int &maxDistance, bool &fo
 	this->reportNames = reportNames;
 	
 	this->bed = new BedFile(bedFile);
-
 }
 
 
