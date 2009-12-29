@@ -1,3 +1,14 @@
+/*****************************************************************************
+  closestBed.h
+
+  (c) 2009 - Aaron Quinlan
+  Hall Laboratory
+  Department of Biochemistry and Molecular Genetics
+  University of Virginia
+  aaronquinlan@gmail.com
+
+  Licenced under the GNU General Public License 2.0+ license.
+******************************************************************************/
 #ifndef CLOSESTBED_H
 #define CLOSESTBED_H
 
@@ -25,8 +36,9 @@ public:
 	void reportB(const BED &);
 	void reportNullB();
 
-	void ClosestBed();
+	void ClosestBed(istream &bedInput);
 	void FindWindowOverlaps(BED &, vector<BED> &);
+	void DetermineBedInput();
 		
 private:
 

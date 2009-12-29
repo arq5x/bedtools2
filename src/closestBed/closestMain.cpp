@@ -1,3 +1,14 @@
+/*****************************************************************************
+  closestMain.cpp
+
+  (c) 2009 - Aaron Quinlan
+  Hall Laboratory
+  Department of Biochemistry and Molecular Genetics
+  University of Virginia
+  aaronquinlan@gmail.com
+
+  Licenced under the GNU General Public License 2.0+ license.
+******************************************************************************/
 #include "closestBed.h"
 #include "version.h"
 
@@ -81,7 +92,7 @@ int main(int argc, char* argv[]) {
 	
 	if (!showHelp) {
 		BedClosest *bc = new BedClosest(bedAFile, bedBFile, forceStrand, tieMode);
-		bc->ClosestBed();
+		bc->DetermineBedInput();
 		return 0;
 	}
 	else {
@@ -96,24 +107,29 @@ void ShowHelp(void) {
 	cerr << " Aaron Quinlan, Ph.D. (aaronquinlan@gmail.com)  " << endl ;
 	cerr << " Hall Laboratory, University of Virginia" << endl;
 	cerr << "===============================================" << endl << endl;
-	cerr << "Description: For each feature in BED A, finds the closest feature (upstream or downstream) in BED B" << endl;
+	cerr << "SUMMARY: For each feature in BED A, finds the closest " << endl;
+	cerr << "  feature (upstream or downstream) in BED B." << endl << endl;
 
-	cerr << "Usage: " << PROGRAM_NAME << " [OPTIONS] -a <a.bed> -b <b.bed>" << endl << endl;
+	cerr << "USAGE: " << PROGRAM_NAME << " [OPTIONS] -a <a.bed> -b <b.bed>" << endl << endl;
 
 	cerr << "OPTIONS: " << endl;
-	cerr << "\t" << "-s\t\t\t"            	<< "Force strandedness.  Only report hits in B that overlap A on the same strand." << endl << "\t\t\t\tBy default, overlaps are reported without respect to strand." << endl << endl;
-	cerr << "\t" << "-t\t\t\t"            	<< "How to handle ties for closest features.  This occurs when two features in B have exactly the" << endl;
-	cerr << "\t\t\t\t"						<< "same overlap with a feature in A.  By default, all such features in B are reported.  Here are all the options:" << endl;
-	cerr << "\t\t\t\t\t"						<< "all\t\tReport all ties (default)." << endl;
-	cerr << "\t\t\t\t\t"						<< "first\t\tReport the first tie that occurred in the B file." << endl;
-	cerr << "\t\t\t\t\t"						<< "last\t\tReport the last tie that occurred in the B file." << endl;
+	cerr << "  " << "-s\t"      << "Force strandedness.  That is, find the closest feature in B that" << endl;
+	cerr						<< "\toverlaps A on the same strand." << endl;
+	cerr						<< "\t  - By default, overlaps are reported without respect to strand." << endl << endl;
+
+	cerr << "  " << "-t\t"     	<< "How ties for closest feature are handled.  This occurs when two" << endl;
+	cerr 						<< "\tfeatures in B have exactly the same overlap with a feature in A." << endl;
+	cerr						<< "\tBy default, all such features in B are reported." << endl;
+	cerr						<< "\tHere are all the options:" << endl;
+	cerr 						<< "\t  - \"all\"  Report all ties (default)." << endl;
+	cerr 						<< "\t  - \"first\"  Report the first tie that occurred in the B file." << endl;
+	cerr 						<< "\t  - \"last\"  Report the last tie that occurred in the B file." << endl << endl;
 
 	
 	cerr << "NOTES: " << endl;
-	cerr << "\t" << "-i stdin\t\t" << "Allows BED file A to be read from stdin.  E.g.: cat a.bed | closestBed -a stdin -b B.bed" << endl << endl;
-	cerr << "\t" << "Reports \"none\" for chrom and \"-1\" for all other fields when a feature is not found in B on the same chromosome" << endl;
-	cerr << "\t" << "as the feature in A.  E.g. none\t-1\t-1" << endl << endl;
-	cerr << "\t***Only tab-delimited  BED3 - BED6 formats allowed.***" << endl << endl;
+	cerr << "  Reports \"none\" for chrom and \"-1\" for all other fields when a feature" << endl;
+	cerr << "  is not found in B on the same chromosome as the feature in A." << endl;
+	cerr << "  E.g. none\t-1\t-1" << endl << endl;
 	
 	// end the program here
 	exit(1);

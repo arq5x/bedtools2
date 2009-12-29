@@ -167,11 +167,11 @@ void ShowHelp(void) {
 	cerr << " Aaron Quinlan, Ph.D. (aaronquinlan@gmail.com)  " << endl ;
 	cerr << " Hall Laboratory, University of Virginia" << endl;
 	cerr << "===============================================" << endl << endl;
-	cerr << "Description: Examines a \"window\" around each feature in A and" << endl;
-	cerr << "reports all features in B that overlap the window. For each" << endl;
-	cerr << "overlap the entire entry in A and B are reported." << endl << endl;
+	cerr << "SUMMARY: Examines a \"window\" around each feature in A and" << endl;
+	cerr << "  reports all features in B that overlap the window. For each" << endl;
+	cerr << "  overlap the entire entry in A and B are reported." << endl << endl;
 
-	cerr << "Usage: " << PROGRAM_NAME << " [OPTIONS] -a <a.bed> -b <b.bed>" << endl << endl;
+	cerr << "USAGE: " << PROGRAM_NAME << " [OPTIONS] -a <a.bed> -b <b.bed>" << endl << endl;
 
 	cerr << "OPTIONS: " << endl;
 	cerr << "  " << "-w\t"		<< "Base pairs added upstream and downstream of each entry" << endl;

@@ -156,11 +156,11 @@ void ShowHelp(void) {
 	cerr << " Aaron Quinlan, Ph.D. (aaronquinlan@gmail.com)  " << endl ;
 	cerr << " Hall Laboratory, University of Virginia" << endl;
 	cerr << "===============================================" << endl << endl;
-	cerr << "Description: Report overlaps between a.bed and b.bed." << endl << endl;
+	cerr << "SUMMARY: Report overlaps between a.bed and b.bed." << endl << endl;
 
-	cerr << "Usage: " << PROGRAM_NAME << " [OPTIONS] -a <a.bed> -b <b.bed>" << endl << endl;
+	cerr << "USAGE: " << PROGRAM_NAME << " [OPTIONS] -a <a.bed> -b <b.bed>" << endl << endl;
 
-	cerr << "Options: " << endl;
+	cerr << "OPTIONS: " << endl;
 	cerr << "  " << "-wa\t"		<< "Write the original entry in A for each overlap." << endl << endl;
 	cerr << "  " << "-wb\t"		<< "Write the original entry in B for each overlap." << endl;
 	cerr 						<< "\t  - Useful for knowing _what_ A overlaps. Restricted by -f." << endl << endl;
