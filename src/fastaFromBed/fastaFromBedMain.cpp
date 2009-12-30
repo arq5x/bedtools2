@@ -109,13 +109,13 @@ void ShowHelp(void) {
 	
 	cerr << "SUMMARY: Extract DNA sequences into a fasta file based on BED coordinates." << endl << endl;
 
-	cerr << "USAGE:   " << PROGRAM_NAME << " -fi (req'd) -bed (req'd) -fo (req'd) -name (opt.)" << endl << endl;
+	cerr << "USAGE:   " << PROGRAM_NAME << " [OPTIONS] -fi -bed -fo " << endl << endl;
 
 	cerr << "OPTIONS: " << endl;
-	cerr << "\t-fi\t\tInput FASTA file" << endl;
-	cerr << "\t-bed\t\tBED file of ranges to extract from -fi" << endl;
-	cerr << "\t-fo\t\tOutput FASTA file" << endl;
-	cerr << "\t-name\t\tUse the BED name field (#4) for the FASTA header" << endl;
+	cerr << "\t\t-fi\tInput FASTA file" << endl;
+	cerr << "\t\t-bed\tBED file of ranges to extract from -fi" << endl;
+	cerr << "\t\t-fo\tOutput FASTA file" << endl;
+	cerr << "\t\t-name\tUse the BED name field (#4) for the FASTA header" << endl;
 
 
 

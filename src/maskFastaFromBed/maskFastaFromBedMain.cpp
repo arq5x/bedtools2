@@ -1,3 +1,14 @@
+/*****************************************************************************
+  maskFastaFromBedMain.cpp
+
+  (c) 2009 - Aaron Quinlan
+  Hall Laboratory
+  Department of Biochemistry and Molecular Genetics
+  University of Virginia
+  aaronquinlan@gmail.com
+
+  Licenced under the GNU General Public License 2.0+ license.
+******************************************************************************/
 #include "maskFastaFromBed.h"
 #include "version.h"
 
@@ -50,7 +61,7 @@ int main(int argc, char* argv[]) {
 
 		int parameterLength = (int)strlen(argv[i]);
 
-		if(PARAMETER_CHECK("-in", 3, parameterLength)) {
+		if(PARAMETER_CHECK("-fi", 3, parameterLength)) {
 			haveFastaIn = true;
 			fastaInFile = argv[i + 1];
 			i++;
@@ -93,24 +104,21 @@ int main(int argc, char* argv[]) {
 void ShowHelp(void) {
 
 	
-	cerr << "===============================================" << endl;
-	cerr << " " <<PROGRAM_NAME << " v" << VERSION << endl ;
-	cerr << " Aaron Quinlan, Ph.D. (aaronquinlan@gmail.com)  " << endl ;
-	cerr << " Hall Laboratory, University of Virginia" << endl;
-	cerr << "===============================================" << endl << endl;
-	cerr << "Description: Mask a fasta file based on BED coordinates." << endl << endl;
 
-	cerr << "Usage: " << PROGRAM_NAME << " -in -out -bed (-soft)" << endl << endl;
+	cerr << endl << "PROGRAM: " << PROGRAM_NAME << " (v" << VERSION << ")" << endl << endl;
+	
+	cerr << "AUTHOR:  Aaron Quinlan (aaronquinlan@gmail.com)" << endl << endl ;
+	
+	cerr << "SUMMARY: Mask a fasta file based on BED coordinates." << endl << endl;
+
+	cerr << "USAGE:   " << PROGRAM_NAME << " [OPTIONS] -fi -out -bed" << endl << endl;
 
 	cerr << "OPTIONS:" << endl;
-	cerr << "\t-in\t\t<FASTA input file>          " << endl;
-	cerr << "\t-bed\t\t<BED coordinates file>          " << endl;
-	cerr << "\t-fo\t\t<FASTA output file>                           " << endl;
-	cerr << "\t-soft\t\tEnforce \"soft\" masking.  That is, instead of masking with Ns," << endl;
+	cerr << "\t\t-fi\tInput FASTA file" << endl;
+	cerr << "\t\t-bed\tBED file of ranges to mask in -fi" << endl;
+	cerr << "\t\t-fo\tOutput FASTA file" << endl;
+	cerr << "\t\t-soft\tEnforce \"soft\" masking.  That is, instead of masking with Ns," << endl;
 	cerr << "\t\t\tmask with lower-case bases." << endl;
-	
-	cerr << "NOTES: " << endl;
-	cerr << "\t***Only tab-delimited BED3 - BED6 formats allowed.***"<< endl << endl;
 
 	// end the program here
 	exit(1);
