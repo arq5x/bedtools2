@@ -112,23 +112,23 @@ void ShowHelp(void) {
 	cerr << "USAGE:   " << PROGRAM_NAME << " [OPTIONS] -a <a.bed> -b <b.bed>" << endl << endl;
 
 	cerr << "OPTIONS: " << endl;
-	cerr << "  " << "-s\t"      << "Force strandedness.  That is, find the closest feature in B that" << endl;
-	cerr						<< "\toverlaps A on the same strand." << endl;
-	cerr						<< "\t- By default, overlaps are reported without respect to strand." << endl << endl;
+	cerr << "\t-s\t"      << "Force strandedness.  That is, find the closest feature in B" << endl;
+	cerr						<< "\t\tthat overlaps A on the same strand." << endl;
+	cerr						<< "\t\t- By default, overlaps are reported without respect to strand." << endl << endl;
 
-	cerr << "  " << "-t\t"     	<< "How ties for closest feature are handled.  This occurs when two" << endl;
-	cerr 						<< "\tfeatures in B have exactly the same overlap with a feature in A." << endl;
-	cerr						<< "\tBy default, all such features in B are reported." << endl;
-	cerr						<< "\tHere are all the options:" << endl;
-	cerr 						<< "\t- \"all\"  Report all ties (default)." << endl;
-	cerr 						<< "\t- \"first\"  Report the first tie that occurred in the B file." << endl;
-	cerr 						<< "\t- \"last\"  Report the last tie that occurred in the B file." << endl << endl;
+	cerr << "\t-t\t"     	<< "How ties for closest feature are handled.  This occurs when two" << endl;
+	cerr 						<< "\t\tfeatures in B have exactly the same overlap with A." << endl;
+	cerr						<< "\t\tBy default, all such features in B are reported." << endl;
+	cerr						<< "\t\tHere are all the options:" << endl;
+	cerr 						<< "\t\t- \"all\"  Report all ties (default)." << endl;
+	cerr 						<< "\t\t- \"first\"  Report the first tie that occurred in the B file." << endl;
+	cerr 						<< "\t\t- \"last\"  Report the last tie that occurred in the B file." << endl << endl;
 
 	
 	cerr << "NOTES: " << endl;
-	cerr << "  Reports \"none\" for chrom and \"-1\" for all other fields when a feature" << endl;
-	cerr << "  is not found in B on the same chromosome as the feature in A." << endl;
-	cerr << "  E.g. none\t-1\t-1" << endl << endl;
+	cerr << "\tReports \"none\" for chrom and \"-1\" for all other fields when a feature" << endl;
+	cerr << "\tis not found in B on the same chromosome as the feature in A." << endl;
+	cerr << "\tE.g. none\t-1\t-1" << endl << endl;
 	
 	// end the program here
 	exit(1);

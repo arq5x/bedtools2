@@ -117,13 +117,13 @@ void ShowHelp(void) {
 	cerr << "USAGE:   " << PROGRAM_NAME << " [OPTIONS] -a <a.bed> -b <b.bed>" << endl << endl;
 
 	cerr << "OPTIONS: " << endl;
-	cerr << "  " << "-f\t"		<< "Minimum overlap required as a fraction of A." << endl;
-	cerr 						<< "\t- Default is 1E-9 (i.e., 1bp)." << endl;
-	cerr						<< "\t- FLOAT (e.g. 0.50)" << endl << endl;
+	cerr << "\t-f\t"			<< "Minimum overlap required as a fraction of A." << endl;
+	cerr 						<< "\t\t- Default is 1E-9 (i.e., 1bp)." << endl;
+	cerr						<< "\t\t- (FLOAT) (e.g. 0.50)" << endl << endl;
 
-	cerr << "  " << "-s\t"      << "Force strandedness.  That is, only report hits in B that" << endl;
-	cerr						<< "\toverlap A on the same strand." << endl;
-	cerr						<< "\t- By default, overlaps are reported without respect to strand." << endl << endl;
+	cerr << "\t-s\t"      		<< "Force strandedness.  That is, only report hits in B that" << endl;
+	cerr						<< "\t\toverlap A on the same strand." << endl;
+	cerr						<< "\t\t- By default, overlaps are reported without respect to strand." << endl << endl;
 
 
 	// end the program here

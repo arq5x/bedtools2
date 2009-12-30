@@ -117,19 +117,20 @@ void ShowHelp(void) {
 	cerr << "USAGE:   " << PROGRAM_NAME << " [OPTIONS] -i <input.bed>" << endl << endl;
 
 	cerr << "OPTIONS: " << endl;
-	cerr << "  " << "-s\t"      << "Force strandedness.  That is, only merge features" << endl;
-	cerr						<< "\tthat are the same strand." << endl;
-	cerr						<< "\t- By default, merging is done without respect to strand." << endl << endl;
+	cerr << "\t-s\t"      		<< "Force strandedness.  That is, only merge features" << endl;
+	cerr						<< "\t\tthat are the same strand." << endl;
+	cerr						<< "\t\t- By default, merging is done without respect to strand." << endl << endl;
 
-	cerr << "  " << "-n\t"		<< "Report the number of BED entries that were merged." << endl;
-	cerr						<< "\t- Note: \"1\" is reported if no merging occurred." << endl << endl;
+	cerr << "\t-n\t"			<< "Report the number of BED entries that were merged." << endl;
+	cerr						<< "\t\t- Note: \"1\" is reported if no merging occurred." << endl << endl;
 
 
-	cerr << "  " << "-d\t"  	<< "Maximum distance between features allowed for features to be merged." << endl;
-	cerr 	 					<< "\t- Def. 0. That is, overlapping and/or book-ended features are merged." << endl;
-	cerr						<< "\t- INTEGER" << endl << endl;
+	cerr << "\t-d\t"	 	 	<< "Maximum distance between features allowed for features" << endl;
+	cerr 						<< "\t\tto be merged." << endl;
+	cerr 	 					<< "\t\t- Def. 0. That is, overlapping & book-ended features are merged." << endl;
+	cerr						<< "\t\t- (INTEGER)" << endl << endl;
 	
-	cerr << "  " << "-nms\t"  	<< "Report the names of the merged features separated by semicolons." << endl << endl;
+	cerr << "\t-nms\t"  		<< "Report the names of the merged features separated by semicolons." << endl << endl;
 	
 
 	// end the program here

@@ -1,3 +1,14 @@
+/*****************************************************************************
+genomeCoverage.h
+
+(c) 2009 - Aaron Quinlan
+Hall Laboratory
+Department of Biochemistry and Molecular Genetics
+University of Virginia
+aaronquinlan@gmail.com
+
+Licenced under the GNU General Public License 2.0+ license.
+******************************************************************************/
 #include "bedFile.h"
 #include <vector>
 #include <iostream>
@@ -22,17 +33,20 @@ class BedCoverage {
 
 public:
 
-  // constructor 
-  BedCoverage(string &, string &, bool &, bool &, int &);
+	// constructor 
+	BedCoverage(string &, string &, bool &, bool &, int &);
 
-  // destructor
-  ~BedCoverage(void);
+	// destructor
+	~BedCoverage(void);
 
-  void CoverageBeds();
-  void ReportChromCoverage(vector<DEPTH> &, int &, string &, chromHistMap&);
-  void ReportGenomeCoverage(map<string, int> &, chromHistMap&);
+	void CoverageBeds(istream &bedInput);
+	void ReportChromCoverage(vector<DEPTH> &, int &, string &, chromHistMap&);
+	void ReportGenomeCoverage(map<string, int> &, chromHistMap&);
+
+	void DetermineBedInput();
+
 private:
-	
+
 	string bedFile;
 	string genomeFile;
 	bool eachBase;

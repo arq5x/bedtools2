@@ -1,3 +1,14 @@
+/*****************************************************************************
+  genomeCoverageMain.cpp
+
+  (c) 2009 - Aaron Quinlan
+  Hall Laboratory
+  Department of Biochemistry and Molecular Genetics
+  University of Virginia
+  aaronquinlan@gmail.com
+
+  Licenced under the GNU General Public License 2.0+ license.
+******************************************************************************/
 #include "genomeCoverageBed.h"
 #include "version.h"
 
@@ -83,7 +94,7 @@ int main(int argc, char* argv[]) {
 	if (!showHelp) {
 		
 		BedCoverage *bc = new BedCoverage(bedFile, genomeFile, eachBase, startSites, max);
-		bc->CoverageBeds();
+		bc->DetermineBedInput();
 		
 		return 0;
 	}
@@ -94,33 +105,40 @@ int main(int argc, char* argv[]) {
 
 void ShowHelp(void) {
 	
-	cerr << "===============================================" << endl;
-	cerr << " " <<PROGRAM_NAME << " v" << VERSION << endl ;
-	cerr << " Aaron Quinlan, Ph.D. (aaronquinlan@gmail.com)  " << endl ;
-	cerr << " Hall Laboratory, University of Virginia" << endl;
-	cerr << "===============================================" << endl << endl;
-	cerr << "Description: Compute the coverage of a BED (-i) file on genome (-g) file." << endl << endl;
-	cerr << "***NOTE: Only tab-delimited BED3 - BED6 formats allowed.***"<< endl;
-	cerr << "***NOTE: Input BED file must be grouped by chromosome.  A simple UNIX sort will suffice.***"<< endl << endl;
+	cerr << endl << "PROGRAM: " << PROGRAM_NAME << " (v" << VERSION << ")" << endl << endl;
+	
+	cerr << "AUTHOR:  Aaron Quinlan (aaronquinlan@gmail.com)" << endl << endl ;
 
-	cerr << "Usage: " << PROGRAM_NAME << " [OPTIONS] -g <genome> -i <bed>" << endl << endl;
+	cerr << "SUMMARY: Compute the coverage of a BED (-i) file on genome (-g) file." << endl << endl;
+
+	cerr << "USAGE:   " << PROGRAM_NAME << " [OPTIONS] -g <genome> -i <bed>" << endl << endl;
 	
 	cerr << "OPTIONS: " << endl;
-	cerr << "\t" << "-d\t\t\t"            	<< "Report the depth at each genome position." << endl << "\t\t\t\tDefault behavior is to report a histogram." << endl << endl;
-	//	cerr << "\t" << "-s \t\t\t"             << "Report depth based on start sites." << endl << endl;
-	cerr << "\t" << "-max\t\t\t"            << "Combine all positions with a depth > max into a single bin in the histogram." << endl << endl;
+	cerr << "\t-d\t"	     	<< "Report the depth at each genome position." << endl;
+	cerr 						<< "\t\tDefault behavior is to report a histogram." << endl << endl;
+
+	cerr << "\t-max\t"          << "Combine all positions with a depth >= max into" << endl;
+	cerr						<< "\t\ta single bin in the histogram." << endl;
+	cerr						<< "\t\t- (INTEGER)" << endl << endl;
+
 	cerr << "NOTES: " << endl;
-	cerr << "\tThe genome file should tab delimited and structured as follows: <chr><TAB><size>. For example, Mus musculus:" << endl;
-	cerr << "\t\tchr1\t197195432" << endl;
-	cerr << "\t\tchr2\t181748087" << endl;
-	cerr << "\t\t..." << endl;
-	cerr << "\t\tchrY_random\t58682461" << endl << endl;
+	cerr << "\t(1)  The genome file should tab delimited and structured as follows:" << endl;
+	cerr << "\t     <chromName><TAB><chromSize>" << endl << endl;
+	cerr << "\tFor example, Human (hg19):" << endl;
+	cerr << "\tchr1\t249250621" << endl;
+	cerr << "\tchr2\t243199373" << endl;
+	cerr << "\t..." << endl;
+	cerr << "\tchr18_gl000207_random\t4262" << endl << endl;
+
+	cerr << "\t(2)  NOTE: The input BED file must be grouped by chromosome." << endl;
+	cerr << "\t     A simple \"sort -k 1,1 <BED> > <BED>.sorted\" will suffice."<< endl << endl;
 
 	
-	cerr << "TIPS:" << endl;
-	cerr << "\tOne can use the UCSC Genome Browser's MySQL database to extract chromosome sizes. For example, H. sapiens:" << endl << endl;
-	cerr << "\tmysql --user=genome --host=genome-mysql.cse.ucsc.edu -A -e \"select chrom, size from hg18.chromInfo\"  > hg18.genome" 
-		<< endl << endl;
+	cerr << "TIPS: " << endl;
+	cerr << "\tOne can use the UCSC Genome Browser's MySQL database to extract" << endl;
+	cerr << "\tchromosome sizes. For example, H. sapiens:" << endl << endl;
+	cerr << "\tmysql --user=genome --host=genome-mysql.cse.ucsc.edu -A -e /" << endl;
+	cerr << "\t\"select chrom, size from hg19.chromInfo\"  > hg19.genome" << endl << endl;
 		
 	
 	// end the program here

@@ -1,11 +1,14 @@
-// 
-//  genomeCoverageBed.cpp
-//  BEDTools
-//  
-//  Created by Aaron Quinlan Spring 2009.
-//  Copyright 2009 Aaron Quinlan. All rights reserved.
-//
-//
+/*****************************************************************************
+  genomeCoverage.cpp
+
+  (c) 2009 - Aaron Quinlan
+  Hall Laboratory
+  Department of Biochemistry and Molecular Genetics
+  University of Virginia
+  aaronquinlan@gmail.com
+
+  Licenced under the GNU General Public License 2.0+ license.
+******************************************************************************/
 #include "lineFileUtilities.h"
 #include "genomeCoverageBed.h"
 
@@ -46,7 +49,7 @@ BedCoverage::~BedCoverage(void) {
 				   Depth: 00011112111111111001111000000000000000
 	_Gotchas:
 */
-void BedCoverage::CoverageBeds() {
+void BedCoverage::CoverageBeds(istream &bedInput) {
 
 	// Variables
 	map<string, int, less<string> > chromSizes;
@@ -69,30 +72,23 @@ void BedCoverage::CoverageBeds() {
 		}
 	}
 
-	// open the BED file for reading.
-	// if successful, store the start and end positions
-	// for each entry (per chromosome)
-	ifstream beds(this->bedFile.c_str(), ios::in);
-	if ( !beds ) {
-		cerr << "Error: The requested bed file (" <<this->bedFile << ") could not be opened. Exiting!" << endl;
-		exit (1);
-	}
-	
 	BED bedEntry;     // used to store the current BED line from the BED file.
-	int lineNum = 0;
-	string bedLine;	  // used to store the current (unparsed) line from the BED file.
 	string prevChrom, currChrom;
 	vector<DEPTH> chromCov;
 	int chromSize = 0;
 	int start, end;
 	
-	while (getline(beds, bedLine)) {
+	string bedLine;                                                                                                                    
+	int lineNum = 0;					// current input line number
+	vector<string> bedFields;			// vector for a BED entry
+	bedFields.reserve(12);
+	
+	while (getline(bedInput, bedLine)) {
 		
-		vector<string> bedFields;
 		Tokenize(bedLine,bedFields);
 		lineNum++;
 
-		if (this->bed->parseBedLine(bedEntry, bedFields, lineNum)) {
+		if (bed->parseLine(bedEntry, bedFields, lineNum)) {
 						
 			currChrom = bedEntry.chrom;
 			start = bedEntry.start;
@@ -138,13 +134,14 @@ void BedCoverage::CoverageBeds() {
 			}
 			prevChrom = currChrom;
 		}
+		bedFields.clear();
 	}
 	// process the results of the last chromosome.
 	ReportChromCoverage(chromCov, chromSizes[currChrom], currChrom, chromDepthHist);
 	
 	if (! this->eachBase) {
 		ReportGenomeCoverage(chromSizes, chromDepthHist);
-	}	
+	}
 }
 
 
@@ -201,6 +198,7 @@ void BedCoverage::ReportGenomeCoverage(map<string, int> &chromSizes, chromHistMa
 		
 		string chrom = m->first;
 		genomeSize += chromSizes[chrom];
+		
 		// if there were no reads for a give chromosome, then
 		// add the length of the chrom to the 0 bin.
 		if ( chromDepthHist.find(chrom) == chromDepthHist.end() ) {
@@ -230,5 +228,20 @@ void BedCoverage::ReportGenomeCoverage(map<string, int> &chromSizes, chromHistMa
 		
 		cout << "genome" << "\t" << depth << "\t" << numBasesAtDepth << "\t" 
 			<< genomeSize << "\t" << (float) ((float)numBasesAtDepth / (float)genomeSize) << endl;
+	}
+}
+
+
+void BedCoverage::DetermineBedInput() {
+	if (bed->bedFile != "stdin") {   // process a file
+		ifstream beds(bed->bedFile.c_str(), ios::in);
+		if ( !beds ) {
+			cerr << "Error: The requested bed file (" << bed->bedFile << ") could not be opened. Exiting!" << endl;
+			exit (1);
+		}
+		CoverageBeds(beds);
+	}
+	else {   						// process stdin
+		CoverageBeds(cin);		
 	}
 }

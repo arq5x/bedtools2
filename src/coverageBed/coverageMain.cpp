@@ -94,8 +94,6 @@ int main(int argc, char* argv[]) {
 
 void ShowHelp(void) {
 	
-	//cout << "\t" << beds[i].count << "\t" << (length-zeroDepthCount) << "\t" << length << "\t" << (float) (length-zeroDepthCount)/length << endl;
-
 	cerr << endl << "PROGRAM: " << PROGRAM_NAME << " (v" << VERSION << ")" << endl << endl;
 	
 	cerr << "AUTHOR:  Aaron Quinlan (aaronquinlan@gmail.com)" << endl << endl ;
@@ -107,7 +105,7 @@ void ShowHelp(void) {
 
 	cerr << "OUTPUT:  " << endl;
 	cerr << "\t" << " After each entry in B, reports: " << endl; 
-	cerr << "\t  1) The number of overlapping entries in A." << endl;
+	cerr << "\t  1) The number of features in A that overlapped the B interval." << endl;
 	cerr << "\t  2) The number of bases in B that had non-zero coverage." << endl;
 	cerr << "\t  3) The length of the entry in B." << endl;
 	cerr << "\t  4) The fraction of bases in B that had non-zero coverage." << endl;
