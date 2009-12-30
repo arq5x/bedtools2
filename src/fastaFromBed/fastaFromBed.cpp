@@ -1,12 +1,14 @@
-// 
-//  fastaFromBed.cpp
-//  BEDTools
-//  
-//  Created by Aaron Quinlan Spring 2009.
-//  Copyright 2009 Aaron Quinlan. All rights reserved.
-//
-//  Summary:  Extract fasta sequences based on BED intervals.
-//
+/*****************************************************************************
+  fastaFromBed.cpp
+
+  (c) 2009 - Aaron Quinlan
+  Hall Laboratory
+  Department of Biochemistry and Molecular Genetics
+  University of Virginia
+  aaronquinlan@gmail.com
+
+  Licenced under the GNU General Public License 2.0+ license.
+******************************************************************************/
 #include "lineFileUtilities.h"
 #include "fastaFromBed.h"
 
@@ -21,7 +23,6 @@ Bed2Fa::Bed2Fa(bool &useName, string &dbFile, string &bedFile, string &fastaOutF
 	this->fastaOutFile = fastaOutFile;
 	
 	this->bed = new BedFile(this->bedFile);
-	bed->loadBedFileIntoMapNoBin();
 }
 
 
@@ -50,9 +51,10 @@ void Bed2Fa::ExtractDNA() {
 		exit (1);
 	}	
 	
+	// load the BED file into an unbinned map.
+	bed->loadBedFileIntoMapNoBin();
 
-	/* Read the fastaDb chromosome by chromosome*/
-	
+	//Read the fastaDb chromosome by chromosome
 	string fastaDbLine;
 	string currChrom;
 	string currDNA = "";
@@ -76,9 +78,7 @@ void Bed2Fa::ExtractDNA() {
 				
 					if (!(this->useName)) {
 				    	faOut << ">" << currChrom << ":"
-					  		<< bedList[i].start << "-" << bedList[i].end
-					  		<< "_" << bedList[i].name << endl
-					  		<< dna << endl;
+					  		<< bedList[i].start << "-" << bedList[i].end << endl << dna << endl;
 				  	}
 				  	else {
 				    	faOut << ">" << bedList[i].name << endl << dna << endl;
@@ -101,14 +101,9 @@ void Bed2Fa::ExtractDNA() {
 				
 			string dna = currDNA.substr(bedList[i].start, ((bedList[i].end - bedList[i].start)));
 		
-			//if (bedList[i].strand == "-")  {
-			//	ReverseComplement(dna);
-			//}
 			if (!(this->useName)) {
 		    	faOut << ">" << currChrom << ":"
-			  		<< bedList[i].start << "-" << bedList[i].end
-			  		<< "_" << bedList[i].name << endl
-			  		<< dna << endl;
+			  		<< bedList[i].start << "-" << bedList[i].end << endl << dna << endl;
 		  	}
 		  	else {
 		    	faOut << ">" << bedList[i].name << endl << dna << endl;
@@ -117,4 +112,6 @@ void Bed2Fa::ExtractDNA() {
 		currDNA = "";	
 	}
 }
+
+
 

@@ -1,3 +1,14 @@
+/*****************************************************************************
+  fastaFromBedMain.cpp
+
+  (c) 2009 - Aaron Quinlan
+  Hall Laboratory
+  Department of Biochemistry and Molecular Genetics
+  University of Virginia
+  aaronquinlan@gmail.com
+
+  Licenced under the GNU General Public License 2.0+ license.
+******************************************************************************/
 #include "fastaFromBed.h"
 #include "version.h"
 
@@ -50,7 +61,7 @@ int main(int argc, char* argv[]) {
 
 		int parameterLength = (int)strlen(argv[i]);
 
-		if(PARAMETER_CHECK("-in", 3, parameterLength)) {
+		if(PARAMETER_CHECK("-fi", 3, parameterLength)) {
 			haveFastaDb = true;
 			fastaDbFile = argv[i + 1];
 			i++;
@@ -92,23 +103,21 @@ int main(int argc, char* argv[]) {
 
 void ShowHelp(void) {
 	
-	cerr << "===============================================" << endl;
-	cerr << " " <<PROGRAM_NAME << " v" << VERSION << endl ;
-	cerr << " Aaron Quinlan, Ph.D. (aaronquinlan@gmail.com)  " << endl ;
-	cerr << " Hall Laboratory, University of Virginia" << endl;
-	cerr << "===============================================" << endl << endl;
-	cerr << "Description: Extract DNA sequences into a fasta file based on BED coordinates." << endl << endl;
-
-	cerr << "Usage: " << PROGRAM_NAME << " -db -bed -fo -name" << endl << endl;
-
-	cerr << "OPTIONS:" << endl;
-	cerr << "\t-in\t\t<FASTA file for input>" << endl;
-	cerr << "\t-bed\t\t<BED coordinates file>" << endl;
-	cerr << "\t-fo\t\t<FASTA output file>" << endl;
-	cerr << "\t-name\t\tUse the BED name field (#4) for the FASTA header" << endl;
+	cerr << endl << "PROGRAM: " << PROGRAM_NAME << " (v" << VERSION << ")" << endl << endl;
 	
-	cerr << "NOTES: " << endl;
-	cerr << "\t***Only tab-delimited BED3 - BED6 formats allowed.***"<< endl << endl;
+	cerr << "AUTHOR:  Aaron Quinlan (aaronquinlan@gmail.com)" << endl << endl ;
+	
+	cerr << "SUMMARY: Extract DNA sequences into a fasta file based on BED coordinates." << endl << endl;
+
+	cerr << "USAGE:   " << PROGRAM_NAME << " -fi (req'd) -bed (req'd) -fo (req'd) -name (opt.)" << endl << endl;
+
+	cerr << "OPTIONS: " << endl;
+	cerr << "\t-fi\t\tInput FASTA file" << endl;
+	cerr << "\t-bed\t\tBED file of ranges to extract from -fi" << endl;
+	cerr << "\t-fo\t\tOutput FASTA file" << endl;
+	cerr << "\t-name\t\tUse the BED name field (#4) for the FASTA header" << endl;
+
+
 
 	// end the program here
 	exit(1);
