@@ -122,7 +122,7 @@ void ShowHelp(void) {
 	cerr						<< "\t- By default, merging is done without respect to strand." << endl << endl;
 
 	cerr << "  " << "-n\t"		<< "Report the number of BED entries that were merged." << endl;
-	cerr						<< "\t- Note: \"1\" is reported if no merging occured." << endl << endl;
+	cerr						<< "\t- Note: \"1\" is reported if no merging occurred." << endl << endl;
 
 
 	cerr << "  " << "-d\t"  	<< "Maximum distance between features allowed for features to be merged." << endl;

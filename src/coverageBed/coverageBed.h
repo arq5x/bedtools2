@@ -1,3 +1,14 @@
+/*****************************************************************************
+  coverageBed.h
+
+  (c) 2009 - Aaron Quinlan
+  Hall Laboratory
+  Department of Biochemistry and Molecular Genetics
+  University of Virginia
+  aaronquinlan@gmail.com
+
+  Licenced under the GNU General Public License 2.0+ license.
+******************************************************************************/
 #ifndef	COVERAGEBED_H
 #define COVERAGEBED_H
 
@@ -12,18 +23,19 @@ using namespace std;
 //************************************************
 // Class methods and elements
 //************************************************
-class BedGraph {
+class BedCoverage {
 
 public:
 
 	// constructor 
-	BedGraph(string &, string &, bool &);
+	BedCoverage(string &, string &, bool &);
 
 	// destructor
-	~BedGraph(void);
+	~BedCoverage(void);
 	
-	void GraphBed();
+	void GetCoverage(istream &bedInput);
 	
+	void DetermineBedInput();
 	
 private:
 

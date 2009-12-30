@@ -1,3 +1,14 @@
+/*****************************************************************************
+  coverageMain.cpp
+
+  (c) 2009 - Aaron Quinlan
+  Hall Laboratory
+  Department of Biochemistry and Molecular Genetics
+  University of Virginia
+  aaronquinlan@gmail.com
+
+  Licenced under the GNU General Public License 2.0+ license.
+******************************************************************************/
 #include "coverageBed.h"
 #include "version.h"
 
@@ -72,8 +83,8 @@ int main(int argc, char* argv[]) {
 
 	if (!showHelp) {
 
-		BedGraph *bg = new BedGraph(bedAFile, bedBFile, forceStrand);
-		bg->GraphBed();
+		BedCoverage *bg = new BedCoverage(bedAFile, bedBFile, forceStrand);
+		bg->DetermineBedInput();
 		return 0;
 	}
 	else {
@@ -85,22 +96,17 @@ void ShowHelp(void) {
 	
 	//cout << "\t" << beds[i].count << "\t" << (length-zeroDepthCount) << "\t" << length << "\t" << (float) (length-zeroDepthCount)/length << endl;
 
-	cerr << "===============================================" << endl;
-	cerr << " " <<PROGRAM_NAME << " v" << VERSION << endl ;
-	cerr << " Aaron Quinlan, Ph.D. (aaronquinlan@gmail.com)  " << endl ;
-	cerr << " Hall Laboratory, University of Virginia" << endl;
-	cerr << "===============================================" << endl << endl;
-	cerr << "Description: Returns the depth and breadth of coverage of features from A" << endl;
-	cerr << "on the intervals in B." << endl << endl;
+	cerr << endl << "PROGRAM: " << PROGRAM_NAME << " (v" << VERSION << ")" << endl << endl;
 	
-	cerr << "Usage: " << PROGRAM_NAME << " [OPTIONS] -a <a.bed> -b <b.bed>" << endl << endl;
+	cerr << "AUTHOR:  Aaron Quinlan (aaronquinlan@gmail.com)" << endl << endl ;
+	
+	cerr << "SUMMARY: Returns the depth and breadth of coverage of features from A" << endl;
+	cerr << "\t on the intervals in B." << endl << endl;
+	
+	cerr << "USAGE:   " << PROGRAM_NAME << " [OPTIONS] -a <a.bed> -b <b.bed>" << endl << endl;
 
-	cerr << "NOTES: " << endl;
-	cerr << "\t" << "-i stdin\t\t"	<< "Allows BED file A to be read from stdin.  E.g.: cat a.bed | coverageBed -a stdin -b B.bed" << endl << endl;
-	cerr << "\t***Only tab-delimited BED3 - BED6 formats allowed.***"<< endl << endl;
-
-	cerr << "OUTPUT: " << endl;
-	cerr << "\t" << "After each entry in B, reports: " << endl; 
+	cerr << "OUTPUT:  " << endl;
+	cerr << "\t" << " After each entry in B, reports: " << endl; 
 	cerr << "\t  1) The number of overlapping entries in A." << endl;
 	cerr << "\t  2) The number of bases in B that had non-zero coverage." << endl;
 	cerr << "\t  3) The length of the entry in B." << endl;

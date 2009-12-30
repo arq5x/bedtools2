@@ -233,7 +233,7 @@ void BedMerge::MergeBedStranded() {
 				}
 				else {
 
-					// was there an overlap befor the current entry broke it?
+					// was there an overlap before the current entry broke it?
 					if (OIP) {
 						if (this->numEntries) {
 							cout << bedList[prev].chrom << "\t" << minStart << "\t" << maxEnd << "\t" << mergeCount << "\t" << strands[s] << endl;

@@ -1,16 +1,19 @@
-// 
-//  coverageBed.cpp
-//  BEDTools
-//  
-//  Created by Aaron Quinlan Spring 2009.
-//  Copyright 2009 Aaron Quinlan. All rights reserved.
-//
-//
+/*****************************************************************************
+  coverageBed.cpp
+
+  (c) 2009 - Aaron Quinlan
+  Hall Laboratory
+  Department of Biochemistry and Molecular Genetics
+  University of Virginia
+  aaronquinlan@gmail.com
+
+  Licenced under the GNU General Public License 2.0+ license.
+******************************************************************************/
 #include "lineFileUtilities.h"
 #include "coverageBed.h"
 
 
-BedGraph::BedGraph(string &bedAFile, string &bedBFile, bool &forceStrand) {
+BedCoverage::BedCoverage(string &bedAFile, string &bedBFile, bool &forceStrand) {
 
 	this->bedAFile = bedAFile;
 	this->bedBFile = bedBFile;
@@ -23,74 +26,42 @@ BedGraph::BedGraph(string &bedAFile, string &bedBFile, bool &forceStrand) {
 
 
 
-BedGraph::~BedGraph(void) {
+BedCoverage::~BedCoverage(void) {
 }
 
 
  
-void BedGraph::GraphBed() {
-
+void BedCoverage::GetCoverage(istream &bedInput) {
+	
 	// load the "B" bed file into a map so
 	// that we can easily compare "A" to it for overlaps
 	bedB->loadBedFileIntoMap();
 
-
-	string bedLine;
-	BED bedEntry;                                                                                                                        
-	int lineNum = 0;
-
-	// are we dealing with a file?
-	if (bedA->bedFile != "stdin") {
-		
-		ifstream bed(bedA->bedFile.c_str(), ios::in);
-		if ( !bed ) {
-			cerr << "Error: The requested bed file (" <<bedA->bedFile << ") could not be opened. Exiting!" << endl;
-			exit (1);
-		}
+	string bedLine;                                                                                                                    
+	int lineNum = 0;					// current input line number
+	vector<string> bedFields;			// vector for a BED entry
 	
-		BED a;
-		while (getline(bed, bedLine)) {
+	bedFields.reserve(12);	
 		
-			if ((bedLine.find("track") != string::npos) || (bedLine.find("browser") != string::npos)) {
-				continue;
-			}
-			else {
-				vector<string> bedFields;
-				Tokenize(bedLine,bedFields);
-				lineNum++;
-				// process the feature in A IFF it's valid.
-				if (bedA->parseBedLine(a, bedFields, lineNum)) {
-			
-					// increment the count of overlaps for each feature in B that
-					// overlaps the current A interval
-					bedB->countHits(bedB->bedMap[a.chrom], a, this->forceStrand);
-				}
-			}
-		}
-	}
-	// A is being passed via stdin.
-	else {
+	BED a;
+	// process each entry in A
+	while (getline(bedInput, bedLine)) {
+
+		lineNum++;
+		Tokenize(bedLine,bedFields);
 	
-		BED a;
-		while (getline(cin, bedLine)) {
-		
-			if ((bedLine.find("track") != string::npos) || (bedLine.find("browser") != string::npos)) {
-				continue;
-			}
-			else {
-				vector<string> bedFields;
-				Tokenize(bedLine,bedFields);
-				lineNum++;
-				// process the feature in A IFF it's valid.
-				if (bedA->parseBedLine(a, bedFields, lineNum)) {
-			
-					// increment the count of overlaps for each feature in B that
-					// overlaps the current A interval
-					bedB->countHits(bedB->bedMap[a.chrom], a, this->forceStrand);
-				}
-			}
-		}
+		// find the overlaps with B if it's a valid BED entry. 
+		if (bedA->parseLine(a, bedFields, lineNum)) {
+	
+			// increment the count of overlaps for each feature in B that
+			// overlaps the current A interval
+			bedB->countHits(bedB->bedMap[a.chrom], a, this->forceStrand);
+		}	
+		// reset for the next input line
+		bedFields.clear();
 	}
+	
+	
 	
 	// now, report the count of hist for each feature in B.
 	for (masterBedMap::iterator c = bedB->bedMap.begin(); c != bedB->bedMap.end(); ++c) {
@@ -131,6 +102,21 @@ void BedGraph::GraphBed() {
 				printf("%d\t%d\t%d\t%0.7f\n", beds[i].count, (length-zeroDepthCount), length, (float) (length-zeroDepthCount)/length);
 			}
 		}
+	}
+}
+
+
+void BedCoverage::DetermineBedInput() {
+	if (bedA->bedFile != "stdin") {   // process a file
+		ifstream beds(bedA->bedFile.c_str(), ios::in);
+		if ( !beds ) {
+			cerr << "Error: The requested bed file (" << bedA->bedFile << ") could not be opened. Exiting!" << endl;
+			exit (1);
+		}
+		GetCoverage(beds);
+	}
+	else {   						// process stdin
+		GetCoverage(cin);		
 	}
 }
 
