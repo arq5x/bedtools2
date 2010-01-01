@@ -1,3 +1,14 @@
+/*****************************************************************************
+  complementBedMain.cpp
+
+  (c) 2009 - Aaron Quinlan
+  Hall Laboratory
+  Department of Biochemistry and Molecular Genetics
+  University of Virginia
+  aaronquinlan@gmail.com
+
+  Licenced under the GNU General Public License 2.0+ license.
+******************************************************************************/
 #include "complementBed.h"
 #include "version.h"
 
@@ -77,25 +88,29 @@ int main(int argc, char* argv[]) {
 
 void ShowHelp(void) {
 	
-	cerr << "===============================================" << endl;
-	cerr << " " <<PROGRAM_NAME << " v" << VERSION << endl ;
-	cerr << " Aaron Quinlan, Ph.D. (aaronquinlan@gmail.com)  " << endl ;
-	cerr << " Hall Laboratory, University of Virginia" << endl;
-	cerr << "===============================================" << endl << endl;
-	cerr << "Description: Returns the base pair complement of a BED file." << endl << endl;
-
-	cerr << "Usage: " << PROGRAM_NAME << " [OPTIONS] -i <input.bed> -g <genome.txt>" << endl << endl;
+	cerr << endl << "Program: " << PROGRAM_NAME << " (v" << VERSION << ")" << endl;
 	
-	cerr << "NOTES: " << endl;
-	cerr << "\t" << "-i stdin\t\t"	<< "Allows BED file A to be read from stdin.  E.g.: cat a.bed | complementBed -a stdin -b B.bed" << endl << endl;
-	cerr << "\t***Only tab-delimited BED3 - BED6 formats allowed.***"<< endl << endl;
+	cerr << "Author:  Aaron Quinlan (aaronquinlan@gmail.com)" << endl;
+	
+	cerr << "Summary: Returns the base pair complement of a BED file." << endl << endl;
 
-	cerr << "\tThe genome file should tab delimited and structured as follows: <chr><TAB><size>. For example, Mus musculus:" << endl;
-	cerr << "\t\tchr1\t197195432" << endl;
-	cerr << "\t\tchr2\t181748087" << endl;
-	cerr << "\t\t..." << endl;
-	cerr << "\t\tchrY_random\t58682461" << endl << endl;
-	// end the program here
+	cerr << "Usage:   " << PROGRAM_NAME << " [OPTIONS] -i <bed> -g <genome>" << endl << endl;
+	
+	cerr << "Notes: " << endl;
+	cerr << "\t(1)  The genome file should tab delimited and structured as follows:" << endl;
+	cerr << "\t     <chromName><TAB><chromSize>" << endl << endl;
+	cerr << "\tFor example, Human (hg19):" << endl;
+	cerr << "\tchr1\t249250621" << endl;
+	cerr << "\tchr2\t243199373" << endl;
+	cerr << "\t..." << endl;
+	cerr << "\tchr18_gl000207_random\t4262" << endl << endl;
+	
+	cerr << "Tips: " << endl;
+	cerr << "\tOne can use the UCSC Genome Browser's MySQL database to extract" << endl;
+	cerr << "\tchromosome sizes. For example, H. sapiens:" << endl << endl;
+	cerr << "\tmysql --user=genome --host=genome-mysql.cse.ucsc.edu -A -e /" << endl;
+	cerr << "\t\"select chrom, size from hg19.chromInfo\"  > hg19.genome" << endl << endl;
+
 	exit(1);
 	
 }

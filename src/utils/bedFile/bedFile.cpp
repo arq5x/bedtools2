@@ -133,22 +133,24 @@ bool byChromThenStart(BED const & a, BED const & b){
 	
 	Free this list with slFreeList.
 */
-void BedFile::binKeeperFind(map<int, vector<BED>, std::less<int> > &bk, const int start, const int end, vector<BED> &hits) {
+void BedFile::binKeeperFind(string chrom, const int start, const int end, vector<BED> &hits) {
 
 	int startBin, endBin;
 	startBin = (start >>_binFirstShift);
 	endBin = ((end-1) >>_binFirstShift);
-	
+
 	for (int i = 0; i < 6; ++i) {
 		int offset = binOffsetsExtended[i];
 
 		for (int j = (startBin+offset); j <= (endBin+offset); ++j)  {
-			for (vector<BED>::const_iterator el = bk[j].begin(); el != bk[j].end(); ++el) {
-				
-				if (overlaps(el->start, el->end, start, end) > 0) {
-					hits.push_back(*el);
-				}
-				
+			
+			vector<BED>::const_iterator bedItr = bedMap[chrom][j].begin();
+			vector<BED>::const_iterator bedEnd = bedMap[chrom][j].end();
+			
+			for (; bedItr != bedEnd; ++bedItr) {
+				if (overlaps(bedItr->start, bedItr->end, start, end) > 0) {
+					hits.push_back(*bedItr);
+				}			
 			}
 		}
 		startBin >>= _binNextShift;

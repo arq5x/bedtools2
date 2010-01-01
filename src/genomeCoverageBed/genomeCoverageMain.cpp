@@ -111,7 +111,7 @@ void ShowHelp(void) {
 
 	cerr << "Summary: Compute the coverage of a BED file among a genome." << endl << endl;
 
-	cerr << "Usage:   " << PROGRAM_NAME << " [OPTIONS] -g <genome> -i <bed>" << endl << endl;
+	cerr << "Usage:   " << PROGRAM_NAME << " [OPTIONS] -i <bed> -g <genome>" << endl << endl;
 	
 	cerr << "Options: " << endl;
 	cerr << "\t-d\t\t"	     	<< "Report the depth at each genome position." << endl;

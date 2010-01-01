@@ -99,8 +99,10 @@ bool byChromThenStart(BED const &, BED const &);
 //*************************************************
 // Common typedefs
 //*************************************************
-typedef std::map<string, map<int, vector<BED>, std::less<int> >, std::less<string> > masterBedMap;
-typedef std::map<string, vector<BED>, std::less<string> > masterBedMapNoBin;
+
+typedef map<int, vector<BED>, std::less<int> > binsToBeds;
+typedef map<string, binsToBeds, std::less<string> > masterBedMap;
+typedef map<string, vector<BED>, std::less<string> > masterBedMapNoBin;
 
 
 //************************************************
@@ -126,9 +128,9 @@ public:
 	void loadBedFileIntoMap();
 	void loadBedFileIntoMapNoBin();	
 
-	void binKeeperFind(map<int, vector<BED>, 
-		std::less<int> > &, const int, 
-		const int, vector<BED> &);
+	//void binKeeperFind(map<int, vector<BED>, std::less<int> > &, const int, const int, vector<BED> &);
+	void binKeeperFind(string chrom, const int start, const int end, vector<BED> &);
+
 
 	void countHits(map<int, vector<BED>, std::less<int> > &, BED &, bool &);
 
@@ -139,10 +141,6 @@ public:
 	void reportBedRangeTab(const BED &bed, int start, int end);
 	void reportBedRangeNewLine(const BED &bed, int start, int end);
 	
-	// a vector of the BED entries in the BED file.
-	vector<BED> bedVector;
-	masterBedMap bedMap;
-	masterBedMapNoBin bedMapNoBin;
 
 	map<string, int> minPosMap;
 	map<string, int> maxPosMap;
@@ -152,8 +150,14 @@ public:
 	unsigned int bedType;  // 3 -6 for BED
 						   // 9 for GFF
 
+	vector<BED> bedVector;
+	masterBedMap bedMap;
+	masterBedMapNoBin bedMapNoBin;
+	
 private:
-	// none
+
+
+	
 };
 
 #endif /* BEDFILE_H */

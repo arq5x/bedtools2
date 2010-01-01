@@ -217,7 +217,6 @@ void BedClosest::ClosestBed(istream &bedInput) {
 			FindWindowOverlaps(a, hits);
 			hits.clear();
 		}
-		
 		// reset for the next input line
 		bedFields.clear();
 	}

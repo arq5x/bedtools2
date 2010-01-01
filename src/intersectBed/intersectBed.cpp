@@ -46,7 +46,8 @@ BedIntersect::~BedIntersect(void) {
 void BedIntersect::FindOverlaps(BED &a, vector<BED> &hits) {
 	
 	// find all of the overlaps between a and B.
-	bedB->binKeeperFind(bedB->bedMap[a.chrom], a.start, a.end, hits);
+	//bedB->binKeeperFind(bedB->bedMap[a.chrom], a.start, a.end, hits);
+	bedB->binKeeperFind(a.chrom, a.start, a.end, hits);
 
 	int numOverlaps = 0;
 	
@@ -169,7 +170,6 @@ void BedIntersect::IntersectBed(istream &bedInput) {
 			FindOverlaps(a, hits);
 			hits.clear();
 		}
-		
 		// reset for the next input line
 		bedFields.clear();
 	}
