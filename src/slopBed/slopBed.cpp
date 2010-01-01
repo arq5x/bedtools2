@@ -39,7 +39,6 @@ BedSlop::~BedSlop(void) {
 
 void BedSlop::SlopBed(istream &bedInput) {
 	
-	BED bedEntry;     // used to store the current BED line from the BED file.
 	int lineNum = 0;
 	string bedLine;	  // used to store the current (unparsed) line from the BED file.
 		
@@ -49,10 +48,8 @@ void BedSlop::SlopBed(istream &bedInput) {
 		Tokenize(bedLine,bedFields);
 		lineNum++;
 		
-		/*
-		   if a valid BED entry, add requested "slop" and print out
-		   the adjusted BED entry.
-		*/
+		BED bedEntry;     // used to store the current BED line from the BED file.
+
 		if (this->bed->parseLine(bedEntry, bedFields, lineNum)) {
 			AddSlop(bedEntry);
 			bed->reportBedNewLine(bedEntry);			

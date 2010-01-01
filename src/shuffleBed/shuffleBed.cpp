@@ -78,8 +78,6 @@ void BedShuffle::Shuffle(istream &bedInput) {
 		}
 	}
 
-
-	BED bedEntry;     // used to store the current BED line from the BED file.
 	int lineNum = 0;
 	string bedLine;	  // used to store the current (unparsed) line from the BED file.
 	vector<string> bedFields;
@@ -87,9 +85,9 @@ void BedShuffle::Shuffle(istream &bedInput) {
 
 	while (getline(bedInput, bedLine)) {
 		
-
 		Tokenize(bedLine,bedFields);
 		lineNum++;
+		BED bedEntry;     // used to store the current BED line from the BED file.
 				
 		if (bed->parseLine(bedEntry, bedFields, lineNum)) {
 
@@ -127,7 +125,6 @@ void BedShuffle::ShuffleWithExclusions(istream &bedInput) {
 		}
 	}
 
-	BED bedEntry;     // used to store the current BED line from the BED file.
 	int lineNum = 0;
 	string bedLine;	  // used to store the current (unparsed) line from the BED file.
 	vector<string> bedFields;
@@ -139,6 +136,7 @@ void BedShuffle::ShuffleWithExclusions(istream &bedInput) {
 		
 		Tokenize(bedLine,bedFields);
 		lineNum++;
+		BED bedEntry;     // used to store the current BED line from the BED file.
 
 		if (bed->parseLine(bedEntry, bedFields, lineNum)) {
 						

@@ -72,7 +72,6 @@ void BedCoverage::CoverageBeds(istream &bedInput) {
 		}
 	}
 
-	BED bedEntry;     // used to store the current BED line from the BED file.
 	string prevChrom, currChrom;
 	vector<DEPTH> chromCov;
 	int chromSize = 0;
@@ -87,7 +86,8 @@ void BedCoverage::CoverageBeds(istream &bedInput) {
 		
 		Tokenize(bedLine,bedFields);
 		lineNum++;
-
+		BED bedEntry;     // used to store the current BED line from the BED file.
+		
 		if (bed->parseLine(bedEntry, bedFields, lineNum)) {
 						
 			currChrom = bedEntry.chrom;

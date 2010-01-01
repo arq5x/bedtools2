@@ -98,8 +98,7 @@ void BedLinks::LinksBed(istream &bedInput) {
 	cout << "<p style=\"font-family:courier\">" << endl;
 	cout << "<table border=\"0\" align=\"justify\"" << endl;
 	
-	string bedLine;
-	BED bedEntry;                                                                                                                        
+	string bedLine;                                                                                                                      
 	int lineNum = 0;
 	vector<string> bedFields;
 	bedFields.reserve(12);
@@ -110,7 +109,8 @@ void BedLinks::LinksBed(istream &bedInput) {
 
 		Tokenize(bedLine,bedFields);
 		lineNum++;
-			
+		BED bedEntry;  	
+		
 		if (this->bed->parseLine(bedEntry, bedFields, lineNum)) {
 			bedEntry.count = 0;
 			WriteURL(bedEntry, base);

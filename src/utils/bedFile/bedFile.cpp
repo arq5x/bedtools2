@@ -406,7 +406,7 @@ bool BedFile::parseGffLine (BED &bed, const vector<string> &lineVector, int line
 			bed.otherFields.push_back(lineVector[1]);  // add GFF "source". unused in BED
 			bed.otherFields.push_back(lineVector[7]);  // add GFF "fname". unused in BED
 			bed.otherFields.push_back(lineVector[8]);  // add GFF "group". unused in BED
-		
+					
 			return true;
 		}
 		else {
@@ -475,14 +475,11 @@ bool BedFile::parseGffLine (BED &bed, const vector<string> &lineVector, int line
 
 void BedFile::loadBedFileIntoMap() {
 
-	string bedLine;
-	BED bedEntry;                                                                                                                        
+	string bedLine;                                                                                                                       
 	int lineNum = 0;
-
-	vector<string> bedFields;	// vector of strings for each column in BED file.
-	bedFields.reserve(12);		// reserve space for worst case (BED 12)
-
-
+	vector<string> bedFields;			// vector for a BED entry
+	bedFields.reserve(12);				// reserve the max BED size
+	
 	// Case 1: Proper BED File.
 	if ( (this->bedFile != "") && (this->bedFile != "stdin") ) {
 		
@@ -494,10 +491,11 @@ void BedFile::loadBedFileIntoMap() {
 		}
 
 		while (getline(bed, bedLine)) {
+					
+			Tokenize(bedLine,bedFields);	// load the fields into the vector
 			lineNum++;
-		
-			Tokenize(bedLine,bedFields);
-
+			
+			BED bedEntry;					// new BED struct for the current line
 			if (parseLine(bedEntry, bedFields, lineNum)) {
 				int bin = getBin(bedEntry.start, bedEntry.end);
 				bedEntry.count = 0;
@@ -509,10 +507,11 @@ void BedFile::loadBedFileIntoMap() {
 	}
 	else {
 		while (getline(cin, bedLine)) {
-			lineNum++;
 		
-			Tokenize(bedLine,bedFields);
-
+			Tokenize(bedLine,bedFields);	// load the fields into the vector
+			lineNum++;
+			
+			BED bedEntry;					// new BED struct for the current line
 			if (parseLine(bedEntry, bedFields, lineNum)) {
 				int bin = getBin(bedEntry.start, bedEntry.end);
 				bedEntry.count = 0;
@@ -527,12 +526,10 @@ void BedFile::loadBedFileIntoMap() {
 
 void BedFile::loadBedFileIntoMapNoBin() {
 
-	string bedLine;
-	BED bedEntry;                                                                                                                        
+	string bedLine;                                                                                                                       
 	int lineNum = 0;
-
-	vector<string> bedFields;	// vector of strings for each column in BED file.
-	bedFields.reserve(12);		// reserve space for worst case (BED 12)
+	vector<string> bedFields;			// vector for a BED entry
+	bedFields.reserve(12);				// reserve the max BED size
 
 	// Case 1: Proper BED File.
 	if ( (this->bedFile != "") && (this->bedFile != "stdin") ) {
@@ -545,42 +542,34 @@ void BedFile::loadBedFileIntoMapNoBin() {
 		}
 
 		while (getline(bed, bedLine)) {
-
-			if ((bedLine.find("track") != string::npos) || (bedLine.find("browser") != string::npos)) {
-				continue;
+		
+			Tokenize(bedLine,bedFields);	// load the fields into the vector
+			lineNum++;
+			
+			BED bedEntry;					// new BED struct for the current line
+			if (parseLine(bedEntry, bedFields, lineNum)) {
+				bedEntry.count = 0;
+				bedEntry.minOverlapStart = INT_MAX;
+				this->bedMapNoBin[bedEntry.chrom].push_back(bedEntry);	
 			}
-			else {
-				Tokenize(bedLine,bedFields);
-				lineNum++;
-
-				if (parseLine(bedEntry, bedFields, lineNum)) {
-					bedEntry.count = 0;
-					bedEntry.minOverlapStart = INT_MAX;
-					this->bedMapNoBin[bedEntry.chrom].push_back(bedEntry);	
-				}
-				bedFields.clear();
-			}
+			bedFields.clear();
 		}
 	}
 	// Case 2: STDIN.
 	else {
 
 		while (getline(cin, bedLine)) {
+		
+			Tokenize(bedLine,bedFields);	// load the fields into the vector
+			lineNum++;
 
-			if ((bedLine.find("track") != string::npos) || (bedLine.find("browser") != string::npos)) {
-				continue;
+			BED bedEntry;					// new BED struct for the current line
+			if (parseLine(bedEntry, bedFields, lineNum)) {
+				bedEntry.count = 0;
+				bedEntry.minOverlapStart = INT_MAX;
+				this->bedMapNoBin[bedEntry.chrom].push_back(bedEntry);	
 			}
-			else {
-				Tokenize(bedLine,bedFields);
-				lineNum++;
-
-				if (parseLine(bedEntry, bedFields, lineNum)) {
-					bedEntry.count = 0;
-					bedEntry.minOverlapStart = INT_MAX;
-					this->bedMapNoBin[bedEntry.chrom].push_back(bedEntry);	
-				}
-				bedFields.clear();
-			}
+			bedFields.clear();
 		}
 	}
 

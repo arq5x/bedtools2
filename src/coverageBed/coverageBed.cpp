@@ -43,13 +43,13 @@ void BedCoverage::GetCoverage(istream &bedInput) {
 	
 	bedFields.reserve(12);	
 		
-	BED a;
 	// process each entry in A
 	while (getline(bedInput, bedLine)) {
 
 		lineNum++;
 		Tokenize(bedLine,bedFields);
-	
+		BED a;
+		
 		// find the overlaps with B if it's a valid BED entry. 
 		if (bedA->parseLine(a, bedFields, lineNum)) {
 	
@@ -60,8 +60,6 @@ void BedCoverage::GetCoverage(istream &bedInput) {
 		// reset for the next input line
 		bedFields.clear();
 	}
-	
-	
 	
 	// now, report the count of hist for each feature in B.
 	for (masterBedMap::iterator c = bedB->bedMap.begin(); c != bedB->bedMap.end(); ++c) {
