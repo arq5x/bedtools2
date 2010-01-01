@@ -105,19 +105,19 @@ void ShowHelp(void) {
 
 	
 
-	cerr << endl << "PROGRAM: " << PROGRAM_NAME << " (v" << VERSION << ")" << endl << endl;
+	cerr << endl << "Program: " << PROGRAM_NAME << " (v" << VERSION << ")" << endl;
 	
-	cerr << "AUTHOR:  Aaron Quinlan (aaronquinlan@gmail.com)" << endl << endl ;
+	cerr << "Author:  Aaron Quinlan (aaronquinlan@gmail.com)" << endl;
 	
-	cerr << "SUMMARY: Mask a fasta file based on BED coordinates." << endl << endl;
+	cerr << "Summary: Mask a fasta file based on BED coordinates." << endl << endl;
 
-	cerr << "USAGE:   " << PROGRAM_NAME << " [OPTIONS] -fi -out -bed" << endl << endl;
+	cerr << "Usage:   " << PROGRAM_NAME << " [OPTIONS] -fi -out -bed" << endl << endl;
 
-	cerr << "OPTIONS:" << endl;
-	cerr << "\t\t-fi\tInput FASTA file" << endl;
-	cerr << "\t\t-bed\tBED file of ranges to mask in -fi" << endl;
-	cerr << "\t\t-fo\tOutput FASTA file" << endl;
-	cerr << "\t\t-soft\tEnforce \"soft\" masking.  That is, instead of masking with Ns," << endl;
+	cerr << "Options:" << endl;
+	cerr << "\t-fi\t\tInput FASTA file" << endl;
+	cerr << "\t-bed\tBED file of ranges to mask in -fi" << endl;
+	cerr << "\t-fo\t\tOutput FASTA file" << endl;
+	cerr << "\t-soft\tEnforce \"soft\" masking.  That is, instead of masking with Ns," << endl;
 	cerr << "\t\t\tmask with lower-case bases." << endl;
 
 	// end the program here

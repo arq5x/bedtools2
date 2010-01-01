@@ -107,16 +107,16 @@ int main(int argc, char* argv[]) {
 
 void ShowHelp(void) {
 
-	cerr << endl << "PROGRAM: " << PROGRAM_NAME << " (v" << VERSION << ")" << endl << endl;
+	cerr << endl << "Program: " << PROGRAM_NAME << " (v" << VERSION << ")" << endl;
 	
-	cerr << "AUTHOR:  Aaron Quinlan (aaronquinlan@gmail.com)" << endl << endl ;
+	cerr << "Author:  Aaron Quinlan (aaronquinlan@gmail.com)" << endl;
 
-	cerr << "SUMMARY: Removes the portion(s) of an interval that is overlapped" << endl;
-	cerr << "\t by another feature(s)." << endl << endl;
+	cerr << "Summary: Removes the portion(s) of an interval that is overlapped" << endl;
+	cerr << "\t\t by another feature(s)." << endl << endl;
 
-	cerr << "USAGE:   " << PROGRAM_NAME << " [OPTIONS] -a <a.bed> -b <b.bed>" << endl << endl;
+	cerr << "Usage:   " << PROGRAM_NAME << " [OPTIONS] -a <a.bed> -b <b.bed>" << endl << endl;
 
-	cerr << "OPTIONS: " << endl;
+	cerr << "Options: " << endl;
 	cerr << "\t-f\t"			<< "Minimum overlap required as a fraction of A." << endl;
 	cerr 						<< "\t\t- Default is 1E-9 (i.e., 1bp)." << endl;
 	cerr						<< "\t\t- (FLOAT) (e.g. 0.50)" << endl << endl;

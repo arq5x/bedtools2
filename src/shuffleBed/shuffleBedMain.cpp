@@ -1,3 +1,14 @@
+/*****************************************************************************
+  shuffleBedMain.cpp
+
+  (c) 2009 - Aaron Quinlan
+  Hall Laboratory
+  Department of Biochemistry and Molecular Genetics
+  University of Virginia
+  aaronquinlan@gmail.com
+
+  Licenced under the GNU General Public License 2.0+ license.
+******************************************************************************/
 #include "shuffleBed.h"
 #include "version.h"
 
@@ -59,17 +70,17 @@ int main(int argc, char* argv[]) {
 			genomeFile = argv[i + 1];
 			i++;
 		}
-		else if(PARAMETER_CHECK("-x", 2, parameterLength)) {
+		else if(PARAMETER_CHECK("-excl", 5, parameterLength)) {
 			haveExclude = true;
 			excludeFile = argv[i + 1];
 			i++;
 		}
-		else if(PARAMETER_CHECK("-s", 2, parameterLength)) {
+		else if(PARAMETER_CHECK("-seed", 5, parameterLength)) {
 			haveSeed = true;
 			seed = atoi(argv[i + 1]);
 			i++;
 		}	
-		else if(PARAMETER_CHECK("-sameChrom", 10, parameterLength)) {
+		else if(PARAMETER_CHECK("-chrom", 6, parameterLength)) {
 			sameChrom = true;
 		}
 		else {
@@ -87,13 +98,8 @@ int main(int argc, char* argv[]) {
 	if (!showHelp) {
 		BedShuffle *bc = new BedShuffle(bedFile, genomeFile, excludeFile, haveSeed, haveExclude, sameChrom, seed);
 		
-		if (haveExclude) {
-			bc->ShuffleWithExclusions();
-		}
-		else {
-			bc->Shuffle();
-		}
-		
+		bc->DetermineBedInput();
+
 		return 0;
 	}
 	else {
@@ -103,33 +109,41 @@ int main(int argc, char* argv[]) {
 
 void ShowHelp(void) {
 	
-	cerr << "===============================================" << endl;
-	cerr << " " <<PROGRAM_NAME << " v" << VERSION << endl ;
-	cerr << " Aaron Quinlan, Ph.D. (aaronquinlan@gmail.com)  " << endl ;
-	cerr << " Hall Laboratory, University of Virginia" << endl;
-	cerr << "===============================================" << endl << endl;
-	cerr << "Description: Randomly shuffle the locations of a BED (-i) file among a genome (-g)." << endl << endl;
-	cerr << "***NOTE: Only tab-delimited BED3 - BED6 formats allowed.***"<< endl;
-
-	cerr << "Usage: " << PROGRAM_NAME << " [OPTIONS] -g <genome> -i <bed>" << endl << endl;
+	cerr << endl << "Program: " << PROGRAM_NAME << " (v" << VERSION << ")" << endl;
 	
-	cerr << "OPTIONS: " << endl;
-	cerr << "\t" << "-x\t\t\t"            	<< "A BED file of coordinates in which features in -i should not be placed (e.g. gaps.bed)." << endl;
-	cerr << "\t" << "-sameChrom\t\t"      << "Keep features in -i on the same chromosome.  By default, the chrom and position are randomly chosen." << endl << endl;
-	cerr << "\t" << "-s\t\t\t"     		 	<< "Supply an integer seed for the shuffling.  By default, the seed is chosen automatically." << endl << endl;
-
-
-	cerr << "NOTES: " << endl;
-	cerr << "\tThe genome file should tab delimited and structured as follows: <chr><TAB><size>. For example, Mus musculus:" << endl;
-	cerr << "\t\tchr1\t197195432" << endl;
-	cerr << "\t\tchr2\t181748087" << endl;
-	cerr << "\t\t..." << endl;
-	cerr << "\t\tchrY_random\t58682461" << endl << endl;
+	cerr << "Author:  Aaron Quinlan (aaronquinlan@gmail.com)" << endl;
 	
-	cerr << "TIPS:" << endl;
-	cerr << "\tOne can use the UCSC Genome Browser's MySQL database to extract chromosome sizes. For example, H. sapiens:" << endl << endl;
-	cerr << "\tmysql --user=genome --host=genome-mysql.cse.ucsc.edu -A -e \"select chrom, size from hg18.chromInfo\"  > hg18.genome" 
-		<< endl << endl;
+	cerr << "Summary: Randomly permute the locations of a BED file among a genome." << endl << endl;
+
+	cerr << "Usage:   " << PROGRAM_NAME << " [OPTIONS] -g <genome> -i <bed>" << endl << endl;
+	
+	cerr << "Options: " << endl;
+	cerr << "\t-excl\t"           	<< "A BED file of coordinates in which features in -i" << endl;
+	cerr							<< "\t\t\tshould not be placed (e.g. gaps.bed)." << endl << endl;
+
+	cerr << "\t-chrom\t"      		<< "Keep features in -i on the same chromosome."<< endl; 
+	cerr							<< "\t\t\t- By default, the chrom and position are randomly chosen." << endl << endl;
+
+	cerr << "\t-seed\t"     		<< "Supply an integer seed for the shuffling." << endl; 
+	cerr							<< "\t\t\t- By default, the seed is chosen automatically." << endl;
+	cerr							<< "\t\t\t- (INTEGER)" << endl << endl;
+
+
+	cerr << "Notes: " << endl;
+	cerr << "\t(1)  The genome file should tab delimited and structured as follows:" << endl;
+	cerr << "\t     <chromName><TAB><chromSize>" << endl << endl;
+	cerr << "\tFor example, Human (hg19):" << endl;
+	cerr << "\tchr1\t249250621" << endl;
+	cerr << "\tchr2\t243199373" << endl;
+	cerr << "\t..." << endl;
+	cerr << "\tchr18_gl000207_random\t4262" << endl << endl;
+
+	
+	cerr << "Tips: " << endl;
+	cerr << "\tOne can use the UCSC Genome Browser's MySQL database to extract" << endl;
+	cerr << "\tchromosome sizes. For example, H. sapiens:" << endl << endl;
+	cerr << "\tmysql --user=genome --host=genome-mysql.cse.ucsc.edu -A -e /" << endl;
+	cerr << "\t\"select chrom, size from hg19.chromInfo\"  > hg19.genome" << endl << endl;
 		
 	
 	// end the program here

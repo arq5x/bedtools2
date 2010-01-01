@@ -151,15 +151,15 @@ int main(int argc, char* argv[]) {
 
 void ShowHelp(void) {
 
-	cerr << endl << "PROGRAM: " << PROGRAM_NAME << " (v" << VERSION << ")" << endl << endl;
+	cerr << endl << "Program: " << PROGRAM_NAME << " (v" << VERSION << ")" << endl;
 	
-	cerr << "AUTHOR:  Aaron Quinlan (aaronquinlan@gmail.com)" << endl << endl ;
+	cerr << "Author:  Aaron Quinlan (aaronquinlan@gmail.com)" << endl;
 
-	cerr << "SUMMARY: Report overlaps between a.bed and b.bed." << endl << endl;
+	cerr << "Summary: Report overlaps between a.bed and b.bed." << endl << endl;
 
-	cerr << "USAGE:   " << PROGRAM_NAME << " [OPTIONS] -a <a.bed> -b <b.bed>" << endl << endl;
+	cerr << "Usage:   " << PROGRAM_NAME << " [OPTIONS] -a <a.bed> -b <b.bed>" << endl << endl;
 
-	cerr << "OPTIONS: " << endl;
+	cerr << "Options: " << endl;
 	cerr << "\t-wa\t"			<< "Write the original entry in A for each overlap." << endl << endl;
 	cerr << "\t-wb\t"			<< "Write the original entry in B for each overlap." << endl;
 	cerr 						<< "\t\t- Useful for knowing _what_ A overlaps. Restricted by -f." << endl << endl;

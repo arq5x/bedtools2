@@ -1,3 +1,14 @@
+/*****************************************************************************
+  linksBedMain.cpp
+
+  (c) 2009 - Aaron Quinlan
+  Hall Laboratory
+  Department of Biochemistry and Molecular Genetics
+  University of Virginia
+  aaronquinlan@gmail.com
+
+  Licenced under the GNU General Public License 2.0+ license.
+******************************************************************************/
 #include "linksBed.h"
 #include "version.h"
 
@@ -21,17 +32,13 @@ int main(int argc, char* argv[]) {
 	// input files
 	string bedFile;
 	bool haveBed = false;
-
-	/* Defaults for Quinlan
-	//string org = "mouse";
-	//string db = "mm9";
-	//string base = "http://mirror.bioch.virginia.edu";
-	*/
 	
 	/* Defaults for everyone else */
 	string org = "human";
 	string db = "hg18";
 	string base = "http://genome.ucsc.edu";
+	
+	if(argc <= 1) showHelp = true;
 	
 	for(int i = 1; i < argc; i++) {
 		int parameterLength = (int)strlen(argv[i]);
@@ -80,7 +87,7 @@ int main(int argc, char* argv[]) {
 
 	if (!showHelp) {
 		BedLinks *bl = new BedLinks(bedFile, base, org, db);
-		bl->LinksBed();			
+		bl->DetermineBedInput();			
 		return 0;
 	}
 	else {
@@ -90,31 +97,28 @@ int main(int argc, char* argv[]) {
 
 void ShowHelp(void) {
 
-	cerr << "===============================================" << endl;
-	cerr << " " <<PROGRAM_NAME << " v" << VERSION << endl ;
-	cerr << " Aaron Quinlan, Ph.D. (aaronquinlan@gmail.com)  " << endl ;
-	cerr << " Hall Laboratory, University of Virginia" << endl;
-	cerr << "===============================================" << endl << endl;
-	cerr << "Description: Creates HTML links from a BED file." << endl << endl;
-	cerr << "Usage: " << PROGRAM_NAME << " [OPTIONS] -i <input.bed> > out.html" << endl << endl;
-
-	cerr << "OPTIONS: " << endl;
-	cerr << "\t" << "-base\t\t"	<< "The browser basename.  Default: http://genome.ucsc.edu " << endl << endl;
-	cerr << "\t" << "-org\t\t"	<< "The organism. Default: human" << endl << endl;
-	cerr << "\t" << "-db\t\t"	<< "The build.  Default: hg18" << endl << endl;
-
-	cerr << "NOTES: " << endl;
-	cerr << "\t" << "-i stdin\t"	<< "Allows BED file to be read from stdin.  E.g.: cat a.bed | linksBed -i stdin > out.html" << endl << endl;
-	cerr << "\t***Only tab-delimited BED3 - BED6 formats allowed.***"<< endl << endl;
+	cerr << endl << "Program: " << PROGRAM_NAME << " (v" << VERSION << ")" << endl;
 	
-	cerr << "EXAMPLE: " << endl;
-	cerr << "\t" << "By default, the links created will point to the human (hg18) UCSC browser.  If you have a local mirror, you can override this behavior";
-	cerr << "by supplying the -base, -org, and -db options."  << endl;
-	cerr << "\t" << "For example, if the main URL of your local mirror for mouse MM9 is called: http://mymirror.myuniversity.edu, then you would use the following parameters:" << endl;
-	cerr << "\t\t" << "-base http://mymirror.myuniversity.edu" << endl;
-	cerr << "\t\t" << "-org mouse" << endl; 
-	cerr << "\t\t" << "-db mm9" << endl;
-	// end the program here
-	exit(1);
+	cerr << "Author:  Aaron Quinlan (aaronquinlan@gmail.com)" << endl;
+	
+	cerr << "Summary: Creates HTML links to an UCSC Genome Browser from a BED file." << endl << endl;
+	cerr << "Usage:   " << PROGRAM_NAME << " [OPTIONS] -i <input.bed> > out.html" << endl << endl;
 
+	cerr << "Options: " << endl;
+	cerr << "\t-base\t"	<< "The browser basename.  Default: http://genome.ucsc.edu " << endl;
+	cerr << "\t-org\t"	<< "The organism. Default: human" << endl;
+	cerr << "\t-db\t\t"	<< "The build.  Default: hg18" << endl << endl;
+	
+	cerr << "Example: " << endl;
+	cerr << "\t" << "By default, the links created will point to the human (hg18) UCSC browser." << endl;
+	cerr << 		"\tIf you have a local mirror, you can override this behavior by supplying" << endl;
+	cerr <<			"\tthe -base, -org, and -db options."  << endl << endl;
+	cerr << "\t" << "For example, if the main URL of your local mirror for mouse MM9 is called: " << endl;
+	cerr << 		"\thttp://mymirror.myuniversity.edu, then you would use the following:" << endl;
+	cerr << 		"\t" << "-base http://mymirror.myuniversity.edu" << endl;
+	cerr << 		"\t" << "-org mouse" << endl; 
+	cerr << 		"\t" << "-db mm9" << endl;
+
+
+	exit(1);
 }

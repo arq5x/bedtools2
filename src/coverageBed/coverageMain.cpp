@@ -94,16 +94,16 @@ int main(int argc, char* argv[]) {
 
 void ShowHelp(void) {
 	
-	cerr << endl << "PROGRAM: " << PROGRAM_NAME << " (v" << VERSION << ")" << endl << endl;
+	cerr << endl << "Program: " << PROGRAM_NAME << " (v" << VERSION << ")" << endl;
 	
-	cerr << "AUTHOR:  Aaron Quinlan (aaronquinlan@gmail.com)" << endl << endl ;
+	cerr << "Author:  Aaron Quinlan (aaronquinlan@gmail.com)" << endl;
 	
-	cerr << "SUMMARY: Returns the depth and breadth of coverage of features from A" << endl;
-	cerr << "\t on the intervals in B." << endl << endl;
+	cerr << "Summary: Returns the depth and breadth of coverage of features from A" << endl;
+	cerr << "\t\t on the intervals in B." << endl << endl;
 	
-	cerr << "USAGE:   " << PROGRAM_NAME << " [OPTIONS] -a <a.bed> -b <b.bed>" << endl << endl;
+	cerr << "Usage:   " << PROGRAM_NAME << " [OPTIONS] -a <a.bed> -b <b.bed>" << endl << endl;
 
-	cerr << "OUTPUT:  " << endl;
+	cerr << "Output:  " << endl;
 	cerr << "\t" << " After each entry in B, reports: " << endl; 
 	cerr << "\t  1) The number of features in A that overlapped the B interval." << endl;
 	cerr << "\t  2) The number of bases in B that had non-zero coverage." << endl;

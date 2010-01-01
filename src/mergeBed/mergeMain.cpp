@@ -108,15 +108,15 @@ int main(int argc, char* argv[]) {
 
 void ShowHelp(void) {
 
-	cerr << endl << "PROGRAM: " << PROGRAM_NAME << " (v" << VERSION << ")" << endl << endl;
+	cerr << endl << "Program: " << PROGRAM_NAME << " (v" << VERSION << ")" << endl;
 	
-	cerr << "AUTHOR:  Aaron Quinlan (aaronquinlan@gmail.com)" << endl << endl ;
+	cerr << "Author:  Aaron Quinlan (aaronquinlan@gmail.com)" << endl;
 	
-	cerr << "SUMMARY: Merges overlapping BED entries into a single interval." << endl << endl;
+	cerr << "Summary: Merges overlapping BED entries into a single interval." << endl << endl;
 
-	cerr << "USAGE:   " << PROGRAM_NAME << " [OPTIONS] -i <input.bed>" << endl << endl;
+	cerr << "Usage:   " << PROGRAM_NAME << " [OPTIONS] -i <input.bed>" << endl << endl;
 
-	cerr << "OPTIONS: " << endl;
+	cerr << "Options: " << endl;
 	cerr << "\t-s\t"      		<< "Force strandedness.  That is, only merge features" << endl;
 	cerr						<< "\t\tthat are the same strand." << endl;
 	cerr						<< "\t\t- By default, merging is done without respect to strand." << endl << endl;

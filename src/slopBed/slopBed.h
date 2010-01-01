@@ -4,8 +4,18 @@
 #include <fstream>
 #include <map>
 #include <cstdlib>
-#include <ctime>
+/*****************************************************************************
+  slopBed.h
 
+  (c) 2009 - Aaron Quinlan
+  Hall Laboratory
+  Department of Biochemistry and Molecular Genetics
+  University of Virginia
+  aaronquinlan@gmail.com
+
+  Licenced under the GNU General Public License 2.0+ license.
+******************************************************************************/
+#include <ctime>
 using namespace std;
 
 
@@ -22,12 +32,12 @@ public:
 	// destructor
 	~BedSlop(void);
 
-	void DetermineBedInput();
-
 	void SlopBed(istream &bedInput);
 		
 	// method to add requested "slop" to a single BED entry
 	void AddSlop(BED &bed);
+	
+	void DetermineBedInput();
 	
 private:
 

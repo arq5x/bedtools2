@@ -1,12 +1,14 @@
-// 
-//  sortBed.cpp
-//  BEDTools
-//  
-//  Created by Aaron Quinlan Spring 2009.
-//  Copyright 2009 Aaron Quinlan. All rights reserved.
-//
-//  Summary:  Sorts a BED file in ascending order by chrom then by start position.
-//
+/*****************************************************************************
+  sortBed.cpp
+
+  (c) 2009 - Aaron Quinlan
+  Hall Laboratory
+  Department of Biochemistry and Molecular Genetics
+  University of Virginia
+  aaronquinlan@gmail.com
+
+  Licenced under the GNU General Public License 2.0+ license.
+******************************************************************************/
 #include "lineFileUtilities.h"
 #include "sortBed.h"
 

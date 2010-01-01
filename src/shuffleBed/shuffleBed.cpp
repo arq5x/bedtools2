@@ -1,11 +1,14 @@
-// 
-//  shuffleBed.cpp
-//  BEDTools
-//  
-//  Created by Aaron Quinlan Spring 2009.
-//  Copyright 2009 Aaron Quinlan. All rights reserved.
-//
-//
+/*****************************************************************************
+  shuffleBed.cpp
+
+  (c) 2009 - Aaron Quinlan
+  Hall Laboratory
+  Department of Biochemistry and Molecular Genetics
+  University of Virginia
+  aaronquinlan@gmail.com
+
+  Licenced under the GNU General Public License 2.0+ license.
+******************************************************************************/
 #include "lineFileUtilities.h"
 #include "shuffleBed.h"
 
@@ -51,7 +54,7 @@ BedShuffle::~BedShuffle(void) {
 
 
 
-void BedShuffle::Shuffle() {
+void BedShuffle::Shuffle(istream &bedInput) {
 
 
 	// open the GENOME file for reading.
@@ -75,37 +78,32 @@ void BedShuffle::Shuffle() {
 		}
 	}
 
-	// open the input BED file for reading.
-	// if successful, store the start and end positions
-	// for each entry (per chromosome)
-	ifstream beds(this->bedFile.c_str(), ios::in);
-	if ( !beds ) {
-		cerr << "Error: The requested bed file (" <<this->bedFile << ") could not be opened. Exiting!" << endl;
-		exit (1);
-	}
-	
+
 	BED bedEntry;     // used to store the current BED line from the BED file.
 	int lineNum = 0;
 	string bedLine;	  // used to store the current (unparsed) line from the BED file.
+	vector<string> bedFields;
+	bedFields.reserve(12);
+
+	while (getline(bedInput, bedLine)) {
 		
-	while (getline(beds, bedLine)) {
-		
-		vector<string> bedFields;
+
 		Tokenize(bedLine,bedFields);
 		lineNum++;
+				
+		if (bed->parseLine(bedEntry, bedFields, lineNum)) {
 
-		if (this->bed->parseBedLine(bedEntry, bedFields, lineNum)) {
-						
 			// choose a new locus for this feat
 			ChooseLocus(bedEntry);			
 			bed->reportBedNewLine(bedEntry);
 		}
+		bedFields.clear();	
 	}
 }
 
 
 
-void BedShuffle::ShuffleWithExclusions() {
+void BedShuffle::ShuffleWithExclusions(istream &bedInput) {
 
 
 	// open the GENOME file for reading.
@@ -129,38 +127,28 @@ void BedShuffle::ShuffleWithExclusions() {
 		}
 	}
 
-	// open the input BED file for reading.
-	// if successful, store the start and end positions
-	// for each entry (per chromosome)
-	ifstream beds(this->bedFile.c_str(), ios::in);
-	if ( !beds ) {
-		cerr << "Error: The requested bed file (" <<this->bedFile << ") could not be opened. Exiting!" << endl;
-		exit (1);
-	}
-	
 	BED bedEntry;     // used to store the current BED line from the BED file.
 	int lineNum = 0;
 	string bedLine;	  // used to store the current (unparsed) line from the BED file.
-	
-	
-	while (getline(beds, bedLine)) {
+	vector<string> bedFields;
+	bedFields.reserve(12);		
+	vector<BED> hits;
+	hits.reserve(100);
 		
-		vector<string> bedFields;
+	while (getline(bedInput, bedLine)) {
+		
 		Tokenize(bedLine,bedFields);
 		lineNum++;
 
-		if (this->bed->parseBedLine(bedEntry, bedFields, lineNum)) {
+		if (bed->parseLine(bedEntry, bedFields, lineNum)) {
 						
 			// choose a random locus
 			ChooseLocus(bedEntry);	
-			/*
-			   test to see if the chosen locus overlaps 
-			   with an exclude region
-			*/
-			vector<BED> hits;
+			
+			// test to see if the chosen locus overlaps 
+			// with an exclude region
 			exclude->binKeeperFind(exclude->bedMap[bedEntry.chrom], bedEntry.start, bedEntry.end, hits);
-			
-			
+					
 			bool haveOverlap = false;
 			for (vector<BED>::const_iterator h = hits.begin(); h != hits.end(); ++h) {
 
@@ -208,6 +196,7 @@ void BedShuffle::ShuffleWithExclusions() {
 				bed->reportBedNewLine(bedEntry);
 			}
 		}
+		bedFields.clear();
 	}
 }
 
@@ -261,6 +250,24 @@ void BedShuffle::ChooseLocus(BED &bedEntry) {
 			bedEntry.start = randomStart;
 			bedEntry.end = randomStart + length;
 		}
+	}
+}
+
+
+void BedShuffle::DetermineBedInput() {
+	if (bed->bedFile != "stdin") {   // process a file
+		ifstream beds(bed->bedFile.c_str(), ios::in);
+		if ( !beds ) {
+			cerr << "Error: The requested bed file (" << bed->bedFile << ") could not be opened. Exiting!" << endl;
+			exit (1);
+		}
+		if (this->haveExclude) { ShuffleWithExclusions(beds); }
+		else {Shuffle(beds); }
+	}
+	else {
+									// process stdin
+		if (this->haveExclude) { ShuffleWithExclusions(cin); }
+		else {Shuffle(cin); }		
 	}
 }
 

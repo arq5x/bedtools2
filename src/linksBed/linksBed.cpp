@@ -1,12 +1,14 @@
-// 
-//  linksBed.cpp
-//  BEDTools
-//  
-//  Created by Aaron Quinlan Spring 2009.
-//  Copyright 2009 Aaron Quinlan. All rights reserved.
-//
-//  Summary:  Creates HTML or UCSC browser coordinates from a BED file.
-//
+/*****************************************************************************
+  linksBed.cpp
+
+  (c) 2009 - Aaron Quinlan
+  Hall Laboratory
+  Department of Biochemistry and Molecular Genetics
+  University of Virginia
+  aaronquinlan@gmail.com
+
+  Licenced under the GNU General Public License 2.0+ license.
+******************************************************************************/
 #include "lineFileUtilities.h"
 #include "linksBed.h"
 
@@ -57,7 +59,7 @@ void BedLinks::WriteURL(BED &bed, string &base) {
 			cout << bed.score << endl;
 			cout << "\t</td>" << endl;
 		}
-		else if (this->bed->bedType == 6) {
+		else if ((this->bed->bedType == 6) || (this->bed->bedType == 9) || (this->bed->bedType == 12)) {
 			cout << "\t<td>" << endl;
 			cout << bed.name << endl;
 			cout << "\t</td>" << endl;
@@ -74,7 +76,7 @@ void BedLinks::WriteURL(BED &bed, string &base) {
 }
 
 
-void BedLinks::LinksBed() {
+void BedLinks::LinksBed(istream &bedInput) {
 
 
 	// construct the html base.
@@ -96,72 +98,42 @@ void BedLinks::LinksBed() {
 	cout << "<p style=\"font-family:courier\">" << endl;
 	cout << "<table border=\"0\" align=\"justify\"" << endl;
 	
+	string bedLine;
+	BED bedEntry;                                                                                                                        
+	int lineNum = 0;
+	vector<string> bedFields;
+	bedFields.reserve(12);
 	
-	// Are we dealing with a BED file or a BED passed via stdin?
+	cout << "<h3>BED Entries from: stdin </h3>" << endl;
 
-	// Case 1: Proper BED File.
-	if ( (this->bedFile != "") && (this->bedFile != "stdin") ) {
+	while (getline(bedInput, bedLine)) {
 
-		// open the BED file for reading                                                                                                                                      
-		ifstream bed(bedFile.c_str(), ios::in);
-		if ( !bed ) {
-			cerr << "Error: The requested bed file (" <<bedFile << ") could not be opened. Exiting!" << endl;
+		Tokenize(bedLine,bedFields);
+		lineNum++;
+			
+		if (this->bed->parseLine(bedEntry, bedFields, lineNum)) {
+			bedEntry.count = 0;
+			WriteURL(bedEntry, base);
+		}
+		bedFields.clear();
+	}
+	cout << "</table>" << endl;
+	cout << "</p>" << endl;
+	cout << "\t</body>" << endl <<"</html>" << endl;
+}
+
+
+void BedLinks::DetermineBedInput() {
+
+	if (this->bedFile != "stdin") {   // process a file
+		ifstream beds(this->bedFile.c_str(), ios::in);
+		if ( !beds ) {
+			cerr << "Error: The requested bed file (" << this->bedFile << ") could not be opened. Exiting!" << endl;
 			exit (1);
 		}
-
-		string bedLine;
-		BED bedEntry;                                                                                                                        
-		int lineNum = 0;
-		
-		cout << "<h3>BED Entries from: " << this->bedFile << "</h3>" << endl;
-
-		while (getline(bed, bedLine)) {
-
-			if ((bedLine.find("track") != string::npos) || (bedLine.find("browser") != string::npos)) {
-				continue;
-			}
-			else {
-				vector<string> bedFields;
-				Tokenize(bedLine,bedFields);
-
-				lineNum++;
-			
-				if (this->bed->parseBedLine(bedEntry, bedFields, lineNum)) {
-					bedEntry.count = 0; 
-					WriteURL(bedEntry, base);
-				}
-			}
-		}
-		cout << "</table>" << endl;
-		cout << "</p>" << endl;
-		cout << "\t</body>" << endl <<"</html>" << endl;  
+		LinksBed(beds);
 	}
-	// Case 2: STDIN.
-	else {
-		string bedLine;
-		BED bedEntry;                                                                                                                        
-		int lineNum = 0;
-
-		cout << "<h3>BED Entries from: stdin </h3>" << endl;
-
-		while (getline(cin, bedLine)) {
-
-			if ((bedLine.find("track") != string::npos) || (bedLine.find("browser") != string::npos)) {
-				continue;
-			}
-			else {
-				vector<string> bedFields;
-				Tokenize(bedLine,bedFields);
-
-				lineNum++;
-				if (this->bed->parseBedLine(bedEntry, bedFields, lineNum)) {
-					bedEntry.count = 0;
-					WriteURL(bedEntry, base);
-				}
-			}
-		}
-		cout << "</table>" << endl;
-		cout << "</p>" << endl;
-		cout << "\t</body>" << endl <<"</html>" << endl;
+	else {   // process stdin
+		LinksBed(cin);		
 	}
 }

@@ -102,21 +102,21 @@ int main(int argc, char* argv[]) {
 
 void ShowHelp(void) {
 
-	cerr << endl << "PROGRAM: " << PROGRAM_NAME << " (v" << VERSION << ")" << endl << endl;
+	cerr << endl << "Program: " << PROGRAM_NAME << " (v" << VERSION << ")" << endl;
 	
-	cerr << "AUTHOR:  Aaron Quinlan (aaronquinlan@gmail.com)" << endl << endl ;
+	cerr << "Author:  Aaron Quinlan (aaronquinlan@gmail.com)" << endl;
 
-	cerr << "SUMMARY: For each feature in BED A, finds the closest " << endl;
-	cerr << "\t feature (upstream or downstream) in BED B." << endl << endl;
+	cerr << "Summary: For each feature in BED A, finds the closest " << endl;
+	cerr << "\t\t feature (upstream or downstream) in BED B." << endl << endl;
 
-	cerr << "USAGE:   " << PROGRAM_NAME << " [OPTIONS] -a <a.bed> -b <b.bed>" << endl << endl;
+	cerr << "Usage:   " << PROGRAM_NAME << " [OPTIONS] -a <a.bed> -b <b.bed>" << endl << endl;
 
-	cerr << "OPTIONS: " << endl;
-	cerr << "\t-s\t"      << "Force strandedness.  That is, find the closest feature in B" << endl;
+	cerr << "Options: " << endl;
+	cerr << "\t-s\t"      		<< "Force strandedness.  That is, find the closest feature in B" << endl;
 	cerr						<< "\t\tthat overlaps A on the same strand." << endl;
 	cerr						<< "\t\t- By default, overlaps are reported without respect to strand." << endl << endl;
 
-	cerr << "\t-t\t"     	<< "How ties for closest feature are handled.  This occurs when two" << endl;
+	cerr << "\t-t\t"     		<< "How ties for closest feature are handled.  This occurs when two" << endl;
 	cerr 						<< "\t\tfeatures in B have exactly the same overlap with A." << endl;
 	cerr						<< "\t\tBy default, all such features in B are reported." << endl;
 	cerr						<< "\t\tHere are all the options:" << endl;
@@ -125,7 +125,7 @@ void ShowHelp(void) {
 	cerr 						<< "\t\t- \"last\"  Report the last tie that occurred in the B file." << endl << endl;
 
 	
-	cerr << "NOTES: " << endl;
+	cerr << "Notes: " << endl;
 	cerr << "\tReports \"none\" for chrom and \"-1\" for all other fields when a feature" << endl;
 	cerr << "\tis not found in B on the same chromosome as the feature in A." << endl;
 	cerr << "\tE.g. none\t-1\t-1" << endl << endl;

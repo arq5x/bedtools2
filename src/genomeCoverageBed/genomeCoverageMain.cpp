@@ -105,23 +105,23 @@ int main(int argc, char* argv[]) {
 
 void ShowHelp(void) {
 	
-	cerr << endl << "PROGRAM: " << PROGRAM_NAME << " (v" << VERSION << ")" << endl << endl;
+	cerr << endl << "Program: " << PROGRAM_NAME << " (v" << VERSION << ")" << endl;
 	
-	cerr << "AUTHOR:  Aaron Quinlan (aaronquinlan@gmail.com)" << endl << endl ;
+	cerr << "Author:  Aaron Quinlan (aaronquinlan@gmail.com)" << endl;
 
-	cerr << "SUMMARY: Compute the coverage of a BED (-i) file on genome (-g) file." << endl << endl;
+	cerr << "Summary: Compute the coverage of a BED file among a genome." << endl << endl;
 
-	cerr << "USAGE:   " << PROGRAM_NAME << " [OPTIONS] -g <genome> -i <bed>" << endl << endl;
+	cerr << "Usage:   " << PROGRAM_NAME << " [OPTIONS] -g <genome> -i <bed>" << endl << endl;
 	
-	cerr << "OPTIONS: " << endl;
-	cerr << "\t-d\t"	     	<< "Report the depth at each genome position." << endl;
-	cerr 						<< "\t\tDefault behavior is to report a histogram." << endl << endl;
+	cerr << "Options: " << endl;
+	cerr << "\t-d\t\t"	     	<< "Report the depth at each genome position." << endl;
+	cerr 						<< "\t\t\tDefault behavior is to report a histogram." << endl << endl;
 
 	cerr << "\t-max\t"          << "Combine all positions with a depth >= max into" << endl;
-	cerr						<< "\t\ta single bin in the histogram." << endl;
-	cerr						<< "\t\t- (INTEGER)" << endl << endl;
+	cerr						<< "\t\t\ta single bin in the histogram." << endl;
+	cerr						<< "\t\t\t- (INTEGER)" << endl << endl;
 
-	cerr << "NOTES: " << endl;
+	cerr << "Notes: " << endl;
 	cerr << "\t(1)  The genome file should tab delimited and structured as follows:" << endl;
 	cerr << "\t     <chromName><TAB><chromSize>" << endl << endl;
 	cerr << "\tFor example, Human (hg19):" << endl;
@@ -134,7 +134,7 @@ void ShowHelp(void) {
 	cerr << "\t     A simple \"sort -k 1,1 <BED> > <BED>.sorted\" will suffice."<< endl << endl;
 
 	
-	cerr << "TIPS: " << endl;
+	cerr << "Tips: " << endl;
 	cerr << "\tOne can use the UCSC Genome Browser's MySQL database to extract" << endl;
 	cerr << "\tchromosome sizes. For example, H. sapiens:" << endl << endl;
 	cerr << "\tmysql --user=genome --host=genome-mysql.cse.ucsc.edu -A -e /" << endl;

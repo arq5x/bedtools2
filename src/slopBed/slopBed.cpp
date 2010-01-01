@@ -1,10 +1,14 @@
-/*
-   BEDTools: slopBed.cpp
-   
-   Created by Aaron Quinlan Spring 2009.
-   Copyright 2009 Aaron Quinlan. All rights reserved.
-*/
+/*****************************************************************************
+  slopBed.cpp
 
+  (c) 2009 - Aaron Quinlan
+  Hall Laboratory
+  Department of Biochemistry and Molecular Genetics
+  University of Virginia
+  aaronquinlan@gmail.com
+
+  Licenced under the GNU General Public License 2.0+ license.
+******************************************************************************/
 #include "lineFileUtilities.h"
 #include "slopBed.h"
 
@@ -32,6 +36,56 @@ BedSlop::~BedSlop(void) {
 
 }
 
+
+void BedSlop::SlopBed(istream &bedInput) {
+	
+	BED bedEntry;     // used to store the current BED line from the BED file.
+	int lineNum = 0;
+	string bedLine;	  // used to store the current (unparsed) line from the BED file.
+		
+	while (getline(bedInput, bedLine)) {
+		
+		vector<string> bedFields;
+		Tokenize(bedLine,bedFields);
+		lineNum++;
+		
+		/*
+		   if a valid BED entry, add requested "slop" and print out
+		   the adjusted BED entry.
+		*/
+		if (this->bed->parseLine(bedEntry, bedFields, lineNum)) {
+			AddSlop(bedEntry);
+			bed->reportBedNewLine(bedEntry);			
+		}
+	}
+}
+
+
+void BedSlop::AddSlop(BED &bed) {
+
+	/*
+	   special handling if the BED entry is on the negative
+	   strand and the user cares about strandedness.
+	*/
+	if ((this->forceStrand) &&  (bed.strand == "-")) {
+		// inspect the start
+		if ((bed.start - rightSlop) > 0) bed.start -= rightSlop;
+		else bed.start = 0;
+
+		// inspect the start		
+		if ((bed.end + leftSlop) <= this->chromSizes[bed.chrom]) bed.end += leftSlop;
+		else bed.end = this->chromSizes[bed.chrom];
+	}
+	else {		
+		// inspect the start
+		if ((bed.start - leftSlop) > 0) bed.start -= leftSlop;
+		else bed.start = 0;
+		
+		// inspect the end
+		if ((bed.end + rightSlop) <= this->chromSizes[bed.chrom]) bed.end += rightSlop;
+		else bed.end = this->chromSizes[bed.chrom];
+	}
+}
 
 
 void BedSlop::DetermineBedInput() {
@@ -63,63 +117,9 @@ void BedSlop::DetermineBedInput() {
 			cerr << "Error: The requested bed file (" << this->bedFile << ") could not be opened. Exiting!" << endl;
 			exit (1);
 		}
-		ProcessBed(beds);
+		SlopBed(beds);
 	}
 	else {   // process stdin
-		ProcessBed(cin);		
+		SlopBed(cin);		
 	}
 }
-
-
-void BedSlop::SlopBed(istream &bedInput) {
-	
-	BED bedEntry;     // used to store the current BED line from the BED file.
-	int lineNum = 0;
-	string bedLine;	  // used to store the current (unparsed) line from the BED file.
-		
-	while (getline(bedInput, bedLine)) {
-		
-		vector<string> bedFields;
-		Tokenize(bedLine,bedFields);
-		lineNum++;
-		
-		/*
-		   if a valid BED entry, add requested "slop" and print out
-		   the adjusted BED entry.
-		*/
-		if (this->bed->parseBedLine(bedEntry, bedFields, lineNum)) {
-			AddSlop(bedEntry);
-			bed->reportBedNewLine(bedEntry);			
-		}
-	}
-}
-
-
-
-void BedSlop::AddSlop(BED &bed) {
-
-	/*
-	   special handling if the BED entry is on the negative
-	   strand and the user cares about strandedness.
-	*/
-	if ((this->forceStrand) &&  (bed.strand == "-")) {
-		// inspect the start
-		if ((bed.start - rightSlop) > 0) bed.start -= rightSlop;
-		else bed.start = 0;
-
-		// inspect the start		
-		if ((bed.end + leftSlop) <= this->chromSizes[bed.chrom]) bed.end += leftSlop;
-		else bed.end = this->chromSizes[bed.chrom];
-	}
-	else {		
-		// inspect the start
-		if ((bed.start - leftSlop) > 0) bed.start -= leftSlop;
-		else bed.start = 0;
-		
-		// inspect the end
-		if ((bed.end + rightSlop) <= this->chromSizes[bed.chrom]) bed.end += rightSlop;
-		else bed.end = this->chromSizes[bed.chrom];
-	}
-}
-
-

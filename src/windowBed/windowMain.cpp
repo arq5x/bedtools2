@@ -162,17 +162,17 @@ int main(int argc, char* argv[]) {
 
 void ShowHelp(void) {
 
-	cerr << endl << "PROGRAM: " << PROGRAM_NAME << " (v" << VERSION << ")" << endl << endl;
+	cerr << endl << "Program: " << PROGRAM_NAME << " (v" << VERSION << ")" << endl;
 	
-	cerr << "AUTHOR:  Aaron Quinlan (aaronquinlan@gmail.com)" << endl << endl ;
+	cerr << "Author:  Aaron Quinlan (aaronquinlan@gmail.com)" << endl;
 
-	cerr << "SUMMARY: Examines a \"window\" around each feature in A and" << endl;
-	cerr << "\t reports all features in B that overlap the window. For each" << endl;
-	cerr << "\t overlap the entire entry in A and B are reported." << endl << endl;
+	cerr << "Summary: Examines a \"window\" around each feature in A and" << endl;
+	cerr << "\t\t reports all features in B that overlap the window. For each" << endl;
+	cerr << "\t\t overlap the entire entry in A and B are reported." << endl << endl;
 
-	cerr << "USAGE:   " << PROGRAM_NAME << " [OPTIONS] -a <a.bed> -b <b.bed>" << endl << endl;
+	cerr << "Usage:   " << PROGRAM_NAME << " [OPTIONS] -a <a.bed> -b <b.bed>" << endl << endl;
 
-	cerr << "OPTIONS: " << endl;
+	cerr << "Options: " << endl;
 	cerr << "\t-w\t"			<< "Base pairs added upstream and downstream of each entry" << endl;
 	cerr						<< "\t\tin A when searching for overlaps in B." << endl;
 	cerr						<< "\t\t- Creates symterical \"windows\" around A." << endl;		

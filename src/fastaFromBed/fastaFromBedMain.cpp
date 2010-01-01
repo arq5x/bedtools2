@@ -103,19 +103,19 @@ int main(int argc, char* argv[]) {
 
 void ShowHelp(void) {
 	
-	cerr << endl << "PROGRAM: " << PROGRAM_NAME << " (v" << VERSION << ")" << endl << endl;
+	cerr << endl << "Program: " << PROGRAM_NAME << " (v" << VERSION << ")" << endl;
 	
-	cerr << "AUTHOR:  Aaron Quinlan (aaronquinlan@gmail.com)" << endl << endl ;
+	cerr << "Author:  Aaron Quinlan (aaronquinlan@gmail.com)" << endl;
 	
-	cerr << "SUMMARY: Extract DNA sequences into a fasta file based on BED coordinates." << endl << endl;
+	cerr << "Summary: Extract DNA sequences into a fasta file based on BED coordinates." << endl << endl;
 
-	cerr << "USAGE:   " << PROGRAM_NAME << " [OPTIONS] -fi -bed -fo " << endl << endl;
+	cerr << "Usage:   " << PROGRAM_NAME << " [OPTIONS] -fi -bed -fo " << endl << endl;
 
-	cerr << "OPTIONS: " << endl;
-	cerr << "\t\t-fi\tInput FASTA file" << endl;
-	cerr << "\t\t-bed\tBED file of ranges to extract from -fi" << endl;
-	cerr << "\t\t-fo\tOutput FASTA file" << endl;
-	cerr << "\t\t-name\tUse the BED name field (#4) for the FASTA header" << endl;
+	cerr << "Options: " << endl;
+	cerr << "\t-fi\t\tInput FASTA file" << endl;
+	cerr << "\t-bed\tBED file of ranges to extract from -fi" << endl;
+	cerr << "\t-fo\t\tOutput FASTA file" << endl;
+	cerr << "\t-name\tUse the BED name field (#4) for the FASTA header" << endl;
 
 
 

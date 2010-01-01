@@ -1,3 +1,14 @@
+/*****************************************************************************
+  slopBedMain.cpp
+
+  (c) 2009 - Aaron Quinlan
+  Hall Laboratory
+  Department of Biochemistry and Molecular Genetics
+  University of Virginia
+  aaronquinlan@gmail.com
+
+  Licenced under the GNU General Public License 2.0+ license.
+******************************************************************************/
 #include "slopBed.h"
 #include "version.h"
 
@@ -104,6 +115,7 @@ int main(int argc, char* argv[]) {
 	  cerr << endl << "*****" << endl << "*****ERROR: Must supply -l and -r with -s. " << endl << "*****" << endl;
 	  showHelp = true;	
 	}	
+	
 	if (!showHelp) {
 		BedSlop *bc = new BedSlop(bedFile, genomeFile, forceStrand, leftSlop, rightSlop);
 		bc->DetermineBedInput();		
@@ -117,36 +129,47 @@ int main(int argc, char* argv[]) {
 
 void ShowHelp(void) {
 	
-	cerr << "===============================================" << endl;
-	cerr << " " <<PROGRAM_NAME << " v" << VERSION << endl ;
-	cerr << " Aaron Quinlan, Ph.D. (aaronquinlan@gmail.com)  " << endl ;
-	cerr << " Hall Laboratory, University of Virginia" << endl;
-	cerr << "===============================================" << endl << endl;
-	cerr << "Description: Add requested base pairs of \"slop\" to each BED entry." << endl << endl;
-
-	cerr << "Usage: " << PROGRAM_NAME << " [OPTIONS] -g <genome> -i <bed>" << endl << endl;
+	cerr << endl << "Program: " << PROGRAM_NAME << " (v" << VERSION << ")" << endl;
 	
-	cerr << "OPTIONS: " << endl;
-	cerr << "\t" << "-l\t\t\t"            	<< "The number of base pairs to subtract from the start coordinate." << endl;
-	cerr << "\t" << "-r\t\t\t"            	<< "The number of base pairs to add to the end coordinate." << endl;
-	cerr << "\t" << "-b\t\t\t"            	<< "Increase the BED entry by the same number base pairs in each direction." << endl;
-	cerr << "\t" << "-s\t\t\t"            	<< "Define -l and -r based on strand.  E.g. if used, -l 500 for a negative-stranded " << endl << "\t\t\t\tfeature, it will add 500 bp downstream.  Default = false." << endl << endl;	
+	cerr << "Author:  Aaron Quinlan (aaronquinlan@gmail.com)" << endl;
+	
+	cerr << "Summary: Add requested base pairs of \"slop\" to each BED entry." << endl << endl;
 
-	cerr << "NOTES: " << endl;
-	cerr << "\t1.  Starts will be corrected to 0 if the requested slop would force it below 0." << endl;
-	cerr << "\t2.  Ends will be corrected to the chromosome length if the requested slop would force it above the max chrom length." << endl;
-	cerr << "\t3.  The genome file should tab delimited and structured as follows: <chr><TAB><size>. For example, Mus musculus:" << endl;
-	cerr << "\t\tchr1\t197195432" << endl;
-	cerr << "\t\tchr2\t181748087" << endl;
-	cerr << "\t\t..." << endl;
-	cerr << "\t\tchrY_random\t58682461" << endl;
-	cerr << "\t4.  -i stdin\t"	<< "Allows BED file to be read from stdin.  E.g.: cat a.bed | slopBed -i stdin" << endl;
-	cerr << "\t5.  ***Only tab-delimited BED3 - BED6 formats allowed.***"<< endl << endl;
+	cerr << "Usage:   " << PROGRAM_NAME << " [OPTIONS] -i <bed> -g <genome> [-b <int> or (-l and -r)]" << endl << endl;
+	
+	cerr << "Options: " << endl;
+	cerr << "\t-b\t"            	<< "Increase the BED entry by the same number base pairs in each direction." << endl;
+	cerr 							<< "\t\t- (Integer)" << endl;
+		
+	cerr << "\t-l\t"            	<< "The number of base pairs to subtract from the start coordinate." << endl;
+	cerr 							<< "\t\t- (Integer)" << endl;
 
-	cerr << "TIPS:" << endl;
-	cerr << "\tOne can use the UCSC Genome Browser's MySQL database to extract chromosome sizes. For example, H. sapiens:" << endl << endl;
-	cerr << "\tmysql --user=genome --host=genome-mysql.cse.ucsc.edu -A -e \"select chrom, size from hg18.chromInfo\"  > hg18.genome" 
-		<< endl << endl;
+	cerr << "\t-r\t"            	<< "The number of base pairs to add to the end coordinate." << endl;
+	cerr 							<< "\t\t- (Integer)" << endl;
+
+	cerr << "\t-s\t"            	<< "Define -l and -r based on strand." << endl;
+	cerr 							<< "\t\tE.g. if used, -l 500 for a negative-stranded feature, " << endl;
+	cerr							<< "\t\tit will add 500 bp downstream.  Default = false." << endl << endl;	
+
+	cerr << "Notes: " << endl;
+	cerr << "\t(1)  Starts will be set to 0 if the requested slop would force it below 0." << endl;
+	cerr << "\t(2)  Ends will be set to the chromosome length if the requested slop would" << endl;
+	cerr <<	       "\t\t force it above the max chrom length." << endl;
+
+	cerr << "\t(3)  The genome file should tab delimited and structured as follows:" << endl;
+	cerr << "\t     <chromName><TAB><chromSize>" << endl << endl;
+	cerr << "\tFor example, Human (hg19):" << endl;
+	cerr << "\tchr1\t249250621" << endl;
+	cerr << "\tchr2\t243199373" << endl;
+	cerr << "\t..." << endl;
+	cerr << "\tchr18_gl000207_random\t4262" << endl << endl;
+
+	
+	cerr << "Tips: " << endl;
+	cerr << "\tOne can use the UCSC Genome Browser's MySQL database to extract" << endl;
+	cerr << "\tchromosome sizes. For example, H. sapiens:" << endl << endl;
+	cerr << "\tmysql --user=genome --host=genome-mysql.cse.ucsc.edu -A -e /" << endl;
+	cerr << "\t\"select chrom, size from hg19.chromInfo\"  > hg19.genome" << endl << endl;
 		
 	
 	// end the program here

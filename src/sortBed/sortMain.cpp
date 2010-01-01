@@ -1,3 +1,14 @@
+/*****************************************************************************
+  sortBedMain.cpp
+
+  (c) 2009 - Aaron Quinlan
+  Hall Laboratory
+  Department of Biochemistry and Molecular Genetics
+  University of Virginia
+  aaronquinlan@gmail.com
+
+  Licenced under the GNU General Public License 2.0+ license.
+******************************************************************************/
 #include "sortBed.h"
 #include "version.h"
 
@@ -29,6 +40,8 @@ int main(int argc, char* argv[]) {
 	bool sortByChromThenSizeDesc = false;
 	bool sortByChromThenScoreAsc = false;
 	bool sortByChromThenScoreDesc = false;
+	
+	if(argc <= 1) showHelp = true;
 	
 	for(int i = 1; i < argc; i++) {
 		int parameterLength = (int)strlen(argv[i]);
@@ -131,26 +144,20 @@ int main(int argc, char* argv[]) {
 
 void ShowHelp(void) {
 
-	cerr << "===============================================" << endl;
-	cerr << " " <<PROGRAM_NAME << " v" << VERSION << endl ;
-	cerr << " Aaron Quinlan, Ph.D. (aaronquinlan@gmail.com)  " << endl ;
-	cerr << " Hall Laboratory, University of Virginia" << endl;
-	cerr << "===============================================" << endl << endl;
-	cerr << "Description: Sorts a BED file in various and useful ways." << endl << endl;
-	cerr << "Usage: " << PROGRAM_NAME << " [OPTIONS] -i <input.bed>" << endl << endl;
-
-	cerr << "OPTIONS: " << endl;
-	cerr << "\t" << "-sizeA\t\t"	<< "Sort the BED file by feature size in ascending order.  Sorts across all chromosomes." << endl << endl;
-	cerr << "\t" << "-sizeD\t\t"	<< "Sort the BED file by feature size in descending order.  Sorts across all chromosomes." << endl << endl;
-	cerr << "\t" << "-chrThenSizeA\t"	<< "Sort the BED file by chrom (ascending), then feature size in ascending order." << endl << endl;
-	cerr << "\t" << "-chrThenSizeD\t"	<< "Sort the BED file by chrom (ascending), then feature size in descending order." << endl << endl;
-	cerr << "\t" << "-chrThenScoreA\t"	<< "Sort the BED file by chrom (ascending), then score in ascending order." << endl << endl;
-	cerr << "\t" << "-chrThenScoreD\t"	<< "Sort the BED file by chrom (ascending), then scor size in descending order." << endl << endl;
+	cerr << endl << "Program: " << PROGRAM_NAME << " (v" << VERSION << ")" << endl;
 	
-	cerr << "NOTES: " << endl;
-	cerr << "\t" << "-i stdin\t\t"	<< "Allows BED file A to be read from stdin.  E.g.: cat a.bed | sortBed -i stdin" << endl << endl;
-	cerr << "\t***Only tab-delimited BED3 - BED6 formats allowed.***"<< endl << endl;
-	// end the program here
+	cerr << "Author:  Aaron Quinlan (aaronquinlan@gmail.com)" << endl;
+	cerr << "Summary: Sorts a BED file in various and useful ways." << endl << endl;
+	cerr << "Usage:   " << PROGRAM_NAME << " [OPTIONS] -i <input.bed>" << endl << endl;
+
+	cerr << "Options: " << endl;
+	cerr << "\t" << "-sizeA\t\t"	<< "Sort by feature size in ascending order." << endl;
+	cerr << "\t" << "-sizeD\t\t"	<< "Sort by feature size in descending order." << endl;
+	cerr << "\t" << "-chrThenSizeA\t"	<< "Sort by chrom (asc), then feature size (asc)." << endl;
+	cerr << "\t" << "-chrThenSizeD\t"	<< "Sort by chrom (asc), then feature size (desc)." << endl;
+	cerr << "\t" << "-chrThenScoreA\t"	<< "Sort by chrom (asc), then score (asc)." << endl;
+	cerr << "\t" << "-chrThenScoreD\t"	<< "Sort by chrom (asc), then score (desc)." << endl << endl;
+	
 	exit(1);
 
 }
