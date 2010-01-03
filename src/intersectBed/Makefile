@@ -1,7 +1,6 @@
-CXX = g++
-CXXFLAGS = -O3  -Wall
-LDFLAGS = 
-
+CXX=		g++
+CXXFLAGS=	-Wall -O3 -m64 -g
+LIBS=		-lz
 UTILITIES_DIR = ../utils/
 OBJ_DIR = ../../obj/
 BIN_DIR = ../../bin/
@@ -9,22 +8,23 @@ BIN_DIR = ../../bin/
 # -------------------
 # define our includes
 # -------------------
-INCLUDES = -I$(UTILITIES_DIR)/bedFile/ -I$(UTILITIES_DIR)/lineFileUtilities/ -I$(UTILITIES_DIR)/version/
+INCLUDES = -I$(UTILITIES_DIR)/BamTools/ -I$(UTILITIES_DIR)/bedFile/ -I$(UTILITIES_DIR)/lineFileUtilities/ -I$(UTILITIES_DIR)/version/
 
 # ----------------------------------
 # define our source and object files
 # ----------------------------------
 SOURCES= intersectMain.cpp intersectBed.cpp
 OBJECTS= $(SOURCES:.cpp=.o)
-_EXT_OBJECTS=bedFile.o lineFileUtilities.o
+_EXT_OBJECTS=bedFile.o lineFileUtilities.o BamReader.o BamWriter.o BGZF.o
 EXT_OBJECTS=$(patsubst %,$(OBJ_DIR)/%,$(_EXT_OBJECTS))
 BUILT_OBJECTS= $(patsubst %,$(OBJ_DIR)/%,$(OBJECTS))
 PROGRAM= intersectBed
-LIBS=
+
 
 all: $(PROGRAM)
 
 .PHONY: all
+
 
 $(PROGRAM): $(BUILT_OBJECTS) $(EXT_OBJECTS)
 	@echo "  * linking $(PROGRAM)"
@@ -37,6 +37,7 @@ $(BUILT_OBJECTS): $(SOURCES)
 $(EXT_OBJECTS):
 	@$(MAKE) --no-print-directory -C $(UTILITIES_DIR)/bedFile/
 	@$(MAKE) --no-print-directory -C $(UTILITIES_DIR)/lineFileUtilities/
+	@$(MAKE) --no-print-directory -C $(UTILITIES_DIR)/BamTools/	
 	
 clean:
 	@echo "Cleaning up."

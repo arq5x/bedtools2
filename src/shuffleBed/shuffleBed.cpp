@@ -145,7 +145,7 @@ void BedShuffle::ShuffleWithExclusions(istream &bedInput) {
 			
 			// test to see if the chosen locus overlaps 
 			// with an exclude region
-			exclude->binKeeperFind(bedEntry.chrom, bedEntry.start, bedEntry.end, hits);
+			exclude->FindOverlapsPerBin(bedEntry.chrom, bedEntry.start, bedEntry.end, bedEntry.strand, hits, false);
 					
 			bool haveOverlap = false;
 			for (vector<BED>::const_iterator h = hits.begin(); h != hits.end(); ++h) {
@@ -171,7 +171,8 @@ void BedShuffle::ShuffleWithExclusions(istream &bedInput) {
 				ChooseLocus(bedEntry);
 
 				vector<BED> hits;
-				exclude->binKeeperFind(exclude->bedMap[bedEntry.chrom], bedEntry.start, bedEntry.end, hits);
+				exclude->FindOverlapsPerBin(bedEntry.chrom, bedEntry.start, bedEntry.end, 
+											bedEntry.strand, hits, false);
 
 				haveOverlap = false;
 				for (vector<BED>::const_iterator h = hits.begin(); h != hits.end(); ++h) {

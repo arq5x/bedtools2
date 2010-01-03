@@ -46,7 +46,9 @@ int main(int argc, char* argv[]) {
 	bool haveFraction = false;
 	bool reciprocalFraction = false;
 	bool forceStrand = false;
-
+	bool inputIsBam = false;
+	bool outputIsBam = false;
+	
 	// check to see if we should print out some help
 	if(argc <= 1) showHelp = true;
 
@@ -73,12 +75,23 @@ int main(int argc, char* argv[]) {
 			}
 			i++;
 		}
+		else if(PARAMETER_CHECK("-abam", 5, parameterLength)) {
+			if ((i+1) < argc) {
+				haveBedA = true;
+				inputIsBam = true;
+				bedAFile = argv[i + 1];			
+			}
+			i++;
+		}
 		else if(PARAMETER_CHECK("-b", 2, parameterLength)) {
 			if ((i+1) < argc) {
 				haveBedB = true;
 				bedBFile = argv[i + 1];
 			}
 			i++;
+		}
+		else if(PARAMETER_CHECK("-outbam", 7, parameterLength)) {
+			outputIsBam = true;
 		}	
 		else if(PARAMETER_CHECK("-u", 2, parameterLength)) {
 			anyHit = true;
@@ -140,7 +153,9 @@ int main(int argc, char* argv[]) {
 
 	if (!showHelp) {
 
-		BedIntersect *bi = new BedIntersect(bedAFile, bedBFile, anyHit, writeA, writeB, overlapFraction, noHit, writeCount, forceStrand, reciprocalFraction);
+		BedIntersect *bi = new BedIntersect(bedAFile, bedBFile, anyHit, writeA, writeB, 
+											overlapFraction, noHit, writeCount, forceStrand, 
+											reciprocalFraction, inputIsBam, outputIsBam);
 		bi->DetermineBedInput();
 		return 0;
 	}
@@ -160,6 +175,12 @@ void ShowHelp(void) {
 	cerr << "Usage:   " << PROGRAM_NAME << " [OPTIONS] -a <a.bed> -b <b.bed>" << endl << endl;
 
 	cerr << "Options: " << endl;
+	
+	cerr << "\t-abam\t"			<< "The A input file is in BAM format.  Output will be BAM as well." << endl << endl;
+
+	cerr << "\t-outbam\t"		<< "Write output as BAM. This will report those BAM alignments." << endl;
+	cerr 						<< "\t\tthat meet the intersect criteria.  BAM entry is written once." << endl << endl;
+		
 	cerr << "\t-wa\t"			<< "Write the original entry in A for each overlap." << endl << endl;
 	cerr << "\t-wb\t"			<< "Write the original entry in B for each overlap." << endl;
 	cerr 						<< "\t\t- Useful for knowing _what_ A overlaps. Restricted by -f." << endl << endl;

@@ -13,9 +13,15 @@
 #define INTERSECTBED_H
 
 #include "bedFile.h"
+#include "BamReader.h"
+#include "BamWriter.h"
+#include "BamAux.h"
+using namespace BamTools;
+
 #include <vector>
 #include <iostream>
 #include <fstream>
+#include <stdlib.h>
 
 using namespace std;
 
@@ -27,7 +33,10 @@ class BedIntersect {
 public:
 
 	// constructor 
-	BedIntersect(string &, string &, bool &, bool &, bool &, float &, bool &, bool &, bool &, bool &);
+	BedIntersect(string bedAFile, string bedBFile, bool anyHit, 
+							   bool writeA, bool writeB, float overlapFraction, 
+							   bool noHit, bool writeCount, bool forceStrand, bool reciprocal,
+							   bool bamInput, bool bamOutput);
 
 	// destructor
 	~BedIntersect(void);
@@ -36,8 +45,12 @@ public:
 	void reportA(const BED &);
 	void reportB(const BED &);
 
-	void FindOverlaps(BED &, vector<BED> &); 
+	bool FindOverlaps(const BED &a, vector<BED> &hits);
+	bool FindOneOrMoreOverlap(const BED &a, vector<BED> &hits);
+	
 	void IntersectBed(istream &bedInput);
+	void IntersectBam(string bamFile);
+		
 	void DetermineBedInput();
 	
 	
@@ -54,7 +67,8 @@ private:
 	bool reciprocal;
 	float overlapFraction;
 	bool noHit;
-
+	bool bamInput;
+	bool bamOutput;
 	// instance of a bed file class.
 	BedFile *bedA, *bedB;
 
