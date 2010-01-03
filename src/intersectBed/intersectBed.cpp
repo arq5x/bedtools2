@@ -1,5 +1,5 @@
 /*****************************************************************************
-  intersectBed.h
+  intersectBed.cpp
 
   (c) 2009 - Aaron Quinlan
   Hall Laboratory
@@ -45,47 +45,61 @@ BedIntersect::~BedIntersect(void) {
 
 void BedIntersect::FindOverlaps(BED &a, vector<BED> &hits) {
 	
-	// find all of the overlaps between a and B.
-	//bedB->binKeeperFind(bedB->bedMap[a.chrom], a.start, a.end, hits);
-	bedB->binKeeperFind(a.chrom, a.start, a.end, hits);
-
-	int numOverlaps = 0;
+	// grab _all_ of the features in B that overlap with a.
+	bedB->FindOverlapsPerBin(a.chrom, a.start, a.end, a.strand, hits, this->forceStrand); 
 	
-	// should we print each overlap, or does the 
-	// user want summary information?
+	// how many overlaps are there b/w a and B?
+	int numOverlaps = 0;		
+	
+	// should we print each overlap, or does the user want summary information?
 	bool printable = true;			
 	if (anyHit || noHit || writeCount) {
 		printable = false;
 	}
 	
-	for (vector<BED>::const_iterator h = hits.begin(); h != hits.end(); ++h) {
+	// loop through the hits and report those that meet the user's criteria
+	vector<BED>::const_iterator h = hits.begin();
+	vector<BED>::const_iterator hitsEnd = hits.end();
+	for (; h != hitsEnd; ++h) {
 	
-		// if forcing strandedness, move on if the hit
-		// is not on the same strand as A.
-		if ((this->forceStrand) && (a.strand != h->strand)) {
-			continue;		// continue force the next iteration of the for loop.
-		}
-		else {
-			int s = max(a.start, h->start);
-			int e = min(a.end, h->end);
+		int s = max(a.start, h->start);
+		int e = min(a.end, h->end);
+		int overlapBases = (e - s);				// the number of overlapping bases b/w a and b
+		int aLength = (a.end - a.start);		// the length of a in b.p.
+		
+		// is there enough overlap relative to the user's request? (default ~ 1bp)
+		if ( ( (float) overlapBases / (float) aLength ) >= this->overlapFraction ) { 
+		
+			// Report the hit if the user doesn't care about reciprocal overlap between A and B.
+			if (!reciprocal) {
 			
-			// is there enough overlap relative to the user's request?
-			// (default ~ 1bp)
-			if ( ((float)(e-s) / (float)(a.end - a.start)) >= this->overlapFraction ) { 
+				numOverlaps++;		// we have another hit for A
+				if (!writeB && printable) {
+					if (writeA) bedA->reportBedNewLine(a); 
+					else bedA->reportBedRangeNewLine(a,s,e);
+				}
+				else if (printable) {
+					if (writeA) {
+						bedA->reportBedTab(a);
+						bedB->reportBedNewLine(*h);
+					}
+					else {
+						bedA->reportBedRangeTab(a,s,e);
+						bedB->reportBedNewLine(*h);									
+					}
+				}
+			}
+			else {			// the user wants there to be sufficient reciprocal overlap
+				int bLength = (h->end - h->start);
+				float bOverlap = ( (float) overlapBases / (float) bLength );
 			
-				// Report the hit if the user doesn't care about reciprocal overlap
-				// between A and B.
-				if (!reciprocal) {
+				if (bOverlap >= this->overlapFraction) {
 				
 					numOverlaps++;		// we have another hit for A
 				
 					if (!writeB && printable) {
-						if (writeA) {
-							bedA->reportBedNewLine(a);
-						}
-						else {
-							bedA->reportBedRangeNewLine(a,s,e);
-						}
+						if (writeA) bedA->reportBedNewLine(a);
+						else bedA->reportBedRangeNewLine(a,s,e);
 					}
 					else if (printable) {
 						if (writeA) {
@@ -95,34 +109,6 @@ void BedIntersect::FindOverlaps(BED &a, vector<BED> &hits) {
 						else {
 							bedA->reportBedRangeTab(a,s,e);
 							bedB->reportBedNewLine(*h);									
-						}
-					}
-				}
-				else {
-				
-					float bOverlap = ((float)(e-s) / (float)(h->end - h->start));
-				
-					if (bOverlap >= this->overlapFraction) {
-					
-						numOverlaps++;		// we have another hit for A
-					
-						if (!writeB && printable) {
-							if (writeA) {
-								bedA->reportBedNewLine(a);
-							}
-							else {
-								bedA->reportBedRangeNewLine(a,s,e);
-							}
-						}
-						else if (printable) {
-							if (writeA) {
-								bedA->reportBedTab(a);
-								bedB->reportBedNewLine(*h);
-							}
-							else {
-								bedA->reportBedRangeTab(a,s,e);
-								bedB->reportBedNewLine(*h);									
-							}
 						}
 					}
 				}

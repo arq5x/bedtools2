@@ -83,51 +83,39 @@ void BedClosest::FindWindowOverlaps(BED &a, vector<BED> &hits) {
 
 		while ((numOverlaps == 0) && (slop <= MAXSLOP)) {
 		
-			if ((a.start - slop) > 0) {
-				aFudgeStart = a.start - slop;
-			}
-			else {
-				aFudgeStart = 0;
-			}
-			if ((a.start + slop) < 2 * MAXSLOP) {
-				aFudgeEnd = a.end + slop;
-			}
-			else {
-				aFudgeEnd = 2 * MAXSLOP;
-			}
+			// add some slop (starting at 0 bases) to a in hopes
+			// of finding a hit in B
+			if ((a.start - slop) > 0) aFudgeStart = a.start - slop;
+			else aFudgeStart = 0;
+			
+			if ((a.start + slop) < 2 * MAXSLOP) aFudgeEnd = a.end + slop;
+			else aFudgeEnd = 2 * MAXSLOP;
 		
-			bedB->binKeeperFind(bedB->bedMap[a.chrom], aFudgeStart, aFudgeEnd, hits);
+			bedB->FindOverlapsPerBin(a.chrom, aFudgeStart, aFudgeEnd, a.strand, hits, this->forceStrand);
 	
-			for (vector<BED>::iterator h = hits.begin(); h != hits.end(); ++h) {
-				
-				// if forcing strandedness, move on if the hit
-				// is not on the same strand as A.
-				if ((this->forceStrand) && (a.strand != h->strand)) {
-					continue;		// continue force the next iteration of the for loop.
-				}
-		
+			vector<BED>::const_iterator h = hits.begin();
+			vector<BED>::const_iterator hitsEnd = hits.end();
+			for (; h != hitsEnd; ++h) {
+						
 				numOverlaps++;
 
 				// do the actual features overlap?		
 				int s = max(a.start, h->start);
 				int e = min(a.end, h->end);
-		
+				int overlapBases = (e - s);				// the number of overlapping bases b/w a and b
+				int aLength = (a.end - a.start);		// the length of a in b.p.
+				
 				if (s < e) {
-
 					// is there enough overlap (default ~ 1bp)
-					float overlap = (float)(e-s) / (float)(a.end - a.start);
-	
-					if ( overlap > 0 ) {
-					
+					float overlap = (float) overlapBases / (float) aLength;
+					if ( overlap > 0 ) {			
 						// is this hit the closest?
 						if (overlap > maxOverlap) {
 							closestB.clear();
 							closestB.push_back(*h);
 							maxOverlap = overlap;
 						}
-						else if (overlap == maxOverlap) {
-							closestB.push_back(*h);
-						}
+						else if (overlap == maxOverlap) closestB.push_back(*h);
 					}
 				}
 				else if (h->end < a.start){
@@ -136,9 +124,7 @@ void BedClosest::FindWindowOverlaps(BED &a, vector<BED> &hits) {
 						closestB.push_back(*h);
 						minDistance = a.start - h->end;
 					}
-					else if ((a.start - h->end) == minDistance) {
-						closestB.push_back(*h);
-					}
+					else if ((a.start - h->end) == minDistance) closestB.push_back(*h);
 				}
 				else {
 					if ((h->start - a.end) < minDistance) {
@@ -146,16 +132,11 @@ void BedClosest::FindWindowOverlaps(BED &a, vector<BED> &hits) {
 						closestB.push_back(*h);
 						minDistance = h->start - a.end;
 					}
-					else if ((h->start - a.end) == minDistance) {
-						closestB.push_back(*h);
-					}	
+					else if ((h->start - a.end) == minDistance) closestB.push_back(*h);	
 				}
-				
 			}
-			/* if no overlaps were found, we'll 
-			   widen the range by SLOPGROWTH in each direction
-			   and search again.
-			*/
+			// if no overlaps were found, we'll widen the range 
+			// by SLOPGROWTH in each direction and search again.
 			slop += SLOPGROWTH;
 		}
 	}

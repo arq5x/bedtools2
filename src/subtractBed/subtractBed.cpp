@@ -39,7 +39,7 @@ BedSubtract::~BedSubtract(void) {
 void BedSubtract::FindOverlaps(BED &a, vector<BED> &hits) {
 	
 	// find all of the overlaps between a and B.
-	bedB->binKeeperFind(bedB->bedMap[a.chrom], a.start, a.end, hits);
+	bedB->FindOverlapsPerBin(a.chrom, a.start, a.end, a.strand, hits, this->forceStrand);
 	
 	//  is A completely spanned by an entry in B?
 	//  if so, A should not be reported.
@@ -47,21 +47,19 @@ void BedSubtract::FindOverlaps(BED &a, vector<BED> &hits) {
 	int numOverlaps = 0;
 	vector<BED> bOverlaps;	// list of hits in B.  Special processing if there are multiple.
 	
-	for (vector<BED>::iterator h = hits.begin(); h != hits.end(); ++h) {
+	vector<BED>::const_iterator h = hits.begin();
+	vector<BED>::const_iterator hitsEnd = hits.end();
+	for (; h != hitsEnd; ++h) {
 		
-		// if forcing strandedness, move on if the hit
-		// is not on the same strand as A.
-		if ((this->forceStrand) && (a.strand != h->strand)) {
-			continue;		// continue force the next iteration of the for loop.
-		}
-	
 		int s = max(a.start, h->start);
-		int e = min(a.end, h->end);
-
+		int e = min(a.end, h->end);		
+		int overlapBases = (e - s);				// the number of overlapping bases b/w a and b
+		int aLength = (a.end - a.start);		// the length of a in b.p.
+			
 		if (s < e) {
 			
 			// is there enough overlap (default ~ 1bp)
-			float overlap = ((float)(e-s) / (float)(a.end - a.start));
+			float overlap = ((float) overlapBases / (float) aLength);
 
 			if (overlap >= 1.0) {
 				numOverlaps++;

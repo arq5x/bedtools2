@@ -15,7 +15,7 @@
 // 		Common Functions
 //***********************************************
 
-void Tokenize(const string& str, vector<string>& tokens)
+void Tokenize(string str, vector<string>& tokens)
 {
 
 	/* method to tokenize on any whitespace
@@ -42,7 +42,6 @@ void Tokenize(const string& str, vector<string>& tokens)
 		// Find next "non-delimiter"
 		pos = str.find_first_of("\t", lastPos);
 	}
-
 }
 
 

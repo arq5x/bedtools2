@@ -191,7 +191,6 @@ void ShowHelp(void) {
 	cerr						<< "\t\t- Default is 1000 bp." << endl;
 	cerr						<< "\t\t- (INTEGER)" << endl << endl;
 		
-
 	cerr << "\t-sw\t"     		<< "Define -l and -r based on strand.  For example if used, -l 500" << endl;
 	cerr 						<< "\t\tfor a negative-stranded feature will add 500 bp downstream." << endl;
 	cerr						<< "\t\t- Default = disabled." << endl << endl;	

@@ -145,7 +145,7 @@ void BedShuffle::ShuffleWithExclusions(istream &bedInput) {
 			
 			// test to see if the chosen locus overlaps 
 			// with an exclude region
-			exclude->binKeeperFind(exclude->bedMap[bedEntry.chrom], bedEntry.start, bedEntry.end, hits);
+			exclude->binKeeperFind(bedEntry.chrom, bedEntry.start, bedEntry.end, hits);
 					
 			bool haveOverlap = false;
 			for (vector<BED>::const_iterator h = hits.begin(); h != hits.end(); ++h) {

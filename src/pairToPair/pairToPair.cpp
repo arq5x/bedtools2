@@ -117,10 +117,10 @@ void PairToPair::FindOverlaps(BEDPE &a, vector<BED> &hitsA1B1, vector<BED> &hits
 
 
 	// Find the _potential_ hits between each end of A and B
-	bedB->binKeeperFind(bedB->bedMapEnd1[a.chrom1], a.start1, a.end1, hitsA1B1);	// hits between A1 to B1
-	bedB->binKeeperFind(bedB->bedMapEnd1[a.chrom2], a.start2, a.end2, hitsA2B1);	// hits between A2 to B1
-	bedB->binKeeperFind(bedB->bedMapEnd2[a.chrom1], a.start1, a.end1, hitsA1B2);	// hits between A1 to B2
-	bedB->binKeeperFind(bedB->bedMapEnd2[a.chrom2], a.start2, a.end2, hitsA2B2);	// hits between A2 to B2	
+	bedB->binKeeperFind(a.chrom1, a.start1, a.end1, hitsA1B1);	// hits between A1 to B1
+	bedB->binKeeperFind(a.chrom2, a.start2, a.end2, hitsA2B1);	// hits between A2 to B1
+	bedB->binKeeperFind(a.chrom1, a.start1, a.end1, hitsA1B2);	// hits between A1 to B2
+	bedB->binKeeperFind(a.chrom2, a.start2, a.end2, hitsA2B2);	// hits between A2 to B2	
 
 
 	// Now, reduce to the set of hits on each end of A and B that meet the required overlap fraction and orientation.

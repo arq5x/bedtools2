@@ -9,7 +9,7 @@
 using namespace std;
 
 // split a line from a file into a vector of strings.  token = "\t"
-void Tokenize(const string& str, vector<string>& tokens);
+void Tokenize(string str, vector<string>& tokens);
 
 
 #endif /* LINEFILEUTILITIES_H */

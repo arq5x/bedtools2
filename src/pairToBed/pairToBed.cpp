@@ -99,7 +99,7 @@ void BedIntersectPE::FindOverlaps(BEDPE &a, vector<BED> &hits1, vector<BED> &hit
 	/* 
 	Find the quality hits between ***end1*** of the BEDPE and the B BED file
 	*/
-	bedB->binKeeperFind(bedB->bedMap[a.chrom1], a.start1, a.end1, hits1);
+	bedB->binKeeperFind(a.chrom1, a.start1, a.end1, hits1);
 	
 	for (vector<BED>::iterator h = hits1.begin(); h != hits1.end(); ++h) {
 	
@@ -127,7 +127,7 @@ void BedIntersectPE::FindOverlaps(BEDPE &a, vector<BED> &hits1, vector<BED> &hit
 	/* 
 	Now find the quality hits between ***end2*** of the BEDPE and the B BED file
 	*/
-	bedB->binKeeperFind(bedB->bedMap[a.chrom2], a.start2, a.end2, hits2);
+	bedB->binKeeperFind(a.chrom2, a.start2, a.end2, hits2);
 	
 	for (vector<BED>::iterator h = hits2.begin(); h != hits2.end(); ++h) {
 	
@@ -218,7 +218,7 @@ void BedIntersectPE::FindSpanningOverlaps(BEDPE &a, vector<BED> &hits, string &t
 	}
 	spanLength = spanEnd - spanStart;
 	
-	bedB->binKeeperFind(bedB->bedMap[a.chrom1], spanStart, spanEnd, hits);
+	bedB->binKeeperFind(a.chrom1, spanStart, spanEnd, hits);
 	
 	for (vector<BED>::iterator h = hits.begin(); h != hits.end(); ++h) {
 	

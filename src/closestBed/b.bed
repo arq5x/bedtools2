@@ -1,3 +1,5 @@
 chr1	20000	30000	geneA	100	+
 chr1	20000	30000	geneB	100	-
-
+chr1	19999	30000	geneC	100	+
+chr1	80	90	geneD	100	+
+chr1	112	1000	geneE	100	+

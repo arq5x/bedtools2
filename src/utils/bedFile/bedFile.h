@@ -1,3 +1,14 @@
+/*****************************************************************************
+  bedFile.h
+
+  (c) 2009 - Aaron Quinlan
+  Hall Laboratory
+  Department of Biochemistry and Molecular Genetics
+  University of Virginia
+  aaronquinlan@gmail.com
+
+  Licensed under the GNU General Public License 2.0+ license.
+******************************************************************************/
 #ifndef BEDFILE_H
 #define BEDFILE_H
 
@@ -11,7 +22,7 @@
 #include <algorithm>
 #include <limits.h>
 #include <cstdio>
-
+#include <tr1/unordered_map>
 using namespace std;
 
 //*************************************************
@@ -58,23 +69,29 @@ struct BED {
 };
 
 
-
-//*************************************************
-// Common functions
-//*************************************************
-
-int getBin(int, int);
+// return the genome "bin" for a feature with this start and end
+int getBin(int start, int end);
 	
-// BED sorting
-bool sortByChrom(BED const &, BED const &);
-bool sortByStart(const BED &, const BED &);
-bool byChromThenStart(BED const &, BED const &);
+// return the amount of overlap between two features.  Negative if none and the the 
+// number of negative bases is the distance between the two.
+inline 
+int overlaps(int aS, int aE, int bS, int bE) {
+	return min(aE, bE) - max(aS, bS);
+}
 
-// BED comparsions
-int overlaps(const int, const int, const int, const int);
-bool leftOf(const int, const int);
-int min(const int, int);
-int max(const int, int);
+// return the lesser of two values.
+inline 
+int min(int a, int b) {
+	if (a <= b) return a;
+	else return b;
+}
+
+// return the greater of two values.
+inline 
+int max(int a, int b) {
+	if (a >= b) return a;
+	else return b;
+}
 
 
 // templated function to convert objects to strings
@@ -88,20 +105,25 @@ std::string ToString(const T & value)
 
 
 // BED Sorting Methods 
-bool sortByChrom(BED const &, BED const &);	
-bool sortByStart(const BED &, const BED &);
-bool sortBySizeAsc(const BED &, const BED &);
-bool sortBySizeDesc(const BED &, const BED &);
-bool sortByScoreAsc(const BED &, const BED &);
-bool sortByScoreDesc(const BED &, const BED &);
-bool byChromThenStart(BED const &, BED const &);
+bool sortByChrom(const BED &a, const BED &b);	
+bool sortByStart(const BED &a, const BED &b);
+bool sortBySizeAsc(const BED &a, const BED &b);
+bool sortBySizeDesc(const BED &a, const BED &b);
+bool sortByScoreAsc(const BED &a, const BED &b);
+bool sortByScoreDesc(const BED &a, const BED &b);
+bool byChromThenStart(BED const &a, BED const &b);
+
+
 
 //*************************************************
 // Common typedefs
 //*************************************************
-
 typedef map<int, vector<BED>, std::less<int> > binsToBeds;
+//typedef tr1::unordered_map<int, vector<BED> > binsToBeds;
+
 typedef map<string, binsToBeds, std::less<string> > masterBedMap;
+//typedef tr1::unordered_map<string, binsToBeds> masterBedMap;
+
 typedef map<string, vector<BED>, std::less<string> > masterBedMapNoBin;
 
 
@@ -118,36 +140,35 @@ public:
 	// Destructor
 	~BedFile(void);
 
-	// parse an input line and determine how it should be handled
-	bool parseLine (BED &bed, const vector<string> &lineVector, int &lineNum);
-	// parse a BED line
-	bool parseBedLine (BED &bed, const vector<string> &lineVector, int lineNum);
-	// parse a GFF line
-	bool parseGffLine (BED &bed, const vector<string> &lineVector, int lineNum);
-	
+	// load a BED file into a map keyed by chrom, then bin.
+	// value is vector of BEDs
 	void loadBedFileIntoMap();
+
+	// load a BED file into a map keyed by chrom
+	// value is vector of BEDs
 	void loadBedFileIntoMapNoBin();	
 
 	//void binKeeperFind(map<int, vector<BED>, std::less<int> > &, const int, const int, vector<BED> &);
-	void binKeeperFind(string chrom, const int start, const int end, vector<BED> &);
+	void FindOverlapsPerBin(string chrom, int start, int end, string strand, vector<BED> &hits, bool forceStrand);
 
-
-	void countHits(map<int, vector<BED>, std::less<int> > &, BED &, bool &);
-
+	//void countHits(map<int, vector<BED>, std::less<int> > &, BED &, bool &);
+	void countHits(const BED &a, bool forceStrand);
+	
 	// printing methods
 	void reportBedTab(const BED &);
-	void reportBedNewLine(const BED &);
-		
+	void reportBedNewLine(const BED &);		
 	void reportBedRangeTab(const BED &bed, int start, int end);
 	void reportBedRangeNewLine(const BED &bed, int start, int end);
 	
-
+	// parse an input line and determine how it should be handled
+	bool parseLine (BED &bed, const vector<string> &lineVector, int &lineNum);
+		
 	map<string, int> minPosMap;
 	map<string, int> maxPosMap;
 
 	// the bedfile with which this instance is associated
 	string bedFile;
-	unsigned int bedType;  // 3 -6 for BED
+	unsigned int bedType;  // 3-6, 12 for BED
 						   // 9 for GFF
 
 	vector<BED> bedVector;
@@ -155,9 +176,11 @@ public:
 	masterBedMapNoBin bedMapNoBin;
 	
 private:
-
-
 	
+	// parse a BED line
+	bool parseBedLine (BED &bed, const vector<string> &lineVector, int lineNum);
+	// parse a GFF line
+	bool parseGffLine (BED &bed, const vector<string> &lineVector, int lineNum);
 };
 
 #endif /* BEDFILE_H */

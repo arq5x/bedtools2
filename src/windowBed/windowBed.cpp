@@ -47,64 +47,60 @@ BedWindow::~BedWindow(void) {
 
 void BedWindow::FindWindowOverlaps(BED &a, vector<BED> &hits) {
 	
+	/* 
+		Adjust the start and end of a based on the requested window
+	*/
+
 	// update the current feature's start and end
 	// according to the slop requested (slop = 0 by default)
 	int aFudgeStart = 0;
 	int aFudgeEnd;
-
 
 	// Does the user want to treat the windows based on strand?
 	// If so, 
 	// if "+", then left is left and right is right
 	// if "-", the left is right and right is left.
 	if (this->strandWindows) {
-		
 		if (a.strand == "+") {
-			if ((a.start - this->leftSlop) > 0) {
-				aFudgeStart = a.start - this->leftSlop;
-			}
-			else {
-				aFudgeStart = 0;
-			}
+			if ((a.start - this->leftSlop) > 0) aFudgeStart = a.start - this->leftSlop;
+			else aFudgeStart = 0;
 			aFudgeEnd = a.end + this->rightSlop;
 		}
 		else {
-			if ((a.start - this->rightSlop) > 0) {
-				aFudgeStart = a.start - this->rightSlop;
-			}
-			else {
-				aFudgeStart = 0;
-			}
+			if ((a.start - this->rightSlop) > 0) aFudgeStart = a.start - this->rightSlop;
+			else aFudgeStart = 0;
 			aFudgeEnd = a.end + this->leftSlop;
 		}
 	}
+	// If not, add the windows irrespective of strand
 	else {
-		if ((a.start - this->leftSlop) > 0) {
-			aFudgeStart = a.start - this->leftSlop;
-		}
-		else {
-			aFudgeStart = 0;
-		}
+		if ((a.start - this->leftSlop) > 0) aFudgeStart = a.start - this->leftSlop;
+		else aFudgeStart = 0;
 		aFudgeEnd = a.end + this->rightSlop;
 	}
 	
-	bedB->binKeeperFind(bedB->bedMap[a.chrom], aFudgeStart, aFudgeEnd, hits);
+	
+	/* 
+		Now report the hits (if any) based on the window around a.
+	*/
+	// get the hits in B for the A feature
+	bedB->FindOverlapsPerBin(a.chrom, aFudgeStart, aFudgeEnd, a.strand, hits, this->matchOnStrand);
 
 	int numOverlaps = 0;
-	for (vector<BED>::iterator h = hits.begin(); h != hits.end(); ++h) {
 	
-		// if forcing strandedness, move on if the hit
-		// is not on the same strand as A.
-		if ((this->matchOnStrand) && (a.strand != h->strand)) {
-			continue;		// continue force the next iteration of the for loop.
-		}
+	// loop through the hits and report those that meet the user's criteria
+	vector<BED>::const_iterator h = hits.begin();
+	vector<BED>::const_iterator hitsEnd = hits.end();
+	for (; h != hitsEnd; ++h) {
 	
 		int s = max(aFudgeStart, h->start);
 		int e = min(aFudgeEnd, h->end);
-	
+		int overlapBases = (e - s);				// the number of overlapping bases b/w a and b
+		int aLength = (a.end - a.start);		// the length of a in b.p.
+			
 		if (s < e) {
 			// is there enough overlap (default ~ 1bp)
-			if ( ((float)(e-s) / (float)(a.end - a.start)) > 0 ) { 
+			if ( ((float) overlapBases / (float) aLength) > 0 ) { 
 				numOverlaps++;	
 				if (!anyHit && !noHit && !writeCount) {			
 					bedA->reportBedTab(a);
@@ -146,7 +142,7 @@ void BedWindow::WindowIntersectBed(istream &bedInput) {
 		Tokenize(bedLine,bedFields);
 		BED a;
 		
-		// find the overlaps with B if it's a valid BED entry. 
+		// find the overlaps between "a" and "B" if "a" is a valid BED entry. 
 		if (bedA->parseLine(a, bedFields, lineNum)) {
 			FindWindowOverlaps(a, hits);
 			hits.clear();

@@ -1,50 +1,67 @@
-// 
-//  bedFile.cpp
-//  BEDTools
-//  
-//  Created by Aaron Quinlan Spring 2009.
-//  Copyright 2009 Aaron Quinlan. All rights reserved.
-//
-//  Summary:  Contains common functions for finding BED overlaps.
-//
-//  Acknowledgments: Much of the code herein is taken from Jim Kent's
-//                   BED processing code.  I am grateful for his elegant
-//					 genome binning algorithm and therefore use it extensively.
+/*****************************************************************************
+  bedFile.cpp
 
+  (c) 2009 - Aaron Quinlan
+  Hall Laboratory
+  Department of Biochemistry and Molecular Genetics
+  University of Virginia
+  aaronquinlan@gmail.com
+
+  Licensed under the GNU General Public License 2.0+ license.
+******************************************************************************/
 #include "lineFileUtilities.h"
 #include "bedFile.h"
 
 
-// return the amount of overlap between two features.  Negative if none.
-int overlaps(const int aS, const int aE, const int bS, const int bE) {
-	return min(aE, bE) - max(aS, bS);
-}
+bool sortByChrom(BED const & a, BED const & b) {
+	if (a.chrom < b.chrom) return true;
+	else return false;
+};
+
+bool sortByStart(const BED &a, const BED &b) {
+	if (a.start < b.start) return true;
+	else return false;
+};
+
+bool sortBySizeAsc(const BED &a, const BED &b) {
+	
+	unsigned int aLen = a.end - a.start;
+	unsigned int bLen = b.end - b.start;
+	
+	if (aLen < bLen) return true;
+	else return false;
+};
+
+bool sortBySizeDesc(const BED &a, const BED &b) {
+	
+	unsigned int aLen = a.end - a.start;
+	unsigned int bLen = b.end - b.start;
+	
+	if (aLen > bLen) return true;
+	else return false;
+};
+
+bool sortByScoreAsc(const BED &a, const BED &b) {
+	if (a.score < b.score) return true;
+	else return false;
+};
+
+bool sortByScoreDesc(const BED &a, const BED &b) {
+	if (a.score > b.score) return true;
+	else return false;
+};
 
 
-bool leftOf(const int a, const int b) {
-	return (a < b);
-}
+bool byChromThenStart(BED const & a, BED const & b) {
 
-// return the lesser of two values.
-int min(const int a, int b) {
-	if (a <= b) {
-		return a;
-	}
-	else {
-		return b;
-	}
-}
+	if (a.chrom < b.chrom) return true;
+	else if (a.chrom > b.chrom) return false;
 
-// return the greater of two values.
-int max(const int a, int b) {
-	if (a >= b) {
-		return a;
-	}
-	else {
-		return b;
-	}
-}
+	if (a.start < b.start) return true;
+	else if (a.start >= b.start) return false;
 
+	return false;
+};
 
 int getBin(int start, int end)
 /* 
@@ -73,84 +90,37 @@ int getBin(int start, int end)
 	return 0;
 }
 
-//*********************************************
-// Sorting functions
-//*********************************************
-bool sortByChrom(BED const & a, BED const & b){
-	if (a.chrom < b.chrom) return true;
-	else return false;
-};
-
-bool sortByStart(const BED &a, const BED &b){
-	if (a.start < b.start) return true;
-	else return false;
-};
-
-bool sortBySizeAsc(const BED &a, const BED &b){
-	
-	unsigned int aLen = a.end - a.start;
-	unsigned int bLen = b.end - b.start;
-	
-	if (aLen < bLen) return true;
-	else return false;
-};
-
-bool sortBySizeDesc(const BED &a, const BED &b){
-	
-	unsigned int aLen = a.end - a.start;
-	unsigned int bLen = b.end - b.start;
-	
-	if (aLen > bLen) return true;
-	else return false;
-};
-
-bool sortByScoreAsc(const BED &a, const BED &b){
-	if (a.score < b.score) return true;
-	else return false;
-};
-
-bool sortByScoreDesc(const BED &a, const BED &b){
-	if (a.score > b.score) return true;
-	else return false;
-};
-
-
-bool byChromThenStart(BED const & a, BED const & b){
-
-	if (a.chrom < b.chrom) return true;
-	else if (a.chrom > b.chrom) return false;
-
-	if (a.start < b.start) return true;
-	else if (a.start >= b.start) return false;
-
-	return false;
-};
-
-
 /*
-	NOTE: Taken ~verbatim from kent source.
-	Return a list of all items in binKeeper that intersect range.
-	
-	Free this list with slFreeList.
+	Adapted from kent source "binKeeperFind"
 */
-void BedFile::binKeeperFind(string chrom, const int start, const int end, vector<BED> &hits) {
+void BedFile::FindOverlapsPerBin(string chrom, int start, int end, string strand, vector<BED> &hits, bool forceStrand) {
 
 	int startBin, endBin;
-	startBin = (start >>_binFirstShift);
-	endBin = ((end-1) >>_binFirstShift);
+	startBin = (start >> _binFirstShift);
+	endBin = ((end-1) >> _binFirstShift);
 
+	// loop through each bin "level" in the binning hierarchy
 	for (int i = 0; i < 6; ++i) {
+		
+		// loop through each bin at this level of the hierarchy
 		int offset = binOffsetsExtended[i];
-
 		for (int j = (startBin+offset); j <= (endBin+offset); ++j)  {
 			
+			// loop through each feature in this chrom/bin and see if it overlaps
+			// with the feature that was passed in.  if so, add the feature to 
+			// the list of hits.
 			vector<BED>::const_iterator bedItr = bedMap[chrom][j].begin();
 			vector<BED>::const_iterator bedEnd = bedMap[chrom][j].end();
-			
 			for (; bedItr != bedEnd; ++bedItr) {
-				if (overlaps(bedItr->start, bedItr->end, start, end) > 0) {
-					hits.push_back(*bedItr);
-				}			
+				
+				// skip the hit if not on the same strand (and we care)
+				if (forceStrand && (strand != bedItr->strand)) {
+					continue;
+				}
+				else if (overlaps(bedItr->start, bedItr->end, start, end) > 0) {
+					hits.push_back(*bedItr);	// it's a hit, add it.
+				}
+							
 			}
 		}
 		startBin >>= _binNextShift;
@@ -159,34 +129,40 @@ void BedFile::binKeeperFind(string chrom, const int start, const int end, vector
 }
 
 
+void BedFile::countHits(const BED &a, bool forceStrand) {
 
-void BedFile::countHits(map<int, vector<BED>, std::less<int> > &bk, BED &a, bool &forceStrand) {
 	int startBin, endBin;
-	int i,j;
+	startBin = (a.start >> _binFirstShift);
+	endBin = ((a.end-1) >> _binFirstShift);
 
-	startBin = (a.start>>_binFirstShift);
-	endBin = ((a.end-1)>>_binFirstShift);
-	for (i=0; i<6; ++i) {
+	// loop through each bin "level" in the binning hierarchy	
+	for (int i = 0; i < 6; ++i) {
+	
+		// loop through each bin at this level of the hierarchy	
 		int offset = binOffsetsExtended[i];
-
-		for (j = (startBin+offset); j <= (endBin+offset); ++j) {
+		for (int j = (startBin+offset); j <= (endBin+offset); ++j) {
 			
-			for (vector<BED>::iterator el = bk[j].begin(); el != bk[j].end(); ++el) {
+			// loop through each feature in this chrom/bin and see if it overlaps
+			// with the feature that was passed in.  if so, add the feature to 
+			// the list of hits.
+			vector<BED>::iterator bedItr = bedMap[a.chrom][j].begin();
+			vector<BED>::iterator bedEnd = bedMap[a.chrom][j].end();		
+			for (; bedItr != bedEnd; ++bedItr) {
 				
-				if (forceStrand && (a.strand != el->strand)) {
-					continue;		// continue force the next iteration of the for loop.
+				// skip the hit if not on the same strand (and we care)
+				if (forceStrand && (a.strand != bedItr->strand)) {
+					continue;
 				}
-				else if (overlaps(el->start, el->end, a.start, a.end) > 0) {
+				else if (overlaps(bedItr->start, bedItr->end, a.start, a.end) > 0) {
 					
-					el->count++;
-					el->depthMap[a.start+1].starts++;
-					el->depthMap[a.end].ends++;
+					bedItr->count++;
+					bedItr->depthMap[a.start+1].starts++;
+					bedItr->depthMap[a.end].ends++;
 					
-					if (a.start < el->minOverlapStart) {
-						el->minOverlapStart = a.start;
+					if (a.start < bedItr->minOverlapStart) {
+						bedItr->minOverlapStart = a.start;
 					}					
 				}
-				
 			}
 		}
 		startBin >>= _binNextShift;

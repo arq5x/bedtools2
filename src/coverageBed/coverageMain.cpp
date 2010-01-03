@@ -103,6 +103,11 @@ void ShowHelp(void) {
 	
 	cerr << "Usage:   " << PROGRAM_NAME << " [OPTIONS] -a <a.bed> -b <b.bed>" << endl << endl;
 
+	cerr << "Options: " << endl;
+	cerr << "\t-s\t"	 	    << "Force strandedness.  That is, only include hits in A that" << endl;
+	cerr						<< "\t\toverlap B on the same strand." << endl;
+	cerr						<< "\t\t- By default, hits are included without respect to strand." << endl << endl;
+
 	cerr << "Output:  " << endl;
 	cerr << "\t" << " After each entry in B, reports: " << endl; 
 	cerr << "\t  1) The number of features in A that overlapped the B interval." << endl;
