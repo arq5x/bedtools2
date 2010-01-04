@@ -97,7 +97,7 @@ void BedIntersectPE::FindOverlaps(BEDPE &a, vector<BED> &hits1, vector<BED> &hit
 
 		// is there enough overlap relative to the user's request? (default ~ 1bp)
 		if ( ( (float) overlapBases / (float) aLength ) >= this->overlapFraction ) {
-			numOverlapsEnd1++;
+			numOverlapsEnd2++;
 				
 			if (type == "either") {
 				bedA->reportBedPETab(a);
@@ -108,7 +108,6 @@ void BedIntersectPE::FindOverlaps(BEDPE &a, vector<BED> &hits1, vector<BED> &hit
 			}	
 		}
 	}
-	
 	
 	// Now report the hits depending on what the user has requested.
 	if (type == "neither") {
@@ -203,8 +202,7 @@ bool BedIntersectPE::FindOneOrMoreOverlaps(BEDPE &a, vector<BED> &hits1, vector<
 			}	
 		}
 	}
-	
-	
+		
 	// Now report the hits depending on what the user has requested.
 	if (type == "neither") {
 		if ( (numOverlapsEnd1 == 0) && (numOverlapsEnd2 == 0) ) return false;
@@ -215,8 +213,7 @@ bool BedIntersectPE::FindOneOrMoreOverlaps(BEDPE &a, vector<BED> &hits1, vector<
 	}
 	else if (type == "both") {
 		if ( (numOverlapsEnd1 > 0) && (numOverlapsEnd2 > 0) ) return true;
-	}
-	
+	}	
 	return false;
 }
 
@@ -229,17 +226,10 @@ void BedIntersectPE::FindSpanningOverlaps(BEDPE &a, vector<BED> &hits, string &t
 	// count of hits on _between_ end of BEDPE
 	// that exceed the requested overlap fraction
 	int numOverlaps = 0;
-
-
-	/* 
-	Find the hits between end1 and start2 of the BEDPE and the B BED file
-	
-	In other words, find the hits between the "span" of the pair
-	*/
-	
 	int spanStart = 0;
 	int spanEnd = 0;
 	int spanLength = 0;
+	
 	if (type == "ispan") {
 		spanStart = a.end1;
 		spanEnd = a.start2;
@@ -249,7 +239,8 @@ void BedIntersectPE::FindSpanningOverlaps(BEDPE &a, vector<BED> &hits, string &t
 		spanEnd = a.end2;		
 	}
 	spanLength = spanEnd - spanStart;
-	
+
+	// get the hits for the span
 	bedB->FindOverlapsPerBin(a.chrom1, spanStart, spanEnd, a.strand1, hits, this->forceStrand);
 	
 	vector<BED>::const_iterator h = hits.begin();
@@ -273,8 +264,6 @@ void BedIntersectPE::FindSpanningOverlaps(BEDPE &a, vector<BED> &hits, string &t
 
 bool BedIntersectPE::FindOneOrMoreSpanningOverlaps(BEDPE &a, vector<BED> &hits, string &type) {
 
-
-	
 	int spanStart = 0;
 	int spanEnd = 0;
 	int spanLength = 0;
@@ -287,7 +276,8 @@ bool BedIntersectPE::FindOneOrMoreSpanningOverlaps(BEDPE &a, vector<BED> &hits, 
 		spanEnd = a.end2;		
 	}
 	spanLength = spanEnd - spanStart;
-	
+
+	// get the hits for the span	
 	bedB->FindOverlapsPerBin(a.chrom1, spanStart, spanEnd, a.strand1, hits, this->forceStrand);
 	
 	vector<BED>::const_iterator h = hits.begin();
@@ -395,7 +385,7 @@ void BedIntersectPE::IntersectBamPE(string bamFile) {
 
 		if ((this->searchType == "ispan") || (this->searchType == "ospan")) {
 			// only do an inspan or outspan if the alignment is intrachromosomal
-			if ( (bam.RefID == bam.MateRefID) && (bam.InsertSize > 0) ) {
+			if (bam.RefID == bam.MateRefID) {
 				if (this->bamOutput == true) {
 					overlapsFound = FindOneOrMoreSpanningOverlaps(a, hits, this->searchType);
 					if (overlapsFound == true) {
@@ -403,15 +393,18 @@ void BedIntersectPE::IntersectBamPE(string bamFile) {
 					}
 				}
 				else {
-					FindSpanningOverlaps(a, hits, this->searchType);
+					// If BED output, we only want to report a pair ONCE
+					if (bam.InsertSize > 0) {
+						FindSpanningOverlaps(a, hits, this->searchType);
+					}
 				}
-				hits.clear();
 			}
+			hits.clear();
 		}
 		else if ((this->searchType == "notispan") || (this->searchType == "notospan")) {
 			// only do an inspan or outspan if the alignment is intrachromosomal
 			// we only want to process one of the two BAM entries for a pair
-			if ( (bam.RefID == bam.MateRefID) && (bam.InsertSize > 0) ) {
+			if (bam.RefID == bam.MateRefID) {
 				if (this->bamOutput == true) {
 					overlapsFound = FindOneOrMoreSpanningOverlaps(a, hits, this->searchType);
 					if (overlapsFound == false) {
@@ -419,35 +412,46 @@ void BedIntersectPE::IntersectBamPE(string bamFile) {
 					}	
 				}
 				else {
-					FindSpanningOverlaps(a, hits, this->searchType);
+					// If BED output, we only want to report a pair ONCE
+					if (bam.InsertSize > 0) {
+						FindSpanningOverlaps(a, hits, this->searchType);
+					}
 				}
 				hits.clear();
 			}
 		}
 		else if ( (this->searchType == "either") || (this->searchType == "xor") || (this->searchType == "both") ){
-			// we only want to process one of the two BAM entries for a pair
-			if ( ((bam.RefID == bam.MateRefID) && (bam.InsertSize > 0)) ||
-				 ((bam.RefID != bam.MateRefID) && (bam.IsFirstMate()))) 
-			{
-				if (this->bamOutput == true) {
-					overlapsFound = FindOneOrMoreOverlaps(a, hits1, hits2, this->searchType);
-					if (overlapsFound == true) writer.SaveAlignment(bam);
+			if (this->bamOutput == true) {
+				overlapsFound = FindOneOrMoreOverlaps(a, hits1, hits2, this->searchType);
+				if (overlapsFound == true) {		// write to BAM if correct hits found
+					writer.SaveAlignment(bam);
 				}
-				else FindOverlaps(a, hits1, hits2, this->searchType);
+			}
+			else {
+				// If BED output, we only want to report a pair ONCE
+				if ( ((bam.RefID == bam.MateRefID) && (bam.InsertSize > 0)) ||
+					 ((bam.RefID != bam.MateRefID) && (bam.IsFirstMate()))) 
+				{
+					FindOverlaps(a, hits1, hits2, this->searchType);
+				}
 			}
 			hits1.clear();
 			hits2.clear();
 		}
 		else if (this->searchType == "neither") {
-			// we only want to process one of the two BAM entries for a pair
-			if ( ((bam.RefID == bam.MateRefID) && (bam.InsertSize > 0)) ||
-				 ((bam.RefID != bam.MateRefID) && (bam.IsFirstMate()))) 
-			{
-				if (this->bamOutput == true) {
-					overlapsFound = FindOneOrMoreOverlaps(a, hits1, hits2, this->searchType);
-					if (overlapsFound == false) writer.SaveAlignment(bam);
+			if (this->bamOutput == true) {
+				overlapsFound = FindOneOrMoreOverlaps(a, hits1, hits2, this->searchType);
+				if (overlapsFound == false) {		// write to BAM if not hits found
+					writer.SaveAlignment(bam);
 				}
-				else FindOverlaps(a, hits1, hits2, this->searchType);
+			}
+			else {
+				// If BED output, we only want to report a pair ONCE
+				if ( ((bam.RefID == bam.MateRefID) && (bam.InsertSize > 0)) ||
+					 ((bam.RefID != bam.MateRefID) && (bam.IsFirstMate()))) 
+				{
+					FindOverlaps(a, hits1, hits2, this->searchType);
+				}
 			}
 			hits1.clear();
 			hits2.clear();

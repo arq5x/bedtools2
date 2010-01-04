@@ -124,7 +124,7 @@ int main(int argc, char* argv[]) {
 		showHelp = true;		
 	}
 	
-	if ( ((searchType == "ispan") || (searchType != "ospan") || (searchType == "notispan") || (searchType == "notospan")) 
+	if ( ((searchType == "ispan") || (searchType == "ospan") || (searchType == "notispan") || (searchType == "notospan")) 
 	     && forceStrand ) {
 		cerr << endl << "*****" << endl << "*****ERROR: Cannot enforce strandedness with selected searchtype" << endl << "*****" << endl;
 		showHelp = true;		
