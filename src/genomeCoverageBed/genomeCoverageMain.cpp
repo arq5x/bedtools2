@@ -114,12 +114,12 @@ void ShowHelp(void) {
 	cerr << "Usage:   " << PROGRAM_NAME << " [OPTIONS] -i <bed> -g <genome>" << endl << endl;
 	
 	cerr << "Options: " << endl;
-	cerr << "\t-d\t\t"	     	<< "Report the depth at each genome position." << endl;
-	cerr 						<< "\t\t\tDefault behavior is to report a histogram." << endl << endl;
+	cerr << "\t-d\t"	     	<< "Report the depth at each genome position." << endl;
+	cerr 						<< "\t\tDefault behavior is to report a histogram." << endl << endl;
 
 	cerr << "\t-max\t"          << "Combine all positions with a depth >= max into" << endl;
-	cerr						<< "\t\t\ta single bin in the histogram." << endl;
-	cerr						<< "\t\t\t- (INTEGER)" << endl << endl;
+	cerr						<< "\t\ta single bin in the histogram." << endl;
+	cerr						<< "\t\t- (INTEGER)" << endl << endl;
 
 	cerr << "Notes: " << endl;
 	cerr << "\t(1)  The genome file should tab delimited and structured as follows:" << endl;

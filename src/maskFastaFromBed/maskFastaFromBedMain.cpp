@@ -114,11 +114,11 @@ void ShowHelp(void) {
 	cerr << "Usage:   " << PROGRAM_NAME << " [OPTIONS] -fi -out -bed" << endl << endl;
 
 	cerr << "Options:" << endl;
-	cerr << "\t-fi\t\tInput FASTA file" << endl;
+	cerr << "\t-fi\tInput FASTA file" << endl;
 	cerr << "\t-bed\tBED file of ranges to mask in -fi" << endl;
-	cerr << "\t-fo\t\tOutput FASTA file" << endl;
+	cerr << "\t-fo\tOutput FASTA file" << endl;
 	cerr << "\t-soft\tEnforce \"soft\" masking.  That is, instead of masking with Ns," << endl;
-	cerr << "\t\t\tmask with lower-case bases." << endl;
+	cerr << "\t\tmask with lower-case bases." << endl;
 
 	// end the program here
 	exit(1);

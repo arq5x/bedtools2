@@ -107,13 +107,13 @@ void ShowHelp(void) {
 	cerr << "Options: " << endl;
 	cerr << "\t-base\t"	<< "The browser basename.  Default: http://genome.ucsc.edu " << endl;
 	cerr << "\t-org\t"	<< "The organism. Default: human" << endl;
-	cerr << "\t-db\t\t"	<< "The build.  Default: hg18" << endl << endl;
+	cerr << "\t-db\t"	<< "The build.  Default: hg18" << endl << endl;
 	
 	cerr << "Example: " << endl;
-	cerr << "\t" << "By default, the links created will point to the human (hg18) UCSC browser." << endl;
+	cerr << "\t" << "By default, the links created will point to human (hg18) UCSC browser." << endl;
 	cerr << 		"\tIf you have a local mirror, you can override this behavior by supplying" << endl;
 	cerr <<			"\tthe -base, -org, and -db options."  << endl << endl;
-	cerr << "\t" << "For example, if the main URL of your local mirror for mouse MM9 is called: " << endl;
+	cerr << "\t" << "For example, if the URL of your local mirror for mouse MM9 is called: " << endl;
 	cerr << 		"\thttp://mymirror.myuniversity.edu, then you would use the following:" << endl;
 	cerr << 		"\t" << "-base http://mymirror.myuniversity.edu" << endl;
 	cerr << 		"\t" << "-org mouse" << endl; 

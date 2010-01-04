@@ -112,9 +112,9 @@ void ShowHelp(void) {
 	cerr << "Usage:   " << PROGRAM_NAME << " [OPTIONS] -fi -bed -fo " << endl << endl;
 
 	cerr << "Options: " << endl;
-	cerr << "\t-fi\t\tInput FASTA file" << endl;
+	cerr << "\t-fi\tInput FASTA file" << endl;
 	cerr << "\t-bed\tBED file of ranges to extract from -fi" << endl;
-	cerr << "\t-fo\t\tOutput FASTA file" << endl;
+	cerr << "\t-fo\tOutput FASTA file" << endl;
 	cerr << "\t-name\tUse the BED name field (#4) for the FASTA header" << endl;
 
 

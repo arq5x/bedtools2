@@ -119,14 +119,14 @@ void ShowHelp(void) {
 	
 	cerr << "Options: " << endl;
 	cerr << "\t-excl\t"           	<< "A BED file of coordinates in which features in -i" << endl;
-	cerr							<< "\t\t\tshould not be placed (e.g. gaps.bed)." << endl << endl;
+	cerr							<< "\t\tshould not be placed (e.g. gaps.bed)." << endl << endl;
 
 	cerr << "\t-chrom\t"      		<< "Keep features in -i on the same chromosome."<< endl; 
-	cerr							<< "\t\t\t- By default, the chrom and position are randomly chosen." << endl << endl;
+	cerr							<< "\t\t- By default, the chrom and position are randomly chosen." << endl << endl;
 
 	cerr << "\t-seed\t"     		<< "Supply an integer seed for the shuffling." << endl; 
-	cerr							<< "\t\t\t- By default, the seed is chosen automatically." << endl;
-	cerr							<< "\t\t\t- (INTEGER)" << endl << endl;
+	cerr							<< "\t\t- By default, the seed is chosen automatically." << endl;
+	cerr							<< "\t\t- (INTEGER)" << endl << endl;
 
 
 	cerr << "Notes: " << endl;

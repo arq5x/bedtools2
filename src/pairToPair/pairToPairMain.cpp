@@ -135,11 +135,11 @@ void ShowHelp(void) {
 	cerr << "\t-f\t"	    			<< "Minimum overlap required as fraction of A (e.g. 0.05)." << endl;
 	cerr 								<< "\t\tDefault is 1E-9 (effectively 1bp)." << endl << endl;
 
-	cerr << "\t-type \t"				<< "Approach to reporting overlaps between A and B." << endl;
-	cerr 								<< "\t\tneither\t\tReport overlaps if neither end of A overlaps B." << endl << endl;
+	cerr << "\t-type \t"				<< "Approach to reporting overlaps between A and B." << endl << endl;
+	cerr 								<< "\t\tneither\tReport overlaps if neither end of A overlaps B." << endl;
 
-	cerr 								<< "\t\tboth\t\tReport overlaps if both ends of A overlap B." << endl;
-	cerr									<< "\t\t\t\t- Default." << endl;
+	cerr 								<< "\t\tboth\tReport overlaps if both ends of A overlap B." << endl;
+	cerr									<< "\t\t\t- Default." << endl << endl;
 
 	cerr << "\t-is\t"	    			<< "Ignore strands when searching for overlaps." << endl;
 	cerr 								<< "\t\t- By default, strands are enforced." << endl << endl;

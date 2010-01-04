@@ -99,7 +99,7 @@ void ShowHelp(void) {
 	cerr << "Author:  Aaron Quinlan (aaronquinlan@gmail.com)" << endl;
 	
 	cerr << "Summary: Returns the depth and breadth of coverage of features from A" << endl;
-	cerr << "\t\t on the intervals in B." << endl << endl;
+	cerr << "\t on the intervals in B." << endl << endl;
 	
 	cerr << "Usage:   " << PROGRAM_NAME << " [OPTIONS] -a <a.bed> -b <b.bed>" << endl << endl;
 

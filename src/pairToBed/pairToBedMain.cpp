@@ -176,11 +176,11 @@ void ShowHelp(void) {
 	cerr								<< "\t\tispan\tReport overlaps between [end1, start2] of A and B." << endl; 
 	cerr									<< "\t\t\t- Note: If chrom1 <> chrom2, entry is ignored." << endl;
 	cerr								<< "\t\tospan\tReport overlaps between [start1, end2] of A and B." << endl; 
-	cerr									<< "\t\t\t- Note: If chrom1 <> chrom2, entry is ignored." << endl << endl;
-	cerr								<< "\t\tnotispan\tReport A if ispan of A doesn't overlap B." << endl; 
 	cerr									<< "\t\t\t- Note: If chrom1 <> chrom2, entry is ignored." << endl;
+	cerr								<< "\t\tnotispan\tReport A if ispan of A doesn't overlap B." << endl; 
+	cerr									<< "\t\t\t\t- Note: If chrom1 <> chrom2, entry is ignored." << endl;
 	cerr								<< "\t\tnotospan\tReport A if ospan of A doesn't overlap B." << endl; 
-	cerr									<< "\t\t\t- Note: If chrom1 <> chrom2, entry is ignored." << endl << endl;
+	cerr									<< "\t\t\t\t- Note: If chrom1 <> chrom2, entry is ignored." << endl << endl;
 		
 	cerr << "Refer to the BEDTools manual for BEDPE format." << endl << endl;
 

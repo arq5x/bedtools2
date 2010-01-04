@@ -138,7 +138,7 @@ void ShowHelp(void) {
 	cerr << "Usage:   " << PROGRAM_NAME << " [OPTIONS] -i <bed> -g <genome> [-b <int> or (-l and -r)]" << endl << endl;
 	
 	cerr << "Options: " << endl;
-	cerr << "\t-b\t"            	<< "Increase the BED entry by the same number base pairs in each direction." << endl;
+	cerr << "\t-b\t"            	<< "Increase the BED entry by -b base pairs in each direction." << endl;
 	cerr 							<< "\t\t- (Integer)" << endl;
 		
 	cerr << "\t-l\t"            	<< "The number of base pairs to subtract from the start coordinate." << endl;
@@ -152,12 +152,12 @@ void ShowHelp(void) {
 	cerr							<< "\t\tit will add 500 bp downstream.  Default = false." << endl << endl;	
 
 	cerr << "Notes: " << endl;
-	cerr << "\t(1)  Starts will be set to 0 if the requested slop would force it below 0." << endl;
-	cerr << "\t(2)  Ends will be set to the chromosome length if the requested slop would" << endl;
-	cerr <<	       "\t\t force it above the max chrom length." << endl;
+	cerr << "\t(1)  Starts will be set to 0 if options would force it below 0." << endl;
+	cerr << "\t(2)  Ends will be set to the chromosome length if  requested slop would" << endl;
+	cerr <<	       "\tforce it above the max chrom length." << endl;
 
 	cerr << "\t(3)  The genome file should tab delimited and structured as follows:" << endl;
-	cerr << "\t     <chromName><TAB><chromSize>" << endl << endl;
+	cerr << "\n\t<chromName><TAB><chromSize>" << endl << endl;
 	cerr << "\tFor example, Human (hg19):" << endl;
 	cerr << "\tchr1\t249250621" << endl;
 	cerr << "\tchr2\t243199373" << endl;
