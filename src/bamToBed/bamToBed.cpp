@@ -152,17 +152,20 @@ void PrintBed(const BamAlignment &bam,  const RefVector &refs, bool useEditDista
 
 	string strand = "+"; 
 	if (bam.IsReverseStrand()) strand = "-";
+	string name = bam.Name;
+	if (bam.IsFirstMate()) name += "/1";
+	if (bam.IsSecondMate()) name += "/2";
 	
 	if (useEditDistance == false) {
 		printf("%s\t%d\t%d\t\%s\t%d\t%s\n", refs.at(bam.RefID).RefName.c_str(), bam.Position,
-									  bam.Position + bam.Length, bam.Name.c_str(),
+									  bam.Position + bam.Length, name.c_str(),
 									  bam.MapQuality, strand.c_str());
 	}
 	else {
 		uint8_t editDistance;
 		if (bam.GetEditDistance(editDistance)) {
 			printf("%s\t%d\t%d\t\%s\t%u\t%s\n", refs.at(bam.RefID).RefName.c_str(), bam.Position,
-										  bam.Position + bam.Length, bam.Name.c_str(),
+										  bam.Position + bam.Length, name.c_str(),
 										  editDistance, strand.c_str());
 		}
 	}
@@ -175,7 +178,7 @@ void PrintBedPE(const BamAlignment &bam,  const RefVector &refs, bool useEditDis
 		string strand1 = "+"; 
 		string strand2 = "+";
 		if (bam.IsReverseStrand()) strand1 = "-"; 
-		if (bam.IsMateReverseStrand()) strand2 = "-";	
+		if (bam.IsMateReverseStrand()) strand2 = "-";
 
 		printf("%s\t%d\t%d\t\%s\t%d\t%d\t%s\t%d\t%s\t%s\n", 
 						refs.at(bam.RefID).RefName.c_str(), bam.Position, bam.Position + bam.Length, 

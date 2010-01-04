@@ -167,7 +167,7 @@ void ShowHelp(void) {
 	cerr 								<< "\t\tDefault is to ignore stand." << endl;
 	cerr 								<< "\t\tNot applicable with -type inspan or -type outspan." << endl << endl;
 	
-	cerr << "\t-type \t"				<< "Report overlaps if between BEDPE A and BED B." << endl << endl;
+	cerr << "\t-type \t"				<< "Approach to reporting overlaps between BEDPE and BED." << endl << endl;
 	cerr 								<< "\t\teither\tReport overlaps if either end of A overlaps B." << endl;
 	cerr									<< "\t\t\t- Default." << endl;
 	cerr 								<< "\t\tneither\tReport A if neither end of A overlaps B." << endl;
@@ -182,7 +182,7 @@ void ShowHelp(void) {
 	cerr								<< "\t\tnotospan\tReport A if ospan of A doesn't overlap B." << endl; 
 	cerr									<< "\t\t\t- Note: If chrom1 <> chrom2, entry is ignored." << endl << endl;
 		
-	cerr << "See BEDTools manual for BEDPE file." << endl << endl;
+	cerr << "Refer to the BEDTools manual for BEDPE format." << endl << endl;
 
 	exit(1);
 }

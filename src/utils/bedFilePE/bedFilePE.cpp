@@ -15,7 +15,7 @@
 #include "bedFilePE.h"
 
 
-void BedFilePE::binKeeperFind(map<int, vector<BED>, std::less<int> > &bk, const int start, const int end, vector<BED> &hits) {
+/*void BedFilePE::binKeeperFind(map<int, vector<BED>, std::less<int> > &bk, const int start, const int end, vector<BED> &hits) {
 
 	int startBin, endBin;
 	startBin = (start >>_binFirstShift);
@@ -37,6 +37,60 @@ void BedFilePE::binKeeperFind(map<int, vector<BED>, std::less<int> > &bk, const 
 		endBin >>= _binNextShift;
 	}
 }
+*/
+
+
+/*
+	Adapted from kent source "binKeeperFind"
+*/
+void BedFilePE::FindOverlapsPerBin(int bEnd, string chrom, int start, int end, string strand, vector<BED> &hits, bool forceStrand) {
+
+	int startBin, endBin;
+	startBin = (start >> _binFirstShift);
+	endBin = ((end-1) >> _binFirstShift);
+
+	// loop through each bin "level" in the binning hierarchy
+	for (int i = 0; i < 6; ++i) {
+		
+		// loop through each bin at this level of the hierarchy
+		int offset = binOffsetsExtended[i];
+		for (int j = (startBin+offset); j <= (endBin+offset); ++j)  {
+			
+			// loop through each feature in this chrom/bin and see if it overlaps
+			// with the feature that was passed in.  if so, add the feature to 
+			// the list of hits.
+			vector<BED>::const_iterator bedItr;
+			vector<BED>::const_iterator bedEnd;
+			if (bEnd == 1) {
+				bedItr = bedMapEnd1[chrom][j].begin();
+				bedEnd = bedMapEnd1[chrom][j].end();
+			}
+			else if (bEnd == 2) {
+				bedItr = bedMapEnd2[chrom][j].begin();
+				bedEnd = bedMapEnd2[chrom][j].end();				
+			}
+			else {
+				cerr << "Unexpected end of B requested" << endl;
+			}
+			for (; bedItr != bedEnd; ++bedItr) {
+				
+				// skip the hit if not on the same strand (and we care)
+				if (forceStrand && (strand != bedItr->strand)) {
+					continue;
+				}
+				else if (overlaps(bedItr->start, bedItr->end, start, end) > 0) {
+					hits.push_back(*bedItr);	// it's a hit, add it.
+				}
+							
+			}
+		}
+		startBin >>= _binNextShift;
+		endBin >>= _binNextShift;
+	}
+}
+
+
+
 
 
 //***********************************************

@@ -1,3 +1,14 @@
+/*****************************************************************************
+  pairToPair.h
+
+  (c) 2009 - Aaron Quinlan
+  Hall Laboratory
+  Department of Biochemistry and Molecular Genetics
+  University of Virginia
+  aaronquinlan@gmail.com
+
+  Licenced under the GNU General Public License 2.0+ license.
+******************************************************************************/
 #ifndef PAIRTOPAIR_H
 #define PAIRTOPAIR_H
 
@@ -22,14 +33,18 @@ public:
 	// destructor
 	~PairToPair(void);
 
- 	void IntersectPairs	();
+ 	void IntersectPairs(istream &bedInput);
 
-	void FindOverlaps(BEDPE &, vector<BED> &, vector<BED> &, vector<BED> &, vector<BED> &, string &);	
+	void FindOverlaps(const BEDPE &a, vector<BED> &hitsA1B1, vector<BED> &hitsA1B2, 
+		vector<BED> &hitsA2B1, vector<BED> &hitsA2B2, string type);
 
-	void FindQualityHitsBetweenEnds(BEDPE, int, vector<BED> &, vector<BED> &, int &);
+	void FindQualityHitsBetweenEnds(const BEDPE &a, int end, const vector<BED> &hits, 
+		vector<BED> &qualityHits, int &numOverlaps);
 	
-	void FindHitsOnBothEnds(const BEDPE &, const vector<BED> &, const vector<BED> &, int &);
+	void FindHitsOnBothEnds(const BEDPE &a, const vector<BED> &qualityHitsEnd1, 
+		const vector<BED> &qualityHitsEnd2, int &matchCount);
 	
+	void DetermineBedPEInput();
 		
 private:
 

@@ -1,3 +1,14 @@
+/*****************************************************************************
+  pairToPairMain.cpp
+
+  (c) 2009 - Aaron Quinlan
+  Hall Laboratory
+  Department of Biochemistry and Molecular Genetics
+  University of Virginia
+  aaronquinlan@gmail.com
+
+  Licenced under the GNU General Public License 2.0+ license.
+******************************************************************************/
 #include "pairToPair.h"
 #include "version.h"
 
@@ -102,7 +113,7 @@ int main(int argc, char* argv[]) {
 	if (!showHelp) {
 
 		PairToPair *bi = new PairToPair(bedAFile, bedBFile, overlapFraction, searchType, ignoreStrand);
-		bi->IntersectPairs();
+		bi->DetermineBedPEInput();
 		return 0;
 	}
 	else {
@@ -112,26 +123,29 @@ int main(int argc, char* argv[]) {
 
 void ShowHelp(void) {
 
-	cerr << "===============================================" << endl;
-	cerr << " " <<PROGRAM_NAME << " v" << VERSION << endl ;
-	cerr << " Aaron Quinlan, Ph.D. (aaronquinlan@gmail.com)  " << endl ;
-	cerr << " Hall Laboratory, University of Virginia" << endl;
-	cerr << "===============================================" << endl << endl;
-	cerr << "Description: Report overlaps between two paired-end BED files (BEDPE)." << endl << endl;
+	cerr << endl << "Program: " << PROGRAM_NAME << " (v" << VERSION << ")" << endl;
+	
+	cerr << "Author:  Aaron Quinlan (aaronquinlan@gmail.com)" << endl;
+	
+	cerr << "Summary: Report overlaps between two paired-end BED files (BEDPE)." << endl << endl;
 
-	cerr << "Usage: " << PROGRAM_NAME << " [OPTIONS] -a <a.bedpe> -b <b.bedpe>" << endl << endl;
+	cerr << "Usage:   " << PROGRAM_NAME << " [OPTIONS] -a <BEDPE> -b <BEDPE>" << endl << endl;
 
-	cerr << "OPTIONS: " << endl;
-	cerr << "\t" << "-f\t\t"	    			<< "Minimum overlap req'd as fraction of a.bed (e.g. 0.05)." << endl << "\t\t\tDefault is 1E-9 (effectively 1bp)." << endl << endl;
-	cerr << "\t" << "-type \t\t"				<< "neither\t\t\tReport overlaps if _neither_ end of BEDPE (A) overlaps BEDPE B." << endl;
-	cerr 	 									<< "\t\t\tboth\t\t\tReport overlaps if _both_ ends of BEDPE (A) overlap BEDPE B." << endl << endl;
-	cerr << "\t" << "-is\t\t"	    			<< "Ignore strands when searching for overlaps. By default, like strands are enforced." << endl;
-	
-	
-	cerr << "NOTES: " << endl;
-	cerr << "\t" << "-i stdin\t"	<< "Allows BEDPE file A to be read from stdin.  E.g.: cat a.bedpe | pairToPair -a stdin -b B.bed" << endl << endl;
-	cerr << "\t***Only 10 columns BEDPE formats allowed.  See below).***"<< endl << endl;
-	
+	cerr << "Options: " << endl;
+	cerr << "\t-f\t"	    			<< "Minimum overlap required as fraction of A (e.g. 0.05)." << endl;
+	cerr 								<< "\t\tDefault is 1E-9 (effectively 1bp)." << endl << endl;
+
+	cerr << "\t-type \t"				<< "Approach to reporting overlaps between A and B." << endl;
+	cerr 								<< "\t\tneither\t\tReport overlaps if neither end of A overlaps B." << endl << endl;
+
+	cerr 								<< "\t\tboth\t\tReport overlaps if both ends of A overlap B." << endl;
+	cerr									<< "\t\t\t\t- Default." << endl;
+
+	cerr << "\t-is\t"	    			<< "Ignore strands when searching for overlaps." << endl;
+	cerr 								<< "\t\t- By default, strands are enforced." << endl << endl;
+
+	cerr << "Refer to the BEDTools manual for BEDPE format." << endl << endl;
+		
 	// end the program here
 	exit(1);
 

@@ -59,9 +59,13 @@ public:
 	void loadBedPEFileIntoMap();
 	void splitBedPEIntoBeds(const BEDPE &, unsigned int, BED &, BED &);
 		 
-	void binKeeperFind(map<int, vector<BED>, 
-		std::less<int> > &, const int, 
-		const int, vector<BED> &);	
+		
+	void FindOverlapsPerBin(int bEnd, string chrom, int start, int end, string strand, 
+		vector<BED> &hits, bool forceStrand);
+		
+	//void binKeeperFind(map<int, vector<BED>, 
+	//	std::less<int> > &, const int, 
+	//	const int, vector<BED> &);	
 		
 	string bedFile;
 	unsigned int bedType;

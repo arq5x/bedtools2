@@ -1,11 +1,14 @@
-/* 
-   BEDTools: pairToPair.cpp
+/*****************************************************************************
+  pairToPair.cpp
 
-   Created by Aaron Quinlan Spring 2009.
-   Copyright 2009 Aaron Quinlan. All rights reserved.
+  (c) 2009 - Aaron Quinlan
+  Hall Laboratory
+  Department of Biochemistry and Molecular Genetics
+  University of Virginia
+  aaronquinlan@gmail.com
 
-   Summary:  Looks for overlaps between paired-end reads / SVs (BEDPE format) and a BED file.
-*/
+  Licenced under the GNU General Public License 2.0+ license.
+******************************************************************************/
 #include "lineFileUtilities.h"
 #include "pairToPair.h"
 
@@ -35,71 +38,47 @@ PairToPair::~PairToPair(void) {
 
 
 
-void PairToPair::IntersectPairs() {
+void PairToPair::IntersectPairs(istream &bedInput) {
 	
 	// load the "B" bed file into a map so
 	// that we can easily compare "A" to it for overlaps
 	bedB->loadBedPEFileIntoMap();
-
-	string bedLine;                                                                                                                     
+	
 	int lineNum = 0;
-
-	// are we dealing with a file?
-	if (bedA->bedFile != "stdin") {
-
-		// open the BEDPE file for reading
-		ifstream bed(bedA->bedFile.c_str(), ios::in);
-		if ( !bed ) {
-			cerr << "Error: The requested bedpe file (" <<bedA->bedFile << ") could not be opened. Exiting!" << endl;
-			exit (1);
-		}
+	string bedLine;
+	vector<string> bedFields;			// vector for a BED entry
+	
+	vector<BED> hitsA1B1, hitsA1B2, hitsA2B1, hitsA2B2;
+	// reserve some space
+	hitsA1B1.reserve(100); hitsA1B2.reserve(100); hitsA2B1.reserve(100); hitsA2B2.reserve(100);
+	
+	bedFields.reserve(10);
+	
+	// process each entry in A
+	while (getline(bedInput, bedLine)) {
 		
-		BEDPE a;
-		// process each entry in A
-		while (getline(bed, bedLine)) {
-			
-			// split the current line into ditinct fields
-			vector<string> bedFields;
-			Tokenize(bedLine,bedFields);
-
-			lineNum++;
-			
-			// find the overlaps with B if it's a valid BED entry. 
-			if (bedA->parseBedPELine(a, bedFields, lineNum)) {
-				vector<BED> hitsA1B1, hitsA1B2, hitsA2B1, hitsA2B2;
-				
-				FindOverlaps(a, hitsA1B1, hitsA1B2, hitsA2B1, hitsA2B2, this->searchType);
-			}
-		}
-	}
-	// "A" is being passed via STDIN.
-	else {
+		BEDPE a;	
+		Tokenize(bedLine,bedFields);
+		lineNum++;
 		
-		BEDPE a;
-		// process each entry in A
-		while (getline(cin, bedLine)) {
-
-			// split the current line into ditinct fields
-			vector<string> bedFields;
-			Tokenize(bedLine,bedFields);
-
-			lineNum++;
+		// find the overlaps with B if it's a valid BED entry. 
+		if (bedA->parseBedPELine(a, bedFields, lineNum)) {
 			
-			// find the overlaps with B if it's a valid BED entry. 
-			if (bedA->parseBedPELine(a, bedFields, lineNum)) {
-				vector<BED> hitsA1B1, hitsA1B2, hitsA2B1, hitsA2B2;
-				
-				FindOverlaps(a, hitsA1B1, hitsA1B2, hitsA2B1, hitsA2B2, this->searchType);
-			}
+			FindOverlaps(a, hitsA1B1, hitsA1B2, hitsA2B1, hitsA2B2, this->searchType);
+			
+			// reset space for next BEDPE
+			hitsA1B1.clear(); hitsA1B2.clear(); hitsA2B1.clear(); hitsA2B2.clear();
 		}
+		// reset for the next input line
+		bedFields.clear();
 	}
 }
 // END IntersectPE
 
 
 
-void PairToPair::FindOverlaps(BEDPE &a, vector<BED> &hitsA1B1, vector<BED> &hitsA1B2, 
-							  vector<BED> &hitsA2B1, vector<BED> &hitsA2B2, string &type) {
+void PairToPair::FindOverlaps(const BEDPE &a, vector<BED> &hitsA1B1, vector<BED> &hitsA1B2, 
+							  vector<BED> &hitsA2B1, vector<BED> &hitsA2B2, string type) {
 
 	// list of hits on each end of BEDPE
 	// that exceed the requested overlap fraction
@@ -117,10 +96,10 @@ void PairToPair::FindOverlaps(BEDPE &a, vector<BED> &hitsA1B1, vector<BED> &hits
 
 
 	// Find the _potential_ hits between each end of A and B
-	bedB->binKeeperFind(a.chrom1, a.start1, a.end1, hitsA1B1);	// hits between A1 to B1
-	bedB->binKeeperFind(a.chrom2, a.start2, a.end2, hitsA2B1);	// hits between A2 to B1
-	bedB->binKeeperFind(a.chrom1, a.start1, a.end1, hitsA1B2);	// hits between A1 to B2
-	bedB->binKeeperFind(a.chrom2, a.start2, a.end2, hitsA2B2);	// hits between A2 to B2	
+	bedB->FindOverlapsPerBin(1, a.chrom1, a.start1, a.end1, a.strand1, hitsA1B1, !(ignoreStrand));	// hits between A1 to B1
+	bedB->FindOverlapsPerBin(1, a.chrom2, a.start2, a.end2, a.strand2, hitsA2B1, !(ignoreStrand));	// hits between A2 to B1
+	bedB->FindOverlapsPerBin(2, a.chrom1, a.start1, a.end1, a.strand1, hitsA1B2, !(ignoreStrand));	// hits between A1 to B2
+	bedB->FindOverlapsPerBin(2, a.chrom2, a.start2, a.end2, a.strand2, hitsA2B2, !(ignoreStrand));	// hits between A2 to B2	
 
 
 	// Now, reduce to the set of hits on each end of A and B that meet the required overlap fraction and orientation.
@@ -147,40 +126,36 @@ void PairToPair::FindOverlaps(BEDPE &a, vector<BED> &hitsA1B1, vector<BED> &hits
 
 
 
-void PairToPair::FindQualityHitsBetweenEnds(BEDPE a, int end, vector<BED> &hits, 
+void PairToPair::FindQualityHitsBetweenEnds(const BEDPE &a, int end, const vector<BED> &hits, 
 											vector<BED> &qualityHits, int &numOverlaps) {
 
 	if (end == 1) {
-		for (vector<BED>::iterator h = hits.begin(); h != hits.end(); ++h) {
-			
-			if ((this->ignoreStrand == true) || (a.strand1 == h->strand)) {
-				
-				int s = max(a.start1, h->start);
-				int e = min(a.end1, h->end);
-				if (s < e) {
-					// is there enough overlap (default ~ 1bp)
-					if ( ((float)(e-s) / (float)(a.end1 - a.start1)) >= this->overlapFraction ) {
-						numOverlaps++;
-						qualityHits.push_back(*h);
-					}
-				}
+		
+		vector<BED>::const_iterator h = hits.begin();
+		vector<BED>::const_iterator hitsEnd = hits.end();
+		for (; h != hitsEnd; ++h) {				
+			int s = max(a.start1, h->start);
+			int e = min(a.end1, h->end);
+
+			// is there enough overlap (default ~ 1bp)
+			if ( ((float)(e-s) / (float)(a.end1 - a.start1)) >= this->overlapFraction ) {
+				numOverlaps++;
+				qualityHits.push_back(*h);
 			}
 		}
+		
 	}
 	else if (end == 2) {
-		for (vector<BED>::iterator h = hits.begin(); h != hits.end(); ++h) {	
-			
-			if ((this->ignoreStrand == true) || (a.strand2 == h->strand)) {
-				
-				int s = max(a.start2, h->start);
-				int e = min(a.end2, h->end);
-				if (s < e) {
-					// is there enough overlap (default ~ 1bp)
-					if ( ((float)(e-s) / (float)(a.end2 - a.start2)) >= this->overlapFraction ) {
-						numOverlaps++;
-						qualityHits.push_back(*h);
-					}
-				}
+		
+		vector<BED>::const_iterator h = hits.begin();
+		vector<BED>::const_iterator hitsEnd = hits.end();
+		for (; h != hitsEnd; ++h) {				
+			int s = max(a.start2, h->start);
+			int e = min(a.end2, h->end);
+			// is there enough overlap (default ~ 1bp)
+			if ( ((float)(e-s) / (float)(a.end2 - a.start2)) >= this->overlapFraction ) {
+				numOverlaps++;
+				qualityHits.push_back(*h);
 			}
 		}
 	}
@@ -200,6 +175,7 @@ void PairToPair::FindHitsOnBothEnds(const BEDPE &a, const vector<BED> &qualityHi
 		hitsMap[h->count].push_back(*h);
 		matchCount++;
 	}
+
 	for (map<unsigned int, vector<BED>, less<unsigned int> >::iterator m = hitsMap.begin(); m != hitsMap.end(); ++m) {
 		if (m->second.size() == 2) {
 			
@@ -214,5 +190,21 @@ void PairToPair::FindHitsOnBothEnds(const BEDPE &a, const vector<BED> &qualityHi
 																   b1.strand.c_str(), b2.strand.c_str());
 			}
 		}
+	}
+}
+
+
+void PairToPair::DetermineBedPEInput() {
+	
+	if (bedA->bedFile != "stdin") {   // process a file
+		ifstream beds(bedA->bedFile.c_str(), ios::in);
+		if ( !beds ) {
+			cerr << "Error: The requested bed file (" << bedA->bedFile << ") could not be opened. Exiting!" << endl;
+			exit (1);
+		}
+		IntersectPairs(beds);
+	}
+	else {   // process stdin
+		IntersectPairs(cin);
 	}
 }
