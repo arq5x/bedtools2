@@ -1,3 +1,14 @@
+/*****************************************************************************
+  pairToBedMain.cpp
+
+  (c) 2009 - Aaron Quinlan
+  Hall Laboratory
+  Department of Biochemistry and Molecular Genetics
+  University of Virginia
+  aaronquinlan@gmail.com
+
+  Licenced under the GNU General Public License 2.0+ license.
+******************************************************************************/
 #include "pairToBed.h"
 #include "version.h"
 
@@ -30,7 +41,10 @@ int main(int argc, char* argv[]) {
 	bool haveBedB = false;
 	bool haveSearchType = false;
 	bool haveFraction = false;
-
+	bool forceStrand = false;
+	bool inputIsBam = false;
+	bool outputIsBam = false;
+	
 	// check to see if we should print out some help
 	if(argc <= 1) showHelp = true;
 
@@ -57,13 +71,24 @@ int main(int argc, char* argv[]) {
 			}
 			i++;
 		}
+		else if(PARAMETER_CHECK("-abam", 5, parameterLength)) {
+			if ((i+1) < argc) {
+				haveBedA = true;
+				inputIsBam = true;
+				bedAFile = argv[i + 1];			
+			}
+			i++;
+		}
 		else if(PARAMETER_CHECK("-b", 2, parameterLength)) {
 			if ((i+1) < argc) {
 				haveBedB = true;
 				bedBFile = argv[i + 1];
 			}
 			i++;
-		}	
+		}
+		else if(PARAMETER_CHECK("-outbam", 7, parameterLength)) {
+			outputIsBam = true;
+		}
 		else if(PARAMETER_CHECK("-type", 5, parameterLength)) {
 			if ((i+1) < argc) {
 				haveSearchType = true;
@@ -76,6 +101,9 @@ int main(int argc, char* argv[]) {
 			overlapFraction = atof(argv[i + 1]);
 			i++;
 		}
+		else if (PARAMETER_CHECK("-s", 2, parameterLength)) {
+			forceStrand = true;
+		}		
 		else {
 			cerr << endl << "*****ERROR: Unrecognized parameter: " << argv[i] << " *****" << endl << endl;
 			showHelp = true;
@@ -90,15 +118,23 @@ int main(int argc, char* argv[]) {
 	}
 	
 	if (haveSearchType && (searchType != "either") && (searchType != "neither") && (searchType != "both") 
-					    && (searchType != "xor") && (searchType != "inspan") && (searchType != "outspan")) {
-		cerr << endl << "*****" << endl << "*****ERROR: Request \"either\" or \"both\" or \"neither\" or \"xor\" or \"inspan\" or \"inspan\"" << endl << "*****" << endl;
+					    && (searchType != "xor") && (searchType != "ispan") && (searchType != "ospan")
+						&& (searchType != "notispan") && (searchType != "notospan")) {
+		cerr << endl << "*****" << endl << "*****ERROR: Request \"either\" or \"both\" or \"neither\" or \"xor\" or \"ispan\" or \"ospan\" or \"notispan\" or \"notospan\"" << endl << "*****" << endl;
+		showHelp = true;		
+	}
+	
+	if ( ((searchType == "ispan") || (searchType != "ospan") || (searchType == "notispan") || (searchType == "notospan")) 
+	     && forceStrand ) {
+		cerr << endl << "*****" << endl << "*****ERROR: Cannot enforce strandedness with selected searchtype" << endl << "*****" << endl;
 		showHelp = true;		
 	}
 
 	if (!showHelp) {
 
-		BedIntersectPE *bi = new BedIntersectPE(bedAFile, bedBFile, overlapFraction, searchType);
-		bi->IntersectBedPE();
+		BedIntersectPE *bi = new BedIntersectPE(bedAFile, bedBFile, overlapFraction, 
+												searchType, forceStrand, inputIsBam, outputIsBam);
+		bi->DetermineBedPEInput();
 		return 0;
 	}
 	else {
@@ -106,51 +142,47 @@ int main(int argc, char* argv[]) {
 	}
 }
 
+
 void ShowHelp(void) {
 
-	cerr << "===============================================" << endl;
-	cerr << " " <<PROGRAM_NAME << " v" << VERSION << endl ;
-	cerr << " Aaron Quinlan, Ph.D. (aaronquinlan@gmail.com)  " << endl ;
-	cerr << " Hall Laboratory, University of Virginia" << endl;
-	cerr << "===============================================" << endl << endl;
-	cerr << "Description: Report overlaps between a BEDPE file (a.bedpe) and a BED file (b.bed)." << endl << endl;
-
-	cerr << "Usage: " << PROGRAM_NAME << " [OPTIONS] -a <a.bedpe> -b <b.bed>" << endl << endl;
-
-	cerr << "OPTIONS: " << endl;
-	//cerr << "\t" << "-u\t\t"            	    << "Write ORIGINAL a.bed entry ONCE if ANY overlap with B.bed." << endl << "\t\t\tIn other words, just report the fact >=1 hit was found." << endl << endl;
-	//cerr << "\t" << "-c \t\t"					<< "For each entry in A, report the number of hits in B while restricting to -f and -type." << endl << "\t\t\tReports 0 for A entries that have no overlap with B." << endl << endl;
-	cerr << "\t" << "-f\t\t"	    			<< "Minimum overlap req'd as fraction of a.bed (e.g. 0.05)." << endl << "\t\t\tDefault is 1E-9 (effectively 1bp)." << endl << endl;
-	cerr << "\t" << "-type \t\t"				<< "either (default)\tReport overlaps if _either_ end of BEDPE (A) overlaps BED B." << endl;
-	cerr 										<< "\t\t\tneither\t\t\tReport overlaps if _neither_ end of BEDPE (A) overlaps BED B." << endl;
-	cerr 	 									<< "\t\t\tboth\t\t\tReport overlaps if _both_ ends of BEDPE (A) overlap BED B." << endl;
-	cerr										<< "\t\t\txor\t\t\tReport overlaps if _one and only one_ end of BEDPE (A) overlap BED B." << endl;
-	cerr										<< "\t\t\tinspan\t\t\tReport overlaps between [end1, start2] of BEDPE (A) and BED B." << endl << "\t\t\t\t\t\tNOTE: chrom1 must equal chrom2, otherwise entry is ignored." << endl;
-	cerr										<< "\t\t\toutspan\t\t\tReport overlaps between [start1, end2] of BEDPE (A) and BED B." << endl << "\t\t\t\t\t\tNOTE: chrom1 must equal chrom2, otherwise entry is ignored." << endl;
+	cerr << endl << "Program: " << PROGRAM_NAME << " (v" << VERSION << ")" << endl;
 	
-	
-	cerr << "NOTES: " << endl;
-	cerr << "\t" << "-i stdin\t"	<< "Allows BEDPE file A to be read from stdin.  E.g.: cat a.bedpe | pairToBed -a stdin -b B.bed" << endl << endl;
-	cerr << "\t***Only BEDPE formats allowed for -a (6,7,8, or 10 column format.  See below).***"<< endl << endl;
-	cerr << "\t***Only tab-delimited BED3 - BED6 formats allowed for -b.***"<< endl << endl;
-	
-	cerr << "BEDPE FORMAT (tab-delimited): " << endl;
-	cerr << "\t" << "1. chrom for end 1 (req'd)" << endl; 
-	cerr << "\t" << "2. start for end 1 (req'd)" << endl;
-	cerr << "\t" << "3. end for end 1 (req'd)" << endl;
-	cerr << "\t" << "4. chrom for end 2 (req'd)" << endl; 
-	cerr << "\t" << "5. start for end 2 (req'd)" << endl;
-	cerr << "\t" << "6. end for end 2 (req'd)" << endl;
-	cerr << "\t" << "7. name (opt.)" << endl; 
-	cerr << "\t" << "8. score (opt.)" << endl;
-	cerr << "\t" << "9. strand for end 1 (opt.)" << endl;
-	cerr << "\t" << "10. strand for end 2 (opt.)" << endl;
-	cerr << "\t" << "Note: Strands for each end must be provided if you choose to include strand information." << endl << endl;
+	cerr << "Author:  Aaron Quinlan (aaronquinlan@gmail.com)" << endl;
 
-	cerr << "Example BEDPE record:" << endl;
-	cerr << "chr1\t1000000\t1000100\tchr1\t1001000\t1001100\tsomename\t100\t+\t-" << endl;
+	cerr << "Summary: Report overlaps between a BEDPE file and a BED file." << endl << endl;
 
-	// end the program here
+	cerr << "Usage:   " << PROGRAM_NAME << " [OPTIONS] -a <BEDPE> -b <BED>" << endl << endl;
+
+	cerr << "Options: " << endl;
+
+	cerr << "\t-abam\t"			<< "The A input file is in BAM format.  Output will be BAM as well." << endl << endl;
+
+	cerr << "\t-outbam\t"		<< "Write output as BAM. This will report those BAM alignments." << endl;
+	cerr 						<< "\t\tthat meet the intersect criteria.  BAM entry is written once." << endl << endl;
+	
+	cerr << "\t-f\t"	    			<< "Minimum overlap required as fraction of A (e.g. 0.05)." << endl;
+	cerr 								<< "\t\tDefault is 1E-9 (effectively 1bp)." << endl << endl;
+
+	cerr << "\t-s\t"	    			<< "Enforce strandedness when finding overlaps." << endl;
+	cerr 								<< "\t\tDefault is to ignore stand." << endl;
+	cerr 								<< "\t\tNot applicable with -type inspan or -type outspan." << endl << endl;
+	
+	cerr << "\t-type \t"				<< "Report overlaps if between BEDPE A and BED B." << endl << endl;
+	cerr 								<< "\t\teither\tReport overlaps if either end of A overlaps B." << endl;
+	cerr									<< "\t\t\t- Default." << endl;
+	cerr 								<< "\t\tneither\tReport A if neither end of A overlaps B." << endl;
+	cerr 	 							<< "\t\tboth\tReport overlaps if both ends of A overlap  B." << endl;
+	cerr								<< "\t\txor\tReport overlaps if one and only one end of A overlaps B." << endl;
+	cerr								<< "\t\tispan\tReport overlaps between [end1, start2] of A and B." << endl; 
+	cerr									<< "\t\t\t- Note: If chrom1 <> chrom2, entry is ignored." << endl;
+	cerr								<< "\t\tospan\tReport overlaps between [start1, end2] of A and B." << endl; 
+	cerr									<< "\t\t\t- Note: If chrom1 <> chrom2, entry is ignored." << endl << endl;
+	cerr								<< "\t\tnotispan\tReport A if ispan of A doesn't overlap B." << endl; 
+	cerr									<< "\t\t\t- Note: If chrom1 <> chrom2, entry is ignored." << endl;
+	cerr								<< "\t\tnotospan\tReport A if ospan of A doesn't overlap B." << endl; 
+	cerr									<< "\t\t\t- Note: If chrom1 <> chrom2, entry is ignored." << endl << endl;
+		
+	cerr << "See BEDTools manual for BEDPE file." << endl << endl;
+
 	exit(1);
-
 }

@@ -277,7 +277,7 @@ void BamWriter::BamWriterPrivate::SaveAlignment(const BamAlignment& al) {
     string baseQualities = al.Qualities;
     char* pBaseQualities = (char*)al.Qualities.data();
 
-    //for(unsigned int i = 0; i < queryLen; i++) { pBaseQualities[i] -= 33; }
+    for(unsigned int i = 0; i < queryLen; i++) { pBaseQualities[i] -= 33; }
     mBGZF.Write(pBaseQualities, queryLen);
 
     // write the read group tag

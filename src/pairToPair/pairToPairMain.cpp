@@ -132,22 +132,6 @@ void ShowHelp(void) {
 	cerr << "\t" << "-i stdin\t"	<< "Allows BEDPE file A to be read from stdin.  E.g.: cat a.bedpe | pairToPair -a stdin -b B.bed" << endl << endl;
 	cerr << "\t***Only 10 columns BEDPE formats allowed.  See below).***"<< endl << endl;
 	
-	cerr << "BEDPE FORMAT (tab-delimited): " << endl;
-	cerr << "\t" << "1. chrom for end 1" << endl; 
-	cerr << "\t" << "2. start for end 1" << endl;
-	cerr << "\t" << "3. end for end 1" << endl;
-	cerr << "\t" << "4. chrom for end 2" << endl; 
-	cerr << "\t" << "5. start for end 2" << endl;
-	cerr << "\t" << "6. end for end 2" << endl;
-	cerr << "\t" << "7. name" << endl; 
-	cerr << "\t" << "8. score" << endl;
-	cerr << "\t" << "9. strand for end 1" << endl;
-	cerr << "\t" << "10. strand for end 2" << endl;
-	cerr << "\t" << "Note: Strands for each end must be provided if you choose to include strand information." << endl << endl;
-
-	cerr << "Example BEDPE record:" << endl;
-	cerr << "chr1\t1000000\t1000100\tchr1\t1001000\t1001100\tsomename\t100\t+\t-" << endl;
-
 	// end the program here
 	exit(1);
 
