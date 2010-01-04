@@ -248,14 +248,10 @@ void BedIntersect::IntersectBam(string bamFile) {
 		if (this->bamOutput == true) {
 			overlapsFound = FindOneOrMoreOverlap(a, hits);
 			if (overlapsFound == true) {
-				if (!this->noHit) {
-					writer.SaveAlignment(bamAlignment);
-				}
+				if (!this->noHit) writer.SaveAlignment(bamAlignment)
 			}
 			else {
-				if (this->noHit) {
-					writer.SaveAlignment(bamAlignment);
-				}
+				if (this->noHit) writer.SaveAlignment(bamAlignment);	
 			}
 		}
 		else {
