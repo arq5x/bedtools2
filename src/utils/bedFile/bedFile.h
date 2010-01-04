@@ -140,18 +140,21 @@ public:
 	// Destructor
 	~BedFile(void);
 
-	// load a BED file into a map keyed by chrom, then bin.
-	// value is vector of BEDs
+	// load a BED file into a map keyed by chrom, then bin. value is vector of BEDs
 	void loadBedFileIntoMap();
 
-	// load a BED file into a map keyed by chrom
-	// value is vector of BEDs
+	// load a BED file into a map keyed by chrom. value is vector of BEDs
 	void loadBedFileIntoMapNoBin();	
 
-	//void binKeeperFind(map<int, vector<BED>, std::less<int> > &, const int, const int, vector<BED> &);
+	// Given a chrom, start, end and strand for a single feature,
+	// search for all overlapping features in another BED file.
+	// Searches through each relevant genome bin on the same chromosome
+	// as the single feature. Note: Adapted from kent source "binKeeperFind"
 	void FindOverlapsPerBin(string chrom, int start, int end, string strand, vector<BED> &hits, bool forceStrand);
 
-	//void countHits(map<int, vector<BED>, std::less<int> > &, BED &, bool &);
+	// Given a chrom, start, end and strand for a single feature,
+	// increment a the number of hits for each feature in B file
+	// that the feature overlaps
 	void countHits(const BED &a, bool forceStrand);
 	
 	// printing methods
@@ -163,23 +166,21 @@ public:
 	// parse an input line and determine how it should be handled
 	bool parseLine (BED &bed, const vector<string> &lineVector, int &lineNum);
 		
-	map<string, int> minPosMap;
-	map<string, int> maxPosMap;
 
 	// the bedfile with which this instance is associated
 	string bedFile;
 	unsigned int bedType;  // 3-6, 12 for BED
 						   // 9 for GFF
 
-	vector<BED> bedVector;
 	masterBedMap bedMap;
 	masterBedMapNoBin bedMapNoBin;
 	
 private:
 	
-	// parse a BED line
+	// process as line from a BED file
 	bool parseBedLine (BED &bed, const vector<string> &lineVector, int lineNum);
-	// parse a GFF line
+	
+	// process as line from a GFF file. convert to a BED feature.
 	bool parseGffLine (BED &bed, const vector<string> &lineVector, int lineNum);
 };
 

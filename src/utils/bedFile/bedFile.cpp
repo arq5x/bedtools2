@@ -13,6 +13,9 @@
 #include "bedFile.h"
 
 
+/***********************************************
+Sorting comparison functions
+************************************************/
 bool sortByChrom(BED const & a, BED const & b) {
 	if (a.chrom < b.chrom) return true;
 	else return false;
@@ -63,7 +66,8 @@ bool byChromThenStart(BED const & a, BED const & b) {
 	return false;
 };
 
-int getBin(int start, int end)
+
+
 /* 
 	NOTE: Taken ~verbatim from kent source.
 	
@@ -71,28 +75,26 @@ int getBin(int start, int end)
 	* a bin.   There's a bin for each 128k segment, for each
 	* 1M segment, for each 8M segment, for each 64M segment,
 	* and for each chromosome (which is assumed to be less than
-	* 512M.)  A range goes into the smallest bin it will fit in. */
-{
+	* 512M.)  A range goes into the smallest bin it will fit in. 
+*/
+int getBin(int start, int end) {
 	int startBin = start;
 	int endBin = end-1;
 	startBin >>= _binFirstShift;
 	endBin >>= _binFirstShift;
 	
-	for (int i=0; i<6; ++i) {
+	for (int i = 0; i < 6; ++i) {
 		if (startBin == endBin) {
 			return binOffsetsExtended[i] + startBin;
 		}
 		startBin >>= _binNextShift;
 		endBin >>= _binNextShift;
 	}
-	
 	cerr << "start " << start << ", end " << end << " out of range in findBin (max is 512M)" << endl;
 	return 0;
 }
 
-/*
-	Adapted from kent source "binKeeperFind"
-*/
+
 void BedFile::FindOverlapsPerBin(string chrom, int start, int end, string strand, vector<BED> &hits, bool forceStrand) {
 
 	int startBin, endBin;
@@ -127,6 +129,7 @@ void BedFile::FindOverlapsPerBin(string chrom, int start, int end, string strand
 		endBin >>= _binNextShift;
 	}
 }
+
 
 
 void BedFile::countHits(const BED &a, bool forceStrand) {
@@ -171,6 +174,12 @@ void BedFile::countHits(const BED &a, bool forceStrand) {
 }
 
 
+
+
+/*******************************************
+Class methods
+*******************************************/
+
 // Constructor
 BedFile::BedFile(string &bedFile) {
 	this->bedFile = bedFile;
@@ -179,6 +188,7 @@ BedFile::BedFile(string &bedFile) {
 // Destructor
 BedFile::~BedFile(void) {
 }
+
 
 
 bool BedFile::parseLine (BED &bed, const vector<string> &lineVector, int &lineNum) {
@@ -199,6 +209,7 @@ bool BedFile::parseLine (BED &bed, const vector<string> &lineVector, int &lineNu
 	
 	return validEntry;
 }
+
 
 
 bool BedFile::parseBedLine (BED &bed, const vector<string> &lineVector, int lineNum) {
@@ -348,6 +359,7 @@ bool BedFile::parseBedLine (BED &bed, const vector<string> &lineVector, int line
 	}
 	return false;
 }
+
 
 
 bool BedFile::parseGffLine (BED &bed, const vector<string> &lineVector, int lineNum) {

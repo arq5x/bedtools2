@@ -1,5 +1,5 @@
 CXX = g++
-CXXFLAGS = -O3  -Wall
+CXXFLAGS = -O3  -Wall -m64
 LDFLAGS = 
 
 UTILITIES_DIR = ../utils/
@@ -20,7 +20,7 @@ _EXT_OBJECTS=bedFile.o lineFileUtilities.o
 EXT_OBJECTS=$(patsubst %,$(OBJ_DIR)/%,$(_EXT_OBJECTS))
 BUILT_OBJECTS= $(patsubst %,$(OBJ_DIR)/%,$(OBJECTS))
 PROGRAM= sortBed
-LIBS=
+
 
 all: $(PROGRAM)
 
