@@ -139,7 +139,7 @@ void ShowHelp(void) {
 	cerr 								<< "\t\tneither\tReport overlaps if neither end of A overlaps B." << endl;
 
 	cerr 								<< "\t\tboth\tReport overlaps if both ends of A overlap B." << endl;
-	cerr									<< "\t\t\t- Default." << endl << endl;
+	cerr									<< "\t\t- Default." << endl << endl;
 
 	cerr << "\t-is\t"	    			<< "Ignore strands when searching for overlaps." << endl;
 	cerr 								<< "\t\t- By default, strands are enforced." << endl << endl;

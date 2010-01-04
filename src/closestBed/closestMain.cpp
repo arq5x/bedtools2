@@ -107,7 +107,7 @@ void ShowHelp(void) {
 	cerr << "Author:  Aaron Quinlan (aaronquinlan@gmail.com)" << endl;
 
 	cerr << "Summary: For each feature in BED A, finds the closest " << endl;
-	cerr << "\t\t feature (upstream or downstream) in BED B." << endl << endl;
+	cerr << "\t feature (upstream or downstream) in BED B." << endl << endl;
 
 	cerr << "Usage:   " << PROGRAM_NAME << " [OPTIONS] -a <a.bed> -b <b.bed>" << endl << endl;
 

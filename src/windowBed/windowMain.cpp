@@ -167,8 +167,8 @@ void ShowHelp(void) {
 	cerr << "Author:  Aaron Quinlan (aaronquinlan@gmail.com)" << endl;
 
 	cerr << "Summary: Examines a \"window\" around each feature in A and" << endl;
-	cerr << "\t\t reports all features in B that overlap the window. For each" << endl;
-	cerr << "\t\t overlap the entire entry in A and B are reported." << endl << endl;
+	cerr << "\t reports all features in B that overlap the window. For each" << endl;
+	cerr << "\t overlap the entire entry in A and B are reported." << endl << endl;
 
 	cerr << "Usage:   " << PROGRAM_NAME << " [OPTIONS] -a <a.bed> -b <b.bed>" << endl << endl;
 
