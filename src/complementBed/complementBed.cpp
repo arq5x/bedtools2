@@ -80,7 +80,7 @@ void BedComplement::ComplementBed() {
 			}
 			
 			// mask all of the positions spanned by this BED entry.
-			for (int b = bIt->start; b <= bIt->end; b++) {
+			for (int b = bIt->start; b < bIt->end; b++) {
 				chromMasks[b] = 1;
 			}
 		}
@@ -94,7 +94,7 @@ void BedComplement::ComplementBed() {
 					i++;
 				}
 				if (start > 0) {
-					cout << currChrom << "\t" << start -1 << "\t" << i << endl;
+					cout << currChrom << "\t" << start << "\t" << i << endl;
 				}
 				else {
 					cout << currChrom << "\t" << 0 << "\t" << i << endl;
