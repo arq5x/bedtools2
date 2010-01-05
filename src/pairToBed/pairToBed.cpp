@@ -194,7 +194,7 @@ bool BedIntersectPE::FindOneOrMoreOverlaps(BEDPE &a, vector<BED> &hits1, vector<
 
 		// is there enough overlap relative to the user's request? (default ~ 1bp)
 		if ( ( (float) overlapBases / (float) aLength ) >= this->overlapFraction ) {
-			numOverlapsEnd1++;
+			numOverlapsEnd2++;
 				
 			if (type == "either") return true;
 			else {
@@ -205,7 +205,7 @@ bool BedIntersectPE::FindOneOrMoreOverlaps(BEDPE &a, vector<BED> &hits1, vector<
 		
 	// Now report the hits depending on what the user has requested.
 	if (type == "neither") {
-		if ( (numOverlapsEnd1 == 0) && (numOverlapsEnd2 == 0) ) return false;
+		if ( (numOverlapsEnd1 == 0) && (numOverlapsEnd2 == 0) ) return true;
 	}
 	else if (type == "xor") {
 		if ( (numOverlapsEnd1 > 0) && (numOverlapsEnd2 == 0) ) return true;
@@ -441,7 +441,7 @@ void BedIntersectPE::IntersectBamPE(string bamFile) {
 		else if (this->searchType == "neither") {
 			if (this->bamOutput == true) {
 				overlapsFound = FindOneOrMoreOverlaps(a, hits1, hits2, this->searchType);
-				if (overlapsFound == false) {		// write to BAM if not hits found
+				if (overlapsFound == true) {		// write to BAM if not hits found
 					writer.SaveAlignment(bam);
 				}
 			}
