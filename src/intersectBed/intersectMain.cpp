@@ -150,6 +150,10 @@ int main(int argc, char* argv[]) {
 		cerr << endl << "*****" << endl << "*****ERROR: Request either -u OR -c, not both." << endl << "*****" << endl;
 		showHelp = true;
 	}
+	if (outputIsBam && !inputIsBam) {
+		cerr << endl << "*****" << endl << "*****ERROR: -outbam must be used with -abam." << endl << "*****" << endl;
+		showHelp = true;
+	}
 
 	if (!showHelp) {
 
