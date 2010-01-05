@@ -70,7 +70,7 @@ void BedMerge::MergeBed() {
 				minStart = min(bedList[prev].start, min(minStart, bedList[curr].start));
 				maxEnd = max(bedList[prev].end, max(maxEnd, bedList[curr].end));
 				
-				names.push_back(bedList[prev].name);
+				//names.push_back(bedList[prev].name);
 				names.push_back(bedList[curr].name);
 			}
 			else if ( overlaps(minStart, maxEnd, 
@@ -118,7 +118,7 @@ void BedMerge::MergeBed() {
 				minStart = INT_MAX;
 				maxEnd = 0;
 				names.clear();
-
+				names.push_back(bedList[prev].name);
 			}
 			prev = curr;
 		}
@@ -219,7 +219,6 @@ void BedMerge::MergeBedStranded() {
 					minStart = min(bedList[prev].start, min(minStart, bedList[curr].start));
 					maxEnd = max(bedList[prev].end, max(maxEnd, bedList[curr].end));
 
-					names.push_back(bedList[prev].name);
 					names.push_back(bedList[curr].name);
 				}
 				else if ( overlaps(minStart, maxEnd, 
@@ -268,6 +267,9 @@ void BedMerge::MergeBedStranded() {
 					minStart = INT_MAX;
 					maxEnd = 0;
 					names.clear();
+					
+					// add the name of the 
+					names.push_back(bedList[prev].name);
 				}
 				prev = curr;
 			}
