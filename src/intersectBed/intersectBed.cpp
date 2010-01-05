@@ -241,8 +241,12 @@ void BedIntersect::IntersectBam(string bamFile) {
 		a.chrom = refs.at(bamAlignment.RefID).RefName;
 		a.start = bamAlignment.Position;
 		a.end = bamAlignment.Position + bamAlignment.Length;
+
 		a.name = bamAlignment.Name;
-		a.score = "1";
+		if (bamAlignment.IsFirstMate()) a.name += "/1";
+		if (bamAlignment.IsSecondMate()) a.name += "/2";
+
+		a.score = ToString(bamAlignment.MapQuality);
 		a.strand = "+"; if (bamAlignment.IsReverseStrand()) a.strand = "-"; 
 	
 		if (this->bamOutput == true) {

@@ -75,7 +75,7 @@ private:
 		a.start2 = bam.MatePosition;
 		a.end2 = bam.MatePosition + bam.Length;
 		a.name = bam.Name;
-		a.score = "1";
+		a.score = ToString(bam.MapQuality);
 		a.strand1 = "+"; if (bam.IsReverseStrand()) a.strand1 = "-";
 		a.strand2 = "+"; if (bam.IsMateReverseStrand()) a.strand2 = "-";
 	};

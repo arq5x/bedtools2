@@ -93,6 +93,7 @@ void BedComplement::ComplementBed() {
 				while ((chromMasks[i] == 0) && (i < chromMasks.size())) {
 					i++;
 				}
+				
 				if (start > 0) {
 					cout << currChrom << "\t" << start << "\t" << i << endl;
 				}
