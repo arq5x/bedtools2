@@ -696,7 +696,7 @@ void BedFile::reportBedRangeTab(const BED &bed, int start, int end) {
 	}
 	else if (this->bedType == 9) {
 		printf ("%s\t%s\t%s\t%d\t%d\t%s\t%s\t%s\t%s\t", bed.chrom.c_str(), bed.otherFields[0].c_str(),
-														 bed.name.c_str(), start, end, 
+														 bed.name.c_str(), start+1, end, 
 														 bed.score.c_str(), bed.strand.c_str(),
 														 bed.otherFields[1].c_str(), bed.otherFields[2].c_str());
 
@@ -740,9 +740,9 @@ void BedFile::reportBedRangeNewLine(const BED &bed, int start, int end) {
 		}
 		printf("\n");
 	}
-	else if (this->bedType == 9) {
+	else if (this->bedType == 9) {	// add 1 to the start for GFF
 		printf ("%s\t%s\t%s\t%d\t%d\t%s\t%s\t%s\t%s\n", bed.chrom.c_str(), bed.otherFields[0].c_str(),
-														 bed.name.c_str(), start, end, 
+														 bed.name.c_str(), start+1, end, 
 														 bed.score.c_str(), bed.strand.c_str(),
 														 bed.otherFields[1].c_str(), bed.otherFields[2].c_str());
 
