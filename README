@@ -46,13 +46,12 @@ complementBed			Returns all genomic intervals not spanned by the features in a B
 
 ===Acknowledgments=== 
 1.  Jim Kent, UCSC.  
-Much of the code herein is based upon the absurdly impressive code-base (really, it's nuts) that Jim Kent has developed for the UCSC Browser.  I am grateful for his elegant genome binning algorithm.  BEDTools uses it extensively.
+Much of the code herein is based upon the genome binning algorithm that Jim developed for the UCSC Browser.  I am grateful for the clear explanation of the method and the open source code base.
 
 2.  Michael Stromberg, Boston College.
 I learned much of what I know about C++ style from Michael Stromberg.  I was formerly a C and Perl 
 programmer and struggled to switch to C++.  The structure of BEDTools and much of the coding style
-emulates Michael's. Quite honestly, this package would never exist were it not for looking through Michael's
-code base. Thanks Mike!
+emulates Michael's. Thanks Mike!
 
 3.  Galaxy.  
 I had been using Galaxy for months prior to writing these tools.  Much of the functionality is based on what is

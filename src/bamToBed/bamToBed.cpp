@@ -113,7 +113,12 @@ int main(int argc, char* argv[]) {
 				PrintBed(bam, refs, useEditDistance);
 			}
 			else {
-				PrintBedPE(bam, refs, useEditDistance);
+				// If BEDPE output, we only want to report a pair ONCE
+				if ( ((bam.RefID == bam.MateRefID) && (bam.InsertSize > 0)) ||
+					 ((bam.RefID != bam.MateRefID) && (bam.IsFirstMate()))) 
+				{
+					PrintBedPE(bam, refs, useEditDistance);
+				}
 			}
 		}
 		reader.Close();	
@@ -168,21 +173,24 @@ void PrintBed(const BamAlignment &bam,  const RefVector &refs, bool useEditDista
 										  bam.Position + bam.Length, name.c_str(),
 										  editDistance, strand.c_str());
 		}
+		else {
+			cerr << "The edit distance tag (NM) was not found in the BAM file.  Please disable -ed.  Exiting\n";
+			exit(1);
+		}
 	}
 }
 
 
 void PrintBedPE(const BamAlignment &bam,  const RefVector &refs, bool useEditDistance) {
 
-	if (bam.InsertSize > 0) {
-		string strand1 = "+"; 
-		string strand2 = "+";
-		if (bam.IsReverseStrand()) strand1 = "-"; 
-		if (bam.IsMateReverseStrand()) strand2 = "-";
+	string strand1 = "+"; 
+	string strand2 = "+";
+	if (bam.IsReverseStrand()) strand1 = "-"; 
+	if (bam.IsMateReverseStrand()) strand2 = "-";
 
-		printf("%s\t%d\t%d\t\%s\t%d\t%d\t%s\t%d\t%s\t%s\n", 
-						refs.at(bam.RefID).RefName.c_str(), bam.Position, bam.Position + bam.Length, 
-						refs.at(bam.MateRefID).RefName.c_str(), bam.MatePosition, bam.MatePosition + bam.Length,
-						bam.Name.c_str(), bam.MapQuality, strand1.c_str(), strand2.c_str());
-	}
+	printf("%s\t%d\t%d\t\%s\t%d\t%d\t%s\t%d\t%s\t%s\n", 
+					refs.at(bam.RefID).RefName.c_str(), bam.Position, bam.Position + bam.Length, 
+					refs.at(bam.MateRefID).RefName.c_str(), bam.MatePosition, bam.MatePosition + bam.Length,
+					bam.Name.c_str(), bam.MapQuality, strand1.c_str(), strand2.c_str());
+
 }

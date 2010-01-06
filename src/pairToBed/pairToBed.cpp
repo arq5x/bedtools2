@@ -379,6 +379,12 @@ void BedIntersectPE::IntersectBamPE(string bamFile) {
 	// get each set of alignments for each pair.
 	while (reader.GetNextAlignment(bam)) {
 
+		// endure that the BAM file is paired.
+		if ( ! bam.IsPaired() ) {
+			cerr << "Encountered an unpaired alignment.  Are you sure this is a paired BAM file?  Exiting." << endl;
+			exit(1);
+		}
+
 		// build a BEDPE struct from the BAM alignment
 		BEDPE a;
 		ConvertBamToBedPE(bam, refs, a);
@@ -428,7 +434,7 @@ void BedIntersectPE::IntersectBamPE(string bamFile) {
 				}
 			}
 			else {
-				// If BED output, we only want to report a pair ONCE
+				// If BEDPE output, we only want to report a pair ONCE
 				if ( ((bam.RefID == bam.MateRefID) && (bam.InsertSize > 0)) ||
 					 ((bam.RefID != bam.MateRefID) && (bam.IsFirstMate()))) 
 				{
@@ -446,7 +452,7 @@ void BedIntersectPE::IntersectBamPE(string bamFile) {
 				}
 			}
 			else {
-				// If BED output, we only want to report a pair ONCE
+				// If BEDPE output, we only want to report a pair ONCE
 				if ( ((bam.RefID == bam.MateRefID) && (bam.InsertSize > 0)) ||
 					 ((bam.RefID != bam.MateRefID) && (bam.IsFirstMate()))) 
 				{
