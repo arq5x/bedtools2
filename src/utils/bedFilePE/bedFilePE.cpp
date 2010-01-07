@@ -134,6 +134,18 @@ void BedFilePE::reportBedPETab(const BEDPE &a) {
 		 									a.chrom2.c_str(), a.start2, a.end2,
 											a.name.c_str(), a.score.c_str(), a.strand1.c_str(), a.strand2.c_str());
 	}
+	else if (this->bedType > 10) {
+		printf("%s\t%d\t%d\t%s\t%d\t%d\t%s\t%s\t%s\t%s\t", a.chrom1.c_str(), a.start1, a.end1,
+		 									a.chrom2.c_str(), a.start2, a.end2,
+											a.name.c_str(), a.score.c_str(), a.strand1.c_str(), a.strand2.c_str());
+											
+		vector<string>::const_iterator othIt = a.otherFields.begin(); 
+		vector<string>::const_iterator othEnd = a.otherFields.end(); 
+		for ( ; othIt != othEnd; ++othIt) {
+			printf("%s\t", othIt->c_str());
+		}
+		printf("\t");
+	}
 }
 
 
@@ -164,6 +176,18 @@ void BedFilePE::reportBedPENewLine(const BEDPE &a) {
 		printf("%s\t%d\t%d\t%s\t%d\t%d\t%s\t%s\t%s\t%s\n", a.chrom1.c_str(), a.start1, a.end1,
 		 									a.chrom2.c_str(), a.start2, a.end2,
 											a.name.c_str(), a.score.c_str(), a.strand1.c_str(), a.strand2.c_str());
+	}
+	else if (this->bedType > 10) {
+		printf("%s\t%d\t%d\t%s\t%d\t%d\t%s\t%s\t%s\t%s\t", a.chrom1.c_str(), a.start1, a.end1,
+		 									a.chrom2.c_str(), a.start2, a.end2,
+											a.name.c_str(), a.score.c_str(), a.strand1.c_str(), a.strand2.c_str());
+											
+		vector<string>::const_iterator othIt = a.otherFields.begin(); 
+		vector<string>::const_iterator othEnd = a.otherFields.end(); 
+		for ( ; othIt != othEnd; ++othIt) {
+			printf("%s\t", othIt->c_str());
+		}
+		printf("\n");
 	}
 }
 
@@ -226,6 +250,26 @@ bool BedFilePE::parseBedPELine (BEDPE &bed, const vector<string> &lineVector, co
 			bed.strand1 = lineVector[8];
 			bed.strand2 = lineVector[9];
 
+			return true;
+		}
+		else if (this->bedType > 10) {
+			bed.chrom1 = lineVector[0];
+			bed.start1 = atoi(lineVector[1].c_str());
+			bed.end1 = atoi(lineVector[2].c_str());
+						
+			bed.chrom2 = lineVector[3];
+			bed.start2 = atoi(lineVector[4].c_str());
+			bed.end2 = atoi(lineVector[5].c_str());
+
+			bed.name = lineVector[6];
+			bed.score = lineVector[7].c_str();
+
+			bed.strand1 = lineVector[8];
+			bed.strand2 = lineVector[9];
+			
+			for (unsigned int i = 6; i < lineVector.size(); ++i) {
+				bed.otherFields.push_back(lineVector[i]); 
+			}
 			return true;
 		}
 		else {
@@ -299,6 +343,26 @@ bool BedFilePE::parseBedPELine (BEDPE &bed, const vector<string> &lineVector, co
 			bed.strand1 = lineVector[8];
 			bed.strand2 = lineVector[9];
 
+			return true;
+		}
+		else if (this->bedType > 10) {
+			bed.chrom1 = lineVector[0];
+			bed.start1 = atoi(lineVector[1].c_str());
+			bed.end1 = atoi(lineVector[2].c_str());
+						
+			bed.chrom2 = lineVector[3];
+			bed.start2 = atoi(lineVector[4].c_str());
+			bed.end2 = atoi(lineVector[5].c_str());
+
+			bed.name = lineVector[6];
+			bed.score = lineVector[7].c_str();
+
+			bed.strand1 = lineVector[8];
+			bed.strand2 = lineVector[9];
+			
+			for (unsigned int i = 6; i < lineVector.size(); ++i) {
+				bed.otherFields.push_back(lineVector[i]); 
+			}
 			return true;
 		}
 		else {

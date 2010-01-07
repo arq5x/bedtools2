@@ -34,6 +34,8 @@ struct BEDPE {
 	
 	string strand1;
 	string strand2;
+	
+	vector<string> otherFields;
 };
 
 
