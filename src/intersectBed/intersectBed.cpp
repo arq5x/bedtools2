@@ -232,36 +232,38 @@ void BedIntersect::IntersectBam(string bamFile) {
 	hits.reserve(100);
 	
 	bedA->bedType = 6;
-	BamAlignment bamAlignment;	
+	BamAlignment bam;	
 	bool overlapsFound;
 	// get each set of alignments for each pair.
-	while (reader.GetNextAlignment(bamAlignment)) {
+	while (reader.GetNextAlignment(bam)) {
 		
-		BED a;
-		a.chrom = refs.at(bamAlignment.RefID).RefName;
-		a.start = bamAlignment.Position;
-		a.end = bamAlignment.Position + bamAlignment.Length;
+		if (bam.IsMapped()) {	
+			BED a;
+			a.chrom = refs.at(bam.RefID).RefName;
+			a.start = bam.Position;
+			a.end = bam.Position + bam.Length;
 
-		a.name = bamAlignment.Name;
-		if (bamAlignment.IsFirstMate()) a.name += "/1";
-		if (bamAlignment.IsSecondMate()) a.name += "/2";
+			a.name = bam.Name;
+			if (bam.IsFirstMate()) a.name += "/1";
+			if (bam.IsSecondMate()) a.name += "/2";
 
-		a.score = ToString(bamAlignment.MapQuality);
-		a.strand = "+"; if (bamAlignment.IsReverseStrand()) a.strand = "-"; 
+			a.score = ToString(bam.MapQuality);
+			a.strand = "+"; if (bam.IsReverseStrand()) a.strand = "-"; 
 	
-		if (this->bamOutput == true) {
-			overlapsFound = FindOneOrMoreOverlap(a, hits);
-			if (overlapsFound == true) {
-				if (!this->noHit) writer.SaveAlignment(bamAlignment);
+			if (this->bamOutput == true) {
+				overlapsFound = FindOneOrMoreOverlap(a, hits);
+				if (overlapsFound == true) {
+					if (!this->noHit) writer.SaveAlignment(bam);
+				}
+				else {
+					if (this->noHit) writer.SaveAlignment(bam);	
+				}
 			}
 			else {
-				if (this->noHit) writer.SaveAlignment(bamAlignment);	
+				overlapsFound = FindOverlaps(a, hits);				
 			}
+			hits.clear();
 		}
-		else {
-			overlapsFound = FindOverlaps(a, hits);				
-		}
-		hits.clear();
 	}
 	
 	reader.Close();

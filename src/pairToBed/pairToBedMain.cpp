@@ -118,9 +118,9 @@ int main(int argc, char* argv[]) {
 	}
 	
 	if (haveSearchType && (searchType != "either") && (searchType != "neither") && (searchType != "both") 
-					    && (searchType != "xor") && (searchType != "ispan") && (searchType != "ospan")
-						&& (searchType != "notispan") && (searchType != "notospan")) {
-		cerr << endl << "*****" << endl << "*****ERROR: Request \"either\" or \"both\" or \"neither\" or \"xor\" or \"ispan\" or \"ospan\" or \"notispan\" or \"notospan\"" << endl << "*****" << endl;
+					    && (searchType != "xor") && (searchType != "notboth") && (searchType != "ispan") 
+						&& (searchType != "ospan") && (searchType != "notispan") && (searchType != "notospan")) {
+		cerr << endl << "*****" << endl << "*****ERROR: Request \"either\" or \"both\" or \"neither\" or \"xor\" or \"notboth\" or \"ispan\" or \"ospan\" or \"notispan\" or \"notospan\"" << endl << "*****" << endl;
 		showHelp = true;		
 	}
 	
@@ -170,15 +170,24 @@ void ShowHelp(void) {
 	cerr << "\t-type \t"				<< "Approach to reporting overlaps between BEDPE and BED." << endl << endl;
 	cerr 								<< "\t\teither\tReport overlaps if either end of A overlaps B." << endl;
 	cerr									<< "\t\t\t- Default." << endl;
+	
 	cerr 								<< "\t\tneither\tReport A if neither end of A overlaps B." << endl;
+	
 	cerr 	 							<< "\t\tboth\tReport overlaps if both ends of A overlap  B." << endl;
-	cerr								<< "\t\txor\tReport overlaps if one and only one end of A overlaps B." << endl << endl;
+	
+	cerr								<< "\t\txor\tReport overlaps if one and only one end of A overlaps B." << endl;
+	
+	cerr 	 							<< "\t\tnotboth\tReport overlaps if one or none of ends of A overlap B." << endl << endl;
+		
 	cerr								<< "\t\tispan\tReport overlaps between [end1, start2] of A and B." << endl; 
 	cerr									<< "\t\t\t- Note: If chrom1 <> chrom2, entry is ignored." << endl << endl;
+	
 	cerr								<< "\t\tospan\tReport overlaps between [start1, end2] of A and B." << endl; 
 	cerr									<< "\t\t\t- Note: If chrom1 <> chrom2, entry is ignored." << endl << endl;
+	
 	cerr								<< "\t\tnotispan\tReport A if ispan of A doesn't overlap B." << endl; 
 	cerr									<< "\t\t\t\t- Note: If chrom1 <> chrom2, entry is ignored." << endl << endl;
+	
 	cerr								<< "\t\tnotospan\tReport A if ospan of A doesn't overlap B." << endl; 
 	cerr									<< "\t\t\t\t- Note: If chrom1 <> chrom2, entry is ignored." << endl << endl;
 		

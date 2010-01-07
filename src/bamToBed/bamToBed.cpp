@@ -34,7 +34,7 @@ using namespace std;
 void ShowHelp(void);
 void PrintBed(const BamAlignment &bam, const RefVector &refs, bool useEditDistance);
 void PrintBedPE(const BamAlignment &bam,  const RefVector &refs, bool useEditDistance);
-
+bool IsCorrectMappingForBEDPE (const BamAlignment &bam);
 
 int main(int argc, char* argv[]) {
 
@@ -108,18 +108,21 @@ int main(int argc, char* argv[]) {
 		RefVector refs = reader.GetReferenceData();
 		
 		BamAlignment bam;
-		while (reader.GetNextAlignment(bam)) {
+		while (reader.GetNextAlignment(bam)) {	
 			if (!writeBedPE) {
-				PrintBed(bam, refs, useEditDistance);
-			}
-			else {
-				// If BEDPE output, we only want to report a pair ONCE
-				if ( ((bam.RefID == bam.MateRefID) && (bam.InsertSize > 0)) ||
-					 ((bam.RefID != bam.MateRefID) && (bam.IsFirstMate()))) 
-				{
-					PrintBedPE(bam, refs, useEditDistance);
+				if (bam.IsMapped()) {
+					PrintBed(bam, refs, useEditDistance);
 				}
 			}
+			else {
+				if ( ! bam.IsPaired() ) {	// ensure that the BAM file is paired.
+					cerr << "Encountered an unpaired alignment.  Are you sure this is a paired BAM file?  Exiting." << endl;
+					exit(1);
+				}
+				else if (IsCorrectMappingForBEDPE(bam)) {	// only report one of the two mappings for a pair
+					PrintBedPE(bam, refs, useEditDistance);
+				}
+			}	
 		}
 		reader.Close();	
 	}	
@@ -183,14 +186,47 @@ void PrintBed(const BamAlignment &bam,  const RefVector &refs, bool useEditDista
 
 void PrintBedPE(const BamAlignment &bam,  const RefVector &refs, bool useEditDistance) {
 
-	string strand1 = "+"; 
-	string strand2 = "+";
-	if (bam.IsReverseStrand()) strand1 = "-"; 
-	if (bam.IsMateReverseStrand()) strand2 = "-";
+	string chrom1, chrom2, strand1, strand2;
+	int start1, start2, end1, end2;
+	start1 = start2 = end1 = end2 = -1;
+	chrom1 = chrom2 = strand1 = strand2 = ".";
+	
+	// end 1
+	if (bam.IsMapped()) {
+		chrom1 = refs.at(bam.RefID).RefName;
+		start1 = bam.Position;
+		end1 = bam.Position + bam.Length;
+		strand1 = "+";
+		if (bam.IsReverseStrand()) strand1 = "-";	
+	}
+
+	// end 2
+	if (bam.IsMateMapped()) {
+		chrom2 = refs.at(bam.MateRefID).RefName;
+		start2 = bam.MatePosition;
+		end2 = bam.MatePosition + bam.Length;
+		strand2 = "+";
+		if (bam.IsMateReverseStrand()) strand2 = "-";	
+	}		
 
 	printf("%s\t%d\t%d\t\%s\t%d\t%d\t%s\t%d\t%s\t%s\n", 
-					refs.at(bam.RefID).RefName.c_str(), bam.Position, bam.Position + bam.Length, 
-					refs.at(bam.MateRefID).RefName.c_str(), bam.MatePosition, bam.MatePosition + bam.Length,
-					bam.Name.c_str(), bam.MapQuality, strand1.c_str(), strand2.c_str());
+			chrom1.c_str(), start1, end1, chrom2.c_str(), start2, end2, 
+			bam.Name.c_str(), bam.MapQuality, strand1.c_str(), strand2.c_str());
 
+}
+
+
+
+bool IsCorrectMappingForBEDPE (const BamAlignment &bam) {
+
+	if ( (bam.RefID == bam.MateRefID) && (bam.InsertSize > 0) ) {
+		return true;
+	}
+	else if ( (bam.RefID == bam.MateRefID) && (bam.InsertSize == 0) && bam.IsFirstMate() ) {
+		return true;
+	}
+	else if ( (bam.RefID != bam.MateRefID) && bam.IsFirstMate() ) {
+		return true;
+	}
+	else return false;
 }
