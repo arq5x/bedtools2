@@ -73,16 +73,22 @@ void Bed2Fa::ExtractDNA() {
 				// loop through each BED entry for this chrom and 
 				// print the sequence
 				for (unsigned int i = 0; i < bedList.size(); i++) {
-						
-					string dna = currDNA.substr(bedList[i].start, ((bedList[i].end - bedList[i].start)));
+					
+					unsigned int start = bedList[i].start;
+					unsigned int end = bedList[i].end;
+					
+					if ( (start < currDNA.size()) && (end < currDNA.size()) ) {	
+						string dna = currDNA.substr(bedList[i].start, ((bedList[i].end - bedList[i].start)));
 				
-					if (!(this->useName)) {
-				    	faOut << ">" << currChrom << ":"
-					  		<< bedList[i].start << "-" << bedList[i].end << endl << dna << endl;
-				  	}
-				  	else {
-				    	faOut << ">" << bedList[i].name << endl << dna << endl;
-				  	}
+						if (!(this->useName)) {
+					    	faOut << ">" << currChrom << ":"
+						  		<< bedList[i].start << "-" << bedList[i].end << endl << dna << endl;
+					  	}
+					  	else {
+					    	faOut << ">" << bedList[i].name << endl << dna << endl;
+					  	}
+					}
+					else cerr << "Feature (" << bedList[i].chrom << ":" << start << "-" << end << ") beyond chromosome size.  Ignoring." << endl;
 				}
 				currDNA = "";	
 			}
@@ -98,16 +104,22 @@ void Bed2Fa::ExtractDNA() {
 		// loop through each BED entry for this chrom and 
 		// print the sequence.
 		for (unsigned int i = 0; i < bedList.size(); i++) {
-				
-			string dna = currDNA.substr(bedList[i].start, ((bedList[i].end - bedList[i].start)));
+			
+			unsigned int start = bedList[i].start;
+			unsigned int end = bedList[i].end;
+			
+			if ( (start < currDNA.size()) && (end < currDNA.size()) ) {	
+				string dna = currDNA.substr(bedList[i].start, ((bedList[i].end - bedList[i].start)));
 		
-			if (!(this->useName)) {
-		    	faOut << ">" << currChrom << ":"
-			  		<< bedList[i].start << "-" << bedList[i].end << endl << dna << endl;
-		  	}
-		  	else {
-		    	faOut << ">" << bedList[i].name << endl << dna << endl;
-		  	}
+				if (!(this->useName)) {
+			    	faOut << ">" << currChrom << ":"
+				  		<< bedList[i].start << "-" << bedList[i].end << endl << dna << endl;
+			  	}
+			  	else {
+			    	faOut << ">" << bedList[i].name << endl << dna << endl;
+			  	}
+			}
+			else cerr << "Feature (" << bedList[i].chrom << ":" << start << "-" << end << ") beyond chromosome size.  Ignoring." << endl;
 		}
 		currDNA = "";	
 	}
