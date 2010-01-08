@@ -78,7 +78,6 @@ int main(int argc, char* argv[]) {
 		}
 		else if(PARAMETER_CHECK("-soft", 5, parameterLength)) {
 			softMask = true;
-			i++;
 		}	
 		else {
 			cerr << "*****ERROR: Unrecognized parameter: " << argv[i] << " *****" << endl << endl;

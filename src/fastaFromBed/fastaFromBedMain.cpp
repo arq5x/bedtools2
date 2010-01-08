@@ -41,6 +41,7 @@ int main(int argc, char* argv[]) {
 	bool haveBed = false;
 	bool haveFastaOut = false;
 	bool useNameOnly = false;
+	bool useFasta = true;
 
 	// check to see if we should print out some help
 	if(argc <= 1) showHelp = true;
@@ -78,8 +79,10 @@ int main(int argc, char* argv[]) {
 		}
 		else if(PARAMETER_CHECK("-name", 5, parameterLength)) {
 			useNameOnly = true;
-			i++;
 		}	
+		else if(PARAMETER_CHECK("-tab", 4, parameterLength)) {
+			useFasta = false;
+		}
 		else {
 			cerr << "*****ERROR: Unrecognized parameter: " << argv[i] << " *****" << endl << endl;
 			showHelp = true;
@@ -92,7 +95,7 @@ int main(int argc, char* argv[]) {
 	
 	if (!showHelp) {
 
-		Bed2Fa *b2f = new Bed2Fa(useNameOnly, fastaDbFile, bedFile, fastaOutFile);
+		Bed2Fa *b2f = new Bed2Fa(useNameOnly, fastaDbFile, bedFile, fastaOutFile, useFasta);
 		b2f->ExtractDNA(); 
 		return 0;
 	}
@@ -114,8 +117,10 @@ void ShowHelp(void) {
 	cerr << "Options: " << endl;
 	cerr << "\t-fi\tInput FASTA file" << endl;
 	cerr << "\t-bed\tBED file of ranges to extract from -fi" << endl;
-	cerr << "\t-fo\tOutput FASTA file" << endl;
+	cerr << "\t-fo\tOutput file (can be FASTA or TAB-delimited)" << endl;
 	cerr << "\t-name\tUse the BED name field (#4) for the FASTA header" << endl;
+	cerr << "\t-tab\tWrite output in TAB delimited format." << endl;	
+	cerr 	<< "\t\tDefault is FASTA format." << endl;
 
 
 

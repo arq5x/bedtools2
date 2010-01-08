@@ -47,7 +47,7 @@ int main(int argc, char* argv[]) {
 	bool reciprocalFraction = false;
 	bool forceStrand = false;
 	bool inputIsBam = false;
-	bool outputIsBam = false;
+	bool outputIsBam = true;
 	
 	// check to see if we should print out some help
 	if(argc <= 1) showHelp = true;
@@ -71,6 +71,7 @@ int main(int argc, char* argv[]) {
 		if(PARAMETER_CHECK("-a", 2, parameterLength)) {
 			if ((i+1) < argc) {
 				haveBedA = true;
+				outputIsBam = false;
 				bedAFile = argv[i + 1];
 			}
 			i++;
@@ -90,8 +91,8 @@ int main(int argc, char* argv[]) {
 			}
 			i++;
 		}
-		else if(PARAMETER_CHECK("-outbam", 7, parameterLength)) {
-			outputIsBam = true;
+		else if(PARAMETER_CHECK("-bed", 4, parameterLength)) {
+			outputIsBam = false;
 		}	
 		else if(PARAMETER_CHECK("-u", 2, parameterLength)) {
 			anyHit = true;
@@ -150,10 +151,7 @@ int main(int argc, char* argv[]) {
 		cerr << endl << "*****" << endl << "*****ERROR: Request either -u OR -c, not both." << endl << "*****" << endl;
 		showHelp = true;
 	}
-	if (outputIsBam && !inputIsBam) {
-		cerr << endl << "*****" << endl << "*****ERROR: -outbam must be used with -abam." << endl << "*****" << endl;
-		showHelp = true;
-	}
+
 
 	if (!showHelp) {
 
@@ -182,9 +180,9 @@ void ShowHelp(void) {
 	
 	cerr << "\t-abam\t"			<< "The A input file is in BAM format.  Output will be BAM as well." << endl << endl;
 
-	cerr << "\t-outbam\t"		<< "Write output as BAM. This will report those BAM alignments." << endl;
-	cerr 						<< "\t\tthat meet the intersect criteria.  BAM entry is written once." << endl << endl;
-		
+	cerr << "\t-bed\t"			<< "When using BAM input (-abam), write output as BED. The default" << endl;
+	cerr 						<< "\t\tis to write output in BAM when using -abam." << endl << endl;
+			
 	cerr << "\t-wa\t"			<< "Write the original entry in A for each overlap." << endl << endl;
 	cerr << "\t-wb\t"			<< "Write the original entry in B for each overlap." << endl;
 	cerr 						<< "\t\t- Useful for knowing _what_ A overlaps. Restricted by -f." << endl << endl;

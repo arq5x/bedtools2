@@ -12,7 +12,7 @@
 #include "lineFileUtilities.h"
 #include "fastaFromBed.h"
 
-Bed2Fa::Bed2Fa(bool &useName, string &dbFile, string &bedFile, string &fastaOutFile) {
+Bed2Fa::Bed2Fa(bool &useName, string &dbFile, string &bedFile, string &fastaOutFile, bool &useFasta) {
 
 	if (useName) {
 		this->useName = true;
@@ -21,6 +21,7 @@ Bed2Fa::Bed2Fa(bool &useName, string &dbFile, string &bedFile, string &fastaOutF
 	this->dbFile = dbFile;
 	this->bedFile = bedFile;
 	this->fastaOutFile = fastaOutFile;
+	this->useFasta = useFasta;
 	
 	this->bed = new BedFile(this->bedFile);
 }
@@ -77,18 +78,30 @@ void Bed2Fa::ExtractDNA() {
 					unsigned int start = bedList[i].start;
 					unsigned int end = bedList[i].end;
 					
-					if ( (start < currDNA.size()) && (end < currDNA.size()) ) {	
+					if ( (start <= currDNA.size()) && (end <= currDNA.size()) ) {	
 						string dna = currDNA.substr(bedList[i].start, ((bedList[i].end - bedList[i].start)));
 				
 						if (!(this->useName)) {
-					    	faOut << ">" << currChrom << ":"
-						  		<< bedList[i].start << "-" << bedList[i].end << endl << dna << endl;
+							if (this->useFasta == true) {
+						    	faOut << ">" << currChrom << ":"
+							  		<< bedList[i].start << "-" << bedList[i].end << endl << dna << endl;
+							}
+							else {
+								faOut << currChrom << ":" << bedList[i].start << "-" << bedList[i].end 
+									  << "\t" << dna << endl;
+							}
 					  	}
 					  	else {
-					    	faOut << ">" << bedList[i].name << endl << dna << endl;
-					  	}
+							if (this->useFasta == true) {
+					    		faOut << ">" << bedList[i].name << endl << dna << endl;
+					  		}
+							else {
+								faOut << bedList[i].name << "\t" << dna << endl;
+							}
+						}
 					}
-					else cerr << "Feature (" << bedList[i].chrom << ":" << start << "-" << end << ") beyond chromosome size.  Ignoring." << endl;
+					else cerr << "Feature (" << bedList[i].chrom << ":" << start << "-" << end << ") beyond " 
+						<< currChrom << " size (" << currDNA.size() << " bp).  Skipping." << endl;
 				}
 				currDNA = "";	
 			}
@@ -108,18 +121,31 @@ void Bed2Fa::ExtractDNA() {
 			unsigned int start = bedList[i].start;
 			unsigned int end = bedList[i].end;
 			
-			if ( (start < currDNA.size()) && (end < currDNA.size()) ) {	
+			if ( (start <= currDNA.size()) && (end <= currDNA.size()) ) {	
 				string dna = currDNA.substr(bedList[i].start, ((bedList[i].end - bedList[i].start)));
 		
 				if (!(this->useName)) {
-			    	faOut << ">" << currChrom << ":"
-				  		<< bedList[i].start << "-" << bedList[i].end << endl << dna << endl;
+					if (this->useFasta == true) {
+				    	faOut << ">" << currChrom << ":"
+					  		<< bedList[i].start << "-" << bedList[i].end << endl << dna << endl;
+					}
+					else {
+						faOut << currChrom << ":" << bedList[i].start << "-" << bedList[i].end 
+							  << "\t" << dna << endl;
+					}
 			  	}
 			  	else {
-			    	faOut << ">" << bedList[i].name << endl << dna << endl;
-			  	}
+					if (this->useFasta == true) {
+			    		faOut << ">" << bedList[i].name << endl << dna << endl;
+			  		}
+					else {
+						faOut << bedList[i].name << "\t" << dna << endl;
+					}
+				}
+				
 			}
-			else cerr << "Feature (" << bedList[i].chrom << ":" << start << "-" << end << ") beyond chromosome size.  Ignoring." << endl;
+			else cerr << "Feature (" << bedList[i].chrom << ":" << start << "-" << end << ") beyond " 
+				<< currChrom << " size (" << currDNA.size() << " bp).  Skipping." << endl;
 		}
 		currDNA = "";	
 	}

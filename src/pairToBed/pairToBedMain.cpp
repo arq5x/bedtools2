@@ -43,7 +43,7 @@ int main(int argc, char* argv[]) {
 	bool haveFraction = false;
 	bool forceStrand = false;
 	bool inputIsBam = false;
-	bool outputIsBam = false;
+	bool outputIsBam = true;
 	
 	// check to see if we should print out some help
 	if(argc <= 1) showHelp = true;
@@ -67,6 +67,7 @@ int main(int argc, char* argv[]) {
 		if(PARAMETER_CHECK("-a", 2, parameterLength)) {
 			if ((i+1) < argc) {
 				haveBedA = true;
+				outputIsBam  = false;
 				bedAFile = argv[i + 1];
 			}
 			i++;
@@ -86,8 +87,8 @@ int main(int argc, char* argv[]) {
 			}
 			i++;
 		}
-		else if(PARAMETER_CHECK("-outbam", 7, parameterLength)) {
-			outputIsBam = true;
+		else if(PARAMETER_CHECK("-bedpe", 6, parameterLength)) {
+			outputIsBam = false;
 		}
 		else if(PARAMETER_CHECK("-type", 5, parameterLength)) {
 			if ((i+1) < argc) {
@@ -157,8 +158,8 @@ void ShowHelp(void) {
 
 	cerr << "\t-abam\t"			<< "The A input file is in BAM format.  Output will be BAM as well." << endl << endl;
 
-	cerr << "\t-outbam\t"		<< "Write output as BAM. This will report those BAM alignments." << endl;
-	cerr 						<< "\t\tthat meet the intersect criteria.  BAM entry is written once." << endl << endl;
+	cerr << "\t-bedpe\t"		<< "When using BAM input (-abam), write output as BEDPE. The default" << endl;
+	cerr 						<< "\t\tis to write output in BAM when using -abam." << endl << endl;
 	
 	cerr << "\t-f\t"	    			<< "Minimum overlap required as fraction of A (e.g. 0.05)." << endl;
 	cerr 								<< "\t\tDefault is 1E-9 (effectively 1bp)." << endl << endl;
