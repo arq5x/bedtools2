@@ -53,15 +53,10 @@ void BgzfData::Close(void) {
     // flush the BGZF block
     if ( IsWriteOnly ) { FlushBlock(); }
 
-	// write an empty block (as EOF marker)                                                                                                   
-	int blockLength = DeflateBlock();
-	fwrite(CompressedBlock, 1, blockLength, Stream);
-
     // flush and close
     fflush(Stream);
     fclose(Stream);
 }
-
 
 // compresses the current block
 int BgzfData::DeflateBlock(void) {
