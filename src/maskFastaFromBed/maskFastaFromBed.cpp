@@ -25,6 +25,8 @@ MaskFastaFromBed::MaskFastaFromBed(string &fastaInFile, string &bedFile, string 
 	this->fastaOutFile = fastaOutFile;
 	
 	this->bed = new BedFile(this->bedFile);
+	
+	// 
 	bed->loadBedFileIntoMapNoBin();
 }
 
@@ -54,9 +56,8 @@ void MaskFastaFromBed::MaskFasta() {
 		exit (1);
 	}	
 	
-
-	/* Read the fastaDb chromosome by chromosome*/
 	
+	/* Read the fastaDb chromosome by chromosome*/
 	string fastaInLine;
 	string currChrom;
 	string currDNA = "";
@@ -92,7 +93,7 @@ void MaskFastaFromBed::MaskFasta() {
 					/* 
 					   (1) if soft masking, extract the sequence, lowercase it,
 					       then put it back
-					    (2) otherwise replace with Ns
+					   (2) otherwise replace with Ns
 					*/
 					if (this->softMask) {
 						replacement = currDNA.substr(start, length);
@@ -138,18 +139,19 @@ void MaskFastaFromBed::MaskFasta() {
 		PrettyPrintChrom(faOut, currChrom, currDNA, fastaWidth);
 	}
 	
+	// closed for business.
 	fa.close();
 	faOut.close();
 }
+
 
 void MaskFastaFromBed::PrettyPrintChrom(ofstream &out, string chrom, const string &sequence, int width) {
 	
 	int seqLength = sequence.size();
 	 
 	out << ">" << chrom << endl;
-	for(int i=0; i < seqLength; i+=width)
-	{
-		if (i+width < seqLength) out << sequence.substr(i, width) << endl;
+	for(int i = 0; i < seqLength; i += width)  {
+		if (i + width < seqLength) out << sequence.substr(i, width) << endl;
 		else out << sequence.substr(i, seqLength-i) << endl;
 	}
 }

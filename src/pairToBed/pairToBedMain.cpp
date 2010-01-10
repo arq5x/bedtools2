@@ -178,7 +178,8 @@ void ShowHelp(void) {
 	
 	cerr								<< "\t\txor\tReport overlaps if one and only one end of A overlaps B." << endl;
 	
-	cerr 	 							<< "\t\tnotboth\tReport overlaps if one or none of ends of A overlap B." << endl << endl;
+	cerr 	 							<< "\t\tnotboth\tReport overlaps if neither end or one and only one " << endl;
+	cerr									<< "\t\t\tend of A overlap B.  That is, xor + neither." << endl << endl;
 		
 	cerr								<< "\t\tispan\tReport overlaps between [end1, start2] of A and B." << endl; 
 	cerr									<< "\t\t\t- Note: If chrom1 <> chrom2, entry is ignored." << endl << endl;
