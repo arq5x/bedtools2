@@ -13,11 +13,16 @@ BEDTools is a collection of utilities for comparing, summarizing, and
 intersecting genomic features in the ubiquitous UCSC Genome Browser BED format. 
 
 
+===Manual===
+See the PDF manual included in this distribution for more details on usage, file formats, behavior, etc.
+
+
 ===BEDTools===
 
 intersectBed			Returns overlaps between two BED files.
 pairToBed				Returns overlaps between a paired-end BED file and a regular BED file.
 pairToPair				Returns overlaps between two paired-end BED files.
+bamToBed				Converts alignments in BAM format to BED or BEDPE format
 windowBed				Returns overlaps between two BED files within a user-defined window.
 closestBed				Returns the closest feature to each entry in a BED file.
 subtractBed				Removes the portion of an interval that is overlapped by another feature.
@@ -43,38 +48,6 @@ complementBed			Returns all genomic intervals not spanned by the features in a B
 6.  Copy the files in bin/ to ~/bin or if you have the privileges, to /usr/local/bin.
 7.  Use the tools.
 
-
-===Acknowledgments=== 
-1.  Jim Kent, UCSC.  
-Much of the code herein is based upon the genome binning algorithm that Jim developed for the UCSC Browser.  I am grateful for the clear explanation of the method and the open source code base.
-
-2.  Michael Stromberg, Boston College.
-I learned much of what I know about C++ style from Michael Stromberg.  I was formerly a C and Perl 
-programmer and struggled to switch to C++.  The structure of BEDTools and much of the coding style
-emulates Michael's. Thanks Mike!
-
-3.  Galaxy.  
-I had been using Galaxy for months prior to writing these tools.  Much of the functionality is based on what is
-available on the Galaxy website.  I merely found it too slow to do several iterations of queries on a website,
-especially with large sequencing datasets.  Regardless, I am grateful to the Galaxy team for creating such a
-useful site.
-
-4.  Ira Hall, UVa.
-Discussions between Ira and I are largely the motivation for these tools.  We are frequently tracking 
-down ad hoc ideas and these tools were originally designed to facilitate such tangents.
-
-5.  Royden Clark, UVa
-Royden is the resident UCSC browser expert.  He has helped me immensely by teaching me how to squeeze every last bit of functionality from the browser.  Also, the algorithmic concept behind the genomeCoverageBed program is Royden's.
-
-6.  Fitz Elliot, UVa
-Fitz kindly taught me the ways of version control with git.  For those that are constantly confused by CVS and SVN, try git. I think you'll be happy.  
-
-7. Loyal Goff, CSAIL, Broad.
-Many thanks to Loyal for his assistance in making BED Tools "compilable" on the SUSE platform.  I appreciate your help and patience.
-
-
-===Requests===
-I would be grateful to learn of any problems or suggestions you have for improving these tools.
 
 
   
