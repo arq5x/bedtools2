@@ -1,3 +1,13 @@
+Version 2.4.0 (Jan-11-2009)
+1.  Added BAM support to intersectBed and pairToBed
+2.  New bamToBed feature.
+3.  Added support for GFF features
+4.  Added support for "blocked" BED format (BED12)
+6.  Wrote complete manual and included it in distribution.
+7.  Fixed several minor bugs.
+8.  Cleaned up code and improved documentation.
+
+
 Version 2.3.3 (12/17/2009)
 Rewrote complementBed to use a slower but much simpler approach.  This resolves several bugs with the previous logic.
 
