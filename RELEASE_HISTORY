@@ -1,3 +1,6 @@
+Version 2.4.1 (Jan-12-2009)
+1. Updated BamTools libraries to remove some compilation issues on some systems/compilers.
+
 Version 2.4.0 (Jan-11-2009)
 1.  Added BAM support to intersectBed and pairToBed
 2.  New bamToBed feature.
