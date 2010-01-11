@@ -3,7 +3,7 @@
 // Marth Lab, Department of Biology, Boston College
 // All rights reserved.
 // ---------------------------------------------------------------------------
-// Last modified: 8 December 2009 (DB)
+// Last modified: 11 January 2010 (DB)
 // ---------------------------------------------------------------------------
 // BGZF routines were adapted from the bgzf.c code developed at the Broad
 // Institute.
@@ -26,18 +26,21 @@
 #include "zlib.h"
 
 // Platform-specific type definitions
-#ifdef _MSC_VER
-        typedef char                 int8_t;
-        typedef unsigned char       uint8_t;
-        typedef short               int16_t;
-        typedef unsigned short     uint16_t;
-        typedef int                 int32_t;
-        typedef unsigned int       uint32_t;
-        typedef long long           int64_t;
-        typedef unsigned long long uint64_t;
-#else
-        #include <stdint.h>
-#endif
+#ifndef BAMTOOLS_TYPES
+#define BAMTOOLS_TYPES
+	#ifdef _MSC_VER
+		typedef char                 int8_t;
+		typedef unsigned char       uint8_t;
+		typedef short               int16_t;
+		typedef unsigned short     uint16_t;
+		typedef int                 int32_t;
+		typedef unsigned int       uint32_t;
+		typedef long long           int64_t;
+		typedef unsigned long long uint64_t;
+	#else
+		#include <stdint.h>
+	#endif
+#endif // BAMTOOLS_TYPES
 
 namespace BamTools {
 
@@ -117,7 +120,6 @@ struct BgzfData {
 
 inline
 bool BgzfData::CheckBlockHeader(char* header) {
-
     return (header[0] == GZIP_ID1 &&
             header[1] == (char)GZIP_ID2 &&
             header[2] == Z_DEFLATED &&
@@ -171,7 +173,7 @@ unsigned int BgzfData::UnpackUnsignedInt(char* buffer) {
 // unpacks a buffer into an unsigned short
 inline
 unsigned short BgzfData::UnpackUnsignedShort(char* buffer) {
-    union { unsigned short value; unsigned char valueBuffer[sizeof(unsigned short)];} un;
+    union { unsigned short value; unsigned char valueBuffer[sizeof(unsigned short)]; } un;
     un.value = 0;
     un.valueBuffer[0] = buffer[0];
     un.valueBuffer[1] = buffer[1];

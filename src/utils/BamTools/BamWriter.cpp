@@ -276,7 +276,6 @@ void BamWriter::BamWriterPrivate::SaveAlignment(const BamAlignment& al) {
     // write the base qualities
     string baseQualities = al.Qualities;
     char* pBaseQualities = (char*)al.Qualities.data();
-
     for(unsigned int i = 0; i < queryLen; i++) { pBaseQualities[i] -= 33; }
     mBGZF.Write(pBaseQualities, queryLen);
 

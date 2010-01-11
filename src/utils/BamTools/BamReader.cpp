@@ -3,7 +3,7 @@
 // Marth Lab, Department of Biology, Boston College
 // All rights reserved.
 // ---------------------------------------------------------------------------
-// Last modified: 8 December 2009 (DB)
+// Last modified: 11 January 2010(DB)
 // ---------------------------------------------------------------------------
 // Uses BGZF routines were adapted from the bgzf.c code developed at the Broad
 // Institute.
@@ -586,9 +586,11 @@ bool BamReader::BamReaderPrivate::LoadIndex(void) {
         return false;
     }
 
+	size_t elementsRead = 0;
+	
     // see if index is valid BAM index
     char magic[4];
-    fread(magic, 1, 4, indexStream);
+    elementsRead = fread(magic, 1, 4, indexStream);
     if (strncmp(magic, "BAI\1", 4)) {
         printf("Problem with index file - invalid format.\n");
         fclose(indexStream);
@@ -597,7 +599,7 @@ bool BamReader::BamReaderPrivate::LoadIndex(void) {
 
     // get number of reference sequences
     uint32_t numRefSeqs;
-    fread(&numRefSeqs, 4, 1, indexStream);
+    elementsRead = fread(&numRefSeqs, 4, 1, indexStream);
 
     // intialize space for BamIndex data structure
     Index.reserve(numRefSeqs);
@@ -607,7 +609,7 @@ bool BamReader::BamReaderPrivate::LoadIndex(void) {
 
         // get number of bins for this reference sequence
         int32_t numBins;
-        fread(&numBins, 4, 1, indexStream);
+        elementsRead = fread(&numBins, 4, 1, indexStream);
 
         if (numBins > 0) {
             RefData& refEntry = References[i];
@@ -622,11 +624,11 @@ bool BamReader::BamReaderPrivate::LoadIndex(void) {
 
             // get binID
             uint32_t binID;
-            fread(&binID, 4, 1, indexStream);
+            elementsRead = fread(&binID, 4, 1, indexStream);
 
             // get number of regionChunks in this bin
             uint32_t numChunks;
-            fread(&numChunks, 4, 1, indexStream);
+            elementsRead = fread(&numChunks, 4, 1, indexStream);
 
             // intialize ChunkVector
             ChunkVector regionChunks;
@@ -638,8 +640,8 @@ bool BamReader::BamReaderPrivate::LoadIndex(void) {
                 // get chunk boundaries (left, right)
                 uint64_t left;
                 uint64_t right;
-                fread(&left, 8, 1, indexStream);
-                fread(&right, 8, 1, indexStream);
+                elementsRead = fread(&left, 8, 1, indexStream);
+                elementsRead = fread(&right, 8, 1, indexStream);
 
                 // save ChunkPair
                 regionChunks.push_back( Chunk(left, right) );
@@ -656,7 +658,7 @@ bool BamReader::BamReaderPrivate::LoadIndex(void) {
 
         // get number of linear offsets
         int32_t numLinearOffsets;
-        fread(&numLinearOffsets, 4, 1, indexStream);
+        elementsRead = fread(&numLinearOffsets, 4, 1, indexStream);
 
         // intialize LinearOffsetVector
         LinearOffsetVector offsets;
@@ -666,7 +668,7 @@ bool BamReader::BamReaderPrivate::LoadIndex(void) {
         uint64_t linearOffset;
         for (int j = 0; j < numLinearOffsets; ++j) {
             // read a linear offset & store
-            fread(&linearOffset, 8, 1, indexStream);
+            elementsRead = fread(&linearOffset, 8, 1, indexStream);
             offsets.push_back(linearOffset);
         }
 

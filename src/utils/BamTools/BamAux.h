@@ -3,7 +3,7 @@
 // Marth Lab, Department of Biology, Boston College
 // All rights reserved.
 // ---------------------------------------------------------------------------
-// Last modified: 8 December 2009 (DB)
+// Last modified: 11 Janaury 2010 (DB)
 // ---------------------------------------------------------------------------
 // Provides the basic constants, data structures, etc. for using BAM files
 // ***************************************************************************
@@ -12,6 +12,7 @@
 #define BAMAUX_H
 
 // C inclues
+#include <cstdio>
 #include <cstdlib>
 #include <cstring>
 
@@ -21,6 +22,23 @@
 #include <string>
 #include <utility>
 #include <vector>
+
+// Platform-specific type definitions
+#ifndef BAMTOOLS_TYPES
+#define BAMTOOLS_TYPES
+	#ifdef _MSC_VER
+		typedef char                 int8_t;
+		typedef unsigned char       uint8_t;
+		typedef short               int16_t;
+		typedef unsigned short     uint16_t;
+		typedef int                 int32_t;
+		typedef unsigned int       uint32_t;
+		typedef long long           int64_t;
+		typedef unsigned long long uint64_t;
+	#else
+		#include <stdint.h>
+	#endif
+#endif // BAMTOOLS_TYPES
 
 namespace BamTools {
 
@@ -73,41 +91,31 @@ struct BamAlignment {
         // Returns true if alignment is second mate on read
         bool IsSecondMate(void) const { return ( (AlignmentFlag & READ_2) != 0 ); }
 
-
-		/*
-		  Aaron's Additions
-		*/
+	// Manipulate alignment flag
+	public:
+		// Sets "PCR duplicate" bit 
+        void SetIsDuplicate(bool ok) { if (ok) AlignmentFlag |= DUPLICATE; else AlignmentFlag &= ~DUPLICATE; }
+        // Sets "failed quality control" bit
+        void SetIsFailedQC(bool ok) { if (ok) AlignmentFlag |= QC_FAILED; else AlignmentFlag &= ~QC_FAILED; }
+        // Sets "alignment is first mate" bit
+        void SetIsFirstMate(bool ok) { if (ok) AlignmentFlag |= READ_1; else AlignmentFlag &= ~READ_1; }
+        // Sets "alignment's mate is mapped" bit
+        void SetIsMateUnmapped(bool ok) { if (ok) AlignmentFlag |= MATE_UNMAPPED; else AlignmentFlag &= ~MATE_UNMAPPED; }
+        // Sets "alignment's mate mapped to reverse strand" bit
+        void SetIsMateReverseStrand(bool ok) { if (ok) AlignmentFlag |= MATE_REVERSE; else AlignmentFlag &= ~MATE_REVERSE; }
+        // Sets "alignment part of paired-end read" bit
+        void SetIsPaired(bool ok) { if (ok) AlignmentFlag |= PAIRED; else AlignmentFlag &= ~PAIRED; }
+        // Sets "alignment is part of read that satisfied paired-end resolution" bit
+        void SetIsProperPair(bool ok) { if (ok) AlignmentFlag |= PROPER_PAIR; else AlignmentFlag &= ~PROPER_PAIR; }
+        // Sets "alignment mapped to reverse strand" bit
+        void SetIsReverseStrand(bool ok) { if (ok) AlignmentFlag |= REVERSE; else AlignmentFlag &= ~REVERSE; }
+		// Sets "position is primary alignment (determined by external app)"
+        void SetIsSecondaryAlignment(bool ok)  { if (ok) AlignmentFlag |= SECONDARY; else AlignmentFlag &= ~SECONDARY; }
+        // Sets "alignment is second mate on read" bit
+        void SetIsSecondMate(bool ok) { if (ok) AlignmentFlag |= READ_2; else AlignmentFlag &= ~READ_2; }
+		// Sets "alignment is mapped" bit
+        void SetIsUnmapped(bool ok) { if (ok) AlignmentFlag |= UNMAPPED; else AlignmentFlag &= ~UNMAPPED; }
 		
-		
-		// Sets "PCR duplicate" bit to TRUE 
-        void SetAsDuplicate(void) { AlignmentFlag |= DUPLICATE; }
-        // Sets "failed quality control" bit to TRUE
-        void SetAsFailedQC(void) { AlignmentFlag |= QC_FAILED; }
-        // Sets "alignment is first mate" bit to TRUE
-        void SetAsFirstMate(void) { AlignmentFlag |= READ_1; }
-        // Sets "alignment is mapped" bit to TRUE
-        void SetAsUnMapped(void) { AlignmentFlag |= UNMAPPED; }
-        // Sets "alignment's mate is mapped" bit to TRUE
-        void SetAsMateUnMapped(void) { AlignmentFlag |= MATE_UNMAPPED; }
-        // Sets "alignment's mate mapped to reverse strand" bit to TRUE
-        void SetAsMateReverseStrand(void) { AlignmentFlag |= MATE_REVERSE; }
-        // Sets "alignment part of paired-end read" bit to TRUE
-        void SetAsPaired(void) { AlignmentFlag |= PAIRED; }
-        // Sets "position is primary alignment (determined by external app)" to true.
-        void SetAsSecondaryAlignment(void)  { AlignmentFlag |= SECONDARY; }
-        // Sets "alignment is part of read that satisfied paired-end resolution" bit to TRUE
-        void SetAsProperPair(void) { AlignmentFlag |= PROPER_PAIR; }
-        // Sets "alignment mapped to reverse strand" bit to TRUE
-        void SetAsReverseStrand(void) { AlignmentFlag |= REVERSE; }
-        // Sets "alignment is second mate on read" bit to TRUE
-        void SetAsSecondMate(void) { AlignmentFlag |= READ_2; }
-
-		
-		void SetInsertSize(int32_t size) { InsertSize = size; }
-		/*
-		  END: Aaron's Additions
-		*/
-
     public:
 
         // get "RG" tag data
@@ -233,7 +241,7 @@ struct BamAlignment {
         int32_t      Position;          // Position (0-based) where alignment starts
         uint16_t     Bin;               // Bin in BAM file where this alignment resides
         uint16_t     MapQuality;        // Mapping quality score
-        uint32_t     AlignmentFlag;     // Alignment bit-flag - see Is<something>() methods for available queries
+        uint32_t     AlignmentFlag;     // Alignment bit-flag - see Is<something>() methods to query this value, SetIs<something>() methods to manipulate 
         std::vector<CigarOp> CigarData; // CIGAR operations for this alignment
         int32_t      MateRefID;         // ID number for reference sequence where alignment's mate was aligned
         int32_t      MatePosition;      // Position (0-based) where alignment's mate starts
