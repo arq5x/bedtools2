@@ -1,4 +1,0 @@
-chr1	10000	20000	A.forward	1	+	chr1	1000	8000	B1
-chr1	10000	20000	A.forward	1	+	chr1	24000	32000	B2
-chr1	10000	20000	A.reverse	1	-	chr1	1000	8000	B1
-chr1	10000	20000	A.reverse	1	-	chr1	24000	32000	B2

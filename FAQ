@@ -1,6 +1,0 @@
-1. Why am I not finding overlap with my SNPs?
-
-		When intersecting SNPs, make sure the coordinate conform to the UCSC format.  That is,
-		the start position for each SNP should be SNP position - 1 and the end position should
-		be SNP position.  For example:
-		chr7	10000001	10000002	rs123464
