@@ -209,8 +209,7 @@ void BedMerge::MergeBedStranded() {
 					}
 					continue;
 				}
-
-				
+	
 				if ( overlaps(bedList[prev].start, bedList[prev].end, 
 				 			bedList[curr].start, bedList[curr].end) >= this->maxDistance) {
 					
@@ -243,7 +242,7 @@ void BedMerge::MergeBedStranded() {
 								if (n < (names.size() - 1)) {cout << names[n] << ";";}
 								else {cout << names[n];}
 							}
-							cout << endl;
+							cout << "\t" << strands[s] << endl;
 						}
 						else {
 							cout << bedList[prev].chrom << "\t" << minStart << "\t" << maxEnd << "\t" << strands[s] << endl;
@@ -254,7 +253,7 @@ void BedMerge::MergeBedStranded() {
 							cout << bedList[prev].chrom << "\t" << bedList[prev].start << "\t" << bedList[prev].end << "\t" << mergeCount << "\t" << strands[s] << endl;
 						}
 						else if (this->reportNames) {
-							cout << bedList[prev].chrom << "\t" << bedList[prev].start << "\t" << bedList[prev].end << "\t" << bedList[prev].name << endl;
+							cout << bedList[prev].chrom << "\t" << bedList[prev].start << "\t" << bedList[prev].end << "\t" << bedList[prev].name << "\t" << strands[s] << endl;
 						}
 						else if (numOnStrand > 0) {
 							cout << bedList[prev].chrom << "\t" << bedList[prev].start << "\t" << bedList[prev].end << "\t" << strands[s] << endl;
@@ -285,7 +284,7 @@ void BedMerge::MergeBedStranded() {
 						if (n < (names.size() - 1)) {cout << names[n] << ";";}
 						else {cout << names[n];}
 					}
-					cout << endl;
+					cout << "\t" << strands[s] << endl;
 				}
 				else {
 					cout << bedList[prev].chrom << "\t" << minStart << "\t" << maxEnd << "\t" << strands[s] << endl;
@@ -295,8 +294,8 @@ void BedMerge::MergeBedStranded() {
 				if ((this->numEntries) && (numOnStrand > 0)) {
 					cout << bedList[prev].chrom << "\t" << bedList[prev].start << "\t" << bedList[prev].end << "\t" << mergeCount << "\t" << strands[s] << endl;
 				}
-				else if (this->reportNames) {
-					cout << bedList[prev].chrom << "\t" << bedList[prev].start << "\t" << bedList[prev].end << "\t" << bedList[prev].name << endl;
+				else if ((this->reportNames) && (numOnStrand > 0)) {
+					cout << bedList[prev].chrom << "\t" << bedList[prev].start << "\t" << bedList[prev].end << "\t" << bedList[prev].name << "\t" << strands[s] << endl;
 				}
 				else if (numOnStrand > 0) {
 					cout << bedList[prev].chrom << "\t" << bedList[prev].start << "\t" << bedList[prev].end << "\t" << strands[s] << endl;
