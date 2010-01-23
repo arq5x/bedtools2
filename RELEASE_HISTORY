@@ -1,3 +1,7 @@
+Version 2.4.2 (Jan-23-2009)
+1. Fixed a minor bug in mergeBed when -nms and -s were used together.
+2. Improved the command line parsing to prevent the occasional segfault.
+
 Version 2.4.1 (Jan-12-2009)
 1. Updated BamTools libraries to remove some compilation issues on some systems/compilers.
 
