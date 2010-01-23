@@ -60,39 +60,35 @@ int main(int argc, char* argv[]) {
 		int parameterLength = (int)strlen(argv[i]);
 
 		if(PARAMETER_CHECK("-i", 2, parameterLength)) {
-			haveBed = true;
-			bedFile = argv[i + 1];
-			i++;
+			if ((i+1) < argc) {
+				haveBed = true;
+				bedFile = argv[i + 1];
+				i++;
+			}
 		}
 		else if(PARAMETER_CHECK("-sizeA", 6, parameterLength)) {
 			sortBySizeAsc = true;
 			sortChoices++;
-			i++;
 		}
 		else if(PARAMETER_CHECK("-sizeD", 6, parameterLength)) {
 			sortBySizeDesc = true;
 			sortChoices++;
-			i++;
 		}
 		else if(PARAMETER_CHECK("-chrThenSizeA", 13, parameterLength)) {
 			sortByChromThenSizeAsc = true;
 			sortChoices++;
-			i++;
 		}
 		else if(PARAMETER_CHECK("-chrThenSizeD", 13, parameterLength)) {
 			sortByChromThenSizeDesc = true;
 			sortChoices++;
-			i++;
 		}	
 		else if(PARAMETER_CHECK("-chrThenScoreA", 14, parameterLength)) {
 			sortByChromThenScoreAsc = true;
 			sortChoices++;
-			i++;
 		}
 		else if(PARAMETER_CHECK("-chrThenScoreD", 14, parameterLength)) {
 			sortByChromThenScoreDesc = true;
 			sortChoices++;
-			i++;
 		}	
 		else {
 			cerr << endl << "*****ERROR: Unrecognized parameter: " << argv[i] << " *****" << endl << endl;

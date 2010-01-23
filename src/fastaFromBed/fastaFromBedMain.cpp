@@ -63,19 +63,25 @@ int main(int argc, char* argv[]) {
 		int parameterLength = (int)strlen(argv[i]);
 
 		if(PARAMETER_CHECK("-fi", 3, parameterLength)) {
-			haveFastaDb = true;
-			fastaDbFile = argv[i + 1];
-			i++;
+			if ((i+1) < argc) {
+				haveFastaDb = true;
+				fastaDbFile = argv[i + 1];
+				i++;
+			}
 		} 
 		else if(PARAMETER_CHECK("-fo", 3, parameterLength)) {
-			haveFastaOut = true;
-			fastaOutFile = argv[i + 1];
-			i++;
+			if ((i+1) < argc) {
+				haveFastaOut = true;
+				fastaOutFile = argv[i + 1];
+				i++;
+			}
 		} 
 		else if(PARAMETER_CHECK("-bed", 4, parameterLength)) {
-			haveBed = true;
-			bedFile = argv[i + 1];
-			i++;
+			if ((i+1) < argc) {
+				haveBed = true;
+				bedFile = argv[i + 1];
+				i++;
+			}
 		}
 		else if(PARAMETER_CHECK("-name", 5, parameterLength)) {
 			useNameOnly = true;

@@ -66,31 +66,32 @@ int main(int argc, char* argv[]) {
 			if ((i+1) < argc) {
 				haveBedA = true;
 				bedAFile = argv[i + 1];
+				i++;
 			}
-			i++;
 		}
 		else if(PARAMETER_CHECK("-b", 2, parameterLength)) {
 			if ((i+1) < argc) {
 				haveBedB = true;
 				bedBFile = argv[i + 1];
+				i++;
 			}
-			i++;
 		}	
 		else if(PARAMETER_CHECK("-type", 5, parameterLength)) {
 			if ((i+1) < argc) {
 				haveSearchType = true;
 				searchType = argv[i + 1];
+				i++;
 			}
-			i++;
 		}
 		else if(PARAMETER_CHECK("-f", 2, parameterLength)) {
-			haveFraction = true;
-			overlapFraction = atof(argv[i + 1]);
-			i++;
+			if ((i+1) < argc) {
+				haveFraction = true;
+				overlapFraction = atof(argv[i + 1]);
+				i++;
+			}
 		}
 		else if(PARAMETER_CHECK("-is", 3, parameterLength)) {
 			ignoreStrand = true;
-			i++;
 		}
 		else {
 			cerr << endl << "*****ERROR: Unrecognized parameter: " << argv[i] << " *****" << endl << endl;

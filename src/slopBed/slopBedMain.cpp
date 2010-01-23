@@ -63,34 +63,43 @@ int main(int argc, char* argv[]) {
 		int parameterLength = (int)strlen(argv[i]);
 
  		if(PARAMETER_CHECK("-i", 2, parameterLength)) {
-			haveBed = true;
-			bedFile = argv[i + 1];
-			i++;
+			if ((i+1) < argc) {
+				haveBed = true;
+				bedFile = argv[i + 1];
+				i++;
+			}
 		}
 		else if(PARAMETER_CHECK("-g", 2, parameterLength)) {
-			haveGenome = true;
-			genomeFile = argv[i + 1];
-			i++;
+			if ((i+1) < argc) {
+				haveGenome = true;
+				genomeFile = argv[i + 1];
+				i++;
+			}
 		}
 		else if(PARAMETER_CHECK("-l", 2, parameterLength)) {
-			haveLeft = true;
-			leftSlop = atoi(argv[i + 1]);
-			i++;
+			if ((i+1) < argc) {
+				haveLeft = true;
+				leftSlop = atoi(argv[i + 1]);
+				i++;
+			}
 		}
 		else if(PARAMETER_CHECK("-r", 2, parameterLength)) {
-			haveRight = true;			
-			rightSlop = atoi(argv[i + 1]);
-			i++;
+			if ((i+1) < argc) {
+				haveRight = true;			
+				rightSlop = atoi(argv[i + 1]);
+				i++;
+			}
 		}
 		else if(PARAMETER_CHECK("-b", 2, parameterLength)) {
-			haveBoth = true;
-			leftSlop = atoi(argv[i + 1]);
-			rightSlop = atoi(argv[i + 1]);			
-			i++;
+			if ((i+1) < argc) {
+				haveBoth = true;
+				leftSlop = atoi(argv[i + 1]);
+				rightSlop = atoi(argv[i + 1]);			
+				i++;
+			}
 		}				
 		else if(PARAMETER_CHECK("-s", 2, parameterLength)) {
 			forceStrand = true;
-			i++;
 		}	
 		else {
 		  cerr << endl << "*****ERROR: Unrecognized parameter: " << argv[i] << " *****" << endl << endl;

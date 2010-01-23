@@ -56,14 +56,18 @@ int main(int argc, char* argv[]) {
 		int parameterLength = (int)strlen(argv[i]);
 
  		if(PARAMETER_CHECK("-i", 2, parameterLength)) {
-			haveBed = true;
-			bedFile = argv[i + 1];
-			i++;
+			if ((i+1) < argc) {
+				haveBed = true;
+				bedFile = argv[i + 1];
+				i++;
+			}
 		}
 		else if(PARAMETER_CHECK("-g", 2, parameterLength)) {
-			haveGenome = true;
-			genomeFile = argv[i + 1];
-			i++;
+			if ((i+1) < argc) {
+				haveGenome = true;
+				genomeFile = argv[i + 1];
+				i++;
+			}
 		}
 		else {
 		  cerr << endl << "*****ERROR: Unrecognized parameter: " << argv[i] << " *****" << endl << endl;

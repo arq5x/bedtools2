@@ -57,21 +57,29 @@ int main(int argc, char* argv[]) {
 		int parameterLength = (int)strlen(argv[i]);
 
 		if(PARAMETER_CHECK("-i", 2, parameterLength)) {
-			haveBed = true;
-			bedFile = argv[i + 1];
-			i++;
+			if ((i+1) < argc) {
+				haveBed = true;
+				bedFile = argv[i + 1];
+				i++;
+			}
 		}
 		else if(PARAMETER_CHECK("-base", 5, parameterLength)) {
-			base = argv[i + 1];
-			i++;
+			if ((i+1) < argc) {
+				base = argv[i + 1];
+				i++;
+			}
 		}
 		else if(PARAMETER_CHECK("-org", 4, parameterLength)) {
-			org = argv[i + 1];
-			i++;
+			if ((i+1) < argc) {
+				org = argv[i + 1];
+				i++;
+			}
 		}
 		else if(PARAMETER_CHECK("-db", 3, parameterLength)) {
-			db = argv[i + 1];
-			i++;
+			if ((i+1) < argc) {
+				db = argv[i + 1];
+				i++;
+			}
 		}	
 		else {
 			cerr << endl << "*****ERROR: Unrecognized parameter: " << argv[i] << " *****" << endl << endl;

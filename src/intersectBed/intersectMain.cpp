@@ -73,23 +73,23 @@ int main(int argc, char* argv[]) {
 				haveBedA = true;
 				outputIsBam = false;
 				bedAFile = argv[i + 1];
+				i++;
 			}
-			i++;
 		}
 		else if(PARAMETER_CHECK("-abam", 5, parameterLength)) {
 			if ((i+1) < argc) {
 				haveBedA = true;
 				inputIsBam = true;
-				bedAFile = argv[i + 1];			
-			}
-			i++;
+				bedAFile = argv[i + 1];
+				i++;		
+			}	
 		}
 		else if(PARAMETER_CHECK("-b", 2, parameterLength)) {
 			if ((i+1) < argc) {
 				haveBedB = true;
 				bedBFile = argv[i + 1];
+				i++;
 			}
-			i++;
 		}
 		else if(PARAMETER_CHECK("-bed", 4, parameterLength)) {
 			outputIsBam = false;
@@ -98,9 +98,11 @@ int main(int argc, char* argv[]) {
 			anyHit = true;
 		}
 		else if(PARAMETER_CHECK("-f", 2, parameterLength)) {
-			haveFraction = true;
-			overlapFraction = atof(argv[i + 1]);
-			i++;
+			if ((i+1) < argc) {
+				haveFraction = true;
+				overlapFraction = atof(argv[i + 1]);
+				i++;
+			}
 		}
 		else if(PARAMETER_CHECK("-wa", 3, parameterLength)) {
 			writeA = true;

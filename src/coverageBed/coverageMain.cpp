@@ -57,14 +57,18 @@ int main(int argc, char* argv[]) {
 		int parameterLength = (int)strlen(argv[i]);
 
 		if(PARAMETER_CHECK("-a", 2, parameterLength)) {
-			haveBedA = true;
-			bedAFile = argv[i + 1];
-			i++;
+			if ((i+1) < argc) {
+				haveBedA = true;
+				bedAFile = argv[i + 1];
+				i++;
+			}
 		}
 		else if(PARAMETER_CHECK("-b", 2, parameterLength)) {
-			haveBedB = true;
-			bedBFile = argv[i + 1];
-			i++;
+			if ((i+1) < argc) {
+				haveBedB = true;
+				bedBFile = argv[i + 1];
+				i++;
+			}
 		}
 		else if (PARAMETER_CHECK("-s", 2, parameterLength)) {
 			forceStrand = true;

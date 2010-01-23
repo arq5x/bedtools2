@@ -69,6 +69,7 @@ int main(int argc, char* argv[]) {
 				haveBedA = true;
 				outputIsBam  = false;
 				bedAFile = argv[i + 1];
+				i++;
 			}
 			i++;
 		}
@@ -77,15 +78,16 @@ int main(int argc, char* argv[]) {
 				haveBedA = true;
 				inputIsBam = true;
 				bedAFile = argv[i + 1];			
+				i++;
 			}
-			i++;
+			
 		}
 		else if(PARAMETER_CHECK("-b", 2, parameterLength)) {
 			if ((i+1) < argc) {
 				haveBedB = true;
 				bedBFile = argv[i + 1];
+				i++;
 			}
-			i++;
 		}
 		else if(PARAMETER_CHECK("-bedpe", 6, parameterLength)) {
 			outputIsBam = false;
@@ -94,13 +96,15 @@ int main(int argc, char* argv[]) {
 			if ((i+1) < argc) {
 				haveSearchType = true;
 				searchType = argv[i + 1];
+				i++;
 			}
-			i++;
 		}
 		else if(PARAMETER_CHECK("-f", 2, parameterLength)) {
-			haveFraction = true;
-			overlapFraction = atof(argv[i + 1]);
-			i++;
+			if ((i+1) < argc) {
+				haveFraction = true;
+				overlapFraction = atof(argv[i + 1]);
+				i++;
+			}
 		}
 		else if (PARAMETER_CHECK("-s", 2, parameterLength)) {
 			forceStrand = true;

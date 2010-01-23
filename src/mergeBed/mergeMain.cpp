@@ -60,17 +60,21 @@ int main(int argc, char* argv[]) {
 		int parameterLength = (int)strlen(argv[i]);
 
 		if(PARAMETER_CHECK("-i", 2, parameterLength)) {
-			haveBed = true;
-			bedFile = argv[i + 1];
-			i++;
+			if ((i+1) < argc) {
+				haveBed = true;
+				bedFile = argv[i + 1];
+				i++;
+			}
 		}
 		else if(PARAMETER_CHECK("-n", 2, parameterLength)) {
 			numEntries = true;
 		}
 		else if(PARAMETER_CHECK("-d", 2, parameterLength)) {
-			haveMaxDistance = true;
-			maxDistance = atoi(argv[i + 1]);
-			i++;
+			if ((i+1) < argc) {
+				haveMaxDistance = true;
+				maxDistance = atoi(argv[i + 1]);
+				i++;
+			}
 		}
 		else if (PARAMETER_CHECK("-s", 2, parameterLength)) {
 			forceStrand = true;

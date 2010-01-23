@@ -68,14 +68,18 @@ int main(int argc, char* argv[]) {
 		int parameterLength = (int)strlen(argv[i]);
 
 		if(PARAMETER_CHECK("-a", 2, parameterLength)) {
-			haveBedA = true;
-			bedAFile = argv[i + 1];
-			i++;
+			if ((i+1) < argc) {
+				haveBedA = true;
+				bedAFile = argv[i + 1];
+				i++;
+			}
 		}
 		else if(PARAMETER_CHECK("-b", 2, parameterLength)) {
-			haveBedB = true;
-			bedBFile = argv[i + 1];
-			i++;
+			if ((i+1) < argc) {
+				haveBedB = true;
+				bedBFile = argv[i + 1];
+				i++;
+			}
 		}	
 		else if(PARAMETER_CHECK("-u", 2, parameterLength)) {
 			anyHit = true;
@@ -93,20 +97,26 @@ int main(int argc, char* argv[]) {
 			matchOnStrand = true;
 		}
 		else if (PARAMETER_CHECK("-w", 2, parameterLength)) {
-			haveSlop = true;
-			leftSlop = atoi(argv[i + 1]);
-			rightSlop = leftSlop;
-			i++;
+			if ((i+1) < argc) {
+				haveSlop = true;
+				leftSlop = atoi(argv[i + 1]);
+				rightSlop = leftSlop;
+				i++;
+			}
 		}
 		else if (PARAMETER_CHECK("-l", 2, parameterLength)) {
-			haveLeft = true;
-			leftSlop = atoi(argv[i + 1]);
-			i++;
+			if ((i+1) < argc) {
+				haveLeft = true;
+				leftSlop = atoi(argv[i + 1]);
+				i++;
+			}
 		}
 		else if (PARAMETER_CHECK("-r", 2, parameterLength)) {
-			haveRight = true;
-			rightSlop = atoi(argv[i + 1]);
-			i++;
+			if ((i+1) < argc) {
+				haveRight = true;
+				rightSlop = atoi(argv[i + 1]);
+				i++;
+			}
 		}		
 		else {
 			cerr << endl << "*****ERROR: Unrecognized parameter: " << argv[i] << " *****" << endl << endl;
