@@ -1,3 +1,8 @@
+Version 2.5.0 (Jan-27-2009)
+1. Added support for custom BED fields after the 6th column.
+2. Fixed a command line parsing bug in pairToBed.
+3. Improved sanity checking.
+
 Version 2.4.2 (Jan-23-2009)
 1. Fixed a minor bug in mergeBed when -nms and -s were used together.
 2. Improved the command line parsing to prevent the occasional segfault.
