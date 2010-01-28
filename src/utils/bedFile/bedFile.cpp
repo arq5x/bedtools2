@@ -199,6 +199,7 @@ bool BedFile::parseLine (BED &bed, const vector<string> &lineVector, int &lineNu
 		if (lineVector.size() != 9) {
 			validEntry = parseBedLine (bed, lineVector, lineNum);
 		}
+		// otherwise test if columns 4 and 5 are integers.  If so, assume BED.
 		else {
 			validEntry = parseGffLine (bed, lineVector, lineNum);
 		}

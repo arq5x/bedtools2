@@ -22,7 +22,7 @@
 #include <algorithm>
 #include <limits.h>
 #include <cstdio>
-#include <tr1/unordered_map>
+//#include <tr1/unordered_map>
 using namespace std;
 
 //*************************************************

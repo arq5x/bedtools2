@@ -71,7 +71,6 @@ int main(int argc, char* argv[]) {
 				bedAFile = argv[i + 1];
 				i++;
 			}
-			i++;
 		}
 		else if(PARAMETER_CHECK("-abam", 5, parameterLength)) {
 			if ((i+1) < argc) {
@@ -80,7 +79,6 @@ int main(int argc, char* argv[]) {
 				bedAFile = argv[i + 1];			
 				i++;
 			}
-			
 		}
 		else if(PARAMETER_CHECK("-b", 2, parameterLength)) {
 			if ((i+1) < argc) {
