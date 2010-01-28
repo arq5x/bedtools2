@@ -178,7 +178,6 @@ void BedIntersect::IntersectBed(istream &bedInput) {
 	// load the "B" bed file into a map so
 	// that we can easily compare "A" to it for overlaps
 	bedB->loadBedFileIntoMap();
-
 	string bedLine;                                                                                                                    
 	int lineNum = 0;					// current input line number
 	vector<BED> hits;					// vector of potential hits
@@ -194,7 +193,6 @@ void BedIntersect::IntersectBed(istream &bedInput) {
 		lineNum++;
 		Tokenize(bedLine,bedFields);
 		BED a;
-		
 		// find the overlaps with B if it's a valid BED entry. 
 		if (bedA->parseLine(a, bedFields, lineNum)) {
 			FindOverlaps(a, hits);

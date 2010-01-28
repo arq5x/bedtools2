@@ -190,18 +190,39 @@ BedFile::~BedFile(void) {
 }
 
 
+void BedFile::setGff (bool gff) {
+	if (gff == true) this->isGff = true;
+	else this->isGff = false;
+}
+
 
 bool BedFile::parseLine (BED &bed, const vector<string> &lineVector, int &lineNum) {
 	
 	bool validEntry = false;
 
 	if ((lineVector[0] != "track") && (lineVector[0] != "browser") && (lineVector[0].find("#") == string::npos) ) {
-		if (lineVector.size() != 9) {
-			validEntry = parseBedLine (bed, lineVector, lineNum);
+
+		// we need at least 3 columns
+		if (lineVector.size() >= 3) {
+			// test if columns	2 and 3 are integers.  If so, assume BED.
+			if (atoi(lineVector[1].c_str()) != 0 && atoi(lineVector[2].c_str()) != 0) {
+				setGff(false);
+				validEntry = parseBedLine (bed, lineVector, lineNum);
+			}
+			// otherwise test if columns 4 and 5 are integers.  If so, assume GFF.
+			else if (atoi(lineVector[3].c_str()) != 0 && atoi(lineVector[4].c_str()) != 0) {
+				setGff(true);
+				validEntry = parseGffLine (bed, lineVector, lineNum);
+			}
+			else {
+				cerr << "Unexpected file format.  Please use tab-delimited BED or GFF" << endl;
+				exit(1);
+			}
 		}
-		// otherwise test if columns 4 and 5 are integers.  If so, assume BED.
-		else {
-			validEntry = parseGffLine (bed, lineVector, lineNum);
+		// gripe if it's not a blank line	
+		else if (lineVector.size() != 0) {
+			cerr << "It looks as though you have less than 3 columns.  Are you sure your files are tab-delimited?" << endl;
+			exit(1);
 		}
 	}
 	else {
@@ -253,7 +274,7 @@ bool BedFile::parseBedLine (BED &bed, const vector<string> &lineVector, int line
 			bed.strand = lineVector[5];
 			return true;
 		}
-		else if (this->bedType == 12) {
+		else if (this->bedType > 6) {
 			bed.chrom = lineVector[0];
 			bed.start = atoi(lineVector[1].c_str());
 			bed.end = atoi(lineVector[2].c_str());
@@ -267,7 +288,7 @@ bool BedFile::parseBedLine (BED &bed, const vector<string> &lineVector, int line
 			return true;
 		}
 		else {
-			cerr << "Error: unexpected number of fields: " << lineNum << ".  Verify that your files are TAB-delimited and that your BED file has 3,4,5 or 6 fields.  Exiting..." << endl;
+			cerr << "Error: unexpected number of fields at line: " << lineNum << ".  Verify that your files are TAB-delimited and that your BED file has 3,4,5 or 6 fields.  Exiting..." << endl;
 			exit(1);
 		}
 		
@@ -319,7 +340,7 @@ bool BedFile::parseBedLine (BED &bed, const vector<string> &lineVector, int line
 			bed.strand = lineVector[5];
 			return true;
 		}
-		else if (this->bedType == 12) {
+		else if (this->bedType > 6) {
 			bed.chrom = lineVector[0];
 			bed.start = atoi(lineVector[1].c_str());
 			bed.end = atoi(lineVector[2].c_str());
@@ -333,7 +354,7 @@ bool BedFile::parseBedLine (BED &bed, const vector<string> &lineVector, int line
 			return true;
 		}
 		else {
-			cerr << "Error: unexpected number of fields: " << lineNum << ".  Verify that your files are TAB-delimited and that your BED file has 3,4,5 or 6 fields.  Exiting..." << endl;
+			cerr << "Error: unexpected number of fields at line: " << lineNum << ".  Verify that your files are TAB-delimited and that your BED file has 3,4,5 or 6 fields.  Exiting..." << endl;
 			exit(1);
 		}
 		
@@ -382,10 +403,9 @@ bool BedFile::parseGffLine (BED &bed, const vector<string> &lineVector, int line
 			the value should be '.'.
 9. group - All lines with the same group are linked together into a single item.
 */
-
 	if ( (lineNum > 1) && (lineVector.size() == this->bedType)) {
 		
-		if (this->bedType == 9) {
+		if (this->bedType == 9 && isGff) {
 			bed.chrom = lineVector[0];
 			// substract 1 to force the start to be BED-style
 			bed.start = atoi(lineVector[3].c_str()) - 1;
@@ -401,7 +421,7 @@ bool BedFile::parseGffLine (BED &bed, const vector<string> &lineVector, int line
 			return true;
 		}
 		else {
-			cerr << "Error: unexpected number of fields: " << lineNum << 
+			cerr << "Error: unexpected number of fields at line: " << lineNum << 
 					".  Verify that your files are TAB-delimited and that your GFF file has 9 fields.  Exiting..." << endl;
 			exit(1);
 		}
@@ -418,7 +438,7 @@ bool BedFile::parseGffLine (BED &bed, const vector<string> &lineVector, int line
 	else if ((lineNum == 1) && (lineVector.size() == 9)) {
 		this->bedType = lineVector.size();
 		
-		if (this->bedType == 9) {
+		if (this->bedType == 9 && isGff) {
 			bed.chrom = lineVector[0];
 			// substract 1 to force the start to be BED-style
 			bed.start = atoi(lineVector[3].c_str()) - 1;
@@ -434,7 +454,8 @@ bool BedFile::parseGffLine (BED &bed, const vector<string> &lineVector, int line
 			return true;
 		}
 		else {
-			cerr << "Error: unexpected number of fields: " << lineNum << 
+			cout << this->bedType << " " << isGff << endl;
+			cerr << "Error: unexpected number of fields at line: " << lineNum << 
 					".  Verify that your files are TAB-delimited and that your GFF file has 9 fields.  Exiting..." << endl;
 			exit(1);
 		}
@@ -581,28 +602,30 @@ void BedFile::loadBedFileIntoMapNoBin() {
 */
 void BedFile::reportBedTab(const BED &bed) {
 	
-	if (this->bedType == 3) {
-		printf ("%s\t%d\t%d\t", bed.chrom.c_str(), bed.start, bed.end);
-	}
-	else if (this->bedType == 4) {
-		printf ("%s\t%d\t%d\t%s\t", bed.chrom.c_str(), bed.start, bed.end, bed.name.c_str());
-	}
-	else if (this->bedType == 5) {
-		printf ("%s\t%d\t%d\t%s\t%s\t", bed.chrom.c_str(), bed.start, bed.end, bed.name.c_str(), 
-										bed.score.c_str());
-	}
-	else if (this->bedType == 6) {
-		printf ("%s\t%d\t%d\t%s\t%s\t%s\t", bed.chrom.c_str(), bed.start, bed.end, bed.name.c_str(), 
-											bed.score.c_str(), bed.strand.c_str());
-	}
-	else if (this->bedType == 12) {
-		printf ("%s\t%d\t%d\t%s\t%s\t%s\t", bed.chrom.c_str(), bed.start, bed.end, bed.name.c_str(), 
-											bed.score.c_str(), bed.strand.c_str());
+	if (isGff == false) {
+		if (this->bedType == 3) {
+			printf ("%s\t%d\t%d\t", bed.chrom.c_str(), bed.start, bed.end);
+		}
+		else if (this->bedType == 4) {
+			printf ("%s\t%d\t%d\t%s\t", bed.chrom.c_str(), bed.start, bed.end, bed.name.c_str());
+		}
+		else if (this->bedType == 5) {
+			printf ("%s\t%d\t%d\t%s\t%s\t", bed.chrom.c_str(), bed.start, bed.end, bed.name.c_str(), 
+											bed.score.c_str());
+		}
+		else if (this->bedType == 6) {
+			printf ("%s\t%d\t%d\t%s\t%s\t%s\t", bed.chrom.c_str(), bed.start, bed.end, bed.name.c_str(), 
+												bed.score.c_str(), bed.strand.c_str());
+		}
+		else if (this->bedType > 6) {
+			printf ("%s\t%d\t%d\t%s\t%s\t%s\t", bed.chrom.c_str(), bed.start, bed.end, bed.name.c_str(), 
+												bed.score.c_str(), bed.strand.c_str());
 		
-		vector<string>::const_iterator othIt = bed.otherFields.begin(); 
-		vector<string>::const_iterator othEnd = bed.otherFields.end(); 
-		for ( ; othIt != othEnd; ++othIt) {
-			printf("%s\t", othIt->c_str());
+			vector<string>::const_iterator othIt = bed.otherFields.begin(); 
+			vector<string>::const_iterator othEnd = bed.otherFields.end(); 
+			for ( ; othIt != othEnd; ++othIt) {
+				printf("%s\t", othIt->c_str());
+			}
 		}
 	}	
 	else if (this->bedType == 9) {
@@ -625,30 +648,32 @@ void BedFile::reportBedTab(const BED &bed) {
 */
 void BedFile::reportBedNewLine(const BED &bed) {
 	
-	if (this->bedType == 3) {
-		printf ("%s\t%d\t%d\n", bed.chrom.c_str(), bed.start, bed.end);
-	}
-	else if (this->bedType == 4) {
-		printf ("%s\t%d\t%d\t%s\n", bed.chrom.c_str(), bed.start, bed.end, bed.name.c_str());
-	}
-	else if (this->bedType == 5) {
-		printf ("%s\t%d\t%d\t%s\t%s\n", bed.chrom.c_str(), bed.start, bed.end, bed.name.c_str(), 
-										bed.score.c_str());
-	}
-	else if (this->bedType == 6) {
-		printf ("%s\t%d\t%d\t%s\t%s\t%s\n", bed.chrom.c_str(), bed.start, bed.end, bed.name.c_str(), 
-											bed.score.c_str(), bed.strand.c_str());
-	}
-	else if (this->bedType == 12) {
-		printf ("%s\t%d\t%d\t%s\t%s\t%s\t", bed.chrom.c_str(), bed.start, bed.end, bed.name.c_str(), 
-											bed.score.c_str(), bed.strand.c_str());
-		
-		vector<string>::const_iterator othIt = bed.otherFields.begin(); 
-		vector<string>::const_iterator othEnd = bed.otherFields.end(); 
-		for ( ; othIt != othEnd; ++othIt) {
-			printf("%s\t", othIt->c_str());
+	if (isGff == false) {
+		if (this->bedType == 3) {
+			printf ("%s\t%d\t%d\n", bed.chrom.c_str(), bed.start, bed.end);
 		}
-		printf("\n");
+		else if (this->bedType == 4) {
+			printf ("%s\t%d\t%d\t%s\n", bed.chrom.c_str(), bed.start, bed.end, bed.name.c_str());
+		}
+		else if (this->bedType == 5) {
+			printf ("%s\t%d\t%d\t%s\t%s\n", bed.chrom.c_str(), bed.start, bed.end, bed.name.c_str(), 
+											bed.score.c_str());
+		}
+		else if (this->bedType == 6) {
+			printf ("%s\t%d\t%d\t%s\t%s\t%s\n", bed.chrom.c_str(), bed.start, bed.end, bed.name.c_str(), 
+												bed.score.c_str(), bed.strand.c_str());
+		}
+		else if (this->bedType > 6) {
+			printf ("%s\t%d\t%d\t%s\t%s\t%s\t", bed.chrom.c_str(), bed.start, bed.end, bed.name.c_str(), 
+												bed.score.c_str(), bed.strand.c_str());
+		
+			vector<string>::const_iterator othIt = bed.otherFields.begin(); 
+			vector<string>::const_iterator othEnd = bed.otherFields.end(); 
+			for ( ; othIt != othEnd; ++othIt) {
+				printf("%s\t", othIt->c_str());
+			}
+			printf("\n");
+		}
 	}
 	else if (this->bedType == 9) {
 		printf ("%s\t%s\t%s\t%d\t%d\t%s\t%s\t%s\t%s\n", bed.chrom.c_str(), bed.otherFields[0].c_str(),
@@ -671,28 +696,30 @@ void BedFile::reportBedNewLine(const BED &bed) {
 */
 void BedFile::reportBedRangeTab(const BED &bed, int start, int end) {
 
-	if (this->bedType == 3) {
-		printf ("%s\t%d\t%d\t", bed.chrom.c_str(), start, end);
-	}
-	else if (this->bedType == 4) {
-		printf ("%s\t%d\t%d\t%s\t", bed.chrom.c_str(), start, end, bed.name.c_str());
-	}
-	else if (this->bedType == 5) {
-		printf ("%s\t%d\t%d\t%s\t%s\t", bed.chrom.c_str(), start, end, bed.name.c_str(), 
-										bed.score.c_str());
-	}
-	else if (this->bedType == 6) {
-		printf ("%s\t%d\t%d\t%s\t%s\t%s\t", bed.chrom.c_str(), start, end, bed.name.c_str(), 
-											bed.score.c_str(), bed.strand.c_str());
-	}
-	else if (this->bedType == 12) {
-		printf ("%s\t%d\t%d\t%s\t%s\t%s\t", bed.chrom.c_str(), start, end, bed.name.c_str(), 
-											bed.score.c_str(), bed.strand.c_str());
+	if (isGff == false) {
+		if (this->bedType == 3) {
+			printf ("%s\t%d\t%d\t", bed.chrom.c_str(), start, end);
+		}
+		else if (this->bedType == 4) {
+			printf ("%s\t%d\t%d\t%s\t", bed.chrom.c_str(), start, end, bed.name.c_str());
+		}
+		else if (this->bedType == 5) {
+			printf ("%s\t%d\t%d\t%s\t%s\t", bed.chrom.c_str(), start, end, bed.name.c_str(), 
+											bed.score.c_str());
+		}
+		else if (this->bedType == 6) {
+			printf ("%s\t%d\t%d\t%s\t%s\t%s\t", bed.chrom.c_str(), start, end, bed.name.c_str(), 
+												bed.score.c_str(), bed.strand.c_str());
+		}
+		else if (this->bedType > 6) {
+			printf ("%s\t%d\t%d\t%s\t%s\t%s\t", bed.chrom.c_str(), start, end, bed.name.c_str(), 
+												bed.score.c_str(), bed.strand.c_str());
 		
-		vector<string>::const_iterator othIt = bed.otherFields.begin(); 
-		vector<string>::const_iterator othEnd = bed.otherFields.end(); 
-		for ( ; othIt != othEnd; ++othIt) {
-			printf("%s\t", othIt->c_str());
+			vector<string>::const_iterator othIt = bed.otherFields.begin(); 
+			vector<string>::const_iterator othEnd = bed.otherFields.end(); 
+			for ( ; othIt != othEnd; ++othIt) {
+				printf("%s\t", othIt->c_str());
+			}
 		}
 	}
 	else if (this->bedType == 9) {
@@ -716,30 +743,32 @@ void BedFile::reportBedRangeTab(const BED &bed, int start, int end) {
 */
 void BedFile::reportBedRangeNewLine(const BED &bed, int start, int end) {
 
-	if (this->bedType == 3) {
-		printf ("%s\t%d\t%d\n", bed.chrom.c_str(), start, end);
-	}
-	else if (this->bedType == 4) {
-		printf ("%s\t%d\t%d\t%s\n", bed.chrom.c_str(), start, end, bed.name.c_str());
-	}
-	else if (this->bedType == 5) {
-		printf ("%s\t%d\t%d\t%s\t%s\n", bed.chrom.c_str(), start, end, bed.name.c_str(), 
-										bed.score.c_str());
-	}
-	else if (this->bedType == 6) {
-		printf ("%s\t%d\t%d\t%s\t%s\t%s\n", bed.chrom.c_str(), start, end, bed.name.c_str(), 
-											bed.score.c_str(), bed.strand.c_str());
-	}
-	else if (this->bedType == 12) {
-		printf ("%s\t%d\t%d\t%s\t%s\t%s\t", bed.chrom.c_str(), start, end, bed.name.c_str(), 
-											bed.score.c_str(), bed.strand.c_str());
-		
-		vector<string>::const_iterator othIt = bed.otherFields.begin(); 
-		vector<string>::const_iterator othEnd = bed.otherFields.end(); 
-		for ( ; othIt != othEnd; ++othIt) {
-			printf("%s\t", othIt->c_str());
+	if (isGff == false) {
+		if (this->bedType == 3) {
+			printf ("%s\t%d\t%d\n", bed.chrom.c_str(), start, end);
 		}
-		printf("\n");
+		else if (this->bedType == 4) {
+			printf ("%s\t%d\t%d\t%s\n", bed.chrom.c_str(), start, end, bed.name.c_str());
+		}
+		else if (this->bedType == 5) {
+			printf ("%s\t%d\t%d\t%s\t%s\n", bed.chrom.c_str(), start, end, bed.name.c_str(), 
+											bed.score.c_str());
+		}
+		else if (this->bedType == 6) {
+			printf ("%s\t%d\t%d\t%s\t%s\t%s\n", bed.chrom.c_str(), start, end, bed.name.c_str(), 
+												bed.score.c_str(), bed.strand.c_str());
+		}
+		else if (this->bedType > 6) {
+			printf ("%s\t%d\t%d\t%s\t%s\t%s\t", bed.chrom.c_str(), start, end, bed.name.c_str(), 
+												bed.score.c_str(), bed.strand.c_str());
+		
+			vector<string>::const_iterator othIt = bed.otherFields.begin(); 
+			vector<string>::const_iterator othEnd = bed.otherFields.end(); 
+			for ( ; othIt != othEnd; ++othIt) {
+				printf("%s\t", othIt->c_str());
+			}
+			printf("\n");
+		}
 	}
 	else if (this->bedType == 9) {	// add 1 to the start for GFF
 		printf ("%s\t%s\t%s\t%d\t%d\t%s\t%s\t%s\t%s\n", bed.chrom.c_str(), bed.otherFields[0].c_str(),

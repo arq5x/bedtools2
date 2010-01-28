@@ -171,6 +171,8 @@ public:
 	string bedFile;
 	unsigned int bedType;  // 3-6, 12 for BED
 						   // 9 for GFF
+						
+	bool isGff;
 
 	masterBedMap bedMap;
 	masterBedMapNoBin bedMapNoBin;
@@ -182,6 +184,8 @@ private:
 	
 	// process as line from a GFF file. convert to a BED feature.
 	bool parseGffLine (BED &bed, const vector<string> &lineVector, int lineNum);
+	
+	void setGff (bool isGff);
 };
 
 #endif /* BEDFILE_H */
