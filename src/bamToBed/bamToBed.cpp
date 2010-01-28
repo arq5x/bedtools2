@@ -71,8 +71,8 @@ int main(int argc, char* argv[]) {
 			if ((i+1) < argc) {
 				haveBam = true;
 				bamFile = argv[i + 1];
+				i++;
 			}
-			i++;
 		}
 		else if(PARAMETER_CHECK("-bedpe", 6, parameterLength)) {
 				writeBedPE = true;
