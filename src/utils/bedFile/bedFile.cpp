@@ -199,20 +199,33 @@ void BedFile::setGff (bool gff) {
 bool BedFile::parseLine (BED &bed, const vector<string> &lineVector, int &lineNum) {
 	
 	bool validEntry = false;
-
+	char *p2End, *p3End, *p4End, *p5End;
+	long l2, l3, l4, l5;
+	
 	if ((lineVector[0] != "track") && (lineVector[0] != "browser") && (lineVector[0].find("#") == string::npos) ) {
 
 		// we need at least 3 columns
 		if (lineVector.size() >= 3) {
+
 			// test if columns	2 and 3 are integers.  If so, assume BED.
-			if (atoi(lineVector[1].c_str()) != 0 && atoi(lineVector[2].c_str()) != 0) {
+			l2 = strtol(lineVector[1].c_str(), &p2End, 10);
+			l3 = strtol(lineVector[2].c_str(), &p3End, 10);
+			
+			// strtol  will set p2End or p3End to the start of the string if non-integral, base 10
+			if (p2End != lineVector[1].c_str() && p3End != lineVector[2].c_str()) {
 				setGff(false);
 				validEntry = parseBedLine (bed, lineVector, lineNum);
 			}
-			// otherwise test if columns 4 and 5 are integers.  If so, assume GFF.
-			else if (atoi(lineVector[3].c_str()) != 0 && atoi(lineVector[4].c_str()) != 0) {
-				setGff(true);
-				validEntry = parseGffLine (bed, lineVector, lineNum);
+			else if (lineVector.size() == 9) {
+				// otherwise test if columns 4 and 5 are integers.  If so, assume GFF.
+				l4 = strtol(lineVector[3].c_str(), &p4End, 10);
+				l5 = strtol(lineVector[4].c_str(), &p5End, 10);
+
+				// strtol  will set p4End or p5End to the start of the string if non-integral, base 10
+				if (p4End != lineVector[3].c_str() && p5End != lineVector[4].c_str()) {		
+					setGff(true);
+					validEntry = parseGffLine (bed, lineVector, lineNum);
+				}
 			}
 			else {
 				cerr << "Unexpected file format.  Please use tab-delimited BED or GFF" << endl;
@@ -245,7 +258,6 @@ bool BedFile::parseBedLine (BED &bed, const vector<string> &lineVector, int line
 			bed.name = "";
 			bed.score = "";
 			bed.strand = "";
-			return true;
 		}
 		else if (this->bedType == 4) {
 			bed.chrom = lineVector[0];
@@ -254,7 +266,6 @@ bool BedFile::parseBedLine (BED &bed, const vector<string> &lineVector, int line
 			bed.name = lineVector[3];
 			bed.score = "";
 			bed.strand = "";
-			return true;
 		}
 		else if (this->bedType ==5) {
 			bed.chrom = lineVector[0];
@@ -262,8 +273,7 @@ bool BedFile::parseBedLine (BED &bed, const vector<string> &lineVector, int line
 			bed.end = atoi(lineVector[2].c_str());
 			bed.name = lineVector[3];
 			bed.score = lineVector[4];
-			bed.strand = "";
-			return true;			
+			bed.strand = "";		
 		}
 		else if (this->bedType == 6) {
 			bed.chrom = lineVector[0];
@@ -272,7 +282,6 @@ bool BedFile::parseBedLine (BED &bed, const vector<string> &lineVector, int line
 			bed.name = lineVector[3];
 			bed.score = lineVector[4];
 			bed.strand = lineVector[5];
-			return true;
 		}
 		else if (this->bedType > 6) {
 			bed.chrom = lineVector[0];
@@ -285,7 +294,6 @@ bool BedFile::parseBedLine (BED &bed, const vector<string> &lineVector, int line
 			for (unsigned int i = 6; i < lineVector.size(); ++i) {
 				bed.otherFields.push_back(lineVector[i]); 
 			}
-			return true;
 		}
 		else {
 			cerr << "Error: unexpected number of fields at line: " << lineNum << ".  Verify that your files are TAB-delimited and that your BED file has 3,4,5 or 6 fields.  Exiting..." << endl;
@@ -296,14 +304,14 @@ bool BedFile::parseBedLine (BED &bed, const vector<string> &lineVector, int line
 			cerr << "Error: malformed BED entry at line " << lineNum << ". Start was greater than end. Exiting." << endl;
 			exit(1);
 		}
-		if ( (bed.start < 0) || (bed.end < 0) ) {
+		else if ( (bed.start < 0) || (bed.end < 0) ) {
 			cerr << "Error: malformed BED entry at line " << lineNum << ". Coordinate detected that is < 0. Exiting." << endl;
 			exit(1);
 		}
+		else return true;
 	}
 	else if ((lineNum == 1) && (lineVector.size() >= 3)) {
 		this->bedType = lineVector.size();
-
 		if (this->bedType == 3) {
 			bed.chrom = lineVector[0];
 			bed.start = atoi(lineVector[1].c_str());
@@ -311,7 +319,6 @@ bool BedFile::parseBedLine (BED &bed, const vector<string> &lineVector, int line
 			bed.name = "";
 			bed.score = "";
 			bed.strand = "";
-			return true;
 		}
 		else if (this->bedType == 4) {
 			bed.chrom = lineVector[0];
@@ -320,7 +327,6 @@ bool BedFile::parseBedLine (BED &bed, const vector<string> &lineVector, int line
 			bed.name = lineVector[3];
 			bed.score = "";
 			bed.strand = "";
-			return true;
 		}
 		else if (this->bedType ==5) {
 			bed.chrom = lineVector[0];
@@ -329,7 +335,6 @@ bool BedFile::parseBedLine (BED &bed, const vector<string> &lineVector, int line
 			bed.name = lineVector[3];
 			bed.score = lineVector[4];
 			bed.strand = "";
-			return true;			
 		}
 		else if (this->bedType == 6) {
 			bed.chrom = lineVector[0];
@@ -338,7 +343,6 @@ bool BedFile::parseBedLine (BED &bed, const vector<string> &lineVector, int line
 			bed.name = lineVector[3];
 			bed.score = lineVector[4];
 			bed.strand = lineVector[5];
-			return true;
 		}
 		else if (this->bedType > 6) {
 			bed.chrom = lineVector[0];
@@ -351,7 +355,6 @@ bool BedFile::parseBedLine (BED &bed, const vector<string> &lineVector, int line
 			for (unsigned int i = 6; i < lineVector.size(); ++i) {
 				bed.otherFields.push_back(lineVector[i]); 
 			}
-			return true;
 		}
 		else {
 			cerr << "Error: unexpected number of fields at line: " << lineNum << ".  Verify that your files are TAB-delimited and that your BED file has 3,4,5 or 6 fields.  Exiting..." << endl;
@@ -362,10 +365,11 @@ bool BedFile::parseBedLine (BED &bed, const vector<string> &lineVector, int line
 			cerr << "Error: malformed BED entry at line " << lineNum << ". Start was greater than end. Exiting." << endl;
 			exit(1);
 		}
-		if ( (bed.start < 0) || (bed.end < 0) ) {
+		else if ( (bed.start < 0) || (bed.end < 0) ) {
 			cerr << "Error: malformed BED entry at line " << lineNum << ". Coordinate detected that is < 0. Exiting." << endl;
 			exit(1);
 		}
+		else return true;
 	}
 	else if (lineVector.size() == 1) {
 		cerr << "Only one BED field detected: " << lineNum << ".  Verify that your files are TAB-delimited.  Exiting..." << endl;
@@ -413,12 +417,9 @@ bool BedFile::parseGffLine (BED &bed, const vector<string> &lineVector, int line
 			bed.name = lineVector[2];
 			bed.score = lineVector[5];
 			bed.strand = lineVector[6];
-		
 			bed.otherFields.push_back(lineVector[1]);  // add GFF "source". unused in BED
 			bed.otherFields.push_back(lineVector[7]);  // add GFF "fname". unused in BED
 			bed.otherFields.push_back(lineVector[8]);  // add GFF "group". unused in BED
-					
-			return true;
 		}
 		else {
 			cerr << "Error: unexpected number of fields at line: " << lineNum << 
@@ -430,10 +431,11 @@ bool BedFile::parseGffLine (BED &bed, const vector<string> &lineVector, int line
 			cerr << "Error: malformed GFF entry at line " << lineNum << ". Start was greater than end. Exiting." << endl;
 			exit(1);
 		}
-		if ( (bed.start < 0) || (bed.end < 0) ) {
+		else if ( (bed.start < 0) || (bed.end < 0) ) {
 			cerr << "Error: malformed GFF entry at line " << lineNum << ". Coordinate detected that is < 1. Exiting." << endl;
 			exit(1);
 		}
+		else return true;
 	}
 	else if ((lineNum == 1) && (lineVector.size() == 9)) {
 		this->bedType = lineVector.size();
@@ -464,10 +466,11 @@ bool BedFile::parseGffLine (BED &bed, const vector<string> &lineVector, int line
 			cerr << "Error: malformed GFF entry at line " << lineNum << ". Start was greater than end. Exiting." << endl;
 			exit(1);
 		}
-		if ( (bed.start < 0) || (bed.end < 0) ) {
+		else if ( (bed.start < 0) || (bed.end < 0) ) {
 			cerr << "Error: malformed GFF entry at line " << lineNum << ". Coordinate detected that is < 1. Exiting." << endl;
 			exit(1);
 		}
+		else return true;
 	}
 	else if (lineVector.size() == 1) {
 		cerr << "Only one GFF field detected: " << lineNum << ".  Verify that your files are TAB-delimited.  Exiting..." << endl;
