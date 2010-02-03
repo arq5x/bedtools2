@@ -785,7 +785,6 @@ bool BamReader::BamReaderPrivate::LoadNextAlignment(BamAlignment& bAlignment) {
 
             // build AlignedBases string
             switch (op.Type) {
-
                 case ('M') :
                 case ('I') : bAlignment.AlignedBases.append( bAlignment.QueryBases.substr(k, op.Length) ); // for 'M', 'I' - write bases
                 case ('S') : k += op.Length;                                                               // for 'S' - skip over query bases
@@ -798,7 +797,7 @@ bool BamReader::BamReaderPrivate::LoadNextAlignment(BamAlignment& bAlignment) {
                              break;
 
                 case ('N') : bAlignment.AlignedBases.append( op.Length, 'N' );  // for 'N' - write N's, skip bases in query sequence
-                             k += op.Length;
+                             //k += op.Length;
                              break;
 
                 case ('H') : break; 					        // for 'H' - do nothing, move to next op

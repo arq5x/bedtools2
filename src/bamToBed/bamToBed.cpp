@@ -164,17 +164,17 @@ void PrintBed(const BamAlignment &bam,  const RefVector &refs, bool useEditDista
 	if (bam.IsFirstMate()) name += "/1";
 	if (bam.IsSecondMate()) name += "/2";
 	
+	unsigned int end = bam.Position + bam.AlignedBases.size();
+	
 	if (useEditDistance == false) {
 		printf("%s\t%d\t%d\t\%s\t%d\t%s\n", refs.at(bam.RefID).RefName.c_str(), bam.Position,
-									  bam.Position + bam.Length, name.c_str(),
-									  bam.MapQuality, strand.c_str());
+									  end, name.c_str(), bam.MapQuality, strand.c_str());
 	}
 	else {
 		uint8_t editDistance;
 		if (bam.GetEditDistance(editDistance)) {
 			printf("%s\t%d\t%d\t\%s\t%u\t%s\n", refs.at(bam.RefID).RefName.c_str(), bam.Position,
-										  bam.Position + bam.Length, name.c_str(),
-										  editDistance, strand.c_str());
+										  end, name.c_str(), editDistance, strand.c_str());
 		}
 		else {
 			cerr << "The edit distance tag (NM) was not found in the BAM file.  Please disable -ed.  Exiting\n";
@@ -187,7 +187,7 @@ void PrintBed(const BamAlignment &bam,  const RefVector &refs, bool useEditDista
 void PrintBedPE(const BamAlignment &bam,  const RefVector &refs, bool useEditDistance) {
 
 	string chrom1, chrom2, strand1, strand2;
-	int start1, start2, end1, end2;
+	unsigned int start1, start2, end1, end2;
 	start1 = start2 = end1 = end2 = -1;
 	chrom1 = chrom2 = strand1 = strand2 = ".";
 	
@@ -195,7 +195,8 @@ void PrintBedPE(const BamAlignment &bam,  const RefVector &refs, bool useEditDis
 	if (bam.IsMapped()) {
 		chrom1 = refs.at(bam.RefID).RefName;
 		start1 = bam.Position;
-		end1 = bam.Position + bam.Length;
+		end1 = bam.Position + bam.AlignedBases.size();  // use the aligned length, 
+		                                                // not the orig. length
 		strand1 = "+";
 		if (bam.IsReverseStrand()) strand1 = "-";	
 	}
@@ -204,7 +205,8 @@ void PrintBedPE(const BamAlignment &bam,  const RefVector &refs, bool useEditDis
 	if (bam.IsMateMapped()) {
 		chrom2 = refs.at(bam.MateRefID).RefName;
 		start2 = bam.MatePosition;
-		end2 = bam.MatePosition + bam.Length;
+		end2 = bam.MatePosition + bam.AlignedBases.size();  // use the aligned length, 
+		                                                    // not the orig. length
 		strand2 = "+";
 		if (bam.IsMateReverseStrand()) strand2 = "-";	
 	}		

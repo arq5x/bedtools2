@@ -14,7 +14,12 @@ intersecting genomic features in the ubiquitous UCSC Genome Browser BED format.
 
 
 ===Manual===
-See the PDF manual included in this distribution for more details on usage, file formats, behavior, etc.
+See the extensive PDF manual included at: http://bedtools.googlecode.com/files/BEDTools-User-Manual.pdf.
+
+This manual covers many common usage examples.  There are also examples available at:
+http://code.google.com/p/bedtools/wiki/Usage
+http://code.google.com/p/bedtools/wiki/UsageMoreAdvanced
+
 
 
 ===BEDTools===

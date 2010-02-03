@@ -291,8 +291,10 @@ void BedIntersectPE::FindSpanningOverlaps(const BEDPE &a, vector<BED> &hits, str
 		// is there enough overlap relative to the user's request? (default ~ 1bp)
 		if ( ( (float) overlapBases / (float) spanLength ) >= this->overlapFraction ) {
 			numOverlaps++;
-			bedA->reportBedPETab(a);
-			bedB->reportBedNewLine(*h);
+			if ((type == "ispan") || (type == "ospan")) {
+				bedA->reportBedPETab(a);
+				bedB->reportBedNewLine(*h);
+			}
 		}
 	}
 	
