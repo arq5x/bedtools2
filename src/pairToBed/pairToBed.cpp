@@ -175,6 +175,10 @@ bool BedIntersectPE::FindOneOrMoreOverlaps(const BEDPE &a, vector<BED> &hits1, v
 	int numOverlapsEnd1 = 0;
 	int numOverlapsEnd2 = 0;
 
+	/* 
+	   Look for overlaps in end 1
+	*/
+	
 	// make sure we have a valid chromosome before we search
 	if (a.chrom1 != ".") {
 		// Find the quality hits between ***end1*** of the BEDPE and the B BED file
@@ -192,15 +196,21 @@ bool BedIntersectPE::FindOneOrMoreOverlaps(const BEDPE &a, vector<BED> &hits1, v
 			// is there enough overlap relative to the user's request? (default ~ 1bp)
 			if ( ( (float) overlapBases / (float) aLength ) >= this->overlapFraction ) {
 				numOverlapsEnd1++;
+				qualityHits1.push_back(*h);
 				
 				if (type == "either") return true;
-				else {
-					qualityHits1.push_back(*h);
-				}	
+				else if (type == "neither") return false;
 			}
 		}
 	}
 	
+	// if testing for "notboth" or "both", we can bail early depending on end one
+	if ((type == "notboth") && (numOverlapsEnd1 == 0)) return true;
+	else if ((type == "both") && (numOverlapsEnd1 == 0)) return false;
+	
+	/* 
+	   Now look for overlaps in end 2
+	*/
 	
 	// make sure we have a valid chromosome before we search
 	if (a.chrom2 != ".") {
@@ -219,28 +229,32 @@ bool BedIntersectPE::FindOneOrMoreOverlaps(const BEDPE &a, vector<BED> &hits1, v
 			// is there enough overlap relative to the user's request? (default ~ 1bp)
 			if ( ( (float) overlapBases / (float) aLength ) >= this->overlapFraction ) {
 				numOverlapsEnd2++;
+				qualityHits2.push_back(*h);
 				
 				if (type == "either") return true;
-				else {
-					qualityHits2.push_back(*h);
-				}	
+				else if (type == "neither") return false;
+				else if ((type == "notboth") && (numOverlapsEnd1 > 0)) return false;	
 			}
 		}
 	}
-		
+	
 	// Now report the hits depending on what the user has requested.
-	if (type == "neither") {
+	if (type == "notboth") {
+		if ( (numOverlapsEnd1 == 0) || (numOverlapsEnd2 == 0) ) return true;
+		else return false;
+	}
+	else if (type == "neither") {
 		if ( (numOverlapsEnd1 == 0) && (numOverlapsEnd2 == 0) ) return true;
+		else return false;		
 	}
 	else if (type == "xor") {
 		if ( (numOverlapsEnd1 > 0) && (numOverlapsEnd2 == 0) ) return true;
 		else if ( (numOverlapsEnd1 == 0) && (numOverlapsEnd2 > 0) ) return true;
+		else return false;
 	}
 	else if (type == "both") {
 		if ( (numOverlapsEnd1 > 0) && (numOverlapsEnd2 > 0) ) return true;
-	}
-	else if (type == "notboth") {
-		if ( (numOverlapsEnd1 == 0) || (numOverlapsEnd2 == 0) ) return true;
+		return false;
 	}
 	return false;
 }
