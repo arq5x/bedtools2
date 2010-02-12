@@ -71,6 +71,7 @@ struct BED {
 
 // return the genome "bin" for a feature with this start and end
 int getBin(int start, int end);
+
 	
 // return the amount of overlap between two features.  Negative if none and the the 
 // number of negative bases is the distance between the two.
@@ -118,11 +119,15 @@ bool byChromThenStart(BED const &a, BED const &b);
 //*************************************************
 // Common typedefs
 //*************************************************
+typedef vector<BED> bedVector;
+
 typedef map<int, vector<BED>, std::less<int> > binsToBeds;
 //typedef tr1::unordered_map<int, vector<BED> > binsToBeds;
 
 typedef map<string, binsToBeds, std::less<string> > masterBedMap;
 //typedef tr1::unordered_map<string, binsToBeds> masterBedMap;
+
+//typedef map<string, bedVector, std::less<string> > masterBedMap;
 
 typedef map<string, vector<BED>, std::less<string> > masterBedMapNoBin;
 
@@ -151,6 +156,15 @@ public:
 	// Searches through each relevant genome bin on the same chromosome
 	// as the single feature. Note: Adapted from kent source "binKeeperFind"
 	void FindOverlapsPerBin(string chrom, int start, int end, string strand, vector<BED> &hits, bool forceStrand);
+
+	// return true if at least one overlap was found.  otherwise, return false.
+	bool FindOneOrMoreOverlapsPerBin(string chrom, int start, int end, string strand, 
+										bool forceStrand, float overlapFraction);
+
+	// return true if at least one __reciprocal__ overlap was found.  otherwise, return false.
+	bool FindOneOrMoreReciprocalOverlapsPerBin(string chrom, int start, int end, string strand, 
+													bool forceStrand, float overlapFraction);
+	
 
 	// Given a chrom, start, end and strand for a single feature,
 	// increment a the number of hits for each feature in B file

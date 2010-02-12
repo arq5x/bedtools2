@@ -137,39 +137,17 @@ bool BedIntersect::FindOverlaps(const BED &a, vector<BED> &hits) {
 }
 
 
-bool BedIntersect::FindOneOrMoreOverlap(const BED &a, vector<BED> &hits) {
-	
-	// grab _all_ of the features in B that overlap with a.
-	bedB->FindOverlapsPerBin(a.chrom, a.start, a.end, a.strand, hits, this->forceStrand); 
-	
-	// loop through the hits and report those that meet the user's criteria
-	vector<BED>::const_iterator h = hits.begin();
-	vector<BED>::const_iterator hitsEnd = hits.end();
-	for (; h != hitsEnd; ++h) {
-		
-		int s = max(a.start, h->start);
-		int e = min(a.end, h->end);
-		int overlapBases = (e - s);				// the number of overlapping bases b/w a and b
-		int aLength = (a.end - a.start);		// the length of a in b.p.
-		
-		// is there enough overlap relative to the user's request? (default ~ 1bp)
-		if ( ( (float) overlapBases / (float) aLength ) >= this->overlapFraction ) { 
-		
-			// Report the hit if the user doesn't care about reciprocal overlap between A and B.
-			if (!reciprocal) {
-				return true;
-			}
-			else {			// the user wants there to be sufficient reciprocal overlap
-				int bLength = (h->end - h->start);
-				float bOverlap = ( (float) overlapBases / (float) bLength );
-			
-				if (bOverlap >= this->overlapFraction) {
-					return true;
-				}
-			}
-		}
+bool BedIntersect::FindOneOrMoreOverlap(const BED &a) {
+	bool overlapsFound;
+	if (this->reciprocal == false) {
+		overlapsFound = bedB->FindOneOrMoreOverlapsPerBin(a.chrom, a.start, a.end, a.strand, 
+			this->forceStrand, this->overlapFraction); 
 	}
-	return false;
+	else {
+		overlapsFound = bedB->FindOneOrMoreReciprocalOverlapsPerBin(a.chrom, a.start, a.end, a.strand, 
+			this->forceStrand, this->overlapFraction);
+	}
+	return overlapsFound;
 }
  
 
@@ -239,8 +217,9 @@ void BedIntersect::IntersectBam(string bamFile) {
 			BED a;
 			a.chrom = refs.at(bam.RefID).RefName;
 			a.start = bam.Position;
-			a.end = bam.Position + bam.Length;
+			a.end = bam.Position + bam.AlignedBases.size();
 
+			// build the name field from the BAM alignment.
 			a.name = bam.Name;
 			if (bam.IsFirstMate()) a.name += "/1";
 			if (bam.IsSecondMate()) a.name += "/2";
@@ -249,7 +228,7 @@ void BedIntersect::IntersectBam(string bamFile) {
 			a.strand = "+"; if (bam.IsReverseStrand()) a.strand = "-"; 
 	
 			if (this->bamOutput == true) {
-				overlapsFound = FindOneOrMoreOverlap(a, hits);
+				overlapsFound = FindOneOrMoreOverlap(a);
 				if (overlapsFound == true) {
 					if (!this->noHit) writer.SaveAlignment(bam);
 				}
@@ -258,9 +237,9 @@ void BedIntersect::IntersectBam(string bamFile) {
 				}
 			}
 			else {
-				overlapsFound = FindOverlaps(a, hits);				
+				overlapsFound = FindOverlaps(a, hits);
+				hits.clear();
 			}
-			hits.clear();
 		}
 	}
 	

@@ -15,31 +15,6 @@
 #include "bedFilePE.h"
 
 
-/*void BedFilePE::binKeeperFind(map<int, vector<BED>, std::less<int> > &bk, const int start, const int end, vector<BED> &hits) {
-
-	int startBin, endBin;
-	startBin = (start >>_binFirstShift);
-	endBin = ((end-1) >>_binFirstShift);
-	
-	for (int i = 0; i < 6; ++i) {
-		int offset = binOffsetsExtended[i];
-
-		for (int j = (startBin+offset); j <= (endBin+offset); ++j)  {
-			for (vector<BED>::const_iterator el = bk[j].begin(); el != bk[j].end(); ++el) {
-				
-				if (overlaps(el->start, el->end, start, end) > 0) {
-					hits.push_back(*el);
-				}
-				
-			}
-		}
-		startBin >>= _binNextShift;
-		endBin >>= _binNextShift;
-	}
-}
-*/
-
-
 /*
 	Adapted from kent source "binKeeperFind"
 */
@@ -267,7 +242,7 @@ bool BedFilePE::parseBedPELine (BEDPE &bed, const vector<string> &lineVector, co
 			bed.strand1 = lineVector[8];
 			bed.strand2 = lineVector[9];
 			
-			for (unsigned int i = 6; i < lineVector.size(); ++i) {
+			for (unsigned int i = 10; i < lineVector.size(); ++i) {
 				bed.otherFields.push_back(lineVector[i]); 
 			}
 			return true;
@@ -360,7 +335,7 @@ bool BedFilePE::parseBedPELine (BEDPE &bed, const vector<string> &lineVector, co
 			bed.strand1 = lineVector[8];
 			bed.strand2 = lineVector[9];
 			
-			for (unsigned int i = 6; i < lineVector.size(); ++i) {
+			for (unsigned int i = 10; i < lineVector.size(); ++i) {
 				bed.otherFields.push_back(lineVector[i]); 
 			}
 			return true;
@@ -433,9 +408,9 @@ void BedFilePE::loadBedPEFileIntoMap() {
 				// load end1 into a UCSC bin map
 				bin1 = getBin(bedEntry1.start, bedEntry1.end);
 				this->bedMapEnd1[bedEntry1.chrom][bin1].push_back(bedEntry1);	
-
+				
 				// load end2 into a UCSC bin map
-				bin2 = getBin(bedEntry2.start, bedEntry2.end);				
+				bin2 = getBin(bedEntry2.start, bedEntry2.end);
 				this->bedMapEnd2[bedEntry2.chrom][bin2].push_back(bedEntry2);		
 			}
 			bedFields.clear();
@@ -459,7 +434,7 @@ void BedFilePE::loadBedPEFileIntoMap() {
 
 					// load end2 into a UCSC bin map
 					bin2 = getBin(bedEntry2.start, bedEntry2.end);				
-					this->bedMapEnd2[bedEntry2.chrom][bin2].push_back(bedEntry2);
+					this->bedMapEnd2[bedEntry2.chrom][bin2].push_back(bedEntry2);		
 				}
 				bedFields.clear();			
 			}

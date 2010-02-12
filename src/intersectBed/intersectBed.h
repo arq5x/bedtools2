@@ -46,7 +46,7 @@ public:
 	void reportB(const BED &);
 
 	bool FindOverlaps(const BED &a, vector<BED> &hits);
-	bool FindOneOrMoreOverlap(const BED &a, vector<BED> &hits);
+	bool FindOneOrMoreOverlap(const BED &a);
 	
 	void IntersectBed(istream &bedInput);
 	void IntersectBam(string bamFile);

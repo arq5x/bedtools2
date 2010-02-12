@@ -111,18 +111,18 @@ void BedFile::FindOverlapsPerBin(string chrom, int start, int end, string strand
 			// loop through each feature in this chrom/bin and see if it overlaps
 			// with the feature that was passed in.  if so, add the feature to 
 			// the list of hits.
-			vector<BED>::const_iterator bedItr = bedMap[chrom][j].begin();
+		 	vector<BED>::const_iterator bedItr = bedMap[chrom][j].begin();
 			vector<BED>::const_iterator bedEnd = bedMap[chrom][j].end();
+
 			for (; bedItr != bedEnd; ++bedItr) {
-				
-				// skip the hit if not on the same strand (and we care)
-				if (forceStrand && (strand != bedItr->strand)) {
-					continue;
-				}
-				else if (overlaps(bedItr->start, bedItr->end, start, end) > 0) {
-					hits.push_back(*bedItr);	// it's a hit, add it.
-				}
-							
+				// do we have sufficient overlap?
+				if (overlaps(bedItr->start, bedItr->end, start, end) > 0) {
+					// skip the hit if not on the same strand (and we care)
+					if (forceStrand == false) hits.push_back(*bedItr);
+					else if ( (forceStrand == true) && (strand == bedItr->strand)) {
+						hits.push_back(*bedItr);
+					}
+				}			
 			}
 		}
 		startBin >>= _binNextShift;
@@ -130,6 +130,96 @@ void BedFile::FindOverlapsPerBin(string chrom, int start, int end, string strand
 	}
 }
 
+
+bool BedFile::FindOneOrMoreOverlapsPerBin(string chrom, int start, int end, string strand, 
+	bool forceStrand, float overlapFraction) {
+
+	int startBin, endBin;
+	startBin = (start >> _binFirstShift);
+	endBin = ((end-1) >> _binFirstShift);
+
+	int aLength = (end - start);
+	
+	// loop through each bin "level" in the binning hierarchy
+	for (int i = 0; i < 6; ++i) {
+		
+		// loop through each bin at this level of the hierarchy
+		int offset = binOffsetsExtended[i];
+		for (int j = (startBin+offset); j <= (endBin+offset); ++j)  {
+			
+			// loop through each feature in this chrom/bin and see if it overlaps
+			// with the feature that was passed in.  if so, add the feature to 
+			// the list of hits.
+			vector<BED>::const_iterator bedItr = bedMap[chrom][j].begin();
+			vector<BED>::const_iterator bedEnd = bedMap[chrom][j].end();
+			for (; bedItr != bedEnd; ++bedItr) {
+				int s = max(start, bedItr->start);
+				int e = min(end, bedItr->end);
+				// the number of overlapping bases b/w a and b
+				int overlapBases = (e - s);
+
+				// do we have sufficient overlap?
+				if ( (float) overlapBases / (float) aLength  >= overlapFraction) {					
+					// skip the hit if not on the same strand (and we care)
+					if (forceStrand == false) return true;
+					else if ( (forceStrand == true) && (strand == bedItr->strand)) {
+						return true;
+					}
+				}			
+			}
+		}
+		startBin >>= _binNextShift;
+		endBin >>= _binNextShift;
+	}
+	return false;
+}
+
+
+bool BedFile::FindOneOrMoreReciprocalOverlapsPerBin(string chrom, int start, int end, string strand, 
+	bool forceStrand, float overlapFraction) {
+
+	int startBin, endBin;
+	startBin = (start >> _binFirstShift);
+	endBin = ((end-1) >> _binFirstShift);
+
+	int aLength = (end - start);
+	
+	// loop through each bin "level" in the binning hierarchy
+	for (int i = 0; i < 6; ++i) {
+		
+		// loop through each bin at this level of the hierarchy
+		int offset = binOffsetsExtended[i];
+		for (int j = (startBin+offset); j <= (endBin+offset); ++j)  {
+			
+			// loop through each feature in this chrom/bin and see if it overlaps
+			// with the feature that was passed in.  if so, add the feature to 
+			// the list of hits.
+			vector<BED>::const_iterator bedItr = bedMap[chrom][j].begin();
+			vector<BED>::const_iterator bedEnd = bedMap[chrom][j].end();
+			for (; bedItr != bedEnd; ++bedItr) {
+				int s = max(start, bedItr->start);
+				int e = min(end, bedItr->end);
+				// the number of overlapping bases b/w a and b
+				int overlapBases = (e - s);
+				
+				// do we have sufficient overlap?
+				if ( (float) overlapBases / (float) aLength  >= overlapFraction) {					
+					int bLength = (bedItr->end - bedItr->start);
+					float bOverlap = ( (float) overlapBases / (float) bLength );
+					if ((forceStrand == false) && (bOverlap >= overlapFraction)) {
+						return true;
+					}
+					else if ( (forceStrand == true) && (strand == bedItr->strand) && (bOverlap >= overlapFraction)) {
+						return true;
+					}
+				}			
+			}
+		}
+		startBin >>= _binNextShift;
+		endBin >>= _binNextShift;
+	}
+	return false;
+}
 
 
 void BedFile::countHits(const BED &a, bool forceStrand) {
@@ -202,7 +292,7 @@ bool BedFile::parseLine (BED &bed, const vector<string> &lineVector, int &lineNu
 	char *p2End, *p3End, *p4End, *p5End;
 	long l2, l3, l4, l5;
 	
-	if ((lineVector[0] != "track") && (lineVector[0] != "browser") && (lineVector[0].find("#") == string::npos) ) {
+	if ((lineVector[0].find("track") == string::npos) && (lineVector[0].find("browser") && string::npos) && (lineVector[0].find("#") == string::npos) ) {
 
 		// we need at least 3 columns
 		if (lineVector.size() >= 3) {
@@ -515,7 +605,10 @@ void BedFile::loadBedFileIntoMap() {
 				int bin = getBin(bedEntry.start, bedEntry.end);
 				bedEntry.count = 0;
 				bedEntry.minOverlapStart = INT_MAX;
-				this->bedMap[bedEntry.chrom][bin].push_back(bedEntry);	
+
+				//string key = getChromBinKey(bedEntry.chrom, bin);
+				//this->bedMap[key].push_back(bedEntry);	
+				this->bedMap[bedEntry.chrom][bin].push_back(bedEntry);
 			}
 			bedFields.clear();
 		}
@@ -531,7 +624,7 @@ void BedFile::loadBedFileIntoMap() {
 				int bin = getBin(bedEntry.start, bedEntry.end);
 				bedEntry.count = 0;
 				bedEntry.minOverlapStart = INT_MAX;
-				this->bedMap[bedEntry.chrom][bin].push_back(bedEntry);	
+				this->bedMap[bedEntry.chrom][bin].push_back(bedEntry);
 			}
 			bedFields.clear();
 		}
