@@ -1,3 +1,11 @@
+Version 2.5.3 (Feb-19-2010)
+1. Fixed bug to "re-allow" track and "browser" lines.
+2. Fixed bug in reporting BEDPE overlaps.
+3. Fixed bug when using type "notboth" with BAM files in pairToBed.
+4. When comparing BAM files to BED/GFF annotations with intersectBed or pairToBed, the __aligned__ sequence is used, rather than the __original__ sequence.
+5. Greatly increased the speed of pairToBed when using BAM alignments.
+6. Fixed a bug in bamToBed when reporting edit distance from certain aligners.
+
 Version 2.5.2 (Feb-2-2010)
 1. The start and end coordinates for BED and BEDPE entries created by bamToBed are now based on the __aligned__ sequence, rather than the original sequence.  It's obvious, but I missed it originally...sorry.
 2. Added an error message to mergeBed preventing one from using "-n" and "-nms" together.

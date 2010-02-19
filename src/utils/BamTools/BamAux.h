@@ -173,13 +173,12 @@ struct BamAlignment {
                 const char* pTagStorageType = pTagData + 2;
                 pTagData       += 3;
                 numBytesParsed += 3;
-
                 // check the current tag
                 if ( strncmp(pTagType, "NM", 2) == 0 ) {
                     foundEditDistanceTag = true;
                     break;
                 }
-
+				
                 // get the storage class and find the next tag
                 SkipToNextTag( *pTagStorageType, pTagData, numBytesParsed );
             }
@@ -193,7 +192,7 @@ struct BamAlignment {
 
     private:
         static void SkipToNextTag(const char storageType, char* &pTagData, unsigned int& numBytesParsed) {
-            switch(storageType) {
+			switch(storageType) {
 
                 case 'A':
                 case 'c':
@@ -221,6 +220,7 @@ struct BamAlignment {
                             ++numBytesParsed;
                             ++pTagData;
                         }
+						++pTagData;
                         break;
 
                 default:
