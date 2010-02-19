@@ -187,7 +187,7 @@ void PrintBed(const BamAlignment &bam,  const RefVector &refs, bool useEditDista
 void PrintBedPE(const BamAlignment &bam,  const RefVector &refs, bool useEditDistance) {
 
 	string chrom1, chrom2, strand1, strand2;
-	unsigned int start1, start2, end1, end2;
+	int start1, start2, end1, end2;
 	start1 = start2 = end1 = end2 = -1;
 	chrom1 = chrom2 = strand1 = strand2 = ".";
 	
