@@ -243,7 +243,7 @@ void BamWriter::BamWriterPrivate::SaveAlignment(const BamAlignment& al) {
     const unsigned int encodedQueryLen = encodedQuery.size();
 
     // store the tag data length
-    const unsigned int tagDataLength = al.TagData.size() + 1;
+    const unsigned int tagDataLength = al.TagData.size();
 
     // assign the BAM core data
     unsigned int buffer[8];
