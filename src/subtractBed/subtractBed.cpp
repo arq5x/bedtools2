@@ -35,7 +35,6 @@ BedSubtract::~BedSubtract(void) {
 }
 
 
-
 void BedSubtract::FindOverlaps(BED &a, vector<BED> &hits) {
 	
 	// find all of the overlaps between a and B.

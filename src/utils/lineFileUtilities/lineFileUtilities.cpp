@@ -14,9 +14,7 @@
 // lineFileUtilities:
 // 		Common Functions
 //***********************************************
-
-void Tokenize(string str, vector<string>& tokens)
-{
+void Tokenize(string str, vector<string> &tokens, const string &delimiter) {
 
 	/*
 	//method to tokenize on any whitespace
@@ -28,18 +26,18 @@ void Tokenize(string str, vector<string>& tokens)
 	*/
 
 	// Skip delimiters at beginning.
-	string::size_type lastPos = str.find_first_not_of("\t", 0);
+	string::size_type lastPos = str.find_first_not_of(delimiter, 0);
 	// Find first "non-delimiter".
-	string::size_type pos     = str.find_first_of("\t", lastPos);
+	string::size_type pos     = str.find_first_of(delimiter, lastPos);
 
 	while (string::npos != pos || string::npos != lastPos)
 	{
 		// Found a token, add it to the vector.
 		tokens.push_back(str.substr(lastPos, pos - lastPos));
 		// Skip delimiters.  Note the "not_of"
-		lastPos = str.find_first_not_of("\t", pos);
+		lastPos = str.find_first_not_of(delimiter, pos);
 		// Find next "non-delimiter"
-		pos = str.find_first_of("\t", lastPos);
+		pos = str.find_first_of(delimiter, lastPos);
 	}
 	
 }

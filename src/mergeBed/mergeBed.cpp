@@ -268,7 +268,7 @@ void BedMerge::MergeBedStranded() {
 					names.clear();
 					
 					// add the name of the 
-					names.push_back(bedList[prev].name);
+					names.push_back(bedList[curr].name);
 				}
 				prev = curr;
 			}

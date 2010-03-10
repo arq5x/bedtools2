@@ -132,7 +132,7 @@ bool BedIntersect::FindOverlaps(const BED &a, vector<BED> &hits) {
 	else if (noHit && (numOverlaps == 0)) {
 		bedA->reportBedNewLine(a);
 	}
-	
+
 	return hitsFound;
 }
 
