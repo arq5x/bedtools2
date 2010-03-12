@@ -19,6 +19,8 @@
 
 using namespace std;
 
+void ReportMergedNames(const map<string, bool> &names);
+
 //************************************************
 // Class methods and elements
 //************************************************

@@ -12,6 +12,18 @@
 #include "lineFileUtilities.h"
 #include "mergeBed.h"
 
+
+void ReportMergedNames(const map<string, bool> &names) {
+	unsigned int n = 0;
+	map<string, bool>::const_iterator nameItr = names.begin();
+	map<string, bool>::const_iterator nameEnd = names.end();
+	for (; nameItr != nameEnd; ++nameItr) {
+		if (n < (names.size() - 1)) {cout << nameItr->first << ";";}
+		else {cout << nameItr->first;}
+		n++;
+	}
+}
+
 // ===============
 // = Constructor =
 // ===============
@@ -52,37 +64,40 @@ void BedMerge::MergeBed() {
 		int minStart = INT_MAX;
 		int maxEnd = 0;
 		bool OIP = false;       // OIP = Overlap In Progress.  Lame, I realize.
-		unsigned int prev = 0;
+		int prev = -1;
 		unsigned int curr = 0;
 		int mergeCount = 1;
-		vector<string> names;
+		map<string, bool> names;
 
 		// loop through the BED entries for this chromosome
 		// and look for overlaps
-		for (curr = 1; curr < bedList.size(); ++curr) {
+		for (curr = 0; curr < bedList.size(); ++curr) {
 			
+			// make sure prev points to an actual element
+			if (prev < 0) {
+				prev = curr;
+				continue;
+			}
+
 			// Is there an overlap between the current and previous entries?		
 			if ( overlaps(bedList[prev].start, bedList[prev].end, 
 			 			bedList[curr].start, bedList[curr].end) >= this->maxDistance) {
-				
 				OIP = true;
 				mergeCount++;
 				minStart = min(bedList[prev].start, min(minStart, bedList[curr].start));
 				maxEnd = max(bedList[prev].end, max(maxEnd, bedList[curr].end));
-				
-				//names.push_back(bedList[prev].name);
-				names.push_back(bedList[curr].name);
+
+				names[bedList[prev].name] = true;
+				names[bedList[curr].name] = true;
 			}
 			else if ( overlaps(minStart, maxEnd, 
 							bedList[curr].start, bedList[curr].end) >= this->maxDistance) {
 				mergeCount++;
 				minStart = min(minStart, bedList[curr].start);
 				maxEnd = max(maxEnd, bedList[curr].end);
-				
-				names.push_back(bedList[curr].name);
+				names[bedList[curr].name] = true;
 			}
 			else {
-
 				// was there an overlap befor the current entry broke it?
 				if (OIP) {
 					if (this->numEntries) {
@@ -90,10 +105,7 @@ void BedMerge::MergeBed() {
 					}
 					else if (this->reportNames) {
 						cout << bedList[prev].chrom << "\t" << minStart << "\t" << maxEnd << "\t";
-						for (unsigned int n = 0; n < names.size(); ++n) {
-							if (n < (names.size() - 1)) {cout << names[n] << ";";}
-							else {cout << names[n];}
-						}
+						ReportMergedNames(names);
 						cout << endl;
 					}
 					else {
@@ -117,8 +129,9 @@ void BedMerge::MergeBed() {
 				mergeCount = 1;			
 				minStart = INT_MAX;
 				maxEnd = 0;
+				
 				names.clear();
-				names.push_back(bedList[prev].name);
+				names[bedList[curr].name] = true;
 			}
 			prev = curr;
 		}
@@ -130,10 +143,7 @@ void BedMerge::MergeBed() {
 			}
 			else if (this->reportNames) {
 				cout << bedList[prev].chrom << "\t" << minStart << "\t" << maxEnd << "\t";
-				for (unsigned int n = 0; n < names.size(); ++n) {
-					if (n < (names.size() - 1)) {cout << names[n] << ";";}
-					else {cout << names[n];}
-				}
+				ReportMergedNames(names);
 				cout << endl;
 			}
 			else {
@@ -185,7 +195,7 @@ void BedMerge::MergeBedStranded() {
 			unsigned int curr = 0;
 			int mergeCount = 1;
 			int numOnStrand = 0;
-			vector<string> names;	
+			map<string, bool> names;	
 			
 			// loop through the BED entries for this chromosome
 			// and look for overlaps
@@ -211,23 +221,21 @@ void BedMerge::MergeBedStranded() {
 				}
 	
 				if ( overlaps(bedList[prev].start, bedList[prev].end, 
-				 			bedList[curr].start, bedList[curr].end) >= this->maxDistance) {
-					
+				 			bedList[curr].start, bedList[curr].end) >= this->maxDistance) {					
 					OIP = true;
 					mergeCount++;
 					minStart = min(bedList[prev].start, min(minStart, bedList[curr].start));
 					maxEnd = max(bedList[prev].end, max(maxEnd, bedList[curr].end));
 
-					names.push_back(bedList[curr].name);
+					names[bedList[prev].name] = true;
+					names[bedList[curr].name] = true;
 				}
 				else if ( overlaps(minStart, maxEnd, 
 								bedList[curr].start, bedList[curr].end) >= this->maxDistance) {
-
 					mergeCount++;
 					minStart = min(minStart, bedList[curr].start);
 					maxEnd = max(maxEnd, bedList[curr].end);
-					
-					names.push_back(bedList[curr].name);
+					names[bedList[curr].name] = true;
 				}
 				else {
 
@@ -238,10 +246,7 @@ void BedMerge::MergeBedStranded() {
 						}
 						else if (this->reportNames) {
 							cout << bedList[prev].chrom << "\t" << minStart << "\t" << maxEnd << "\t";
-							for (unsigned int n = 0; n < names.size(); ++n) {
-								if (n < (names.size() - 1)) {cout << names[n] << ";";}
-								else {cout << names[n];}
-							}
+							ReportMergedNames(names);
 							cout << "\t" << strands[s] << endl;
 						}
 						else {
@@ -267,8 +272,8 @@ void BedMerge::MergeBedStranded() {
 					maxEnd = 0;
 					names.clear();
 					
-					// add the name of the 
-					names.push_back(bedList[curr].name);
+					// add the name of the current element in prep for the next block
+					names[bedList[curr].name] = true;
 				}
 				prev = curr;
 			}
@@ -280,10 +285,7 @@ void BedMerge::MergeBedStranded() {
 				}
 				else if (this->reportNames) {
 					cout << bedList[prev].chrom << "\t" << minStart << "\t" << maxEnd << "\t";
-					for (unsigned int n = 0; n < names.size(); ++n) {
-						if (n < (names.size() - 1)) {cout << names[n] << ";";}
-						else {cout << names[n];}
-					}
+					ReportMergedNames(names);
 					cout << "\t" << strands[s] << endl;
 				}
 				else {
