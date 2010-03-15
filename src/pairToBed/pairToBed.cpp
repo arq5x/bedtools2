@@ -129,12 +129,29 @@ void BedIntersectPE::FindOverlaps(const BEDPE &a, vector<BED> &hits1, vector<BED
 	}
 	
 	// Now report the hits depending on what the user has requested.
-	if ( (type == "neither") || (type == "notboth") ) {
+	if (type == "neither") {
 		if ( (numOverlapsEnd1 == 0) && (numOverlapsEnd2 == 0) ) {
 			bedA->reportBedPENewLine(a); 
 		}
 	}
-	else if ( (type == "xor") || (type == "notboth") ) {
+	else if (type == "notboth") {
+		if ( (numOverlapsEnd1 == 0) && (numOverlapsEnd2 == 0) ) {
+			bedA->reportBedPENewLine(a); 
+		}
+		else if ( (numOverlapsEnd1 > 0) && (numOverlapsEnd2 == 0) ) {
+			for (vector<BED>::iterator q = qualityHits1.begin(); q != qualityHits1.end(); ++q) {
+				bedA->reportBedPETab(a);
+				bedB->reportBedNewLine(*q);
+			}
+		}
+		else if ( (numOverlapsEnd1 == 0) && (numOverlapsEnd2 > 0) ) {
+			for (vector<BED>::iterator q = qualityHits2.begin(); q != qualityHits2.end(); ++q) {
+				bedA->reportBedPETab(a);
+				bedB->reportBedNewLine(*q);
+			}
+		}
+	}
+	else if (type == "xor") {
 		if ( (numOverlapsEnd1 > 0) && (numOverlapsEnd2 == 0) ) {
 			for (vector<BED>::iterator q = qualityHits1.begin(); q != qualityHits1.end(); ++q) {
 				bedA->reportBedPETab(a);
