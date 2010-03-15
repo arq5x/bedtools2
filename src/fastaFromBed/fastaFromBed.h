@@ -28,7 +28,8 @@ class Bed2Fa {
 public:
 	
 	// constructor 
-	Bed2Fa(bool &, string &, string &, string &, bool &);
+	Bed2Fa(bool &useName, string &dbFile, string &bedFile, string &fastaOutFile, 
+		bool &useFasta, bool &useStrand);
 
 	// destructor
 	~Bed2Fa(void);
@@ -42,6 +43,7 @@ private:
 	string bedFile;
 	string fastaOutFile;
 	bool useFasta;
+	bool useStrand;
 	
 	// instance of a bed file class.
 	BedFile *bed;

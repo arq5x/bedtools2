@@ -42,6 +42,7 @@ int main(int argc, char* argv[]) {
 	bool haveFastaOut = false;
 	bool useNameOnly = false;
 	bool useFasta = true;
+	bool useStrand = false;	
 
 	// check to see if we should print out some help
 	if(argc <= 1) showHelp = true;
@@ -89,6 +90,9 @@ int main(int argc, char* argv[]) {
 		else if(PARAMETER_CHECK("-tab", 4, parameterLength)) {
 			useFasta = false;
 		}
+		else if(PARAMETER_CHECK("-s", 2, parameterLength)) {
+			useStrand = true;
+		}
 		else {
 			cerr << "*****ERROR: Unrecognized parameter: " << argv[i] << " *****" << endl << endl;
 			showHelp = true;
@@ -101,7 +105,7 @@ int main(int argc, char* argv[]) {
 	
 	if (!showHelp) {
 
-		Bed2Fa *b2f = new Bed2Fa(useNameOnly, fastaDbFile, bedFile, fastaOutFile, useFasta);
+		Bed2Fa *b2f = new Bed2Fa(useNameOnly, fastaDbFile, bedFile, fastaOutFile, useFasta, useStrand);
 		b2f->ExtractDNA(); 
 		return 0;
 	}
@@ -125,8 +129,13 @@ void ShowHelp(void) {
 	cerr << "\t-bed\tBED file of ranges to extract from -fi" << endl;
 	cerr << "\t-fo\tOutput file (can be FASTA or TAB-delimited)" << endl;
 	cerr << "\t-name\tUse the BED name field (#4) for the FASTA header" << endl;
+
 	cerr << "\t-tab\tWrite output in TAB delimited format." << endl;	
-	cerr 	<< "\t\tDefault is FASTA format." << endl;
+	cerr << "\t\t- Default is FASTA format." << endl << endl;
+
+	cerr << "\t-s\tForce strandedness. If the feature occupies the antisense strand," << endl;
+	cerr << "\t\tthe sequence will be reverse complemented." << endl;
+	cerr << "\t\t- By default, strand information is ignored." << endl << endl;	
 
 
 

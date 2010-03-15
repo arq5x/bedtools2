@@ -17,23 +17,25 @@
 	Constructor
 */
 BedIntersect::BedIntersect(string bedAFile, string bedBFile, bool anyHit, 
-						   bool writeA, bool writeB, float overlapFraction, 
+						   bool writeA, bool writeB, bool writeOverlap, float overlapFraction, 
 						   bool noHit, bool writeCount, bool forceStrand, bool reciprocal,
 						   bool bamInput, bool bamOutput) {
 
-	this->bedAFile = bedAFile;
-	this->bedBFile = bedBFile;
-	this->anyHit = anyHit;
-	this->noHit = noHit;
-	this->writeA = writeA;	
-	this->writeB = writeB;
-	this->writeCount = writeCount;
+	this->bedAFile        = bedAFile;
+	this->bedBFile        = bedBFile;
+	this->anyHit          = anyHit;
+	this->noHit           = noHit;
+	this->writeA          = writeA;	
+	this->writeB          = writeB;
+	this->writeOverlap    = writeOverlap;	
+	this->writeCount      = writeCount;
 	this->overlapFraction = overlapFraction;
-	this->forceStrand = forceStrand;
-	this->reciprocal = reciprocal;
-	this->bamInput = bamInput;
-	this->bamOutput = bamOutput;
+	this->forceStrand     = forceStrand;
+	this->reciprocal      = reciprocal;
+	this->bamInput        = bamInput;
+	this->bamOutput       = bamOutput;
 	
+	// create new BED file objects for A and B
 	this->bedA = new BedFile(bedAFile);
 	this->bedB = new BedFile(bedBFile);
 }
@@ -80,7 +82,7 @@ bool BedIntersect::FindOverlaps(const BED &a, vector<BED> &hits) {
 				
 				hitsFound = true;
 				numOverlaps++;		// we have another hit for A
-				
+/*				
 				if (!writeB && printable) {
 					if (writeA) bedA->reportBedNewLine(a); 
 					else bedA->reportBedRangeNewLine(a,s,e);
@@ -95,6 +97,30 @@ bool BedIntersect::FindOverlaps(const BED &a, vector<BED> &hits) {
 						bedB->reportBedNewLine(*h);									
 					}
 				}
+*/				
+				// new
+				if (printable == true) {
+					if (writeA == false && writeB == false && writeOverlap == false) {
+						bedA->reportBedRangeNewLine(a,s,e);
+					}
+					else if (writeA == true && writeB == true) {
+						bedA->reportBedTab(a);
+						bedB->reportBedNewLine(*h);
+					}
+					else if (writeA == true) {
+						bedA->reportBedNewLine(a);
+					}
+					else if (writeB == true) {
+						bedA->reportBedRangeTab(a,s,e);
+						bedB->reportBedNewLine(*h);
+					}
+					else if (writeOverlap == true) {
+						bedA->reportBedTab(a);
+						bedB->reportBedTab(*h);
+						printf("%d\n", overlapBases);
+					}
+				}
+				
 			}
 			else {			// the user wants there to be sufficient reciprocal overlap
 				int bLength = (h->end - h->start);

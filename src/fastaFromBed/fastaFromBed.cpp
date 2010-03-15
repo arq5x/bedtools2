@@ -12,7 +12,8 @@
 #include "lineFileUtilities.h"
 #include "fastaFromBed.h"
 
-Bed2Fa::Bed2Fa(bool &useName, string &dbFile, string &bedFile, string &fastaOutFile, bool &useFasta) {
+Bed2Fa::Bed2Fa(bool &useName, string &dbFile, string &bedFile, string &fastaOutFile, 
+	bool &useFasta, bool &useStrand) {
 
 	if (useName) {
 		this->useName = true;
@@ -22,7 +23,8 @@ Bed2Fa::Bed2Fa(bool &useName, string &dbFile, string &bedFile, string &fastaOutF
 	this->bedFile = bedFile;
 	this->fastaOutFile = fastaOutFile;
 	this->useFasta = useFasta;
-	
+	this->useStrand = useStrand;
+		
 	this->bed = new BedFile(this->bedFile);
 }
 
@@ -78,17 +80,35 @@ void Bed2Fa::ExtractDNA() {
 					unsigned int start = bedList[i].start;
 					unsigned int end = bedList[i].end;
 					
-					if ( (start <= currDNA.size()) && (end <= currDNA.size()) ) {	
+					if ( (start <= currDNA.size()) && (end <= currDNA.size()) ) {
+							
 						string dna = currDNA.substr(bedList[i].start, ((bedList[i].end - bedList[i].start)));
-				
+						// revcomp if necessary.  Thanks to Thomas Doktor.
+						if ((this->useStrand == true) && (bedList[i].strand == "-")) {
+							reverseComplement(dna);
+						}
+						
 						if (!(this->useName)) {
 							if (this->useFasta == true) {
-						    	faOut << ">" << currChrom << ":"
-							  		<< bedList[i].start << "-" << bedList[i].end << endl << dna << endl;
+								if (this->useStrand == true) {
+							    	faOut << ">" << currChrom << ":" << bedList[i].start << "-" 
+								          << bedList[i].end   << "(" << bedList[i].strand << ")" << endl << dna << endl;
+								}
+								else {
+							    	faOut << ">" << currChrom << ":" << bedList[i].start << "-" 
+								          << bedList[i].end << endl << dna << endl;	
+								}
 							}
 							else {
-								faOut << currChrom << ":" << bedList[i].start << "-" << bedList[i].end 
-									  << "\t" << dna << endl;
+								if (this->useStrand == true) {
+									faOut << currChrom << ":" << bedList[i].start << "-" 
+									      << bedList[i].end << "(" << bedList[i].strand << ")"
+										  << "\t" << dna << endl;								
+								}
+								else {
+									faOut << currChrom << ":" << bedList[i].start << "-" << bedList[i].end 
+										  << "\t" << dna << endl;
+								}
 							}
 					  	}
 					  	else {
@@ -120,18 +140,36 @@ void Bed2Fa::ExtractDNA() {
 			
 			unsigned int start = bedList[i].start;
 			unsigned int end = bedList[i].end;
-			
-			if ( (start <= currDNA.size()) && (end <= currDNA.size()) ) {	
+
+			if ( (start <= currDNA.size()) && (end <= currDNA.size()) ) {			
+
 				string dna = currDNA.substr(bedList[i].start, ((bedList[i].end - bedList[i].start)));
-		
+				// revcomp if necessary.  Thanks to Thomas Doktor.
+				if ((this->useStrand == true) && (bedList[i].strand == "-")) {
+					reverseComplement(dna);
+				}
+				
 				if (!(this->useName)) {
 					if (this->useFasta == true) {
-				    	faOut << ">" << currChrom << ":"
-					  		<< bedList[i].start << "-" << bedList[i].end << endl << dna << endl;
+						if (this->useStrand == true) {
+					    	faOut << ">" << currChrom << ":" << bedList[i].start << "-" 
+						          << bedList[i].end   << "(" << bedList[i].strand << ")" << endl << dna << endl;
+						}
+						else {
+					    	faOut << ">" << currChrom << ":" << bedList[i].start << "-" 
+						          << bedList[i].end << endl << dna << endl;	
+						}
 					}
 					else {
-						faOut << currChrom << ":" << bedList[i].start << "-" << bedList[i].end 
-							  << "\t" << dna << endl;
+						if (this->useStrand == true) {
+							faOut << currChrom << ":" << bedList[i].start << "-" 
+							      << bedList[i].end << "(" << bedList[i].strand << ")"
+								  << "\t" << dna << endl;								
+						}
+						else {
+							faOut << currChrom << ":" << bedList[i].start << "-" << bedList[i].end 
+								  << "\t" << dna << endl;
+						}
 					}
 			  	}
 			  	else {
@@ -142,10 +180,10 @@ void Bed2Fa::ExtractDNA() {
 						faOut << bedList[i].name << "\t" << dna << endl;
 					}
 				}
-				
 			}
 			else cerr << "Feature (" << bedList[i].chrom << ":" << start << "-" << end << ") beyond " 
 				<< currChrom << " size (" << currDNA.size() << " bp).  Skipping." << endl;
+
 		}
 		currDNA = "";	
 	}

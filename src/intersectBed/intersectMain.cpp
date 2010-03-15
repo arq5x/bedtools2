@@ -36,18 +36,19 @@ int main(int argc, char* argv[]) {
 	// input arguments
 	float overlapFraction = 1E-9;
 
-	bool haveBedA = false;
-	bool haveBedB = false;
-	bool noHit = false;
-	bool anyHit = false;
-	bool writeA = false;	
-	bool writeB = false;
-	bool writeCount = false;
-	bool haveFraction = false;
+	bool haveBedA           = false;
+	bool haveBedB           = false;
+	bool noHit              = false;
+	bool anyHit             = false;
+	bool writeA             = false;	
+	bool writeB             = false;
+	bool writeCount         = false;
+	bool writeOverlap       = false;
+	bool haveFraction       = false;
 	bool reciprocalFraction = false;
-	bool forceStrand = false;
-	bool inputIsBam = false;
-	bool outputIsBam = true;
+	bool forceStrand        = false;
+	bool inputIsBam         = false;
+	bool outputIsBam        = true;
 	
 	// check to see if we should print out some help
 	if(argc <= 1) showHelp = true;
@@ -110,6 +111,9 @@ int main(int argc, char* argv[]) {
 		else if(PARAMETER_CHECK("-wb", 3, parameterLength)) {
 			writeB = true;
 		}
+		else if(PARAMETER_CHECK("-wo", 3, parameterLength)) {
+			writeOverlap = true;
+		}
 		else if(PARAMETER_CHECK("-c", 2, parameterLength)) {
 			writeCount = true;
 		}
@@ -143,6 +147,21 @@ int main(int argc, char* argv[]) {
 		cerr << endl << "*****" << endl << "*****ERROR: Request either -wb OR -c, not both." << endl << "*****" << endl;
 		showHelp = true;
 	}
+	
+	if (writeCount && writeOverlap) {
+		cerr << endl << "*****" << endl << "*****ERROR: Request either -wb OR -wo, not both." << endl << "*****" << endl;
+		showHelp = true;
+	}
+	
+	if (writeA && writeOverlap) {
+		cerr << endl << "*****" << endl << "*****ERROR: Request either -wa OR -wo, not both." << endl << "*****" << endl;
+		showHelp = true;
+	}
+	
+	if (writeB && writeOverlap) {
+		cerr << endl << "*****" << endl << "*****ERROR: Request either -wb OR -wo, not both." << endl << "*****" << endl;
+		showHelp = true;
+	}
 
 	if (reciprocalFraction && !haveFraction) {
 		cerr << endl << "*****" << endl << "*****ERROR: If using -r, you need to define -f." << endl << "*****" << endl;
@@ -153,11 +172,21 @@ int main(int argc, char* argv[]) {
 		cerr << endl << "*****" << endl << "*****ERROR: Request either -u OR -c, not both." << endl << "*****" << endl;
 		showHelp = true;
 	}
+	
+	if (anyHit && writeB) {
+		cerr << endl << "*****" << endl << "*****ERROR: Request either -u OR -wb, not both." << endl << "*****" << endl;
+		showHelp = true;
+	}
+	
+	if (anyHit && writeOverlap) {
+		cerr << endl << "*****" << endl << "*****ERROR: Request either -u OR -wo, not both." << endl << "*****" << endl;
+		showHelp = true;
+	}
 
 
 	if (!showHelp) {
 
-		BedIntersect *bi = new BedIntersect(bedAFile, bedBFile, anyHit, writeA, writeB, 
+		BedIntersect *bi = new BedIntersect(bedAFile, bedBFile, anyHit, writeA, writeB, writeOverlap,
 											overlapFraction, noHit, writeCount, forceStrand, 
 											reciprocalFraction, inputIsBam, outputIsBam);
 		bi->DetermineBedInput();
@@ -186,18 +215,24 @@ void ShowHelp(void) {
 	cerr 						<< "\t\tis to write output in BAM when using -abam." << endl << endl;
 			
 	cerr << "\t-wa\t"			<< "Write the original entry in A for each overlap." << endl << endl;
+	
 	cerr << "\t-wb\t"			<< "Write the original entry in B for each overlap." << endl;
-	cerr 						<< "\t\t- Useful for knowing _what_ A overlaps. Restricted by -f." << endl << endl;
+	cerr 						<< "\t\t- Useful for knowing _what_ A overlaps. Restricted by -f and -r." << endl << endl;
 
+	cerr << "\t-wo\t"			<< "Write the original A and B entries plus the number of base" << endl;
+	cerr 						<< "\t\tpairs of overlap between the two features." << endl;
+	cerr						<< "\t\t- Overlaps restricted by -f and -r." << endl << endl;
+		
 	cerr << "\t-u\t"      		<< "Write the original A entry _once_ if _any_ overlaps found in B." << endl;
-	cerr 						<< "\t\t- In other words, just report the fact >=1 hit was found." << endl << endl;
-
+	cerr 						<< "\t\t- In other words, just report the fact >=1 hit was found." << endl;
+	cerr						<< "\t\t- Overlaps restricted by -f and -r." << endl << endl;
+	
 	cerr << "\t-c\t"			<< "For each entry in A, report the number of overlaps with B." << endl; 
 	cerr 						<< "\t\t- Reports 0 for A entries that have no overlap with B." << endl;
-	cerr						<< "\t\t- Overlaps restricted by -f." << endl << endl;
+	cerr						<< "\t\t- Overlaps restricted by -f and -r." << endl << endl;
 
 	cerr << "\t-v\t"	        << "Only report those entries in A that have _no overlaps_ with B." << endl;
-	cerr 						<< "\t\t- Similar to \"grep -v.\"" << endl << endl;
+	cerr 						<< "\t\t- Similar to \"grep -v\" (an homage)." << endl << endl;
 
 	cerr << "\t-f\t"			<< "Minimum overlap required as a fraction of A." << endl;
 	cerr 						<< "\t\t- Default is 1E-9 (i.e., 1bp)." << endl;
@@ -206,7 +241,6 @@ void ShowHelp(void) {
 	cerr << "\t-r\t"			<< "Require that the fraction overlap be reciprocal for A and B." << endl;
 	cerr 						<< "\t\t- In other words, if -f is 0.90 and -r is used, this requires" << endl;
 	cerr						<< "\t\t  that B overlap 90% of A and A _also_ overlaps 90% of B." << endl << endl;
-
 	
 	cerr << "\t-s\t"	 	    << "Force strandedness.  That is, only report hits in B that" << endl;
 	cerr						<< "\t\toverlap A on the same strand." << endl;
