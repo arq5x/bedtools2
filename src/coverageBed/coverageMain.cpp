@@ -32,7 +32,8 @@ int main(int argc, char* argv[]) {
 	string bedAFile;
 	string bedBFile;
 	bool forceStrand = false;
-
+	bool writeHistogram = false;
+	
 	bool haveBedA = false;
 	bool haveBedB = false;
 
@@ -73,6 +74,9 @@ int main(int argc, char* argv[]) {
 		else if (PARAMETER_CHECK("-s", 2, parameterLength)) {
 			forceStrand = true;
 		}	
+		else if (PARAMETER_CHECK("-hist", 5, parameterLength)) {
+			writeHistogram = true;
+		}
 		else {
 			cerr << endl << "*****ERROR: Unrecognized parameter: " << argv[i] << " *****" << endl << endl;
 			showHelp = true;
@@ -87,7 +91,7 @@ int main(int argc, char* argv[]) {
 
 	if (!showHelp) {
 
-		BedCoverage *bg = new BedCoverage(bedAFile, bedBFile, forceStrand);
+		BedCoverage *bg = new BedCoverage(bedAFile, bedBFile, forceStrand, writeHistogram);
 		bg->DetermineBedInput();
 		return 0;
 	}
@@ -112,7 +116,11 @@ void ShowHelp(void) {
 	cerr						<< "\t\toverlap B on the same strand." << endl;
 	cerr						<< "\t\t- By default, hits are included without respect to strand." << endl << endl;
 
-	cerr << "Output:  " << endl;
+	cerr << "\t-hist\t"	 	    << "Report a histogram of coverage for each feature in B" << endl << endl;
+	cerr						<< "\t\tOutput (tab delimited):" << endl;
+	
+
+	cerr << "Default Output:  " << endl;
 	cerr << "\t" << " After each entry in B, reports: " << endl; 
 	cerr << "\t  1) The number of features in A that overlapped the B interval." << endl;
 	cerr << "\t  2) The number of bases in B that had non-zero coverage." << endl;

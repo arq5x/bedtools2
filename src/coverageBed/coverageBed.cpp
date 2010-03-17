@@ -13,15 +13,16 @@
 #include "coverageBed.h"
 
 
-BedCoverage::BedCoverage(string &bedAFile, string &bedBFile, bool &forceStrand) {
-
-	this->bedAFile = bedAFile;
-	this->bedBFile = bedBFile;
+BedCoverage::BedCoverage(string &bedAFile, string &bedBFile, bool &forceStrand, bool &writeHistogram) {
 	
-	this->bedA = new BedFile(bedAFile);
-	this->bedB = new BedFile(bedBFile);
+	this->bedAFile       = bedAFile;
+	this->bedBFile       = bedBFile;
 	
-	this->forceStrand = forceStrand;
+	this->bedA           = new BedFile(bedAFile);
+	this->bedB           = new BedFile(bedBFile);
+	
+	this->forceStrand    = forceStrand;
+	this->writeHistogram = writeHistogram;
 }
 
 
@@ -31,7 +32,7 @@ BedCoverage::~BedCoverage(void) {
 
 
  
-void BedCoverage::GetCoverage(istream &bedInput) {
+void BedCoverage::CollectCoverage(istream &bedInput) {
 	
 	// load the "B" bed file into a map so
 	// that we can easily compare "A" to it for overlaps
@@ -55,12 +56,18 @@ void BedCoverage::GetCoverage(istream &bedInput) {
 		}	
 		// reset for the next input line
 		bedFields.clear();
-	}
+	}	
 	
-	//vector<int> depths;	// track the discrete depths for each base in B
-						// used to calculate, min, max, median, etc.
-						
-	// now, report the count of hits for each feature in B.
+	// report the coverage (summary or histogram) for BED B.
+	ReportCoverage();					
+}
+
+
+void BedCoverage::ReportCoverage() {
+
+	map<unsigned int, unsigned int> allDepthHist;
+	unsigned int totalLength = 0;
+
 	masterBedMap::const_iterator chromItr = bedB->bedMap.begin();
 	masterBedMap::const_iterator chromEnd = bedB->bedMap.end();
 	for (; chromItr != chromEnd; ++chromItr) {
@@ -77,48 +84,62 @@ void BedCoverage::GetCoverage(istream &bedInput) {
 				int depth = 0;
 				int start = min(bedItr->minOverlapStart, bedItr->start);
 				
+				// track the numnber of bases in the feature covered by
+				// 0, 1, 2, ... n features in A
+				map<unsigned int, unsigned int> depthHist;
+				map<unsigned int, DEPTH>::const_iterator depthItr;
+				
 				for (int pos = start+1; pos <= bedItr->end; pos++) {
 					
-					if (bedItr->depthMap.find(pos) != bedItr->depthMap.end()) {
-						
-						map<unsigned int, DEPTH> dMap = bedItr->depthMap;
-						depth += dMap[pos].starts;
-						//depths.push_back(depth);
-																				
-						if ((depth == 0) && (pos > bedItr->start) && (pos <= bedItr->end)) {
-							zeroDepthCount++;
+					depthItr = bedItr->depthMap.find(pos);
+					
+					if (depthItr != bedItr->depthMap.end()) {
+						depth += depthItr->second.starts;
+						if ((pos > bedItr->start) && (pos <= bedItr->end)) {	
+							if (depth == 0) zeroDepthCount++;
+							depthHist[depth]++;
+							allDepthHist[depth]++;
 						}
-						
-						depth = depth - dMap[pos].ends;
+						depth = depth - depthItr->second.ends;
 					}
 					else {
-						if ((depth == 0) && (pos > bedItr->start) && (pos <= bedItr->end)) {
-							zeroDepthCount++;
+						if ((pos > bedItr->start) && (pos <= bedItr->end)) {	
+							if (depth == 0) zeroDepthCount++;
+							depthHist[depth]++;
+							allDepthHist[depth]++;
 						}
-						//depths.push_back(depth);
 					}
 				}
 
 				// Report the coverage for the current interval.
 				int length = bedItr->end - bedItr->start;
+				totalLength += length;
+				
 				int nonZeroBases =  (length-zeroDepthCount);
 				float fractCovered = (float) nonZeroBases /length;
-				//sort(depths.begin(), depths.end());
 				
-				bedB->reportBedTab(*bedItr);
-				printf("%d\t%d\t%d\t%0.7f\n", bedItr->count, nonZeroBases, length, fractCovered);
-				/*
-				cout << bedItr->count << "\t";
-				cout << (length-zeroDepthCount) << "\t";
-				cout << length << "\t";
-				cout << setw (10);
-				cout << fractCovered << "\t";							
-				cout << *min_element(depths.begin(), depths.end()) << "\t";
-				cout << *max_element(depths.begin(), depths.end()) << "\t";
-				cout << *(depths.begin()+depths.size()/2) << "\n";
-				depths.clear();
-				*/				
+				if (this->writeHistogram == false) {
+					bedB->reportBedTab(*bedItr);
+					printf("%d\t%d\t%d\t%0.7f\n", bedItr->count, nonZeroBases, length, fractCovered);
+				}
+				else {
+					map<unsigned int, unsigned int>::const_iterator histItr = depthHist.begin();
+					map<unsigned int, unsigned int>::const_iterator histEnd = depthHist.end();
+					for (; histItr != histEnd; ++histItr) {
+						float fractAtThisDepth = (float) histItr->second / length;
+						bedB->reportBedTab(*bedItr);
+						printf("%d\t%d\t%d\t%0.7f\n", histItr->first, histItr->second, length, fractAtThisDepth);
+					}
+				}
 			}
+		}
+	}
+	if (this->writeHistogram == true) {
+		map<unsigned int, unsigned int>::const_iterator histItr = allDepthHist.begin();
+		map<unsigned int, unsigned int>::const_iterator histEnd = allDepthHist.end();
+		for (; histItr != histEnd; ++histItr) {
+			float fractAtThisDepth = (float) histItr->second / totalLength;
+			printf("all\t%d\t%d\t%d\t%0.7f\n", histItr->first, histItr->second, totalLength, fractAtThisDepth);
 		}
 	}
 }
@@ -131,10 +152,10 @@ void BedCoverage::DetermineBedInput() {
 			cerr << "Error: The requested bed file (" << bedA->bedFile << ") could not be opened. Exiting!" << endl;
 			exit (1);
 		}
-		GetCoverage(beds);
+		CollectCoverage(beds);
 	}
 	else {   						// process stdin
-		GetCoverage(cin);		
+		CollectCoverage(cin);		
 	}
 }
 

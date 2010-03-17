@@ -30,12 +30,12 @@ class BedCoverage {
 public:
 
 	// constructor 
-	BedCoverage(string &, string &, bool &);
+	BedCoverage(string &bedAFile, string &bedBFile, bool &forceStrand, bool &writeHistogram);
 
 	// destructor
 	~BedCoverage(void);
 	
-	void GetCoverage(istream &bedInput);
+	void CollectCoverage(istream &bedInput);
 	
 	void DetermineBedInput();
 	
@@ -48,6 +48,8 @@ private:
 	BedFile *bedA, *bedB;
 	
 	bool forceStrand;
-
+	bool writeHistogram;
+	
+	void ReportCoverage();
 };
 #endif /* COVERAGEBED_H */

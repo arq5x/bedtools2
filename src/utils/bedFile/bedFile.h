@@ -187,7 +187,6 @@ public:
 						   // 9 for GFF
 						
 	bool isGff;
-
 	masterBedMap bedMap;
 	masterBedMapNoBin bedMapNoBin;
 	
