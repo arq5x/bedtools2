@@ -32,7 +32,12 @@ using namespace std;
 
 // function declarations
 void ShowHelp(void);
+
+void ParseCigarBed(const vector<CigarOp> cigar, int &end);
+void ParseCigarBed2(const vector<CigarOp> cigar, vector<int> &blockStarts, vector<int> &blockEnds, int &end);
+
 void PrintBed(const BamAlignment &bam, const RefVector &refs, bool useEditDistance);
+void PrintBed12(const BamAlignment &bam, const RefVector &refs, bool useEditDistance, string color = "255,0,0");
 void PrintBedPE(const BamAlignment &bam,  const RefVector &refs, bool useEditDistance);
 bool IsCorrectMappingForBEDPE (const BamAlignment &bam);
 
@@ -43,9 +48,12 @@ int main(int argc, char* argv[]) {
 
 	// input files
 	string bamFile;
-
-	bool haveBam = false;
-	bool writeBedPE = false;
+	string color = "255,0,0";
+	
+	bool haveBam         = false;
+	bool haveColor       = false;	
+	bool writeBedPE      = false;
+	bool writeBed12      = false;	
 	bool useEditDistance = false;
 	
 	// check to see if we should print out some help
@@ -77,9 +85,19 @@ int main(int argc, char* argv[]) {
 		else if(PARAMETER_CHECK("-bedpe", 6, parameterLength)) {
 				writeBedPE = true;
 		}
+		else if(PARAMETER_CHECK("-bed12", 6, parameterLength)) {
+				writeBed12 = true;
+		}		
 		else if(PARAMETER_CHECK("-ed", 3, parameterLength)) {
 				useEditDistance = true;
-		}		
+		}
+		else if(PARAMETER_CHECK("-color", 6, parameterLength)) {
+			if ((i+1) < argc) {
+				haveColor = true;
+				color = argv[i + 1];
+				i++;
+			}	
+		}				
 		else {
 			cerr << endl << "*****ERROR: Unrecognized parameter: " << argv[i] << " *****" << endl << endl;
 			showHelp = true;
@@ -91,9 +109,12 @@ int main(int argc, char* argv[]) {
 		cerr << endl << "*****" << endl << "*****ERROR: Need -i (BAM) file. " << endl << "*****" << endl;
 		showHelp = true;
 	}
-	// make sure we have an input files
 	if (writeBedPE && useEditDistance) {
 		cerr << endl << "*****" << endl << "*****ERROR: Cannot use edit distance with BEDPE. " << endl << "*****" << endl;
+		showHelp = true;
+	}
+	if (haveColor && writeBed12 == false) {
+		cerr << endl << "*****" << endl << "*****ERROR: Cannot use color without BED12. " << endl << "*****" << endl;
 		showHelp = true;
 	}
 	
@@ -109,9 +130,14 @@ int main(int argc, char* argv[]) {
 		
 		BamAlignment bam;
 		while (reader.GetNextAlignment(bam)) {	
-			if (!writeBedPE) {
+			if (writeBedPE == false && writeBed12 == false) {
 				if (bam.IsMapped()) {
 					PrintBed(bam, refs, useEditDistance);
+				}
+			}
+			else if (writeBedPE == false && writeBed12 == true) {
+				if (bam.IsMapped()) {
+					PrintBed12(bam, refs, useEditDistance, color);
 				}
 			}
 			else {
@@ -144,11 +170,16 @@ void ShowHelp(void) {
 	cerr << "Options: " << endl;
 	
 	cerr << "\t-bedpe\t"	<< "Write BEDPE format." << endl << endl;
+	cerr << "\t-bed12\t"	<< "Write \"blocked\" BED format (aka \"BED12\")." << endl << endl;
 	
 	cerr << "\t-ed\t"		<< "Use BAM edit distance (NM tag) for score." << endl;
 	cerr 					<< "\t\tDefault is to use mapping quality." << endl;
 	cerr 					<< "\t\tNot available for BEDPE format." << endl << endl;
-	
+
+	cerr << "\t-color\t"	<< "An R,G,B string for the color used with BED12 format." << endl;
+	cerr 					<< "\t\tDefault is (255,0,0). For more details, see:" << endl;
+	cerr 					<< "\t\thttp://genome-test.cse.ucsc.edu/FAQ/FAQformat#format1" << endl << endl;
+
 
 	// end the program here
 	exit(1);
@@ -156,15 +187,68 @@ void ShowHelp(void) {
 }
 
 
+void ParseCigarBed(const vector<CigarOp> cigar, unsigned int &end) {
+
+	int currPosition = 0;
+		
+	//	Rip through the CIGAR ops and figure out if there is more 
+	//	than one block for this alignment
+	vector<CigarOp>::const_iterator cigItr = cigar.begin();
+	vector<CigarOp>::const_iterator cigEnd = cigar.end();
+	for (; cigItr != cigEnd; ++cigItr) {
+		if (cigItr->Type =='M') currPosition += cigItr->Length;
+	}	
+	end = currPosition;
+}
+
+
+void ParseCigarBed12(const vector<CigarOp> cigar, vector<int> &blockStarts, vector<int> &blockLengths, unsigned int &end) {
+
+	int currPosition = 0;
+	int blockLength	 = 0;
+		
+	//	Rip through the CIGAR ops and figure out if there is more 
+	//	than one block for this alignment
+	vector<CigarOp>::const_iterator cigItr = cigar.begin();
+	vector<CigarOp>::const_iterator cigEnd = cigar.end();
+	for (; cigItr != cigEnd; ++cigItr) {
+		switch (cigItr->Type) {
+			case ('M') : 
+				blockLength  += cigItr->Length;
+				currPosition += cigItr->Length;
+			case ('I') : break;
+		    case ('S') : break;
+		    case ('D') : break;
+		    case ('P') : break;
+			case ('N') : 
+				blockLengths.push_back(blockLength);
+				blockStarts.push_back(currPosition + cigItr->Length);
+				blockLength = 0;
+		    case ('H') : break; 					        // for 'H' - do nothing, move to next op
+		    default    : 
+				printf("ERROR: Invalid Cigar op type\n"); // shouldn't get here
+				exit(1);
+		}
+	}
+	blockLengths.push_back(blockLength);
+	
+	end = currPosition;
+}
+
+
 void PrintBed(const BamAlignment &bam,  const RefVector &refs, bool useEditDistance) {
+
+	unsigned int end;
 
 	string strand = "+"; 
 	if (bam.IsReverseStrand()) strand = "-";
 	string name = bam.Name;
 	if (bam.IsFirstMate()) name += "/1";
 	if (bam.IsSecondMate()) name += "/2";
-	
-	unsigned int end = bam.Position + bam.AlignedBases.size();
+
+	// rip through the CIGAR string and reconstruct the alignment coordinates
+	ParseCigarBed(bam.CigarData, end);
+	end += bam.Position;
 	
 	if (useEditDistance == false) {
 		printf("%s\t%d\t%d\t\%s\t%d\t%s\n", refs.at(bam.RefID).RefName.c_str(), bam.Position,
@@ -181,6 +265,58 @@ void PrintBed(const BamAlignment &bam,  const RefVector &refs, bool useEditDista
 			exit(1);
 		}
 	}
+}
+
+
+void PrintBed12(const BamAlignment &bam, const RefVector &refs, bool useEditDistance, string color) {
+
+	string strand = "+"; 
+	if (bam.IsReverseStrand()) strand = "-";
+	string name = bam.Name;
+	if (bam.IsFirstMate()) name += "/1";
+	if (bam.IsSecondMate()) name += "/2";
+	
+	unsigned int end;
+	vector<int> blockLengths;
+	vector<int> blockStarts;
+	blockStarts.push_back(0);   // by default, we have a block start at the start of the alignment.
+	
+	// rip through the CIGAR string and reconstruct the alignment coordinates
+	ParseCigarBed12(bam.CigarData, blockStarts, blockLengths, end);
+	end += bam.Position;
+	
+	// write BED6 portion
+	if (useEditDistance == false) {
+		printf("%s\t%d\t%d\t\%s\t%d\t%s\t", refs.at(bam.RefID).RefName.c_str(), bam.Position,
+									  end, name.c_str(), bam.MapQuality, strand.c_str());
+	}
+	else {
+		uint8_t editDistance;
+		if (bam.GetEditDistance(editDistance)) {
+			printf("%s\t%d\t%d\t\%s\t%u\t%s\t", refs.at(bam.RefID).RefName.c_str(), bam.Position,
+										  end, name.c_str(), editDistance, strand.c_str());
+		}
+		else {
+			cerr << "The edit distance tag (NM) was not found in the BAM file.  Please disable -ed.  Exiting\n";
+			exit(1);
+		}
+	}
+	
+	// write the colors, etc.
+	printf("%d\t%d\t%s\t%d\t", bam.Position, end, color.c_str(), (int) blockStarts.size());
+	
+	// now write the lengths portion
+	unsigned int b;
+	for (b = 0; b < blockLengths.size() - 1; ++b) {
+		printf("%d,", blockLengths[b]);
+	}
+	printf("%d\t", blockLengths[b]);
+
+	// now write the starts portion
+	for (b = 0; b < blockStarts.size() - 1; ++b) {
+		printf("%d,", blockStarts[b]);
+	}
+	printf("%d\n", blockStarts[b]);	
 }
 
 
