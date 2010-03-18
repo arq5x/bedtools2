@@ -82,23 +82,7 @@ bool BedIntersect::FindOverlaps(const BED &a, vector<BED> &hits) {
 				
 				hitsFound = true;
 				numOverlaps++;		// we have another hit for A
-/*				
-				if (!writeB && printable) {
-					if (writeA) bedA->reportBedNewLine(a); 
-					else bedA->reportBedRangeNewLine(a,s,e);
-				}
-				else if (printable) {
-					if (writeA) {
-						bedA->reportBedTab(a);
-						bedB->reportBedNewLine(*h);
-					}
-					else {
-						bedA->reportBedRangeTab(a,s,e);
-						bedB->reportBedNewLine(*h);									
-					}
-				}
-*/				
-				// new
+
 				if (printable == true) {
 					if (writeA == false && writeB == false && writeOverlap == false) {
 						bedA->reportBedRangeNewLine(a,s,e);
