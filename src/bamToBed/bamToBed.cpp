@@ -187,7 +187,7 @@ void ShowHelp(void) {
 }
 
 
-void ParseCigarBed(const vector<CigarOp> cigar, unsigned int &end) {
+void ParseCigarBed(const vector<CigarOp> cigar, unsigned int &alignmentEnd) {
 
 	int currPosition = 0;
 		
@@ -198,11 +198,11 @@ void ParseCigarBed(const vector<CigarOp> cigar, unsigned int &end) {
 	for (; cigItr != cigEnd; ++cigItr) {
 		if (cigItr->Type =='M') currPosition += cigItr->Length;
 	}	
-	end = currPosition;
+	alignmentEnd = currPosition;
 }
 
 
-void ParseCigarBed12(const vector<CigarOp> cigar, vector<int> &blockStarts, vector<int> &blockLengths, unsigned int &end) {
+void ParseCigarBed12(const vector<CigarOp> cigar, vector<int> &blockStarts, vector<int> &blockLengths, unsigned int &alignmentEnd) {
 
 	int currPosition = 0;
 	int blockLength	 = 0;
@@ -232,13 +232,13 @@ void ParseCigarBed12(const vector<CigarOp> cigar, vector<int> &blockStarts, vect
 	}
 	blockLengths.push_back(blockLength);
 	
-	end = currPosition;
+	alignmentEnd = currPosition;
 }
 
 
 void PrintBed(const BamAlignment &bam,  const RefVector &refs, bool useEditDistance) {
 
-	unsigned int end;
+	unsigned int alignmentEnd;
 
 	string strand = "+"; 
 	if (bam.IsReverseStrand()) strand = "-";
@@ -247,18 +247,18 @@ void PrintBed(const BamAlignment &bam,  const RefVector &refs, bool useEditDista
 	if (bam.IsSecondMate()) name += "/2";
 
 	// rip through the CIGAR string and reconstruct the alignment coordinates
-	ParseCigarBed(bam.CigarData, end);
-	end += bam.Position;
+	ParseCigarBed(bam.CigarData, alignmentEnd);
+	alignmentEnd += bam.Position;
 	
 	if (useEditDistance == false) {
 		printf("%s\t%d\t%d\t\%s\t%d\t%s\n", refs.at(bam.RefID).RefName.c_str(), bam.Position,
-									  end, name.c_str(), bam.MapQuality, strand.c_str());
+									  alignmentEnd, name.c_str(), bam.MapQuality, strand.c_str());
 	}
 	else {
 		uint8_t editDistance;
 		if (bam.GetEditDistance(editDistance)) {
 			printf("%s\t%d\t%d\t\%s\t%u\t%s\n", refs.at(bam.RefID).RefName.c_str(), bam.Position,
-										  end, name.c_str(), editDistance, strand.c_str());
+										  alignmentEnd, name.c_str(), editDistance, strand.c_str());
 		}
 		else {
 			cerr << "The edit distance tag (NM) was not found in the BAM file.  Please disable -ed.  Exiting\n";
@@ -276,25 +276,25 @@ void PrintBed12(const BamAlignment &bam, const RefVector &refs, bool useEditDist
 	if (bam.IsFirstMate()) name += "/1";
 	if (bam.IsSecondMate()) name += "/2";
 	
-	unsigned int end;
+	unsigned int alignmentEnd;
 	vector<int> blockLengths;
 	vector<int> blockStarts;
 	blockStarts.push_back(0);   // by default, we have a block start at the start of the alignment.
 	
 	// rip through the CIGAR string and reconstruct the alignment coordinates
-	ParseCigarBed12(bam.CigarData, blockStarts, blockLengths, end);
-	end += bam.Position;
+	ParseCigarBed12(bam.CigarData, blockStarts, blockLengths, alignmentEnd);
+	alignmentEnd += bam.Position;
 	
 	// write BED6 portion
 	if (useEditDistance == false) {
 		printf("%s\t%d\t%d\t\%s\t%d\t%s\t", refs.at(bam.RefID).RefName.c_str(), bam.Position,
-									  end, name.c_str(), bam.MapQuality, strand.c_str());
+									  alignmentEnd, name.c_str(), bam.MapQuality, strand.c_str());
 	}
 	else {
 		uint8_t editDistance;
 		if (bam.GetEditDistance(editDistance)) {
 			printf("%s\t%d\t%d\t\%s\t%u\t%s\t", refs.at(bam.RefID).RefName.c_str(), bam.Position,
-										  end, name.c_str(), editDistance, strand.c_str());
+										  alignmentEnd, name.c_str(), editDistance, strand.c_str());
 		}
 		else {
 			cerr << "The edit distance tag (NM) was not found in the BAM file.  Please disable -ed.  Exiting\n";
@@ -303,7 +303,7 @@ void PrintBed12(const BamAlignment &bam, const RefVector &refs, bool useEditDist
 	}
 	
 	// write the colors, etc.
-	printf("%d\t%d\t%s\t%d\t", bam.Position, end, color.c_str(), (int) blockStarts.size());
+	printf("%d\t%d\t%s\t%d\t", bam.Position, alignmentEnd, color.c_str(), (int) blockStarts.size());
 	
 	// now write the lengths portion
 	unsigned int b;
