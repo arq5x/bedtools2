@@ -11,7 +11,6 @@
 ******************************************************************************/
 #include "version.h"
 #include "BamReader.h"
-#include "BamWriter.h"
 #include "BamAux.h"
 using namespace BamTools;
 
@@ -32,14 +31,14 @@ using namespace std;
 
 // function declarations
 void ShowHelp(void);
-
 void ParseCigarBed(const vector<CigarOp> cigar, int &end);
 void ParseCigarBed2(const vector<CigarOp> cigar, vector<int> &blockStarts, vector<int> &blockEnds, int &end);
-
 void PrintBed(const BamAlignment &bam, const RefVector &refs, bool useEditDistance);
 void PrintBed12(const BamAlignment &bam, const RefVector &refs, bool useEditDistance, string color = "255,0,0");
 void PrintBedPE(const BamAlignment &bam,  const RefVector &refs, bool useEditDistance);
 bool IsCorrectMappingForBEDPE (const BamAlignment &bam);
+
+
 
 int main(int argc, char* argv[]) {
 
@@ -157,6 +156,7 @@ int main(int argc, char* argv[]) {
 	}
 }
 
+
 void ShowHelp(void) {
 
 	cerr << endl << "Program: " << PROGRAM_NAME << " (v" << VERSION << ")" << endl;
@@ -171,19 +171,18 @@ void ShowHelp(void) {
 	
 	cerr << "\t-bedpe\t"	<< "Write BEDPE format." << endl << endl;
 	cerr << "\t-bed12\t"	<< "Write \"blocked\" BED format (aka \"BED12\")." << endl << endl;
-	
+	cerr 					<< "\t\thttp://genome-test.cse.ucsc.edu/FAQ/FAQformat#format1" << endl << endl;
+		
 	cerr << "\t-ed\t"		<< "Use BAM edit distance (NM tag) for score." << endl;
 	cerr 					<< "\t\tDefault is to use mapping quality." << endl;
 	cerr 					<< "\t\tNot available for BEDPE format." << endl << endl;
 
 	cerr << "\t-color\t"	<< "An R,G,B string for the color used with BED12 format." << endl;
-	cerr 					<< "\t\tDefault is (255,0,0). For more details, see:" << endl;
-	cerr 					<< "\t\thttp://genome-test.cse.ucsc.edu/FAQ/FAQformat#format1" << endl << endl;
+	cerr 					<< "\t\tDefault is (255,0,0)." << endl;
 
 
 	// end the program here
 	exit(1);
-
 }
 
 
@@ -220,9 +219,10 @@ void ParseCigarBed12(const vector<CigarOp> cigar, vector<int> &blockStarts, vect
 		    case ('S') : break;
 		    case ('D') : break;
 		    case ('P') : break;
-			case ('N') : 
-				blockLengths.push_back(blockLength);
+			case ('N') :
 				blockStarts.push_back(currPosition + cigItr->Length);
+				blockLengths.push_back(blockLength);
+				currPosition += cigItr->Length;
 				blockLength = 0;
 		    case ('H') : break; 					        // for 'H' - do nothing, move to next op
 		    default    : 
@@ -231,15 +231,13 @@ void ParseCigarBed12(const vector<CigarOp> cigar, vector<int> &blockStarts, vect
 		}
 	}
 	blockLengths.push_back(blockLength);
-	
 	alignmentEnd = currPosition;
 }
 
 
 void PrintBed(const BamAlignment &bam,  const RefVector &refs, bool useEditDistance) {
 
-	unsigned int alignmentEnd;
-
+	// set the name of the feature based on the sequence
 	string strand = "+"; 
 	if (bam.IsReverseStrand()) strand = "-";
 	string name = bam.Name;
@@ -247,9 +245,11 @@ void PrintBed(const BamAlignment &bam,  const RefVector &refs, bool useEditDista
 	if (bam.IsSecondMate()) name += "/2";
 
 	// rip through the CIGAR string and reconstruct the alignment coordinates
+	unsigned int alignmentEnd;
 	ParseCigarBed(bam.CigarData, alignmentEnd);
 	alignmentEnd += bam.Position;
-	
+
+	// report the alignment in BED6 format.
 	if (useEditDistance == false) {
 		printf("%s\t%d\t%d\t\%s\t%d\t%s\n", refs.at(bam.RefID).RefName.c_str(), bam.Position,
 									  alignmentEnd, name.c_str(), bam.MapQuality, strand.c_str());
@@ -270,20 +270,23 @@ void PrintBed(const BamAlignment &bam,  const RefVector &refs, bool useEditDista
 
 void PrintBed12(const BamAlignment &bam, const RefVector &refs, bool useEditDistance, string color) {
 
+	// set the name of the feature based on the sequence
 	string strand = "+"; 
 	if (bam.IsReverseStrand()) strand = "-";
+
 	string name = bam.Name;
 	if (bam.IsFirstMate()) name += "/1";
 	if (bam.IsSecondMate()) name += "/2";
 	
+	// parse the CIGAR string and figure out the alignment blocks
 	unsigned int alignmentEnd;
 	vector<int> blockLengths;
 	vector<int> blockStarts;
-	blockStarts.push_back(0);   // by default, we have a block start at the start of the alignment.
-	
-	// rip through the CIGAR string and reconstruct the alignment coordinates
+	blockStarts.push_back(0);
+	   
 	ParseCigarBed12(bam.CigarData, blockStarts, blockLengths, alignmentEnd);
 	alignmentEnd += bam.Position;
+	
 	
 	// write BED6 portion
 	if (useEditDistance == false) {
@@ -331,7 +334,7 @@ void PrintBedPE(const BamAlignment &bam,  const RefVector &refs, bool useEditDis
 	if (bam.IsMapped()) {
 		chrom1 = refs.at(bam.RefID).RefName;
 		start1 = bam.Position;
-		end1 = bam.Position + bam.AlignedBases.size();  // use the aligned length, 
+		end1   = bam.Position + bam.AlignedBases.size();  // use the aligned length, 
 		                                                // not the orig. length
 		strand1 = "+";
 		if (bam.IsReverseStrand()) strand1 = "-";	
@@ -341,7 +344,7 @@ void PrintBedPE(const BamAlignment &bam,  const RefVector &refs, bool useEditDis
 	if (bam.IsMateMapped()) {
 		chrom2 = refs.at(bam.MateRefID).RefName;
 		start2 = bam.MatePosition;
-		end2 = bam.MatePosition + bam.AlignedBases.size();  // use the aligned length, 
+		end2   = bam.MatePosition + bam.AlignedBases.size();  // use the aligned length, 
 		                                                    // not the orig. length
 		strand2 = "+";
 		if (bam.IsMateReverseStrand()) strand2 = "-";	
