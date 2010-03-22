@@ -15,15 +15,16 @@
 /*
 	Constructor
 */
-BedCoverage::BedCoverage(string &bedFile, string &genomeFile, bool &eachBase, bool &startSites, int &max) {
+BedCoverage::BedCoverage(string &bedFile, string &genomeFile, bool &eachBase, bool &startSites, bool &bedGraph, int &max) {
 
-	this->bedFile = bedFile;
+	this->bedFile    = bedFile;
 	this->genomeFile = genomeFile;
-	this->eachBase = eachBase;
+	this->eachBase   = eachBase;
 	this->startSites = startSites;
-	this->max = max;
+	this->bedGraph   = bedGraph;
+	this->max        = max;
 
-	this->bed = new BedFile(bedFile);
+	this->bed        = new BedFile(bedFile);
 }
 
 
@@ -139,14 +140,14 @@ void BedCoverage::CoverageBeds(istream &bedInput) {
 	// process the results of the last chromosome.
 	ReportChromCoverage(chromCov, chromSizes[currChrom], currChrom, chromDepthHist);
 	
-	if (! this->eachBase) {
+	if (this->eachBase == false && this->bedGraph == false) {
 		ReportGenomeCoverage(chromSizes, chromDepthHist);
 	}
 }
 
 
 
-void BedCoverage::ReportChromCoverage(vector<DEPTH> &chromCov, int &chromSize, string &chrom, chromHistMap &chromDepthHist) {
+void BedCoverage::ReportChromCoverage(const vector<DEPTH> &chromCov, int &chromSize, string &chrom, chromHistMap &chromDepthHist) {
 	
 	if (this->eachBase) {
 		int depth = 0;  // initialize the depth
@@ -158,6 +159,9 @@ void BedCoverage::ReportChromCoverage(vector<DEPTH> &chromCov, int &chromSize, s
 			
 			depth = depth - chromCov[pos].ends;
 		}
+	}
+	else if (this->bedGraph) {
+		ReportChromCoverageBedGraph(chromCov, chromSize, chrom);
 	}
 	else {
 		
@@ -228,6 +232,46 @@ void BedCoverage::ReportGenomeCoverage(map<string, int> &chromSizes, chromHistMa
 		
 		cout << "genome" << "\t" << depth << "\t" << numBasesAtDepth << "\t" 
 			<< genomeSize << "\t" << (float) ((float)numBasesAtDepth / (float)genomeSize) << endl;
+	}
+}
+
+
+void BedCoverage::ReportChromCoverageBedGraph(const vector<DEPTH> &chromCov, int &chromSize, string &chrom) {
+
+	int depth     = 0;     // initialize the depth
+	int lastStart = -1 ;
+	int lastDepth = -1 ;
+
+	for (int pos = 0; pos < chromSize; pos++) {
+		depth += chromCov[pos].starts;
+
+		if (depth == 0 && lastDepth != -1) {
+			// We've found a new block of zero coverage, so report
+			// the previous block of non-zero coverage.
+			cout << chrom << "\t" << lastStart << "\t" << pos << "\t" << lastDepth << endl;
+			lastDepth = -1;
+			lastStart = -1;
+		}
+		else if (depth > 0 && depth != lastDepth) {
+			// Coverage depth has changed, print the last interval coverage (if any)
+			if (lastDepth != -1) { 
+				cout << chrom << "\t" << lastStart << "\t" << pos << "\t" << lastDepth << endl;
+			}
+			//Set current position as the new interval start + depth
+			lastDepth = depth;
+			lastStart = pos;
+		}
+		// Default: the depth has not changed, so we will not print anything.
+		// Proceed until the depth changes.
+		
+		// Update depth
+		depth = depth - chromCov[pos].ends;
+	}
+	
+	
+	//Print information about the last position
+	if (lastDepth != -1) {
+		cout << chrom << "\t" << lastStart << "\t" << chromSize << "\t" << lastDepth << endl;
 	}
 }
 

@@ -34,10 +34,11 @@ int main(int argc, char* argv[]) {
 	string genomeFile;
 	int max = 999999999;
 	
-	bool haveBed = false;
+	bool haveBed    = false;
 	bool haveGenome = false;
 	bool startSites = false;
-	bool eachBase = false;
+	bool bedGraph   = false;
+	bool eachBase   = false;
 
 	// check to see if we should print out some help
 	if(argc <= 1) showHelp = true;
@@ -75,6 +76,9 @@ int main(int argc, char* argv[]) {
 		else if(PARAMETER_CHECK("-d", 2, parameterLength)) {
 			eachBase = true;
 		}
+		else if(PARAMETER_CHECK("-bg", 3, parameterLength)) {
+			bedGraph = true;
+		}		
 		else if(PARAMETER_CHECK("-max", 4, parameterLength)) {
 			if ((i+1) < argc) {
 				max = atoi(argv[i + 1]);
@@ -92,10 +96,14 @@ int main(int argc, char* argv[]) {
 	  cerr << endl << "*****" << endl << "*****ERROR: Need both a BED (-i) and a genome (-g) file. " << endl << "*****" << endl;
 	  showHelp = true;
 	}
+	if (bedGraph && eachBase) {
+	  cerr << endl << "*****" << endl << "*****ERROR: Use -d or -bedgraph, not both" << endl << "*****" << endl;
+	  showHelp = true;
+	}
 	
 	if (!showHelp) {
 		
-		BedCoverage *bc = new BedCoverage(bedFile, genomeFile, eachBase, startSites, max);
+		BedCoverage *bc = new BedCoverage(bedFile, genomeFile, eachBase, startSites, bedGraph, max);
 		bc->DetermineBedInput();
 		
 		return 0;
@@ -119,8 +127,12 @@ void ShowHelp(void) {
 	cerr << "\t-d\t"	     	<< "Report the depth at each genome position." << endl;
 	cerr 						<< "\t\tDefault behavior is to report a histogram." << endl << endl;
 
+	cerr << "\t-bg\t"			<< "Report depth in BedGraph format. For details, see:" << endl;
+	cerr 						<< "\t\tgenome.ucsc.edu/goldenPath/help/bedgraph.html" << endl << endl;
+
 	cerr << "\t-max\t"          << "Combine all positions with a depth >= max into" << endl;
-	cerr						<< "\t\ta single bin in the histogram." << endl;
+	cerr						<< "\t\ta single bin in the histogram. Irrelevant" << endl;
+	cerr						<< "\t\tfor -d and -bedGraph" << endl;
 	cerr						<< "\t\t- (INTEGER)" << endl << endl;
 
 	cerr << "Notes: " << endl;
@@ -140,7 +152,7 @@ void ShowHelp(void) {
 	cerr << "\tOne can use the UCSC Genome Browser's MySQL database to extract" << endl;
 	cerr << "\tchromosome sizes. For example, H. sapiens:" << endl << endl;
 	cerr << "\tmysql --user=genome --host=genome-mysql.cse.ucsc.edu -A -e /" << endl;
-	cerr << "\t\"select chrom, size from hg19.chromInfo\"  > hg19.genome" << endl << endl;
+	cerr << "\t\"select chrom, size from hg19.chromInfo\" | awk 'NR>1' > hg19.genome" << endl << endl;
 		
 	
 	// end the program here
