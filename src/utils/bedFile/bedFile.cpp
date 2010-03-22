@@ -292,7 +292,10 @@ bool BedFile::parseLine (BED &bed, const vector<string> &lineVector, int &lineNu
 	char *p2End, *p3End, *p4End, *p5End;
 	long l2, l3, l4, l5;
 	
-	if ((lineVector[0].find("track") == string::npos) && (lineVector[0].find("browser") && string::npos) && (lineVector[0].find("#") == string::npos) ) {
+	// bail out if we have a blank line
+	if (lineVector.size() == 0) return false;
+	
+	if ((lineVector[0].find("track") == string::npos) && (lineVector[0].find("browser") == string::npos) && (lineVector[0].find("#") == string::npos) ) {
 
 		// we need at least 3 columns
 		if (lineVector.size() >= 3) {
