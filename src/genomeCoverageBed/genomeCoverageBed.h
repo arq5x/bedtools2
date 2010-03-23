@@ -10,6 +10,7 @@ aaronquinlan@gmail.com
 Licenced under the GNU General Public License 2.0+ license.
 ******************************************************************************/
 #include "bedFile.h"
+#include "genomeFile.h"
 
 #include "BamReader.h"
 #include "BamAux.h"
@@ -50,7 +51,7 @@ public:
 
 	void ReportChromCoverage(const vector<DEPTH> &, int &chromSize, string &chrom, chromHistMap&);
 
-	void ReportGenomeCoverage(map<string, int> &chromSizes, chromHistMap &chromDepthHist);
+	void ReportGenomeCoverage(chromHistMap &chromDepthHist);
 
 	void ReportChromCoverageBedGraph(const vector<DEPTH> &chromCov, int &chromSize, string &chrom);
 
@@ -60,13 +61,15 @@ private:
 
 	string bedFile;
 	string genomeFile;
-	bool bamInput;
-	bool eachBase;
-	bool startSites;
-	bool bedGraph;
-	int max;
+	bool   bamInput;
+	bool   eachBase;
+	bool   startSites;
+	bool   bedGraph;
+	int    max;
 
 	// The BED file from which to compute coverage.
-	BedFile *bed;
+	BedFile    *bed;
+	GenomeFile *genome;
+	
 	chromDepthMap chromCov;
 };

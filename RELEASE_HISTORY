@@ -1,6 +1,7 @@
 Version 2.5.4 (Mar-3-2010)
 1. Fixed an insidious bug that caused malformed BAM output from intersectBed and pairToBed.  The previous BAM files worked fine with samtools as BAM input, but when piped in as SAM, there was an extra tab that thwarted conversion from SAM back to BAM.  Many thanks to Ivan Gregoretti for reporting this bug.  I had never used the BAM output in this way and thus never caught the bug!
 
+
 Version 2.5.3 (Feb-19-2010)
 1. Fixed bug to "re-allow" track and "browser" lines.
 2. Fixed bug in reporting BEDPE overlaps.
@@ -9,25 +10,31 @@ Version 2.5.3 (Feb-19-2010)
 5. Greatly increased the speed of pairToBed when using BAM alignments.
 6. Fixed a bug in bamToBed when reporting edit distance from certain aligners.
 
+
 Version 2.5.2 (Feb-2-2010)
 1. The start and end coordinates for BED and BEDPE entries created by bamToBed are now based on the __aligned__ sequence, rather than the original sequence.  It's obvious, but I missed it originally...sorry.
 2. Added an error message to mergeBed preventing one from using "-n" and "-nms" together.
 3. Fixed a bug in pairToBed that caused neither -type "notispan" nor "notospan" to behave as described.
 
+
 Version 2.5.1 (Jan-28-2010)
 1. Fixed a bug in the new GFF/BED determinator that caused a segfault when start = 0.
+
 
 Version 2.5.0 (Jan-27-2010)
 1. Added support for custom BED fields after the 6th column.
 2. Fixed a command line parsing bug in pairToBed.
 3. Improved sanity checking.
 
+
 Version 2.4.2 (Jan-23-2010)
 1. Fixed a minor bug in mergeBed when -nms and -s were used together.
 2. Improved the command line parsing to prevent the occasional segfault.
 
+
 Version 2.4.1 (Jan-12-2010)
 1. Updated BamTools libraries to remove some compilation issues on some systems/compilers.
+
 
 Version 2.4.0 (Jan-11-2010)
 1.  Added BAM support to intersectBed and pairToBed
@@ -42,9 +49,11 @@ Version 2.4.0 (Jan-11-2010)
 Version 2.3.3 (12/17/2009)
 Rewrote complementBed to use a slower but much simpler approach.  This resolves several bugs with the previous logic.
 
+
 Version 2.3.2 (11/25/2009)
 Fixed a bug in subtractBed that prevent a file from subtracting itself when the following is used:
 	$ subtractBed -a test.bed -b test.bed
+
 
 Version 2.3.1 (11/19/2009)
 Fixed a typo in closestBed that caused all nearby features to be returned instead of just the closest one.
@@ -55,7 +64,7 @@ Version 2.3.0 (11/18/2009)
 	- shuffleBed. 			Randomly permutes the locations of a BED file among a genome.  Useful for testing for significant overlap enrichments.
 	- slopBed.    			Adds a requested number of base pairs to each end of a BED feature.  Constrained by the size of each chromosome.
 	- maskFastaFromBed. 	Masks a FASTA file based on BED coordinates.  Useful making custom genome files from targeted capture experiment, etc.
-	- pairToPair.			Returns overlaps between two paired-end BED files.  This is great for finding structural variants that 			are private or shared among samples.
+	- pairToPair.			Returns overlaps between two paired-end BED files.  This is great for finding structural variants that are private or shared among samples.
 							
 2. Increased the speed of intersectBed by nearly 50%.
 3. Improved corrected some of the help messages.
