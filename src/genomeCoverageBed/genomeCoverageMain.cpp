@@ -35,6 +35,7 @@ int main(int argc, char* argv[]) {
 	int max = 999999999;
 	
 	bool haveBed    = false;
+	bool bamInput   = false;
 	bool haveGenome = false;
 	bool startSites = false;
 	bool bedGraph   = false;
@@ -64,6 +65,14 @@ int main(int argc, char* argv[]) {
 				haveBed = true;
 				bedFile = argv[i + 1];
 				i++;
+			}
+		}
+		if(PARAMETER_CHECK("-ibam", 5, parameterLength)) {
+			if ((i+1) < argc) {
+				haveBed  = true;
+				bamInput = true;
+				bedFile  = argv[i + 1];
+				i++;		
 			}
 		}
 		else if(PARAMETER_CHECK("-g", 2, parameterLength)) {
@@ -103,7 +112,9 @@ int main(int argc, char* argv[]) {
 	
 	if (!showHelp) {
 		
-		BedCoverage *bc = new BedCoverage(bedFile, genomeFile, eachBase, startSites, bedGraph, max);
+		BedGenomeCoverage *bc = new BedGenomeCoverage(bedFile, genomeFile, eachBase, 
+                                                      startSites, bedGraph, max, bamInput);
+		
 		bc->DetermineBedInput();
 		
 		return 0;
@@ -124,6 +135,10 @@ void ShowHelp(void) {
 	cerr << "Usage:   " << PROGRAM_NAME << " [OPTIONS] -i <bed> -g <genome>" << endl << endl;
 	
 	cerr << "Options: " << endl;
+	
+	cerr << "\t-ibam\t"			<< "The input file is in BAM format." << endl;
+	cerr                        << "\t\tNote: BAM _must_ be sorted by position" << endl << endl;	
+	
 	cerr << "\t-d\t"	     	<< "Report the depth at each genome position." << endl;
 	cerr 						<< "\t\tDefault behavior is to report a histogram." << endl << endl;
 
@@ -144,9 +159,11 @@ void ShowHelp(void) {
 	cerr << "\t..." << endl;
 	cerr << "\tchr18_gl000207_random\t4262" << endl << endl;
 
-	cerr << "\t(2)  NOTE: The input BED file must be grouped by chromosome." << endl;
+	cerr << "\t(2)  The input BED (-i) file must be grouped by chromosome." << endl;
 	cerr << "\t     A simple \"sort -k 1,1 <BED> > <BED>.sorted\" will suffice."<< endl << endl;
 
+	cerr << "\t(3)  The input BAM (-ibam) file must be sorted by position." << endl;
+	cerr << "\t     A \"samtools sort <BAM>\" should suffice."<< endl << endl;
 	
 	cerr << "Tips: " << endl;
 	cerr << "\tOne can use the UCSC Genome Browser's MySQL database to extract" << endl;

@@ -10,36 +10,43 @@ aaronquinlan@gmail.com
 Licenced under the GNU General Public License 2.0+ license.
 ******************************************************************************/
 #include "bedFile.h"
+
+#include "BamReader.h"
+#include "BamAux.h"
+using namespace BamTools;
+
 #include <vector>
 #include <iostream>
 #include <fstream>
-
 using namespace std;
 
 
 //***********************************************
 // Typedefs
 //***********************************************
-typedef map<int, DEPTH, less<int> > depthMap;
+typedef map<int, DEPTH, less<int> >          depthMap;
 typedef map<string, depthMap, less<string> > chromDepthMap;
 
-typedef map<int, unsigned int, less<int> > histMap;
-typedef map<string, histMap, less<string> > chromHistMap;
+typedef map<int, unsigned int, less<int> >   histMap;
+typedef map<string, histMap, less<string> >  chromHistMap;
 
 //************************************************
 // Class methods and elements
 //************************************************
-class BedCoverage {
+class BedGenomeCoverage {
 
 public:
 
 	// constructor 
-	BedCoverage(string &bedFile, string &genomeFile, bool &eachBase, bool &startSites, bool &bedGraph, int &max);
+	BedGenomeCoverage(string &bedFile, string &genomeFile, bool &eachBase, bool &startSites, 
+		bool &bedGraph, int &max, bool &bamInput);
 
 	// destructor
-	~BedCoverage(void);
+	~BedGenomeCoverage(void);
 
-	void CoverageBeds(istream &bedInput);
+	void CoverageBed(istream &bedInput);
+
+	void CoverageBam(string bamFile);
 
 	void ReportChromCoverage(const vector<DEPTH> &, int &chromSize, string &chrom, chromHistMap&);
 
@@ -53,6 +60,7 @@ private:
 
 	string bedFile;
 	string genomeFile;
+	bool bamInput;
 	bool eachBase;
 	bool startSites;
 	bool bedGraph;
