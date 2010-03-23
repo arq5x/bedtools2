@@ -12,8 +12,8 @@
 #include "lineFileUtilities.h"
 #include "coverageBed.h"
 
-
-BedCoverage::BedCoverage(string &bedAFile, string &bedBFile, bool &forceStrand, bool &writeHistogram) {
+// build
+BedCoverage::BedCoverage(string &bedAFile, string &bedBFile, bool &forceStrand, bool &writeHistogram, bool &bamInput) {
 	
 	this->bedAFile       = bedAFile;
 	this->bedBFile       = bedBFile;
@@ -23,16 +23,17 @@ BedCoverage::BedCoverage(string &bedAFile, string &bedBFile, bool &forceStrand, 
 	
 	this->forceStrand    = forceStrand;
 	this->writeHistogram = writeHistogram;
+	this->bamInput       = bamInput;
 }
 
-
-
+// destroy
 BedCoverage::~BedCoverage(void) {
+	delete this->bedA;
+	delete this->bedB;
 }
 
 
- 
-void BedCoverage::CollectCoverage(istream &bedInput) {
+void BedCoverage::CollectCoverageBed(istream &bedInput) {
 	
 	// load the "B" bed file into a map so
 	// that we can easily compare "A" to it for overlaps
@@ -63,6 +64,44 @@ void BedCoverage::CollectCoverage(istream &bedInput) {
 }
 
 
+void BedCoverage::CollectCoverageBam(string bamFile) {
+
+	// load the "B" bed file into a map so
+	// that we can easily compare "A" to it for overlaps
+	bedB->loadBedFileIntoMap();
+	
+	// open the BAM file
+	BamReader reader;
+	reader.Open(bamFile);
+
+	// get header & reference information
+	string header = reader.GetHeaderText();
+	RefVector refs = reader.GetReferenceData();
+
+	// convert each aligned BAM entry to BED 
+	// and compute coverage on B
+	BamAlignment bam;	
+	while (reader.GetNextAlignment(bam)) {
+		
+		if (bam.IsMapped()) {
+			
+			// construct a new BED entry from the current BAM alignment.	
+			BED a;
+			a.chrom  = refs.at(bam.RefID).RefName;
+			a.start  = bam.Position;
+			a.end    = bam.Position + bam.AlignedBases.size();
+			a.strand = "+"; if (bam.IsReverseStrand()) a.strand = "-"; 	
+
+			bedB->countHits(a, this->forceStrand);
+		}
+	}
+	// report the coverage (summary or histogram) for BED B.
+	ReportCoverage();
+	// close the BAM file	
+	reader.Close();
+}
+
+
 void BedCoverage::ReportCoverage() {
 
 	map<unsigned int, unsigned int> allDepthHist;
@@ -81,8 +120,8 @@ void BedCoverage::ReportCoverage() {
 			for (; bedItr != bedEnd; ++bedItr) {
 									
 				int zeroDepthCount = 0;
-				int depth = 0;
-				int start = min(bedItr->minOverlapStart, bedItr->start);
+				int depth          = 0;
+				int start          = min(bedItr->minOverlapStart, bedItr->start);
 				
 				// track the numnber of bases in the feature covered by
 				// 0, 1, 2, ... n features in A
@@ -112,11 +151,11 @@ void BedCoverage::ReportCoverage() {
 				}
 
 				// Report the coverage for the current interval.
-				int length = bedItr->end - bedItr->start;
+				int length   = bedItr->end - bedItr->start;
 				totalLength += length;
 				
-				int nonZeroBases =  (length-zeroDepthCount);
-				float fractCovered = (float) nonZeroBases /length;
+				int nonZeroBases   = (length - zeroDepthCount);
+				float fractCovered = (float) nonZeroBases / length;
 				
 				if (this->writeHistogram == false) {
 					bedB->reportBedTab(*bedItr);
@@ -147,16 +186,22 @@ void BedCoverage::ReportCoverage() {
 
 void BedCoverage::DetermineBedInput() {
 	if (bedA->bedFile != "stdin") {   // process a file
-		ifstream beds(bedA->bedFile.c_str(), ios::in);
-		if ( !beds ) {
-			cerr << "Error: The requested bed file (" << bedA->bedFile << ") could not be opened. Exiting!" << endl;
-			exit (1);
+		if (this->bamInput == false) { //bed/gff
+			ifstream beds(bedA->bedFile.c_str(), ios::in);
+			if ( !beds ) {
+				cerr << "Error: The requested bed file (" << bedA->bedFile << ") could not be opened. Exiting!" << endl;
+				exit (1);
+			}
+			CollectCoverageBed(beds);
 		}
-		CollectCoverage(beds);
+		else 
+			CollectCoverageBam(bedA->bedFile);
 	}
-	else {   						// process stdin
-		CollectCoverage(cin);		
+	else {   // process stdin
+		if (this->bamInput == false) 
+			CollectCoverageBed(cin);
+		else 
+			CollectCoverageBam("stdin");	
 	}
 }
-
 

@@ -13,6 +13,11 @@
 #define COVERAGEBED_H
 
 #include "bedFile.h"
+
+#include "BamReader.h"
+#include "BamAux.h"
+using namespace BamTools;
+
 #include <vector>
 #include <algorithm>
 #include <iostream>
@@ -30,26 +35,36 @@ class BedCoverage {
 public:
 
 	// constructor 
-	BedCoverage(string &bedAFile, string &bedBFile, bool &forceStrand, bool &writeHistogram);
+	BedCoverage(string &bedAFile, string &bedBFile, bool &forceStrand, bool &writeHistogram, bool &bamInput);
 
 	// destructor
 	~BedCoverage(void);
 	
-	void CollectCoverage(istream &bedInput);
+	void CollectCoverageBed(istream &bedInput);
+
+	void CollectCoverageBam(string bamFile);
 	
 	void DetermineBedInput();
 	
 private:
 
+	// input files.
 	string bedAFile;
 	string bedBFile;
 
 	// instance of a bed file class.
 	BedFile *bedA, *bedB;
 	
+	// do we care about strandedness when counting coverage?
 	bool forceStrand;
+	
+	// should we write a histogram for each feature in B?
 	bool writeHistogram;
 	
+	// are we dealing with BAM input for "A"?
+	bool bamInput;
+	
+	// private function for reporting coverage information
 	void ReportCoverage();
 };
 #endif /* COVERAGEBED_H */

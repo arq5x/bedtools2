@@ -31,12 +31,13 @@ int main(int argc, char* argv[]) {
 	// input files
 	string bedAFile;
 	string bedBFile;
-	bool forceStrand = false;
-	bool writeHistogram = false;
 	
-	bool haveBedA = false;
-	bool haveBedB = false;
-
+	// parm flags
+	bool forceStrand    = false;
+	bool writeHistogram = false;
+	bool bamInput     = false;	
+	bool haveBedA       = false;
+	bool haveBedB       = false;
 
 	// check to see if we should print out some help
 	if(argc <= 1) showHelp = true;
@@ -62,6 +63,14 @@ int main(int argc, char* argv[]) {
 				haveBedA = true;
 				bedAFile = argv[i + 1];
 				i++;
+			}
+		}
+		if(PARAMETER_CHECK("-abam", 5, parameterLength)) {
+			if ((i+1) < argc) {
+				haveBedA = true;
+				bamInput = true;
+				bedAFile = argv[i + 1];
+				i++;		
 			}
 		}
 		else if(PARAMETER_CHECK("-b", 2, parameterLength)) {
@@ -91,7 +100,7 @@ int main(int argc, char* argv[]) {
 
 	if (!showHelp) {
 
-		BedCoverage *bg = new BedCoverage(bedAFile, bedBFile, forceStrand, writeHistogram);
+		BedCoverage *bg = new BedCoverage(bedAFile, bedBFile, forceStrand, writeHistogram, bamInput);
 		bg->DetermineBedInput();
 		return 0;
 	}
@@ -112,21 +121,25 @@ void ShowHelp(void) {
 	cerr << "Usage:   " << PROGRAM_NAME << " [OPTIONS] -a <a.bed> -b <b.bed>" << endl << endl;
 
 	cerr << "Options: " << endl;
+
+	cerr << "\t-abam\t"			<< "The A input file is in BAM format." << endl << endl;
+
 	cerr << "\t-s\t"	 	    << "Force strandedness.  That is, only include hits in A that" << endl;
 	cerr						<< "\t\toverlap B on the same strand." << endl;
 	cerr						<< "\t\t- By default, hits are included without respect to strand." << endl << endl;
 
-	cerr << "\t-hist\t"	 	    << "Report a histogram of coverage for each feature in B" << endl << endl;
-	cerr						<< "\t\tOutput (tab delimited):" << endl;
+	cerr << "\t-hist\t"	 	    << "Report a histogram of coverage for each feature in B" << endl;
+	cerr						<< "\t\tas well as a summary histogram for _all_ features in B." << endl << endl;
+	cerr						<< "\t\tOutput (tab delimited) after each feature in B:" << endl;
+	cerr						<< "\t\t  1) depth\n\t\t  2) # bases at depth\n\t\t  3) size of B\n\t\t  4) % of B at depth" << endl << endl;
 	
 
 	cerr << "Default Output:  " << endl;
 	cerr << "\t" << " After each entry in B, reports: " << endl; 
-	cerr << "\t  1) The number of features in A that overlapped the B interval." << endl;
-	cerr << "\t  2) The number of bases in B that had non-zero coverage." << endl;
-	cerr << "\t  3) The length of the entry in B." << endl;
-	cerr << "\t  4) The fraction of bases in B that had non-zero coverage." << endl;
+	cerr << "\t   1) The number of features in A that overlapped the B interval." << endl;
+	cerr << "\t   2) The number of bases in B that had non-zero coverage." << endl;
+	cerr << "\t   3) The length of the entry in B." << endl;
+	cerr << "\t   4) The fraction of bases in B that had non-zero coverage." << endl << endl;
 	
 	exit(1);
-
 }
