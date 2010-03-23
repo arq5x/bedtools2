@@ -12,17 +12,16 @@
 #include "lineFileUtilities.h"
 #include "shuffleBed.h"
 
-/*
-	Constructor
-*/
+
 BedShuffle::BedShuffle(string &bedFile, string &genomeFile, string &excludeFile, bool &haveSeed, bool &haveExclude, bool &sameChrom, int &seed) {
-	this->bedFile = bedFile;
-	this->genomeFile = genomeFile;
+
+	this->bedFile     = bedFile;
+	this->genomeFile  = genomeFile;
 	this->excludeFile = excludeFile;
-	this->sameChrom = sameChrom;
+	this->sameChrom   = sameChrom;
 	this->haveExclude = haveExclude;
-	this->haveSeed = haveSeed;
-	this->numChroms = 0;
+	this->haveSeed    = haveSeed;
+
 	
 	// use the supplied seed for the random
 	// number generation if given.  else,
@@ -35,7 +34,10 @@ BedShuffle::BedShuffle(string &bedFile, string &genomeFile, string &excludeFile,
 		srand((unsigned)time(0)); 
 	}
 	
-	this->bed = new BedFile(bedFile);
+	this->bed         = new BedFile(bedFile);
+	this->genome      = new GenomeFile(genomeFile);
+	this->chroms      = genome->getChromList();
+	this->numChroms   = genome->getNumberOfChroms();
 	
 	if (this->haveExclude) {
 		this->exclude = new BedFile(excludeFile);
@@ -44,39 +46,12 @@ BedShuffle::BedShuffle(string &bedFile, string &genomeFile, string &excludeFile,
 }
 
 
-
-/*
-	Destructor
-*/
 BedShuffle::~BedShuffle(void) {
 
 }
 
 
-
 void BedShuffle::Shuffle(istream &bedInput) {
-
-
-	// open the GENOME file for reading.
-	// if successful, load each chrom and it's size into
-	// the "chromSize" map.  also compute the total size of the genome
-	// and store in "genomeSize"
-	ifstream genome(this->genomeFile.c_str(), ios::in);
-	if ( !genome ) {
-		cerr << "Error: The requested genome file (" <<this->genomeFile << ") could not be opened. Exiting!" << endl;
-		exit (1);
-	}
-	else {
-		string chrom;
-		unsigned int size;
-		while (genome >> chrom >> size) {
-			if (chrom.size() > 0 && size > 0) {
-				this->chromSizes[chrom] = size;
-				this->chroms.push_back(chrom);
-				this->numChroms++;
-			}
-		}
-	}
 
 	int lineNum = 0;
 	string bedLine;	  // used to store the current (unparsed) line from the BED file.
@@ -90,7 +65,6 @@ void BedShuffle::Shuffle(istream &bedInput) {
 		BED bedEntry;     // used to store the current BED line from the BED file.
 				
 		if (bed->parseLine(bedEntry, bedFields, lineNum)) {
-
 			// choose a new locus for this feat
 			ChooseLocus(bedEntry);			
 			bed->reportBedNewLine(bedEntry);
@@ -102,28 +76,6 @@ void BedShuffle::Shuffle(istream &bedInput) {
 
 
 void BedShuffle::ShuffleWithExclusions(istream &bedInput) {
-
-
-	// open the GENOME file for reading.
-	// if successful, load each chrom and it's size into
-	// the "chromSize" map.  also compute the total size of the genome
-	// and store in "genomeSize".
-	ifstream genome(this->genomeFile.c_str(), ios::in);
-	if ( !genome ) {
-		cerr << "Error: The requested genome file (" <<this->genomeFile << ") could not be opened. Exiting!" << endl;
-		exit (1);
-	}
-	else {
-		string chrom;
-		unsigned int size;
-		while (genome >> chrom >> size) {
-			if (chrom.size() > 0 && size > 0) {
-				this->chromSizes[chrom] = size;
-				this->chroms.push_back(chrom);
-				this->numChroms++;
-			}
-		}
-	}
 
 	int lineNum = 0;
 	string bedLine;	  // used to store the current (unparsed) line from the BED file.
@@ -148,12 +100,14 @@ void BedShuffle::ShuffleWithExclusions(istream &bedInput) {
 			exclude->FindOverlapsPerBin(bedEntry.chrom, bedEntry.start, bedEntry.end, bedEntry.strand, hits, false);
 					
 			bool haveOverlap = false;
-			for (vector<BED>::const_iterator h = hits.begin(); h != hits.end(); ++h) {
+			vector<BED>::const_iterator hitsItr = hits.begin();
+			vector<BED>::const_iterator hitsEnd = hits.end();
+			for (; hitsItr != hitsEnd; ++hitsItr) {
 
-				int s = max(bedEntry.start, h->start);
-				int e = min(bedEntry.end, h->end);
+				int s = max(bedEntry.start, hitsItr->start);
+				int e = min(bedEntry.end, hitsItr->end);
 
-				if ( (e-s) > 0) {
+				if ( (e - s) > 0) {
 					haveOverlap = true;
 					break;   /* stop looking.  one overlap is enough*/
 				}
@@ -175,12 +129,14 @@ void BedShuffle::ShuffleWithExclusions(istream &bedInput) {
 											bedEntry.strand, hits, false);
 
 				haveOverlap = false;
-				for (vector<BED>::const_iterator h = hits.begin(); h != hits.end(); ++h) {
+				vector<BED>::const_iterator hitsItr = hits.begin();
+				vector<BED>::const_iterator hitsEnd = hits.end();
+				for (; hitsItr != hitsEnd; ++hitsItr) {
 
-					int s = max(bedEntry.start, h->start);
-					int e = min(bedEntry.end, h->end);
+					int s = max(bedEntry.start, hitsItr->start);
+					int e = min(bedEntry.end, hitsItr->end);
 
-					if ( (e-s) > 0) {
+					if ( (e - s) > 0) {
 						haveOverlap = true;
 						break;  /* stop looking.  one overlap is enough*/
 					}
@@ -204,29 +160,27 @@ void BedShuffle::ShuffleWithExclusions(istream &bedInput) {
 void BedShuffle::ChooseLocus(BED &bedEntry) {
 	
 	string chrom = bedEntry.chrom;
-	int start = bedEntry.start;
-	int end = bedEntry.end;
-	int length = end - start;
+	int start    = bedEntry.start;
+	int end      = bedEntry.end;
+	int length   = end - start;
 	
 	string randomChrom;
 	int randomStart;
 	int chromSize;
 	
 	if (!this->sameChrom) {
-		randomChrom = this->chroms[rand() % this->numChroms];
-		chromSize = this->chromSizes[randomChrom];
-		randomStart = rand() % chromSize;
-
+		randomChrom    = chroms[rand() % this->numChroms];
+		chromSize      = genome->getChromSize(randomChrom);
+		randomStart    = rand() % chromSize;
 		bedEntry.chrom = randomChrom;
 		bedEntry.start = randomStart;
-		bedEntry.end = randomStart + length;
+		bedEntry.end   = randomStart + length;
 	}
 	else {
-		chromSize = this->chromSizes[chrom];
-		randomStart = rand() % chromSize;
-
+		chromSize      = genome->getChromSize(chrom);
+		randomStart    = rand() % chromSize;
 		bedEntry.start = randomStart;
-		bedEntry.end = randomStart + length;
+		bedEntry.end   = randomStart + length;
 	}
 	
 	// ensure that the chosen location doesn't go past
@@ -234,20 +188,18 @@ void BedShuffle::ChooseLocus(BED &bedEntry) {
 	// for a new spot.
 	while (bedEntry.end > chromSize) {
 		if (!this->sameChrom) {
-			randomChrom = this->chroms[rand() % this->numChroms];
-			chromSize = this->chromSizes[randomChrom];
-			randomStart = rand() % chromSize;
-
+			randomChrom    = chroms[rand() % this->numChroms];
+			chromSize      = genome->getChromSize(randomChrom);
+			randomStart    = rand() % chromSize;
 			bedEntry.chrom = randomChrom;
 			bedEntry.start = randomStart;
-			bedEntry.end = randomStart + length;
+			bedEntry.end   = randomStart + length;
 		}
 		else {
-			chromSize = this->chromSizes[chrom];
-			randomStart = rand() % chromSize;
-
+			chromSize      = genome->getChromSize(chrom);
+			randomStart    = rand() % chromSize;
 			bedEntry.start = randomStart;
-			bedEntry.end = randomStart + length;
+			bedEntry.end   = randomStart + length;
 		}
 	}
 }
@@ -260,13 +212,21 @@ void BedShuffle::DetermineBedInput() {
 			cerr << "Error: The requested bed file (" << bed->bedFile << ") could not be opened. Exiting!" << endl;
 			exit (1);
 		}
-		if (this->haveExclude) { ShuffleWithExclusions(beds); }
-		else {Shuffle(beds); }
+		if (this->haveExclude) { 
+			ShuffleWithExclusions(beds); 
+		}
+		else {
+			Shuffle(beds); 
+		}
 	}
 	else {
 									// process stdin
-		if (this->haveExclude) { ShuffleWithExclusions(cin); }
-		else {Shuffle(cin); }		
+		if (this->haveExclude) { 
+			ShuffleWithExclusions(cin); 
+		}
+		else {
+			Shuffle(cin); 
+		}		
 	}
 }
 

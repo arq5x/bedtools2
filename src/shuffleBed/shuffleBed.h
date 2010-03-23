@@ -10,6 +10,8 @@
   Licenced under the GNU General Public License 2.0+ license.
 ******************************************************************************/
 #include "bedFile.h"
+#include "genomeFile.h"
+
 #include <vector>
 #include <iostream>
 #include <fstream>
@@ -29,7 +31,8 @@ class BedShuffle {
 public:
 
 	// constructor 
-	BedShuffle(string &, string &, string &, bool &, bool &, bool &, int &);
+	BedShuffle(string &bedFile, string &genomeFile, string &excludeFile, 
+		bool &haveSeed, bool &haveExclude, bool &sameChrom, int &seed);
 
 	// destructor
 	~BedShuffle(void);
@@ -56,7 +59,8 @@ private:
 	BedFile *bed;
 	BedFile *exclude;
 
-	map<string, int, less<string> > chromSizes;
+	GenomeFile *genome;
+
 	vector<string> chroms;
 	int numChroms;
 };

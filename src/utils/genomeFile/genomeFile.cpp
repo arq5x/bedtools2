@@ -80,3 +80,7 @@ int GenomeFile::getChromSize(const string &chrom) {
 vector<string> GenomeFile::getChromList() {
 	return _chromList;
 }
+
+int GenomeFile::getNumberOfChroms() {
+	return _chromList.size();
+}

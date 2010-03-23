@@ -123,7 +123,7 @@ void ShowHelp(void) {
 	
 	cerr << "Summary: Randomly permute the locations of a BED file among a genome." << endl << endl;
 
-	cerr << "Usage:   " << PROGRAM_NAME << " [OPTIONS] -g <genome> -i <bed>" << endl << endl;
+	cerr << "Usage:   " << PROGRAM_NAME << " [OPTIONS] -i <bed> -g <genome>" << endl << endl;
 	
 	cerr << "Options: " << endl;
 	cerr << "\t-excl\t"           	<< "A BED file of coordinates in which features in -i" << endl;
