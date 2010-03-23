@@ -12,20 +12,16 @@
 #include "lineFileUtilities.h"
 #include "complementBed.h"
 
-//==========================
-// Constructor
-//
 BedComplement::BedComplement(string &bedFile, string &genomeFile) {
 
 	this->bedFile = bedFile;
 	this->genomeFile = genomeFile;
-	this->bed = new BedFile(bedFile);
+	
+	this->bed    = new BedFile(bedFile);
+	this->genome = new GenomeFile(genomeFile);	
 }
 
 
-//
-// Destructor
-//
 BedComplement::~BedComplement(void) {
 }
 
@@ -34,22 +30,6 @@ BedComplement::~BedComplement(void) {
 // Merge overlapping BED entries into a single entry 
 //
 void BedComplement::ComplementBed() {
-
-	// open the GENOME file for reading
-	ifstream genome(this->genomeFile.c_str(), ios::in);
-	if ( !genome ) {
-		cerr << "Error: The requested genome file (" <<this->genomeFile << ") could not be opened. Exiting!" << endl;
-		exit (1);
-	}
-
-	string chrom;
-	unsigned int size;
-
-	map<string, int, less<string> > chromSizes; 
-
-	while (genome >> chrom >> size) {
-		chromSizes[chrom] = size;
-	}
 
 	// load the "B" bed file into a map so
 	// that we can easily compare "A" to it for overlaps
@@ -62,18 +42,20 @@ void BedComplement::ComplementBed() {
 	for (masterBedMapNoBin::iterator m = bed->bedMapNoBin.begin(); m != bed->bedMapNoBin.end(); ++m) {
 
 		currChrom = m->first;
+		int currChromSize = genome->getChromSize(currChrom);
+		
 		// bedList is already sorted by start position.
 		vector<BED> bedList = m->second; 
 		
 		// create a flag for every base on the chrom.
-		vector<short> chromMasks(chromSizes[currChrom], 0);
+		vector<short> chromMasks(currChromSize, 0);
 		
-		vector<BED>::const_iterator bIt = bedList.begin();
+		vector<BED>::const_iterator bIt  = bedList.begin();
 		vector<BED>::const_iterator bEnd = bedList.end();
 		for ( ; bIt != bEnd; ++bIt) {
 			
 			// sanity check the end of the bed entry
-			if (bIt->end > chromSizes[currChrom]) {
+			if (bIt->end > currChromSize) {
 				cout << "End of BED entry exceeds chromosome length. Please correct." << endl;
 				bed->reportBedNewLine(*bIt);
 				exit(1);

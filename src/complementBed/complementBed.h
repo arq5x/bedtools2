@@ -10,6 +10,8 @@
   Licenced under the GNU General Public License 2.0+ license.
 ******************************************************************************/
 #include "bedFile.h"
+#include "genomeFile.h"
+
 #include <vector>
 #include <algorithm>
 #include <iostream>
@@ -42,5 +44,5 @@ private:
 		
 	// instance of a bed file class.
 	BedFile *bed;
-
+	GenomeFile *genome;
 };
