@@ -1,9 +1,3 @@
-#include "bedFile.h"
-#include <vector>
-#include <iostream>
-#include <fstream>
-#include <map>
-#include <cstdlib>
 /*****************************************************************************
   slopBed.h
 
@@ -15,6 +9,15 @@
 
   Licenced under the GNU General Public License 2.0+ license.
 ******************************************************************************/
+
+#include "bedFile.h"
+#include "genomeFile.h"
+
+#include <vector>
+#include <iostream>
+#include <fstream>
+#include <map>
+#include <cstdlib>
 #include <ctime>
 using namespace std;
 
@@ -49,6 +52,5 @@ private:
 	int rightSlop;
 	
 	BedFile *bed;
-	
-	map<string, int, less<string> > chromSizes;
+	GenomeFile *genome;
 };

@@ -12,9 +12,7 @@
 #include "lineFileUtilities.h"
 #include "slopBed.h"
 
-/*
-	Constructor
-*/
+
 BedSlop::BedSlop(string &bedFile, string &genomeFile, bool &forceStrand, int &leftSlop, int &rightSlop) {
 
 	this->bedFile = bedFile;
@@ -24,14 +22,11 @@ BedSlop::BedSlop(string &bedFile, string &genomeFile, bool &forceStrand, int &le
 	this->leftSlop = leftSlop;
 	this->rightSlop = rightSlop;
 	
-	this->bed = new BedFile(bedFile);	
+	this->bed    = new BedFile(bedFile);
+	this->genome = new GenomeFile(genomeFile);	
 }
 
 
-
-/*
-	Destructor
-*/
 BedSlop::~BedSlop(void) {
 
 }
@@ -49,7 +44,6 @@ void BedSlop::SlopBed(istream &bedInput) {
 		lineNum++;
 		
 		BED bedEntry;     // used to store the current BED line from the BED file.
-
 		if (this->bed->parseLine(bedEntry, bedFields, lineNum)) {
 			AddSlop(bedEntry);
 			bed->reportBedNewLine(bedEntry);			
@@ -60,18 +54,18 @@ void BedSlop::SlopBed(istream &bedInput) {
 
 void BedSlop::AddSlop(BED &bed) {
 
-	/*
-	   special handling if the BED entry is on the negative
-	   strand and the user cares about strandedness.
-	*/
-	if ((this->forceStrand) &&  (bed.strand == "-")) {
+	// special handling if the BED entry is on the negative
+	// strand and the user cares about strandedness.
+	int chromSize = genome->getChromSize(bed.chrom);
+	
+	if ( (this->forceStrand) && (bed.strand == "-") ) {
 		// inspect the start
 		if ((bed.start - rightSlop) > 0) bed.start -= rightSlop;
 		else bed.start = 0;
 
 		// inspect the start		
-		if ((bed.end + leftSlop) <= this->chromSizes[bed.chrom]) bed.end += leftSlop;
-		else bed.end = this->chromSizes[bed.chrom];
+		if ((bed.end + leftSlop) <= chromSize) bed.end += leftSlop;
+		else bed.end = chromSize;
 	}
 	else {		
 		// inspect the start
@@ -79,34 +73,13 @@ void BedSlop::AddSlop(BED &bed) {
 		else bed.start = 0;
 		
 		// inspect the end
-		if ((bed.end + rightSlop) <= this->chromSizes[bed.chrom]) bed.end += rightSlop;
-		else bed.end = this->chromSizes[bed.chrom];
+		if ((bed.end + rightSlop) <= chromSize) bed.end += rightSlop;
+		else bed.end = chromSize;
 	}
 }
 
 
 void BedSlop::DetermineBedInput() {
-
-
-	/* open the GENOME file for reading.
-	   if successful, load each chrom and it's size into
-	   the "chromSize" map.  also compute the total size of the genome
-	   and store in "genomeSize"
-	*/
-	ifstream genome(this->genomeFile.c_str(), ios::in);
-	if ( !genome ) {
-		cerr << "Error: The requested genome file (" <<this->genomeFile << ") could not be opened. Exiting!" << endl;
-		exit (1);
-	}
-	else {
-		string chrom;
-		unsigned int size;
-		while (genome >> chrom >> size) {
-			if (chrom.size() > 0 && size > 0) {
-				this->chromSizes[chrom] = size;
-			}
-		}
-	}
 
 	if (this->bedFile != "stdin") {   // process a file
 		ifstream beds(this->bedFile.c_str(), ios::in);
