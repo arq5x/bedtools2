@@ -70,6 +70,7 @@ private:
 	bool noHit;
 	bool bamInput;
 	bool bamOutput;
+	
 	// instance of a bed file class.
 	BedFile *bedA, *bedB;
 
