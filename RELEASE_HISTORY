@@ -1,5 +1,51 @@
+Version 2.6.0 (Mar-23-2010)
+***Specific improvements / additions to tools***
+1. intersectBed
+  * Added an option (-wo) that reports the number of overlapping bases for each intersection b/w A and B files.
+    -- Not sure why this wasn't added sooner; it's obvious.
+
+2. coverageBed
+  * native BAM support
+  * can now report a histogram (-hist) of coverage for each feature in B.  Useful for exome sequencing projects, for example.
+    -- thanks for the excellent suggestion from Jose Bras
+  * faster
+
+3. genomeCoverageBed
+  * native BAM support
+  * can now report coverage in BEDGRAPH format (-bg)
+    -- thanks for the code and great suggestion from Gordon Assaf, CSHL.
+
+4. bamToBed
+  * support for "blocked" BED (aka BED12) format.  This facilitates the creation of BED entries for "split" alignments (e.g. RNAseq or SV)
+    -- thanks to Ann Loraine, UNCC for test data to support this addition.
+
+5. fastaFromBed
+  * added the ability to extract sequences from a FASTA file according to the strand in the BED file.  That is, when "-" the extracted sequence is reverse complemented.
+    -- thanks to Thomas Doktor, U. of Southern Denmark for the code and suggestion.
+
+6. ***NEW*** overlap
+  * newly added tool for computing the overlap/distance between features on the same line.
+  -- For example:
+	$ cat test.out
+	chr1	10	20	A	chr1	15	25	B
+	chr1	10	20	C	chr1	25	35	D
+
+	$ cat test.out | overlaps -i stdin -cols 2,3,6,7
+	chr1	10	20	A	chr1	15	25	B	5
+	chr1	10	20	C	chr1	25	35	D	-5
+
+***Bug fixes***
+1. Fixed a bug in pairToBed when comparing paired-end BAM alignments to BED annotations and using the "notboth" option.
+2. Fixed an idiotic bug in intersectBed that occasionally caused segfaults when blank lines existed in BED files.
+3. Fixed a minor bug in mergeBed when using the -nms option.
+
+***General changes***
+1. Added a proper class for genomeFiles.  The code is much cleaner and the tools are less sensitive to minor problems with the formatting of genome files.  Per Gordon Assaf's wise suggestion, the tools now support "chromInfo" files directly downloaded from UCSC.  Thanks Gordon---I disagreed at first, but you were right.
+2. Cleaned up some of the code and made the API a bit more streamlined.  Will facilitate future tool development, etc.
+
+
 Version 2.5.4 (Mar-3-2010)
-1. Fixed an insidious bug that caused malformed BAM output from intersectBed and pairToBed.  The previous BAM files worked fine with samtools as BAM input, but when piped in as SAM, there was an extra tab that thwarted conversion from SAM back to BAM.  Many thanks to Ivan Gregoretti for reporting this bug.  I had never used the BAM output in this way and thus never caught the bug!
+1. Fixed an insidious bug that caused malform BAM output from intersectBed and pairToBed.  The previous BAM files worked fine with samtools as BAM input, but when piped in as SAM, there was an extra tab that thwarted conversion from SAM back to BAM.  Many thanks to Ivan Gregoretti for reporting this bug.  I had never used the BAM output in this way and thus never caught the bug!
 
 
 Version 2.5.3 (Feb-19-2010)

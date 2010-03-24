@@ -1,7 +1,7 @@
 CXX = g++
 CXXFLAGS = -O3  -Wall
 LDFLAGS = 
-LIBFLAGS = -lc
+LIBS=
 
 UTILITIES_DIR = ../utils/
 OBJ_DIR = ../../obj/
@@ -21,7 +21,7 @@ _EXT_OBJECTS=bedFile.o genomeFile.o lineFileUtilities.o
 EXT_OBJECTS=$(patsubst %,$(OBJ_DIR)/%,$(_EXT_OBJECTS))
 BUILT_OBJECTS= $(patsubst %,$(OBJ_DIR)/%,$(OBJECTS))
 PROGRAM= complementBed
-LIBS=
+
 
 all: $(PROGRAM)
 
@@ -29,16 +29,16 @@ all: $(PROGRAM)
 
 $(PROGRAM): $(BUILT_OBJECTS) $(EXT_OBJECTS)
 	@echo "  * linking $(PROGRAM)"
-	@$(CXX) $(LIBFLAGS) $(CXXFLAGS) -o $(BIN_DIR)/$@ $^ $(LIBS)
+	@$(CXX) $(LDFLAGS) $(CXXFLAGS) -o $(BIN_DIR)/$@ $^ $(LIBS)
 
 $(BUILT_OBJECTS): $(SOURCES)
 	@echo "  * compiling" $(*F).cpp
 	@$(CXX) -c -o $@ $(*F).cpp $(LDFLAGS) $(CXXFLAGS) $(INCLUDES)
 
 $(EXT_OBJECTS):
-	@$(MAKE) --no-print-directory -C $(UTILITIES_DIR)/bedFile/
-	@$(MAKE) --no-print-directory -C $(UTILITIES_DIR)/genomeFile/	
 	@$(MAKE) --no-print-directory -C $(UTILITIES_DIR)/lineFileUtilities/
+	@$(MAKE) --no-print-directory -C $(UTILITIES_DIR)/bedFile/
+	@$(MAKE) --no-print-directory -C $(UTILITIES_DIR)/genomeFile/		
 	
 clean:
 	@echo "Cleaning up."
