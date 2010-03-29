@@ -1,3 +1,7 @@
+Version 2.6.1 (Mar-29-2010)
+1. Fixed a careless command line parsing bug in coverageBed.
+
+
 Version 2.6.0 (Mar-23-2010)
 ***Specific improvements / additions to tools***
 1. intersectBed

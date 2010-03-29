@@ -65,7 +65,7 @@ int main(int argc, char* argv[]) {
 				i++;
 			}
 		}
-		if(PARAMETER_CHECK("-abam", 5, parameterLength)) {
+		else if(PARAMETER_CHECK("-abam", 5, parameterLength)) {
 			if ((i+1) < argc) {
 				haveBedA = true;
 				bamInput = true;
