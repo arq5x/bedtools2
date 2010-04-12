@@ -877,3 +877,67 @@ void BedFile::reportBedRangeNewLine(const BED &bed, int start, int end) {
 
 	}
 }
+
+
+/*
+	reportNullBedTab
+*/
+void BedFile::reportNullBedTab() {
+	
+	if (isGff == false) {
+		if (this->bedType == 3) {
+			printf (".\t-1\t-1\t");
+		}
+		else if (this->bedType == 4) {
+			printf (".\t-1\t-1\t.\t");
+		}
+		else if (this->bedType == 5) {
+			printf (".\t-1\t-1\t.\t-1\t");
+		}
+		else if (this->bedType == 6) {
+			printf (".\t-1\t-1\t.\t-1\t.\t");
+		}
+		else if (this->bedType > 6) {
+			printf (".\t-1\t-1\t.\t-1\t.\t");
+			for (unsigned int i = 6; i < this->bedType; ++i) {
+				printf(".\t");
+			}
+		}
+	}	
+	else if (this->bedType == 9) {
+		printf (".\t.\t.\t-1\t-1\t-1\t.\t.\t.\t");
+	}
+}
+
+
+/*
+	reportNullBedTab
+*/
+void BedFile::reportNullBedNewLine() {
+	
+	if (isGff == false) {
+		if (this->bedType == 3) {
+			printf (".\t-1\t-1\n");
+		}
+		else if (this->bedType == 4) {
+			printf (".\t-1\t-1\t.\n");
+		}
+		else if (this->bedType == 5) {
+			printf (".\t-1\t-1\t.\t-1\n");
+		}
+		else if (this->bedType == 6) {
+			printf (".\t-1\t-1\t.\t-1\t.\n");
+		}
+		else if (this->bedType > 6) {
+			printf (".\t-1\t-1\t.\t-1\t.\n");
+			for (unsigned int i = 6; i < this->bedType; ++i) {
+				printf(".\t");
+			}
+			printf("\n");
+		}
+	}	
+	else if (this->bedType == 9) {
+		printf (".\t.\t.\t-1\t-1\t-1\t.\t.\t.\n");
+	}
+}
+

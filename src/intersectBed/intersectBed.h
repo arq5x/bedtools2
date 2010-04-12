@@ -13,67 +13,74 @@
 #define INTERSECTBED_H
 
 #include "bedFile.h"
+
 #include "BamReader.h"
 #include "BamWriter.h"
 #include "BamAux.h"
 using namespace BamTools;
 
+
 #include <vector>
 #include <iostream>
 #include <fstream>
 #include <stdlib.h>
-
 using namespace std;
 
-//************************************************
-// Class methods and elements
-//************************************************
+
 class BedIntersect {
 
 public:
 
 	// constructor 
 	BedIntersect(string bedAFile, string bedBFile, bool anyHit, 
-							   bool writeA, bool writeB, bool writeOverlap, float overlapFraction, 
-							   bool noHit, bool writeCount, bool forceStrand, bool reciprocal,
-							   bool bamInput, bool bamOutput);
+							   bool writeA, bool writeB, bool writeOverlap, bool writeAllOverlap,
+							   float overlapFraction, bool noHit, bool writeCount, bool forceStrand, 
+							   bool reciprocal, bool bamInput, bool bamOutput);
 
 	// destructor
 	~BedIntersect(void);
-	
-	void reportAIntersect(const BED &, int &, int &);	
-	void reportA(const BED &);
-	void reportB(const BED &);
-
-	bool FindOverlaps(const BED &a, vector<BED> &hits);
-	bool FindOneOrMoreOverlap(const BED &a);
-	
-	void IntersectBed(istream &bedInput);
-	void IntersectBam(string bamFile);
-		
 	void DetermineBedInput();
 	
-	
 private:
+	
+	//------------------------------------------------
+	// private attributes
+	//------------------------------------------------
+	string _bedAFile;
+	string _bedBFile;
+	
+	bool  _writeA;            // should the original A feature be reported?
+	bool  _writeB;            // should the original B feature be reported?
+	bool  _writeOverlap;
+	bool  _writeAllOverlap;
 
-	string bedAFile;
-	string bedBFile;
-	string notInBFile;
-	bool anyHit;
-	bool writeA;
-	bool writeB;
-	bool writeCount;
-	bool writeOverlap;
-	bool forceStrand;
-	bool reciprocal;
-	float overlapFraction;
-	bool noHit;
-	bool bamInput;
-	bool bamOutput;
+	bool  _forceStrand;
+	bool  _reciprocal;
+	float _overlapFraction;
+
+	bool  _anyHit;
+	bool  _noHit;
+	bool  _writeCount;        // do we want a count of the number of overlaps in B?
+
+	bool  _bamInput;
+	bool  _bamOutput;
 	
 	// instance of a bed file class.
-	BedFile *bedA, *bedB;
+	BedFile *_bedA, *_bedB;
 
+	//------------------------------------------------
+	// private methods
+	//------------------------------------------------
+	void IntersectBed(istream &bedInput);
+	void IntersectBam(string bamFile);
+	
+	bool FindOverlaps(const BED &a, vector<BED> &hits);
+	bool FindOneOrMoreOverlap(const BED &a);
+
+	void ReportOverlapDetail(const int &overlapBases, const BED &a, const BED &b,
+		                     const int &s, const int &e);
+	void ReportOverlapSummary(const BED &a, const int &numOverlapsFound);
+	
 };
 
 #endif /* INTERSECTBED_H */

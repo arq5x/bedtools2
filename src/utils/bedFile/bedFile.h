@@ -176,6 +176,8 @@ public:
 	void reportBedNewLine(const BED &);		
 	void reportBedRangeTab(const BED &bed, int start, int end);
 	void reportBedRangeNewLine(const BED &bed, int start, int end);
+	void reportNullBedTab(void);
+	void reportNullBedNewLine(void);
 	
 	// parse an input line and determine how it should be handled
 	bool parseLine (BED &bed, const vector<string> &lineVector, int &lineNum);

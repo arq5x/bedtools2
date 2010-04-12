@@ -44,6 +44,7 @@ int main(int argc, char* argv[]) {
 	bool writeB             = false;
 	bool writeCount         = false;
 	bool writeOverlap       = false;
+	bool writeAllOverlap    = false;
 	bool haveFraction       = false;
 	bool reciprocalFraction = false;
 	bool forceStrand        = false;
@@ -112,6 +113,10 @@ int main(int argc, char* argv[]) {
 			writeB = true;
 		}
 		else if(PARAMETER_CHECK("-wo", 3, parameterLength)) {
+			writeOverlap = true;
+		}
+		else if(PARAMETER_CHECK("-wao", 4, parameterLength)) {
+			writeAllOverlap = true;
 			writeOverlap = true;
 		}
 		else if(PARAMETER_CHECK("-c", 2, parameterLength)) {
@@ -187,7 +192,7 @@ int main(int argc, char* argv[]) {
 	if (!showHelp) {
 
 		BedIntersect *bi = new BedIntersect(bedAFile, bedBFile, anyHit, writeA, writeB, writeOverlap,
-											overlapFraction, noHit, writeCount, forceStrand, 
+											writeAllOverlap, overlapFraction, noHit, writeCount, forceStrand, 
 											reciprocalFraction, inputIsBam, outputIsBam);
 		bi->DetermineBedInput();
 		return 0;
@@ -221,8 +226,15 @@ void ShowHelp(void) {
 
 	cerr << "\t-wo\t"			<< "Write the original A and B entries plus the number of base" << endl;
 	cerr 						<< "\t\tpairs of overlap between the two features." << endl;
-	cerr						<< "\t\t- Overlaps restricted by -f and -r." << endl << endl;
-		
+	cerr						<< "\t\t- Overlaps restricted by -f and -r." << endl;
+	cerr						<< "\t\t  Only A features with overlap are reported." << endl << endl;
+
+	cerr << "\t-wao\t"			<< "Write the original A and B entries plus the number of base" << endl;
+	cerr 						<< "\t\tpairs of overlap between the two features." << endl;
+	cerr						<< "\t\t- Overlapping features restricted by -f and -r." << endl;
+	cerr						<< "\t\t  However, A features w/o overlap are also reported" << endl << endl;
+	cerr						<< "\t\t  with a NULL B feature and overlap = 0." << endl << endl;
+					
 	cerr << "\t-u\t"      		<< "Write the original A entry _once_ if _any_ overlaps found in B." << endl;
 	cerr 						<< "\t\t- In other words, just report the fact >=1 hit was found." << endl;
 	cerr						<< "\t\t- Overlaps restricted by -f and -r." << endl << endl;
