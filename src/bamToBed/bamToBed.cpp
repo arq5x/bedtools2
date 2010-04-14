@@ -201,6 +201,7 @@ void ParseCigarBed(const vector<CigarOp> cigar, unsigned int &alignmentEnd) {
 }
 
 
+
 void ParseCigarBed12(const vector<CigarOp> cigar, vector<int> &blockStarts, vector<int> &blockLengths, unsigned int &alignmentEnd) {
 
 	int currPosition = 0;
@@ -245,9 +246,9 @@ void PrintBed(const BamAlignment &bam,  const RefVector &refs, bool useEditDista
 	if (bam.IsSecondMate()) name += "/2";
 
 	// rip through the CIGAR string and reconstruct the alignment coordinates
-	unsigned int alignmentEnd;
-	ParseCigarBed(bam.CigarData, alignmentEnd);
-	alignmentEnd += bam.Position;
+	unsigned int alignmentEnd = bam.GetAlignmentEnd();
+	//ParseCigarBed(bam.CigarData, alignmentEnd);
+	//alignmentEnd += bam.Position;
 
 	// report the alignment in BED6 format.
 	if (useEditDistance == false) {
