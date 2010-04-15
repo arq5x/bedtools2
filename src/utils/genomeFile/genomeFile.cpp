@@ -84,3 +84,7 @@ vector<string> GenomeFile::getChromList() {
 int GenomeFile::getNumberOfChroms() {
 	return _chromList.size();
 }
+
+string GenomeFile::getGenomeFileName() {
+	return _genomeFile;
+}

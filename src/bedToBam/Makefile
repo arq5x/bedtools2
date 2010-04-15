@@ -1,7 +1,6 @@
-CXX = g++
-CXXFLAGS = -O3 -Wall
-LDFLAGS = 
-LIBS = -lz
+CXX=		g++
+CXXFLAGS=	-Wall -O3
+LIBS=		-lz
 UTILITIES_DIR = ../utils/
 OBJ_DIR = ../../obj/
 BIN_DIR = ../../bin/
@@ -9,21 +8,23 @@ BIN_DIR = ../../bin/
 # -------------------
 # define our includes
 # -------------------
-INCLUDES = -I$(UTILITIES_DIR)/bedFile/ -I$(UTILITIES_DIR)/lineFileUtilities/ -I$(UTILITIES_DIR)/version/ -I$(UTILITIES_DIR)/gzstream/
+INCLUDES = -I$(UTILITIES_DIR)/bedFile/ -I$(UTILITIES_DIR)/genomeFile/ -I$(UTILITIES_DIR)/lineFileUtilities/  -I$(UTILITIES_DIR)/BamTools/  -I$(UTILITIES_DIR)/version/ -I$(UTILITIES_DIR)/gzstream/
 
 # ----------------------------------
 # define our source and object files
 # ----------------------------------
-SOURCES= closestMain.cpp closestBed.cpp
+SOURCES= bedToBam.cpp
 OBJECTS= $(SOURCES:.cpp=.o)
-_EXT_OBJECTS=bedFile.o lineFileUtilities.o gzstream.o
+_EXT_OBJECTS=BamWriter.o BGZF.o bedFile.o genomeFile.o lineFileUtilities.o gzstream.o
 EXT_OBJECTS=$(patsubst %,$(OBJ_DIR)/%,$(_EXT_OBJECTS))
 BUILT_OBJECTS= $(patsubst %,$(OBJ_DIR)/%,$(OBJECTS))
-PROGRAM= closestBed
+PROGRAM= bedToBam
+
 
 all: $(PROGRAM)
 
 .PHONY: all
+
 
 $(PROGRAM): $(BUILT_OBJECTS) $(EXT_OBJECTS)
 	@echo "  * linking $(PROGRAM)"
@@ -34,10 +35,12 @@ $(BUILT_OBJECTS): $(SOURCES)
 	@$(CXX) -c -o $@ $(*F).cpp $(LDFLAGS) $(CXXFLAGS) $(INCLUDES)
 
 $(EXT_OBJECTS):
-	@$(MAKE) --no-print-directory -C $(UTILITIES_DIR)/gzstream/
-	@$(MAKE) --no-print-directory -C $(UTILITIES_DIR)/bedFile/
+	@$(MAKE) --no-print-directory -C $(UTILITIES_DIR)/BamTools/	
 	@$(MAKE) --no-print-directory -C $(UTILITIES_DIR)/lineFileUtilities/
-
+	@$(MAKE) --no-print-directory -C $(UTILITIES_DIR)/bedFile/
+	@$(MAKE) --no-print-directory -C $(UTILITIES_DIR)/genomeFile/
+	@$(MAKE) --no-print-directory -C $(UTILITIES_DIR)/gzstream/
+			
 clean:
 	@echo "Cleaning up."
 	@rm -f $(OBJ_DIR)/* $(BIN_DIR)/*

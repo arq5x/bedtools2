@@ -191,7 +191,7 @@ void ProcessBed(istream &bedInput, BedFile *bed, GenomeFile *genome, bool isBED1
 	RefVector refs;
 	string    bamHeader;
 	map<string, int, std::less<string> > chromToId;
-	MakeBamHeader(genome->genomeFile, refs, bamHeader, chromToId);
+	MakeBamHeader(genome->getGenomeFileName(), refs, bamHeader, chromToId);
 	
 	// add the reference headers to the BAM file
 	writer.Open("stdout", bamHeader, refs);
@@ -265,8 +265,8 @@ void ConvertBedToBam(const BED &bed, BamAlignment &bam, map<string, int, std::le
 
 		// extract the relevant BED fields to convert BED12 to BAM
 		// namely: thickStart, thickEnd, blockCount, blockStarts, blockEnds
-		unsigned int thickStart = atoi(bed.otherFields[0].c_str());
-		unsigned int thickEnd   = atoi(bed.otherFields[1].c_str());
+		// unsigned int thickStart = atoi(bed.otherFields[0].c_str());
+		// unsigned int thickEnd   = atoi(bed.otherFields[1].c_str());
 		unsigned int blockCount = atoi(bed.otherFields[3].c_str());
 
 		vector<string> blockSizesString, blockStartsString;

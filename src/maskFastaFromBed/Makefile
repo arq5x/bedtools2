@@ -1,7 +1,7 @@
 CXX = g++
 CXXFLAGS = -O3  -Wall
 LDFLAGS = 
-
+LIBS = -lz
 UTILITIES_DIR = ../utils/
 OBJ_DIR = ../../obj/
 BIN_DIR = ../../bin/
@@ -9,18 +9,17 @@ BIN_DIR = ../../bin/
 # -------------------
 # define our includes
 # -------------------
-INCLUDES = -I$(UTILITIES_DIR)/bedFile/ -I$(UTILITIES_DIR)/sequenceUtilities/ -I$(UTILITIES_DIR)/lineFileUtilities/ -I$(UTILITIES_DIR)/version/
+INCLUDES = -I$(UTILITIES_DIR)/bedFile/ -I$(UTILITIES_DIR)/sequenceUtilities/ -I$(UTILITIES_DIR)/lineFileUtilities/ -I$(UTILITIES_DIR)/version/ -I$(UTILITIES_DIR)/gzstream/
 
 # ----------------------------------
 # define our source and object files
 # ----------------------------------
 SOURCES= maskFastaFromBedMain.cpp maskFastaFromBed.cpp
 OBJECTS= $(SOURCES:.cpp=.o)
-_EXT_OBJECTS=bedFile.o sequenceUtils.o lineFileUtilities.o
+_EXT_OBJECTS=bedFile.o sequenceUtils.o lineFileUtilities.o gzstream.o
 EXT_OBJECTS=$(patsubst %,$(OBJ_DIR)/%,$(_EXT_OBJECTS))
 BUILT_OBJECTS= $(patsubst %,$(OBJ_DIR)/%,$(OBJECTS))
 PROGRAM= maskFastaFromBed
-LIBS=
 
 all: $(PROGRAM)
 
@@ -38,6 +37,7 @@ $(EXT_OBJECTS):
 	@$(MAKE) --no-print-directory -C $(UTILITIES_DIR)/sequenceUtilities/
 	@$(MAKE) --no-print-directory -C $(UTILITIES_DIR)/lineFileUtilities/
 	@$(MAKE) --no-print-directory -C $(UTILITIES_DIR)/bedFile/
+	@$(MAKE) --no-print-directory -C $(UTILITIES_DIR)/gzstream/	
 	
 clean:
 	@echo "Cleaning up."

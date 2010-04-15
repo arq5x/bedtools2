@@ -1,7 +1,7 @@
 CXX = g++
-CXXFLAGS = -O3 -Wall
-LDFLAGS = 
-LIBS = -lz
+CXXFLAGS = -O3  -Wall
+LDFLAGS =
+
 UTILITIES_DIR = ../utils/
 OBJ_DIR = ../../obj/
 BIN_DIR = ../../bin/
@@ -9,17 +9,18 @@ BIN_DIR = ../../bin/
 # -------------------
 # define our includes
 # -------------------
-INCLUDES = -I$(UTILITIES_DIR)/bedFile/ -I$(UTILITIES_DIR)/lineFileUtilities/ -I$(UTILITIES_DIR)/version/ -I$(UTILITIES_DIR)/gzstream/
+INCLUDES = -I$(UTILITIES_DIR)/bedFile/ -I$(UTILITIES_DIR)/lineFileUtilities/ -I$(UTILITIES_DIR)/version/
 
 # ----------------------------------
 # define our source and object files
 # ----------------------------------
-SOURCES= closestMain.cpp closestBed.cpp
+SOURCES= coverageMain.cpp coverageBed.cpp
 OBJECTS= $(SOURCES:.cpp=.o)
-_EXT_OBJECTS=bedFile.o lineFileUtilities.o gzstream.o
+_EXT_OBJECTS=bedFile.o lineFileUtilities.o
 EXT_OBJECTS=$(patsubst %,$(OBJ_DIR)/%,$(_EXT_OBJECTS))
 BUILT_OBJECTS= $(patsubst %,$(OBJ_DIR)/%,$(OBJECTS))
-PROGRAM= closestBed
+PROGRAM= coverageBed
+
 
 all: $(PROGRAM)
 
@@ -34,10 +35,9 @@ $(BUILT_OBJECTS): $(SOURCES)
 	@$(CXX) -c -o $@ $(*F).cpp $(LDFLAGS) $(CXXFLAGS) $(INCLUDES)
 
 $(EXT_OBJECTS):
-	@$(MAKE) --no-print-directory -C $(UTILITIES_DIR)/gzstream/
 	@$(MAKE) --no-print-directory -C $(UTILITIES_DIR)/bedFile/
 	@$(MAKE) --no-print-directory -C $(UTILITIES_DIR)/lineFileUtilities/
-
+	
 clean:
 	@echo "Cleaning up."
 	@rm -f $(OBJ_DIR)/* $(BIN_DIR)/*

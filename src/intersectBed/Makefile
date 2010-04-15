@@ -10,14 +10,14 @@ BIN_DIR = ../../bin/
 # -------------------
 # define our includes
 # -------------------
-INCLUDES = -I$(UTILITIES_DIR)/bedFile/ -I$(UTILITIES_DIR)/lineFileUtilities/ -I$(UTILITIES_DIR)/version/ -I$(UTILITIES_DIR)/BamTools/
+INCLUDES = -I$(UTILITIES_DIR)/bedFile/ -I$(UTILITIES_DIR)/lineFileUtilities/ -I$(UTILITIES_DIR)/version/ -I$(UTILITIES_DIR)/BamTools/ -I$(UTILITIES_DIR)/gzstream/
 
 # ----------------------------------
 # define our source and object files
 # ----------------------------------
 SOURCES= intersectMain.cpp intersectBed.cpp
 OBJECTS= $(SOURCES:.cpp=.o)
-_EXT_OBJECTS=bedFile.o lineFileUtilities.o BamReader.o BamWriter.o BGZF.o
+_EXT_OBJECTS=bedFile.o lineFileUtilities.o BamReader.o BamWriter.o BGZF.o gzstream.o
 EXT_OBJECTS=$(patsubst %,$(OBJ_DIR)/%,$(_EXT_OBJECTS))
 BUILT_OBJECTS= $(patsubst %,$(OBJ_DIR)/%,$(OBJECTS))
 PROGRAM= intersectBed
@@ -37,7 +37,8 @@ $(BUILT_OBJECTS): $(SOURCES)
 $(EXT_OBJECTS):
 	@$(MAKE) --no-print-directory -C $(UTILITIES_DIR)/bedFile/
 	@$(MAKE) --no-print-directory -C $(UTILITIES_DIR)/lineFileUtilities/
-	@$(MAKE) --no-print-directory -C $(UTILITIES_DIR)/BamTools/	
+	@$(MAKE) --no-print-directory -C $(UTILITIES_DIR)/BamTools/
+	@$(MAKE) --no-print-directory -C $(UTILITIES_DIR)/gzstream/		
 		
 clean:
 	@echo "Cleaning up."

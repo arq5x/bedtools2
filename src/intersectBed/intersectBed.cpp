@@ -307,6 +307,7 @@ void BedIntersect::DetermineBedInput() {
 		// it's BED or GFF 
 		if (_bamInput == false) {					
 			IntersectBed();
+		}
 		// it's BAM
 		else {
 			IntersectBam("stdin");

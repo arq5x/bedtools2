@@ -7,7 +7,7 @@ UTILITIES_DIR = ../../utils/
 # -------------------
 # define our includes
 # -------------------
-INCLUDES = -I$(UTILITIES_DIR)/lineFileUtilities/ -I$(UTILITIES_DIR)/bedFile/
+INCLUDES = -I$(UTILITIES_DIR)/lineFileUtilities/ -I$(UTILITIES_DIR)/bedFile/ -I$(UTILITIES_DIR)/gzstream/
 
 # ----------------------------------
 # define our source and object files
