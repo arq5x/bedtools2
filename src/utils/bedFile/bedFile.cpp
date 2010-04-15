@@ -181,8 +181,8 @@ bool BedFile::GetNextBed (BED &bed, int &lineNum) {
 		if (parseLine(bed, bedFields, lineNum)) {
 			return true;
 		}
-		return false;
 	}
+	return false;
 }
 
 
@@ -352,22 +352,6 @@ void BedFile::countHits(const BED &a, bool forceStrand) {
 		startBin >>= _binNextShift;
 		endBin >>= _binNextShift;
 	}
-}
-
-
-
-
-/*******************************************
-Class methods
-*******************************************/
-
-// Constructor
-BedFile::BedFile(string &bedFile) {
-	this->bedFile = bedFile;
-}
-
-// Destructor
-BedFile::~BedFile(void) {
 }
 
 

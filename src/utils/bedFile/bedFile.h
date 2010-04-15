@@ -12,6 +12,7 @@
 #ifndef BEDFILE_H
 #define BEDFILE_H
 
+#include "gzstream.h"
 #include <vector>
 #include <map>
 #include <string>
@@ -22,7 +23,7 @@
 #include <algorithm>
 #include <limits.h>
 #include <cstdio>
-//#include <tr1/unordered_map>
+
 using namespace std;
 
 //*************************************************
@@ -207,6 +208,8 @@ private:
 	bool parseGffLine (BED &bed, const vector<string> &lineVector, int lineNum);
 	
 	void setGff (bool isGff);
+	
+	istream *bedStream;
 };
 
 #endif /* BEDFILE_H */
