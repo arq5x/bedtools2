@@ -62,21 +62,22 @@ public:
 	
 private:
 
-	string bedAFilePE;
-	string bedBFile;
-	float overlapFraction;
-	string searchType;
-	bool forceStrand;
-	bool bamInput;
-	bool bamOutput;
+	string _bedAFilePE;
+	string _bedBFile;
+	float _overlapFraction;
+	string _searchType;
+	bool _forceStrand;
+	bool _bamInput;
+	bool _bamOutput;
 
 	// instance of a paired-end bed file class.
-	BedFilePE *bedA;
+	BedFilePE *_bedA;
 
 	// instance of a bed file class.
-	BedFile *bedB;	
+	BedFile *_bedB;	
 
-	inline void ConvertBamToBedPE(const BamAlignment &bam, const RefVector &refs, BEDPE &a) {
+	inline 
+	void ConvertBamToBedPE(const BamAlignment &bam, const RefVector &refs, BEDPE &a) {
 
 		a.start1 = a.start2 = a.end1 = a.end2 = -1;
 		a.chrom1 = a.chrom2 = a.strand1 = a.strand2 = ".";

@@ -45,31 +45,28 @@ public:
 	// destructor
 	~BedGenomeCoverage(void);
 
-	void CoverageBed(istream &bedInput);
-
-	void CoverageBam(string bamFile);
-
-	void ReportChromCoverage(const vector<DEPTH> &, int &chromSize, string &chrom, chromHistMap&);
-
-	void ReportGenomeCoverage(chromHistMap &chromDepthHist);
-
-	void ReportChromCoverageBedGraph(const vector<DEPTH> &chromCov, int &chromSize, string &chrom);
-
-	void DetermineBedInput();
-
 private:
 
-	string bedFile;
-	string genomeFile;
-	bool   bamInput;
-	bool   eachBase;
-	bool   startSites;
-	bool   bedGraph;
-	int    max;
+	// data
+	string _bedFile;
+	string _genomeFile;
+	bool   _bamInput;
+	bool   _eachBase;
+	bool   _startSites;
+	bool   _bedGraph;
+	int    _max;
 
 	// The BED file from which to compute coverage.
-	BedFile    *bed;
-	GenomeFile *genome;
+	BedFile    *_bed;
+	GenomeFile *_genome;
 	
-	chromDepthMap chromCov;
+	chromDepthMap _chromCov;
+	
+	// methods
+	void CoverageBed();
+	void CoverageBam(string bamFile);
+	void ReportChromCoverage(const vector<DEPTH> &, int &chromSize, string &chrom, chromHistMap&);
+	void ReportGenomeCoverage(chromHistMap &chromDepthHist);
+	void ReportChromCoverageBedGraph(const vector<DEPTH> &chromCov, int &chromSize, string &chrom);
+	
 };

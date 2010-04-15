@@ -127,7 +127,7 @@ int main(int argc, char* argv[]) {
 	
 	if (!showHelp) {
 		BedSlop *bc = new BedSlop(bedFile, genomeFile, forceStrand, leftSlop, rightSlop);
-		bc->DetermineBedInput();		
+		delete bc;		
 		
 		return 0;
 	}

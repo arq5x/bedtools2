@@ -16,25 +16,38 @@
 BedGenomeCoverage::BedGenomeCoverage(string &bedFile, string &genomeFile, bool &eachBase, 
 	                                 bool &startSites, bool &bedGraph, int &max, bool &bamInput) {
 
-	this->bedFile    = bedFile;
-	this->genomeFile = genomeFile;
-	this->eachBase   = eachBase;
-	this->startSites = startSites;
-	this->bedGraph   = bedGraph;
-	this->max        = max;
-	this->bamInput   = bamInput;
+	_bedFile    = bedFile;
+	_genomeFile = genomeFile;
+	_eachBase   = eachBase;
+	_startSites = startSites;
+	_bedGraph   = bedGraph;
+	_max        = max;
+	_bamInput   = bamInput;
 	
-	this->bed        = new BedFile(bedFile);
-	this->genome     = new GenomeFile(genomeFile);
+	_bed        = new BedFile(bedFile);
+	_genome     = new GenomeFile(genomeFile);
+	
+	if (_bed->bedFile != "stdin") {   // process a file
+		if (_bamInput == false)
+			CoverageBed();
+		else 
+			CoverageBam(_bed->bedFile);
+	}
+	else {   // process stdin
+		if (_bamInput == false) 
+			CoverageBed();
+		else 
+			CoverageBam("stdin");	
+	}
 }
 
 
 BedGenomeCoverage::~BedGenomeCoverage(void) {
-	delete this->bed;
+	delete _bed;
 }
 
 
-void BedGenomeCoverage::CoverageBed(istream &bedInput) {
+void BedGenomeCoverage::CoverageBed() {
 
 	chromHistMap chromDepthHist;
 
@@ -45,71 +58,64 @@ void BedGenomeCoverage::CoverageBed(istream &bedInput) {
 	int currChromSize = 0;
 	int start, end;
 	
-	string bedLine;                                                                                                                    
+	BED a;
 	int lineNum = 0;					// current input line number
-	vector<string> bedFields;			// vector for a BED entry
-	bedFields.reserve(12);
 	
-	while (getline(bedInput, bedLine)) {
-		
-		Tokenize(bedLine,bedFields);
-		lineNum++;
-		BED bedEntry;     // used to store the current BED line from the BED file.
-		
-		if (bed->parseLine(bedEntry, bedFields, lineNum)) {
+	_bed->Open();
+	while (_bed->GetNextBed(a, lineNum)) {
 						
-			currChrom = bedEntry.chrom;
-			start     = bedEntry.start;
-			end       = bedEntry.end - 1;
+		currChrom = a.chrom;
+		start     = a.start;
+		end       = a.end - 1;
+				
+		if (currChrom != prevChrom)  {
+			// If we've moved beyond the first encountered chromosomes,
+			// process the results of the previous chromosome.
+			if (prevChrom.length() > 0) {
+				ReportChromCoverage(chromCov, prevChromSize, prevChrom, chromDepthHist);
+			}
 			
-			if (currChrom != prevChrom)  {
-				// If we've moved beyond the first encountered chromosomes,
-				// process the results of the previous chromosome.
-				if (prevChrom.length() > 0) {
-					ReportChromCoverage(chromCov, prevChromSize, prevChrom, chromDepthHist);
-				}
-				
-				// empty the previous chromosome and reserve new
-				std::vector<DEPTH>().swap(chromCov);
-				
-				// get the current chrom size and allocate space 
-				currChromSize = genome->getChromSize(currChrom);
-				chromCov.resize(currChromSize);
+			// empty the previous chromosome and reserve new
+			std::vector<DEPTH>().swap(chromCov);
+			
+			// get the current chrom size and allocate space 
+			currChromSize = _genome->getChromSize(currChrom);
+			chromCov.resize(currChromSize);
 
-				// process the first line for this chromosome.
-				// make sure the coordinates fit within the chrom
-				if (start < currChromSize) {
-					chromCov[start].starts++;
-				}
-				if (end < currChromSize) {
-					chromCov[end].ends++;
-				}
-				else {
-					chromCov[currChromSize-1].ends++;
-				}
+			// process the first line for this chromosome.
+			// make sure the coordinates fit within the chrom
+			if (start < currChromSize) {
+				chromCov[start].starts++;
+			}
+			if (end < currChromSize) {
+				chromCov[end].ends++;
 			}
 			else {
-				// process the other lines for this chromosome.
-				// make sure the coordinates fit within the chrom
-				if (start < currChromSize) {
-					chromCov[start].starts++;
-				}
-				if (end < currChromSize) {
-					chromCov[end].ends++;
-				}
-				else {
-					chromCov[currChromSize-1].ends++;
-				}			
+				chromCov[currChromSize-1].ends++;
 			}
-			prevChrom     = currChrom;
-			prevChromSize = currChromSize;
 		}
-		bedFields.clear();
+		else {
+			// process the other lines for this chromosome.
+			// make sure the coordinates fit within the chrom
+			if (start < currChromSize) {
+				chromCov[start].starts++;
+			}
+			if (end < currChromSize) {
+				chromCov[end].ends++;
+			}
+			else {
+				chromCov[currChromSize-1].ends++;
+			}			
+		}
+		prevChrom     = currChrom;
+		prevChromSize = currChromSize;
 	}
+	_bed->Close();
+	
 	// process the results of the last chromosome.
 	ReportChromCoverage(chromCov, currChromSize, currChrom, chromDepthHist);
 	
-	if (this->eachBase == false && this->bedGraph == false) {
+	if (_eachBase == false && _bedGraph == false) {
 		ReportGenomeCoverage(chromDepthHist);
 	}
 }
@@ -156,7 +162,7 @@ void BedGenomeCoverage::CoverageBam(string bamFile) {
 				std::vector<DEPTH>().swap(chromCov);
 
 				// get the current chrom size and allocate space
-				currChromSize = genome->getChromSize(currChrom);
+				currChromSize = _genome->getChromSize(currChrom);
 				chromCov.resize(currChromSize);
 
 				// process the first line for this chromosome.
@@ -191,7 +197,7 @@ void BedGenomeCoverage::CoverageBam(string bamFile) {
 	// process the results of the last chromosome.
 	ReportChromCoverage(chromCov, currChromSize, currChrom, chromDepthHist);
 	
-	if (this->eachBase == false && this->bedGraph == false) {
+	if (_eachBase == false && _bedGraph == false) {
 		ReportGenomeCoverage(chromDepthHist);
 	}
 	
@@ -202,7 +208,7 @@ void BedGenomeCoverage::CoverageBam(string bamFile) {
 
 void BedGenomeCoverage::ReportChromCoverage(const vector<DEPTH> &chromCov, int &chromSize, string &chrom, chromHistMap &chromDepthHist) {
 	
-	if (this->eachBase) {
+	if (_eachBase) {
 		int depth = 0;  // initialize the depth
 		for (int pos = 0; pos < chromSize; pos++) {
 			
@@ -212,7 +218,7 @@ void BedGenomeCoverage::ReportChromCoverage(const vector<DEPTH> &chromCov, int &
 			depth = depth - chromCov[pos].ends;
 		}
 	}
-	else if (this->bedGraph) {
+	else if (_bedGraph) {
 		ReportChromCoverageBedGraph(chromCov, chromSize, chrom);
 	}
 	else {
@@ -226,8 +232,8 @@ void BedGenomeCoverage::ReportChromCoverage(const vector<DEPTH> &chromCov, int &
 			// add the depth at this position to the depth histogram
 			// for this chromosome.  if the depth is greater than the
 			// maximum bin requested, then readjust the depth to be the max
-			if (depth >= this->max) {
-				chromDepthHist[chrom][this->max]++;
+			if (depth >= _max) {
+				chromDepthHist[chrom][_max]++;
 			}
 			else {
 				chromDepthHist[chrom][depth]++;
@@ -250,18 +256,18 @@ void BedGenomeCoverage::ReportChromCoverage(const vector<DEPTH> &chromCov, int &
 void BedGenomeCoverage::ReportGenomeCoverage(chromHistMap &chromDepthHist) {
 	
 	// get the list of chromosome names in the genome
-	vector<string> chromList = genome->getChromList();
+	vector<string> chromList = _genome->getChromList();
 
 	unsigned int genomeSize = 0;
 	vector<string>::const_iterator chromItr = chromList.begin();
 	vector<string>::const_iterator chromEnd = chromList.end();	
 	for (; chromItr != chromEnd; ++chromItr) {	
 		string chrom = *chromItr;
-		genomeSize   += genome->getChromSize(chrom);
+		genomeSize   += _genome->getChromSize(chrom);
 		// if there were no reads for a give chromosome, then
 		// add the length of the chrom to the 0 bin.
 		if ( chromDepthHist.find(chrom) == chromDepthHist.end() ) {
-			chromDepthHist[chrom][0] += genome->getChromSize(chrom);
+			chromDepthHist[chrom][0] += _genome->getChromSize(chrom);
 		}
 	}
 
@@ -326,27 +332,5 @@ void BedGenomeCoverage::ReportChromCoverageBedGraph(const vector<DEPTH> &chromCo
 	//Print information about the last position
 	if (lastDepth != -1) {
 		cout << chrom << "\t" << lastStart << "\t" << chromSize << "\t" << lastDepth << endl;
-	}
-}
-
-
-void BedGenomeCoverage::DetermineBedInput() {
-	if (bed->bedFile != "stdin") {   // process a file
-		if (this->bamInput == false) { //bed/gff
-			ifstream beds(bed->bedFile.c_str(), ios::in);
-			if ( !beds ) {
-				cerr << "Error: The requested bed file (" << bed->bedFile << ") could not be opened. Exiting!" << endl;
-				exit (1);
-			}
-			CoverageBed(beds);
-		}
-		else 
-			CoverageBam(bed->bedFile);
-	}
-	else {   // process stdin
-		if (this->bamInput == false) 
-			CoverageBed(cin);
-		else 
-			CoverageBam("stdin");	
 	}
 }

@@ -28,25 +28,26 @@ class MaskFastaFromBed {
 public:
 	
 	// constructor 
-	MaskFastaFromBed(string &, string &, string &, bool &);
+	MaskFastaFromBed(string &fastaInFile, string &bedFile, string &fastaOutFile, bool &softMask);
 
 	// destructor
 	~MaskFastaFromBed(void);
 
-	void MaskFasta();
-	
-	void PrettyPrintChrom(ofstream &, string , const string &, int);
 	
 private:
 	
-	bool softMask;
+	bool _softMask;
 	
-	string fastaInFile;
-	string bedFile;
-	string fastaOutFile;
+	string _fastaInFile;
+	string _bedFile;
+	string _fastaOutFile;
 	
 	// instance of a bed file class.
-	BedFile *bed;
+	BedFile *_bed;
+
+	void MaskFasta();
+	
+	void PrettyPrintChrom(ofstream &out, string chrom, const string &sequence, int width);
 
 };
 

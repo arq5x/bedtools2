@@ -95,7 +95,7 @@ int main(int argc, char* argv[]) {
 
 	if (!showHelp) {
 		BedLinks *bl = new BedLinks(bedFile, base, org, db);
-		bl->DetermineBedInput();			
+		delete bl;			
 		return 0;
 	}
 	else {

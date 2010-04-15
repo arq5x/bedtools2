@@ -194,7 +194,7 @@ int main(int argc, char* argv[]) {
 		BedIntersect *bi = new BedIntersect(bedAFile, bedBFile, anyHit, writeA, writeB, writeOverlap,
 											writeAllOverlap, overlapFraction, noHit, writeCount, forceStrand, 
 											reciprocalFraction, inputIsBam, outputIsBam);
-		bi->DetermineBedInput();
+		delete bi;
 		return 0;
 	}
 	else {

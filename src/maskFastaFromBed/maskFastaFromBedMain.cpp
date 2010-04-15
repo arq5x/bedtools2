@@ -98,7 +98,7 @@ int main(int argc, char* argv[]) {
 	if (!showHelp) {
 
 		MaskFastaFromBed *maskFasta = new MaskFastaFromBed(fastaInFile, bedFile, fastaOutFile, softMask);
-		maskFasta->MaskFasta(); 
+		delete maskFasta; 
 		return 0;
 	}
 	else {

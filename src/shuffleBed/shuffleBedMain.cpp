@@ -105,9 +105,7 @@ int main(int argc, char* argv[]) {
 	
 	if (!showHelp) {
 		BedShuffle *bc = new BedShuffle(bedFile, genomeFile, excludeFile, haveSeed, haveExclude, sameChrom, seed);
-		
-		bc->DetermineBedInput();
-
+		delete bc;
 		return 0;
 	}
 	else {

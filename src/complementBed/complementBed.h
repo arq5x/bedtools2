@@ -30,7 +30,7 @@ class BedComplement {
 public:
 
   // constructor 
-  BedComplement(string &, string &);
+  BedComplement(string &bedFile, string &genomeFile);
 
   // destructor
   ~BedComplement(void);
@@ -39,10 +39,8 @@ public:
 
 private:
 	
-	string bedFile;
-	string genomeFile;
-		
-	// instance of a bed file class.
-	BedFile *bed;
-	GenomeFile *genome;
+	string _bedFile;
+	string _genomeFile;
+	BedFile *_bed;
+	GenomeFile *_genome;
 };

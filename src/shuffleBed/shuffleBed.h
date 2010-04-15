@@ -37,30 +37,29 @@ public:
 	// destructor
 	~BedShuffle(void);
 
-	void Shuffle(istream &bedInput);
-	void ShuffleWithExclusions(istream &bedInput);
-	
-	void ChooseLocus(BED &);
-	
-	void DetermineBedInput();
-
 private:
 
-	string bedFile;
-	string genomeFile;
-	string excludeFile;
-	int seed;
-	bool sameChrom;
-	bool haveExclude;
-	bool haveSeed;
+	string _bedFile;
+	string _genomeFile;
+	string _excludeFile;
+	int _seed;
+	bool _sameChrom;
+	bool _haveExclude;
+	bool _haveSeed;
 
 
 	// The BED file from which to compute coverage.
-	BedFile *bed;
-	BedFile *exclude;
+	BedFile *_bed;
+	BedFile *_exclude;
 
-	GenomeFile *genome;
+	GenomeFile *_genome;
 
-	vector<string> chroms;
-	int numChroms;
+	vector<string> _chroms;
+	int _numChroms;
+	
+	// methods
+	void Shuffle();
+	void ShuffleWithExclusions();
+	
+	void ChooseLocus(BED &);
 };

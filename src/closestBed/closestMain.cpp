@@ -98,7 +98,6 @@ int main(int argc, char* argv[]) {
 	
 	if (!showHelp) {
 		BedClosest *bc = new BedClosest(bedAFile, bedBFile, forceStrand, tieMode);
-		bc->DetermineBedInput();
 		return 0;
 	}
 	else {

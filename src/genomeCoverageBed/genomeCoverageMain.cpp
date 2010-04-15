@@ -114,8 +114,7 @@ int main(int argc, char* argv[]) {
 		
 		BedGenomeCoverage *bc = new BedGenomeCoverage(bedFile, genomeFile, eachBase, 
                                                       startSites, bedGraph, max, bamInput);
-		
-		bc->DetermineBedInput();
+		delete bc;
 		
 		return 0;
 	}

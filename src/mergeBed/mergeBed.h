@@ -29,7 +29,7 @@ class BedMerge {
 public:
 
   // constructor 
-  BedMerge(string &, bool &, int&, bool &, bool &);
+  BedMerge(string &bedFile, bool &numEntries, int &maxDistance, bool &forceStrand, bool &reportNames);
 
   // destructor
   ~BedMerge(void);
@@ -39,12 +39,12 @@ public:
 
 private:
 	
-	string bedFile;
-	bool numEntries;
-	bool forceStrand;
-	bool reportNames;
-	int maxDistance;
+	string _bedFile;
+	bool _numEntries;
+	bool _forceStrand;
+	bool _reportNames;
+	int _maxDistance;
 	// instance of a bed file class.
-	BedFile *bed;
+	BedFile *_bed;
 
 };

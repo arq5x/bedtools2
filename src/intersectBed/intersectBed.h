@@ -39,7 +39,6 @@ public:
 
 	// destructor
 	~BedIntersect(void);
-	void DetermineBedInput();
 	
 private:
 	

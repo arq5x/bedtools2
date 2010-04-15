@@ -100,13 +100,7 @@ int main(int argc, char* argv[]) {
 
 	if (!showHelp) {
 		BedMerge *bm = new BedMerge(bedFile, numEntries, maxDistance, forceStrand, reportNames);
-		
-		if (!forceStrand) {
-			bm->MergeBed();
-		}
-		else {
-			bm->MergeBedStranded();			
-		}
+		delete bm;
 		return 0;
 	}
 	else {

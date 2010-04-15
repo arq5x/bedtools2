@@ -40,31 +40,29 @@ public:
 	// destructor
 	~BedCoverage(void);
 	
-	void CollectCoverageBed(istream &bedInput);
-
-	void CollectCoverageBam(string bamFile);
-	
-	void DetermineBedInput();
-	
 private:
 
 	// input files.
-	string bedAFile;
-	string bedBFile;
+	string _bedAFile;
+	string _bedBFile;
 
 	// instance of a bed file class.
-	BedFile *bedA, *bedB;
+	BedFile *_bedA, *_bedB;
 	
 	// do we care about strandedness when counting coverage?
-	bool forceStrand;
+	bool _forceStrand;
 	
 	// should we write a histogram for each feature in B?
-	bool writeHistogram;
+	bool _writeHistogram;
 	
 	// are we dealing with BAM input for "A"?
-	bool bamInput;
+	bool _bamInput;
 	
 	// private function for reporting coverage information
 	void ReportCoverage();
+	
+	void CollectCoverageBed();
+
+	void CollectCoverageBam(string bamFile);
 };
 #endif /* COVERAGEBED_H */

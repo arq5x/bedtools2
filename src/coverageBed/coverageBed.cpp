@@ -15,48 +15,52 @@
 // build
 BedCoverage::BedCoverage(string &bedAFile, string &bedBFile, bool &forceStrand, bool &writeHistogram, bool &bamInput) {
 	
-	this->bedAFile       = bedAFile;
-	this->bedBFile       = bedBFile;
+	_bedAFile       = bedAFile;
+	_bedBFile       = bedBFile;
 	
-	this->bedA           = new BedFile(bedAFile);
-	this->bedB           = new BedFile(bedBFile);
+	_bedA           = new BedFile(bedAFile);
+	_bedB           = new BedFile(bedBFile);
 	
-	this->forceStrand    = forceStrand;
-	this->writeHistogram = writeHistogram;
-	this->bamInput       = bamInput;
+	_forceStrand    = forceStrand;
+	_writeHistogram = writeHistogram;
+	_bamInput       = bamInput;
+	
+	if (_bedA->bedFile != "stdin") {   // process a file
+		if (_bamInput == false) { //bed/gff
+			CollectCoverageBed();
+		}
+		else {
+			CollectCoverageBam(_bedA->bedFile);
+		}
+	}
+	else {   // process stdin
+		if (_bamInput == false) 
+			CollectCoverageBed();
+		else {
+			CollectCoverageBam("stdin");	
+		}
+	}
 }
 
 // destroy
 BedCoverage::~BedCoverage(void) {
-	delete this->bedA;
-	delete this->bedB;
+	delete _bedA;
+	delete _bedB;
 }
 
 
-void BedCoverage::CollectCoverageBed(istream &bedInput) {
+void BedCoverage::CollectCoverageBed() {
 	
 	// load the "B" bed file into a map so
 	// that we can easily compare "A" to it for overlaps
-	bedB->loadBedFileIntoMap();
+	_bedB->loadBedFileIntoMap();
 
-	string bedLine;                                                                                                                    
 	int lineNum = 0;					// current input line number
-	vector<string> bedFields;			// vector for a BED entry
-	bedFields.reserve(12);	
-		
+	BED a;		
 	// process each entry in A
-	while (getline(bedInput, bedLine)) {
-
-		lineNum++;
-		Tokenize(bedLine,bedFields);
-		BED a;
-
-		if (bedA->parseLine(a, bedFields, lineNum)) {	
-			// count a as a hit with all the relevant features in B
-			bedB->countHits(a, this->forceStrand);
-		}	
-		// reset for the next input line
-		bedFields.clear();
+	while (_bedA->GetNextBed(a, lineNum)) {
+		// count a as a hit with all the relevant features in B
+		_bedB->countHits(a, _forceStrand);
 	}	
 	
 	// report the coverage (summary or histogram) for BED B.
@@ -68,7 +72,7 @@ void BedCoverage::CollectCoverageBam(string bamFile) {
 
 	// load the "B" bed file into a map so
 	// that we can easily compare "A" to it for overlaps
-	bedB->loadBedFileIntoMap();
+	_bedB->loadBedFileIntoMap();
 	
 	// open the BAM file
 	BamReader reader;
@@ -92,7 +96,7 @@ void BedCoverage::CollectCoverageBam(string bamFile) {
 			a.end    = bam.Position + bam.AlignedBases.size();
 			a.strand = "+"; if (bam.IsReverseStrand()) a.strand = "-"; 	
 
-			bedB->countHits(a, this->forceStrand);
+			_bedB->countHits(a, _forceStrand);
 		}
 	}
 	// report the coverage (summary or histogram) for BED B.
@@ -107,8 +111,8 @@ void BedCoverage::ReportCoverage() {
 	map<unsigned int, unsigned int> allDepthHist;
 	unsigned int totalLength = 0;
 
-	masterBedMap::const_iterator chromItr = bedB->bedMap.begin();
-	masterBedMap::const_iterator chromEnd = bedB->bedMap.end();
+	masterBedMap::const_iterator chromItr = _bedB->bedMap.begin();
+	masterBedMap::const_iterator chromEnd = _bedB->bedMap.end();
 	for (; chromItr != chromEnd; ++chromItr) {
 	
 		binsToBeds::const_iterator binItr = chromItr->second.begin();
@@ -157,8 +161,8 @@ void BedCoverage::ReportCoverage() {
 				int nonZeroBases   = (length - zeroDepthCount);
 				float fractCovered = (float) nonZeroBases / length;
 				
-				if (this->writeHistogram == false) {
-					bedB->reportBedTab(*bedItr);
+				if (_writeHistogram == false) {
+					_bedB->reportBedTab(*bedItr);
 					printf("%d\t%d\t%d\t%0.7f\n", bedItr->count, nonZeroBases, length, fractCovered);
 				}
 				else {
@@ -166,14 +170,14 @@ void BedCoverage::ReportCoverage() {
 					map<unsigned int, unsigned int>::const_iterator histEnd = depthHist.end();
 					for (; histItr != histEnd; ++histItr) {
 						float fractAtThisDepth = (float) histItr->second / length;
-						bedB->reportBedTab(*bedItr);
+						_bedB->reportBedTab(*bedItr);
 						printf("%d\t%d\t%d\t%0.7f\n", histItr->first, histItr->second, length, fractAtThisDepth);
 					}
 				}
 			}
 		}
 	}
-	if (this->writeHistogram == true) {
+	if (_writeHistogram == true) {
 		map<unsigned int, unsigned int>::const_iterator histItr = allDepthHist.begin();
 		map<unsigned int, unsigned int>::const_iterator histEnd = allDepthHist.end();
 		for (; histItr != histEnd; ++histItr) {
@@ -183,25 +187,4 @@ void BedCoverage::ReportCoverage() {
 	}
 }
 
-
-void BedCoverage::DetermineBedInput() {
-	if (bedA->bedFile != "stdin") {   // process a file
-		if (this->bamInput == false) { //bed/gff
-			ifstream beds(bedA->bedFile.c_str(), ios::in);
-			if ( !beds ) {
-				cerr << "Error: The requested bed file (" << bedA->bedFile << ") could not be opened. Exiting!" << endl;
-				exit (1);
-			}
-			CollectCoverageBed(beds);
-		}
-		else 
-			CollectCoverageBam(bedA->bedFile);
-	}
-	else {   // process stdin
-		if (this->bamInput == false) 
-			CollectCoverageBed(cin);
-		else 
-			CollectCoverageBam("stdin");	
-	}
-}
 

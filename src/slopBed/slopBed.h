@@ -30,27 +30,29 @@ class BedSlop {
 public:
 
 	// constructor 
-	BedSlop(string &, string &, bool &, int &, int &);
+	BedSlop(string &bedFile, string &genomeFile, bool &forceStrand, int &leftSlop, int &rightSlop) ;
 
 	// destructor
 	~BedSlop(void);
 
-	void SlopBed(istream &bedInput);
-		
-	// method to add requested "slop" to a single BED entry
-	void AddSlop(BED &bed);
-	
-	void DetermineBedInput();
+
 	
 private:
 
-	string bedFile;
-	string genomeFile;
+	string _bedFile;
+	string _genomeFile;
 
-	bool forceStrand;
-	int leftSlop;
-	int rightSlop;
+	bool _forceStrand;
+	int _leftSlop;
+	int _rightSlop;
 	
-	BedFile *bed;
-	GenomeFile *genome;
+	BedFile *_bed;
+	GenomeFile *_genome;
+	
+	// methods
+	
+	void SlopBed();
+		
+	// method to add requested "slop" to a single BED entry
+	void AddSlop(BED &bed);
 };

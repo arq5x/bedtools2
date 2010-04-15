@@ -16,8 +16,10 @@
 // Constructor
 //
 BedSort::BedSort(string &bedFile) {
-	this->bedFile = bedFile;
-	this->bed = new BedFile(bedFile);
+	_bedFile = bedFile;
+	_bed = new BedFile(bedFile);
+	
+	SortBed();
 }
 
 //
@@ -31,16 +33,16 @@ void BedSort::SortBed() {
 
 	// load the "B" bed file into a map so
 	// that we can easily compare "A" to it for overlaps
-	bed->loadBedFileIntoMapNoBin();
+	_bed->loadBedFileIntoMapNoBin();
 
 	// loop through each chromosome and merge their BED entries
-	for (masterBedMapNoBin::iterator m = bed->bedMapNoBin.begin(); m != bed->bedMapNoBin.end(); ++m) {
+	for (masterBedMapNoBin::iterator m = _bed->bedMapNoBin.begin(); m != _bed->bedMapNoBin.end(); ++m) {
 
 		// bedList is already sorted by start position.
 		vector<BED> bedList = m->second; 
 
 		for (unsigned int i = 0; i < bedList.size(); ++i) {
-			bed->reportBedNewLine(bedList[i]);
+			_bed->reportBedNewLine(bedList[i]);
 		}
 	}
 }
@@ -50,13 +52,13 @@ void BedSort::SortBedBySizeAsc() {
 
 	// load the "B" bed file into a map so
 	// that we can easily compare "A" to it for overlaps
-	bed->loadBedFileIntoMapNoBin();
+	_bed->loadBedFileIntoMapNoBin();
 
 	vector<BED> masterList;
 	masterList.reserve(1000000);
 	
 	// loop through each chromosome and merge their BED entries
-	for (masterBedMapNoBin::iterator m = bed->bedMapNoBin.begin(); m != bed->bedMapNoBin.end(); ++m) {
+	for (masterBedMapNoBin::iterator m = _bed->bedMapNoBin.begin(); m != _bed->bedMapNoBin.end(); ++m) {
 
 		// bedList is already sorted by start position.
 		vector<BED> bedList = m->second; 
@@ -72,7 +74,7 @@ void BedSort::SortBedBySizeAsc() {
 	
 	// report the entries in ascending order
 	for (unsigned int i = 0; i < masterList.size(); ++i) {
-		bed->reportBedNewLine(masterList[i]);
+		_bed->reportBedNewLine(masterList[i]);
 	}
 }
 
@@ -81,13 +83,13 @@ void BedSort::SortBedBySizeDesc() {
 
 	// load the "B" bed file into a map so
 	// that we can easily compare "A" to it for overlaps
-	bed->loadBedFileIntoMapNoBin();
+	_bed->loadBedFileIntoMapNoBin();
 
 	vector<BED> masterList;
 	masterList.reserve(1000000);
 	
 	// loop through each chromosome and merge their BED entries
-	for (masterBedMapNoBin::iterator m = bed->bedMapNoBin.begin(); m != bed->bedMapNoBin.end(); ++m) {
+	for (masterBedMapNoBin::iterator m = _bed->bedMapNoBin.begin(); m != _bed->bedMapNoBin.end(); ++m) {
 
 		// bedList is already sorted by start position.
 		vector<BED> bedList = m->second; 
@@ -103,7 +105,7 @@ void BedSort::SortBedBySizeDesc() {
 	
 	// report the entries in ascending order
 	for (unsigned int i = 0; i < masterList.size(); ++i) {
-		bed->reportBedNewLine(masterList[i]);
+		_bed->reportBedNewLine(masterList[i]);
 	}
 }
 
@@ -111,17 +113,17 @@ void BedSort::SortBedByChromThenSizeAsc() {
 
 	// load the "B" bed file into a map so
 	// that we can easily compare "A" to it for overlaps
-	bed->loadBedFileIntoMapNoBin();
+	_bed->loadBedFileIntoMapNoBin();
 
 	// loop through each chromosome and merge their BED entries
-	for (masterBedMapNoBin::iterator m = bed->bedMapNoBin.begin(); m != bed->bedMapNoBin.end(); ++m) {
+	for (masterBedMapNoBin::iterator m = _bed->bedMapNoBin.begin(); m != _bed->bedMapNoBin.end(); ++m) {
 
 		// bedList is already sorted by start position.
 		vector<BED> bedList = m->second; 
 		sort(bedList.begin(), bedList.end(), sortBySizeAsc);
 		
 		for (unsigned int i = 0; i < bedList.size(); ++i) {
-			bed->reportBedNewLine(bedList[i]);
+			_bed->reportBedNewLine(bedList[i]);
 		}
 	}
 }
@@ -131,10 +133,10 @@ void BedSort::SortBedByChromThenSizeDesc() {
 
 	// load the "B" bed file into a map so
 	// that we can easily compare "A" to it for overlaps
-	bed->loadBedFileIntoMapNoBin();
+	_bed->loadBedFileIntoMapNoBin();
 
 	// loop through each chromosome and merge their BED entries
-	for (masterBedMapNoBin::iterator m = bed->bedMapNoBin.begin(); m != bed->bedMapNoBin.end(); ++m) {
+	for (masterBedMapNoBin::iterator m = _bed->bedMapNoBin.begin(); m != _bed->bedMapNoBin.end(); ++m) {
 
 		// bedList is already sorted by start position.
 		vector<BED> bedList = m->second; 
@@ -142,7 +144,7 @@ void BedSort::SortBedByChromThenSizeDesc() {
 		sort(bedList.begin(), bedList.end(), sortBySizeDesc);
 		
 		for (unsigned int i = 0; i < bedList.size(); ++i) {
-			bed->reportBedNewLine(bedList[i]);
+			_bed->reportBedNewLine(bedList[i]);
 		}
 	}
 }
@@ -152,18 +154,18 @@ void BedSort::SortBedByChromThenScoreAsc() {
 
 	// load the "B" bed file into a map so
 	// that we can easily compare "A" to it for overlaps
-	bed->loadBedFileIntoMapNoBin();
+	_bed->loadBedFileIntoMapNoBin();
 
-	if (bed->bedType >= 5) {
+	if (_bed->bedType >= 5) {
 		// loop through each chromosome and merge their BED entries
-		for (masterBedMapNoBin::iterator m = bed->bedMapNoBin.begin(); m != bed->bedMapNoBin.end(); ++m) {
+		for (masterBedMapNoBin::iterator m = _bed->bedMapNoBin.begin(); m != _bed->bedMapNoBin.end(); ++m) {
 
 			// bedList is already sorted by start position.
 			vector<BED> bedList = m->second; 
 			sort(bedList.begin(), bedList.end(), sortByScoreAsc);
 			
 			for (unsigned int i = 0; i < bedList.size(); ++i) {
-				bed->reportBedNewLine(bedList[i]);
+				_bed->reportBedNewLine(bedList[i]);
 			}
 		}
 	}
@@ -178,18 +180,18 @@ void BedSort::SortBedByChromThenScoreDesc() {
 
 	// load the "B" bed file into a map so
 	// that we can easily compare "A" to it for overlaps
-	bed->loadBedFileIntoMapNoBin();
+	_bed->loadBedFileIntoMapNoBin();
 
-	if (bed->bedType >= 5) {
+	if (_bed->bedType >= 5) {
 		// loop through each chromosome and merge their BED entries
-		for (masterBedMapNoBin::iterator m = bed->bedMapNoBin.begin(); m != bed->bedMapNoBin.end(); ++m) {
+		for (masterBedMapNoBin::iterator m = _bed->bedMapNoBin.begin(); m != _bed->bedMapNoBin.end(); ++m) {
 
 			// bedList is already sorted by start position.
 			vector<BED> bedList = m->second; 
 			sort(bedList.begin(), bedList.end(), sortByScoreDesc);
 		
 			for (unsigned int i = 0; i < bedList.size(); ++i) {
-				bed->reportBedNewLine(bedList[i]);
+				_bed->reportBedNewLine(bedList[i]);
 			}
 		}
 	}

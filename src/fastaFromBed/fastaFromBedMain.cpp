@@ -106,7 +106,8 @@ int main(int argc, char* argv[]) {
 	if (!showHelp) {
 
 		Bed2Fa *b2f = new Bed2Fa(useNameOnly, fastaDbFile, bedFile, fastaOutFile, useFasta, useStrand);
-		b2f->ExtractDNA(); 
+		delete b2f;
+		 
 		return 0;
 	}
 	else {

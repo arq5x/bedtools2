@@ -99,9 +99,8 @@ int main(int argc, char* argv[]) {
 	}
 
 	if (!showHelp) {
-
 		BedCoverage *bg = new BedCoverage(bedAFile, bedBFile, forceStrand, writeHistogram, bamInput);
-		bg->DetermineBedInput();
+		delete bg;
 		return 0;
 	}
 	else {

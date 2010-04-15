@@ -16,16 +16,18 @@ Bed2Fa::Bed2Fa(bool &useName, string &dbFile, string &bedFile, string &fastaOutF
 	bool &useFasta, bool &useStrand) {
 
 	if (useName) {
-		this->useName = true;
+		_useName = true;
 	}
 	
-	this->dbFile = dbFile;
-	this->bedFile = bedFile;
-	this->fastaOutFile = fastaOutFile;
-	this->useFasta = useFasta;
-	this->useStrand = useStrand;
+	_dbFile = dbFile;
+	_bedFile = bedFile;
+	_fastaOutFile = fastaOutFile;
+	_useFasta = useFasta;
+	_useStrand = useStrand;
 		
-	this->bed = new BedFile(this->bedFile);
+	_bed = new BedFile(_bedFile);
+	
+	ExtractDNA();
 }
 
 
@@ -41,21 +43,21 @@ void Bed2Fa::ExtractDNA() {
 	/* Make sure that we can oen all of the files successfully*/
 	
 	// open the fasta database for reading
-	ifstream faDb(this->dbFile.c_str(), ios::in);
+	ifstream faDb(_dbFile.c_str(), ios::in);
 	if ( !faDb ) {
-		cerr << "Error: The requested fasta database file (" << this->dbFile << ") could not be opened. Exiting!" << endl;
+		cerr << "Error: The requested fasta database file (" << _dbFile << ") could not be opened. Exiting!" << endl;
 		exit (1);
 	}
 	
 	// open the fasta database for reading
-	ofstream faOut(this->fastaOutFile.c_str(), ios::out);
+	ofstream faOut(_fastaOutFile.c_str(), ios::out);
 	if ( !faOut ) {
-		cerr << "Error: The requested fasta output file (" << this->fastaOutFile << ") could not be opened. Exiting!" << endl;
+		cerr << "Error: The requested fasta output file (" << _fastaOutFile << ") could not be opened. Exiting!" << endl;
 		exit (1);
 	}	
 	
 	// load the BED file into an unbinned map.
-	bed->loadBedFileIntoMapNoBin();
+	_bed->loadBedFileIntoMapNoBin();
 
 	//Read the fastaDb chromosome by chromosome
 	string fastaDbLine;
@@ -71,7 +73,7 @@ void Bed2Fa::ExtractDNA() {
 		else {
 			if (currDNA.size() > 0) {
 
-				vector<BED> bedList = bed->bedMapNoBin[currChrom];
+				vector<BED> bedList = _bed->bedMapNoBin[currChrom];
 
 				// loop through each BED entry for this chrom and 
 				// print the sequence
@@ -84,13 +86,13 @@ void Bed2Fa::ExtractDNA() {
 							
 						string dna = currDNA.substr(bedList[i].start, ((bedList[i].end - bedList[i].start)));
 						// revcomp if necessary.  Thanks to Thomas Doktor.
-						if ((this->useStrand == true) && (bedList[i].strand == "-")) {
+						if ((_useStrand == true) && (bedList[i].strand == "-")) {
 							reverseComplement(dna);
 						}
 						
-						if (!(this->useName)) {
-							if (this->useFasta == true) {
-								if (this->useStrand == true) {
+						if (!(_useName)) {
+							if (_useFasta == true) {
+								if (_useStrand == true) {
 							    	faOut << ">" << currChrom << ":" << bedList[i].start << "-" 
 								          << bedList[i].end   << "(" << bedList[i].strand << ")" << endl << dna << endl;
 								}
@@ -100,7 +102,7 @@ void Bed2Fa::ExtractDNA() {
 								}
 							}
 							else {
-								if (this->useStrand == true) {
+								if (_useStrand == true) {
 									faOut << currChrom << ":" << bedList[i].start << "-" 
 									      << bedList[i].end << "(" << bedList[i].strand << ")"
 										  << "\t" << dna << endl;								
@@ -112,7 +114,7 @@ void Bed2Fa::ExtractDNA() {
 							}
 					  	}
 					  	else {
-							if (this->useFasta == true) {
+							if (_useFasta == true) {
 					    		faOut << ">" << bedList[i].name << endl << dna << endl;
 					  		}
 							else {
@@ -132,7 +134,7 @@ void Bed2Fa::ExtractDNA() {
 	// process the last chromosome in the fasta file.
 	if (currDNA.size() > 0) {
 		
-		vector<BED> bedList = bed->bedMapNoBin[currChrom];
+		vector<BED> bedList = _bed->bedMapNoBin[currChrom];
 
 		// loop through each BED entry for this chrom and 
 		// print the sequence.
@@ -145,13 +147,13 @@ void Bed2Fa::ExtractDNA() {
 
 				string dna = currDNA.substr(bedList[i].start, ((bedList[i].end - bedList[i].start)));
 				// revcomp if necessary.  Thanks to Thomas Doktor.
-				if ((this->useStrand == true) && (bedList[i].strand == "-")) {
+				if ((_useStrand == true) && (bedList[i].strand == "-")) {
 					reverseComplement(dna);
 				}
 				
-				if (!(this->useName)) {
-					if (this->useFasta == true) {
-						if (this->useStrand == true) {
+				if (!(_useName)) {
+					if (_useFasta == true) {
+						if (_useStrand == true) {
 					    	faOut << ">" << currChrom << ":" << bedList[i].start << "-" 
 						          << bedList[i].end   << "(" << bedList[i].strand << ")" << endl << dna << endl;
 						}
@@ -161,7 +163,7 @@ void Bed2Fa::ExtractDNA() {
 						}
 					}
 					else {
-						if (this->useStrand == true) {
+						if (_useStrand == true) {
 							faOut << currChrom << ":" << bedList[i].start << "-" 
 							      << bedList[i].end << "(" << bedList[i].strand << ")"
 								  << "\t" << dna << endl;								
@@ -173,7 +175,7 @@ void Bed2Fa::ExtractDNA() {
 					}
 			  	}
 			  	else {
-					if (this->useFasta == true) {
+					if (_useFasta == true) {
 			    		faOut << ">" << bedList[i].name << endl << dna << endl;
 			  		}
 					else {

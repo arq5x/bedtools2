@@ -39,6 +39,21 @@ BedIntersect::BedIntersect(string bedAFile, string bedBFile, bool anyHit,
 	// create new BED file objects for A and B
 	_bedA = new BedFile(bedAFile);
 	_bedB = new BedFile(bedBFile);
+	
+	// dealing with a proper file
+	if (_bedA->bedFile != "stdin") {   
+		if (_bamInput == false) 
+			IntersectBed();
+		else
+			IntersectBam(_bedA->bedFile);
+	}
+	// reading from stdin
+	else {  
+		if (_bamInput == false)
+			IntersectBed();
+		else
+			IntersectBam("stdin");			
+	}
 }
 
 
@@ -262,28 +277,3 @@ void BedIntersect::IntersectBam(string bamFile) {
 	}
 }
 
-
-void BedIntersect::DetermineBedInput() {
-
-	// dealing with a proper file
-	if (_bedA->bedFile != "stdin") {   
-		// it's BED or GFF
-		if (_bamInput == false) { 
-			IntersectBed();
-		}
-		else {
-			IntersectBam(_bedA->bedFile);
-		}
-	}
-	// reading from stdin
-	else {  
-		// it's BED or GFF 
-		if (_bamInput == false) {					
-			IntersectBed();
-		}
-		// it's BAM
-		else {
-			IntersectBam("stdin");
-		}				
-	}
-}

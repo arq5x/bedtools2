@@ -27,28 +27,29 @@ class BedClosest {
 public:
 
 	// constructor 
-	BedClosest(string &, string &, bool &, string &);
+	BedClosest(string &bedAFile, string &bedAFile, bool &forceStrand, string &tieMode);
 
 	// destructor
 	~BedClosest(void);
+	
+	// find the closest feature in B to A
+	void FindClosestBed();
 		
+private:
+	
+	// data
+	string _bedAFile;
+	string _bedBFile;
+	string _tieMode;
+	bool _forceStrand;
+	
+	BedFile *_bedA, *_bedB;
+	
+	// methods
 	void reportA(const BED &);
 	void reportB(const BED &);
 	void reportNullB();
-
-	void ClosestBed(istream &bedInput);
 	void FindWindowOverlaps(BED &, vector<BED> &);
-	void DetermineBedInput();
-		
-private:
-
-	string bedAFile;
-	string bedBFile;
-	string tieMode;
-	bool forceStrand;
-	
-	// instance of a bed file class.
-	BedFile *bedA, *bedB;
 
 };
 #endif /* CLOSEST_H */

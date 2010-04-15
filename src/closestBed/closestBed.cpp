@@ -23,14 +23,15 @@ const int SLOPGROWTH = 2048000;
 */
 BedClosest::BedClosest(string &bedAFile, string &bedBFile, bool &forceStrand, string &tieMode) {
 
-	this->bedAFile = bedAFile;
-	this->bedBFile = bedBFile;
-	this->forceStrand = forceStrand;
-	this->tieMode = tieMode;
+	_bedAFile = bedAFile;
+	_bedBFile = bedBFile;
+	_forceStrand = forceStrand;
+	_tieMode = tieMode;
 
-	this->bedA = new BedFile(bedAFile);
-	this->bedB = new BedFile(bedBFile);
+	_bedA = new BedFile(bedAFile);
+	_bedB = new BedFile(bedBFile);
 	
+	FindClosestBed();
 }
 
 /*
@@ -47,16 +48,16 @@ BedClosest::~BedClosest(void) {
 	Works for BED3 - BED6.
 */
 void BedClosest::reportNullB() {
-	if (bedB->bedType == 3) {
+	if (_bedB->bedType == 3) {
 		printf("none\t-1\t-1\n");
 	}
-	else if (bedB->bedType == 4) {
+	else if (_bedB->bedType == 4) {
 		printf("none\t-1\t-1\t-1\n");
 	}
-	else if (bedB->bedType == 5) {
+	else if (_bedB->bedType == 5) {
 		printf("none\t-1\t-1\t-1\t-1\n");
 	}
-	else if (bedB->bedType == 6) {
+	else if (_bedB->bedType == 6) {
 		printf("none\t-1\t-1\t-1\t-1\t-1\n");
 	}
 }
@@ -79,7 +80,7 @@ void BedClosest::FindWindowOverlaps(BED &a, vector<BED> &hits) {
 	int minDistance = 999999999;
 
 
-	if(bedB->bedMap.find(a.chrom) != bedB->bedMap.end()) {
+	if(_bedB->bedMap.find(a.chrom) != _bedB->bedMap.end()) {
 
 		while ((numOverlaps == 0) && (slop <= MAXSLOP)) {
 		
@@ -91,7 +92,7 @@ void BedClosest::FindWindowOverlaps(BED &a, vector<BED> &hits) {
 			if ((a.start + slop) < 2 * MAXSLOP) aFudgeEnd = a.end + slop;
 			else aFudgeEnd = 2 * MAXSLOP;
 		
-			bedB->FindOverlapsPerBin(a.chrom, aFudgeStart, aFudgeEnd, a.strand, hits, this->forceStrand);
+			_bedB->FindOverlapsPerBin(a.chrom, aFudgeStart, aFudgeEnd, a.strand, hits, _forceStrand);
 	
 			vector<BED>::const_iterator h = hits.begin();
 			vector<BED>::const_iterator hitsEnd = hits.end();
@@ -141,82 +142,54 @@ void BedClosest::FindWindowOverlaps(BED &a, vector<BED> &hits) {
 		}
 	}
 	else {
-		bedA->reportBedTab(a);
+		_bedA->reportBedTab(a);
 		reportNullB(); 
 	}
 
 	if (numOverlaps > 0) {
 		
 		if (closestB.size() == 1) {		
-			bedA->reportBedTab(a); 
-			bedB->reportBedNewLine(closestB[0]);
+			_bedA->reportBedTab(a); 
+			_bedB->reportBedNewLine(closestB[0]);
 		}
 		else {
-			if (this->tieMode == "all") {
+			if (_tieMode == "all") {
 				for (vector<BED>::iterator b = closestB.begin(); b != closestB.end(); ++b) {
-					bedA->reportBedTab(a); 
-					bedB->reportBedNewLine(*b);
+					_bedA->reportBedTab(a); 
+					_bedB->reportBedNewLine(*b);
 				}
 			}
-			else if (this->tieMode == "first") {
-				bedA->reportBedTab(a); 
-				bedB->reportBedNewLine(closestB[0]);
+			else if (_tieMode == "first") {
+				_bedA->reportBedTab(a); 
+				_bedB->reportBedNewLine(closestB[0]);
 			}
-			else if (this->tieMode == "last") {
-				bedA->reportBedTab(a); 
-				bedB->reportBedNewLine(closestB[closestB.size()-1]);
+			else if (_tieMode == "last") {
+				_bedA->reportBedTab(a); 
+				_bedB->reportBedNewLine(closestB[closestB.size()-1]);
 			}
 		}
 	}
 }
 
  
-void BedClosest::ClosestBed(istream &bedInput) {
+void BedClosest::FindClosestBed() {
 
 	// load the "B" bed file into a map so
 	// that we can easily compare "A" to it for overlaps
-	bedB->loadBedFileIntoMap();
-
-	string bedLine;                                                                                                                    
+	_bedB->loadBedFileIntoMap();
+	
+	BED a;
 	int lineNum = 0;					// current input line number
 	vector<BED> hits;					// vector of potential hits
-	vector<string> bedFields;			// vector for a BED entry
-	
-	// reserve some space
 	hits.reserve(100);
-	bedFields.reserve(12);	
-		
-	// process each entry in A
-	while (getline(bedInput, bedLine)) {
 
-		lineNum++;
-		Tokenize(bedLine,bedFields);
-		BED a;
-		
-		// find the overlaps with B if it's a valid BED entry. 
-		if (bedA->parseLine(a, bedFields, lineNum)) {
-			FindWindowOverlaps(a, hits);
-			hits.clear();
-		}
-		// reset for the next input line
-		bedFields.clear();
+	_bedA->Open();
+	// process each entry in A in search of the closest feature in B
+	while (_bedA->GetNextBed(a, lineNum)) {
+		FindWindowOverlaps(a, hits);
+		hits.clear();
 	}
+	_bedA->Close();
 }
 // END ClosestBed
-
-
-
-void BedClosest::DetermineBedInput() {
-	if (bedA->bedFile != "stdin") {   // process a file
-		ifstream beds(bedA->bedFile.c_str(), ios::in);
-		if ( !beds ) {
-			cerr << "Error: The requested bed file (" << bedA->bedFile << ") could not be opened. Exiting!" << endl;
-			exit (1);
-		}
-		ClosestBed(beds);
-	}
-	else {   						// process stdin
-		ClosestBed(cin);		
-	}
-}
 

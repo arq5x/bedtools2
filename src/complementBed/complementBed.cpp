@@ -14,11 +14,12 @@
 
 BedComplement::BedComplement(string &bedFile, string &genomeFile) {
 
-	this->bedFile = bedFile;
-	this->genomeFile = genomeFile;
+	_bedFile = bedFile;
+	_genomeFile = genomeFile;
 	
-	this->bed    = new BedFile(bedFile);
-	this->genome = new GenomeFile(genomeFile);	
+	_bed    = new BedFile(bedFile);
+	_genome = new GenomeFile(genomeFile);
+		
 }
 
 
@@ -33,16 +34,16 @@ void BedComplement::ComplementBed() {
 
 	// load the "B" bed file into a map so
 	// that we can easily compare "A" to it for overlaps
-	bed->loadBedFileIntoMapNoBin();
+	_bed->loadBedFileIntoMapNoBin();
 	
 	vector<short> chromMasks;
 	string currChrom;
 	
 	// loop through each chromosome and merge their BED entries
-	for (masterBedMapNoBin::iterator m = bed->bedMapNoBin.begin(); m != bed->bedMapNoBin.end(); ++m) {
+	for (masterBedMapNoBin::iterator m = _bed->bedMapNoBin.begin(); m != _bed->bedMapNoBin.end(); ++m) {
 
 		currChrom = m->first;
-		int currChromSize = genome->getChromSize(currChrom);
+		int currChromSize = _genome->getChromSize(currChrom);
 		
 		// bedList is already sorted by start position.
 		vector<BED> bedList = m->second; 
@@ -57,7 +58,7 @@ void BedComplement::ComplementBed() {
 			// sanity check the end of the bed entry
 			if (bIt->end > currChromSize) {
 				cout << "End of BED entry exceeds chromosome length. Please correct." << endl;
-				bed->reportBedNewLine(*bIt);
+				_bed->reportBedNewLine(*bIt);
 				exit(1);
 			}
 			

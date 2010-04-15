@@ -15,19 +15,20 @@
 
 MaskFastaFromBed::MaskFastaFromBed(string &fastaInFile, string &bedFile, string &fastaOutFile, bool &softMask) {
 
-	this->softMask = false;
+	_softMask = false;
 	if (softMask) {
-		this->softMask = true;
+		_softMask = true;
 	}
 	
-	this->fastaInFile = fastaInFile;
-	this->bedFile = bedFile;
-	this->fastaOutFile = fastaOutFile;
+	_fastaInFile = fastaInFile;
+	_bedFile = bedFile;
+	_fastaOutFile = fastaOutFile;
 	
-	this->bed = new BedFile(this->bedFile);
+	_bed = new BedFile(_bedFile);
+
+	_bed->loadBedFileIntoMapNoBin();
 	
-	// 
-	bed->loadBedFileIntoMapNoBin();
+	MaskFasta();
 }
 
 
@@ -43,16 +44,16 @@ void MaskFastaFromBed::MaskFasta() {
 	/* Make sure that we can open all of the files successfully*/
 	
 	// open the fasta database for reading
-	ifstream fa(this->fastaInFile.c_str(), ios::in);
+	ifstream fa(_fastaInFile.c_str(), ios::in);
 	if ( !fa ) {
-		cerr << "Error: The requested fasta file (" << this->fastaInFile << ") could not be opened. Exiting!" << endl;
+		cerr << "Error: The requested fasta file (" << _fastaInFile << ") could not be opened. Exiting!" << endl;
 		exit (1);
 	}
 	
 	// open the fasta database for reading
-	ofstream faOut(this->fastaOutFile.c_str(), ios::out);
+	ofstream faOut(_fastaOutFile.c_str(), ios::out);
 	if ( !faOut ) {
-		cerr << "Error: The requested fasta output file (" << this->fastaOutFile << ") could not be opened. Exiting!" << endl;
+		cerr << "Error: The requested fasta output file (" << _fastaOutFile << ") could not be opened. Exiting!" << endl;
 		exit (1);
 	}	
 	
@@ -79,7 +80,7 @@ void MaskFastaFromBed::MaskFasta() {
 		else {
 			if (currDNA.size() > 0) {
 
-				vector<BED> bedList = bed->bedMapNoBin[currChrom];
+				vector<BED> bedList = _bed->bedMapNoBin[currChrom];
 
 				/*
 					loop through each BED entry for this chrom and 
@@ -95,7 +96,7 @@ void MaskFastaFromBed::MaskFasta() {
 					       then put it back
 					   (2) otherwise replace with Ns
 					*/
-					if (this->softMask) {
+					if (_softMask) {
 						replacement = currDNA.substr(start, length);
 						toLowerCase(replacement);
 						currDNA.replace(start, length, replacement);
@@ -119,14 +120,14 @@ void MaskFastaFromBed::MaskFasta() {
 	// exact same logic as in the main loop.
 	if (currDNA.size() > 0) {
 
-		vector<BED> bedList = bed->bedMapNoBin[currChrom];
+		vector<BED> bedList = _bed->bedMapNoBin[currChrom];
 
 		for (unsigned int i = 0; i < bedList.size(); i++) {
 			start = bedList[i].start;
 			end = bedList[i].end;
 			length = end - start;
 			
-			if (this->softMask) {
+			if (_softMask) {
 				replacement = currDNA.substr(start, length);
 				toLowerCase(replacement);
 				currDNA.replace(start, length, replacement);
