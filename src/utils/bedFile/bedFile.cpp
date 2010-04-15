@@ -658,7 +658,7 @@ bool BedFile::parseGffLine (BED &bed, const vector<string> &lineVector, int line
 
 void BedFile::loadBedFileIntoMap() {
 
-	BED bedEntry;
+	BED bedEntry, nullBed;
 	int lineNum = 0;
 	
 	Open();
@@ -667,6 +667,8 @@ void BedFile::loadBedFileIntoMap() {
 		bedEntry.count = 0;
 		bedEntry.minOverlapStart = INT_MAX;
 		bedMap[bedEntry.chrom][bin].push_back(bedEntry);
+		
+		bedEntry = nullBed;
 	}
 	Close();
 }
@@ -674,7 +676,7 @@ void BedFile::loadBedFileIntoMap() {
 
 void BedFile::loadBedFileIntoMapNoBin() {
 	
-	BED bedEntry;
+	BED bedEntry, nullBed;
 	int lineNum = 0;
 	
 	Open();
@@ -682,6 +684,8 @@ void BedFile::loadBedFileIntoMapNoBin() {
 		bedEntry.count = 0;
 		bedEntry.minOverlapStart = INT_MAX;
 		bedMapNoBin[bedEntry.chrom].push_back(bedEntry);
+		
+		bedEntry = nullBed;		
 	}
 	Close();
 }

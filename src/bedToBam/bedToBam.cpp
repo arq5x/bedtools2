@@ -184,8 +184,7 @@ void DetermineBedInput(BedFile *bed, GenomeFile *genome, bool isBED12, int mapQu
 
 void ProcessBed(istream &bedInput, BedFile *bed, GenomeFile *genome, bool isBED12, int mapQual) {
 
-	// open the BAM file for writing.
-	BamWriter writer;
+	BamWriter *writer = new BamWriter();
 	
 	// build a BAM header from the genomeFile
 	RefVector refs;
@@ -193,37 +192,29 @@ void ProcessBed(istream &bedInput, BedFile *bed, GenomeFile *genome, bool isBED1
 	map<string, int, std::less<string> > chromToId;
 	MakeBamHeader(genome->getGenomeFileName(), refs, bamHeader, chromToId);
 	
-	// add the reference headers to the BAM file
-	writer.Open("stdout", bamHeader, refs);
+	// open a BAM and add the reference headers to the BAM file
+	writer->Open("stdout", bamHeader, refs);
+	// open the BED file for reading.
+	bed->Open();
 
-
-	string bedLine;                                                                                                                    
-	int lineNum = 0;					// current input line number
-	vector<string> bedFields;			// vector for a BED entry
-	bedFields.reserve(12);	
-		
-	// process each entry in A
-	while (getline(bedInput, bedLine)) {
-
-		lineNum++;
-		Tokenize(bedLine,bedFields);
-		
-		BED theBed;
-		BamAlignment theBam;
-		if (bed->parseLine(theBed, bedFields, lineNum)) {			
-			if (bed->bedType >= 4) {
-				ConvertBedToBam(theBed, theBam, chromToId, isBED12, mapQual, lineNum);
-				writer.SaveAlignment(theBam);
-			}
-			else {
-				cerr << "Error: BED entry without name found at line: " << lineNum << ".  Exiting!" << endl;
-				exit (1);
-			}
+	// process each BED entry and convert to BAM
+	BED bedEntry, nullBed;
+	int lineNum = 0;
+	while (bed->GetNextBed(bedEntry, lineNum)) {
+		BamAlignment bamEntry;
+		if (bed->bedType >= 4) {
+			ConvertBedToBam(bedEntry, bamEntry, chromToId, isBED12, mapQual, lineNum);
+			writer->SaveAlignment(bamEntry);
 		}
-		// reset for the next input line
-		bedFields.clear();
+		else {
+			cerr << "Error: BED entry without name found at line: " << lineNum << ".  Exiting!" << endl;
+			exit (1);
+		}
+		bedEntry = nullBed;
 	}
-	writer.Close();
+	// close up
+	bed->Close();
+	writer->Close();
 }
 
 
@@ -253,6 +244,8 @@ void ConvertBedToBam(const BED &bed, BamAlignment &bam, map<string, int, std::le
 	bam.MatePosition = -1;
 	bam.InsertSize   = 0;
 	bam.MateRefID    = -1;
+	
+	bam.CigarData.clear();
 	
 	if (isBED12 == false) {
 		CigarOp cOp;

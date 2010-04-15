@@ -178,7 +178,7 @@ void BedClosest::FindClosestBed() {
 	// that we can easily compare "A" to it for overlaps
 	_bedB->loadBedFileIntoMap();
 	
-	BED a;
+	BED a, nullBed;
 	int lineNum = 0;					// current input line number
 	vector<BED> hits;					// vector of potential hits
 	hits.reserve(100);
@@ -188,6 +188,7 @@ void BedClosest::FindClosestBed() {
 	while (_bedA->GetNextBed(a, lineNum)) {
 		FindWindowOverlaps(a, hits);
 		hits.clear();
+		a = nullBed;
 	}
 	_bedA->Close();
 }

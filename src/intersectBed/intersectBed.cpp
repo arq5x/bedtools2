@@ -194,13 +194,14 @@ void BedIntersect::IntersectBed() {
 	int lineNum = 0;
 	vector<BED> hits;
 	hits.reserve(100);
-	BED a;	
+	BED a, nullBed;	
 	
 	// open the "A" file, process each BED entry and searh for overlaps.
 	_bedA->Open();
 	while (_bedA->GetNextBed(a, lineNum) == true) {
 		FindOverlaps(a, hits);
 		hits.clear();
+		a = nullBed;
 	}
 	_bedA->Close();
 	

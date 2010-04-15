@@ -58,7 +58,7 @@ void BedGenomeCoverage::CoverageBed() {
 	int currChromSize = 0;
 	int start, end;
 	
-	BED a;
+	BED a, nullBed;
 	int lineNum = 0;					// current input line number
 	
 	_bed->Open();
@@ -109,6 +109,7 @@ void BedGenomeCoverage::CoverageBed() {
 		}
 		prevChrom     = currChrom;
 		prevChromSize = currChromSize;
+		a = nullBed;
 	}
 	_bed->Close();
 	

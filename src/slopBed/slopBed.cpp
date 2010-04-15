@@ -37,12 +37,13 @@ BedSlop::~BedSlop(void) {
 void BedSlop::SlopBed() {
 	
 	int lineNum = 0;
-	BED bedEntry;     // used to store the current BED line from the BED file.
+	BED bedEntry, nullBed;     // used to store the current BED line from the BED file.
 
 	_bed->Open();
 	while (_bed->GetNextBed(bedEntry, lineNum)) {
 		AddSlop(bedEntry);
-		_bed->reportBedNewLine(bedEntry);			
+		_bed->reportBedNewLine(bedEntry);
+		bedEntry = nullBed;					
 	}
 	_bed->Close();
 }
