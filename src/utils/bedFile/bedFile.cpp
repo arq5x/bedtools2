@@ -112,7 +112,7 @@ BedFile::~BedFile(void) {
 void BedFile::Open(void) {
 	
 	if (bedFile == "stdin") {
-		bedStream = &cin;
+		_bedStream = &cin;
 	}
 	else {
 		size_t foundPos;
@@ -130,7 +130,7 @@ void BedFile::Open(void) {
 				// now set a pointer to the stream so that we
 				// can read the file later on.
 				// Thank God for Josuttis, p. 631!
-				bedStream = new igzstream(bedFile.c_str(), ios::in);
+				_bedStream = new igzstream(bedFile.c_str(), ios::in);
 			}
 		}  
 		// not GZIPPED.
@@ -148,7 +148,7 @@ void BedFile::Open(void) {
 				// now set a pointer to the stream so that we
 				// can read the file later on.
 				// Thank God for Josuttis, p. 631!
-				bedStream = new ifstream(bedFile.c_str(), ios::in);
+				_bedStream = new ifstream(bedFile.c_str(), ios::in);
 			}
 		}
 	}
@@ -157,7 +157,7 @@ void BedFile::Open(void) {
 
 // Close the BED file
 void BedFile::Close(void) {
-	delete bedStream;
+	delete _bedStream;
 }
 
 
@@ -165,13 +165,13 @@ bool BedFile::GetNextBed (BED &bed, int &lineNum) {
 
 	// make sure there are still lines to process.
 	// if so, tokenize, validate and return the BED entry.
-	if (bedStream->good()) {
+	if (_bedStream->good()) {
 		string bedLine;
 		vector<string> bedFields;
 		bedFields.reserve(12);
 		
 		// parse the bedStream pointer
-		getline(*bedStream, bedLine);
+		getline(*_bedStream, bedLine);
 		lineNum++;
 
 		// split into a string vector.
@@ -356,8 +356,8 @@ void BedFile::countHits(const BED &a, bool forceStrand) {
 
 
 void BedFile::setGff (bool gff) {
-	if (gff == true) this->isGff = true;
-	else this->isGff = false;
+	if (gff == true) this->_isGff = true;
+	else this->_isGff = false;
 }
 
 
@@ -577,7 +577,7 @@ bool BedFile::parseGffLine (BED &bed, const vector<string> &lineVector, int line
 */
 	if ( (lineNum > 1) && (lineVector.size() == this->bedType)) {
 		
-		if (this->bedType == 9 && isGff) {
+		if (this->bedType == 9 && _isGff) {
 			bed.chrom = lineVector[0];
 			// substract 1 to force the start to be BED-style
 			bed.start = atoi(lineVector[3].c_str()) - 1;
@@ -608,7 +608,7 @@ bool BedFile::parseGffLine (BED &bed, const vector<string> &lineVector, int line
 	else if ((lineNum == 1) && (lineVector.size() == 9)) {
 		this->bedType = lineVector.size();
 		
-		if (this->bedType == 9 && isGff) {
+		if (this->bedType == 9 && _isGff) {
 			bed.chrom = lineVector[0];
 			// substract 1 to force the start to be BED-style
 			bed.start = atoi(lineVector[3].c_str()) - 1;
@@ -624,7 +624,7 @@ bool BedFile::parseGffLine (BED &bed, const vector<string> &lineVector, int line
 			return true;
 		}
 		else {
-			cout << this->bedType << " " << isGff << endl;
+			cout << this->bedType << " " << _isGff << endl;
 			cerr << "Error: unexpected number of fields at line: " << lineNum << 
 					".  Verify that your files are TAB-delimited and that your GFF file has 9 fields.  Exiting..." << endl;
 			exit(1);
@@ -658,112 +658,32 @@ bool BedFile::parseGffLine (BED &bed, const vector<string> &lineVector, int line
 
 void BedFile::loadBedFileIntoMap() {
 
-	string bedLine;                                                                                                                       
+	BED bedEntry;
 	int lineNum = 0;
-	vector<string> bedFields;			// vector for a BED entry
-	bedFields.reserve(12);				// reserve the max BED size
 	
-	// Case 1: Proper BED File.
-	if ( (this->bedFile != "") && (this->bedFile != "stdin") ) {
-		
-		// open the BED file for reading                                                                                                                                      
-		ifstream bed(bedFile.c_str(), ios::in);
-		if ( !bed ) {
-			cerr << "Error: The requested bed file (" <<bedFile << ") could not be opened. Exiting!" << endl;
-			exit (1);
-		}
-
-		while (getline(bed, bedLine)) {
-					
-			Tokenize(bedLine,bedFields);	// load the fields into the vector
-			lineNum++;
-			
-			BED bedEntry;					// new BED struct for the current line
-			if (parseLine(bedEntry, bedFields, lineNum)) {
-				int bin = getBin(bedEntry.start, bedEntry.end);
-				bedEntry.count = 0;
-				bedEntry.minOverlapStart = INT_MAX;
-
-				//string key = getChromBinKey(bedEntry.chrom, bin);
-				//this->bedMap[key].push_back(bedEntry);	
-				this->bedMap[bedEntry.chrom][bin].push_back(bedEntry);
-			}
-			bedFields.clear();
-		}
+	Open();
+	while (this->GetNextBed(bedEntry, lineNum)) {
+		int bin = getBin(bedEntry.start, bedEntry.end);
+		bedEntry.count = 0;
+		bedEntry.minOverlapStart = INT_MAX;
+		bedMap[bedEntry.chrom][bin].push_back(bedEntry);
 	}
-	else {
-		while (getline(cin, bedLine)) {
-		
-			Tokenize(bedLine,bedFields);	// load the fields into the vector
-			lineNum++;
-			
-			BED bedEntry;					// new BED struct for the current line
-			if (parseLine(bedEntry, bedFields, lineNum)) {
-				int bin = getBin(bedEntry.start, bedEntry.end);
-				bedEntry.count = 0;
-				bedEntry.minOverlapStart = INT_MAX;
-				this->bedMap[bedEntry.chrom][bin].push_back(bedEntry);
-			}
-			bedFields.clear();
-		}
-	}
+	Close();
 }
 
 
 void BedFile::loadBedFileIntoMapNoBin() {
-
-	string bedLine;                                                                                                                       
+	
+	BED bedEntry;
 	int lineNum = 0;
-	vector<string> bedFields;			// vector for a BED entry
-	bedFields.reserve(12);				// reserve the max BED size
-
-	// Case 1: Proper BED File.
-	if ( (this->bedFile != "") && (this->bedFile != "stdin") ) {
-
-		// open the BED file for reading                                                                                                                                      
-		ifstream bed(bedFile.c_str(), ios::in);
-		if ( !bed ) {
-			cerr << "Error: The requested bed file (" <<bedFile << ") could not be opened. Exiting!" << endl;
-			exit (1);
-		}
-
-		while (getline(bed, bedLine)) {
-		
-			Tokenize(bedLine,bedFields);	// load the fields into the vector
-			lineNum++;
-			
-			BED bedEntry;					// new BED struct for the current line
-			if (parseLine(bedEntry, bedFields, lineNum)) {
-				bedEntry.count = 0;
-				bedEntry.minOverlapStart = INT_MAX;
-				this->bedMapNoBin[bedEntry.chrom].push_back(bedEntry);	
-			}
-			bedFields.clear();
-		}
+	
+	Open();
+	while (this->GetNextBed(bedEntry, lineNum)) {
+		bedEntry.count = 0;
+		bedEntry.minOverlapStart = INT_MAX;
+		bedMapNoBin[bedEntry.chrom].push_back(bedEntry);
 	}
-	// Case 2: STDIN.
-	else {
-
-		while (getline(cin, bedLine)) {
-		
-			Tokenize(bedLine,bedFields);	// load the fields into the vector
-			lineNum++;
-
-			BED bedEntry;					// new BED struct for the current line
-			if (parseLine(bedEntry, bedFields, lineNum)) {
-				bedEntry.count = 0;
-				bedEntry.minOverlapStart = INT_MAX;
-				this->bedMapNoBin[bedEntry.chrom].push_back(bedEntry);	
-			}
-			bedFields.clear();
-		}
-	}
-
-	// sort the BED entries for each chromosome
-	// in ascending order of start position
-	for (masterBedMapNoBin::iterator m = this->bedMapNoBin.begin(); m != this->bedMapNoBin.end(); ++m) {
-		sort(m->second.begin(), m->second.end(), sortByStart);		
-	}
+	Close();
 }
 
 
@@ -776,7 +696,7 @@ void BedFile::loadBedFileIntoMapNoBin() {
 */
 void BedFile::reportBedTab(const BED &bed) {
 	
-	if (isGff == false) {
+	if (_isGff == false) {
 		if (this->bedType == 3) {
 			printf ("%s\t%d\t%d\t", bed.chrom.c_str(), bed.start, bed.end);
 		}
@@ -822,7 +742,7 @@ void BedFile::reportBedTab(const BED &bed) {
 */
 void BedFile::reportBedNewLine(const BED &bed) {
 	
-	if (isGff == false) {
+	if (_isGff == false) {
 		if (this->bedType == 3) {
 			printf ("%s\t%d\t%d\n", bed.chrom.c_str(), bed.start, bed.end);
 		}
@@ -870,7 +790,7 @@ void BedFile::reportBedNewLine(const BED &bed) {
 */
 void BedFile::reportBedRangeTab(const BED &bed, int start, int end) {
 
-	if (isGff == false) {
+	if (_isGff == false) {
 		if (this->bedType == 3) {
 			printf ("%s\t%d\t%d\t", bed.chrom.c_str(), start, end);
 		}
@@ -917,7 +837,7 @@ void BedFile::reportBedRangeTab(const BED &bed, int start, int end) {
 */
 void BedFile::reportBedRangeNewLine(const BED &bed, int start, int end) {
 
-	if (isGff == false) {
+	if (_isGff == false) {
 		if (this->bedType == 3) {
 			printf ("%s\t%d\t%d\n", bed.chrom.c_str(), start, end);
 		}
@@ -959,7 +879,7 @@ void BedFile::reportBedRangeNewLine(const BED &bed, int start, int end) {
 */
 void BedFile::reportNullBedTab() {
 	
-	if (isGff == false) {
+	if (_isGff == false) {
 		if (this->bedType == 3) {
 			printf (".\t-1\t-1\t");
 		}
@@ -990,7 +910,7 @@ void BedFile::reportNullBedTab() {
 */
 void BedFile::reportNullBedNewLine() {
 	
-	if (isGff == false) {
+	if (_isGff == false) {
 		if (this->bedType == 3) {
 			printf (".\t-1\t-1\n");
 		}

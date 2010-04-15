@@ -1,5 +1,5 @@
 /*****************************************************************************
-  subtractMain.cpp
+  coverageMain.cpp
 
   (c) 2009 - Aaron Quinlan
   Hall Laboratory
@@ -9,14 +9,13 @@
 
   Licenced under the GNU General Public License 2.0+ license.
 ******************************************************************************/
-#include "subtractBed.h"
+#include "coverageBed.h"
 #include "version.h"
 
 using namespace std;
 
-// define our program name
-#define PROGRAM_NAME "subtractBed"
-
+// define the version
+#define PROGRAM_NAME "coverageBed"
 
 // define our parameter checking macro
 #define PARAMETER_CHECK(param, paramLen, actualLen) (strncmp(argv[i], param, min(actualLen, paramLen))== 0) && (actualLen == paramLen)
@@ -32,14 +31,11 @@ int main(int argc, char* argv[]) {
 	// input files
 	string bedAFile;
 	string bedBFile;
-
-	// input arguments
-	float overlapFraction = 1E-9;
+	bool forceStrand = false;
 
 	bool haveBedA = false;
 	bool haveBedB = false;
-	bool haveFraction = false;
-	bool forceStrand = false;
+
 
 	// check to see if we should print out some help
 	if(argc <= 1) showHelp = true;
@@ -73,17 +69,10 @@ int main(int argc, char* argv[]) {
 				bedBFile = argv[i + 1];
 				i++;
 			}
-		}	
-		else if(PARAMETER_CHECK("-f", 2, parameterLength)) {
-			if ((i+1) < argc) {
-				haveFraction = true;
-				overlapFraction = atof(argv[i + 1]);
-				i++;
-			}
 		}
 		else if (PARAMETER_CHECK("-s", 2, parameterLength)) {
 			forceStrand = true;
-		}
+		}	
 		else {
 			cerr << endl << "*****ERROR: Unrecognized parameter: " << argv[i] << " *****" << endl << endl;
 			showHelp = true;
@@ -98,8 +87,8 @@ int main(int argc, char* argv[]) {
 
 	if (!showHelp) {
 
-		BedSubtract *bs = new BedSubtract(bedAFile, bedBFile, overlapFraction, forceStrand);
-		delete bs;
+		BedCoverage *bg = new BedCoverage(bedAFile, bedBFile, forceStrand);
+		bg->DetermineBedInput();
 		return 0;
 	}
 	else {
@@ -108,26 +97,28 @@ int main(int argc, char* argv[]) {
 }
 
 void ShowHelp(void) {
-
+	
 	cerr << endl << "Program: " << PROGRAM_NAME << " (v" << VERSION << ")" << endl;
 	
 	cerr << "Author:  Aaron Quinlan (aaronquinlan@gmail.com)" << endl;
-
-	cerr << "Summary: Removes the portion(s) of an interval that is overlapped" << endl;
-	cerr << "\t by another feature(s)." << endl << endl;
-
+	
+	cerr << "Summary: Returns the depth and breadth of coverage of features from A" << endl;
+	cerr << "\t on the intervals in B." << endl << endl;
+	
 	cerr << "Usage:   " << PROGRAM_NAME << " [OPTIONS] -a <a.bed> -b <b.bed>" << endl << endl;
 
 	cerr << "Options: " << endl;
-	cerr << "\t-f\t"			<< "Minimum overlap required as a fraction of A." << endl;
-	cerr 						<< "\t\t- Default is 1E-9 (i.e., 1bp)." << endl;
-	cerr						<< "\t\t- (FLOAT) (e.g. 0.50)" << endl << endl;
+	cerr << "\t-s\t"	 	    << "Force strandedness.  That is, only include hits in A that" << endl;
+	cerr						<< "\t\toverlap B on the same strand." << endl;
+	cerr						<< "\t\t- By default, hits are included without respect to strand." << endl << endl;
 
-	cerr << "\t-s\t"      		<< "Force strandedness.  That is, only report hits in B that" << endl;
-	cerr						<< "\t\toverlap A on the same strand." << endl;
-	cerr						<< "\t\t- By default, overlaps are reported without respect to strand." << endl << endl;
-
-
-	// end the program here
+	cerr << "Output:  " << endl;
+	cerr << "\t" << " After each entry in B, reports: " << endl; 
+	cerr << "\t  1) The number of features in A that overlapped the B interval." << endl;
+	cerr << "\t  2) The number of bases in B that had non-zero coverage." << endl;
+	cerr << "\t  3) The length of the entry in B." << endl;
+	cerr << "\t  4) The fraction of bases in B that had non-zero coverage." << endl;
+	
 	exit(1);
+
 }

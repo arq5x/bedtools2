@@ -1,5 +1,5 @@
 /*****************************************************************************
-  windowBed.h
+  coverageBed.h
 
   (c) 2009 - Aaron Quinlan
   Hall Laboratory
@@ -9,48 +9,45 @@
 
   Licenced under the GNU General Public License 2.0+ license.
 ******************************************************************************/
-#ifndef WINDOWBED_H
-#define WINDOWBED_H
+#ifndef	COVERAGEBED_H
+#define COVERAGEBED_H
 
 #include "bedFile.h"
 #include <vector>
+#include <algorithm>
 #include <iostream>
+#include <iomanip>
 #include <fstream>
+#include <stdlib.h>
 
 using namespace std;
 
 //************************************************
 // Class methods and elements
 //************************************************
-class BedWindow {
+class BedCoverage {
 
 public:
 
 	// constructor 
-	BedWindow(string &bedAFile, string &bedBFile, int &leftSlop, int &rightSlop, bool &anyHit, bool &noHit, 
-			  bool &writeCount, bool &strandWindows, bool &matchOnStrand);
+	BedCoverage(string &, string &, bool &);
 
 	// destructor
-	~BedWindow(void);
-		
+	~BedCoverage(void);
+	
+	void GetCoverage(istream &bedInput);
+	
+	void DetermineBedInput();
+	
 private:
 
-	string _bedAFile;
-	string _bedBFile;
-	bool _anyHit;
-	bool _writeCount;
-	int _leftSlop;
-	int _rightSlop;
-	bool _noHit;
-	bool _strandWindows;
-	bool _matchOnStrand;
+	string bedAFile;
+	string bedBFile;
 
 	// instance of a bed file class.
-	BedFile *_bedA, *_bedB;
+	BedFile *bedA, *bedB;
 	
-	// methods
-	void WindowIntersectBed();
-	void FindWindowOverlaps(BED &a, vector<BED> &hits);
+	bool forceStrand;
 
 };
-#endif /* WINDOWBED_H */
+#endif /* COVERAGEBED_H */

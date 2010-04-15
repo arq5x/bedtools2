@@ -162,7 +162,7 @@ int main(int argc, char* argv[]) {
 	
 	if (!showHelp) {
 		BedWindow *bi = new BedWindow(bedAFile, bedBFile, leftSlop, rightSlop, anyHit, noHit, writeCount, strandWindows, matchOnStrand);
-		bi->DetermineBedInput();
+		delete bi;
 		return 0;
 	}
 	else {

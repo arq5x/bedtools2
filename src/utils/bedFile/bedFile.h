@@ -146,10 +146,13 @@ public:
 	// Destructor
 	~BedFile(void);
 	
+	// Open a BED file for reading (creates an istream pointer)
 	void Open(void);
 	
+	// Close an opened BED file.
 	void Close(void);
 	
+	// Get the next BED entry in an opened BED file.
 	bool GetNextBed (BED &bed, int &lineNum);
 
 	// load a BED file into a map keyed by chrom, then bin. value is vector of BEDs
@@ -194,22 +197,24 @@ public:
 	string bedFile;
 	unsigned int bedType;  // 3-6, 12 for BED
 						   // 9 for GFF
-						
-	bool isGff;
 	masterBedMap bedMap;
 	masterBedMapNoBin bedMapNoBin;
-	
+						
 private:
 	
-	// process as line from a BED file
-	bool parseBedLine (BED &bed, const vector<string> &lineVector, int lineNum);
+	// data
+	bool _isGff;
+	istream *_bedStream;
+
+	// methods
 	
+	// process as line from a BED file
+	bool parseBedLine (BED &bed, const vector<string> &lineVector, int lineNum);	
 	// process as line from a GFF file. convert to a BED feature.
 	bool parseGffLine (BED &bed, const vector<string> &lineVector, int lineNum);
-	
 	void setGff (bool isGff);
 	
-	istream *bedStream;
+
 };
 
 #endif /* BEDFILE_H */

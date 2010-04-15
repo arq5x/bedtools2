@@ -98,6 +98,7 @@ int main(int argc, char* argv[]) {
 	
 	if (!showHelp) {
 		BedClosest *bc = new BedClosest(bedAFile, bedBFile, forceStrand, tieMode);
+		delete bc;
 		return 0;
 	}
 	else {
