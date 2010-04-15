@@ -246,7 +246,7 @@ void PrintBed(const BamAlignment &bam,  const RefVector &refs, bool useEditDista
 	if (bam.IsSecondMate()) name += "/2";
 
 	// rip through the CIGAR string and reconstruct the alignment coordinates
-	unsigned int alignmentEnd = bam.GetAlignmentEnd();
+	unsigned int alignmentEnd = bam.GetEndPosition();
 	//ParseCigarBed(bam.CigarData, alignmentEnd);
 	//alignmentEnd += bam.Position;
 

@@ -1,9 +1,9 @@
 // ***************************************************************************
-// BamReader.h (c) 2009 Derek Barnett, Michael Strömberg
+// BamReader.h (c) 2009 Derek Barnett, Michael Strï¿½mberg
 // Marth Lab, Department of Biology, Boston College
 // All rights reserved.
 // ---------------------------------------------------------------------------
-// Last modified: 8 December 2009 (DB)
+// Last modified: 30 March 2010 (DB)
 // ---------------------------------------------------------------------------
 // Uses BGZF routines were adapted from the bgzf.c code developed at the Broad
 // Institute.
@@ -59,11 +59,11 @@ class BamReader {
         // returns SAM header text
         const std::string GetHeaderText(void) const;
         // returns number of reference sequences
-        const int GetReferenceCount(void) const;
+        int GetReferenceCount(void) const;
         // returns vector of reference objects
         const BamTools::RefVector GetReferenceData(void) const;
         // returns reference id (used for BamReader::Jump()) for the given reference name
-        const int GetReferenceID(const std::string& refName) const;
+        int GetReferenceID(const std::string& refName) const;
 
         // ----------------------
         // BAM index operations

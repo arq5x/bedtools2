@@ -1,5 +1,5 @@
 // ***************************************************************************
-// BGZF.h (c) 2009 Derek Barnett, Michael Strömberg
+// BGZF.h (c) 2009 Derek Barnett, Michael Strï¿½mberg
 // Marth Lab, Department of Biology, Boston College
 // All rights reserved.
 // ---------------------------------------------------------------------------
@@ -130,7 +130,7 @@ bool BgzfData::CheckBlockHeader(char* header) {
             BgzfData::UnpackUnsignedShort(&header[14]) == BGZF_LEN );
 }
 
-// packs an unsigned integer into the specified buffer
+// 'packs' an unsigned integer into the specified buffer
 inline
 void BgzfData::PackUnsignedInt(char* buffer, unsigned int value) {
     buffer[0] = (char)value;
@@ -139,14 +139,14 @@ void BgzfData::PackUnsignedInt(char* buffer, unsigned int value) {
     buffer[3] = (char)(value >> 24);
 }
 
-// packs an unsigned short into the specified buffer
+// 'packs' an unsigned short into the specified buffer
 inline
 void BgzfData::PackUnsignedShort(char* buffer, unsigned short value) {
     buffer[0] = (char)value;
     buffer[1] = (char)(value >> 8);
 }
 
-// unpacks a buffer into a signed int
+// 'unpacks' a buffer into a signed int
 inline
 signed int BgzfData::UnpackSignedInt(char* buffer) {
     union { signed int value; unsigned char valueBuffer[sizeof(signed int)]; } un;
@@ -158,7 +158,7 @@ signed int BgzfData::UnpackSignedInt(char* buffer) {
     return un.value;
 }
 
-// unpacks a buffer into an unsigned int
+// 'unpacks' a buffer into an unsigned int
 inline
 unsigned int BgzfData::UnpackUnsignedInt(char* buffer) {
     union { unsigned int value; unsigned char valueBuffer[sizeof(unsigned int)]; } un;
@@ -170,7 +170,7 @@ unsigned int BgzfData::UnpackUnsignedInt(char* buffer) {
     return un.value;
 }
 
-// unpacks a buffer into an unsigned short
+// 'unpacks' a buffer into an unsigned short
 inline
 unsigned short BgzfData::UnpackUnsignedShort(char* buffer) {
     union { unsigned short value; unsigned char valueBuffer[sizeof(unsigned short)]; } un;

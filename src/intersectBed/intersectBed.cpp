@@ -172,34 +172,8 @@ bool BedIntersect::FindOneOrMoreOverlap(const BED &a) {
 
 void BedIntersect::IntersectBed() {
 
-/*
-	// load the "B" bed file into a map so
-	// that we can easily compare "A" to it for overlaps
-	_bedB->loadBedFileIntoMap();
-	string bedLine;                                                                                                                    
-	int lineNum = 0;					// current input line number
-	vector<BED> hits;					// vector of potential hits
-	vector<string> bedFields;			// vector for a BED entry
-	
-	// reserve some space
-	hits.reserve(100);
-	bedFields.reserve(12);	
-		
-	// process each entry in A
-	while (getline(bedInput, bedLine)) {
-
-		lineNum++;
-		Tokenize(bedLine,bedFields);
-		BED a;
-		// find the overlaps with B if it's a valid BED entry. 
-		if (_bedA->parseLine(a, bedFields, lineNum)) {
-			FindOverlaps(a, hits);
-			hits.clear();
-		}
-		// reset for the next input line
-		bedFields.clear();
-	}
-	*/
+	// load the "B" file into a map in order to 
+	// compare each entry in A to it in search of overlaps.
 	_bedB->loadBedFileIntoMap();                                                                                                                 
 	
 	int lineNum = 0;
@@ -207,6 +181,7 @@ void BedIntersect::IntersectBed() {
 	hits.reserve(100);
 	BED a;	
 	
+	// open the "A" file, process each BED entry and searh for overlaps.
 	_bedA->Open();
 	while (_bedA->GetNextBed(a, lineNum) == true) {
 		FindOverlaps(a, hits);
@@ -269,7 +244,7 @@ void BedIntersect::IntersectBam(string bamFile) {
 						writer.SaveAlignment(bam);
 				}
 				else {
-					if (_noHit == false) 
+					if (_noHit == true) 
 						writer.SaveAlignment(bam);	
 				}
 			}
@@ -294,12 +269,10 @@ void BedIntersect::DetermineBedInput() {
 	if (_bedA->bedFile != "stdin") {   
 		// it's BED or GFF
 		if (_bamInput == false) { 
-			ifstream beds(_bedA->bedFile.c_str(), ios::in);
-			if ( !beds ) {
-				cerr << "Error: The requested bed file (" << _bedA->bedFile << ") could not be opened. Exiting!" << endl;
-				exit (1);
-			}
 			IntersectBed();
+		}
+		else {
+			IntersectBam(_bedA->bedFile);
 		}
 	}
 	// reading from stdin
