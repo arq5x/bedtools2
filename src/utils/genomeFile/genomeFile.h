@@ -43,9 +43,11 @@ public:
 	int getChromSize(const string &chrom);
 	vector<string> getChromList();
 	int getNumberOfChroms();
-	
+
+
+		
 private:
-	string genomeFile;
+	string  _genomeFile;
 	chromToSizes _chromSizes;
 	vector<string> _chromList;
 };

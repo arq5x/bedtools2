@@ -144,6 +144,12 @@ public:
 
 	// Destructor
 	~BedFile(void);
+	
+	void Open(void);
+	
+	void Close(void);
+	
+	bool GetNextBed (BED &bed, int &lineNum);
 
 	// load a BED file into a map keyed by chrom, then bin. value is vector of BEDs
 	void loadBedFileIntoMap();

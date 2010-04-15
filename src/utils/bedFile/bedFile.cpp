@@ -95,6 +95,97 @@ int getBin(int start, int end) {
 }
 
 
+/*******************************************
+Class methods
+*******************************************/
+
+// Constructor
+BedFile::BedFile(string &bedFile)
+: bedFile(bedFile)
+{}
+
+// Destructor
+BedFile::~BedFile(void) {
+}
+
+
+void BedFile::Open(void) {
+	
+	if (bedFile == "stdin") {
+		bedStream = &cin;
+	}
+	else {
+		size_t foundPos;
+	  	foundPos = bedFile.find_last_of(".gz");
+		// is this a GZIPPED BED file?
+		if (foundPos == bedFile.size() - 1) {
+			igzstream beds(bedFile.c_str(), ios::in);
+			if ( !beds ) {
+				cerr << "Error: The requested bed file (" << bedFile << ") could not be opened. Exiting!" << endl;
+				exit (1);
+			}
+			else {
+				// if so, close it (this was just a test)
+				beds.close();		
+				// now set a pointer to the stream so that we
+				// can read the file later on.
+				// Thank God for Josuttis, p. 631!
+				bedStream = new igzstream(bedFile.c_str(), ios::in);
+			}
+		}  
+		// not GZIPPED.
+		else {
+		
+			ifstream beds(bedFile.c_str(), ios::in);
+			// can we open the file?
+			if ( !beds ) {
+				cerr << "Error: The requested bed file (" << bedFile << ") could not be opened. Exiting!" << endl;
+				exit (1);
+			}
+			else {
+				// if so, close it (this was just a test)
+				beds.close();		
+				// now set a pointer to the stream so that we
+				// can read the file later on.
+				// Thank God for Josuttis, p. 631!
+				bedStream = new ifstream(bedFile.c_str(), ios::in);
+			}
+		}
+	}
+}
+
+
+// Close the BED file
+void BedFile::Close(void) {
+	delete bedStream;
+}
+
+
+bool BedFile::GetNextBed (BED &bed, int &lineNum) {
+
+	// make sure there are still lines to process.
+	// if so, tokenize, validate and return the BED entry.
+	if (bedStream->good()) {
+		string bedLine;
+		vector<string> bedFields;
+		bedFields.reserve(12);
+		
+		// parse the bedStream pointer
+		getline(*bedStream, bedLine);
+		lineNum++;
+
+		// split into a string vector.
+		Tokenize(bedLine,bedFields);
+
+		// load the BED struct as long as it's a valid BED entry.
+		if (parseLine(bed, bedFields, lineNum)) {
+			return true;
+		}
+		return false;
+	}
+}
+
+
 void BedFile::FindOverlapsPerBin(string chrom, int start, int end, string strand, vector<BED> &hits, bool forceStrand) {
 
 	int startBin, endBin;

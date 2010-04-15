@@ -72,6 +72,9 @@ private:
 	// private methods
 	//------------------------------------------------
 	void IntersectBed(istream &bedInput);
+
+	void IntersectBed();
+
 	void IntersectBam(string bamFile);
 	
 	bool FindOverlaps(const BED &a, vector<BED> &hits);

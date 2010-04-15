@@ -191,11 +191,11 @@ void ProcessBed(istream &bedInput, BedFile *bed, GenomeFile *genome, bool isBED1
 	RefVector refs;
 	string    bamHeader;
 	map<string, int, std::less<string> > chromToId;
-	
 	MakeBamHeader(genome->genomeFile, refs, bamHeader, chromToId);
 	
 	// add the reference headers to the BAM file
 	writer.Open("stdout", bamHeader, refs);
+
 
 	string bedLine;                                                                                                                    
 	int lineNum = 0;					// current input line number

@@ -170,8 +170,9 @@ bool BedIntersect::FindOneOrMoreOverlap(const BED &a) {
 }
  
 
-void BedIntersect::IntersectBed(istream &bedInput) {
+void BedIntersect::IntersectBed() {
 
+/*
 	// load the "B" bed file into a map so
 	// that we can easily compare "A" to it for overlaps
 	_bedB->loadBedFileIntoMap();
@@ -198,6 +199,21 @@ void BedIntersect::IntersectBed(istream &bedInput) {
 		// reset for the next input line
 		bedFields.clear();
 	}
+	*/
+	_bedB->loadBedFileIntoMap();                                                                                                                 
+	
+	int lineNum = 0;
+	vector<BED> hits;
+	hits.reserve(100);
+	BED a;	
+	
+	_bedA->Open();
+	while (_bedA->GetNextBed(a, lineNum) == true) {
+		FindOverlaps(a, hits);
+		hits.clear();
+	}
+	_bedA->Close();
+	
 }
 
 
@@ -273,7 +289,7 @@ void BedIntersect::IntersectBam(string bamFile) {
 
 
 void BedIntersect::DetermineBedInput() {
-	
+
 	// dealing with a proper file
 	if (_bedA->bedFile != "stdin") {   
 		// it's BED or GFF
@@ -283,19 +299,14 @@ void BedIntersect::DetermineBedInput() {
 				cerr << "Error: The requested bed file (" << _bedA->bedFile << ") could not be opened. Exiting!" << endl;
 				exit (1);
 			}
-			IntersectBed(beds);
-		}
-		// it's BAM
-		else {
-			IntersectBam(_bedA->bedFile);
+			IntersectBed();
 		}
 	}
 	// reading from stdin
 	else {  
 		// it's BED or GFF 
 		if (_bamInput == false) {					
-			IntersectBed(cin);
-		}
+			IntersectBed();
 		// it's BAM
 		else {
 			IntersectBam("stdin");

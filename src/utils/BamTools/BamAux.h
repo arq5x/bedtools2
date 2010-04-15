@@ -62,7 +62,12 @@ const int BAM_LIDX_SHIFT    = 14;
 // Explicit variable sizes
 const int BT_SIZEOF_INT = 4;
 
-struct CigarOp;
+// ARQ: moved this here.
+struct CigarOp {
+    char     Type;   // Operation type (MIDNSHP)
+    uint32_t Length; // Operation length (number of bases)
+};
+
 
 struct BamAlignment {
 
@@ -190,6 +195,27 @@ struct BamAlignment {
             return true;
         }
 
+		// ARQ:
+		// compute and retuen the alignment end coordinate based on the CIGAR string.
+		int GetAlignmentEnd(bool usePadded = false) const {
+		    // initialize alignment end to starting position
+		    int alignEnd = Position;
+
+		    // iterate over cigar operations
+		    std::vector<CigarOp>::const_iterator cigarIter = CigarData.begin();
+		    std::vector<CigarOp>::const_iterator cigarEnd  = CigarData.end();
+		    for ( ; cigarIter != cigarEnd; ++cigarIter) {
+		        char cigarType = (*cigarIter).Type;
+		        if ( cigarType == 'M' || cigarType == 'D' || cigarType == 'N' ) {
+		            alignEnd += (*cigarIter).Length;
+		        }
+				else if (cigarType == 'I' && usePadded == true) {
+					alignEnd += (*cigarIter).Length;
+				}
+		    }
+		    return alignEnd;
+		} 
+
     private:
         static void SkipToNextTag(const char storageType, char* &pTagData, unsigned int& numBytesParsed) {
 			switch(storageType) {
@@ -265,11 +291,6 @@ struct BamAlignment {
 
 // ----------------------------------------------------------------
 // Auxiliary data structs & typedefs
-
-struct CigarOp {
-    char     Type;   // Operation type (MIDNSHP)
-    uint32_t Length; // Operation length (number of bases)
-};
 
 struct RefData {
     // data members

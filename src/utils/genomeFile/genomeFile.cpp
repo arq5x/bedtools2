@@ -14,7 +14,7 @@
 
 
 GenomeFile::GenomeFile(const string &genomeFile) {
-	this->genomeFile = genomeFile;
+	_genomeFile = genomeFile;
 	loadGenomeFileIntoMap();
 }
 
@@ -30,9 +30,9 @@ void GenomeFile::loadGenomeFileIntoMap() {
 	vector<string> genomeFields;			// vector for a GENOME entry
 
 	// open the GENOME file for reading                                                                                                                                      
-	ifstream genome(genomeFile.c_str(), ios::in);
+	ifstream genome(_genomeFile.c_str(), ios::in);
 	if ( !genome ) {
-		cerr << "Error: The requested genome file (" <<genomeFile << ") could not be opened. Exiting!" << endl;
+		cerr << "Error: The requested genome file (" << _genomeFile << ") could not be opened. Exiting!" << endl;
 		exit (1);
 	}
 
@@ -62,7 +62,7 @@ void GenomeFile::loadGenomeFileIntoMap() {
 					}
 				}
 				else {
-					cerr << "Less than the req'd two fields were encountered in the genome file (" <<genomeFile << ")";
+					cerr << "Less than the req'd two fields were encountered in the genome file (" << _genomeFile << ")";
 					cerr << " at line " << lineNum << ".  Exiting." << endl;
 					exit (1);
 				}
