@@ -102,8 +102,10 @@ struct BamAlignment {
 
     // Tag data access methods
     public:
-        bool GetEditDistance(uint8_t& editDistance) const;	// get "NM" tag data - contributed by Aaron Quinlan
-        bool GetReadGroup(std::string& readGroup) const;	// get "RG" tag data
+        bool GetEditDistance(uint8_t& editDistance) const;	     // get "NM" tag data - contributed by Aaron Quinlan
+        bool GetReadGroup(std::string& readGroup) const;	     // get "RG" tag data
+		bool GetMateSequence(std::string& mateSequence) const;   // get "R2" tag data
+		bool GetMateQualities(std::string& mateSequence) const;  // get "Q2" tag data
 		bool AddBamTag(const std::string &tag, const std::string &valType, const std::string &value);
 
     // Additional data access methods
@@ -374,6 +376,91 @@ bool BamAlignment::GetReadGroup(std::string& readGroup) const {
 }
 
 
+// get "R2" tag data
+// stores data in 'mateSequence', returns success/fail
+inline 
+bool BamAlignment::GetMateSequence(std::string& mateSequence) const {
+
+    if ( TagData.empty() ) { return false; }
+
+    // localize the tag data
+    char* pTagData = (char*)TagData.data();
+    const unsigned int tagDataLen = TagData.size();
+    unsigned int numBytesParsed = 0;
+
+    bool foundMateSequence = false;
+    while( numBytesParsed < tagDataLen ) {
+
+        const char* pTagType = pTagData;
+        const char* pTagStorageType = pTagData + 2;
+        pTagData       += 3;
+        numBytesParsed += 3;
+
+        // check the current tag
+        if ( std::strncmp(pTagType, "R2", 2) == 0 ) {
+            foundMateSequence = true;
+            break;
+        }
+
+        // get the storage class and find the next tag
+        if (*pTagStorageType == '\0') { return false; }
+        SkipToNextTag( *pTagStorageType, pTagData, numBytesParsed );
+        if (*pTagData == '\0') { return false; }
+    }
+
+    // return if the mate sequence tag was not present
+    if ( !foundMateSequence ) { return false; }
+
+    // assign the mate sequence
+    const unsigned int mateSequenceLen = std::strlen(pTagData);
+    mateSequence.resize(mateSequenceLen);
+    std::memcpy( (char*)mateSequence.data(), pTagData, mateSequenceLen );
+    return true;
+}
+
+// get "Q2" tag data
+// stores data in 'mateQualities', returns success/fail
+inline 
+bool BamAlignment::GetMateQualities(std::string& mateQualities) const {
+
+    if ( TagData.empty() ) { return false; }
+
+    // localize the tag data
+    char* pTagData = (char*)TagData.data();
+    const unsigned int tagDataLen = TagData.size();
+    unsigned int numBytesParsed = 0;
+
+    bool foundMateQualities = false;
+    while( numBytesParsed < tagDataLen ) {
+
+        const char* pTagType = pTagData;
+        const char* pTagStorageType = pTagData + 2;
+        pTagData       += 3;
+        numBytesParsed += 3;
+
+        // check the current tag
+        if ( std::strncmp(pTagType, "Q2", 2) == 0 ) {
+            foundMateQualities = true;
+            break;
+        }
+
+        // get the storage class and find the next tag
+        if (*pTagStorageType == '\0') { return false; }
+        SkipToNextTag( *pTagStorageType, pTagData, numBytesParsed );
+        if (*pTagData == '\0') { return false; }
+    }
+
+    // return if the mate qualities tag was not present
+    if ( !foundMateQualities ) { return false; }
+
+    // assign the mate qualities
+    const unsigned int mateQualitiesLen = std::strlen(pTagData);
+    mateQualities.resize(mateQualitiesLen);
+    std::memcpy( (char*)mateQualities.data(), pTagData, mateQualitiesLen );
+    return true;
+}
+
+
 // Add a new tag to a BAM alignment
 //   - allows third-party apps to add 
 //     custom tags to BAM records
@@ -416,11 +503,11 @@ bool BamAlignment::AddBamTag(const std::string &tag, const std::string &valType,
 		SkipToNextTag( *pTagStorageType, pTagData, numBytesParsed );
 		if (*pTagData == '\0') { break; }
 	}
-
+	
 	// :::Step 2:::
-	// Add the requested tag.
-	std::string newTag = tag + valType + value;
-	TagData.append(newTag);
+	// Add the requested tag.  Note that a NULL terminator is needed for string tags (i.e. Z and H) 
+	std::string newTag = tag + valType + value + '\0';
+	TagData += newTag;
 
 	return true;
 }
