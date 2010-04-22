@@ -83,7 +83,6 @@ bool BedIntersect::FindOverlaps(const BED &a, vector<BED> &hits) {
 	vector<BED>::const_iterator h = hits.begin();
 	vector<BED>::const_iterator hitsEnd = hits.end();
 	for (; h != hitsEnd; ++h) {
-		
 		int s            = max(a.start, h->start);
 		int e            = min(a.end, h->end);
 		int overlapBases = (e - s);				// the number of overlapping bases b/w a and b
@@ -198,7 +197,7 @@ void BedIntersect::IntersectBed() {
 	
 	// open the "A" file, process each BED entry and searh for overlaps.
 	_bedA->Open();
-	while (_bedA->GetNextBed(a, lineNum) == true) {
+	while (_bedA->GetNextBed(a, lineNum) != BED_INVALID) {
 		FindOverlaps(a, hits);
 		hits.clear();
 		a = nullBed;
@@ -256,7 +255,7 @@ void BedIntersect::IntersectBam(string bamFile) {
 			if (_bamOutput == true) {
 				overlapsFound = FindOneOrMoreOverlap(a);
 				if (overlapsFound == true) {
-					if (_noHit == false) 
+					if (_noHit == false)
 						writer.SaveAlignment(bam);
 				}
 				else {

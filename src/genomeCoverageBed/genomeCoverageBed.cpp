@@ -301,8 +301,8 @@ void BedGenomeCoverage::ReportGenomeCoverage(chromHistMap &chromDepthHist) {
 void BedGenomeCoverage::ReportChromCoverageBedGraph(const vector<DEPTH> &chromCov, int &chromSize, string &chrom) {
 
 	int depth     = 0;     // initialize the depth
-	int lastStart = -1 ;
-	int lastDepth = -1 ;
+	int lastStart = -1;
+	int lastDepth = -1;
 
 	for (int pos = 0; pos < chromSize; pos++) {
 		depth += chromCov[pos].starts;

@@ -77,33 +77,42 @@ private:
 	BedFile *_bedB;	
 
 	inline 
-	void ConvertBamToBedPE(const BamAlignment &bam, const RefVector &refs, BEDPE &a) {
+	void ConvertBamToBedPE(const BamAlignment &bam1, const BamAlignment &bam2, const RefVector &refs, BEDPE &a) {
 
 		a.start1 = a.start2 = a.end1 = a.end2 = -1;
 		a.chrom1 = a.chrom2 = a.strand1 = a.strand2 = ".";
 		
 		// end 1
-		if (bam.IsMapped()) {
-			a.chrom1 = refs.at(bam.RefID).RefName;
-			a.start1 = bam.Position;
-			a.end1 = bam.Position + bam.AlignedBases.size();
+		if (bam1.IsMapped()) {
+			a.chrom1 = refs.at(bam1.RefID).RefName;
+			a.start1 = bam1.Position;
+			a.end1 = bam1.GetEndPosition();
+			//a.end1 = bam.Position + bam.AlignedBases.size();
 			a.strand1 = "+";
-			if (bam.IsReverseStrand()) a.strand1 = "-";	
+			if (bam1.IsReverseStrand()) a.strand1 = "-";	
 		}
 		
 		// end 2
-		if (bam.IsMateMapped()) {
-			a.chrom2 = refs.at(bam.MateRefID).RefName;
-			a.start2 = bam.MatePosition;
-			a.end2 = bam.MatePosition + bam.AlignedBases.size();
+		if (bam2.IsMapped()) {
+			a.chrom2 = refs.at(bam2.RefID).RefName;
+			a.start2 = bam2.Position;
+			a.end2 = bam2.GetEndPosition();
+			//a.end1 = bam.Position + bam.AlignedBases.size();
 			a.strand2 = "+";
-			if (bam.IsMateReverseStrand()) a.strand2 = "-";	
+			if (bam2.IsReverseStrand()) a.strand2 = "-";	
 		}
 		
-		a.name = bam.Name;
-		a.score = ToString(bam.MapQuality);
+		a.name = bam1.Name;		
+		uint8_t edit1, edit2;
+		bam1.GetEditDistance(edit1);
+		bam2.GetEditDistance(edit2);
+		a.score = edit1 + edit2;
 	};
-
+	
+	inline
+	void ProcessBamBlock (const vector<BamAlignment> &alignments, 
+	                                      const RefVector &refs,
+	                                      BamWriter &writer);
 };
 
 #endif /* PEINTERSECTBED_H */

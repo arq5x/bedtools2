@@ -74,17 +74,17 @@ struct BamAlignment {
 
     // Queries against alignment flags
     public:        
-        bool IsDuplicate(void) const;		// Returns true if this read is a PCR duplicate       
-        bool IsFailedQC(void) const;		// Returns true if this read failed quality control      
-        bool IsFirstMate(void) const;		// Returns true if alignment is first mate on read        
-        bool IsMapped(void) const;		// Returns true if alignment is mapped        
-        bool IsMateMapped(void) const;		// Returns true if alignment's mate is mapped        
+        bool IsDuplicate(void) const;			// Returns true if this read is a PCR duplicate       
+        bool IsFailedQC(void) const;			// Returns true if this read failed quality control      
+        bool IsFirstMate(void) const;			// Returns true if alignment is first mate on read        
+        bool IsMapped(void) const;				// Returns true if alignment is mapped        
+        bool IsMateMapped(void) const;			// Returns true if alignment's mate is mapped        
         bool IsMateReverseStrand(void) const;	// Returns true if alignment's mate mapped to reverse strand        
-        bool IsPaired(void) const;		// Returns true if alignment part of paired-end read        
+        bool IsPaired(void) const;				// Returns true if alignment part of paired-end read        
         bool IsPrimaryAlignment(void) const;	// Returns true if reported position is primary alignment       
-        bool IsProperPair(void) const;		// Returns true if alignment is part of read that satisfied paired-end resolution     
-        bool IsReverseStrand(void) const;	// Returns true if alignment mapped to reverse strand
-        bool IsSecondMate(void) const;		// Returns true if alignment is second mate on read
+        bool IsProperPair(void) const;			// Returns true if alignment is part of read that satisfied paired-end resolution     
+        bool IsReverseStrand(void) const;		// Returns true if alignment mapped to reverse strand
+        bool IsSecondMate(void) const;			// Returns true if alignment is second mate on read
 
     // Manipulate alignment flags
     public:        
@@ -94,7 +94,7 @@ struct BamAlignment {
         void SetIsMateUnmapped(bool ok);	// Sets "alignment's mate is mapped" flag        
         void SetIsMateReverseStrand(bool ok);	// Sets "alignment's mate mapped to reverse strand" flag        
         void SetIsPaired(bool ok);		// Sets "alignment part of paired-end read" flag        
-	void SetIsProperPair(bool ok);		// Sets "alignment is part of read that satisfied paired-end resolution" flag        
+		void SetIsProperPair(bool ok);		// Sets "alignment is part of read that satisfied paired-end resolution" flag        
         void SetIsReverseStrand(bool ok);	// Sets "alignment mapped to reverse strand" flag        
         void SetIsSecondaryAlignment(bool ok);	// Sets "position is primary alignment" flag        
         void SetIsSecondMate(bool ok);		// Sets "alignment is second mate on read" flag        
@@ -104,6 +104,7 @@ struct BamAlignment {
     public:
         bool GetEditDistance(uint8_t& editDistance) const;	// get "NM" tag data - contributed by Aaron Quinlan
         bool GetReadGroup(std::string& readGroup) const;	// get "RG" tag data
+		bool AddBamTag(const std::string &tag, const std::string &valType, const std::string &value);
 
     // Additional data access methods
     public:
@@ -280,10 +281,10 @@ int BamAlignment::GetEndPosition(bool usePadded) const {
     std::vector<CigarOp>::const_iterator cigarIter = CigarData.begin();
     std::vector<CigarOp>::const_iterator cigarEnd  = CigarData.end();
     for ( ; cigarIter != cigarEnd; ++cigarIter) {
-	const char cigarType = (*cigarIter).Type;
-	if ( cigarType == 'M' || cigarType == 'D' || cigarType == 'N' ) {
-	    alignEnd += (*cigarIter).Length;
-	} 
+		const char cigarType = (*cigarIter).Type;
+		if ( cigarType == 'M' || cigarType == 'D' || cigarType == 'N' ) {
+		    alignEnd += (*cigarIter).Length;
+		} 
         else if ( usePadded && cigarType == 'I' ) {
             alignEnd += (*cigarIter).Length;
         }
@@ -371,6 +372,59 @@ bool BamAlignment::GetReadGroup(std::string& readGroup) const {
     std::memcpy( (char*)readGroup.data(), pTagData, readGroupLen );
     return true;
 }
+
+
+// Add a new tag to a BAM alignment
+//   - allows third-party apps to add 
+//     custom tags to BAM records
+//   - returns false iff requested tag already exists
+//
+// Contributed by Aaron Quinlan
+inline 
+bool BamAlignment::AddBamTag(const std::string &tag, const std::string &valType, const std::string &value) {
+
+	// sanity check the requested tag values.
+	// this could be more strict. namely, we could enforce valid valTypes...
+	if ((tag.size() != 2) || (valType.size() != 1))
+		return false;
+
+	// :::Step 1:::
+	// Scan the existing tags to see if the requested 
+	// tag already exists. The SAM spec prohibits multiple 
+	// tags with the same key for a given alignment.
+
+	// localize the tag data
+	char* pTagData = (char*)TagData.data();
+	const unsigned int tagDataLen = TagData.size();
+	unsigned int numBytesParsed = 0;
+
+	while( numBytesParsed < tagDataLen ) {
+
+		const char* pTagType = pTagData;
+		const char* pTagStorageType = pTagData + 2;
+		pTagData       += 3;
+		numBytesParsed += 3;
+
+		// check the current tag.  if it matches the requested
+		// tag, then we should return false, as this is disallowed
+		if ( strncmp(pTagType, tag.c_str(), 2) == 0 ) {
+			return false;
+		}
+
+		// get the storage class and find the next tag
+		if (*pTagStorageType == '\0') { break; }
+		SkipToNextTag( *pTagStorageType, pTagData, numBytesParsed );
+		if (*pTagData == '\0') { break; }
+	}
+
+	// :::Step 2:::
+	// Add the requested tag.
+	std::string newTag = tag + valType + value;
+	TagData.append(newTag);
+
+	return true;
+}
+
 
 inline
 void BamAlignment::SkipToNextTag(const char storageType, char* &pTagData, unsigned int& numBytesParsed) {

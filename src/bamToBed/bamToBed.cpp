@@ -33,11 +33,10 @@ using namespace std;
 void ShowHelp(void);
 void ParseCigarBed(const vector<CigarOp> cigar, int &end);
 void ParseCigarBed2(const vector<CigarOp> cigar, vector<int> &blockStarts, vector<int> &blockEnds, int &end);
-void PrintBed(const BamAlignment &bam, const RefVector &refs, bool useEditDistance);
+void PrintBed(const BamAlignment &bam, const RefVector &refs, bool useEditDistance, bool usePadded = false);
 void PrintBed12(const BamAlignment &bam, const RefVector &refs, bool useEditDistance, string color = "255,0,0");
 void PrintBedPE(const BamAlignment &bam,  const RefVector &refs, bool useEditDistance);
 bool IsCorrectMappingForBEDPE (const BamAlignment &bam);
-
 
 
 int main(int argc, char* argv[]) {
@@ -54,7 +53,8 @@ int main(int argc, char* argv[]) {
 	bool writeBedPE      = false;
 	bool writeBed12      = false;	
 	bool useEditDistance = false;
-	
+	bool usePadded       = false;
+		
 	// check to see if we should print out some help
 	if(argc <= 1) showHelp = true;
 
@@ -90,6 +90,9 @@ int main(int argc, char* argv[]) {
 		else if(PARAMETER_CHECK("-ed", 3, parameterLength)) {
 				useEditDistance = true;
 		}
+		else if(PARAMETER_CHECK("-padded", 7, parameterLength)) {
+				usePadded = true;
+		}		
 		else if(PARAMETER_CHECK("-color", 6, parameterLength)) {
 			if ((i+1) < argc) {
 				haveColor = true;
@@ -186,22 +189,6 @@ void ShowHelp(void) {
 }
 
 
-void ParseCigarBed(const vector<CigarOp> cigar, unsigned int &alignmentEnd) {
-
-	int currPosition = 0;
-		
-	//	Rip through the CIGAR ops and figure out if there is more 
-	//	than one block for this alignment
-	vector<CigarOp>::const_iterator cigItr = cigar.begin();
-	vector<CigarOp>::const_iterator cigEnd = cigar.end();
-	for (; cigItr != cigEnd; ++cigItr) {
-		if (cigItr->Type =='M') currPosition += cigItr->Length;
-	}	
-	alignmentEnd = currPosition;
-}
-
-
-
 void ParseCigarBed12(const vector<CigarOp> cigar, vector<int> &blockStarts, vector<int> &blockLengths, unsigned int &alignmentEnd) {
 
 	int currPosition = 0;
@@ -236,7 +223,7 @@ void ParseCigarBed12(const vector<CigarOp> cigar, vector<int> &blockStarts, vect
 }
 
 
-void PrintBed(const BamAlignment &bam,  const RefVector &refs, bool useEditDistance) {
+void PrintBed(const BamAlignment &bam,  const RefVector &refs, bool useEditDistance, bool usePadded) {
 
 	// set the name of the feature based on the sequence
 	string strand = "+"; 
@@ -245,10 +232,7 @@ void PrintBed(const BamAlignment &bam,  const RefVector &refs, bool useEditDista
 	if (bam.IsFirstMate()) name += "/1";
 	if (bam.IsSecondMate()) name += "/2";
 
-	// rip through the CIGAR string and reconstruct the alignment coordinates
-	unsigned int alignmentEnd = bam.GetEndPosition();
-	//ParseCigarBed(bam.CigarData, alignmentEnd);
-	//alignmentEnd += bam.Position;
+	unsigned int alignmentEnd = bam.GetEndPosition(usePadded);
 
 	// report the alignment in BED6 format.
 	if (useEditDistance == false) {

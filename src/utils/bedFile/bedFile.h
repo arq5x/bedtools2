@@ -70,6 +70,15 @@ struct BED {
 };
 
 
+// enum to flag the state of a given line in a BED file.
+enum BedLineStatus
+{ BED_INVALID = -1,
+  BED_HEADER  = 0,
+  BED_BLANK   = 1,
+  BED_VALID   = 2
+};
+
+
 // return the genome "bin" for a feature with this start and end
 int getBin(int start, int end);
 
@@ -153,7 +162,7 @@ public:
 	void Close(void);
 	
 	// Get the next BED entry in an opened BED file.
-	bool GetNextBed (BED &bed, int &lineNum);
+	BedLineStatus GetNextBed (BED &bed, int &lineNum);
 
 	// load a BED file into a map keyed by chrom, then bin. value is vector of BEDs
 	void loadBedFileIntoMap();
@@ -190,7 +199,7 @@ public:
 	void reportNullBedNewLine(void);
 	
 	// parse an input line and determine how it should be handled
-	bool parseLine (BED &bed, const vector<string> &lineVector, int &lineNum);
+	BedLineStatus parseLine (BED &bed, const vector<string> &lineVector, int &lineNum);
 		
 
 	// the bedfile with which this instance is associated

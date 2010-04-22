@@ -110,7 +110,6 @@ BedFile::~BedFile(void) {
 
 
 void BedFile::Open(void) {
-	
 	if (bedFile == "stdin") {
 		_bedStream = &cin;
 	}
@@ -161,7 +160,7 @@ void BedFile::Close(void) {
 }
 
 
-bool BedFile::GetNextBed (BED &bed, int &lineNum) {
+BedLineStatus BedFile::GetNextBed (BED &bed, int &lineNum) {
 
 	// make sure there are still lines to process.
 	// if so, tokenize, validate and return the BED entry.
@@ -176,13 +175,13 @@ bool BedFile::GetNextBed (BED &bed, int &lineNum) {
 
 		// split into a string vector.
 		Tokenize(bedLine,bedFields);
-
+		
 		// load the BED struct as long as it's a valid BED entry.
-		if (parseLine(bed, bedFields, lineNum)) {
-			return true;
-		}
+		return parseLine(bed, bedFields, lineNum);
 	}
-	return false;
+	
+	// default if file is closed or EOF
+	return BED_INVALID;
 }
 
 
@@ -361,14 +360,14 @@ void BedFile::setGff (bool gff) {
 }
 
 
-bool BedFile::parseLine (BED &bed, const vector<string> &lineVector, int &lineNum) {
-	
-	bool validEntry = false;
+BedLineStatus BedFile::parseLine (BED &bed, const vector<string> &lineVector, int &lineNum) {
+		
 	char *p2End, *p3End, *p4End, *p5End;
 	long l2, l3, l4, l5;
 	
 	// bail out if we have a blank line
-	if (lineVector.size() == 0) return false;
+	if (lineVector.size() == 0) 
+		return BED_BLANK;
 	
 	if ((lineVector[0].find("track") == string::npos) && (lineVector[0].find("browser") == string::npos) && (lineVector[0].find("#") == string::npos) ) {
 
@@ -382,7 +381,8 @@ bool BedFile::parseLine (BED &bed, const vector<string> &lineVector, int &lineNu
 			// strtol  will set p2End or p3End to the start of the string if non-integral, base 10
 			if (p2End != lineVector[1].c_str() && p3End != lineVector[2].c_str()) {
 				setGff(false);
-				validEntry = parseBedLine (bed, lineVector, lineNum);
+				if (parseBedLine(bed, lineVector, lineNum) == true)
+					return BED_VALID;
 			}
 			else if (lineVector.size() == 9) {
 				// otherwise test if columns 4 and 5 are integers.  If so, assume GFF.
@@ -392,7 +392,8 @@ bool BedFile::parseLine (BED &bed, const vector<string> &lineVector, int &lineNu
 				// strtol  will set p4End or p5End to the start of the string if non-integral, base 10
 				if (p4End != lineVector[3].c_str() && p5End != lineVector[4].c_str()) {		
 					setGff(true);
-					validEntry = parseGffLine (bed, lineVector, lineNum);
+					if (parseGffLine(bed, lineVector, lineNum) == true)
+						return BED_VALID;
 				}
 			}
 			else {
@@ -407,10 +408,12 @@ bool BedFile::parseLine (BED &bed, const vector<string> &lineVector, int &lineNu
 		}
 	}
 	else {
-		lineNum--;	
+		lineNum--;
+		return BED_HEADER;	
 	}
 	
-	return validEntry;
+	// default
+	return BED_INVALID;
 }
 
 
@@ -660,15 +663,21 @@ void BedFile::loadBedFileIntoMap() {
 
 	BED bedEntry, nullBed;
 	int lineNum = 0;
-	
-	Open();
-	while (this->GetNextBed(bedEntry, lineNum)) {
-		int bin = getBin(bedEntry.start, bedEntry.end);
-		bedEntry.count = 0;
-		bedEntry.minOverlapStart = INT_MAX;
-		bedMap[bedEntry.chrom][bin].push_back(bedEntry);
+	BedLineStatus bedStatus;
 		
-		bedEntry = nullBed;
+	Open();
+	bedStatus = this->GetNextBed(bedEntry, lineNum);	
+	while (bedStatus != BED_INVALID) {
+		// ignore headers and blank lines
+		if (bedStatus == BED_VALID) {		
+			int bin = getBin(bedEntry.start, bedEntry.end);
+			bedEntry.count = 0;
+			bedEntry.minOverlapStart = INT_MAX;
+			bedMap[bedEntry.chrom][bin].push_back(bedEntry);
+
+			bedEntry = nullBed;
+		}
+		bedStatus = this->GetNextBed(bedEntry, lineNum);	
 	}
 	Close();
 }
@@ -678,14 +687,20 @@ void BedFile::loadBedFileIntoMapNoBin() {
 	
 	BED bedEntry, nullBed;
 	int lineNum = 0;
+	BedLineStatus bedStatus;
 	
 	Open();
-	while (this->GetNextBed(bedEntry, lineNum)) {
-		bedEntry.count = 0;
-		bedEntry.minOverlapStart = INT_MAX;
-		bedMapNoBin[bedEntry.chrom].push_back(bedEntry);
+	bedStatus = this->GetNextBed(bedEntry, lineNum);
+	while (bedStatus != BED_INVALID) {
+		// ignore headers and blank lines
+		if (bedStatus == BED_VALID) {
+			bedEntry.count = 0;
+			bedEntry.minOverlapStart = INT_MAX;
+			bedMapNoBin[bedEntry.chrom].push_back(bedEntry);
 		
-		bedEntry = nullBed;		
+			bedEntry = nullBed;	
+		}
+		bedStatus = this->GetNextBed(bedEntry, lineNum);	
 	}
 	Close();
 }
