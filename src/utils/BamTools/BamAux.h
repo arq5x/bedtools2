@@ -111,7 +111,7 @@ struct BamAlignment {
     // Additional data access methods
     public:
 		int GetEndPosition(bool usePadded = false) const;	// calculates alignment end position, based on starting position and CIGAR operations
-
+		
     // 'internal' utility methods 
     private:
         static void SkipToNextTag(const char storageType, char* &pTagData, unsigned int& numBytesParsed);
@@ -507,8 +507,7 @@ bool BamAlignment::AddBamTag(const std::string &tag, const std::string &valType,
 	// :::Step 2:::
 	// Add the requested tag.  Note that a NULL terminator is needed for string tags (i.e. Z and H) 
 	std::string newTag = tag + valType + value + '\0';
-	TagData += newTag;
-
+	TagData.append(newTag);
 	return true;
 }
 

@@ -31,11 +31,18 @@ using namespace std;
 
 // function declarations
 void ShowHelp(void);
-void ParseCigarBed(const vector<CigarOp> cigar, int &end);
-void ParseCigarBed2(const vector<CigarOp> cigar, vector<int> &blockStarts, vector<int> &blockEnds, int &end);
-void PrintBed(const BamAlignment &bam, const RefVector &refs, bool useEditDistance, bool usePadded = false);
+
+void ConvertBamToBed(const string &bamFile, const bool &useEditDistance, 
+                     const bool &writeBed12, const string &color);
+void ConvertBamToBedpe(const string &bamFile, const bool &useEditDistance);
+					
+void PrintBed(const BamAlignment &bam, const RefVector &refs, bool useEditDistance);
 void PrintBed12(const BamAlignment &bam, const RefVector &refs, bool useEditDistance, string color = "255,0,0");
-void PrintBedPE(const BamAlignment &bam,  const RefVector &refs, bool useEditDistance);
+void PrintBedPE(const BamAlignment &bam1, const BamAlignment &bam1,
+                const RefVector &refs, bool useEditDistance);
+
+void ParseCigarBed12(const vector<CigarOp> &cigar, vector<int> &blockStarts, 
+                     vector<int> &blockEnds, int &alignmentEnd);
 bool IsCorrectMappingForBEDPE (const BamAlignment &bam);
 
 
@@ -53,7 +60,6 @@ int main(int argc, char* argv[]) {
 	bool writeBedPE      = false;
 	bool writeBed12      = false;	
 	bool useEditDistance = false;
-	bool usePadded       = false;
 		
 	// check to see if we should print out some help
 	if(argc <= 1) showHelp = true;
@@ -90,9 +96,6 @@ int main(int argc, char* argv[]) {
 		else if(PARAMETER_CHECK("-ed", 3, parameterLength)) {
 				useEditDistance = true;
 		}
-		else if(PARAMETER_CHECK("-padded", 7, parameterLength)) {
-				usePadded = true;
-		}		
 		else if(PARAMETER_CHECK("-color", 6, parameterLength)) {
 			if ((i+1) < argc) {
 				haveColor = true;
@@ -111,48 +114,17 @@ int main(int argc, char* argv[]) {
 		cerr << endl << "*****" << endl << "*****ERROR: Need -i (BAM) file. " << endl << "*****" << endl;
 		showHelp = true;
 	}
-	if (writeBedPE && useEditDistance) {
-		cerr << endl << "*****" << endl << "*****ERROR: Cannot use edit distance with BEDPE. " << endl << "*****" << endl;
-		showHelp = true;
-	}
 	if (haveColor && writeBed12 == false) {
 		cerr << endl << "*****" << endl << "*****ERROR: Cannot use color without BED12. " << endl << "*****" << endl;
 		showHelp = true;
 	}
 	
+	// if there are no problems, let's convert BAM to BED or BEDPE
 	if (!showHelp) {
-
-		// open the BAM file
-		BamReader reader;
-		reader.Open(bamFile);
-
-		// get header & reference information
-		string header = reader.GetHeaderText();
-		RefVector refs = reader.GetReferenceData();
-		
-		BamAlignment bam;
-		while (reader.GetNextAlignment(bam)) {	
-			if (writeBedPE == false && writeBed12 == false) {
-				if (bam.IsMapped()) {
-					PrintBed(bam, refs, useEditDistance);
-				}
-			}
-			else if (writeBedPE == false && writeBed12 == true) {
-				if (bam.IsMapped()) {
-					PrintBed12(bam, refs, useEditDistance, color);
-				}
-			}
-			else {
-				if ( ! bam.IsPaired() ) {	// ensure that the BAM file is paired.
-					cerr << "Encountered an unpaired alignment.  Are you sure this is a paired BAM file?  Exiting." << endl;
-					exit(1);
-				}
-				else if (IsCorrectMappingForBEDPE(bam)) {	// only report one of the two mappings for a pair
-					PrintBedPE(bam, refs, useEditDistance);
-				}
-			}	
-		}
-		reader.Close();	
+		if (writeBedPE == false) 
+			ConvertBamToBed(bamFile, useEditDistance, writeBed12, color);	// BED or "blocked BED"
+		else
+			ConvertBamToBedpe(bamFile, useEditDistance);                    // BEDPE
 	}	
 	else {
 		ShowHelp();
@@ -172,13 +144,18 @@ void ShowHelp(void) {
 
 	cerr << "Options: " << endl;
 	
-	cerr << "\t-bedpe\t"	<< "Write BEDPE format." << endl << endl;
+	cerr << "\t-bedpe\t"	<< "Write BEDPE format." << endl;
+	cerr 					<< "\t\t- Requires BAM to be grouped or sorted by query." << endl << endl;
+	
 	cerr << "\t-bed12\t"	<< "Write \"blocked\" BED format (aka \"BED12\")." << endl << endl;
 	cerr 					<< "\t\thttp://genome-test.cse.ucsc.edu/FAQ/FAQformat#format1" << endl << endl;
 		
-	cerr << "\t-ed\t"		<< "Use BAM edit distance (NM tag) for score." << endl;
-	cerr 					<< "\t\tDefault is to use mapping quality." << endl;
-	cerr 					<< "\t\tNot available for BEDPE format." << endl << endl;
+	cerr << "\t-ed\t"		<< "Use BAM edit distance (NM tag) for BED score." << endl;
+	cerr 					<< "\t\t- Default for BED is to use mapping quality." << endl;
+	cerr 					<< "\t\t- Default for BEDPE is to use the minimum of" << endl;
+	cerr 					<< "\t\t  of the two mapping qualities for the pair." << endl;
+	cerr 					<< "\t\t- When -ed is used with -bedpe, the total edit" << endl;
+	cerr 					<< "\t\t  distance from the two mates is reported." << endl << endl;
 
 	cerr << "\t-color\t"	<< "An R,G,B string for the color used with BED12 format." << endl;
 	cerr 					<< "\t\tDefault is (255,0,0)." << endl;
@@ -189,7 +166,67 @@ void ShowHelp(void) {
 }
 
 
-void ParseCigarBed12(const vector<CigarOp> cigar, vector<int> &blockStarts, vector<int> &blockLengths, unsigned int &alignmentEnd) {
+void ConvertBamToBed(const string &bamFile, const bool &useEditDistance, 
+                     const bool &writeBed12, const string &color) {
+	// open the BAM file
+	BamReader reader;
+	reader.Open(bamFile);
+
+	// get header & reference information
+	string header = reader.GetHeaderText();
+	RefVector refs = reader.GetReferenceData();
+	
+	// rip through the BAM file and convert each mapped entry to BED
+	BamAlignment bam;
+	while (reader.GetNextAlignment(bam)) {
+		if (bam.IsMapped() == true) {
+			if (writeBed12 == false)                 // BED
+				PrintBed(bam, refs, useEditDistance);
+			else                                     //"blocked" BED
+				PrintBed12(bam, refs, useEditDistance, color);
+		}
+	}
+	reader.Close();	
+}
+
+
+/*
+  Assumptions:
+     1.  The BAM file is grouped/sorted by query name, 
+         not alignment position
+*/
+void ConvertBamToBedpe(const string &bamFile, const bool &useEditDistance) {
+	// open the BAM file
+	BamReader reader;
+	reader.Open(bamFile);
+
+	// get header & reference information
+	string header = reader.GetHeaderText();
+	RefVector refs = reader.GetReferenceData();
+	
+	// rip through the BAM file and convert each mapped entry to BEDPE
+	BamAlignment bam1, bam2;
+	while (reader.GetNextAlignment(bam1)) {
+		// the alignment must be paired
+		if (bam1.IsPaired() == true) {
+			// grab the second alignment for the pair.
+			reader.GetNextAlignment(bam2);
+			
+			// require that the alignments are from the same query
+			if (bam1.Name == bam2.Name) {
+				PrintBedPE(bam1, bam2, refs, useEditDistance);
+			}
+			else {
+				cerr << "*****ERROR: -bedpe requires BAM to be sorted/grouped by query name. " << endl;
+				exit(1);
+			}
+		}
+	}
+	reader.Close();
+}
+
+
+void ParseCigarBed12(const vector<CigarOp> &cigar, vector<int> &blockStarts, vector<int> &blockLengths, unsigned int &alignmentEnd) {
 
 	int currPosition = 0;
 	int blockLength	 = 0;
@@ -206,6 +243,8 @@ void ParseCigarBed12(const vector<CigarOp> cigar, vector<int> &blockStarts, vect
 			case ('I') : break;
 		    case ('S') : break;
 		    case ('D') : break;
+				blockLength  += cigItr->Length;
+				currPosition += cigItr->Length;
 		    case ('P') : break;
 			case ('N') :
 				blockStarts.push_back(currPosition + cigItr->Length);
@@ -214,25 +253,30 @@ void ParseCigarBed12(const vector<CigarOp> cigar, vector<int> &blockStarts, vect
 				blockLength = 0;
 		    case ('H') : break; 					        // for 'H' - do nothing, move to next op
 		    default    : 
-				printf("ERROR: Invalid Cigar op type\n"); // shouldn't get here
+				printf("ERROR: Invalid Cigar op type\n");   // shouldn't get here
 				exit(1);
 		}
 	}
+	// add the kast block and set the 
+	// alignment end (i.e., relative to the start)
 	blockLengths.push_back(blockLength);
 	alignmentEnd = currPosition;
 }
 
 
-void PrintBed(const BamAlignment &bam,  const RefVector &refs, bool useEditDistance, bool usePadded) {
+void PrintBed(const BamAlignment &bam,  const RefVector &refs, bool useEditDistance) {
+
+	// set the strand
+	string strand = "+"; 
+	if (bam.IsReverseStrand() == true) strand = "-";
 
 	// set the name of the feature based on the sequence
-	string strand = "+"; 
-	if (bam.IsReverseStrand()) strand = "-";
 	string name = bam.Name;
-	if (bam.IsFirstMate()) name += "/1";
-	if (bam.IsSecondMate()) name += "/2";
+	if (bam.IsFirstMate() == true)  name += "/1";
+	if (bam.IsSecondMate() == true) name += "/2";
 
-	unsigned int alignmentEnd = bam.GetEndPosition(usePadded);
+	// get the unpadded (parm = false) end position based on the CIGAR
+	unsigned int alignmentEnd = bam.GetEndPosition(false);
 
 	// report the alignment in BED6 format.
 	if (useEditDistance == false) {
@@ -255,10 +299,11 @@ void PrintBed(const BamAlignment &bam,  const RefVector &refs, bool useEditDista
 
 void PrintBed12(const BamAlignment &bam, const RefVector &refs, bool useEditDistance, string color) {
 
-	// set the name of the feature based on the sequence
+	// set the strand
 	string strand = "+"; 
 	if (bam.IsReverseStrand()) strand = "-";
 
+	// set the name of the feature based on the sequence
 	string name = bam.Name;
 	if (bam.IsFirstMate()) name += "/1";
 	if (bam.IsSecondMate()) name += "/2";
@@ -269,9 +314,9 @@ void PrintBed12(const BamAlignment &bam, const RefVector &refs, bool useEditDist
 	vector<int> blockStarts;
 	blockStarts.push_back(0);
 	   
+	// extract the block starts and lengths from the CIGAR string
 	ParseCigarBed12(bam.CigarData, blockStarts, blockLengths, alignmentEnd);
 	alignmentEnd += bam.Position;
-	
 	
 	// write BED6 portion
 	if (useEditDistance == false) {
@@ -308,41 +353,67 @@ void PrintBed12(const BamAlignment &bam, const RefVector &refs, bool useEditDist
 }
 
 
-void PrintBedPE(const BamAlignment &bam,  const RefVector &refs, bool useEditDistance) {
+void PrintBedPE(const BamAlignment &bam1, const BamAlignment &bam2, const RefVector &refs, bool useEditDistance) {
 
+	// initialize BEDPE variables
 	string chrom1, chrom2, strand1, strand2;
 	int start1, start2, end1, end2;
+	uint8_t editDistance1, editDistance2;
 	start1 = start2 = end1 = end2 = -1;
 	chrom1 = chrom2 = strand1 = strand2 = ".";
+	editDistance1 = editDistance2 = 0;
 	
-	// end 1
-	if (bam.IsMapped()) {
-		chrom1 = refs.at(bam.RefID).RefName;
-		start1 = bam.Position;
-		end1   = bam.Position + bam.AlignedBases.size();  // use the aligned length, 
-		                                                // not the orig. length
+	// compute the minimum mapping quality b/w the two ends of the pair.
+	uint16_t minMapQuality = min(bam1.MapQuality, bam2.MapQuality);
+				
+	// extract relevant info for end 1
+	if (bam1.IsMapped()) {
+		chrom1 = refs.at(bam1.RefID).RefName;
+		start1 = bam1.Position;
+		end1   = bam1.GetEndPosition(false);
 		strand1 = "+";
-		if (bam.IsReverseStrand()) strand1 = "-";	
+		if (bam1.IsReverseStrand()) strand1 = "-";
+		
+		// extract the edit distance from the NM tag
+		// if possible. otherwise, complain.
+		if (useEditDistance == true && bam1.GetEditDistance(editDistance1) == false) {
+			cerr << "The edit distance tag (NM) was not found in the BAM file.  Please disable -ed.  Exiting\n";
+			exit(1);
+		}
 	}
 
-	// end 2
-	if (bam.IsMateMapped()) {
-		chrom2 = refs.at(bam.MateRefID).RefName;
-		start2 = bam.MatePosition;
-		end2   = bam.MatePosition + bam.AlignedBases.size();  // use the aligned length, 
-		                                                    // not the orig. length
+	// extract relevant info for end 2
+	if (bam2.IsMapped()) {
+		chrom2 = refs.at(bam2.RefID).RefName;
+		start2 = bam2.Position;
+		end2   = bam2.GetEndPosition(false);
 		strand2 = "+";
-		if (bam.IsMateReverseStrand()) strand2 = "-";	
+		if (bam2.IsReverseStrand()) strand2 = "-";
+		
+		// extract the edit distance from the NM tag
+		// if possible. otherwise, complain.
+		if (useEditDistance == true && bam2.GetEditDistance(editDistance2) == false) {
+			cerr << "The edit distance tag (NM) was not found in the BAM file.  Please disable -ed.  Exiting\n";
+			exit(1);
+		}
 	}		
 
-	printf("%s\t%d\t%d\t\%s\t%d\t%d\t%s\t%d\t%s\t%s\n", 
-			chrom1.c_str(), start1, end1, chrom2.c_str(), start2, end2, 
-			bam.Name.c_str(), bam.MapQuality, strand1.c_str(), strand2.c_str());
-
+	// report BEDPE using min mapQuality
+	if (useEditDistance == false) {   
+		printf("%s\t%d\t%d\t\%s\t%d\t%d\t%s\t%d\t%s\t%s\n", 
+				chrom1.c_str(), start1, end1, chrom2.c_str(), start2, end2, 
+				bam1.Name.c_str(), minMapQuality, strand1.c_str(), strand2.c_str());
+	}
+	// report BEDPE using total edit distance
+	else {	
+		uint16_t totalEditDistance = editDistance1 + editDistance2;
+		printf("%s\t%d\t%d\t\%s\t%d\t%d\t%s\t%d\t%s\t%s\n", 
+				chrom1.c_str(), start1, end1, chrom2.c_str(), start2, end2, 
+				bam1.Name.c_str(), totalEditDistance, strand1.c_str(), strand2.c_str());			
+	}
 }
 
-
-
+// deprecated.
 bool IsCorrectMappingForBEDPE (const BamAlignment &bam) {
 
 	if ( (bam.RefID == bam.MateRefID) && (bam.InsertSize > 0) ) {

@@ -26,7 +26,7 @@ struct BamWriter::BamWriterPrivate {
     
     // constructor / destructor
     BamWriterPrivate(void) { 
-      IsBigEndian = SystemIsBigEndian();  
+		IsBigEndian = SystemIsBigEndian();
     }
     
     ~BamWriterPrivate(void) {
@@ -240,6 +240,7 @@ void BamWriter::BamWriterPrivate::Open(const string& filename, const string& sam
         mBGZF.Write((char*)&referenceLength, BT_SIZEOF_INT);
     }
 }
+
 
 // saves the alignment to the alignment archive
 void BamWriter::BamWriterPrivate::SaveAlignment(const BamAlignment& al) {
