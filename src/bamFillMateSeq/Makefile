@@ -1,7 +1,6 @@
-CXX = g++
-CXXFLAGS = -O2  -Wall
-LDFLAGS = 
-LIBS = -lz
+CXX=		g++
+CXXFLAGS=	-Wall  -g
+LIBS=		-lz
 UTILITIES_DIR = ../utils/
 OBJ_DIR = ../../obj/
 BIN_DIR = ../../bin/
@@ -9,21 +8,23 @@ BIN_DIR = ../../bin/
 # -------------------
 # define our includes
 # -------------------
-INCLUDES = -I$(UTILITIES_DIR)/bedFile/ -I$(UTILITIES_DIR)/sequenceUtilities/ -I$(UTILITIES_DIR)/lineFileUtilities/ -I$(UTILITIES_DIR)/version/ -I$(UTILITIES_DIR)/gzstream/
+INCLUDES = -I$(UTILITIES_DIR)/BamTools/ -I$(UTILITIES_DIR)/sequenceUtilities/ -I$(UTILITIES_DIR)/version/
 
 # ----------------------------------
 # define our source and object files
 # ----------------------------------
-SOURCES= maskFastaFromBedMain.cpp maskFastaFromBed.cpp
+SOURCES= bamFillMateSeq.cpp
 OBJECTS= $(SOURCES:.cpp=.o)
-_EXT_OBJECTS=bedFile.o sequenceUtils.o lineFileUtilities.o gzstream.o
+_EXT_OBJECTS=BamReader.o BamWriter.o sequenceUtils.o BGZF.o
 EXT_OBJECTS=$(patsubst %,$(OBJ_DIR)/%,$(_EXT_OBJECTS))
 BUILT_OBJECTS= $(patsubst %,$(OBJ_DIR)/%,$(OBJECTS))
-PROGRAM= maskFastaFromBed
+PROGRAM= bamFillMateSeq
+
 
 all: $(PROGRAM)
 
 .PHONY: all
+
 
 $(PROGRAM): $(BUILT_OBJECTS) $(EXT_OBJECTS)
 	@echo "  * linking $(PROGRAM)"
@@ -35,9 +36,7 @@ $(BUILT_OBJECTS): $(SOURCES)
 
 $(EXT_OBJECTS):
 	@$(MAKE) --no-print-directory -C $(UTILITIES_DIR)/sequenceUtilities/
-	@$(MAKE) --no-print-directory -C $(UTILITIES_DIR)/lineFileUtilities/
-	@$(MAKE) --no-print-directory -C $(UTILITIES_DIR)/bedFile/
-	@$(MAKE) --no-print-directory -C $(UTILITIES_DIR)/gzstream/	
+	@$(MAKE) --no-print-directory -C $(UTILITIES_DIR)/BamTools/	
 	
 clean:
 	@echo "Cleaning up."

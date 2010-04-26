@@ -1,5 +1,5 @@
 CXX = g++
-CXXFLAGS = -O3  -Wall
+CXXFLAGS = -O2  -Wall
 LDFLAGS = 
 LIBS = -lz
 UTILITIES_DIR = ../utils/

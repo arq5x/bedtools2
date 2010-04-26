@@ -1,5 +1,5 @@
 CXX = g++ -c
-CXXFLAGS = -O3  -Wall
+CXXFLAGS = -O2  -Wall
 LDFLAGS = 
 OBJ_DIR = ../../../obj/
 BIN_DIR = ../../../bin/
