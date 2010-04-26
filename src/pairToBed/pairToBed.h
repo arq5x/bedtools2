@@ -43,7 +43,7 @@ public:
 
 	// constructor 
 	BedIntersectPE(string bedAFilePE, string bedBFile, float overlapFraction, 
-		string searchType, bool forceStrand, bool bamInput, bool bamOutput);
+		string searchType, bool forceStrand, bool bamInput, bool bamOutput, bool useEditDistance);
 
 	// destructor
 	~BedIntersectPE(void);
@@ -67,6 +67,7 @@ private:
 	float _overlapFraction;
 	string _searchType;
 	bool _forceStrand;
+	bool _useEditDistance;
 	bool _bamInput;
 	bool _bamOutput;
 
@@ -79,38 +80,71 @@ private:
 	inline 
 	void ConvertBamToBedPE(const BamAlignment &bam1, const BamAlignment &bam2, const RefVector &refs, BEDPE &a) {
 
+		// initialize BEDPE variables
 		a.start1 = a.start2 = a.end1 = a.end2 = -1;
 		a.chrom1 = a.chrom2 = a.strand1 = a.strand2 = ".";
+
+		uint8_t editDistance1, editDistance2;
+		editDistance1 = editDistance2 = 0;
 		
+		// take the qname from end 1.
+		a.name = bam1.Name;
+
 		// end 1
 		if (bam1.IsMapped()) {
-			a.chrom1 = refs.at(bam1.RefID).RefName;
-			a.start1 = bam1.Position;
-			a.end1 = bam1.GetEndPosition();
-			//a.end1 = bam.Position + bam.AlignedBases.size();
+			a.chrom1  = refs.at(bam1.RefID).RefName;
+			a.start1  = bam1.Position;
+			a.end1    = bam1.GetEndPosition();
 			a.strand1 = "+";
-			if (bam1.IsReverseStrand()) a.strand1 = "-";	
+			if (bam1.IsReverseStrand()) a.strand1 = "-";
+			
+			// extract the edit distance from the NM tag
+			// if possible. otherwise, complain.
+			if (_useEditDistance == true) {
+				if (bam1.GetEditDistance(editDistance1) == false) {
+					cerr << "The edit distance tag (NM) was not found in the BAM file.  Please disable -ed.  Exiting\n";
+					exit(1);
+				}
+			}	
 		}
 		
 		// end 2
 		if (bam2.IsMapped()) {
-			a.chrom2 = refs.at(bam2.RefID).RefName;
-			a.start2 = bam2.Position;
-			a.end2 = bam2.GetEndPosition();
-			//a.end1 = bam.Position + bam.AlignedBases.size();
+			a.chrom2  = refs.at(bam2.RefID).RefName;
+			a.start2  = bam2.Position;
+			a.end2    = bam2.GetEndPosition();
 			a.strand2 = "+";
-			if (bam2.IsReverseStrand()) a.strand2 = "-";	
+			if (bam2.IsReverseStrand()) a.strand2 = "-";
+			
+			// extract the edit distance from the NM tag
+			// if possible. otherwise, complain.
+			if (_useEditDistance == true) {
+				if (bam2.GetEditDistance(editDistance2) == false) {
+					cerr << "The edit distance tag (NM) was not found in the BAM file.  Please disable -ed.  Exiting\n";
+					exit(1);
+				}
+			}
 		}
 		
-		a.name = bam1.Name;		
-		uint8_t edit1, edit2;
-		bam1.GetEditDistance(edit1);
-		bam2.GetEditDistance(edit2);
-		a.score = edit1 + edit2;
+		// compute the minimum mapping quality b/w the two ends of the pair.
+		a.score = "0";
+		if (_useEditDistance == false) {
+			if (bam1.IsMapped() == true && bam2.IsMapped() == true) 
+				a.score = ToString(min(bam1.MapQuality, bam2.MapQuality));
+		}
+		// BEDPE using edit distance
+		else {
+			if (bam1.IsMapped() == true && bam2.IsMapped() == true)
+				a.score = ToString((int) (editDistance1 + editDistance2));
+			else if (bam1.IsMapped() == true)
+				a.score = ToString((int) editDistance1);
+			else if (bam2.IsMapped() == true)
+				a.score = ToString((int) editDistance2);
+		}
 	};
 	
 	inline
-	void ProcessBamBlock (const vector<BamAlignment> &alignments, 
+	void ProcessBamBlock (const BamAlignment &bam1, const BamAlignment &bam2, 
 	                                      const RefVector &refs,
 	                                      BamWriter &writer);
 };

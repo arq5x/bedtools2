@@ -362,9 +362,7 @@ void PrintBedPE(const BamAlignment &bam1, const BamAlignment &bam2, const RefVec
 	start1 = start2 = end1 = end2 = -1;
 	chrom1 = chrom2 = strand1 = strand2 = ".";
 	editDistance1 = editDistance2 = 0;
-	
-	// compute the minimum mapping quality b/w the two ends of the pair.
-	uint16_t minMapQuality = min(bam1.MapQuality, bam2.MapQuality);
+	uint16_t minMapQuality = 0;		
 				
 	// extract relevant info for end 1
 	if (bam1.IsMapped()) {
@@ -399,14 +397,25 @@ void PrintBedPE(const BamAlignment &bam1, const BamAlignment &bam2, const RefVec
 	}		
 
 	// report BEDPE using min mapQuality
-	if (useEditDistance == false) {   
+	if (useEditDistance == false) {
+		// compute the minimum mapping quality b/w the two ends of the pair.
+		if (bam1.IsMapped() == true && bam2.IsMapped() == true) 
+			minMapQuality = min(bam1.MapQuality, bam2.MapQuality); 
+		   
 		printf("%s\t%d\t%d\t\%s\t%d\t%d\t%s\t%d\t%s\t%s\n", 
 				chrom1.c_str(), start1, end1, chrom2.c_str(), start2, end2, 
 				bam1.Name.c_str(), minMapQuality, strand1.c_str(), strand2.c_str());
 	}
 	// report BEDPE using total edit distance
 	else {	
-		uint16_t totalEditDistance = editDistance1 + editDistance2;
+		uint16_t totalEditDistance = 0;
+		if (bam1.IsMapped() == true && bam2.IsMapped() == true)
+			totalEditDistance = editDistance1 + editDistance2;
+		else if (bam1.IsMapped() == true)
+			totalEditDistance = editDistance1;
+		else if (bam2.IsMapped() == true)
+			totalEditDistance = editDistance2;
+
 		printf("%s\t%d\t%d\t\%s\t%d\t%d\t%s\t%d\t%s\t%s\n", 
 				chrom1.c_str(), start1, end1, chrom2.c_str(), start2, end2, 
 				bam1.Name.c_str(), totalEditDistance, strand1.c_str(), strand2.c_str());			

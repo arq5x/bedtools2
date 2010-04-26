@@ -33,15 +33,17 @@ bool IsCorrectMappingForBEDPE (const BamAlignment &bam) {
 */
 
 BedIntersectPE::BedIntersectPE(string bedAFilePE, string bedBFile, float overlapFraction, 
-						       string searchType, bool forceStrand, bool bamInput, bool bamOutput) {
+						       string searchType, bool forceStrand, bool bamInput, bool bamOutput,
+						       bool useEditDistance) {
 
-	_bedAFilePE = bedAFilePE;
-	_bedBFile = bedBFile;
+	_bedAFilePE      = bedAFilePE;
+	_bedBFile        = bedBFile;
 	_overlapFraction = overlapFraction;
-	_forceStrand = forceStrand;
-	_searchType = searchType;
-	_bamInput =  bamInput;
-	_bamOutput = bamOutput;
+	_forceStrand     = forceStrand;
+	_useEditDistance = useEditDistance;
+	_searchType      = searchType;
+	_bamInput        = bamInput;
+	_bamOutput       = bamOutput;
 	
 	_bedA = new BedFilePE(bedAFilePE);
 	_bedB = new BedFile(bedBFile);
@@ -321,7 +323,6 @@ bool BedIntersectPE::FindOneOrMoreSpanningOverlaps(const BEDPE &a, const string 
 	return overlapFound;
 }
 
- 
 
 void BedIntersectPE::IntersectBedPE(istream &bedInput) {
 
@@ -400,124 +401,35 @@ void BedIntersectPE::IntersectBamPE(string bamFile) {
 	alignments.reserve(100);
 		
 	_bedA->bedType = 10;					// it's a full BEDPE given it's BAM
-	BamAlignment bam;	
-	
-	// get each set of alignments for each pair.
-	while (reader.GetNextAlignment(bam)) {
-		
-		currName = bam.Name;		
-		if ( (currName != prevName) && (prevName != "") ) {
-			// block change.  enforce expected sort order.
-			if (currName < prevName) {
-				cerr << "Error: The BAM file (" << bamFile << ") is not sorted by sequence name. Exiting!" << endl;
-				exit (1);
+
+	// rip through the BAM file and convert each mapped entry to BEDPE
+	BamAlignment bam1, bam2;
+	while (reader.GetNextAlignment(bam1)) {
+		// the alignment must be paired
+		if (bam1.IsPaired() == true) {
+			// grab the second alignment for the pair.
+			reader.GetNextAlignment(bam2);
+			
+			// require that the alignments are from the same query
+			if (bam1.Name == bam2.Name) {
+				ProcessBamBlock(bam1, bam2, refs, writer);
 			}
 			else {
-				// process the current block of alignments
-				ProcessBamBlock(alignments, refs, writer);
-				// reset the alignment vector for the next block
-				// and add the first alignment in the next block
-				alignments.clear();
-				alignments.push_back(bam);
-			}	
+				cerr << "*****ERROR: -bedpe requires BAM to be sorted or grouped by query name. " << endl;
+				exit(1);
+			}
 		}
-		else {
-			alignments.push_back(bam);
-		}
-		prevName = currName;
 	}
-	// process the last block
-	ProcessBamBlock(alignments, refs, writer);
-	
 	// close up
 	reader.Close();
 	if (_bamOutput == true) {
 		writer.Close();
 	}
-/*	
-	// get each set of alignments for each pair.
-	while (reader.GetNextAlignment(bam)) {
-
-		// endure that the BAM file is paired.
-		if ( ! bam.IsPaired() ) {
-			cerr << "Encountered an unpaired alignment.  Are you sure this is a paired BAM file?  Exiting." << endl;
-			exit(1);
-		}
-		else if ((_searchType == "ispan") || (_searchType == "ospan")) {			
-			// only look for ispan and ospan when both ends are mapped.
-			if (bam.IsMapped() && bam.IsMateMapped()) {
-				// only do an inspan or outspan check if the alignment is intrachromosomal
-				if (bam.RefID == bam.MateRefID) {
-					if (_bamOutput == true) {	// BAM output
-						BEDPE a;  ConvertBamToBedPE(bam, refs, a);
-						
-						// look for overlaps, and write to BAM if >=1 were found	
-						overlapsFound = FindOneOrMoreSpanningOverlaps(a, _searchType);
-						if (overlapsFound == true) writer.SaveAlignment(bam);
-					}
-					else if ( IsCorrectMappingForBEDPE(bam) ) {	// BEDPE output
-						BEDPE a;
-						ConvertBamToBedPE(bam, refs, a);
-						FindSpanningOverlaps(a, hits, _searchType);
-					}
-				}
-			}		
-		}
-		else if ((_searchType == "notispan") || (_searchType == "notospan")) {
-			// only look for notispan and notospan when both ends are mapped.
-			if (bam.IsMapped() && bam.IsMateMapped()) {
-				// only do an inspan or outspan if the alignment is intrachromosomal
-				if (bam.RefID == bam.MateRefID) {
-					if (_bamOutput == true) {	// BAM output
-						BEDPE a;  ConvertBamToBedPE(bam, refs, a);
-						
-						// write to BAM if there were no overlaps
-						overlapsFound = FindOneOrMoreSpanningOverlaps(a, _searchType);
-						if (overlapsFound == false) writer.SaveAlignment(bam);
-					}
-					else if ( IsCorrectMappingForBEDPE(bam) ) {	// BEDPE output
-						BEDPE a;
-						ConvertBamToBedPE(bam, refs, a);
-						FindSpanningOverlaps(a, hits, _searchType);
-					}
-				}
-				// if inter-chromosomal or orphaned, we know it's not ispan and not ospan
-				else if (_bamOutput == true) writer.SaveAlignment(bam);
-			}
-			// if both ends aren't mapped, we know that it's notispan and not ospan
-			else if (_bamOutput == true) writer.SaveAlignment(bam);
-		}
-		else if ( (_searchType == "either") || (_searchType == "xor") || 
-				  (_searchType == "both") || (_searchType == "notboth") ||
-				  (_searchType == "neither") ) {
-					
-			if (_bamOutput == true) {	// BAM output
-				BEDPE a;  ConvertBamToBedPE(bam, refs, a);
-
-				// write to BAM if correct hits found
-				overlapsFound = FindOneOrMoreOverlaps(a, _searchType);
-				if (overlapsFound == true) writer.SaveAlignment(bam);
-			}
-			else if ( IsCorrectMappingForBEDPE(bam) ) {	// BEDPE output
-				BEDPE a;
-				ConvertBamToBedPE(bam, refs, a);
-				FindOverlaps(a, hits1, hits2, _searchType);
-				hits1.clear();
-				hits2.clear();
-			}
-		}
-	}
-	reader.Close();
-	if (_bamOutput == true) {
-		writer.Close();
-	}
-	*/
 }
 
 
-void BedIntersectPE::ProcessBamBlock (const vector<BamAlignment> &alignments, 
-                                      const RefVector &refs,
-                                      BamWriter &writer) {
+void BedIntersectPE::ProcessBamBlock (const BamAlignment &bam1, const BamAlignment &bam2, 
+                                      const RefVector &refs, BamWriter &writer) {
 	
 	vector<BED> hits, hits1, hits2;			// vector of potential hits
 	hits.reserve(1000);						// reserve some space
@@ -525,97 +437,82 @@ void BedIntersectPE::ProcessBamBlock (const vector<BamAlignment> &alignments,
 	hits2.reserve(1000);
 	
 	bool overlapsFound;						// flag to indicate if overlaps were found
-	
-	// alItr is a BAM alignment iterator
-	vector<BamAlignment>::const_iterator alItr = alignments.begin();
-	vector<BamAlignment>::const_iterator alEnd = alignments.end();
-	while (alItr != alEnd) {
-		
-		// require that a __PAIR__ of BAM alignments are processed together
-		if ( alItr->IsPaired() && (alItr+1)->IsPaired() ) {
-			
-			if ( (_searchType == "either") || (_searchType == "xor") || 
-					  (_searchType == "both") || (_searchType == "notboth") ||
-					  (_searchType == "neither") ) {
-						
+				
+	if ( (_searchType == "either") || (_searchType == "xor") || 
+			  (_searchType == "both") || (_searchType == "notboth") ||
+			  (_searchType == "neither") ) {
+				
+		// create a new BEDPE feature from the BAM alignments.
+		BEDPE a;
+		ConvertBamToBedPE(bam1, bam2, refs, a);
+		if (_bamOutput == true) {	// BAM output
+			// write to BAM if correct hits found
+			overlapsFound = FindOneOrMoreOverlaps(a, _searchType);
+			if (overlapsFound == true) {
+				writer.SaveAlignment(bam1);
+				writer.SaveAlignment(bam2);
+			}
+		}
+		else {	// BEDPE output
+			FindOverlaps(a, hits1, hits2, _searchType);
+			hits1.clear();
+			hits2.clear();
+		}
+	}
+	else if ( (_searchType == "ispan") || (_searchType == "ospan") ) {			
+		// only look for ispan and ospan when both ends are mapped.
+		if (bam1.IsMapped() && bam2.IsMapped()) {
+			// only do an inspan or outspan check if the alignment is intrachromosomal
+			if (bam1.RefID == bam2.RefID) {
 				// create a new BEDPE feature from the BAM alignments.
 				BEDPE a;
-				ConvertBamToBedPE(*alItr, *(alItr+1), refs, a);
+				ConvertBamToBedPE(bam1, bam2, refs, a);
 				if (_bamOutput == true) {	// BAM output
-					// write to BAM if correct hits found
-					overlapsFound = FindOneOrMoreOverlaps(a, _searchType);
+					// look for overlaps, and write to BAM if >=1 were found	
+					overlapsFound = FindOneOrMoreSpanningOverlaps(a, _searchType);
 					if (overlapsFound == true) {
-						writer.SaveAlignment(*alItr);
-						writer.SaveAlignment(*(alItr+1));
+						writer.SaveAlignment(bam1);
+						writer.SaveAlignment(bam2);
 					}
 				}
 				else {	// BEDPE output
-					FindOverlaps(a, hits1, hits2, _searchType);
-					hits1.clear();
-					hits2.clear();
+					FindSpanningOverlaps(a, hits, _searchType);
+					hits.clear();
 				}
 			}
-			else if ( (_searchType == "ispan") || (_searchType == "ospan") ) {			
-				// only look for ispan and ospan when both ends are mapped.
-				if (alItr->IsMapped() && (alItr+1)->IsMapped()) {
-					// only do an inspan or outspan check if the alignment is intrachromosomal
-					if (alItr->RefID == (alItr+1)->RefID) {
-						// create a new BEDPE feature from the BAM alignments.
-						BEDPE a;
-						ConvertBamToBedPE(*alItr, *(alItr+1), refs, a);
-						if (_bamOutput == true) {	// BAM output
-							// look for overlaps, and write to BAM if >=1 were found	
-							overlapsFound = FindOneOrMoreSpanningOverlaps(a, _searchType);
-							if (overlapsFound == true) {
-								writer.SaveAlignment(*alItr);
-								writer.SaveAlignment(*(alItr+1));
-							}
-						}
-						else {	// BEDPE output
-							FindSpanningOverlaps(a, hits, _searchType);
-							hits.clear();
-						}
-					}
-				}		
-			}
-			else if ( (_searchType == "notispan") || (_searchType == "notospan") ) {
-				// only look for notispan and notospan when both ends are mapped.
-				if (alItr->IsMapped() && (alItr+1)->IsMapped()) {
-					// only do an inspan or outspan if the alignment is intrachromosomal
-					if (alItr->RefID == (alItr+1)->RefID) {
-						// create a new BEDPE feature from the BAM alignments.
-						BEDPE a;
-						ConvertBamToBedPE(*alItr, *(alItr+1), refs, a);
-						if (_bamOutput == true) {	// BAM output
-							// write to BAM if there were no overlaps
-							overlapsFound = FindOneOrMoreSpanningOverlaps(a, _searchType);
-							if (overlapsFound == false) {
-								writer.SaveAlignment(*alItr);
-								writer.SaveAlignment(*(alItr+1));
-							}
-						}
-						else {	// BEDPE output
-							FindSpanningOverlaps(a, hits, _searchType);
-							hits.clear();
-						}
-					}
-					// if inter-chromosomal or orphaned, we know it's not ispan and not ospan
-					else if (_bamOutput == true) {
-						writer.SaveAlignment(*alItr);
-						writer.SaveAlignment(*(alItr+1));
+		}		
+	}
+	else if ( (_searchType == "notispan") || (_searchType == "notospan") ) {
+		// only look for notispan and notospan when both ends are mapped.
+		if (bam1.IsMapped() && bam2.IsMapped()) {
+			// only do an inspan or outspan check if the alignment is intrachromosomal
+			if (bam1.RefID == bam2.RefID) {
+				// create a new BEDPE feature from the BAM alignments.
+				BEDPE a;
+				ConvertBamToBedPE(bam1, bam2, refs, a);
+				if (_bamOutput == true) {	// BAM output
+					// write to BAM if there were no overlaps
+					overlapsFound = FindOneOrMoreSpanningOverlaps(a, _searchType);
+					if (overlapsFound == false) {
+						writer.SaveAlignment(bam1);
+						writer.SaveAlignment(bam2);
 					}
 				}
-				// if both ends aren't mapped, we know that it's notispan and not ospan
-				else if (_bamOutput == true) {
-					writer.SaveAlignment(*alItr);
-					writer.SaveAlignment(*(alItr+1));
+				else {	// BEDPE output
+					FindSpanningOverlaps(a, hits, _searchType);
+					hits.clear();
 				}
 			}
-			// skip ahead as we are processing BAM alignments in sets of two
-			alItr+=2;
+			// if inter-chromosomal or orphaned, we know it's not ispan and not ospan
+			else if (_bamOutput == true) {
+				writer.SaveAlignment(bam1);
+				writer.SaveAlignment(bam2);
+			}
 		}
-		else {
-			++alItr;
+		// if both ends aren't mapped, we know that it's notispan and not ospan
+		else if (_bamOutput == true) {
+			writer.SaveAlignment(bam1);
+			writer.SaveAlignment(bam2);
 		}
 	}
 }

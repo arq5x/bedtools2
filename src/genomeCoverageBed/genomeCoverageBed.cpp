@@ -150,7 +150,7 @@ void BedGenomeCoverage::CoverageBam(string bamFile) {
 			
 			currChrom  = refs.at(bam.RefID).RefName;
 			start      = bam.Position;
-			end        = bam.Position + bam.AlignedBases.size() - 1;
+			end        = bam.GetEndPosition(false); - 1;
 			
 			if (currChrom != prevChrom)  {
 				// If we've moved beyond the first encountered chromosomes,

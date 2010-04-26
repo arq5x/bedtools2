@@ -242,7 +242,7 @@ void BedIntersect::IntersectBam(string bamFile) {
 			BED a;
 			a.chrom = refs.at(bam.RefID).RefName;
 			a.start = bam.Position;
-			a.end   = bam.Position + bam.AlignedBases.size();
+			a.end   = bam.GetEndPosition(false);
 
 			// build the name field from the BAM alignment.
 			a.name = bam.Name;

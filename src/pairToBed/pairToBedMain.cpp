@@ -37,13 +37,14 @@ int main(int argc, char* argv[]) {
 	string searchType = "either";
 
 	// flags to track parameters
-	bool haveBedA = false;
-	bool haveBedB = false;
-	bool haveSearchType = false;
-	bool haveFraction = false;
-	bool forceStrand = false;
-	bool inputIsBam = false;
-	bool outputIsBam = true;
+	bool haveBedA        = false;
+	bool haveBedB        = false;
+	bool haveSearchType  = false;
+	bool haveFraction    = false;
+	bool forceStrand     = false;
+	bool useEditDistance = false;
+	bool inputIsBam      = false;
+	bool outputIsBam     = true;
 	
 	// check to see if we should print out some help
 	if(argc <= 1) showHelp = true;
@@ -89,6 +90,9 @@ int main(int argc, char* argv[]) {
 		}
 		else if(PARAMETER_CHECK("-bedpe", 6, parameterLength)) {
 			outputIsBam = false;
+		}
+		else if(PARAMETER_CHECK("-ed", 3, parameterLength)) {
+			useEditDistance = true;
 		}
 		else if(PARAMETER_CHECK("-type", 5, parameterLength)) {
 			if ((i+1) < argc) {
@@ -136,7 +140,8 @@ int main(int argc, char* argv[]) {
 	if (!showHelp) {
 
 		BedIntersectPE *bi = new BedIntersectPE(bedAFile, bedBFile, overlapFraction, 
-												searchType, forceStrand, inputIsBam, outputIsBam);
+												searchType, forceStrand, inputIsBam, 
+												outputIsBam, useEditDistance);
 		bi->DetermineBedPEInput();
 		return 0;
 	}
@@ -162,6 +167,12 @@ void ShowHelp(void) {
 
 	cerr << "\t-bedpe\t"		<< "When using BAM input (-abam), write output as BEDPE. The default" << endl;
 	cerr 						<< "\t\tis to write output in BAM when using -abam." << endl << endl;
+	
+	cerr << "\t-ed\t"		<< "Use BAM total edit distance (NM tag) for BEDPE score." << endl;
+	cerr 					<< "\t\t- Default for BEDPE is to use the minimum of" << endl;
+	cerr 					<< "\t\t  of the two mapping qualities for the pair." << endl;
+	cerr 					<< "\t\t- When -ed is used the total edit distance" << endl;
+	cerr 					<< "\t\t  from the two mates is reported as the score." << endl << endl;
 	
 	cerr << "\t-f\t"	    			<< "Minimum overlap required as fraction of A (e.g. 0.05)." << endl;
 	cerr 								<< "\t\tDefault is 1E-9 (effectively 1bp)." << endl << endl;
