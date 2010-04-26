@@ -114,7 +114,7 @@ int main(int argc, char* argv[]) {
 	if (!showHelp) {
 
 		PairToPair *bi = new PairToPair(bedAFile, bedBFile, overlapFraction, searchType, ignoreStrand);
-		bi->DetermineBedPEInput();
+		delete bi;
 		return 0;
 	}
 	else {

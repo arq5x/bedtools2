@@ -47,6 +47,21 @@ BedIntersectPE::BedIntersectPE(string bedAFilePE, string bedBFile, float overlap
 	
 	_bedA = new BedFilePE(bedAFilePE);
 	_bedB = new BedFile(bedBFile);
+	
+	// dealing with a proper file
+	if (_bedA->bedFile != "stdin") {   
+		if (_bamInput == false) 
+			IntersectBedPE();
+		else
+			IntersectBamPE(_bedA->bedFile);
+	}
+	// reading from stdin
+	else {  
+		if (_bamInput == false)
+			IntersectBedPE();
+		else
+			IntersectBamPE("stdin");			
+	}
 }
 
 
@@ -324,50 +339,41 @@ bool BedIntersectPE::FindOneOrMoreSpanningOverlaps(const BEDPE &a, const string 
 }
 
 
-void BedIntersectPE::IntersectBedPE(istream &bedInput) {
+void BedIntersectPE::IntersectBedPE() {
 
 	// load the "B" bed file into a map so
 	// that we can easily compare "A" to it for overlaps
 	_bedB->loadBedFileIntoMap();
 
-	string bedLine;                                                                                                                    
 	int lineNum = 0;					// current input line number
-	vector<BED> hits, hits1, hits2;					// vector of potential hits
-	vector<string> bedFields;			// vector for a BED entry
+	vector<BED> hits, hits1, hits2;		// vector of potential hits
 	
 	// reserve some space
 	hits.reserve(100);
 	hits1.reserve(100);
 	hits2.reserve(100);
-	bedFields.reserve(12);	
+	
+	BEDPE a, nullBedPE;
+	
+	_bedA->Open();	
+	while (_bedA->GetNextBedPE(a, lineNum) != BED_INVALID) {
 		
-	// process each entry in A
-	while (getline(bedInput, bedLine)) {
-
-		lineNum++;
-		Tokenize(bedLine,bedFields);
-		BEDPE a;
-		
-		// find the overlaps with B if it's a valid BED entry. 
-		if (_bedA->parseBedPELine(a, bedFields, lineNum)) {
-			if ( (_searchType == "ispan") || (_searchType == "ospan") ||
-			 	 (_searchType == "notispan") || (_searchType == "notospan") ) {
-				if (a.chrom1 == a.chrom2) {
-					FindSpanningOverlaps(a, hits, _searchType);
-					hits.clear();
-				}
-			}
-			else {
-				FindOverlaps(a, hits1, hits2, _searchType);
-				hits1.clear();
-				hits2.clear();
+		if ( (_searchType == "ispan") || (_searchType == "ospan") ||
+		 	 (_searchType == "notispan") || (_searchType == "notospan") ) {
+			if (a.chrom1 == a.chrom2) {
+				FindSpanningOverlaps(a, hits, _searchType);
+				hits.clear();
 			}
 		}
-		// reset for the next input line
-		bedFields.clear();
+		else {
+			FindOverlaps(a, hits1, hits2, _searchType);
+			hits1.clear();
+			hits2.clear();
+		}
+		a = nullBedPE;
 	}
+	_bedA->Close();
 }
-// END IntersectPE
 
 
 void BedIntersectPE::IntersectBamPE(string bamFile) {
@@ -514,32 +520,6 @@ void BedIntersectPE::ProcessBamBlock (const BamAlignment &bam1, const BamAlignme
 			writer.SaveAlignment(bam1);
 			writer.SaveAlignment(bam2);
 		}
-	}
-}
-
-
-void BedIntersectPE::DetermineBedPEInput() {
-	
-	if (_bedA->bedFile != "stdin") {   // process a file
-		if (_bamInput == false) { // BEDPE
-			ifstream beds(_bedA->bedFile.c_str(), ios::in);
-			if ( !beds ) {
-				cerr << "Error: The requested bed file (" << _bedA->bedFile << ") could not be opened. Exiting!" << endl;
-				exit (1);
-			}
-			IntersectBedPE(beds);
-		}
-		else {	// bam
-			IntersectBamPE(_bedA->bedFile);
-		}
-	}
-	else {   // process stdin
-		if (_bamInput == false) {	// BEDPE					
-			IntersectBedPE(cin);
-		}
-		else {
-			IntersectBamPE("stdin");
-		}				
 	}
 }
 

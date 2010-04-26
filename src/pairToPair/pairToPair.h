@@ -33,7 +33,7 @@ public:
 	// destructor
 	~PairToPair(void);
 
- 	void IntersectPairs(istream &bedInput);
+ 	void IntersectPairs();
 
 	void FindOverlaps(const BEDPE &a, vector<BED> &hitsA1B1, vector<BED> &hitsA1B2, 
 		vector<BED> &hitsA2B1, vector<BED> &hitsA2B2, string type);
@@ -44,22 +44,21 @@ public:
 	void FindHitsOnBothEnds(const BEDPE &a, const vector<BED> &qualityHitsEnd1, 
 		const vector<BED> &qualityHitsEnd2, int &matchCount);
 	
-	void DetermineBedPEInput();
 		
 private:
 
-	string bedAFilePE;
-	string bedBFilePE;
+	string _bedAFilePE;
+	string _bedBFilePE;
 	
-	float overlapFraction;
-	string searchType;
-	bool ignoreStrand;
+	float _overlapFraction;
+	string _searchType;
+	bool _ignoreStrand;
 
 	// instance of a paired-end bed file class.
-	BedFilePE *bedA;
+	BedFilePE *_bedA;
 
 	// instance of a bed file class.
-	BedFilePE *bedB;
+	BedFilePE *_bedB;
 };
 
 #endif /* PAIRTOPAIR_H */

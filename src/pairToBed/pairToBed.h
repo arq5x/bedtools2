@@ -55,7 +55,7 @@ public:
 	void FindSpanningOverlaps(const BEDPE &a, vector<BED> &hits, const string &type); 
 	bool FindOneOrMoreSpanningOverlaps(const BEDPE &a, const string &type);
 
-	void IntersectBedPE(istream &bedInput);
+	void IntersectBedPE();
 	void IntersectBamPE(string bamFile);
 	
 	void DetermineBedPEInput();

@@ -54,20 +54,27 @@ public:
 	// Destructor
 	~BedFilePE(void);
 
+	// Open a BEDPE file for reading (creates an istream pointer)
+	void Open(void);
+	
+	// Close an opened BEDPE file.
+	void Close(void);
+	
+	// Get the next BED entry in an opened BED file.
+	BedLineStatus GetNextBedPE (BEDPE &bedpe, int &lineNum);
+	
+	
 	// Methods
-	bool parseBedPELine (BEDPE &, const vector<string> &, const int &);
-	void reportBedPETab(const BEDPE &);
-	void reportBedPENewLine(const BEDPE &);
+
+	void reportBedPETab(const BEDPE &a);
+	void reportBedPENewLine(const BEDPE &a);
 	void loadBedPEFileIntoMap();
-	void splitBedPEIntoBeds(const BEDPE &, unsigned int, BED &, BED &);
+	void splitBedPEIntoBeds(const BEDPE &a, const int &lineNum, BED &bedEntry1, BED &bedEntry2);
 		 
 		
 	void FindOverlapsPerBin(int bEnd, string chrom, int start, int end, string strand, 
 		vector<BED> &hits, bool forceStrand);
 		
-	//void binKeeperFind(map<int, vector<BED>, 
-	//	std::less<int> > &, const int, 
-	//	const int, vector<BED> &);	
 		
 	string bedFile;
 	unsigned int bedType;
@@ -76,7 +83,11 @@ public:
 	masterBedMap bedMapEnd2;
 	
 private:
-	// none
+	istream *_bedStream;
+	
+	// methods
+	BedLineStatus parseLine (BEDPE &bedpe, const vector<string> &lineVector, int &lineNum);
+	bool parseBedPELine (BEDPE &bed, const vector<string> &lineVector, const int &lineNum);
 };
 
 #endif /* BEDFILEPE_H */

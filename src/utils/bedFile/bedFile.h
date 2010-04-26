@@ -198,10 +198,6 @@ public:
 	void reportNullBedTab(void);
 	void reportNullBedNewLine(void);
 	
-	// parse an input line and determine how it should be handled
-	BedLineStatus parseLine (BED &bed, const vector<string> &lineVector, int &lineNum);
-		
-
 	// the bedfile with which this instance is associated
 	string bedFile;
 	unsigned int bedType;  // 3-6, 12 for BED
@@ -217,6 +213,8 @@ private:
 
 	// methods
 	
+	// parse an input line and determine how it should be handled
+	BedLineStatus parseLine (BED &bed, const vector<string> &lineVector, int &lineNum);
 	// process as line from a BED file
 	bool parseBedLine (BED &bed, const vector<string> &lineVector, int lineNum);	
 	// process as line from a GFF file. convert to a BED feature.

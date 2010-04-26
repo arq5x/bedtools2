@@ -147,7 +147,7 @@ int main(int argc, char* argv[]) {
 		BedIntersectPE *bi = new BedIntersectPE(bedAFile, bedBFile, overlapFraction, 
 												searchType, forceStrand, inputIsBam, 
 												outputIsBam, useEditDistance);
-		bi->DetermineBedPEInput();
+		delete bi;
 		return 0;
 	}
 	else {
