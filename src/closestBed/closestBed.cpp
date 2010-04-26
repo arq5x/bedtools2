@@ -182,13 +182,18 @@ void BedClosest::FindClosestBed() {
 	int lineNum = 0;					// current input line number
 	vector<BED> hits;					// vector of potential hits
 	hits.reserve(100);
+	BedLineStatus bedStatus;
 
 	_bedA->Open();
 	// process each entry in A in search of the closest feature in B
-	while (_bedA->GetNextBed(a, lineNum)) {
-		FindWindowOverlaps(a, hits);
-		hits.clear();
-		a = nullBed;
+	bedStatus = _bedA->GetNextBed(a, lineNum);
+	while (bedStatus != BED_INVALID) {
+		if (bedStatus == BED_VALID) {
+			FindWindowOverlaps(a, hits);
+			hits.clear();
+			a = nullBed;
+		}
+		bedStatus = _bedA->GetNextBed(a, lineNum);
 	}
 	_bedA->Close();
 }

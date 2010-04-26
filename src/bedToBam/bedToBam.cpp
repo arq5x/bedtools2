@@ -194,23 +194,29 @@ void ProcessBed(istream &bedInput, BedFile *bed, GenomeFile *genome, bool isBED1
 	
 	// open a BAM and add the reference headers to the BAM file
 	writer->Open("stdout", bamHeader, refs);
-	// open the BED file for reading.
-	bed->Open();
+
 
 	// process each BED entry and convert to BAM
 	BED bedEntry, nullBed;
 	int lineNum = 0;
-	while (bed->GetNextBed(bedEntry, lineNum)) {
-		BamAlignment bamEntry;
-		if (bed->bedType >= 4) {
-			ConvertBedToBam(bedEntry, bamEntry, chromToId, isBED12, mapQual, lineNum);
-			writer->SaveAlignment(bamEntry);
+	BedLineStatus bedStatus;
+	// open the BED file for reading.
+	bed->Open();
+	bedStatus = bed->GetNextBed(bedEntry, lineNum);
+	while (bedStatus != BED_INVALID) {
+		if (bedStatus == BED_VALID) {
+			BamAlignment bamEntry;
+			if (bed->bedType >= 4) {
+				ConvertBedToBam(bedEntry, bamEntry, chromToId, isBED12, mapQual, lineNum);
+				writer->SaveAlignment(bamEntry);
+			}
+			else {
+				cerr << "Error: BED entry without name found at line: " << lineNum << ".  Exiting!" << endl;
+				exit (1);
+			}
+			bedEntry = nullBed;
 		}
-		else {
-			cerr << "Error: BED entry without name found at line: " << lineNum << ".  Exiting!" << endl;
-			exit (1);
-		}
-		bedEntry = nullBed;
+		bedStatus = bed->GetNextBed(bedEntry, lineNum);
 	}
 	// close up
 	bed->Close();

@@ -131,14 +131,18 @@ void BedWindow::WindowIntersectBed() {
 
 	BED a;                                                                                                                    
 	int lineNum = 0;					// current input line number
+	BedLineStatus bedStatus;
 	vector<BED> hits;					// vector of potential hits
 	hits.reserve(100);
 
 	// process each entry in A
-	_bedA->Open();
-	while (_bedA->GetNextBed(a, lineNum)) {
-		FindWindowOverlaps(a, hits);
-		hits.clear();
+	bedStatus = _bedA->GetNextBed(a, lineNum);
+	while (bedStatus != BED_INVALID) {
+		if (bedStatus == BED_VALID) {
+			FindWindowOverlaps(a, hits);
+			hits.clear();
+		}
+		bedStatus = _bedA->GetNextBed(a, lineNum);
 	}
 	_bedA->Close();
 }

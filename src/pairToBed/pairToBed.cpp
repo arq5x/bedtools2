@@ -354,23 +354,27 @@ void BedIntersectPE::IntersectBedPE() {
 	hits2.reserve(100);
 	
 	BEDPE a, nullBedPE;
+	BedLineStatus bedStatus;
 	
 	_bedA->Open();	
-	while (_bedA->GetNextBedPE(a, lineNum) != BED_INVALID) {
-		
-		if ( (_searchType == "ispan") || (_searchType == "ospan") ||
-		 	 (_searchType == "notispan") || (_searchType == "notospan") ) {
-			if (a.chrom1 == a.chrom2) {
-				FindSpanningOverlaps(a, hits, _searchType);
-				hits.clear();
+	bedStatus = _bedA->GetNextBedPE(a, lineNum);
+	while (bedStatus != BED_INVALID) {
+		if (bedStatus == BED_VALID) {		
+			if ( (_searchType == "ispan") || (_searchType == "ospan") ||
+			 	 (_searchType == "notispan") || (_searchType == "notospan") ) {
+				if (a.chrom1 == a.chrom2) {
+					FindSpanningOverlaps(a, hits, _searchType);
+					hits.clear();
+				}
 			}
+			else {
+				FindOverlaps(a, hits1, hits2, _searchType);
+				hits1.clear();
+				hits2.clear();
+			}
+			a = nullBedPE;
 		}
-		else {
-			FindOverlaps(a, hits1, hits2, _searchType);
-			hits1.clear();
-			hits2.clear();
-		}
-		a = nullBedPE;
+		bedStatus = _bedA->GetNextBedPE(a, lineNum);
 	}
 	_bedA->Close();
 }

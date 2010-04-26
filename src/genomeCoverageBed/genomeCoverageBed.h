@@ -39,8 +39,8 @@ class BedGenomeCoverage {
 public:
 
 	// constructor 
-	BedGenomeCoverage(string &bedFile, string &genomeFile, bool &eachBase, bool &startSites, 
-		bool &bedGraph, int &max, bool &bamInput);
+	BedGenomeCoverage(string bedFile, string genomeFile, bool eachBase, bool startSites, 
+		bool bedGraph, int max, bool bamInput);
 
 	// destructor
 	~BedGenomeCoverage(void);
@@ -65,8 +65,8 @@ private:
 	// methods
 	void CoverageBed();
 	void CoverageBam(string bamFile);
-	void ReportChromCoverage(const vector<DEPTH> &, int &chromSize, string &chrom, chromHistMap&);
+	void ReportChromCoverage(const vector<DEPTH> &, const int &chromSize, const string &chrom, chromHistMap&);
 	void ReportGenomeCoverage(chromHistMap &chromDepthHist);
-	void ReportChromCoverageBedGraph(const vector<DEPTH> &chromCov, int &chromSize, string &chrom);
+	void ReportChromCoverageBedGraph(const vector<DEPTH> &chromCov, const int &chromSize, const string &chrom);
 	
 };

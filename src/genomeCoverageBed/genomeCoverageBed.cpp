@@ -13,8 +13,8 @@
 #include "genomeCoverageBed.h"
 
 
-BedGenomeCoverage::BedGenomeCoverage(string &bedFile, string &genomeFile, bool &eachBase, 
-	                                 bool &startSites, bool &bedGraph, int &max, bool &bamInput) {
+BedGenomeCoverage::BedGenomeCoverage(string bedFile, string genomeFile, bool eachBase, 
+	                                 bool startSites, bool bedGraph, int max, bool bamInput) {
 
 	_bedFile    = bedFile;
 	_genomeFile = genomeFile;
@@ -44,6 +44,7 @@ BedGenomeCoverage::BedGenomeCoverage(string &bedFile, string &genomeFile, bool &
 
 BedGenomeCoverage::~BedGenomeCoverage(void) {
 	delete _bed;
+	delete _genome;
 }
 
 
@@ -60,62 +61,66 @@ void BedGenomeCoverage::CoverageBed() {
 	
 	BED a, nullBed;
 	int lineNum = 0;					// current input line number
+	BedLineStatus bedStatus;
 	
 	_bed->Open();
-	while (_bed->GetNextBed(a, lineNum)) {
-						
-		currChrom = a.chrom;
-		start     = a.start;
-		end       = a.end - 1;
+	bedStatus = _bed->GetNextBed(a, lineNum);
+	while (bedStatus != BED_INVALID) {
+		// ignore headers and blank lines
+		if (bedStatus == BED_VALID) {	
+			currChrom = a.chrom;
+			start     = a.start;
+			end       = a.end - 1;
 				
-		if (currChrom != prevChrom)  {
-			// If we've moved beyond the first encountered chromosomes,
-			// process the results of the previous chromosome.
-			if (prevChrom.length() > 0) {
-				ReportChromCoverage(chromCov, prevChromSize, prevChrom, chromDepthHist);
-			}
+			if (currChrom != prevChrom)  {
+				// If we've moved beyond the first encountered chromosomes,
+				// process the results of the previous chromosome.
+				if (prevChrom.length() > 0) {
+					ReportChromCoverage(chromCov, prevChromSize, prevChrom, chromDepthHist);
+				}
 			
-			// empty the previous chromosome and reserve new
-			std::vector<DEPTH>().swap(chromCov);
+				// empty the previous chromosome and reserve new
+				std::vector<DEPTH>().swap(chromCov);
 			
-			// get the current chrom size and allocate space 
-			currChromSize = _genome->getChromSize(currChrom);
-			chromCov.resize(currChromSize);
+				// get the current chrom size and allocate space 
+				currChromSize = _genome->getChromSize(currChrom);
+				chromCov.resize(currChromSize);
 
-			// process the first line for this chromosome.
-			// make sure the coordinates fit within the chrom
-			if (start < currChromSize) {
-				chromCov[start].starts++;
-			}
-			if (end < currChromSize) {
-				chromCov[end].ends++;
-			}
-			else {
-				chromCov[currChromSize-1].ends++;
-			}
-		}
-		else {
-			// process the other lines for this chromosome.
-			// make sure the coordinates fit within the chrom
-			if (start < currChromSize) {
-				chromCov[start].starts++;
-			}
-			if (end < currChromSize) {
-				chromCov[end].ends++;
+				// process the first line for this chromosome.
+				// make sure the coordinates fit within the chrom
+				if (start < currChromSize) {
+					chromCov[start].starts++;
+				}
+				if (end < currChromSize) {
+					chromCov[end].ends++;
+				}
+				else {
+					chromCov[currChromSize-1].ends++;
+				}
 			}
 			else {
-				chromCov[currChromSize-1].ends++;
-			}			
+				// process the other lines for this chromosome.
+				// make sure the coordinates fit within the chrom
+				if (start < currChromSize) {
+					chromCov[start].starts++;
+				}
+				if (end < currChromSize) {
+					chromCov[end].ends++;
+				}
+				else {
+					chromCov[currChromSize-1].ends++;
+				}			
+			}
+			prevChrom     = currChrom;
+			prevChromSize = currChromSize;
+			a = nullBed;
 		}
-		prevChrom     = currChrom;
-		prevChromSize = currChromSize;
-		a = nullBed;
+		bedStatus = _bed->GetNextBed(a, lineNum);
 	}
 	_bed->Close();
-	
+
 	// process the results of the last chromosome.
-	ReportChromCoverage(chromCov, currChromSize, currChrom, chromDepthHist);
-	
+	ReportChromCoverage(chromCov, currChromSize, currChrom, chromDepthHist);	
 	if (_eachBase == false && _bedGraph == false) {
 		ReportGenomeCoverage(chromDepthHist);
 	}
@@ -150,7 +155,7 @@ void BedGenomeCoverage::CoverageBam(string bamFile) {
 			
 			currChrom  = refs.at(bam.RefID).RefName;
 			start      = bam.Position;
-			end        = bam.GetEndPosition(false); - 1;
+			end        = bam.GetEndPosition(false) - 1;
 			
 			if (currChrom != prevChrom)  {
 				// If we've moved beyond the first encountered chromosomes,
@@ -207,7 +212,7 @@ void BedGenomeCoverage::CoverageBam(string bamFile) {
 }
 
 
-void BedGenomeCoverage::ReportChromCoverage(const vector<DEPTH> &chromCov, int &chromSize, string &chrom, chromHistMap &chromDepthHist) {
+void BedGenomeCoverage::ReportChromCoverage(const vector<DEPTH> &chromCov, const int &chromSize, const string &chrom, chromHistMap &chromDepthHist) {
 	
 	if (_eachBase) {
 		int depth = 0;  // initialize the depth
@@ -242,10 +247,11 @@ void BedGenomeCoverage::ReportChromCoverage(const vector<DEPTH> &chromCov, int &
 			depth = depth - chromCov[pos].ends;
 		}
 		// report the histogram for each chromosome
-		for (histMap::iterator depthIt = chromDepthHist[chrom].begin(); depthIt != chromDepthHist[chrom].end(); ++depthIt) {
+		histMap::const_iterator depthIt  = chromDepthHist[chrom].begin();
+		histMap::const_iterator depthEnd = chromDepthHist[chrom].end();
+		for (; depthIt != depthEnd; ++depthIt) {
 			int depth                    = depthIt->first;
 			unsigned int numBasesAtDepth = depthIt->second;  
-			
 			cout << chrom << "\t" << depth << "\t" << numBasesAtDepth << "\t" 
 				<< chromSize << "\t" << (float) ((float)numBasesAtDepth / (float)chromSize) << endl;
 		}
@@ -298,7 +304,7 @@ void BedGenomeCoverage::ReportGenomeCoverage(chromHistMap &chromDepthHist) {
 }
 
 
-void BedGenomeCoverage::ReportChromCoverageBedGraph(const vector<DEPTH> &chromCov, int &chromSize, string &chrom) {
+void BedGenomeCoverage::ReportChromCoverageBedGraph(const vector<DEPTH> &chromCov, const int &chromSize, const string &chrom) {
 
 	int depth     = 0;     // initialize the depth
 	int lastStart = -1;
@@ -329,7 +335,6 @@ void BedGenomeCoverage::ReportChromCoverageBedGraph(const vector<DEPTH> &chromCo
 		// Update depth
 		depth = depth - chromCov[pos].ends;
 	}
-	
 	//Print information about the last position
 	if (lastDepth != -1) {
 		cout << chrom << "\t" << lastStart << "\t" << chromSize << "\t" << lastDepth << endl;

@@ -56,12 +56,18 @@ void BedCoverage::CollectCoverageBed() {
 	_bedB->loadBedFileIntoMap();
 
 	int lineNum = 0;					// current input line number
-	BED a, nullBed;		
+	BED a, nullBed;	
+	BedLineStatus bedStatus;
+		
 	// process each entry in A
-	while (_bedA->GetNextBed(a, lineNum)) {
-		// count a as a hit with all the relevant features in B
-		_bedB->countHits(a, _forceStrand);
-		a = nullBed;
+	bedStatus = _bedA->GetNextBed(a, lineNum);
+	while (bedStatus != BED_INVALID) {
+		if (bedStatus == BED_VALID) {
+			// count a as a hit with all the relevant features in B
+			_bedB->countHits(a, _forceStrand);
+			a = nullBed;
+		}
+		bedStatus = _bedA->GetNextBed(a, lineNum);
 	}	
 	
 	// report the coverage (summary or histogram) for BED B.
