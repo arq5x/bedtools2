@@ -40,7 +40,7 @@ public:
 
 	// constructor 
 	BedGenomeCoverage(string bedFile, string genomeFile, bool eachBase, bool startSites, 
-		bool bedGraph, int max, bool bamInput);
+		              bool bedGraph, bool bedGraphAll, int max, bool bamInput);
 
 	// destructor
 	~BedGenomeCoverage(void);
@@ -54,6 +54,7 @@ private:
 	bool   _eachBase;
 	bool   _startSites;
 	bool   _bedGraph;
+	bool   _bedGraphAll;
 	int    _max;
 
 	// The BED file from which to compute coverage.

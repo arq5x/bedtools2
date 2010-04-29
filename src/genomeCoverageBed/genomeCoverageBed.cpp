@@ -14,15 +14,16 @@
 
 
 BedGenomeCoverage::BedGenomeCoverage(string bedFile, string genomeFile, bool eachBase, 
-	                                 bool startSites, bool bedGraph, int max, bool bamInput) {
+	                                 bool startSites, bool bedGraph, bool bedGraphAll, int max, bool bamInput) {
 
-	_bedFile    = bedFile;
-	_genomeFile = genomeFile;
-	_eachBase   = eachBase;
-	_startSites = startSites;
-	_bedGraph   = bedGraph;
-	_max        = max;
-	_bamInput   = bamInput;
+	_bedFile       = bedFile;
+	_genomeFile    = genomeFile;
+	_eachBase      = eachBase;
+	_startSites    = startSites;
+	_bedGraph      = bedGraph;
+	_bedGraphAll   = bedGraphAll;
+	_max           = max;
+	_bamInput      = bamInput;
 	
 	_bed        = new BedFile(bedFile);
 	_genome     = new GenomeFile(genomeFile);
@@ -124,10 +125,9 @@ void BedGenomeCoverage::CoverageBed() {
 	}
 	_bed->Close();
 
-	cout << "yep\n";
 	// process the results of the last chromosome.
 	ReportChromCoverage(chromCov, currChromSize, currChrom, chromDepthHist);	
-	if (_eachBase == false && _bedGraph == false) {
+	if (_eachBase == false && _bedGraph == false && _bedGraphAll == false) {
 		ReportGenomeCoverage(chromDepthHist);
 	}
 }
@@ -234,7 +234,7 @@ void BedGenomeCoverage::ReportChromCoverage(const vector<DEPTH> &chromCov, const
 			depth = depth - chromCov[pos].ends;
 		}
 	}
-	else if (_bedGraph) {
+	else if (_bedGraph == true || _bedGraphAll == true) {
 		ReportChromCoverageBedGraph(chromCov, chromSize, chrom);
 	}
 	else {
@@ -323,16 +323,12 @@ void BedGenomeCoverage::ReportChromCoverageBedGraph(const vector<DEPTH> &chromCo
 	for (int pos = 0; pos < chromSize; pos++) {
 		depth += chromCov[pos].starts;
 
-		if (depth == 0 && lastDepth != -1) {
-			// We've found a new block of zero coverage, so report
-			// the previous block of non-zero coverage.
-			cout << chrom << "\t" << lastStart << "\t" << pos << "\t" << lastDepth << endl;
-			lastDepth = -1;
-			lastStart = -1;
-		}
-		else if (depth > 0 && depth != lastDepth) {
+		if (depth != lastDepth) {
 			// Coverage depth has changed, print the last interval coverage (if any)
-			if (lastDepth != -1) { 
+			// Print if:
+			//    (1) depth>0 (the default running mode),
+			//    (2) depth==0 and the user requested to print zero covered regions (_bedGraphAll)
+			if ( (lastDepth != -1) && (lastDepth > 0 || _bedGraphAll) ) {
 				cout << chrom << "\t" << lastStart << "\t" << pos << "\t" << lastDepth << endl;
 			}
 			//Set current position as the new interval start + depth
@@ -340,13 +336,12 @@ void BedGenomeCoverage::ReportChromCoverageBedGraph(const vector<DEPTH> &chromCo
 			lastStart = pos;
 		}
 		// Default: the depth has not changed, so we will not print anything.
-		// Proceed until the depth changes.
-		
+		// Proceed until the depth changes.		
 		// Update depth
 		depth = depth - chromCov[pos].ends;
 	}
 	//Print information about the last position
-	if (lastDepth != -1) {
+	if ( (lastDepth != -1) && (lastDepth > 0 || _bedGraphAll) ) {
 		cout << chrom << "\t" << lastStart << "\t" << chromSize << "\t" << lastDepth << endl;
 	}
 }

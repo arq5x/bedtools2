@@ -34,12 +34,13 @@ int main(int argc, char* argv[]) {
 	string genomeFile;
 	int max = 999999999;
 	
-	bool haveBed    = false;
-	bool bamInput   = false;
-	bool haveGenome = false;
-	bool startSites = false;
-	bool bedGraph   = false;
-	bool eachBase   = false;
+	bool haveBed       = false;
+	bool bamInput      = false;
+	bool haveGenome    = false;
+	bool startSites    = false;
+	bool bedGraph      = false;
+	bool bedGraphAll   = false;	
+	bool eachBase      = false;
 
 	// check to see if we should print out some help
 	if(argc <= 1) showHelp = true;
@@ -87,7 +88,10 @@ int main(int argc, char* argv[]) {
 		}
 		else if(PARAMETER_CHECK("-bg", 3, parameterLength)) {
 			bedGraph = true;
-		}		
+		}
+		else if(PARAMETER_CHECK("-bga", 4, parameterLength)) {
+			bedGraphAll = true;
+		}				
 		else if(PARAMETER_CHECK("-max", 4, parameterLength)) {
 			if ((i+1) < argc) {
 				max = atoi(argv[i + 1]);
@@ -106,14 +110,19 @@ int main(int argc, char* argv[]) {
 	  showHelp = true;
 	}
 	if (bedGraph && eachBase) {
-	  cerr << endl << "*****" << endl << "*****ERROR: Use -d or -bedgraph, not both" << endl << "*****" << endl;
+	  cerr << endl << "*****" << endl << "*****ERROR: Use -d or -bg, not both" << endl << "*****" << endl;
 	  showHelp = true;
 	}
-	
+	if (bedGraphAll && eachBase) {
+	  cerr << endl << "*****" << endl << "*****ERROR: Use -d or -bga, not both" << endl << "*****" << endl;
+	  showHelp = true;
+	}
+		
 	if (!showHelp) {
 		
 		BedGenomeCoverage *bc = new BedGenomeCoverage(bedFile, genomeFile, eachBase, 
-                                                      startSites, bedGraph, max, bamInput);
+                                                      startSites, bedGraph, bedGraphAll, 
+                                                      max, bamInput);
 		delete bc;
 		
 		return 0;
@@ -127,9 +136,11 @@ void ShowHelp(void) {
 	
 	cerr << endl << "Program: " << PROGRAM_NAME << " (v" << VERSION << ")" << endl;
 	
-	cerr << "Author:  Aaron Quinlan (aaronquinlan@gmail.com)" << endl;
+	cerr << "Authors: Aaron Quinlan (aaronquinlan@gmail.com)" << endl;
+	cerr << "         Gordon Assaf, CSHL" << endl;
+	cerr << "         Royden Clark, UVa." << endl << endl;
 
-	cerr << "Summary: Compute the coverage of a BED file among a genome." << endl << endl;
+	cerr << "Summary: Compute the coverage of a BED/BAM file among a genome." << endl << endl;
 
 	cerr << "Usage:   " << PROGRAM_NAME << " [OPTIONS] -i <bed> -g <genome>" << endl << endl;
 	
@@ -144,6 +155,10 @@ void ShowHelp(void) {
 	cerr << "\t-bg\t"			<< "Report depth in BedGraph format. For details, see:" << endl;
 	cerr 						<< "\t\tgenome.ucsc.edu/goldenPath/help/bedgraph.html" << endl << endl;
 
+	cerr << "\t-bga\t"			<< "Report depth in BedGraph format (same as above)." << endl;
+	cerr 						<< "\t\tHowever with this option, regions with zero " << endl;
+	cerr                        << "\t\tcoverage are also reported." << endl << endl;
+		
 	cerr << "\t-max\t"          << "Combine all positions with a depth >= max into" << endl;
 	cerr						<< "\t\ta single bin in the histogram. Irrelevant" << endl;
 	cerr						<< "\t\tfor -d and -bedGraph" << endl;
