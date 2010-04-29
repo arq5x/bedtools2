@@ -137,8 +137,7 @@ void ShowHelp(void) {
 	cerr << endl << "Program: " << PROGRAM_NAME << " (v" << VERSION << ")" << endl;
 	
 	cerr << "Authors: Aaron Quinlan (aaronquinlan@gmail.com)" << endl;
-	cerr << "         Gordon Assaf, CSHL" << endl;
-	cerr << "         Royden Clark, UVa." << endl << endl;
+	cerr << "         Gordon Assaf, CSHL" << endl << endl;
 
 	cerr << "Summary: Compute the coverage of a BED/BAM file among a genome." << endl << endl;
 
@@ -155,9 +154,11 @@ void ShowHelp(void) {
 	cerr << "\t-bg\t"			<< "Report depth in BedGraph format. For details, see:" << endl;
 	cerr 						<< "\t\tgenome.ucsc.edu/goldenPath/help/bedgraph.html" << endl << endl;
 
-	cerr << "\t-bga\t"			<< "Report depth in BedGraph format (same as above)." << endl;
+	cerr << "\t-bga\t"			<< "Report depth in BedGraph format, as above (-bg)." << endl;
 	cerr 						<< "\t\tHowever with this option, regions with zero " << endl;
-	cerr                        << "\t\tcoverage are also reported." << endl << endl;
+	cerr                        << "\t\tcoverage are also reported.  This allows one to" << endl;
+	cerr                        << "\t\tquickly extract all regions of a genome with 0 " << endl;
+	cerr                        << "\t\tcoverage by applying: \"grep -w 0$\" to the output." << endl << endl;
 		
 	cerr << "\t-max\t"          << "Combine all positions with a depth >= max into" << endl;
 	cerr						<< "\t\ta single bin in the histogram. Irrelevant" << endl;
