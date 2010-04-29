@@ -403,7 +403,7 @@ BedLineStatus BedFile::parseLine (BED &bed, const vector<string> &lineVector, in
 		}
 		// gripe if it's not a blank line	
 		else if (lineVector.size() != 0) {
-			cerr << "It looks as though you have less than 3 columns.  Are you sure your files are tab-delimited?" << endl;
+			cerr << "It looks as though you have less than 3 columns at line: " << lineNum << ".  Are you sure your files are tab-delimited?" << endl;
 			exit(1);
 		}
 	}
