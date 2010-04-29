@@ -84,8 +84,13 @@ void BedGenomeCoverage::CoverageBed() {
 			
 				// get the current chrom size and allocate space 
 				currChromSize = _genome->getChromSize(currChrom);
-				chromCov.resize(currChromSize);
-
+				if (currChromSize >= 0)
+					chromCov.resize(currChromSize);
+				else {
+					cerr << "Chromosome " << currChrom << " found in your BED file but not in your genome file.  Exiting." << endl;
+					exit(1);
+				}
+					
 				// process the first line for this chromosome.
 				// make sure the coordinates fit within the chrom
 				if (start < currChromSize) {
@@ -119,6 +124,7 @@ void BedGenomeCoverage::CoverageBed() {
 	}
 	_bed->Close();
 
+	cout << "yep\n";
 	// process the results of the last chromosome.
 	ReportChromCoverage(chromCov, currChromSize, currChrom, chromDepthHist);	
 	if (_eachBase == false && _bedGraph == false) {
@@ -167,9 +173,13 @@ void BedGenomeCoverage::CoverageBam(string bamFile) {
 				// empty the previous chromosome and reserve new
 				std::vector<DEPTH>().swap(chromCov);
 
-				// get the current chrom size and allocate space
-				currChromSize = _genome->getChromSize(currChrom);
-				chromCov.resize(currChromSize);
+				// get the current chrom size and allocate space				
+				if (currChromSize >= 0)
+					chromCov.resize(currChromSize);
+				else {
+					cerr << "Chromosome " << currChrom << " found in your BED file but not in your genome file.  Exiting." << endl;
+					exit(1);
+				}
 
 				// process the first line for this chromosome.
 				// make sure the coordinates fit within the chrom

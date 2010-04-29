@@ -74,7 +74,11 @@ void GenomeFile::loadGenomeFileIntoMap() {
 
 
 int GenomeFile::getChromSize(const string &chrom) {
-	return _chromSizes[chrom];
+	chromToSizes::const_iterator chromIt = _chromSizes.find(chrom);
+	if (chromIt != _chromSizes.end())
+		return _chromSizes[chrom];
+	else
+		return -1;  // chrom not found.  
 }
 
 vector<string> GenomeFile::getChromList() {
