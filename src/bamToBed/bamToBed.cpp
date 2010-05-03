@@ -15,6 +15,7 @@
 using namespace BamTools;
 
 #include <vector>
+#include <algorithm>	// for swap()
 #include <iostream>
 #include <fstream>
 #include <stdlib.h>
@@ -38,7 +39,7 @@ void ConvertBamToBedpe(const string &bamFile, const bool &useEditDistance);
 					
 void PrintBed(const BamAlignment &bam, const RefVector &refs, bool useEditDistance);
 void PrintBed12(const BamAlignment &bam, const RefVector &refs, bool useEditDistance, string color = "255,0,0");
-void PrintBedPE(const BamAlignment &bam1, const BamAlignment &bam1,
+void PrintBedPE(const BamAlignment &bam1, const BamAlignment &bam2,
                 const RefVector &refs, bool useEditDistance);
 
 void ParseCigarBed12(const vector<CigarOp> &cigar, vector<int> &blockStarts, 
@@ -153,7 +154,7 @@ void ShowHelp(void) {
 	cerr << "\t-ed\t"		<< "Use BAM edit distance (NM tag) for BED score." << endl;
 	cerr 					<< "\t\t- Default for BED is to use mapping quality." << endl;
 	cerr 					<< "\t\t- Default for BEDPE is to use the minimum of" << endl;
-	cerr 					<< "\t\t  of the two mapping qualities for the pair." << endl;
+	cerr 					<< "\t\t  the two mapping qualities for the pair." << endl;
 	cerr 					<< "\t\t- When -ed is used with -bedpe, the total edit" << endl;
 	cerr 					<< "\t\t  distance from the two mates is reported." << endl << endl;
 
@@ -394,7 +395,16 @@ void PrintBedPE(const BamAlignment &bam1, const BamAlignment &bam2, const RefVec
 			cerr << "The edit distance tag (NM) was not found in the BAM file.  Please disable -ed.  Exiting\n";
 			exit(1);
 		}
-	}		
+	}
+	
+	// swap the ends if necessary
+	if ( chrom1 > chrom2 || ((chrom1 == chrom2) && (start1 > start2)) ) {
+		swap(chrom1, chrom2);
+		swap(start1, start2);
+		swap(end1, end2);
+		swap(strand1, strand2);
+		if (useEditDistance == true) swap(editDistance1, editDistance2);		
+	}
 
 	// report BEDPE using min mapQuality
 	if (useEditDistance == false) {
@@ -421,6 +431,7 @@ void PrintBedPE(const BamAlignment &bam1, const BamAlignment &bam2, const RefVec
 				bam1.Name.c_str(), totalEditDistance, strand1.c_str(), strand2.c_str());			
 	}
 }
+
 
 // deprecated.
 bool IsCorrectMappingForBEDPE (const BamAlignment &bam) {

@@ -232,7 +232,7 @@ void ShowHelp(void) {
 	cerr << "\t-wao\t"			<< "Write the original A and B entries plus the number of base" << endl;
 	cerr 						<< "\t\tpairs of overlap between the two features." << endl;
 	cerr						<< "\t\t- Overlapping features restricted by -f and -r." << endl;
-	cerr						<< "\t\t  However, A features w/o overlap are also reported" << endl << endl;
+	cerr						<< "\t\t  However, A features w/o overlap are also reported" << endl;
 	cerr						<< "\t\t  with a NULL B feature and overlap = 0." << endl << endl;
 					
 	cerr << "\t-u\t"      		<< "Write the original A entry _once_ if _any_ overlaps found in B." << endl;

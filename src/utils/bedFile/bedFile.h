@@ -178,11 +178,11 @@ public:
 
 	// return true if at least one overlap was found.  otherwise, return false.
 	bool FindOneOrMoreOverlapsPerBin(string chrom, int start, int end, string strand, 
-										bool forceStrand, float overlapFraction);
+										bool forceStrand, float overlapFraction = 0.0);
 
 	// return true if at least one __reciprocal__ overlap was found.  otherwise, return false.
 	bool FindOneOrMoreReciprocalOverlapsPerBin(string chrom, int start, int end, string strand, 
-													bool forceStrand, float overlapFraction);
+													bool forceStrand, float overlapFraction = 0.0);
 	
 
 	// Given a chrom, start, end and strand for a single feature,

@@ -16,8 +16,8 @@
 /*
 	Constructor
 */
-BedWindow::BedWindow(string &bedAFile, string &bedBFile, int &leftSlop, int &rightSlop, bool &anyHit, bool &noHit, 
-					bool &writeCount, bool &strandWindows, bool &matchOnStrand) {
+BedWindow::BedWindow(string bedAFile, string bedBFile, int leftSlop, int rightSlop, bool anyHit, bool noHit, 
+					bool writeCount, bool strandWindows, bool matchOnStrand, bool bamInput, bool bamOutput) {
 
 	_bedAFile      = bedAFile;
 	_bedBFile      = bedBFile;
@@ -30,12 +30,26 @@ BedWindow::BedWindow(string &bedAFile, string &bedBFile, int &leftSlop, int &rig
 	_writeCount    = writeCount;
 	_strandWindows = strandWindows;	
 	_matchOnStrand = matchOnStrand;
+	_bamInput      = bamInput;
+	_bamOutput     = bamOutput;
 		
 	_bedA          = new BedFile(bedAFile);
 	_bedB          = new BedFile(bedBFile);
 	
-	// do the work
-	WindowIntersectBed();
+	// dealing with a proper file
+	if (_bedA->bedFile != "stdin") {   
+		if (_bamInput == false) 
+			WindowIntersectBed();
+		else
+			WindowIntersectBam(_bedA->bedFile);
+	}
+	// reading from stdin
+	else {  
+		if (_bamInput == false)
+			WindowIntersectBed();
+		else
+			WindowIntersectBam("stdin");			
+	}
 }
 
 
@@ -48,7 +62,7 @@ BedWindow::~BedWindow(void) {
 
 
 
-void BedWindow::FindWindowOverlaps(BED &a, vector<BED> &hits) {
+void BedWindow::FindWindowOverlaps(const BED &a, vector<BED> &hits) {
 	
 	/* 
 		Adjust the start and end of a based on the requested window
@@ -58,31 +72,8 @@ void BedWindow::FindWindowOverlaps(BED &a, vector<BED> &hits) {
 	// according to the slop requested (slop = 0 by default)
 	int aFudgeStart = 0;
 	int aFudgeEnd;
+	AddWindow(a, aFudgeStart, aFudgeEnd);
 
-	// Does the user want to treat the windows based on strand?
-	// If so, 
-	// if "+", then left is left and right is right
-	// if "-", the left is right and right is left.
-	if (_strandWindows) {
-		if (a.strand == "+") {
-			if ((a.start - _leftSlop) > 0) aFudgeStart = a.start - _leftSlop;
-			else aFudgeStart = 0;
-			aFudgeEnd = a.end + _rightSlop;
-		}
-		else {
-			if ((a.start - _rightSlop) > 0) aFudgeStart = a.start - _rightSlop;
-			else aFudgeStart = 0;
-			aFudgeEnd = a.end + _leftSlop;
-		}
-	}
-	// If not, add the windows irrespective of strand
-	else {
-		if ((a.start - _leftSlop) > 0) aFudgeStart = a.start - _leftSlop;
-		else aFudgeStart = 0;
-		aFudgeEnd = a.end + _rightSlop;
-	}
-	
-	
 	/* 
 		Now report the hits (if any) based on the window around a.
 	*/
@@ -122,6 +113,19 @@ void BedWindow::FindWindowOverlaps(BED &a, vector<BED> &hits) {
 	}
 }
 
+
+bool BedWindow::FindOneOrMoreWindowOverlaps(const BED &a) {
+	
+	// update the current feature's start and end
+	// according to the slop requested (slop = 0 by default)
+	int aFudgeStart = 0;
+	int aFudgeEnd;
+	AddWindow(a, aFudgeStart, aFudgeEnd);
+	
+	bool overlapsFound = _bedB->FindOneOrMoreOverlapsPerBin(a.chrom, a.start, a.end, a.strand, _matchOnStrand);
+	return overlapsFound;
+}
+
  
 void BedWindow::WindowIntersectBed() {
 
@@ -147,4 +151,100 @@ void BedWindow::WindowIntersectBed() {
 	_bedA->Close();
 }
 
+
+void BedWindow::WindowIntersectBam(string bamFile) {
+
+	// load the "B" bed file into a map so
+	// that we can easily compare "A" to it for overlaps
+	_bedB->loadBedFileIntoMap();
+	
+	// open the BAM file
+	BamReader reader;
+	BamWriter writer;
+	reader.Open(bamFile);
+
+	// get header & reference information
+	string header  = reader.GetHeaderText();
+	RefVector refs = reader.GetReferenceData();
+
+	// open a BAM output to stdout if we are writing BAM
+	if (_bamOutput == true) {
+		// open our BAM writer
+		writer.Open("stdout", header, refs);
+	}
+
+	vector<BED> hits;					// vector of potential hits
+	// reserve some space
+	hits.reserve(100);
+	
+	_bedA->bedType = 6;
+	BamAlignment bam;	
+	bool overlapsFound;
+	// get each set of alignments for each pair.
+	while (reader.GetNextAlignment(bam)) {
+		
+		if (bam.IsMapped()) {	
+			BED a;
+			a.chrom = refs.at(bam.RefID).RefName;
+			a.start = bam.Position;
+			a.end   = bam.GetEndPosition(false);
+
+			// build the name field from the BAM alignment.
+			a.name = bam.Name;
+			if (bam.IsFirstMate()) a.name += "/1";
+			if (bam.IsSecondMate()) a.name += "/2";
+
+			a.score  = ToString(bam.MapQuality);
+			a.strand = "+"; if (bam.IsReverseStrand()) a.strand = "-"; 
+	
+			if (_bamOutput == true) {
+				overlapsFound = FindOneOrMoreWindowOverlaps(a);
+				if (overlapsFound == true) {
+					if (_noHit == false)
+						writer.SaveAlignment(bam);
+				}
+				else {
+					if (_noHit == true) 
+						writer.SaveAlignment(bam);	
+				}
+			}
+			else {
+				FindWindowOverlaps(a, hits);
+				hits.clear();
+			}
+		}
+	}
+	
+	// close the relevant BAM files.
+	reader.Close();
+	if (_bamOutput == true) {
+		writer.Close();
+	}
+}
+
+
+void BedWindow::AddWindow(const BED &a, int &fudgeStart, int &fudgeEnd) {
+	// Does the user want to treat the windows based on strand?
+	// If so, 
+	// if "+", then left is left and right is right
+	// if "-", the left is right and right is left.
+	if (_strandWindows) {
+		if (a.strand == "+") {
+			if ((a.start - _leftSlop) > 0) fudgeStart = a.start - _leftSlop;
+			else fudgeStart = 0;
+			fudgeEnd = a.end + _rightSlop;
+		}
+		else {
+			if ((a.start - _rightSlop) > 0) fudgeStart = a.start - _rightSlop;
+			else fudgeStart = 0;
+			fudgeEnd = a.end + _leftSlop;
+		}
+	}
+	// If not, add the windows irrespective of strand
+	else {
+		if ((a.start - _leftSlop) > 0) fudgeStart = a.start - _leftSlop;
+		else fudgeStart = 0;
+		fudgeEnd = a.end + _rightSlop;
+	}
+}
 
