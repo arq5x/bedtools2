@@ -126,6 +126,14 @@ private:
 			}
 		}
 		
+		// swap the ends if necessary
+		if ( a.chrom1 > a.chrom2 || ((a.chrom1 == a.chrom2) && (a.start1 > a.start2)) ) {
+			swap(a.chrom1, a.chrom2);
+			swap(a.start1, a.start2);
+			swap(a.end1, a.end2);
+			swap(a.strand1, a.strand2);	
+		}
+			
 		// compute the minimum mapping quality b/w the two ends of the pair.
 		a.score = "0";
 		if (_useEditDistance == false) {

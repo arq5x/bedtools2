@@ -402,8 +402,7 @@ void PrintBedPE(const BamAlignment &bam1, const BamAlignment &bam2, const RefVec
 		swap(chrom1, chrom2);
 		swap(start1, start2);
 		swap(end1, end2);
-		swap(strand1, strand2);
-		if (useEditDistance == true) swap(editDistance1, editDistance2);		
+		swap(strand1, strand2);		
 	}
 
 	// report BEDPE using min mapQuality
