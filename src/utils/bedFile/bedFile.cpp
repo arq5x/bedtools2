@@ -669,12 +669,11 @@ void BedFile::loadBedFileIntoMap() {
 	bedStatus = this->GetNextBed(bedEntry, lineNum);	
 	while (bedStatus != BED_INVALID) {
 		// ignore headers and blank lines
-		if (bedStatus == BED_VALID) {		
+		if (bedStatus == BED_VALID) {
 			int bin = getBin(bedEntry.start, bedEntry.end);
 			bedEntry.count = 0;
 			bedEntry.minOverlapStart = INT_MAX;
 			bedMap[bedEntry.chrom][bin].push_back(bedEntry);
-
 			bedEntry = nullBed;
 		}
 		bedStatus = this->GetNextBed(bedEntry, lineNum);	

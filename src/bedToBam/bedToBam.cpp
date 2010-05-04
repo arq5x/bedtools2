@@ -233,10 +233,13 @@ void ConvertBedToBam(const BED &bed, BamAlignment &bam, map<string, int, std::le
 	
 	// hard-code the sequence and qualities.
 	int bedLength  = bed.end - bed.start;
-	string query(bedLength, 'N');
-	string quals(bedLength, 'H');
-	bam.QueryBases = query;
-	bam.Qualities  = quals;
+
+	// set dummy seq and qual strings.  the input is BED, 
+	// so the sequence is inherently the same as it's
+	// reference genome.  
+	// Thanks to James M. Ward for pointing this out. 
+	bam.QueryBases = "";
+	bam.Qualities  = "";
 
 	// chrom and map quality
 	bam.RefID      = chromToId[bed.chrom];
@@ -259,58 +262,65 @@ void ConvertBedToBam(const BED &bed, BamAlignment &bam, map<string, int, std::le
 		cOp.Length = bedLength;
 		bam.CigarData.push_back(cOp);
 	}
-	// precess each block.
+	// we're being told that the input is BED12.
 	else {
-
-		// extract the relevant BED fields to convert BED12 to BAM
-		// namely: thickStart, thickEnd, blockCount, blockStarts, blockEnds
-		// unsigned int thickStart = atoi(bed.otherFields[0].c_str());
-		// unsigned int thickEnd   = atoi(bed.otherFields[1].c_str());
-		unsigned int blockCount = atoi(bed.otherFields[3].c_str());
-
-		vector<string> blockSizesString, blockStartsString;
-		vector<int> blockSizes, blockStarts;
-		Tokenize(bed.otherFields[4], blockSizesString, ",");
-		Tokenize(bed.otherFields[5], blockStartsString, ",");
 		
-		for (unsigned int i = 0; i < blockCount; ++i) {
-			blockStarts.push_back(atoi(blockStartsString[i].c_str()));
-			blockSizes.push_back(atoi(blockSizesString[i].c_str()));
-		}
-		
-		// make sure this is a well-formed BED12 entry.
-		if ((blockSizes.size() != blockCount) || (blockSizes.size() != blockCount)) {
-			cerr << "Error: Number of BED blocks does not match blockCount at line: " << lineNum << ".  Exiting!" << endl;
-			exit (1);
-		}
-		else {
-			// does the first block start after the bed.start?
-			// if so, we need to do some "splicing"
-			if (blockStarts[0] - bed.start > 0) {	
-				CigarOp cOp;
-				cOp.Length = blockStarts[0] - bed.start;
-				cOp.Type = 'N';
-				bam.CigarData.push_back(cOp);
-			}
-			// handle the "middle" blocks
-			for (unsigned int i = 0; i < blockCount - 1; ++i) {
-				CigarOp cOp;
-				cOp.Length = blockSizes[i];
-				cOp.Type = 'M';
-				bam.CigarData.push_back(cOp);
+		// does it smell like BED12?  if so, process it.
+		if (bed.otherFields.size() == 6) {
 			
-				if (blockStarts[i+1] > (blockStarts[i] + blockSizes[i])) {
+			// extract the relevant BED fields to convert BED12 to BAM
+			// namely: blockCount, blockStarts, blockEnds
+			unsigned int blockCount = atoi(bed.otherFields[3].c_str());
+
+			vector<string> blockSizesString, blockStartsString;
+			vector<int> blockSizes, blockStarts;
+			Tokenize(bed.otherFields[4], blockSizesString, ",");
+			Tokenize(bed.otherFields[5], blockStartsString, ",");
+		
+			for (unsigned int i = 0; i < blockCount; ++i) {
+				blockStarts.push_back(atoi(blockStartsString[i].c_str()));
+				blockSizes.push_back(atoi(blockSizesString[i].c_str()));
+			}
+		
+			// make sure this is a well-formed BED12 entry.
+			if ((blockSizes.size() != blockCount) || (blockSizes.size() != blockCount)) {
+				cerr << "Error: Number of BED blocks does not match blockCount at line: " << lineNum << ".  Exiting!" << endl;
+				exit (1);
+			}
+			else {
+				// does the first block start after the bed.start?
+				// if so, we need to do some "splicing"
+				if (blockStarts[0] - bed.start > 0) {	
 					CigarOp cOp;
-					cOp.Length = (blockStarts[i+1] - (blockStarts[i] + blockSizes[i]));
+					cOp.Length = blockStarts[0] - bed.start;
 					cOp.Type = 'N';
 					bam.CigarData.push_back(cOp);
 				}
+				// handle the "middle" blocks
+				for (unsigned int i = 0; i < blockCount - 1; ++i) {
+					CigarOp cOp;
+					cOp.Length = blockSizes[i];
+					cOp.Type = 'M';
+					bam.CigarData.push_back(cOp);
+			
+					if (blockStarts[i+1] > (blockStarts[i] + blockSizes[i])) {
+						CigarOp cOp;
+						cOp.Length = (blockStarts[i+1] - (blockStarts[i] + blockSizes[i]));
+						cOp.Type = 'N';
+						bam.CigarData.push_back(cOp);
+					}
+				}
+				// handle the last block.
+				CigarOp cOp;
+				cOp.Length = blockSizes[blockCount - 1];
+				cOp.Type = 'M';
+				bam.CigarData.push_back(cOp);
 			}
-			// handle the last block.
-			CigarOp cOp;
-			cOp.Length = blockSizes[blockCount - 1];
-			cOp.Type = 'M';
-			bam.CigarData.push_back(cOp);
+		}
+		// it doesn't smell like BED12.  complain.
+		else {
+			cerr << "You've indicated that the input file is in BED12 format, yet the relevant fields cannot be found.  Exiting." << endl << endl;
+			exit(1);
 		}
 	}
 }

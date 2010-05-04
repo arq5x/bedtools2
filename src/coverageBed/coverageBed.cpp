@@ -80,7 +80,7 @@ void BedCoverage::CollectCoverageBam(string bamFile) {
 	// load the "B" bed file into a map so
 	// that we can easily compare "A" to it for overlaps
 	_bedB->loadBedFileIntoMap();
-	
+
 	// open the BAM file
 	BamReader reader;
 	reader.Open(bamFile);
@@ -102,7 +102,6 @@ void BedCoverage::CollectCoverageBam(string bamFile) {
 			a.start  = bam.Position;
 			a.end    = bam.GetEndPosition(false);
 			a.strand = "+"; if (bam.IsReverseStrand()) a.strand = "-"; 	
-
 			_bedB->countHits(a, _forceStrand);
 		}
 	}
