@@ -58,7 +58,8 @@ void BedCoverage::CollectCoverageBed() {
 	int lineNum = 0;					// current input line number
 	BED a, nullBed;	
 	BedLineStatus bedStatus;
-		
+	
+	_bedA->Open();	
 	// process each entry in A
 	bedStatus = _bedA->GetNextBed(a, lineNum);
 	while (bedStatus != BED_INVALID) {
@@ -69,6 +70,7 @@ void BedCoverage::CollectCoverageBed() {
 		}
 		bedStatus = _bedA->GetNextBed(a, lineNum);
 	}	
+	_bedA->Close();
 	
 	// report the coverage (summary or histogram) for BED B.
 	ReportCoverage();					
