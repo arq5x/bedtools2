@@ -1,3 +1,43 @@
+Version 2.7.0 (May-05-2010)
+
+General:
+1. "Gzipped" BED and GFF files are now supported as input by all BEDTools.  Such files must end in ".gz".
+2. Tools that process BAM alignments now uniformly compute an ungapped alignment end position based on the BAM CIGAR string.  Specifically, "M", "D" and "N" operations are observed when computing the end position.
+3. bamToBed requires the BAM file to be sorted/grouped by read id when creating BEDPE output.  This allows the alignments end coordinate  for each end of the pair to be properly computed based on its CIGAR string.  The same requirement applies to pairToBed.
+4. Updated manual.
+5. Many silent modifications to the code that improve clarity and sanity-checking and facilitate future additions/modifications.
+
+	
+New Tools:
+1. bedToBam. This utility will convert BED files to BAM format.  Both "blocked" (aka BED12) and "unblocked" (e.g. BED6) formats are acceptable.  This allows one to, for example, compress large BED files such as dbSNP into BAM format for efficient visualization.
+
+
+Changes to existing tools:
+	intersectBed
+		1. Added -wao option to report 0 overlap for features in A that do not intersect any features in B.  This is an extension of the -wo option. 
+	
+	bamToBed
+		1. Requires that BAM input be sorted/grouped by read name.
+
+	pairToBed
+		1. Requires that BAM input be sorted/grouped by read name.
+		2. Allows use of minimum mapping quality or total edit distance for score field.
+
+	windowBed
+		1. Now supports BAM input.
+
+	genomeCoverageBed
+		1. -bga option. Thanks to Gordon Assaf for the suggestion.
+		2. Eliminated potential seg fault.
+
+Acknowledgements:
+	1. Gordon Assaf: for suggesting the -bga option in genomeCoverageBed and for testing the new bedToBam utility.
+	2. Ivan Gregoretti: for helping to expedite the inclusion of gzip support.
+	3. Can Alkan: for suggesting the addition of the -wao option to intersectBed.
+	4. James Ward: for pointing out that bedToBam did not need to create "dummy" seq and qual entries.
+
+
+
 Version 2.6.1 (Mar-29-2010)
 1. Fixed a careless command line parsing bug in coverageBed.
 
