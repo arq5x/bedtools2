@@ -173,7 +173,8 @@ void BedGenomeCoverage::CoverageBam(string bamFile) {
 				// empty the previous chromosome and reserve new
 				std::vector<DEPTH>().swap(chromCov);
 
-				// get the current chrom size and allocate space				
+				// get the current chrom size and allocate space 
+				currChromSize = _genome->getChromSize(currChrom);				
 				if (currChromSize >= 0)
 					chromCov.resize(currChromSize);
 				else {
