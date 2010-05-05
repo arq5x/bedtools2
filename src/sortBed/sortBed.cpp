@@ -18,8 +18,6 @@
 BedSort::BedSort(string &bedFile) {
 	_bedFile = bedFile;
 	_bed = new BedFile(bedFile);
-	
-	SortBed();
 }
 
 //

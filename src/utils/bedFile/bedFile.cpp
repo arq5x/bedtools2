@@ -702,6 +702,12 @@ void BedFile::loadBedFileIntoMapNoBin() {
 		bedStatus = this->GetNextBed(bedEntry, lineNum);	
 	}
 	Close();
+	
+	// sort the BED entries for each chromosome
+	// in ascending order of start position
+	for (masterBedMapNoBin::iterator m = this->bedMapNoBin.begin(); m != this->bedMapNoBin.end(); ++m) {
+		sort(m->second.begin(), m->second.end(), sortByStart);		
+	}
 }
 
 
