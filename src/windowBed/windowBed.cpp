@@ -139,6 +139,7 @@ void BedWindow::WindowIntersectBed() {
 	vector<BED> hits;					// vector of potential hits
 	hits.reserve(100);
 
+	_bedA->Open();
 	// process each entry in A
 	bedStatus = _bedA->GetNextBed(a, lineNum);
 	while (bedStatus != BED_INVALID) {
