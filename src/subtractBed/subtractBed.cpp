@@ -160,7 +160,8 @@ void BedSubtract::SubtractBed() {
 	vector<BED> hits;					// vector of potential hits	
 	// reserve some space
 	hits.reserve(100);
-	 	
+
+	_bedA->Open();	 	
 	bedStatus = _bedA->GetNextBed(a, lineNum);
 	while (bedStatus != BED_INVALID) {
 		if (bedStatus == BED_VALID) {
