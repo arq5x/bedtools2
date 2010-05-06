@@ -1,3 +1,6 @@
+Version 2.7.1 (May-06-2010)
+Fixed a typo that caused some compilers to fail on closestBed.
+
 Version 2.7.0 (May-05-2010)
 
 General:
