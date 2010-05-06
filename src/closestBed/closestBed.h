@@ -27,7 +27,7 @@ class BedClosest {
 public:
 
 	// constructor 
-	BedClosest(string &bedAFile, string &bedAFile, bool &forceStrand, string &tieMode);
+	BedClosest(string &bedAFile, string &bedBFile, bool &forceStrand, string &tieMode);
 
 	// destructor
 	~BedClosest(void);
@@ -46,8 +46,6 @@ private:
 	BedFile *_bedA, *_bedB;
 	
 	// methods
-	void reportA(const BED &);
-	void reportB(const BED &);
 	void reportNullB();
 	void FindWindowOverlaps(BED &, vector<BED> &);
 

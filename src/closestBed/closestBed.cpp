@@ -13,8 +13,8 @@
 #include "closestBed.h"
 
 const int MAXSLOP = 256000000;  // 2*MAXSLOP = 512 megabases.
-			        // We don't want to keep looking if we
-			        // can't find a nearby feature within 512 Mb.
+			        			// We don't want to keep looking if we
+			        			// can't find a nearby feature within 512 Mb.
 const int SLOPGROWTH = 2048000;
 
 
