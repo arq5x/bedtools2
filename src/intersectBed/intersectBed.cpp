@@ -70,7 +70,7 @@ bool BedIntersect::FindOverlaps(const BED &a, vector<BED> &hits) {
 	
 	// grab _all_ of the features in B that overlap with a.
 	_bedB->FindOverlapsPerBin(a.chrom, a.start, a.end, a.strand, hits, _forceStrand); 
-	
+    
 	// how many overlaps are there b/w a and B?
 	int numOverlaps = 0;		
 	
@@ -80,7 +80,7 @@ bool BedIntersect::FindOverlaps(const BED &a, vector<BED> &hits) {
 		printable = false;
 	
 	// loop through the hits and report those that meet the user's criteria
-	vector<BED>::const_iterator h = hits.begin();
+	vector<BED>::const_iterator h       = hits.begin();
 	vector<BED>::const_iterator hitsEnd = hits.end();
 	for (; h != hitsEnd; ++h) {
 		int s            = max(a.start, h->start);
@@ -119,7 +119,7 @@ bool BedIntersect::FindOverlaps(const BED &a, vector<BED> &hits) {
 
 
 void BedIntersect::ReportOverlapDetail(const int &overlapBases, const BED &a, const BED &b,
-									   const int &s, const int &e) {
+									   const CHRPOS &s, const CHRPOS &e) {
 	// simple intersection only
 	if (_writeA == false && _writeB == false && _writeOverlap == false) {
 		_bedA->reportBedRangeNewLine(a,s,e);
@@ -198,17 +198,14 @@ void BedIntersect::IntersectBed() {
 	
 	// open the "A" file, process each BED entry and searh for overlaps.
 	_bedA->Open();
-	bedStatus = _bedA->GetNextBed(a, lineNum);
-	while (bedStatus != BED_INVALID) {
+	while ((bedStatus = _bedA->GetNextBed(a, lineNum)) != BED_INVALID) {
 		if (bedStatus == BED_VALID) {
 			FindOverlaps(a, hits);
 			hits.clear();
 			a = nullBed;
 		}
-		bedStatus = _bedA->GetNextBed(a, lineNum);
 	}
 	_bedA->Close();
-	
 }
 
 
@@ -255,7 +252,7 @@ void BedIntersect::IntersectBam(string bamFile) {
 			if (bam.IsSecondMate()) a.name += "/2";
 
 			a.score  = ToString(bam.MapQuality);
-			a.strand = "+"; if (bam.IsReverseStrand()) a.strand = "-"; 
+			a.strand = '+'; if (bam.IsReverseStrand()) a.strand = '-'; 
 	
 			if (_bamOutput == true) {
 				overlapsFound = FindOneOrMoreOverlap(a);

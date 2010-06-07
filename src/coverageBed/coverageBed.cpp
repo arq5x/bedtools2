@@ -53,7 +53,7 @@ void BedCoverage::CollectCoverageBed() {
 	
 	// load the "B" bed file into a map so
 	// that we can easily compare "A" to it for overlaps
-	_bedB->loadBedFileIntoMap();
+	_bedB->loadBedCovFileIntoMap();
 
 	int lineNum = 0;					// current input line number
 	BED a, nullBed;	
@@ -61,14 +61,12 @@ void BedCoverage::CollectCoverageBed() {
 	
 	_bedA->Open();	
 	// process each entry in A
-	bedStatus = _bedA->GetNextBed(a, lineNum);
-	while (bedStatus != BED_INVALID) {
+	while ((bedStatus = _bedA->GetNextBed(a, lineNum)) != BED_INVALID) {
 		if (bedStatus == BED_VALID) {
 			// count a as a hit with all the relevant features in B
 			_bedB->countHits(a, _forceStrand);
 			a = nullBed;
 		}
-		bedStatus = _bedA->GetNextBed(a, lineNum);
 	}	
 	_bedA->Close();
 	
@@ -81,7 +79,7 @@ void BedCoverage::CollectCoverageBam(string bamFile) {
 
 	// load the "B" bed file into a map so
 	// that we can easily compare "A" to it for overlaps
-	_bedB->loadBedFileIntoMap();
+	_bedB->loadBedCovFileIntoMap();
 
 	// open the BAM file
 	BamReader reader;
@@ -103,7 +101,7 @@ void BedCoverage::CollectCoverageBam(string bamFile) {
 			a.chrom  = refs.at(bam.RefID).RefName;
 			a.start  = bam.Position;
 			a.end    = bam.GetEndPosition(false);
-			a.strand = "+"; if (bam.IsReverseStrand()) a.strand = "-"; 	
+			a.strand = '+'; if (bam.IsReverseStrand()) a.strand = '-'; 	
 			_bedB->countHits(a, _forceStrand);
 		}
 	}
@@ -119,16 +117,16 @@ void BedCoverage::ReportCoverage() {
 	map<unsigned int, unsigned int> allDepthHist;
 	unsigned int totalLength = 0;
 
-	masterBedMap::const_iterator chromItr = _bedB->bedMap.begin();
-	masterBedMap::const_iterator chromEnd = _bedB->bedMap.end();
+	masterBedCovMap::const_iterator chromItr = _bedB->bedCovMap.begin();
+	masterBedCovMap::const_iterator chromEnd = _bedB->bedCovMap.end();
 	for (; chromItr != chromEnd; ++chromItr) {
 	
-		binsToBeds::const_iterator binItr = chromItr->second.begin();
-		binsToBeds::const_iterator binEnd = chromItr->second.end();
+		binsToBedCovs::const_iterator binItr = chromItr->second.begin();
+		binsToBedCovs::const_iterator binEnd = chromItr->second.end();
 		for (; binItr != binEnd; ++binItr) {
 
-			vector<BED>::const_iterator bedItr = binItr->second.begin();
-			vector<BED>::const_iterator bedEnd = binItr->second.end();
+			vector<BEDCOV>::const_iterator bedItr = binItr->second.begin();
+			vector<BEDCOV>::const_iterator bedEnd = binItr->second.end();
 			for (; bedItr != bedEnd; ++bedItr) {
 									
 				int zeroDepthCount = 0;
@@ -140,7 +138,7 @@ void BedCoverage::ReportCoverage() {
 				map<unsigned int, unsigned int> depthHist;
 				map<unsigned int, DEPTH>::const_iterator depthItr;
 				
-				for (int pos = start+1; pos <= bedItr->end; pos++) {
+				for (CHRPOS pos = start+1; pos <= bedItr->end; pos++) {
 					
 					depthItr = bedItr->depthMap.find(pos);
 					
@@ -163,7 +161,7 @@ void BedCoverage::ReportCoverage() {
 				}
 
 				// Report the coverage for the current interval.
-				int length   = bedItr->end - bedItr->start;
+				CHRPOS length   = bedItr->end - bedItr->start;
 				totalLength += length;
 				
 				int nonZeroBases   = (length - zeroDepthCount);

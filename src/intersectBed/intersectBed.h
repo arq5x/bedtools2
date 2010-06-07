@@ -80,7 +80,7 @@ private:
 	bool FindOneOrMoreOverlap(const BED &a);
 
 	void ReportOverlapDetail(const int &overlapBases, const BED &a, const BED &b,
-		                     const int &s, const int &e);
+		                     const CHRPOS &s, const CHRPOS &e);
 	void ReportOverlapSummary(const BED &a, const int &numOverlapsFound);
 	
 };
