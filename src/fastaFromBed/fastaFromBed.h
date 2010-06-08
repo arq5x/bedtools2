@@ -35,6 +35,8 @@ public:
 	~Bed2Fa(void);
 
 	void ExtractDNA();
+    void ReportDNA(const BED &bed, const string &currDNA, const string &currChrom);
+    
 
 private:
 	
@@ -46,8 +48,8 @@ private:
 	bool _useStrand;
 	
 	// instance of a bed file class.
-	BedFile *_bed;
-
+	BedFile  *_bed;
+    ostream *_faOut;
 };
 
 #endif

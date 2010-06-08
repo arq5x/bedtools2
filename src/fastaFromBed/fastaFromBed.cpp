@@ -12,27 +12,85 @@
 #include "lineFileUtilities.h"
 #include "fastaFromBed.h"
 
-Bed2Fa::Bed2Fa(bool &useName, string &dbFile, string &bedFile, string &fastaOutFile, 
-	bool &useFasta, bool &useStrand) {
+
+Bed2Fa::Bed2Fa(bool &useName, string &dbFile, string &bedFile, 
+    string &fastaOutFile, bool &useFasta, bool &useStrand) {
 
 	if (useName) {
 		_useName = true;
 	}
 	
-	_dbFile = dbFile;
-	_bedFile = bedFile;
+	_dbFile       = dbFile;
+	_bedFile      = bedFile;
 	_fastaOutFile = fastaOutFile;
-	_useFasta = useFasta;
-	_useStrand = useStrand;
+	_useFasta     = useFasta;
+	_useStrand    = useStrand;
 		
 	_bed = new BedFile(_bedFile);
 	
+	// Figure out what the output file should be.
+	if (fastaOutFile == "stdout") {
+        _faOut = &cout;
+    }
+    else {
+    	// Make sure we can open the file.
+    	ofstream fa(fastaOutFile.c_str(), ios::out);
+    	if ( !fa ) {
+    		cerr << "Error: The requested fasta output file (" << fastaOutFile << ") could not be opened. Exiting!" << endl;
+    		exit (1);
+    	}
+    	else {
+    		fa.close();		
+    		_faOut = new ofstream(fastaOutFile.c_str(), ios::out);
+    	}
+	}
+
+	// Extract the requested intervals from the FASTA input file.
 	ExtractDNA();
 }
 
 
 Bed2Fa::~Bed2Fa(void) {
 }
+
+
+//******************************************************************************
+// ReportDNA
+//******************************************************************************
+void Bed2Fa::ReportDNA(const BED &bed, const string &currDNA, const string &currChrom) {
+    
+    if ( (bed.start <= currDNA.size()) && (bed.end <= currDNA.size()) ) {			
+
+    	string dna = currDNA.substr(bed.start, ((bed.end - bed.start)));
+    	// revcomp if necessary.  Thanks to Thomas Doktor.
+    	if ((_useStrand == true) && (bed.strand == '-'))
+    		reverseComplement(dna);
+	
+    	if (!(_useName)) {
+    		if (_useFasta == true) {
+    			if (_useStrand == true)
+    		    	*_faOut << ">" << currChrom << ":" << bed.start << "-" << bed.end   << "(" << bed.strand << ")" << endl << dna << endl;
+    			else 
+    		        *_faOut << ">" << currChrom << ":" << bed.start << "-" << bed.end << endl << dna << endl;	
+    		}
+    		else {
+    			if (_useStrand == true)
+    				*_faOut << currChrom << ":" << bed.start << "-" << bed.end << "(" << bed.strand << ")" << "\t" << dna << endl;								
+    			else
+    				*_faOut << currChrom << ":" << bed.start << "-" << bed.end << "\t" << dna << endl;
+    		}
+      	}
+      	else {
+    		if (_useFasta == true)
+        		*_faOut << ">" << bed.name << endl << dna << endl;
+    		else
+    			*_faOut << bed.name << "\t" << dna << endl;
+    	}
+    }
+    else cerr << "Feature (" << bed.chrom << ":" << bed.start << "-" << bed.end << ") beyond " 
+    	<< currChrom << " size (" << currDNA.size() << " bp).  Skipping." << endl;
+}
+
 
 
 //******************************************************************************
@@ -49,13 +107,6 @@ void Bed2Fa::ExtractDNA() {
 		exit (1);
 	}
 	
-	// open the fasta database for reading
-	ofstream faOut(_fastaOutFile.c_str(), ios::out);
-	if ( !faOut ) {
-		cerr << "Error: The requested fasta output file (" << _fastaOutFile << ") could not be opened. Exiting!" << endl;
-		exit (1);
-	}	
-	
 	// load the BED file into an unbinned map.
 	_bed->loadBedFileIntoMapNoBin();
 
@@ -66,65 +117,18 @@ void Bed2Fa::ExtractDNA() {
 	currDNA.reserve(500000000);
 	
 	while (getline(faDb,fastaDbLine)) {
-		
 		if (fastaDbLine.find(">",0) != 0 ) {
 			currDNA += fastaDbLine;
 		}
 		else {
 			if (currDNA.size() > 0) {
-
-				vector<BED> bedList = _bed->bedMapNoBin[currChrom];
-
-				// loop through each BED entry for this chrom and 
-				// print the sequence
-				for (unsigned int i = 0; i < bedList.size(); i++) {
-					
-					unsigned int start = bedList[i].start;
-					unsigned int end = bedList[i].end;
-					
-					if ( (start <= currDNA.size()) && (end <= currDNA.size()) ) {
-							
-						string dna = currDNA.substr(bedList[i].start, ((bedList[i].end - bedList[i].start)));
-						// revcomp if necessary.  Thanks to Thomas Doktor.
-						if ((_useStrand == true) && (bedList[i].strand == "-")) {
-							reverseComplement(dna);
-						}
-						
-						if (!(_useName)) {
-							if (_useFasta == true) {
-								if (_useStrand == true) {
-							    	faOut << ">" << currChrom << ":" << bedList[i].start << "-" 
-								          << bedList[i].end   << "(" << bedList[i].strand << ")" << endl << dna << endl;
-								}
-								else {
-							    	faOut << ">" << currChrom << ":" << bedList[i].start << "-" 
-								          << bedList[i].end << endl << dna << endl;	
-								}
-							}
-							else {
-								if (_useStrand == true) {
-									faOut << currChrom << ":" << bedList[i].start << "-" 
-									      << bedList[i].end << "(" << bedList[i].strand << ")"
-										  << "\t" << dna << endl;								
-								}
-								else {
-									faOut << currChrom << ":" << bedList[i].start << "-" << bedList[i].end 
-										  << "\t" << dna << endl;
-								}
-							}
-					  	}
-					  	else {
-							if (_useFasta == true) {
-					    		faOut << ">" << bedList[i].name << endl << dna << endl;
-					  		}
-							else {
-								faOut << bedList[i].name << "\t" << dna << endl;
-							}
-						}
-					}
-					else cerr << "Feature (" << bedList[i].chrom << ":" << start << "-" << end << ") beyond " 
-						<< currChrom << " size (" << currDNA.size() << " bp).  Skipping." << endl;
-				}
+			    
+				vector<BED>::const_iterator bedItr = _bed->bedMapNoBin[currChrom].begin();
+            	vector<BED>::const_iterator bedEnd = _bed->bedMapNoBin[currChrom].end();
+				// loop through each BED entry for this chrom and print the sequence
+                for (; bedItr != bedEnd; ++bedItr) {
+                    ReportDNA(*bedItr, currDNA, currChrom);                
+                }
 				currDNA = "";	
 			}
 			currChrom = fastaDbLine.substr(1, fastaDbLine.find_first_of(" ")-1);
@@ -133,61 +137,13 @@ void Bed2Fa::ExtractDNA() {
 	
 	// process the last chromosome in the fasta file.
 	if (currDNA.size() > 0) {
-		
-		vector<BED> bedList = _bed->bedMapNoBin[currChrom];
-
-		// loop through each BED entry for this chrom and 
-		// print the sequence.
-		for (unsigned int i = 0; i < bedList.size(); i++) {
-			
-			unsigned int start = bedList[i].start;
-			unsigned int end = bedList[i].end;
-
-			if ( (start <= currDNA.size()) && (end <= currDNA.size()) ) {			
-
-				string dna = currDNA.substr(bedList[i].start, ((bedList[i].end - bedList[i].start)));
-				// revcomp if necessary.  Thanks to Thomas Doktor.
-				if ((_useStrand == true) && (bedList[i].strand == "-")) {
-					reverseComplement(dna);
-				}
-				
-				if (!(_useName)) {
-					if (_useFasta == true) {
-						if (_useStrand == true) {
-					    	faOut << ">" << currChrom << ":" << bedList[i].start << "-" 
-						          << bedList[i].end   << "(" << bedList[i].strand << ")" << endl << dna << endl;
-						}
-						else {
-					    	faOut << ">" << currChrom << ":" << bedList[i].start << "-" 
-						          << bedList[i].end << endl << dna << endl;	
-						}
-					}
-					else {
-						if (_useStrand == true) {
-							faOut << currChrom << ":" << bedList[i].start << "-" 
-							      << bedList[i].end << "(" << bedList[i].strand << ")"
-								  << "\t" << dna << endl;								
-						}
-						else {
-							faOut << currChrom << ":" << bedList[i].start << "-" << bedList[i].end 
-								  << "\t" << dna << endl;
-						}
-					}
-			  	}
-			  	else {
-					if (_useFasta == true) {
-			    		faOut << ">" << bedList[i].name << endl << dna << endl;
-			  		}
-					else {
-						faOut << bedList[i].name << "\t" << dna << endl;
-					}
-				}
-			}
-			else cerr << "Feature (" << bedList[i].chrom << ":" << start << "-" << end << ") beyond " 
-				<< currChrom << " size (" << currDNA.size() << " bp).  Skipping." << endl;
-
-		}
-		currDNA = "";	
+		vector<BED>::const_iterator bedItr = _bed->bedMapNoBin[currChrom].begin();
+    	vector<BED>::const_iterator bedEnd = _bed->bedMapNoBin[currChrom].end();
+		// loop through each BED entry for this chrom and print the sequence
+        for (; bedItr != bedEnd; ++bedItr) {
+            ReportDNA(*bedItr, currDNA, currChrom);
+        }
+		currDNA = "";
 	}
 }
 
