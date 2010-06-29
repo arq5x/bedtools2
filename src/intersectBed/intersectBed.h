@@ -13,9 +13,9 @@
 #define INTERSECTBED_H
 
 #include "bedFile.h"
-
 #include "BamReader.h"
 #include "BamWriter.h"
+#include "BamAncillary.h"
 #include "BamAux.h"
 using namespace BamTools;
 
@@ -27,6 +27,7 @@ using namespace BamTools;
 using namespace std;
 
 
+
 class BedIntersect {
 
 public:
@@ -35,7 +36,7 @@ public:
 	BedIntersect(string bedAFile, string bedBFile, bool anyHit, 
 							   bool writeA, bool writeB, bool writeOverlap, bool writeAllOverlap,
 							   float overlapFraction, bool noHit, bool writeCount, bool forceStrand, 
-							   bool reciprocal, bool bamInput, bool bamOutput);
+							   bool reciprocal, bool obeySplits, bool bamInput, bool bamOutput);
 
 	// destructor
 	~BedIntersect(void);
@@ -60,7 +61,7 @@ private:
 	bool  _anyHit;
 	bool  _noHit;
 	bool  _writeCount;        // do we want a count of the number of overlaps in B?
-
+    bool  _obeySplits;
 	bool  _bamInput;
 	bool  _bamOutput;
 	
@@ -76,7 +77,9 @@ private:
 
 	void IntersectBam(string bamFile);
 	
-	bool FindOverlaps(const BED &a, vector<BED> &hits);
+    bool processHits(const BED &a, const vector<BED> &hits, bool printable);
+	
+	bool FindOverlaps(const BED &a, vector<BED> &hits, int lineNum);
 	bool FindOneOrMoreOverlap(const BED &a);
 
 	void ReportOverlapDetail(const int &overlapBases, const BED &a, const BED &b,

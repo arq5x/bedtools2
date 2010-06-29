@@ -12,73 +12,15 @@
 #include "lineFileUtilities.h"
 #include "intersectBed.h"
 
+/************************************
+Helper functions
+************************************/
+bool BedIntersect::processHits(const BED &a, const vector<BED> &hits, bool printable) {
 
-/*
-	Constructor
-*/
-BedIntersect::BedIntersect(string bedAFile, string bedBFile, bool anyHit, 
-						   bool writeA, bool writeB, bool writeOverlap, bool writeAllOverlap,
-						   float overlapFraction, bool noHit, bool writeCount, bool forceStrand, 
-						   bool reciprocal, bool bamInput, bool bamOutput) {
-
-	_bedAFile            = bedAFile;
-	_bedBFile            = bedBFile;
-	_anyHit              = anyHit;
-	_noHit               = noHit;
-	_writeA              = writeA;	
-	_writeB              = writeB;
-	_writeOverlap        = writeOverlap;
-	_writeAllOverlap     = writeAllOverlap;		
-	_writeCount          = writeCount;
-	_overlapFraction     = overlapFraction;
-	_forceStrand         = forceStrand;
-	_reciprocal          = reciprocal;
-	_bamInput            = bamInput;
-	_bamOutput           = bamOutput;
-	
-	// create new BED file objects for A and B
-	_bedA = new BedFile(bedAFile);
-	_bedB = new BedFile(bedBFile);
-	
-	// dealing with a proper file
-	if (_bedA->bedFile != "stdin") {   
-		if (_bamInput == false) 
-			IntersectBed();
-		else
-			IntersectBam(_bedA->bedFile);
-	}
-	// reading from stdin
-	else {  
-		if (_bamInput == false)
-			IntersectBed();
-		else
-			IntersectBam("stdin");			
-	}
-}
-
-
-/*
-	Destructor
-*/
-BedIntersect::~BedIntersect(void) {
-}
-
-
-bool BedIntersect::FindOverlaps(const BED &a, vector<BED> &hits) {
-	
-	bool hitsFound = false;
-	
-	// grab _all_ of the features in B that overlap with a.
-	_bedB->FindOverlapsPerBin(a.chrom, a.start, a.end, a.strand, hits, _forceStrand); 
+    // how many overlaps are there b/w the bed and the set of hits?
+	int  numOverlaps = 0;		
+    bool hitsFound   = false;
     
-	// how many overlaps are there b/w a and B?
-	int numOverlaps = 0;		
-	
-	// should we print each overlap, or does the user want summary information?
-	bool printable = true;			
-	if (_anyHit || _noHit || _writeCount)
-		printable = false;
-	
 	// loop through the hits and report those that meet the user's criteria
 	vector<BED>::const_iterator h       = hits.begin();
 	vector<BED>::const_iterator hitsEnd = hits.end();
@@ -115,6 +57,93 @@ bool BedIntersect::FindOverlaps(const BED &a, vector<BED> &hits) {
 	ReportOverlapSummary(a, numOverlaps);
 	// were hits found for this BED feature?
 	return hitsFound;
+}
+
+
+/*
+	Constructor
+*/
+BedIntersect::BedIntersect(string bedAFile, string bedBFile, bool anyHit, 
+						   bool writeA, bool writeB, bool writeOverlap, bool writeAllOverlap,
+						   float overlapFraction, bool noHit, bool writeCount, bool forceStrand, 
+						   bool reciprocal, bool obeySplits, bool bamInput, bool bamOutput) {
+
+	_bedAFile            = bedAFile;
+	_bedBFile            = bedBFile;
+	_anyHit              = anyHit;
+	_noHit               = noHit;
+	_writeA              = writeA;	
+	_writeB              = writeB;
+	_writeOverlap        = writeOverlap;
+	_writeAllOverlap     = writeAllOverlap;		
+	_writeCount          = writeCount;
+	_overlapFraction     = overlapFraction;
+	_forceStrand         = forceStrand;
+	_reciprocal          = reciprocal;
+    _obeySplits          = obeySplits;
+	_bamInput            = bamInput;
+	_bamOutput           = bamOutput;
+	
+	// create new BED file objects for A and B
+	_bedA = new BedFile(bedAFile);
+	_bedB = new BedFile(bedBFile);
+	
+	// dealing with a proper file
+	if (_bedA->bedFile != "stdin") {   
+		if (_bamInput == false) 
+			IntersectBed();
+		else
+			IntersectBam(_bedA->bedFile);
+	}
+	// reading from stdin
+	else {  
+		if (_bamInput == false)
+			IntersectBed();
+		else
+			IntersectBam("stdin");			
+	}
+}
+
+
+/*
+	Destructor
+*/
+BedIntersect::~BedIntersect(void) {
+}
+
+
+bool BedIntersect::FindOverlaps(const BED &a, vector<BED> &hits, int lineNum) {
+	
+	bool hitsFound = false;
+
+	// should we print each overlap, or does the user want summary information?
+	bool printable = true;			
+	if (_anyHit || _noHit || _writeCount)
+		printable = false;
+	
+	if (_obeySplits == false) {
+    	// grab _all_ of the features in B that overlap with a.
+    	_bedB->FindOverlapsPerBin(a.chrom, a.start, a.end, a.strand, hits, _forceStrand);
+        hitsFound = processHits(a, hits, printable);
+    }
+    else {
+        bool hitFoundForBlock = false;
+        bedVector bedBlocks;  // vec to store the discrete BED "blocks" from a
+        splitBedIntoBlocks(a, lineNum, bedBlocks);
+        
+        vector<BED>::const_iterator bedItr  = bedBlocks.begin();
+    	vector<BED>::const_iterator bedEnd  = bedBlocks.end();
+    	for (; bedItr != bedEnd; ++bedItr) {
+	        // collect and process the hits for this "block"
+	        _bedB->FindOverlapsPerBin(bedItr->chrom, bedItr->start, bedItr->end, bedItr->strand, hits, _forceStrand);
+	        hitFoundForBlock = processHits(*bedItr, hits, printable);
+	        
+	        if (hitFoundForBlock == true) 
+                hitsFound = true;
+            hits.clear();
+	    }
+    }
+    return hitsFound;
 }
 
 
@@ -200,7 +229,7 @@ void BedIntersect::IntersectBed() {
 	_bedA->Open();
 	while ((bedStatus = _bedA->GetNextBed(a, lineNum)) != BED_INVALID) {
 		if (bedStatus == BED_VALID) {
-			FindOverlaps(a, hits);
+			FindOverlaps(a, hits, lineNum);
 			hits.clear();
 			a = nullBed;
 		}
@@ -266,7 +295,7 @@ void BedIntersect::IntersectBam(string bamFile) {
 				}
 			}
 			else {
-				overlapsFound = FindOverlaps(a, hits);
+				overlapsFound = FindOverlaps(a, hits, 0);
 				hits.clear();
 			}
 		}

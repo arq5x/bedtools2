@@ -48,6 +48,7 @@ int main(int argc, char* argv[]) {
 	bool haveFraction       = false;
 	bool reciprocalFraction = false;
 	bool forceStrand        = false;
+    bool obeySplits         = false;
 	bool inputIsBam         = false;
 	bool outputIsBam        = true;
 	
@@ -131,6 +132,9 @@ int main(int argc, char* argv[]) {
 		else if (PARAMETER_CHECK("-s", 2, parameterLength)) {
 			forceStrand = true;
 		}
+		else if (PARAMETER_CHECK("-split", 6, parameterLength)) {
+			obeySplits = true;
+		}		
 		else {
 			cerr << endl << "*****ERROR: Unrecognized parameter: " << argv[i] << " *****" << endl << endl;
 			showHelp = true;
@@ -193,7 +197,7 @@ int main(int argc, char* argv[]) {
 
 		BedIntersect *bi = new BedIntersect(bedAFile, bedBFile, anyHit, writeA, writeB, writeOverlap,
 											writeAllOverlap, overlapFraction, noHit, writeCount, forceStrand, 
-											reciprocalFraction, inputIsBam, outputIsBam);
+											reciprocalFraction, obeySplits, inputIsBam, outputIsBam);
 		delete bi;
 		return 0;
 	}
@@ -257,6 +261,9 @@ void ShowHelp(void) {
 	cerr << "\t-s\t"	 	    << "Force strandedness.  That is, only report hits in B that" << endl;
 	cerr						<< "\t\toverlap A on the same strand." << endl;
 	cerr						<< "\t\t- By default, overlaps are reported without respect to strand." << endl << endl;
+	
+	cerr << "\t-split\t"	<< "Report \"split\" BAM alignments as separate BED entries." << endl << endl;
+	
 
 	// end the program here
 	exit(1);

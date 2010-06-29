@@ -13,6 +13,51 @@
 #include "bedFile.h"
 
 
+/************************************************
+Helper functions
+*************************************************/
+void splitBedIntoBlocks(const BED &bed, int lineNum, bedVector &bedBlocks) {
+
+	if (bed.otherFields.size() < 6) {
+		cerr << "Input error: Cannot split into blocks. Found interval with fewer than 12 columns on line " << lineNum << "." << endl;
+		exit(1);
+	}
+
+	int blockCount = atoi(bed.otherFields[3].c_str());
+	if ( blockCount <= 0 ) {
+		cerr << "Input error: found interval having <= 0 blocks on line " << lineNum << "." << endl;
+		exit(1);
+	}
+	else if ( blockCount == 1 ) {
+		//take a short-cut for single blocks
+		bedBlocks.push_back(bed);
+	}
+	else {
+	    // get the comma-delimited strings for the BED12 block starts and block ends.
+    	string blockSizes(bed.otherFields[4]);
+    	string blockStarts(bed.otherFields[5]);
+
+    	vector<int> sizes;
+    	vector<int> starts;
+    	Tokenize(blockSizes, sizes, ",");
+    	Tokenize(blockStarts, starts, ",");
+
+    	if ( sizes.size() != (size_t) blockCount || starts.size() != (size_t) blockCount ) {
+    		cerr << "Input error: found interval with block-counts not matching starts/sizes on line " << lineNum << "." << endl;
+    		exit(1);
+    	}
+
+        // add each BED block to the bedBlocks vector
+    	for (UINT i = 0; i < (UINT) blockCount; ++i) {
+            UINT blockStart = bed.start + starts[i];
+            UINT blockEnd   = bed.start + starts[i] + sizes[i];
+            BED currBedBlock(bed.chrom, blockStart, blockEnd, bed.name, bed.score, bed.strand, bed.otherFields);
+            bedBlocks.push_back(currBedBlock);
+    	}
+	}
+}
+
+
 /***********************************************
 Sorting comparison functions
 ************************************************/

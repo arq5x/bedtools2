@@ -111,6 +111,18 @@ public:
       end(end),
       strand(strand)
     {}
+    
+    // BEDALL
+    BED(string chrom, CHRPOS start, CHRPOS end, string name, 
+        string score, string strand, vector<string> otherFields) 
+    : chrom(chrom), 
+      start(start),
+      end(end),
+      name(name),
+      score(score),
+      strand(strand),
+      otherFields(otherFields)
+    {}
 }; // BED
 
 
@@ -149,6 +161,29 @@ enum BedLineStatus
 };
 
 
+//*************************************************
+// Data structure typedefs
+//*************************************************
+typedef vector<BED>    bedVector;
+typedef vector<BEDCOV> bedCovVector;
+
+typedef map<BIN, bedVector,    std::less<BIN> > binsToBeds;
+typedef map<BIN, bedCovVector, std::less<BIN> > binsToBedCovs;
+
+typedef map<string, binsToBeds, std::less<string> >    masterBedMap;
+typedef map<string, binsToBedCovs, std::less<string> > masterBedCovMap;
+typedef map<string, bedVector, std::less<string> >   masterBedMapNoBin;
+
+
+// EXPERIMENTAL
+//typedef tr1::unordered_map<int, vector<BED> > binsToBeds;
+//typedef tr1::unordered_map<string, binsToBeds> masterBedMap;
+//typedef map<string, bedVector, std::less<string> > masterBedMap;
+//typedef vector<BED> masterBedMapNew[_numBins];
+//typedef tr1::unordered_map<int, vector<BED> > binsToBedsNew;
+//typedef tr1::unordered_map<string, binsToBeds> masterBedMapNew;
+
+
 // return the genome "bin" for a feature with this start and end
 inline
 BIN getBin(CHRPOS start, CHRPOS end) {
@@ -185,7 +220,7 @@ std::string ToString(const T & value)
 
 
 // Ancillary functions
-
+void splitBedIntoBlocks(const BED &bed, int lineNum, bedVector &bedBlocks);
 
 
 // BED Sorting Methods 
@@ -196,31 +231,6 @@ bool sortBySizeDesc(const BED &a, const BED &b);
 bool sortByScoreAsc(const BED &a, const BED &b);
 bool sortByScoreDesc(const BED &a, const BED &b);
 bool byChromThenStart(BED const &a, BED const &b);
-
-
-
-//*************************************************
-// Data structure typedefs
-//*************************************************
-typedef vector<BED>    bedVector;
-typedef vector<BEDCOV> bedCovVector;
-
-typedef map<BIN, bedVector,    std::less<BIN> > binsToBeds;
-typedef map<BIN, bedCovVector, std::less<BIN> > binsToBedCovs;
-
-typedef map<string, binsToBeds, std::less<string> >    masterBedMap;
-typedef map<string, binsToBedCovs, std::less<string> > masterBedCovMap;
-typedef map<string, bedVector, std::less<string> >   masterBedMapNoBin;
-
-
-// EXPERIMENTAL
-//typedef tr1::unordered_map<int, vector<BED> > binsToBeds;
-//typedef tr1::unordered_map<string, binsToBeds> masterBedMap;
-//typedef map<string, bedVector, std::less<string> > masterBedMap;
-//typedef vector<BED> masterBedMapNew[_numBins];
-//typedef tr1::unordered_map<int, vector<BED> > binsToBedsNew;
-//typedef tr1::unordered_map<string, binsToBeds> masterBedMapNew;
-
 
 
 
