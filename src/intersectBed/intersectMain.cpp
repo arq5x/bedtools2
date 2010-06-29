@@ -262,7 +262,7 @@ void ShowHelp(void) {
 	cerr						<< "\t\toverlap A on the same strand." << endl;
 	cerr						<< "\t\t- By default, overlaps are reported without respect to strand." << endl << endl;
 	
-	cerr << "\t-split\t"	<< "Report \"split\" BAM alignments as separate BED entries." << endl << endl;
+	cerr << "\t-split\t"	    << "Treat \"split\" BAM or BED12 entries as distinct BED intervals." << endl << endl;
 	
 
 	// end the program here

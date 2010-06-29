@@ -24,14 +24,18 @@ namespace BamTools {
     	CHRPOS currPosition = bam.Position;
         CHRPOS blockStart   = bam.Position;
         string chrom        = refs.at(bam.RefID).RefName;
-
+        string name         = bam.Name;
+        string strand       = "+";
+        string score        = ToString(bam.MapQuality);
+        if (bam.IsReverseStrand()) strand = "-"; 
+    	
     	vector<CigarOp>::const_iterator cigItr = bam.CigarData.begin();
     	vector<CigarOp>::const_iterator cigEnd = bam.CigarData.end();
         for ( ; cigItr != cigEnd; ++cigItr ) {
     		switch (cigItr->Type) {
     		case 'M':
                 currPosition += cigItr->Length;
-    			blocks.push_back( BED(chrom, blockStart, currPosition) );
+    			blocks.push_back( BED(chrom, blockStart, currPosition, name, score, strand) );
     			break;
 
     		case 'S':
@@ -46,7 +50,7 @@ namespace BamTools {
     		    if (includeDeletions == true)
     		        currPosition += cigItr->Length;
     		    else {
-                    blocks.push_back( BED(chrom, blockStart, currPosition) );
+                    blocks.push_back( BED(chrom, blockStart, currPosition, name, score, strand) );
                     currPosition += cigItr->Length;
                     blockStart    = currPosition;		        
     		    }

@@ -111,6 +111,17 @@ public:
       end(end),
       strand(strand)
     {}
+
+    // BED6
+    BED(string chrom, CHRPOS start, CHRPOS end, string name, 
+        string score, string strand) 
+    : chrom(chrom), 
+      start(start),
+      end(end),
+      name(name),
+      score(score),
+      strand(strand)
+    {}
     
     // BEDALL
     BED(string chrom, CHRPOS start, CHRPOS end, string name, 

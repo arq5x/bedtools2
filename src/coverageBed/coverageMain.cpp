@@ -35,7 +35,8 @@ int main(int argc, char* argv[]) {
 	// parm flags
 	bool forceStrand    = false;
 	bool writeHistogram = false;
-	bool bamInput     = false;	
+    bool obeySplits     = false;
+	bool bamInput       = false;	
 	bool haveBedA       = false;
 	bool haveBedB       = false;
 
@@ -86,6 +87,9 @@ int main(int argc, char* argv[]) {
 		else if (PARAMETER_CHECK("-hist", 5, parameterLength)) {
 			writeHistogram = true;
 		}
+		else if (PARAMETER_CHECK("-split", 6, parameterLength)) {
+			obeySplits = true;
+		}
 		else {
 			cerr << endl << "*****ERROR: Unrecognized parameter: " << argv[i] << " *****" << endl << endl;
 			showHelp = true;
@@ -99,7 +103,7 @@ int main(int argc, char* argv[]) {
 	}
 
 	if (!showHelp) {
-		BedCoverage *bg = new BedCoverage(bedAFile, bedBFile, forceStrand, writeHistogram, bamInput);
+		BedCoverage *bg = new BedCoverage(bedAFile, bedBFile, forceStrand, writeHistogram, bamInput, obeySplits);
 		delete bg;
 		return 0;
 	}
@@ -132,6 +136,7 @@ void ShowHelp(void) {
 	cerr						<< "\t\tOutput (tab delimited) after each feature in B:" << endl;
 	cerr						<< "\t\t  1) depth\n\t\t  2) # bases at depth\n\t\t  3) size of B\n\t\t  4) % of B at depth" << endl << endl;
 	
+	cerr << "\t-split\t"	    << "Treat \"split\" BAM or BED12 entries as distinct BED intervals." << endl << endl;
 
 	cerr << "Default Output:  " << endl;
 	cerr << "\t" << " After each entry in B, reports: " << endl; 

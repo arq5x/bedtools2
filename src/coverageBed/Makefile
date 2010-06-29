@@ -17,7 +17,7 @@ INCLUDES = -I$(UTILITIES_DIR)/bedFile/ -I$(UTILITIES_DIR)/lineFileUtilities/ -I$
 # ----------------------------------
 SOURCES= coverageMain.cpp coverageBed.cpp
 OBJECTS= $(SOURCES:.cpp=.o)
-_EXT_OBJECTS=bedFile.o lineFileUtilities.o BamReader.o BGZF.o gzstream.o
+_EXT_OBJECTS=bedFile.o lineFileUtilities.o BamReader.o BamAncillary.o BGZF.o gzstream.o
 EXT_OBJECTS=$(patsubst %,$(OBJ_DIR)/%,$(_EXT_OBJECTS))
 BUILT_OBJECTS= $(patsubst %,$(OBJ_DIR)/%,$(OBJECTS))
 PROGRAM= coverageBed

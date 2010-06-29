@@ -16,6 +16,7 @@
 
 #include "BamReader.h"
 #include "BamAux.h"
+#include "BamAncillary.h"
 using namespace BamTools;
 
 #include <vector>
@@ -35,7 +36,8 @@ class BedCoverage {
 public:
 
 	// constructor 
-	BedCoverage(string &bedAFile, string &bedBFile, bool &forceStrand, bool &writeHistogram, bool &bamInput);
+	BedCoverage(string &bedAFile, string &bedBFile, bool &forceStrand, bool &writeHistogram, 
+	            bool &bamInput, bool &obeySplits);
 
 	// destructor
 	~BedCoverage(void);
@@ -57,6 +59,9 @@ private:
 	
 	// are we dealing with BAM input for "A"?
 	bool _bamInput;
+	
+	// should we split BED/BAM into discrete blocks?
+    bool _obeySplits;
 	
 	// private function for reporting coverage information
 	void ReportCoverage();

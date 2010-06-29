@@ -49,8 +49,8 @@ void splitBedIntoBlocks(const BED &bed, int lineNum, bedVector &bedBlocks) {
 
         // add each BED block to the bedBlocks vector
     	for (UINT i = 0; i < (UINT) blockCount; ++i) {
-            UINT blockStart = bed.start + starts[i];
-            UINT blockEnd   = bed.start + starts[i] + sizes[i];
+            CHRPOS blockStart = bed.start + starts[i];
+            CHRPOS blockEnd   = bed.start + starts[i] + sizes[i];
             BED currBedBlock(bed.chrom, blockStart, blockEnd, bed.name, bed.score, bed.strand, bed.otherFields);
             bedBlocks.push_back(currBedBlock);
     	}

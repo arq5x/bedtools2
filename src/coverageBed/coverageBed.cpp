@@ -13,7 +13,8 @@
 #include "coverageBed.h"
 
 // build
-BedCoverage::BedCoverage(string &bedAFile, string &bedBFile, bool &forceStrand, bool &writeHistogram, bool &bamInput) {
+BedCoverage::BedCoverage(string &bedAFile, string &bedBFile, bool &forceStrand, 
+                         bool &writeHistogram, bool &bamInput, bool &obeySplits) {
 	
 	_bedAFile       = bedAFile;
 	_bedBFile       = bedBFile;
@@ -22,6 +23,7 @@ BedCoverage::BedCoverage(string &bedAFile, string &bedBFile, bool &forceStrand, 
 	_bedB           = new BedFile(bedBFile);
 	
 	_forceStrand    = forceStrand;
+    _obeySplits     = obeySplits;
 	_writeHistogram = writeHistogram;
 	_bamInput       = bamInput;
 	
@@ -63,8 +65,19 @@ void BedCoverage::CollectCoverageBed() {
 	// process each entry in A
 	while ((bedStatus = _bedA->GetNextBed(a, lineNum)) != BED_INVALID) {
 		if (bedStatus == BED_VALID) {
-			// count a as a hit with all the relevant features in B
-			_bedB->countHits(a, _forceStrand);
+		    // process the BED entry as a single block
+            if (_obeySplits == false)
+    			_bedB->countHits(a, _forceStrand);
+			// split the BED into discrete blocksand process each independently.
+			else {
+			    bedVector bedBlocks;  // vec to store the discrete BED "blocks" from a
+                splitBedIntoBlocks(a, lineNum, bedBlocks);
+                
+                vector<BED>::const_iterator bedItr  = bedBlocks.begin();
+            	vector<BED>::const_iterator bedEnd  = bedBlocks.end();
+            	for (; bedItr != bedEnd; ++bedItr)
+        	        _bedB->countHits(*bedItr, _forceStrand);
+			}
 			a = nullBed;
 		}
 	}	
@@ -95,14 +108,33 @@ void BedCoverage::CollectCoverageBam(string bamFile) {
 	while (reader.GetNextAlignment(bam)) {
 		
 		if (bam.IsMapped()) {
-			
-			// construct a new BED entry from the current BAM alignment.	
-			BED a;
-			a.chrom  = refs.at(bam.RefID).RefName;
-			a.start  = bam.Position;
-			a.end    = bam.GetEndPosition(false);
-			a.strand = '+'; if (bam.IsReverseStrand()) a.strand = '-'; 	
-			_bedB->countHits(a, _forceStrand);
+		    // treat the BAM alignment as a single "block"
+		    if (_obeySplits == false) {
+		        // construct a new BED entry from the current BAM alignment.	
+    			BED a;
+    			a.chrom  = refs.at(bam.RefID).RefName;
+    			a.start  = bam.Position;
+    			a.end    = bam.GetEndPosition(false);
+    			a.strand = "+"; 
+    			if (bam.IsReverseStrand()) a.strand = "-";
+    			
+    			_bedB->countHits(a, _forceStrand);
+			}
+			// split the BAM alignment into discrete blocks and
+			// look for overlaps only within each block.
+			else {
+			    // vec to store the discrete BED "blocks" from a
+			    bedVector bedBlocks;
+                // since we are counting coverage, we do want to split blocks when a 
+                // deletion (D) CIGAR op is encountered (hence the true for the last parm)
+                getBamBlocks(bam, refs, bedBlocks, true);   
+                
+                vector<BED>::const_iterator bedItr  = bedBlocks.begin();
+            	vector<BED>::const_iterator bedEnd  = bedBlocks.end();
+            	for (; bedItr != bedEnd; ++bedItr) {
+            	    _bedB->countHits(*bedItr, _forceStrand);
+        	    }
+			} 	
 		}
 	}
 	// report the coverage (summary or histogram) for BED B.
