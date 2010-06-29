@@ -70,8 +70,8 @@ void BedWindow::FindWindowOverlaps(const BED &a, vector<BED> &hits) {
 
 	// update the current feature's start and end
 	// according to the slop requested (slop = 0 by default)
-	int aFudgeStart = 0;
-	int aFudgeEnd;
+	CHRPOS aFudgeStart = 0;
+	CHRPOS aFudgeEnd;
 	AddWindow(a, aFudgeStart, aFudgeEnd);
 
 	/* 
@@ -118,8 +118,8 @@ bool BedWindow::FindOneOrMoreWindowOverlaps(const BED &a) {
 	
 	// update the current feature's start and end
 	// according to the slop requested (slop = 0 by default)
-	int aFudgeStart = 0;
-	int aFudgeEnd;
+	CHRPOS aFudgeStart = 0;
+	CHRPOS aFudgeEnd;
 	AddWindow(a, aFudgeStart, aFudgeEnd);
 	
 	bool overlapsFound = _bedB->FindOneOrMoreOverlapsPerBin(a.chrom, a.start, a.end, a.strand, _matchOnStrand);
@@ -133,21 +133,19 @@ void BedWindow::WindowIntersectBed() {
 	// that we can easily compare "A" to it for overlaps
 	_bedB->loadBedFileIntoMap();
 
-	BED a;                                                                                                                    
+	BED a, nullBed;                                                                                                                    
 	int lineNum = 0;					// current input line number
 	BedLineStatus bedStatus;
 	vector<BED> hits;					// vector of potential hits
 	hits.reserve(100);
 
 	_bedA->Open();
-	// process each entry in A
-	bedStatus = _bedA->GetNextBed(a, lineNum);
-	while (bedStatus != BED_INVALID) {
+	while ((bedStatus = _bedA->GetNextBed(a, lineNum)) != BED_INVALID) {
 		if (bedStatus == BED_VALID) {
 			FindWindowOverlaps(a, hits);
 			hits.clear();
+			a = nullBed;
 		}
-		bedStatus = _bedA->GetNextBed(a, lineNum);
 	}
 	_bedA->Close();
 }
@@ -196,7 +194,7 @@ void BedWindow::WindowIntersectBam(string bamFile) {
 			if (bam.IsSecondMate()) a.name += "/2";
 
 			a.score  = ToString(bam.MapQuality);
-			a.strand = "+"; if (bam.IsReverseStrand()) a.strand = "-"; 
+			a.strand = '+'; if (bam.IsReverseStrand()) a.strand = '-'; 
 	
 			if (_bamOutput == true) {
 				overlapsFound = FindOneOrMoreWindowOverlaps(a);
@@ -224,7 +222,7 @@ void BedWindow::WindowIntersectBam(string bamFile) {
 }
 
 
-void BedWindow::AddWindow(const BED &a, int &fudgeStart, int &fudgeEnd) {
+void BedWindow::AddWindow(const BED &a, CHRPOS &fudgeStart, CHRPOS &fudgeEnd) {
 	// Does the user want to treat the windows based on strand?
 	// If so, 
 	// if "+", then left is left and right is right

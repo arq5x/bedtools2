@@ -11,7 +11,9 @@
 ******************************************************************************/
 #include "version.h"
 #include "BamReader.h"
+#include "BamAncillary.h"
 #include "BamAux.h"
+#include "bedFile.h"
 using namespace BamTools;
 
 #include <vector>
@@ -34,10 +36,10 @@ using namespace std;
 void ShowHelp(void);
 
 void ConvertBamToBed(const string &bamFile, const bool &useEditDistance, 
-                     const bool &writeBed12, const string &color);
+                     const bool &writeBed12, const bool &obeySplits, const string &color);
 void ConvertBamToBedpe(const string &bamFile, const bool &useEditDistance);
 					
-void PrintBed(const BamAlignment &bam, const RefVector &refs, bool useEditDistance);
+void PrintBed(const BamAlignment &bam, const RefVector &refs, bool useEditDistance, bool obeySplits);
 void PrintBed12(const BamAlignment &bam, const RefVector &refs, bool useEditDistance, string color = "255,0,0");
 void PrintBedPE(const BamAlignment &bam1, const BamAlignment &bam2,
                 const RefVector &refs, bool useEditDistance);
@@ -61,6 +63,7 @@ int main(int argc, char* argv[]) {
 	bool writeBedPE      = false;
 	bool writeBed12      = false;	
 	bool useEditDistance = false;
+	bool obeySplits      = false;
 		
 	// check to see if we should print out some help
 	if(argc <= 1) showHelp = true;
@@ -93,7 +96,10 @@ int main(int argc, char* argv[]) {
 		}
 		else if(PARAMETER_CHECK("-bed12", 6, parameterLength)) {
 				writeBed12 = true;
-		}		
+		}	
+		else if(PARAMETER_CHECK("-split", 6, parameterLength)) {
+				obeySplits = true;
+		}	
 		else if(PARAMETER_CHECK("-ed", 3, parameterLength)) {
 				useEditDistance = true;
 		}
@@ -111,19 +117,23 @@ int main(int argc, char* argv[]) {
 	}
 
 	// make sure we have an input files
-	if (!haveBam ) {
+	if (haveBam == false) {
 		cerr << endl << "*****" << endl << "*****ERROR: Need -i (BAM) file. " << endl << "*****" << endl;
 		showHelp = true;
 	}
-	if (haveColor && writeBed12 == false) {
+	if (haveColor == true && writeBed12 == false) {
 		cerr << endl << "*****" << endl << "*****ERROR: Cannot use color without BED12. " << endl << "*****" << endl;
+		showHelp = true;
+	}
+	if (useEditDistance == true && obeySplits == true) {
+		cerr << endl << "*****" << endl << "*****ERROR: Cannot use -ed with -splits.  Edit distances cannot be computed for each \'chunk\'." << endl << "*****" << endl;
 		showHelp = true;
 	}
 	
 	// if there are no problems, let's convert BAM to BED or BEDPE
 	if (!showHelp) {
 		if (writeBedPE == false) 
-			ConvertBamToBed(bamFile, useEditDistance, writeBed12, color);	// BED or "blocked BED"
+			ConvertBamToBed(bamFile, useEditDistance, writeBed12, obeySplits, color);	// BED or "blocked BED"
 		else
 			ConvertBamToBedpe(bamFile, useEditDistance);                    // BEDPE
 	}	
@@ -150,7 +160,9 @@ void ShowHelp(void) {
 	
 	cerr << "\t-bed12\t"	<< "Write \"blocked\" BED format (aka \"BED12\")." << endl << endl;
 	cerr 					<< "\t\thttp://genome-test.cse.ucsc.edu/FAQ/FAQformat#format1" << endl << endl;
-		
+
+	cerr << "\t-split\t"	<< "Report \"split\" BAM alignments as separate BED entries." << endl << endl;
+			
 	cerr << "\t-ed\t"		<< "Use BAM edit distance (NM tag) for BED score." << endl;
 	cerr 					<< "\t\t- Default for BED is to use mapping quality." << endl;
 	cerr 					<< "\t\t- Default for BEDPE is to use the minimum of" << endl;
@@ -168,7 +180,7 @@ void ShowHelp(void) {
 
 
 void ConvertBamToBed(const string &bamFile, const bool &useEditDistance, 
-                     const bool &writeBed12, const string &color) {
+                     const bool &writeBed12, const bool &obeySplits, const string &color) {
 	// open the BAM file
 	BamReader reader;
 	reader.Open(bamFile);
@@ -182,7 +194,7 @@ void ConvertBamToBed(const string &bamFile, const bool &useEditDistance,
 	while (reader.GetNextAlignment(bam)) {
 		if (bam.IsMapped() == true) {
 			if (writeBed12 == false)                 // BED
-				PrintBed(bam, refs, useEditDistance);
+				PrintBed(bam, refs, useEditDistance, obeySplits);
 			else                                     //"blocked" BED
 				PrintBed12(bam, refs, useEditDistance, color);
 		}
@@ -265,7 +277,7 @@ void ParseCigarBed12(const vector<CigarOp> &cigar, vector<int> &blockStarts, vec
 }
 
 
-void PrintBed(const BamAlignment &bam,  const RefVector &refs, bool useEditDistance) {
+void PrintBed(const BamAlignment &bam,  const RefVector &refs, bool useEditDistance, bool obeySplits) {
 
 	// set the strand
 	string strand = "+"; 
@@ -279,21 +291,39 @@ void PrintBed(const BamAlignment &bam,  const RefVector &refs, bool useEditDista
 	// get the unpadded (parm = false) end position based on the CIGAR
 	unsigned int alignmentEnd = bam.GetEndPosition(false);
 
-	// report the alignment in BED6 format.
-	if (useEditDistance == false) {
-		printf("%s\t%d\t%d\t\%s\t%d\t%s\n", refs.at(bam.RefID).RefName.c_str(), bam.Position,
-									  alignmentEnd, name.c_str(), bam.MapQuality, strand.c_str());
+    // report the entire BAM footprint as a single BED entry
+    if (obeySplits == false) {
+    	// report the alignment in BED6 format.
+    	if (useEditDistance == false) {
+    		printf("%s\t%d\t%d\t\%s\t%d\t%s\n", refs.at(bam.RefID).RefName.c_str(), bam.Position,
+    									  alignmentEnd, name.c_str(), bam.MapQuality, strand.c_str());
+    	}
+    	else {
+    		uint8_t editDistance;
+    		if (bam.GetEditDistance(editDistance)) {
+    			printf("%s\t%d\t%d\t\%s\t%u\t%s\n", refs.at(bam.RefID).RefName.c_str(), bam.Position,
+    										  alignmentEnd, name.c_str(), editDistance, strand.c_str());
+    		}
+    		else {
+    			cerr << "The edit distance tag (NM) was not found in the BAM file.  Please disable -ed.  Exiting\n";
+    			exit(1);
+    		}
+    	}
 	}
+    // Report each chunk of the BAM alignment as a discrete BED entry
+    // For example 10M100N10M would be reported as two seprate BED entries of length 10
 	else {
-		uint8_t editDistance;
-		if (bam.GetEditDistance(editDistance)) {
-			printf("%s\t%d\t%d\t\%s\t%u\t%s\n", refs.at(bam.RefID).RefName.c_str(), bam.Position,
-										  alignmentEnd, name.c_str(), editDistance, strand.c_str());
-		}
-		else {
-			cerr << "The edit distance tag (NM) was not found in the BAM file.  Please disable -ed.  Exiting\n";
-			exit(1);
-		}
+        vector<BED> bedBlocks;
+        // Load the alignment blocks in bam into the bedBlocks vector. 
+        // Don't trigger a new block when a "D" (deletion) CIGAR op is found.
+        getBamBlocks(bam, refs, bedBlocks, false);
+        
+        vector<BED>::const_iterator bedItr = bedBlocks.begin();
+    	vector<BED>::const_iterator bedEnd = bedBlocks.end();
+    	for (; bedItr != bedEnd; ++bedItr) {
+	        printf("%s\t%d\t%d\t\%s\t%d\t%s\n", refs.at(bam.RefID).RefName.c_str(), bedItr->start,
+    									  bedItr->end, name.c_str(), bam.MapQuality, strand.c_str());
+	    }
 	}
 }
 

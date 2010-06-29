@@ -214,7 +214,7 @@ void BedGenomeCoverage::CoverageBam(string bamFile) {
 	// process the results of the last chromosome.
 	ReportChromCoverage(chromCov, currChromSize, currChrom, chromDepthHist);
 	
-	if (_eachBase == false && _bedGraph == false) {
+	if (_eachBase == false && _bedGraph == false && _bedGraphAll == false) {
 		ReportGenomeCoverage(chromDepthHist);
 	}
 	

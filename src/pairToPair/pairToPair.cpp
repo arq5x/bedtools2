@@ -47,7 +47,7 @@ void PairToPair::IntersectPairs() {
 	_bedB->loadBedPEFileIntoMap();
 	
 	int lineNum = 0;	
-	vector<BED> hitsA1B1, hitsA1B2, hitsA2B1, hitsA2B2;
+	vector<BEDCOV> hitsA1B1, hitsA1B2, hitsA2B1, hitsA2B2;
 	// reserve some space
 	hitsA1B1.reserve(100); hitsA1B2.reserve(100); hitsA2B1.reserve(100); hitsA2B2.reserve(100);
 	
@@ -55,16 +55,15 @@ void PairToPair::IntersectPairs() {
 	BEDPE a, nullBedPE;
 	
 	_bedA->Open();	
-	bedStatus = _bedA->GetNextBedPE(a, lineNum);
-	while (bedStatus != BED_INVALID) {
+	while ((bedStatus = _bedA->GetNextBedPE(a, lineNum)) != BED_INVALID) {
 		if (bedStatus == BED_VALID) {
+            // identify overlaps b/w the pairs
 			FindOverlaps(a, hitsA1B1, hitsA1B2, hitsA2B1, hitsA2B2, _searchType);
 		
 			// reset space for next BEDPE
 			hitsA1B1.clear(); hitsA1B2.clear(); hitsA2B1.clear(); hitsA2B2.clear();		
 			a = nullBedPE;
 		}
-		bedStatus = _bedA->GetNextBedPE(a, lineNum);
 	}
 	_bedA->Close();
 }
@@ -72,15 +71,15 @@ void PairToPair::IntersectPairs() {
 
 
 
-void PairToPair::FindOverlaps(const BEDPE &a, vector<BED> &hitsA1B1, vector<BED> &hitsA1B2, 
-							  vector<BED> &hitsA2B1, vector<BED> &hitsA2B2, string type) {
+void PairToPair::FindOverlaps(const BEDPE &a, vector<BEDCOV> &hitsA1B1, vector<BEDCOV> &hitsA1B2, 
+							  vector<BEDCOV> &hitsA2B1, vector<BEDCOV> &hitsA2B2, string type) {
 
 	// list of hits on each end of BEDPE
 	// that exceed the requested overlap fraction
-	vector<BED> qualityHitsA1B1;
-	vector<BED> qualityHitsA1B2;
-	vector<BED> qualityHitsA2B1;
-	vector<BED> qualityHitsA2B2;
+	vector<BEDCOV> qualityHitsA1B1;
+	vector<BEDCOV> qualityHitsA1B2;
+	vector<BEDCOV> qualityHitsA2B1;
+	vector<BEDCOV> qualityHitsA2B2;
 
 	// count of hits on each end of BEDPE
 	// that exceed the requested overlap fraction
@@ -121,13 +120,13 @@ void PairToPair::FindOverlaps(const BEDPE &a, vector<BED> &hitsA1B1, vector<BED>
 
 
 
-void PairToPair::FindQualityHitsBetweenEnds(const BEDPE &a, int end, const vector<BED> &hits, 
-											vector<BED> &qualityHits, int &numOverlaps) {
+void PairToPair::FindQualityHitsBetweenEnds(const BEDPE &a, int end, const vector<BEDCOV> &hits, 
+											vector<BEDCOV> &qualityHits, int &numOverlaps) {
 
 	if (end == 1) {
 		
-		vector<BED>::const_iterator h = hits.begin();
-		vector<BED>::const_iterator hitsEnd = hits.end();
+		vector<BEDCOV>::const_iterator h = hits.begin();
+		vector<BEDCOV>::const_iterator hitsEnd = hits.end();
 		for (; h != hitsEnd; ++h) {				
 			int s = max(a.start1, h->start);
 			int e = min(a.end1, h->end);
@@ -142,8 +141,8 @@ void PairToPair::FindQualityHitsBetweenEnds(const BEDPE &a, int end, const vecto
 	}
 	else if (end == 2) {
 		
-		vector<BED>::const_iterator h = hits.begin();
-		vector<BED>::const_iterator hitsEnd = hits.end();
+		vector<BEDCOV>::const_iterator h = hits.begin();
+		vector<BEDCOV>::const_iterator hitsEnd = hits.end();
 		for (; h != hitsEnd; ++h) {				
 			int s = max(a.start2, h->start);
 			int e = min(a.end2, h->end);
@@ -157,25 +156,25 @@ void PairToPair::FindQualityHitsBetweenEnds(const BEDPE &a, int end, const vecto
 }
 
 
-void PairToPair::FindHitsOnBothEnds(const BEDPE &a, const vector<BED> &qualityHitsEnd1, 
-									const vector<BED> &qualityHitsEnd2, int &matchCount) {
+void PairToPair::FindHitsOnBothEnds(const BEDPE &a, const vector<BEDCOV> &qualityHitsEnd1, 
+									const vector<BEDCOV> &qualityHitsEnd2, int &matchCount) {
 	
-	map<unsigned int, vector<BED>, less<int> > hitsMap;
+	map<unsigned int, vector<BEDCOV>, less<int> > hitsMap;
 	
-	for (vector<BED>::const_iterator h = qualityHitsEnd1.begin(); h != qualityHitsEnd1.end(); ++h) {
+	for (vector<BEDCOV>::const_iterator h = qualityHitsEnd1.begin(); h != qualityHitsEnd1.end(); ++h) {
 		hitsMap[h->count].push_back(*h);
 		matchCount++;
 	}
-	for (vector<BED>::const_iterator h = qualityHitsEnd2.begin(); h != qualityHitsEnd2.end(); ++h) {
+	for (vector<BEDCOV>::const_iterator h = qualityHitsEnd2.begin(); h != qualityHitsEnd2.end(); ++h) {
 		hitsMap[h->count].push_back(*h);
 		matchCount++;
 	}
 
-	for (map<unsigned int, vector<BED>, less<unsigned int> >::iterator m = hitsMap.begin(); m != hitsMap.end(); ++m) {
+	for (map<unsigned int, vector<BEDCOV>, less<unsigned int> >::iterator m = hitsMap.begin(); m != hitsMap.end(); ++m) {
 		if (m->second.size() == 2) {
 			
-			BED b1 = m->second[0];
-			BED b2 = m->second[1];
+			BEDCOV b1 = m->second[0];
+			BEDCOV b2 = m->second[1];
 			
 			if (_searchType == "both") {
 				_bedA->reportBedPETab(a);

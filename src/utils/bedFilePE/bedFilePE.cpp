@@ -174,7 +174,7 @@ void BedFilePE::reportBedPENewLine(const BEDPE &a) {
 		 									a.chrom2.c_str(), a.start2, a.end2,
 											a.name.c_str(), a.score.c_str(), a.strand1.c_str(), a.strand2.c_str());
 											
-		vector<string>::const_iterator othIt = a.otherFields.begin(); 
+		vector<string>::const_iterator othIt  = a.otherFields.begin(); 
 		vector<string>::const_iterator othEnd = a.otherFields.end(); 
 		for ( ; othIt != othEnd; ++othIt) {
 			printf("%s\t", othIt->c_str());
@@ -421,24 +421,24 @@ bool BedFilePE::parseBedPELine (BEDPE &bed, const vector<string> &lineVector, co
 /*
 	Adapted from kent source "binKeeperFind"
 */
-void BedFilePE::FindOverlapsPerBin(int bEnd, string chrom, int start, int end, string strand, vector<BED> &hits, bool forceStrand) {
+void BedFilePE::FindOverlapsPerBin(int bEnd, string chrom, CHRPOS start, CHRPOS end, string strand, vector<BEDCOV> &hits, bool forceStrand) {
 
 	int startBin, endBin;
 	startBin = (start >> _binFirstShift);
 	endBin = ((end-1) >> _binFirstShift);
 
 	// loop through each bin "level" in the binning hierarchy
-	for (int i = 0; i < 6; ++i) {
+	for (int i = 0; i < _binLevels; ++i) {
 		
 		// loop through each bin at this level of the hierarchy
-		int offset = binOffsetsExtended[i];
+		int offset = _binOffsetsExtended[i];
 		for (int j = (startBin+offset); j <= (endBin+offset); ++j)  {
 			
 			// loop through each feature in this chrom/bin and see if it overlaps
 			// with the feature that was passed in.  if so, add the feature to 
 			// the list of hits.
-			vector<BED>::const_iterator bedItr;
-			vector<BED>::const_iterator bedEnd;
+			vector<BEDCOV>::const_iterator bedItr;
+			vector<BEDCOV>::const_iterator bedEnd;
 			if (bEnd == 1) {
 				bedItr = bedMapEnd1[chrom][j].begin();
 				bedEnd = bedMapEnd1[chrom][j].end();
@@ -480,7 +480,7 @@ void BedFilePE::loadBedPEFileIntoMap() {
 	while (bedStatus != BED_INVALID) {
 		
 		if (bedStatus == BED_VALID) {
-			BED bedEntry1, bedEntry2;
+			BEDCOV bedEntry1, bedEntry2;
 			// separate the BEDPE entry into separate
 			// BED entries
 			splitBedPEIntoBeds(bedpeEntry, lineNum, bedEntry1, bedEntry2);
@@ -501,7 +501,7 @@ void BedFilePE::loadBedPEFileIntoMap() {
 }
 
 
-void BedFilePE::splitBedPEIntoBeds(const BEDPE &bedpeEntry, const int &lineNum, BED &bedEntry1, BED &bedEntry2) {
+void BedFilePE::splitBedPEIntoBeds(const BEDPE &bedpeEntry, const int &lineNum, BEDCOV &bedEntry1, BEDCOV &bedEntry2) {
 	
 	/* 
 	   Split the BEDPE entry into separate BED entries

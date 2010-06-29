@@ -1,5 +1,5 @@
 CXX=		g++
-CXXFLAGS=	-Wall -O2
+CXXFLAGS=	-Wall -O2 -fopenmp
 LIBS=		-lz
 UTILITIES_DIR = ../utils/
 OBJ_DIR = ../../obj/
@@ -8,7 +8,7 @@ BIN_DIR = ../../bin/
 # -------------------
 # define our includes
 # -------------------
-INCLUDES = -I$(UTILITIES_DIR)/bedFile/ -I$(UTILITIES_DIR)/genomeFile/ -I$(UTILITIES_DIR)/lineFileUtilities/  -I$(UTILITIES_DIR)/BamTools/  -I$(UTILITIES_DIR)/version/ -I$(UTILITIES_DIR)/gzstream/
+INCLUDES = -I$(UTILITIES_DIR)/bedFile/ -I$(UTILITIES_DIR)/genomeFile/ -I$(UTILITIES_DIR)/lineFileUtilities/  -I$(UTILITIES_DIR)/BamTools/  -I$(UTILITIES_DIR)/version/ -I$(UTILITIES_DIR)/gzstream/ 
 
 # ----------------------------------
 # define our source and object files

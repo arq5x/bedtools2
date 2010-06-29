@@ -35,14 +35,14 @@ public:
 
  	void IntersectPairs();
 
-	void FindOverlaps(const BEDPE &a, vector<BED> &hitsA1B1, vector<BED> &hitsA1B2, 
-		vector<BED> &hitsA2B1, vector<BED> &hitsA2B2, string type);
+	void FindOverlaps(const BEDPE &a, vector<BEDCOV> &hitsA1B1, vector<BEDCOV> &hitsA1B2, 
+		vector<BEDCOV> &hitsA2B1, vector<BEDCOV> &hitsA2B2, string type);
 
-	void FindQualityHitsBetweenEnds(const BEDPE &a, int end, const vector<BED> &hits, 
-		vector<BED> &qualityHits, int &numOverlaps);
+	void FindQualityHitsBetweenEnds(const BEDPE &a, int end, const vector<BEDCOV> &hits, 
+		vector<BEDCOV> &qualityHits, int &numOverlaps);
 	
-	void FindHitsOnBothEnds(const BEDPE &a, const vector<BED> &qualityHitsEnd1, 
-		const vector<BED> &qualityHitsEnd2, int &matchCount);
+	void FindHitsOnBothEnds(const BEDPE &a, const vector<BEDCOV> &qualityHitsEnd1, 
+		const vector<BEDCOV> &qualityHitsEnd2, int &matchCount);
 	
 		
 private:

@@ -82,8 +82,8 @@ private:
 
 		// initialize BEDPE variables
 		a.start1 = a.start2 = a.end1 = a.end2 = -1;
-		a.chrom1 = a.chrom2 = a.strand1 = a.strand2 = ".";
-
+		a.chrom1 = a.chrom2 = ".";
+        a.strand1 = a.strand2 = '.';
 		uint8_t editDistance1, editDistance2;
 		editDistance1 = editDistance2 = 0;
 		
@@ -95,8 +95,8 @@ private:
 			a.chrom1  = refs.at(bam1.RefID).RefName;
 			a.start1  = bam1.Position;
 			a.end1    = bam1.GetEndPosition();
-			a.strand1 = "+";
-			if (bam1.IsReverseStrand()) a.strand1 = "-";
+			a.strand1 = '+';
+			if (bam1.IsReverseStrand()) a.strand1 = '-';
 			
 			// extract the edit distance from the NM tag
 			// if possible. otherwise, complain.
@@ -113,8 +113,8 @@ private:
 			a.chrom2  = refs.at(bam2.RefID).RefName;
 			a.start2  = bam2.Position;
 			a.end2    = bam2.GetEndPosition();
-			a.strand2 = "+";
-			if (bam2.IsReverseStrand()) a.strand2 = "-";
+			a.strand2 = '+';
+			if (bam2.IsReverseStrand()) a.strand2 = '-';
 			
 			// extract the edit distance from the NM tag
 			// if possible. otherwise, complain.

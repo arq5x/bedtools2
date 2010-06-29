@@ -63,7 +63,7 @@ void Bed2Fa::ReportDNA(const BED &bed, const string &currDNA, const string &curr
 
     	string dna = currDNA.substr(bed.start, ((bed.end - bed.start)));
     	// revcomp if necessary.  Thanks to Thomas Doktor.
-    	if ((_useStrand == true) && (bed.strand == '-'))
+    	if ((_useStrand == true) && (bed.strand == "-"))
     		reverseComplement(dna);
 	
     	if (!(_useName)) {

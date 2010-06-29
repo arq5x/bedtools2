@@ -106,14 +106,11 @@ void BedLinks::CreateLinks() {
 	BedLineStatus bedStatus;
 	
 	_bed->Open();
-	bedStatus = _bed->GetNextBed(bedEntry, lineNum);
-	while (bedStatus != BED_INVALID) {
+	while ((bedStatus = _bed->GetNextBed(bedEntry, lineNum)) != BED_INVALID) {
 		if (bedStatus == BED_VALID) {
-			bedEntry.count = 0;
 			WriteURL(bedEntry, base);
 			bedEntry = nullBed;
 		}
-		bedStatus = _bed->GetNextBed(bedEntry, lineNum);
 	}
 	_bed->Close();
 

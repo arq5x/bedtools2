@@ -58,7 +58,7 @@ void BedSlop::AddSlop(BED &bed) {
 
 	// special handling if the BED entry is on the negative
 	// strand and the user cares about strandedness.
-	int chromSize = _genome->getChromSize(bed.chrom);
+	CHRPOS chromSize = _genome->getChromSize(bed.chrom);
 	
 	if ( (_forceStrand) && (bed.strand == "-") ) {
 		// inspect the start

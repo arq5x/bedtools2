@@ -13,6 +13,8 @@
 #include "bedFile.h"
 #include "genomeFile.h"
 #include "version.h"
+#include <omp.h>
+
 
 #include "BamWriter.h"
 #include "BamAux.h"
@@ -155,7 +157,7 @@ void ShowHelp(void) {
 
 
 	cerr << "Notes: " << endl;
-	cerr << "\t(1)  BED files must be at least BED4 (needs name field)." << endl << endl;
+	cerr << "\t(1)  BED files must be at least BED4 to be amenable to BAM (needs name field)." << endl << endl;
 
 
 	// end the program here
@@ -202,8 +204,7 @@ void ProcessBed(istream &bedInput, BedFile *bed, GenomeFile *genome, bool isBED1
 	BedLineStatus bedStatus;
 	// open the BED file for reading.
 	bed->Open();
-	bedStatus = bed->GetNextBed(bedEntry, lineNum);
-	while (bedStatus != BED_INVALID) {
+	while ((bedStatus = bed->GetNextBed(bedEntry, lineNum)) != BED_INVALID) {        
 		if (bedStatus == BED_VALID) {
 			BamAlignment bamEntry;
 			if (bed->bedType >= 4) {
@@ -216,8 +217,10 @@ void ProcessBed(istream &bedInput, BedFile *bed, GenomeFile *genome, bool isBED1
 			}
 			bedEntry = nullBed;
 		}
-		bedStatus = bed->GetNextBed(bedEntry, lineNum);
 	}
+
+
+
 	// close up
 	bed->Close();
 	writer->Close();

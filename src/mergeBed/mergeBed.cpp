@@ -66,8 +66,8 @@ void BedMerge::MergeBed() {
 		// bedList is already sorted by start position.
 		vector<BED> bedList = m->second; 
 
-		int minStart = INT_MAX;
-		int maxEnd = 0;
+		CHRPOS minStart = INT_MAX;
+		CHRPOS maxEnd = 0;
 		bool OIP = false;       // OIP = Overlap In Progress.  Lame, I realize.
 		int prev = -1;
 		unsigned int curr = 0;
@@ -180,8 +180,9 @@ void BedMerge::MergeBedStranded() {
 	_bed->loadBedFileIntoMapNoBin();
 
 	// loop through each chromosome and merge their BED entries
-	for (masterBedMapNoBin::iterator m = _bed->bedMapNoBin.begin(); m != _bed->bedMapNoBin.end(); ++m) {
-
+	masterBedMapNoBin::const_iterator m    = _bed->bedMapNoBin.begin(); 
+	masterBedMapNoBin::const_iterator mEnd = _bed->bedMapNoBin.end(); 
+    for (; m != mEnd; ++m) {
 		// bedList is already sorted by start position.
 		vector<BED> bedList = m->second; 
 
@@ -193,8 +194,8 @@ void BedMerge::MergeBedStranded() {
 		// do two passes, one for each strand.
 		for (unsigned int s = 0; s < strands.size(); s++) {
 
-			int minStart = INT_MAX;
-			int maxEnd = 0;
+			CHRPOS minStart = INT_MAX;
+			CHRPOS maxEnd = 0;
 			bool OIP = false;       // OIP = Overlap In Progress.  Lame, I realize.
 			int prev = -1;
 			unsigned int curr = 0;

@@ -41,30 +41,6 @@ BedClosest::~BedClosest(void) {
 }
 
 
-/*
-	reportNullB
-	
-	Writes a NULL B entry for cases where no closest BED was found
-	Works for BED3 - BED6.
-*/
-void BedClosest::reportNullB() {
-	if (_bedB->bedType == 3) {
-		printf("none\t-1\t-1\n");
-	}
-	else if (_bedB->bedType == 4) {
-		printf("none\t-1\t-1\t-1\n");
-	}
-	else if (_bedB->bedType == 5) {
-		printf("none\t-1\t-1\t-1\t-1\n");
-	}
-	else if (_bedB->bedType == 6) {
-		printf("none\t-1\t-1\t-1\t-1\t-1\n");
-	}
-}
-
-
-
-
 void BedClosest::FindWindowOverlaps(BED &a, vector<BED> &hits) {
 	
 	int slop = 0;  // start out just looking for overlaps 
@@ -72,12 +48,12 @@ void BedClosest::FindWindowOverlaps(BED &a, vector<BED> &hits) {
 
 	// update the current feature's start and end
 
-	int aFudgeStart = 0;
-	int aFudgeEnd;
+	CHRPOS aFudgeStart = 0;
+	CHRPOS aFudgeEnd;
 	int numOverlaps = 0;
 	vector<BED> closestB;
 	float maxOverlap = 0;
-	int minDistance = 999999999;
+	CHRPOS minDistance = INT_MAX;
 
 
 	if(_bedB->bedMap.find(a.chrom) != _bedB->bedMap.end()) {
@@ -143,7 +119,7 @@ void BedClosest::FindWindowOverlaps(BED &a, vector<BED> &hits) {
 	}
 	else {
 		_bedA->reportBedTab(a);
-		reportNullB(); 
+		_bedB->reportNullBedNewLine(); 
 	}
 
 	if (numOverlaps > 0) {
@@ -186,14 +162,12 @@ void BedClosest::FindClosestBed() {
 
 	_bedA->Open();
 	// process each entry in A in search of the closest feature in B
-	bedStatus = _bedA->GetNextBed(a, lineNum);
-	while (bedStatus != BED_INVALID) {
+	while ((bedStatus = _bedA->GetNextBed(a, lineNum)) != BED_INVALID) {
 		if (bedStatus == BED_VALID) {
 			FindWindowOverlaps(a, hits);
 			hits.clear();
 			a = nullBed;
 		}
-		bedStatus = _bedA->GetNextBed(a, lineNum);
 	}
 	_bedA->Close();
 }

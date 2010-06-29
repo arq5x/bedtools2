@@ -133,11 +133,11 @@ void BedSubtract::FindAndSubtractOverlaps(BED &a, vector<BED> &hits) {
 			// report the remaining blocks.
 			for (unsigned int i = 0; i < aKeep.size(); ++i) {
 				if (aKeep[i] == true) {
-					int blockStart = i + a.start;
+					CHRPOS blockStart = i + a.start;
 					while ((aKeep[i] == true) && (i < aKeep.size())) {
 						i++;
 					}
-					int blockEnd = i + a.start;
+					CHRPOS blockEnd = i + a.start;
 					blockEnd = min(a.end, blockEnd);
 					_bedA->reportBedRangeNewLine(a,blockStart,blockEnd);
 				}
@@ -162,14 +162,12 @@ void BedSubtract::SubtractBed() {
 	hits.reserve(100);
 
 	_bedA->Open();	 	
-	bedStatus = _bedA->GetNextBed(a, lineNum);
-	while (bedStatus != BED_INVALID) {
+	while ((bedStatus = _bedA->GetNextBed(a, lineNum)) != BED_INVALID) {
 		if (bedStatus == BED_VALID) {
 			FindAndSubtractOverlaps(a, hits);
 			hits.clear();
 			a = nullBed;
-		}
-		bedStatus = _bedA->GetNextBed(a, lineNum);		
+		}	
 	}
 	_bedA->Close();
 	

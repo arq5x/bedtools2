@@ -22,12 +22,12 @@ struct BEDPE {
 
 	// UCSC BED fields
 	string chrom1;
-	int start1;
-	int end1;
+	CHRPOS start1;
+	CHRPOS end1;
 	
 	string chrom2;
-	int start2;
-	int end2;
+	CHRPOS start2;
+	CHRPOS end2;
 	 
 	string name;
 	string score;
@@ -69,18 +69,18 @@ public:
 	void reportBedPETab(const BEDPE &a);
 	void reportBedPENewLine(const BEDPE &a);
 	void loadBedPEFileIntoMap();
-	void splitBedPEIntoBeds(const BEDPE &a, const int &lineNum, BED &bedEntry1, BED &bedEntry2);
+	void splitBedPEIntoBeds(const BEDPE &a, const int &lineNum, BEDCOV &bedEntry1, BEDCOV &bedEntry2);
 		 
 		
-	void FindOverlapsPerBin(int bEnd, string chrom, int start, int end, string strand, 
-		vector<BED> &hits, bool forceStrand);
+	void FindOverlapsPerBin(int bEnd, string chrom, CHRPOS start, CHRPOS end, string strand, 
+		vector<BEDCOV> &hits, bool forceStrand);
 		
 		
 	string bedFile;
 	unsigned int bedType;
 	
-	masterBedMap bedMapEnd1;
-	masterBedMap bedMapEnd2;
+	masterBedCovMap bedMapEnd1;
+	masterBedCovMap bedMapEnd2;
 	
 private:
 	istream *_bedStream;

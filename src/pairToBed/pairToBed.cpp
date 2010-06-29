@@ -257,9 +257,9 @@ void BedIntersectPE::FindSpanningOverlaps(const BEDPE &a, vector<BED> &hits, con
 	// count of hits on _between_ end of BEDPE
 	// that exceed the requested overlap fraction
 	int numOverlaps = 0;
-	int spanStart = 0;
-	int spanEnd = 0;
-	int spanLength = 0;
+	CHRPOS spanStart = 0;
+	CHRPOS spanEnd = 0;
+	CHRPOS spanLength = 0;
 	
 	if ((type == "ispan") || (type == "notispan")) {
 		spanStart = a.end1;
@@ -357,8 +357,7 @@ void BedIntersectPE::IntersectBedPE() {
 	BedLineStatus bedStatus;
 	
 	_bedA->Open();	
-	bedStatus = _bedA->GetNextBedPE(a, lineNum);
-	while (bedStatus != BED_INVALID) {
+	while ((bedStatus = _bedA->GetNextBedPE(a, lineNum)) != BED_INVALID) {
 		if (bedStatus == BED_VALID) {		
 			if ( (_searchType == "ispan") || (_searchType == "ospan") ||
 			 	 (_searchType == "notispan") || (_searchType == "notospan") ) {
@@ -374,7 +373,6 @@ void BedIntersectPE::IntersectBedPE() {
 			}
 			a = nullBedPE;
 		}
-		bedStatus = _bedA->GetNextBedPE(a, lineNum);
 	}
 	_bedA->Close();
 }

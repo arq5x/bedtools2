@@ -60,7 +60,7 @@ private:
 	void WindowIntersectBam(string bamFile);	
 	void FindWindowOverlaps(const BED &a, vector<BED> &hits);
 	bool FindOneOrMoreWindowOverlaps(const BED &a);	
-	void AddWindow(const BED &a, int &fudgeStart, int &fudgeEnd);	
+	void AddWindow(const BED &a, CHRPOS &fudgeStart, CHRPOS &fudgeEnd);	
 
 };
 #endif /* WINDOWBED_H */

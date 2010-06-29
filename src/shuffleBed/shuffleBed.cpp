@@ -71,14 +71,12 @@ void BedShuffle::Shuffle() {
 	BedLineStatus bedStatus;
 	
 	_bed->Open();
-	bedStatus = _bed->GetNextBed(bedEntry, lineNum);
-	while (bedStatus != BED_INVALID) {
+	while ((bedStatus = _bed->GetNextBed(bedEntry, lineNum)) != BED_INVALID) {
 		if (bedStatus == BED_VALID) {
 			ChooseLocus(bedEntry);			
 			_bed->reportBedNewLine(bedEntry);
 			bedEntry = nullBed;
 		}
-		bedStatus = _bed->GetNextBed(bedEntry, lineNum);
 	}
 	_bed->Close();
 }
@@ -88,72 +86,76 @@ void BedShuffle::Shuffle() {
 void BedShuffle::ShuffleWithExclusions() {
 
 	int lineNum = 0;
-	BED bedEntry;     // used to store the current BED line from the BED file.
+	BED bedEntry, nullBed;     // used to store the current BED line from the BED file.
+	BedLineStatus bedStatus;
 	vector<BED> hits;
 	hits.reserve(100);
 		
 	_bed->Open();	
-	while (_bed->GetNextBed(bedEntry, lineNum)) {
-						
-		// choose a random locus
-		ChooseLocus(bedEntry);	
+	while ((bedStatus = _bed->GetNextBed(bedEntry, lineNum)) != BED_INVALID) {
+		if (bedStatus == BED_VALID) {				
+    		// choose a random locus
+    		ChooseLocus(bedEntry);	
 		
-		// test to see if the chosen locus overlaps 
-		// with an exclude region
-		_exclude->FindOverlapsPerBin(bedEntry.chrom, bedEntry.start, bedEntry.end, bedEntry.strand, hits, false);
+    		// test to see if the chosen locus overlaps 
+    		// with an exclude region
+    		_exclude->FindOverlapsPerBin(bedEntry.chrom, bedEntry.start, bedEntry.end, bedEntry.strand, hits, false);
 				
-		bool haveOverlap = false;
-		vector<BED>::const_iterator hitsItr = hits.begin();
-		vector<BED>::const_iterator hitsEnd = hits.end();
-		for (; hitsItr != hitsEnd; ++hitsItr) {
+    		bool haveOverlap = false;
+    		vector<BED>::const_iterator hitsItr = hits.begin();
+    		vector<BED>::const_iterator hitsEnd = hits.end();
+    		for (; hitsItr != hitsEnd; ++hitsItr) {
 
-			int s = max(bedEntry.start, hitsItr->start);
-			int e = min(bedEntry.end, hitsItr->end);
+    			int s = max(bedEntry.start, hitsItr->start);
+    			int e = min(bedEntry.end, hitsItr->end);
 
-			if ( (e - s) > 0) {
-				haveOverlap = true;
-				break;   /* stop looking.  one overlap is enough*/
-			}
-		}
+    			if ( (e - s) > 0) {
+    				haveOverlap = true;
+    				break;   /* stop looking.  one overlap is enough*/
+    			}
+    		}
 		
-		/* 
-		   keep looking as long as the chosen
-		   locus happens to overlap with regions
-		   that the user wishes to exclude.
-		*/
-		int tries = 0;
-		while ((haveOverlap == true) && (tries <= MAX_TRIES)) {
+    		/* 
+    		   keep looking as long as the chosen
+    		   locus happens to overlap with regions
+    		   that the user wishes to exclude.
+    		*/
+    		int tries = 0;
+    		while ((haveOverlap == true) && (tries <= MAX_TRIES)) {
 
-			// choose a new locus
-			ChooseLocus(bedEntry);
+    			// choose a new locus
+    			ChooseLocus(bedEntry);
 
-			vector<BED> hits;
-			_exclude->FindOverlapsPerBin(bedEntry.chrom, bedEntry.start, bedEntry.end, 
-										bedEntry.strand, hits, false);
+    			vector<BED> hits;
+    			_exclude->FindOverlapsPerBin(bedEntry.chrom, bedEntry.start, bedEntry.end, 
+    										bedEntry.strand, hits, false);
 
-			haveOverlap = false;
-			vector<BED>::const_iterator hitsItr = hits.begin();
-			vector<BED>::const_iterator hitsEnd = hits.end();
-			for (; hitsItr != hitsEnd; ++hitsItr) {
+    			haveOverlap = false;
+    			vector<BED>::const_iterator hitsItr = hits.begin();
+    			vector<BED>::const_iterator hitsEnd = hits.end();
+    			for (; hitsItr != hitsEnd; ++hitsItr) {
 
-				int s = max(bedEntry.start, hitsItr->start);
-				int e = min(bedEntry.end, hitsItr->end);
+    				int s = max(bedEntry.start, hitsItr->start);
+    				int e = min(bedEntry.end, hitsItr->end);
 
-				if ( (e - s) > 0) {
-					haveOverlap = true;
-					break;  /* stop looking.  one overlap is enough*/
-				}
-			}
-			tries++;
-		}
+    				if ( (e - s) > 0) {
+    					haveOverlap = true;
+    					break;  // stop looking.  one overlap is enough
+    				}
+    			}
+    			tries++;
+    		}
 		
-		if (tries > MAX_TRIES) {
-			cerr << "Error, line " << lineNum << ": tried " << MAX_TRIES << " potential loci for entry, but could not avoid excluded regions.  Ignoring entry and moving on." << endl;
-		}
-		else {
-			_bed->reportBedNewLine(bedEntry);
-		}
+    		if (tries > MAX_TRIES) {
+    			cerr << "Error, line " << lineNum << ": tried " << MAX_TRIES << " potential loci for entry, but could not avoid excluded regions.  Ignoring entry and moving on." << endl;
+    		}
+    		else {
+    			_bed->reportBedNewLine(bedEntry);
+    		}
+    	}
+    	bedEntry = nullBed;
 	}
+	_bed->Close();
 }
 
 
@@ -161,13 +163,13 @@ void BedShuffle::ShuffleWithExclusions() {
 void BedShuffle::ChooseLocus(BED &bedEntry) {
 	
 	string chrom = bedEntry.chrom;
-	int start    = bedEntry.start;
-	int end      = bedEntry.end;
-	int length   = end - start;
+	CHRPOS start    = bedEntry.start;
+	CHRPOS end      = bedEntry.end;
+	CHRPOS length   = end - start;
 	
 	string randomChrom;
-	int randomStart;
-	int chromSize;
+	CHRPOS randomStart;
+	CHRPOS chromSize;
 	
 	if (_sameChrom == false) {
 		randomChrom    = _chroms[rand() % _numChroms];

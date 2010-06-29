@@ -40,10 +40,11 @@ void BedComplement::ComplementBed() {
 	string currChrom;
 	
 	// loop through each chromosome and merge their BED entries
-	for (masterBedMapNoBin::iterator m = _bed->bedMapNoBin.begin(); m != _bed->bedMapNoBin.end(); ++m) {
-
+	masterBedMapNoBin::const_iterator m    = _bed->bedMapNoBin.begin();
+	masterBedMapNoBin::const_iterator mEnd = _bed->bedMapNoBin.end();
+    for (; m != mEnd; ++m) {
 		currChrom = m->first;
-		int currChromSize = _genome->getChromSize(currChrom);
+		CHRPOS currChromSize = _genome->getChromSize(currChrom);
 		
 		// bedList is already sorted by start position.
 		vector<BED> bedList = m->second; 
@@ -63,26 +64,22 @@ void BedComplement::ComplementBed() {
 			}
 			
 			// mask all of the positions spanned by this BED entry.
-			for (int b = bIt->start; b < bIt->end; b++) {
+			for (CHRPOS b = bIt->start; b < bIt->end; b++)
 				chromMasks[b] = 1;
-			}
 		}
 		
-		unsigned int i = 0;
-		unsigned int start;
+		CHRPOS i = 0;
+		CHRPOS start;
 		while (i < chromMasks.size()) {
 			if (chromMasks[i] == 0) {
 				start = i;
-				while ((chromMasks[i] == 0) && (i < chromMasks.size())) {
+				while ((chromMasks[i] == 0) && (i < chromMasks.size()))
 					i++;
-				}
 				
-				if (start > 0) {
-					cout << currChrom << "\t" << start << "\t" << i << endl;
-				}
-				else {
-					cout << currChrom << "\t" << 0 << "\t" << i << endl;
-				}
+				if (start > 0) 
+				    cout << currChrom << "\t" << start << "\t" << i << endl;
+				else 
+				    cout << currChrom << "\t" << 0 << "\t" << i << endl;
 			}
 			i++;
 		}
