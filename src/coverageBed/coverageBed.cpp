@@ -70,7 +70,7 @@ void BedCoverage::CollectCoverageBed() {
     			_bedB->countHits(a, _forceStrand);
 			// split the BED into discrete blocksand process each independently.
 			else {
-			    bedVector bedBlocks;  // vec to store the discrete BED "blocks" from a
+			    bedVector bedBlocks;
                 splitBedIntoBlocks(a, lineNum, bedBlocks);
                 
                 vector<BED>::const_iterator bedItr  = bedBlocks.begin();
@@ -93,11 +93,11 @@ void BedCoverage::CollectCoverageBam(string bamFile) {
 	// load the "B" bed file into a map so
 	// that we can easily compare "A" to it for overlaps
 	_bedB->loadBedCovFileIntoMap();
-
+	
 	// open the BAM file
 	BamReader reader;
 	reader.Open(bamFile);
-
+	
 	// get header & reference information
 	string header = reader.GetHeaderText();
 	RefVector refs = reader.GetReferenceData();
@@ -106,7 +106,6 @@ void BedCoverage::CollectCoverageBam(string bamFile) {
 	// and compute coverage on B
 	BamAlignment bam;	
 	while (reader.GetNextAlignment(bam)) {
-		
 		if (bam.IsMapped()) {
 		    // treat the BAM alignment as a single "block"
 		    if (_obeySplits == false) {
@@ -127,7 +126,7 @@ void BedCoverage::CollectCoverageBam(string bamFile) {
 			    bedVector bedBlocks;
                 // since we are counting coverage, we do want to split blocks when a 
                 // deletion (D) CIGAR op is encountered (hence the true for the last parm)
-                getBamBlocks(bam, refs, bedBlocks, true);   
+                getBamBlocks(bam, refs, bedBlocks, true); 
                 
                 vector<BED>::const_iterator bedItr  = bedBlocks.begin();
             	vector<BED>::const_iterator bedEnd  = bedBlocks.end();

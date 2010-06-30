@@ -1,8 +1,3 @@
-CXX = g++
-CXXFLAGS = -O2  -Wall
-LDFLAGS = 
-LIBS=	-lz
-
 UTILITIES_DIR = ../utils/
 OBJ_DIR = ../../obj/
 BIN_DIR = ../../bin/
@@ -17,7 +12,7 @@ INCLUDES = -I$(UTILITIES_DIR)/bedFile/ -I$(UTILITIES_DIR)/genomeFile/ -I$(UTILIT
 # ----------------------------------
 SOURCES= genomeCoverageMain.cpp genomeCoverageBed.cpp
 OBJECTS= $(SOURCES:.cpp=.o)
-_EXT_OBJECTS=bedFile.o genomeFile.o lineFileUtilities.o BamReader.o BGZF.o gzstream.o
+_EXT_OBJECTS=bedFile.o genomeFile.o lineFileUtilities.o BamReader.o BamAncillary.o BGZF.o gzstream.o
 EXT_OBJECTS=$(patsubst %,$(OBJ_DIR)/%,$(_EXT_OBJECTS))
 BUILT_OBJECTS= $(patsubst %,$(OBJ_DIR)/%,$(OBJECTS))
 PROGRAM= genomeCoverageBed

@@ -1,6 +1,3 @@
-CXX=		g++
-CXXFLAGS=	-Wall -O2 -fopenmp
-LIBS=		-lz
 UTILITIES_DIR = ../utils/
 OBJ_DIR = ../../obj/
 BIN_DIR = ../../bin/

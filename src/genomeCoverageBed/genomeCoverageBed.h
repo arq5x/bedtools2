@@ -13,10 +13,12 @@ Licenced under the GNU General Public License 2.0+ license.
 #include "genomeFile.h"
 
 #include "BamReader.h"
+#include "BamAncillary.h"
 #include "BamAux.h"
 using namespace BamTools;
 
 #include <vector>
+#include <set>
 #include <iostream>
 #include <fstream>
 using namespace std;
@@ -40,14 +42,15 @@ public:
 
 	// constructor 
 	BedGenomeCoverage(string bedFile, string genomeFile, bool eachBase, bool startSites, 
-		              bool bedGraph, bool bedGraphAll, int max, bool bamInput);
+		              bool bedGraph, bool bedGraphAll, int max, bool bamInput, bool obeySplits,
+                      bool filterByStrand, string requestedStrand);
 
 	// destructor
 	~BedGenomeCoverage(void);
 
 private:
 
-	// data
+	// data (parms)
 	string _bedFile;
 	string _genomeFile;
 	bool   _bamInput;
@@ -56,12 +59,21 @@ private:
 	bool   _bedGraph;
 	bool   _bedGraphAll;
 	int    _max;
-
-	// The BED file from which to compute coverage.
+    bool   _obeySplits;
+	bool   _filterByStrand;
+	string _requestedStrand;
+	
 	BedFile    *_bed;
 	GenomeFile *_genome;
-	
+
+    // data for internal processing
 	chromDepthMap _chromCov;
+	string _currChromName ;
+	vector<DEPTH> _currChromCoverage;
+	chromHistMap _currChromDepthHist;
+	int _currChromSize ;
+	set<string> _visitedChromosomes;
+	
 	
 	// methods
 	void CoverageBed();
@@ -69,5 +81,9 @@ private:
 	void ReportChromCoverage(const vector<DEPTH> &, const int &chromSize, const string &chrom, chromHistMap&);
 	void ReportGenomeCoverage(chromHistMap &chromDepthHist);
 	void ReportChromCoverageBedGraph(const vector<DEPTH> &chromCov, const int &chromSize, const string &chrom);
-	
+	void ResetChromCoverage();
+	void StartNewChrom (const string& chrom);
+	void AddCoverage (int start, int end);
+    void AddBlockedCoverage(const vector<BED> &bedBlocks);
+	void PrintFinalCoverage();
 };

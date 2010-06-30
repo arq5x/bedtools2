@@ -219,7 +219,7 @@ void BedIntersect::IntersectBed() {
 			}
 			// split the BED12 into blocks and look for overlaps in each discrete block
             else {
-                bedVector bedBlocks;  // vec to store the discrete BED "blocks" from a
+                bedVector bedBlocks;  // vec to store the discrete BED "blocks"
                 splitBedIntoBlocks(a, lineNum, bedBlocks);
                 
                 vector<BED>::const_iterator bedItr  = bedBlocks.begin();

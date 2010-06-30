@@ -34,13 +34,16 @@ int main(int argc, char* argv[]) {
 	string genomeFile;
 	int max = 999999999;
 	
-	bool haveBed       = false;
-	bool bamInput      = false;
-	bool haveGenome    = false;
-	bool startSites    = false;
-	bool bedGraph      = false;
-	bool bedGraphAll   = false;	
-	bool eachBase      = false;
+	bool haveBed           = false;
+	bool bamInput          = false;
+	bool haveGenome        = false;
+	bool startSites        = false;
+	bool bedGraph          = false;
+	bool bedGraphAll       = false;	
+	bool eachBase          = false;
+	bool obeySplits	       = false;
+	bool filterByStrand    = false;
+	string requestedStrand = "X";
 
 	// check to see if we should print out some help
 	if(argc <= 1) showHelp = true;
@@ -98,6 +101,24 @@ int main(int argc, char* argv[]) {
 				i++;
 			}
 		}
+		else if(PARAMETER_CHECK("-split", 6, parameterLength)) {
+			obeySplits = true;
+		}
+		else if(PARAMETER_CHECK("-strand", 7, parameterLength)) {
+			if ((i+1) < argc) {
+				filterByStrand = true;
+				requestedStrand = argv[i+1][0];
+				if (!(requestedStrand == "-" || requestedStrand == "+")) {
+					cerr << "*****ERROR: invalid -strand value (" << requestedStrand << "). Allowed options are + or -" << endl;
+					showHelp = true;
+				}
+				i++;
+			} 
+			else {
+				cerr << "*****ERROR: -strand options requires a value: + or -" << endl;
+				showHelp = true;
+			}
+		}
 		else {
 		  cerr << endl << "*****ERROR: Unrecognized parameter: " << argv[i] << " *****" << endl << endl;
 			showHelp = true;
@@ -122,7 +143,8 @@ int main(int argc, char* argv[]) {
 		
 		BedGenomeCoverage *bc = new BedGenomeCoverage(bedFile, genomeFile, eachBase, 
                                                       startSites, bedGraph, bedGraphAll, 
-                                                      max, bamInput);
+                                                      max, bamInput, obeySplits,
+  						                              filterByStrand, requestedStrand);
 		delete bc;
 		
 		return 0;
@@ -159,7 +181,19 @@ void ShowHelp(void) {
 	cerr                        << "\t\tcoverage are also reported.  This allows one to" << endl;
 	cerr                        << "\t\tquickly extract all regions of a genome with 0 " << endl;
 	cerr                        << "\t\tcoverage by applying: \"grep -w 0$\" to the output." << endl << endl;
-		
+
+	cerr << "\t-split\t"	    << "Treat \"split\" BAM or BED12 entries as distinct BED intervals." << endl;
+	cerr						<< "\t\twhen computing coverage." << endl;
+    cerr			            << "\t\tFor BAM files, this uses the CIGAR \"N\" and \"D\" operations " << endl;
+	cerr						<< "\t\tto infer the blocks for computing coverage." << endl;
+    cerr			            << "\t\tFor BED12 files, this uses the BlockCount, BlockStarts, and BlockEnds" << endl;
+    cerr			            << "\t\tfields (i.e., columns 10,11,12)." << endl << endl;
+    
+	cerr << "\t-strand\t"       << "Calculate coverage of intervals from a specific strand." << endl;
+	cerr			            << "\t\tWith BED files, requires at least 6 columns (strand is column 6). " << endl;
+    cerr			            << "\t\t- (STRING): can be + or -" << endl << endl;
+
+			
 	cerr << "\t-max\t"          << "Combine all positions with a depth >= max into" << endl;
 	cerr						<< "\t\ta single bin in the histogram. Irrelevant" << endl;
 	cerr						<< "\t\tfor -d and -bedGraph" << endl;

@@ -238,45 +238,47 @@ bool BamReader::BamReaderPrivate::BuildCharData(BamAlignment& bAlignment, const 
     bAlignment.AlignedBases.clear();
     bAlignment.AlignedBases.reserve(supportData.QuerySequenceLength);
     
-    int k = 0;
-    vector<CigarOp>::const_iterator cigarIter = bAlignment.CigarData.begin();
-    vector<CigarOp>::const_iterator cigarEnd  = bAlignment.CigarData.end();
-    for ( ; cigarIter != cigarEnd; ++cigarIter ) {
-        
-        const CigarOp& op = (*cigarIter);
-        switch(op.Type) {
+    if (bAlignment.QueryBases.empty() == false) {
+        int k = 0;
+        vector<CigarOp>::const_iterator cigarIter = bAlignment.CigarData.begin();
+        vector<CigarOp>::const_iterator cigarEnd  = bAlignment.CigarData.end();
+        for ( ; cigarIter != cigarEnd; ++cigarIter ) {
+            const CigarOp& op = (*cigarIter);
+            switch(op.Type) {
           
-            case ('M') :
-            case ('I') :
-                bAlignment.AlignedBases.append(bAlignment.QueryBases.substr(k, op.Length)); // for 'M', 'I' - write bases
-                // fall through
+                case ('M') :
+                case ('I') :
+                    bAlignment.AlignedBases.append(bAlignment.QueryBases.substr(k, op.Length)); // for 'M', 'I' - write bases
+                    // fall through
             
-            case ('S') :
-                k += op.Length;                                     // for 'S' - soft clip, skip over query bases
-                break;
+                case ('S') :
+                    k += op.Length;                                     // for 'S' - soft clip, skip over query bases
+                    break;
                 
-            case ('D') :
-                bAlignment.AlignedBases.append(op.Length, '-');     // for 'D' - write gap character
-                break;
+                case ('D') :
+                    bAlignment.AlignedBases.append(op.Length, '-');     // for 'D' - write gap character
+                    break;
                 
-            case ('P') :
-                bAlignment.AlignedBases.append( op.Length, '*' );   // for 'P' - write padding character
-                break;
+                case ('P') :
+                    bAlignment.AlignedBases.append( op.Length, '*' );   // for 'P' - write padding character
+                    break;
                 
-            case ('N') :
-                bAlignment.AlignedBases.append( op.Length, 'N' );  // for 'N' - write N's, skip bases in original query sequence
-                // k+=op.Length; 
-                break;
+                case ('N') :
+                    bAlignment.AlignedBases.append( op.Length, 'N' );  // for 'N' - write N's, skip bases in original query sequence
+                    //k+=op.Length; 
+                    break;
                 
-            case ('H') :
-                break;  // for 'H' - hard clip, do nothing to AlignedBases, move to next op
+                case ('H') :
+                    break;  // for 'H' - hard clip, do nothing to AlignedBases, move to next op
                 
-            default:
-                printf("ERROR: Invalid Cigar op type\n"); // shouldn't get here
-                exit(1);
+                default:
+                    printf("ERROR: Invalid Cigar op type\n"); // shouldn't get here
+                    exit(1);
+            }
         }
     }
- 
+    else {bAlignment.AlignedBases = bAlignment.QueryBases;}
+
     // -----------------------
     // Added: 3-25-2010 DWB
     // Fixed: endian-correctness for tag data
@@ -324,7 +326,6 @@ bool BamReader::BamReaderPrivate::BuildCharData(BamAlignment& bAlignment, const 
             }
         }
     }
-    
     // store TagData
     bAlignment.TagData.clear();
     bAlignment.TagData.resize(tagDataLength);
@@ -510,7 +511,7 @@ int BamReader::BamReaderPrivate::GetReferenceID(const string& refName) const {
 
 // get next alignment (from specified region, if given)
 bool BamReader::BamReaderPrivate::GetNextAlignment(BamAlignment& bAlignment) {
-
+    
     BamAlignmentSupportData supportData;
   
     // if valid alignment available
@@ -518,7 +519,9 @@ bool BamReader::BamReaderPrivate::GetNextAlignment(BamAlignment& bAlignment) {
 
         // if region not specified, return success
         if ( !IsRegionSpecified ) { 
+        
           bool ok = BuildCharData(bAlignment, supportData);
+
           return ok; 
         }
 
@@ -527,7 +530,6 @@ bool BamReader::BamReaderPrivate::GetNextAlignment(BamAlignment& bAlignment) {
             // if no valid alignment available (likely EOF) return failure
             if ( !LoadNextAlignment(bAlignment, supportData) ) { return false; }
         }
-
         // return success (alignment found that overlaps region)
         bool ok = BuildCharData(bAlignment, supportData);
         return ok;
@@ -846,8 +848,9 @@ bool BamReader::BamReaderPrivate::LoadNextAlignment(BamAlignment& bAlignment, Ba
     }
     
     // set BamAlignment 'core' and 'support' data
-    bAlignment.RefID    = BgzfData::UnpackSignedInt(&x[0]);  
+    bAlignment.RefID    = BgzfData::UnpackSignedInt(&x[0]);
     bAlignment.Position = BgzfData::UnpackSignedInt(&x[4]);
+    
     
     unsigned int tempValue = BgzfData::UnpackUnsignedInt(&x[8]);
     bAlignment.Bin        = tempValue >> 16;

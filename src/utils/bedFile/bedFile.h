@@ -506,7 +506,7 @@ private:
 
     		bed.chrom  = lineVector[0];
     		bed.start  = atoi(lineVector[1].c_str()) - 1;  // VCF is one-based
-    		bed.end    = atoi(lineVector[1].c_str());      // TO-DO: make this the size of the variant.
+            bed.end    = bed.start + lineVector[3].size(); // VCF 4.0 stores the size of the affected REF allele.
             bed.strand = "+";
 
     		if (this->bedType > 2) {		
@@ -532,7 +532,7 @@ private:
 
     		bed.chrom  = lineVector[0];
     		bed.start  = atoi(lineVector[1].c_str()) - 1;  // VCF is one-based
-    		bed.end    = atoi(lineVector[1].c_str());      // TO-DO: make this the size of the variant.
+            bed.end    = bed.start + lineVector[3].size(); // VCF 4.0 stores the size of the affected REF allele.
             bed.strand = "+";
 
     		if (this->bedType > 2) {		
@@ -685,7 +685,8 @@ public:
     */
     template <typename T>
     void reportBedTab(const T &bed) {
-    	if (_isGff == false) {
+        // BED
+    	if (_isGff == false && _isVcf == false) {
     		if (this->bedType == 3) {
     			printf ("%s\t%d\t%d\t", bed.chrom.c_str(), bed.start, bed.end);
     		}
@@ -710,7 +711,18 @@ public:
     				printf("%s\t", othIt->c_str());
     			}
     		}
+    	}
+    	// VCF
+    	else if (_isGff == false && _isVcf == true) {
+    	    printf ("%s\t%d\t", bed.chrom.c_str(), bed.start+1);
+
+			vector<string>::const_iterator othIt = bed.otherFields.begin(); 
+			vector<string>::const_iterator othEnd = bed.otherFields.end(); 
+			for ( ; othIt != othEnd; ++othIt) {
+				printf("%s\t", othIt->c_str());
+			}
     	}	
+    	// GFF
     	else if (this->bedType == 9) {
     		printf ("%s\t%s\t%s\t%d\t%d\t%s\t%s\t%s\t%s\t", bed.chrom.c_str(), bed.otherFields[0].c_str(),
     														 bed.name.c_str(), bed.start+1, bed.end, 
@@ -730,7 +742,8 @@ public:
     */
     template <typename T>
     void reportBedNewLine(const T &bed) {
-    	if (_isGff == false) {
+        //BED
+    	if (_isGff == false && _isVcf == false) {
     		if (this->bedType == 3) {
     			printf ("%s\t%d\t%d\n", bed.chrom.c_str(), bed.start, bed.end);
     		}
@@ -757,6 +770,18 @@ public:
     			printf("\n");
     		}
     	}
+    	// VCF
+    	else if (_isGff == false && _isVcf == true) {
+    	    printf ("%s\t%d\t", bed.chrom.c_str(), bed.start+1);
+
+			vector<string>::const_iterator othIt = bed.otherFields.begin(); 
+			vector<string>::const_iterator othEnd = bed.otherFields.end(); 
+			for ( ; othIt != othEnd; ++othIt) {
+				printf("%s\t", othIt->c_str());
+			}
+			printf("\n");
+    	}
+    	//GFF
     	else if (this->bedType == 9) {
     		printf ("%s\t%s\t%s\t%d\t%d\t%s\t%s\t%s\t%s\n", bed.chrom.c_str(), bed.otherFields[0].c_str(),
     														 bed.name.c_str(), bed.start+1, bed.end, 
@@ -777,7 +802,8 @@ public:
     */
     template <typename T>
     void reportBedRangeTab(const T &bed, CHRPOS start, CHRPOS end) {
-    	if (_isGff == false) {
+        // BED
+    	if (_isGff == false && _isVcf == false) {
     		if (this->bedType == 3) {
     			printf ("%s\t%d\t%d\t", bed.chrom.c_str(), start, end);
     		}
@@ -803,6 +829,17 @@ public:
     			}
     		}
     	}
+    	// VCF
+    	else if (_isGff == false && _isVcf == true) {
+    	    printf ("%s\t%d\t", bed.chrom.c_str(), bed.start+1);
+
+			vector<string>::const_iterator othIt = bed.otherFields.begin(); 
+			vector<string>::const_iterator othEnd = bed.otherFields.end(); 
+			for ( ; othIt != othEnd; ++othIt) {
+				printf("%s\t", othIt->c_str());
+			}
+    	}
+    	// GFF
     	else if (this->bedType == 9) {
     		printf ("%s\t%s\t%s\t%d\t%d\t%s\t%s\t%s\t%s\t", bed.chrom.c_str(), bed.otherFields[0].c_str(),
     														 bed.name.c_str(), start+1, end, 
@@ -823,7 +860,8 @@ public:
     */
     template <typename T>
     void reportBedRangeNewLine(const T &bed, CHRPOS start, CHRPOS end) {
-    	if (_isGff == false) {
+        // BED
+    	if (_isGff == false && _isVcf == false) {
     		if (this->bedType == 3) {
     			printf ("%s\t%d\t%d\n", bed.chrom.c_str(), start, end);
     		}
@@ -850,6 +888,18 @@ public:
     			printf("\n");
     		}
     	}
+    	// VCF
+    	else if (_isGff == false && _isVcf == true) {
+    	    printf ("%s\t%d\t", bed.chrom.c_str(), bed.start+1);
+
+			vector<string>::const_iterator othIt = bed.otherFields.begin(); 
+			vector<string>::const_iterator othEnd = bed.otherFields.end(); 
+			for ( ; othIt != othEnd; ++othIt) {
+				printf("%s\t", othIt->c_str());
+			}
+            printf("\n");
+    	}
+    	// GFF
     	else if (this->bedType == 9) {	// add 1 to the start for GFF
     		printf ("%s\t%s\t%s\t%d\t%d\t%s\t%s\t%s\t%s\n", bed.chrom.c_str(), bed.otherFields[0].c_str(),
     														 bed.name.c_str(), start+1, end, 

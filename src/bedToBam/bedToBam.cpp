@@ -266,7 +266,7 @@ void ConvertBedToBam(const BED &bed, BamAlignment &bam, map<string, int, std::le
 		bam.CigarData.push_back(cOp);
 	}
 	// we're being told that the input is BED12.
-	else {
+	else{
 		
 		// does it smell like BED12?  if so, process it.
 		if (bed.otherFields.size() == 6) {
@@ -275,27 +275,21 @@ void ConvertBedToBam(const BED &bed, BamAlignment &bam, map<string, int, std::le
 			// namely: blockCount, blockStarts, blockEnds
 			unsigned int blockCount = atoi(bed.otherFields[3].c_str());
 
-			vector<string> blockSizesString, blockStartsString;
 			vector<int> blockSizes, blockStarts;
-			Tokenize(bed.otherFields[4], blockSizesString, ",");
-			Tokenize(bed.otherFields[5], blockStartsString, ",");
-		
-			for (unsigned int i = 0; i < blockCount; ++i) {
-				blockStarts.push_back(atoi(blockStartsString[i].c_str()));
-				blockSizes.push_back(atoi(blockSizesString[i].c_str()));
-			}
+			Tokenize(bed.otherFields[4], blockSizes, ",");
+			Tokenize(bed.otherFields[5], blockStarts, ",");
 		
 			// make sure this is a well-formed BED12 entry.
-			if ((blockSizes.size() != blockCount) || (blockSizes.size() != blockCount)) {
+			if (blockSizes.size() != blockCount) {
 				cerr << "Error: Number of BED blocks does not match blockCount at line: " << lineNum << ".  Exiting!" << endl;
 				exit (1);
 			}
 			else {
 				// does the first block start after the bed.start?
 				// if so, we need to do some "splicing"
-				if (blockStarts[0] - bed.start > 0) {	
+				if (blockStarts[0] > 0) {	
 					CigarOp cOp;
-					cOp.Length = blockStarts[0] - bed.start;
+					cOp.Length = blockStarts[0];
 					cOp.Type = 'N';
 					bam.CigarData.push_back(cOp);
 				}

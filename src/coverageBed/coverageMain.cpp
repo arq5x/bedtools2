@@ -136,7 +136,12 @@ void ShowHelp(void) {
 	cerr						<< "\t\tOutput (tab delimited) after each feature in B:" << endl;
 	cerr						<< "\t\t  1) depth\n\t\t  2) # bases at depth\n\t\t  3) size of B\n\t\t  4) % of B at depth" << endl << endl;
 	
-	cerr << "\t-split\t"	    << "Treat \"split\" BAM or BED12 entries as distinct BED intervals." << endl << endl;
+	cerr << "\t-split\t"	    << "Treat \"split\" BAM or BED12 entries as distinct BED intervals." << endl;
+	cerr						<< "\t\twhen computing coverage." << endl;
+    cerr			            << "\t\tFor BAM files, this uses the CIGAR \"N\" and \"D\" operations " << endl;
+	cerr						<< "\t\tto infer the blocks for computing coverage." << endl;
+    cerr			            << "\t\tFor BED12 files, this uses the BlockCount, BlockStarts," << endl;
+    cerr			            << "\t\tand BlockEnds fields (i.e., columns 10,11,12)." << endl << endl;
 
 	cerr << "Default Output:  " << endl;
 	cerr << "\t" << " After each entry in B, reports: " << endl; 
