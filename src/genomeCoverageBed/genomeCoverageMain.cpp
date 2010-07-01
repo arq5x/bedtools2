@@ -32,7 +32,7 @@ int main(int argc, char* argv[]) {
 	// input files
 	string bedFile;
 	string genomeFile;
-	int max = 999999999;
+	int max = INT_MAX;
 	
 	bool haveBed           = false;
 	bool bamInput          = false;

@@ -226,29 +226,28 @@ void ProcessBed(istream &bedInput, BedFile *bed, string path, string sortType, s
     if (session != "none")
         cout << "load " << session << endl;
         
-	// process each BED entry and convert to an IGV request
+	
 	BED bedEntry, nullBed;
 	int lineNum = 0;
 	BedLineStatus bedStatus;
 
 	bed->Open();
+	// process each BED entry and convert to an IGV request
 	while ((bedStatus = bed->GetNextBed(bedEntry, lineNum)) != BED_INVALID) {        
 		if (bedStatus == BED_VALID) {
             
             string locus, filename;
-            if (useNames == false) {
-                locus = bedEntry.chrom + ":" + ToString(bedEntry.start - slop) + "-" + ToString(bedEntry.end + slop);
+            locus = bedEntry.chrom + ":" + ToString(bedEntry.start - slop) + "-" + ToString(bedEntry.end + slop);
+            
+            if (useNames == false)
                 filename = locus;
-            }
             else {
-                locus = bedEntry.chrom + ":" + ToString(bedEntry.start - slop) + "-" + ToString(bedEntry.end + slop);
                 if (bedEntry.name.empty() == false)
                     filename = bedEntry.name;
                 else {
                     cerr << "Error: You requested that filenames be based upon the name field.  However, it appears to be empty. Exiting!" << endl;
         			exit (1);
-                }
-                    
+                }  
             }
             // goto
             cout << "goto " << locus << endl;
@@ -264,6 +263,7 @@ void ProcessBed(istream &bedInput, BedFile *bed, string path, string sortType, s
             // snapshot
             cout << "snapshot " << filename << "." << imageType << endl;
             
+            // reset
 			bedEntry = nullBed;
 		}
 	}

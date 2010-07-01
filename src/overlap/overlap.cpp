@@ -124,7 +124,7 @@ void ShowHelp(void) {
 	
 	cerr << "Usage:   " << PROGRAM_NAME << " [OPTIONS] -i <input> -cols s1,e1,s2,e2 " << endl << endl;
 
-	cerr << "Notes: " << endl;
+	cerr << "Options: " << endl;
 	cerr << "\t-i\t"	    << "Input file. Use \"stdin\" for pipes." << endl << endl;
 	
 	cerr << "\t-cols\t"		<< "Specify the columns (1-based) for the starts and ends of the" << endl;
