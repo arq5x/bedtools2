@@ -422,6 +422,8 @@ void BedFile::countSplitHits(const vector<BED> &bedBlocks, bool forceStrand) {
     set< vector<BEDCOV>::iterator >::iterator validHitsItr = validHits.begin();
     set< vector<BEDCOV>::iterator >::iterator validHitsEnd = validHits.end();
     for (; validHitsItr != validHitsEnd; ++validHitsItr)
+        // the validHitsItr points to another itr, hence the (*itr)-> dereferencing.
+        // ugly, but that's C++.
         (*validHitsItr)->count++;
 }
 

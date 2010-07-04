@@ -194,7 +194,7 @@ void BedWindow::WindowIntersectBam(string bamFile) {
 			if (bam.IsSecondMate()) a.name += "/2";
 
 			a.score  = ToString(bam.MapQuality);
-			a.strand = '+'; if (bam.IsReverseStrand()) a.strand = '-'; 
+			a.strand = "+"; if (bam.IsReverseStrand()) a.strand = "-"; 
 	
 			if (_bamOutput == true) {
 				overlapsFound = FindOneOrMoreWindowOverlaps(a);
