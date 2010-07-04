@@ -10,6 +10,7 @@
   Licensed under the GNU General Public License 2.0+ license.
 ******************************************************************************/
 #include "bedFile.h"
+#include "lineFileUtilities.h"
 #include "BamAux.h"
 
 namespace BamTools {

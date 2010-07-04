@@ -53,6 +53,7 @@ const BINLEVEL _binLevels = 7;
 // Bins 585-4680   span 128Kbp     # Level 5
 // Bins 4681-37449 span 16Kbp      # Level 6
 const BIN _binOffsetsExtended[] = {32678+4096+512+64+8+1, 4096+512+64+8+1, 512+64+8+1, 64+8+1, 8+1, 1, 0};
+//const BIN _binOffsetsExtended[] = {4096+512+64+8+1, 4096+512+64+8+1, 512+64+8+1, 64+8+1, 8+1, 1, 0};
 	
 const USHORT _binFirstShift = 14;	    /* How much to shift to get to finest bin. */
 const USHORT _binNextShift  = 3;		/* How much to shift to get to next larger bin. */
@@ -79,7 +80,7 @@ struct BED {
 	CHRPOS end; 
 	string name;
 	string score;
-	string  strand;
+	string strand;
 
 	// Add'l fields for BED12 and/or custom BED annotations
 	vector<string> otherFields;
@@ -221,16 +222,6 @@ int overlaps(CHRPOS aS, CHRPOS aE, CHRPOS bS, CHRPOS bE) {
 }
 
 
-// templated function to convert objects to strings
-template <typename T>
-std::string ToString(const T & value)
-{
-	std::stringstream ss;
-	ss << value;
-	return ss.str();
-}
-
-
 // Ancillary functions
 void splitBedIntoBlocks(const BED &bed, int lineNum, bedVector &bedBlocks);
 
@@ -337,20 +328,21 @@ private:
 
     	char *p2End, *p3End, *p4End, *p5End;
     	long l2, l3, l4, l5;
-
+    	
     	// bail out if we have a blank line
-    	if (lineVector.size() == 0) 
+    	if (lineVector.size() == 0) { 
     		return BED_BLANK;
+		}
 
     	if ((lineVector[0].find("track") == string::npos) && (lineVector[0].find("browser") == string::npos) && (lineVector[0].find("#") == string::npos) ) {
 
     		// we need at least 3 columns
     		if (lineVector.size() >= 3) {
-
+                
     			// test if columns	2 and 3 are integers.  If so, assume BED.
     			l2 = strtol(lineVector[1].c_str(), &p2End, 10);
     			l3 = strtol(lineVector[2].c_str(), &p3End, 10);
-
+    			
     			// strtol  will set p2End or p3End to the start of the string if non-integral, base 10
     			if (p2End != lineVector[1].c_str() && p3End != lineVector[2].c_str()) {
     				setGff(false);
@@ -390,7 +382,6 @@ private:
     		lineNum--;
     		return BED_HEADER;	
     	}
-
     	// default
     	return BED_INVALID;
     }
@@ -401,7 +392,6 @@ private:
     */
     template <typename T>
     inline bool parseBedLine (T &bed, const vector<string> &lineVector, int lineNum) {
-
     	if ( (lineNum > 1) && (lineVector.size() == this->bedType)) {
 
     		bed.chrom = lineVector[0];
@@ -411,7 +401,7 @@ private:
     		if (this->bedType == 4) {
     			bed.name = lineVector[3];
     		}
-    		else if (this->bedType ==5) {
+    		else if (this->bedType == 5) {
     			bed.name = lineVector[3];
     			bed.score = lineVector[4];
     		}
@@ -433,7 +423,7 @@ private:
     			exit(1);
     		}
 
-    		if ((bed.start <= bed.end) && (bed.start > 0) && (bed.end > 0)) {
+    		if ((bed.start <= bed.end) && (bed.start >= 0) && (bed.end > 0)) {
                 return true;
     		}
     		else if (bed.start > bed.end) {
@@ -476,7 +466,7 @@ private:
     			cerr << "Error: unexpected number of fields at line: " << lineNum << ".  Verify that your files are TAB-delimited and that your BED file has 3,4,5 or 6 fields.  Exiting..." << endl;
     			exit(1);
     		}
-    		if ((bed.start <= bed.end) && (bed.start > 0) && (bed.end > 0)) {
+    		if ((bed.start <= bed.end) && (bed.start >= 0) && (bed.end > 0)) {
                 return true;
     		}
     		else if (bed.start > bed.end) {
@@ -650,7 +640,6 @@ private:
     			return true;
     		}
     		else {
-    			cout << this->bedType << " " << _isGff << endl;
     			cerr << "Error: unexpected number of fields at line: " << lineNum << 
     					".  Verify that your files are TAB-delimited and that your GFF file has 9 fields.  Exiting..." << endl;
     			exit(1);

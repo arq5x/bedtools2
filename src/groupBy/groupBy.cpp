@@ -21,6 +21,7 @@
 
 #include "version.h"
 #include "lineFileUtilities.h"
+#include "tabFile.h"
 using namespace std;
 
 
@@ -32,12 +33,11 @@ using namespace std;
 
 // function declarations
 void ShowHelp(void);
-void DetermineInput(string &inFile, const vector<int> &groupColumns, int opColumn, string op);
-void GroupBy(istream &input, const vector<int> &groupColumns, int opColumn, string op);
+void GroupBy(const string &inFile, const vector<int> &groupColumns, int opColumn, string op);
 void ReportSummary(const vector<string> &group, const vector<string> &data, string op);
 float ToFloat (string element);
 void TabPrint (string element);
-
+void CommaPrint (string element);
             
 int main(int argc, char* argv[]) {
 
@@ -110,7 +110,12 @@ int main(int argc, char* argv[]) {
 		cerr << endl << "*****" << endl << "*****ERROR: Need -opCol." << endl << "*****" << endl;
 		showHelp = true;
 	}
-	
+	if ((op != "sum")  && (op != "max")    && (op != "min") && (op != "mean") &&
+	    (op != "mode") && (op != "median") && (op != "antimode") && (op != "stdev") &&
+	    (op != "count") && (op != "collapse")) {
+		    cerr << endl << "*****" << endl << "*****ERROR: Invalid op selection. " << endl << "*****" << endl;	
+		    showHelp = true;		                    
+	}
 	if (!showHelp) {
 		
 		// Split the column string sent by the user into discrete column numbers
@@ -120,7 +125,8 @@ int main(int argc, char* argv[]) {
 		
         int opColumnInt = atoi(opColumnString.c_str());
 
-		DetermineInput(inFile, groupColumnsInt, opColumnInt, op);
+		//DetermineInput(inFile, groupColumnsInt, opColumnInt, op);
+		GroupBy(inFile, groupColumnsInt, opColumnInt, op);
 	}	
 	else {
 		ShowHelp();
@@ -150,7 +156,7 @@ void ShowHelp(void) {
 
 	cerr << "\t-op\t"	    << "Specify the operation that should be applied to opCol." << endl;
 	cerr 					<< "\t\tValid operations: sum, count, min, max, mean, median," << endl;
-    cerr                    << "\t\tmode, antimode, stdev" << endl;
+    cerr                    << "\t\tmode, antimode, stdev, collapse (i.e., print a comma separated list)" << endl;
     cerr                    << "\t\tDefault: sum" << endl;
 
 	cerr << "Examples: " << endl;
@@ -174,58 +180,63 @@ void ShowHelp(void) {
 }
 
 
-void DetermineInput(string &inFile, const vector<int> &groupColumns, int opColumn, string op) {
+void GroupBy(const string &inFile, const vector<int> &groupColumns, int opColumn, string op) {
 	
-	
-	if (inFile != "stdin") {   // process a file
-
-		ifstream in(inFile.c_str(), ios::in);
-		if ( !in ) {
-			cerr << "Error: The requested input file (" << inFile << ") could not be opened. Exiting!" << endl;
-			exit (1);
-		}
-		GroupBy(in, groupColumns, opColumn, op);
-	}
-	else GroupBy(cin, groupColumns, opColumn, op);
-}
-		
-
-void GroupBy(istream &input, const vector<int> &groupColumns, int opColumn, string op) {
-	
+	// current line number
 	int lineNum = 0;
+	// string representing current line
 	string inLine;
+	
+	// vector of strings holding the tokenized current line
 	vector<string>  inFields;
+    inFields.reserve(20);
+    
+    // keys for the current and previous group
     vector<string>  prevGroup(0);
     vector<string>  currGroup(0);
+    
+    // vector of the opColumn values for the current group
     vector<string>  values;
     values.reserve(100000);
     
-	while (getline(input, inLine)) {
-		lineNum++;
-		Tokenize(inLine, inFields);
-        
-        currGroup.clear();
-        vector<int>::const_iterator gIt  = groupColumns.begin();
-        vector<int>::const_iterator gEnd = groupColumns.end();
-        for (; gIt != gEnd; ++gIt)
-            currGroup.push_back(inFields[*gIt-1]);
-        
-        if ((currGroup != prevGroup) && (prevGroup.size() > 0)) {
-            // Summarize this group
-            ReportSummary(prevGroup, values, op);
-            values.clear();
-            values.push_back(inFields[opColumn-1].c_str());
-        }
-        else
-            values.push_back(inFields[opColumn-1].c_str());
-                    
-        prevGroup = currGroup;
-		inFields.clear();
-	}
+    // check the status of the current line
+    TabLineStatus tabLineStatus;
+    
+    // open a new tab file, loop through it line by line
+    // and summarize the data for a given group when the group
+    // fields change
+    TabFile *_tab = new TabFile(inFile);    
+    _tab->Open();
+	while ((tabLineStatus = _tab->GetNextTabLine(inFields, lineNum)) != TAB_INVALID) {
+		if (tabLineStatus == TAB_VALID) {
+		    // build the group vector for the current line
+		    currGroup.clear();
+            vector<int>::const_iterator gIt  = groupColumns.begin();
+            vector<int>::const_iterator gEnd = groupColumns.end();
+            for (; gIt != gEnd; ++gIt) {currGroup.push_back(inFields[*gIt-1]);}
+
+            // group change
+            if ((currGroup != prevGroup) && (prevGroup.size() > 0)) {
+                // Summarize this group
+                ReportSummary(prevGroup, values, op);
+                values.clear();
+                values.push_back(inFields[opColumn-1].c_str());
+            }
+            // same group
+            else
+                values.push_back(inFields[opColumn-1].c_str());
+
+            // reset for the next line
+            prevGroup = currGroup;
+            inFields.clear();
+	    }
+    }
+    // report the last group
     values.clear();
     values.push_back(inFields[opColumn-1].c_str());
     ReportSummary(currGroup, values, op);
-
+    
+    _tab->Close();
 }
 
 
@@ -239,6 +250,11 @@ void ReportSummary(const vector<string> &group, const vector<string> &data, stri
         double total = accumulate(dataF.begin(), dataF.end(), 0.0);
         for_each(group.begin(), group.end(), TabPrint);
         cout << setprecision (7) << total << endl; 
+    }
+    if (op == "collapse") {        
+        for_each(group.begin(), group.end(), TabPrint);
+        for_each(data.begin(), data.end(), CommaPrint);
+        cout << endl;
     }
     else if (op == "min") {
         for_each(group.begin(), group.end(), TabPrint);
@@ -332,4 +348,8 @@ float ToFloat (string element) {
 
 void TabPrint (string element) {
     cout << element << "\t";
+}
+
+void CommaPrint (string element) {
+    cout << element << ",";
 }

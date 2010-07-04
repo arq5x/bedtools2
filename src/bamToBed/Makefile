@@ -5,7 +5,7 @@ BIN_DIR = ../../bin/
 # -------------------
 # define our includes
 # -------------------
-INCLUDES = -I$(UTILITIES_DIR)/bedFile/ -I$(UTILITIES_DIR)/BamTools/  -I$(UTILITIES_DIR)/version/ -I$(UTILITIES_DIR)/gzstream/
+INCLUDES = -I$(UTILITIES_DIR)/bedFile/ -I$(UTILITIES_DIR)/BamTools/  -I$(UTILITIES_DIR)/version/ -I$(UTILITIES_DIR)/gzstream/ -I$(UTILITIES_DIR)/lineFileUtilities/
 
 # ----------------------------------
 # define our source and object files
