@@ -73,10 +73,9 @@ void BedCoverage::CollectCoverageBed() {
 			    bedVector bedBlocks;
                 splitBedIntoBlocks(a, lineNum, bedBlocks);
                 
-                vector<BED>::const_iterator bedItr  = bedBlocks.begin();
-            	vector<BED>::const_iterator bedEnd  = bedBlocks.end();
-            	for (; bedItr != bedEnd; ++bedItr)
-        	        _bedB->countHits(*bedItr, _forceStrand);
+        	    // use countSplitHits to avoid over-counting each split chunk
+        	    // as distinct read coverage.
+    	        _bedB->countSplitHits(bedBlocks, _forceStrand);
 			}
 			a = nullBed;
 		}
@@ -127,12 +126,9 @@ void BedCoverage::CollectCoverageBam(string bamFile) {
                 // since we are counting coverage, we do want to split blocks when a 
                 // deletion (D) CIGAR op is encountered (hence the true for the last parm)
                 getBamBlocks(bam, refs, bedBlocks, true); 
-                
-                vector<BED>::const_iterator bedItr  = bedBlocks.begin();
-            	vector<BED>::const_iterator bedEnd  = bedBlocks.end();
-            	for (; bedItr != bedEnd; ++bedItr) {
-            	    _bedB->countHits(*bedItr, _forceStrand);
-        	    }
+        	    // use countSplitHits to avoid over-counting each split chunk
+        	    // as distinct read coverage.
+        	    _bedB->countSplitHits(bedBlocks, _forceStrand);
 			} 	
 		}
 	}

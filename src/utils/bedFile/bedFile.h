@@ -15,6 +15,7 @@
 #include "gzstream.h"
 #include <vector>
 #include <map>
+#include <set>
 #include <string>
 #include <iostream>
 #include <fstream>
@@ -294,6 +295,13 @@ public:
 	// increment a the number of hits for each feature in B file
 	// that the feature overlaps
 	void countHits(const BED &a, bool forceStrand);
+	
+	// same as above, but has special logic that processes a set of
+	// BED "blocks" from a single entry so as to avoid over-counting 
+	// each "block" of a single BAM/BED12 as distinct coverage.  That is,
+	// if one read has four block, we only want to count the coverage as
+	// coming from one read, notfour.
+    void countSplitHits(const vector<BED> &bedBlock, bool forceStrand);
 	
 	// the bedfile with which this instance is associated
 	string bedFile;

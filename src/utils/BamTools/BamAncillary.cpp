@@ -19,7 +19,7 @@ using namespace std;
   
 namespace BamTools {
     void getBamBlocks(const BamAlignment &bam, const RefVector &refs, 
-                      vector<BED> &blocks, bool includeDeletions) {
+                      vector<BED> &blocks, bool breakOnDeletionOps) {
     
     	CHRPOS currPosition = bam.Position;
         CHRPOS blockStart   = bam.Position;
@@ -32,38 +32,30 @@ namespace BamTools {
     	vector<CigarOp>::const_iterator cigItr = bam.CigarData.begin();
     	vector<CigarOp>::const_iterator cigEnd = bam.CigarData.end();
         for ( ; cigItr != cigEnd; ++cigItr ) {
-    		switch (cigItr->Type) {
-    		case 'M':
+            if (cigItr->Type == 'M') {
                 currPosition += cigItr->Length;
     			blocks.push_back( BED(chrom, blockStart, currPosition, name, score, strand) );
-    			break;
-
-    		case 'S':
-    		case 'P':
-    		case 'H':
-    		case 'I':
-    			// Insertion relative to the reference genome.
-    			// Don't advance the current position, since no new nucleotides are covered.
-    			break;
-
-    		case 'D':
-    		    if (includeDeletions == true)
-    		        currPosition += cigItr->Length;
-    		    else {
-                    blocks.push_back( BED(chrom, blockStart, currPosition, name, score, strand) );
+    			blockStart    = currPosition;
+            }
+            else if (cigItr->Type == 'D') {
+                if (breakOnDeletionOps == false)
                     currPosition += cigItr->Length;
-                    blockStart    = currPosition;		        
-    		    }
-    		case 'N':
+                else {
+                    currPosition += cigItr->Length;
+                    blockStart    = currPosition;
+                }
+            }
+            else if (cigItr->Type == 'N') {
                 currPosition += cigItr->Length;
-                blockStart    = currPosition;            
-    			break;
-
-    		default:
-    			cerr << "Input error: invalid CIGAR type (" << cigItr->Type
+                blockStart    = currPosition;            }
+            else if (cigItr->Type == 'S' || cigItr->Type == 'H' || cigItr->Type == 'P' || cigItr->Type == 'I') {
+                // do nothing
+            }
+            else {
+                cerr << "Input error: invalid CIGAR type (" << cigItr->Type
     				<< ") for: " << bam.Name << endl;
     			exit(1);
-    		}
+            }
     	}
     }
 }

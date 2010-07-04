@@ -293,6 +293,7 @@ void BedIntersect::IntersectBam(string bamFile) {
 				else {
                     bool overlapFoundForBlock;
 				    bedVector bedBlocks;  // vec to store the discrete BED "blocks" from a
+				    // we don't want to split on "D" ops, hence the "false"
                     getBamBlocks(bam, refs, bedBlocks, false);
                     
                     vector<BED>::const_iterator bedItr  = bedBlocks.begin();

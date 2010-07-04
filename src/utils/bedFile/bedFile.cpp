@@ -370,6 +370,62 @@ void BedFile::countHits(const BED &a, bool forceStrand) {
 }
 
 
+void BedFile::countSplitHits(const vector<BED> &bedBlocks, bool forceStrand) {
+
+    // set to track the distinct B features that had coverage.
+    // we'll update the counts of coverage for these features by one
+    // at the end of this function to avoid over-counting. 
+    set< vector<BEDCOV>::iterator > validHits;
+            
+    vector<BED>::const_iterator blockItr  = bedBlocks.begin();
+	vector<BED>::const_iterator blockEnd  = bedBlocks.end();
+	for (; blockItr != blockEnd; ++blockItr) {
+	    
+        BIN startBin, endBin;
+        startBin = (blockItr->start >> _binFirstShift);
+        endBin = ((blockItr->end-1) >> _binFirstShift);
+    
+        // loop through each bin "level" in the binning hierarchy	
+        for (BINLEVEL i = 0; i < _binLevels; ++i) {
+
+            // loop through each bin at this level of the hierarchy	
+            BIN offset = _binOffsetsExtended[i];
+            for (BIN j = (startBin+offset); j <= (endBin+offset); ++j) {
+
+                // loop through each feature in this chrom/bin and see if it overlaps
+                // with the feature that was passed in.  if so, add the feature to 
+                // the list of hits.
+                vector<BEDCOV>::iterator bedItr = bedCovMap[blockItr->chrom][j].begin();
+                vector<BEDCOV>::iterator bedEnd = bedCovMap[blockItr->chrom][j].end();		
+                for (; bedItr != bedEnd; ++bedItr) {
+
+                    // skip the hit if not on the same strand (and we care)
+                    if (forceStrand && (blockItr->strand != bedItr->strand)) {
+                        continue;
+                    }
+                    else if (overlaps(bedItr->start, bedItr->end, blockItr->start, blockItr->end) > 0) {
+                        bedItr->depthMap[blockItr->start+1].starts++;
+                        bedItr->depthMap[blockItr->end].ends++;
+                        validHits.insert(bedItr);
+                        if (blockItr->start < bedItr->minOverlapStart)
+                            bedItr->minOverlapStart = blockItr->start;                   
+                    }
+                }
+            }
+            startBin >>= _binNextShift;
+            endBin >>= _binNextShift;
+        }
+    }
+    // incrment the count of overlap by one for each B feature that overlapped
+    // the current passed hit.  This is necessary to prevent over-counting for
+    // each "split"" of a single read.
+    set< vector<BEDCOV>::iterator >::iterator validHitsItr = validHits.begin();
+    set< vector<BEDCOV>::iterator >::iterator validHitsEnd = validHits.end();
+    for (; validHitsItr != validHitsEnd; ++validHitsItr)
+        (*validHitsItr)->count++;
+}
+
+
 void BedFile::setGff (bool gff) {
 	if (gff == true) this->_isGff = true;
 	else this->_isGff = false;

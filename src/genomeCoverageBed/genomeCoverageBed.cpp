@@ -100,7 +100,10 @@ void BedGenomeCoverage::AddBlockedCoverage(const vector<BED> &bedBlocks) {
     vector<BED>::const_iterator bedItr  = bedBlocks.begin();
     vector<BED>::const_iterator bedEnd  = bedBlocks.end();
     for (; bedItr != bedEnd; ++bedItr) {
-        AddCoverage(bedItr->start, bedItr->end);
+        // the end - 1 must be done because BamAncillary::getBamBlocks
+        // returns ends uncorrected for the genomeCoverageBed data structure.
+        // ugly, but necessary.
+        AddCoverage(bedItr->start, bedItr->end - 1);
     }
 }
 
