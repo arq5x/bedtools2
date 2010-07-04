@@ -10,12 +10,12 @@
   Licenced under the GNU General Public License 2.0+ license.
 ******************************************************************************/
 #include <vector>
-#include <map>
 #include <numeric>
 #include <iterator>
 #include <iostream>
 #include <iomanip>
 #include <fstream>
+#include <sstream>
 #include <stdlib.h>
 #include <math.h>
 
@@ -36,6 +36,7 @@ void ShowHelp(void);
 void GroupBy(const string &inFile, const vector<int> &groupColumns, int opColumn, string op);
 void ReportSummary(const vector<string> &group, const vector<string> &data, string op);
 float ToFloat (string element);
+double ToDouble(const string &element);
 void TabPrint (string element);
 void CommaPrint (string element);
             
@@ -232,8 +233,6 @@ void GroupBy(const string &inFile, const vector<int> &groupColumns, int opColumn
 	    }
     }
     // report the last group
-    values.clear();
-    values.push_back(inFields[opColumn-1].c_str());
     ReportSummary(currGroup, values, op);
     
     _tab->Close();
@@ -241,9 +240,13 @@ void GroupBy(const string &inFile, const vector<int> &groupColumns, int opColumn
 
 
 void ReportSummary(const vector<string> &group, const vector<string> &data, string op) {
+    
     vector<double> dataF;
-    // convert to floats
-    transform(data.begin(), data.end(), back_inserter(dataF), ToFloat);
+    // are we doing a numeric conversion?  if so, convert the strings to doubles.
+    if ((op == "sum") || (op == "max") || (op == "min") || (op == "mean") ||
+	    (op == "median") || (op == "stdev")) {
+            transform(data.begin(), data.end(), back_inserter(dataF), ToDouble);
+    }
     
     if (op == "sum") {        
         // sum them up
@@ -352,4 +355,14 @@ void TabPrint (string element) {
 
 void CommaPrint (string element) {
     cout << element << ",";
+}
+
+double ToDouble(const string &element) {
+    std::istringstream i(element);
+    double x;
+    if (!(i >> x)) {
+        cerr << "Error: Could not properly convert string to numeric (\"" + element + "\")" << endl;
+        exit(1);
+    }
+    return x;
 }
