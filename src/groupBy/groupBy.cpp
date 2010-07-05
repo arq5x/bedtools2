@@ -164,15 +164,15 @@ void ShowHelp(void) {
 	cerr << "\t$ cat test.out" << endl;
 	cerr << "\tchr1	10	20	A	chr1	15	25	1000" << endl;
 	cerr << "\tchr1	10	20	A	chr1	25	35	10000" << endl << endl;
-	cerr << "\t$ cat test.out | groupBy -i stdin -grpCols 1,2,3,4 -opCol 8 -op sum" << endl;
+	cerr << "\t$ cat test.out | groupBy -i stdin -grp 1,2,3,4 -opCol 8 -op sum" << endl;
 	cerr << "\tchr1	10	20	A	11000" << endl << endl;
-	cerr << "\t$ cat test.out | groupBy -i stdin -grpCols 1,2,3,4 -opCol 8 -op max" << endl;
+	cerr << "\t$ cat test.out | groupBy -i stdin -grp 1,2,3,4 -opCol 8 -op max" << endl;
 	cerr << "\tchr1	10	20	A	1000" << endl << endl;
-	cerr << "\t$ cat test.out | groupBy -i stdin -grpCols 1,2,3,4 -opCol 8 -op mean" << endl;
+	cerr << "\t$ cat test.out | groupBy -i stdin -grp 1,2,3,4 -opCol 8 -op mean" << endl;
 	cerr << "\tchr1	10	20	A	5500" << endl << endl;
 	
 	cerr << "Notes: " << endl;
-	cerr << "\t(1)  The input file/stream should be sorted/grouped by the -grpCols." << endl << endl;
+	cerr << "\t(1)  The input file/stream should be sorted/grouped by the -grp. columns" << endl << endl;
 
 	
 	// end the program here

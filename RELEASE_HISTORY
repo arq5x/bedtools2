@@ -1,3 +1,26 @@
+Version 2.8.0 (July-05-2010)
+
+1.  Proper support for "split" BAM alignments and "blocked" BED (aka BED12) features. By using the "-split" option, intersectBed, coverageBed, genomeCoverageBed, and bamToBed will now correctly compute overlaps/coverage solely for the "split" portions of BAM alignments or the "blocks" of BED12 features such as genes. 
+
+2.  Added native support for the 1000 Genome Variant Calling Format (VCF) version 4.0.
+
+3.  New bed12ToBed6 tool.  This tool will convert each block of a BED12 feature into discrete BED6 features.
+
+4.  Useful new groupBy tool.  This is a very useful new tool that mimics the "groupBy" clause in SQL.  Given a file or stream that is sorted by the appropriate "grouping columns", groupBy will compute summary statistics on another column in the file or stream.  This will work with output from all BEDTools as well as any other tab-delimited file or stream.  Example summary operations include: sum, mean, stdev, min, max, etc.  Please see the help for the tools for examples.  The functionality in groupBy was motivated by helpful discussions with Erik Arner at Riken.
+
+5.  Improvements to genomeCoverageBed.  Applied several code improvements provided by Gordon Assaf at CSHL.  Most notably, beyond the several efficiency and organizational changes he made, he include a "-strand" option which allows one to specify that coverage should only be computed on either the "+" or the "-" strand.
+
+6.  Fixed a bug in closestBed found by Erik Arner (Riken) which incorrectly reported "null" overlaps for features that did not have a closest feature in the B file.
+
+7.  Fixed a careless bug in slopBed also found by Erik Arner (Riken) that caused an infinite loop when the "-excl" option was used.
+ 
+8.  Reduced memory consumption by ca. 15% and run time by ca. 10% for most tools.
+
+9.  Several code-cleanliness updates such as templated functions and common tyedefs.
+
+10.  Tweaked the genome binning approach such that 16kb bins are the most granular.
+
+
 Version 2.7.1 (May-06-2010)
 Fixed a typo that caused some compilers to fail on closestBed.
 
