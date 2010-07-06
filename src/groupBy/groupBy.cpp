@@ -144,7 +144,7 @@ void ShowHelp(void) {
 	cerr << "Summary: Summarizes a dataset column based upon" << endl;
 	cerr << "\t common column groupings. Akin to the SQL \"group by\" command." << endl << endl;
 	
-	cerr << "Usage:   " << PROGRAM_NAME << " [OPTIONS] -i <input> -opCol <> " << endl << endl;
+	cerr << "Usage:   " << PROGRAM_NAME << " [OPTIONS] -i <input> -opCol <column> " << endl << endl;
 
 	cerr << "Options: " << endl;
 	cerr << "\t-i\t"	    << "Input file. Use \"stdin\" for pipes." << endl << endl;
@@ -171,6 +171,8 @@ void ShowHelp(void) {
 	cerr << "\tchr1	10	20	A	1000" << endl << endl;
 	cerr << "\t$ cat test.out | groupBy -i stdin -grp 1,2,3,4 -opCol 8 -op mean" << endl;
 	cerr << "\tchr1	10	20	A	5500" << endl << endl;
+	cerr << "\t$ cat test.out | groupBy -i stdin -grp 1,2,3,4 -opCol 8 -op collapse" << endl;
+	cerr << "\tchr1	10	20	A	1000,10000," << endl << endl;
 	
 	cerr << "Notes: " << endl;
 	cerr << "\t(1)  The input file/stream should be sorted/grouped by the -grp. columns" << endl << endl;

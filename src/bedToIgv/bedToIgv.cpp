@@ -157,7 +157,7 @@ void ShowHelp(void) {
 	cerr << "Summary: Creates a batch script to create IGV images " << endl;
 	cerr << "         at each interval defined in a BED/GFF/VCF file." << endl << endl;
 
-	cerr << "Usage:   " << PROGRAM_NAME << " [OPTIONS] -i <bed/gff/vcf> -g <genome>" << endl << endl;
+	cerr << "Usage:   " << PROGRAM_NAME << " [OPTIONS] -i <bed/gff/vcf>" << endl << endl;
 
 	cerr << "Options: " << endl;
 
