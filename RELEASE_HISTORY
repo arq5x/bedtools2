@@ -1,4 +1,8 @@
 Version 2.8.0 (July-05-2010)
+1.  Added bedToIgv.
+
+
+Version 2.8.0 (July-04-2010)
 
 1.  Proper support for "split" BAM alignments and "blocked" BED (aka BED12) features. By using the "-split" option, intersectBed, coverageBed, genomeCoverageBed, and bamToBed will now correctly compute overlaps/coverage solely for the "split" portions of BAM alignments or the "blocks" of BED12 features such as genes. 
 
