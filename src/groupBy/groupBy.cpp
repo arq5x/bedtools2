@@ -10,6 +10,7 @@
   Licenced under the GNU General Public License 2.0+ license.
 ******************************************************************************/
 #include <vector>
+#include <map>
 #include <numeric>
 #include <iterator>
 #include <iostream>

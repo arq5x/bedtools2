@@ -9,22 +9,14 @@
 
   Licensed under the GNU General Public License 2.0+ license.
 ******************************************************************************/
-#ifndef BEDFILE_H
-#define BEDFILE_H
+#ifndef TABFILE_H
+#define TABFILE_H
 
 #include "gzstream.h"
 #include <vector>
-#include <map>
-#include <set>
 #include <string>
 #include <iostream>
-#include <fstream>
-#include <sstream>
-#include <cstring>
-#include <algorithm>
-#include <limits.h>
-#include <stdint.h>
-#include <cstdio>
+
 using namespace std;
 
 // enum to flag the state of a given line in a TAB file.
