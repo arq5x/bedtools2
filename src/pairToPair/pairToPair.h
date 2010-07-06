@@ -28,22 +28,14 @@ class PairToPair {
 public:
 
 	// constructor 
-	PairToPair(string &, string &, float &, string, bool);
+	PairToPair(string &bedAFilePE, string &bedBFilePE, float &overlapFraction, 
+        string searchType, bool ignoreStrand, int slop, bool strandedSlop);
 
 	// destructor
 	~PairToPair(void);
 
  	void IntersectPairs();
 
-	void FindOverlaps(const BEDPE &a, vector<BEDCOV> &hitsA1B1, vector<BEDCOV> &hitsA1B2, 
-		vector<BEDCOV> &hitsA2B1, vector<BEDCOV> &hitsA2B2, string type);
-
-	void FindQualityHitsBetweenEnds(const BEDPE &a, int end, const vector<BEDCOV> &hits, 
-		vector<BEDCOV> &qualityHits, int &numOverlaps);
-	
-	void FindHitsOnBothEnds(const BEDPE &a, const vector<BEDCOV> &qualityHitsEnd1, 
-		const vector<BEDCOV> &qualityHitsEnd2, int &matchCount);
-	
 		
 private:
 
@@ -53,12 +45,28 @@ private:
 	float _overlapFraction;
 	string _searchType;
 	bool _ignoreStrand;
+    int _slop;
+    bool _strandedSlop;
 
 	// instance of a paired-end bed file class.
 	BedFilePE *_bedA;
 
 	// instance of a bed file class.
 	BedFilePE *_bedB;
+	
+	// methods
+	void FindOverlaps(const BEDPE &a, vector<BEDCOV> &hitsA1B1, vector<BEDCOV> &hitsA1B2, 
+		vector<BEDCOV> &hitsA2B1, vector<BEDCOV> &hitsA2B2);
+
+    void FindQualityHitsBetweenEnds(CHRPOS start1, CHRPOS end1, CHRPOS start2, CHRPOS end2, 
+        const vector<BEDCOV> &hits, vector<BEDCOV> &qualityHits, int &numOverlaps);
+	
+	void FindHitsOnBothEnds(const BEDPE &a, const vector<BEDCOV> &qualityHitsEnd1, 
+		const vector<BEDCOV> &qualityHitsEnd2, int &matchCount);
+		
+	void FindHitsOnEitherEnd(const BEDPE &a, const vector<BEDCOV> &qualityHitsEnd1, 
+        const vector<BEDCOV> &qualityHitsEnd2, int &matchCount);
+        
 };
 
 #endif /* PAIRTOPAIR_H */
