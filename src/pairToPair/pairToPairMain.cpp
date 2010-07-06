@@ -164,8 +164,8 @@ void ShowHelp(void) {
 	cerr << "\t-slop \t"				<< "The amount of slop (in b.p.). to be added to each footprint." << endl << endl;
 
 	cerr << "\t-ss\t"	    			<< "Add slop based to each BEDPE footprint based on strand." << endl;
-	cerr 								<< "\t\t- If strand is \"+\", slop is only added to the end coordinates." << endl << endl;
-	cerr 								<< "\t\t- If strand is \"-\", slop is only added to the start coordinates." << endl << endl;
+	cerr 								<< "\t\t- If strand is \"+\", slop is only added to the end coordinates." << endl;
+	cerr 								<< "\t\t- If strand is \"-\", slop is only added to the start coordinates." << endl;
 	cerr 								<< "\t\t- By default, slop is added in both directions." << endl << endl;
 	
 	cerr << "\t-is\t"	    			<< "Ignore strands when searching for overlaps." << endl;
