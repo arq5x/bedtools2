@@ -139,8 +139,8 @@ int main(int argc, char* argv[]) {
 	}
 }
 
-void ShowHelp(void) {
 
+void ShowHelp(void) {
 	cerr << endl << "Program: " << PROGRAM_NAME << " (v" << VERSION << ")" << endl;
 	
 	cerr << "Author:  Aaron Quinlan (aaronquinlan@gmail.com)" << endl;
@@ -159,7 +159,7 @@ void ShowHelp(void) {
 	cerr 								<< "\t\teither\tReport overlaps if either ends of A overlap B." << endl;
 
 	cerr 								<< "\t\tboth\tReport overlaps if both ends of A overlap B." << endl;
-	cerr									<< "\t\t\t- Default = both." << endl << endl;
+	cerr								<< "\t\t\t- Default = both." << endl << endl;
 
 	cerr << "\t-slop \t"				<< "The amount of slop (in b.p.). to be added to each footprint." << endl << endl;
 
@@ -175,5 +175,4 @@ void ShowHelp(void) {
 		
 	// end the program here
 	exit(1);
-
 }

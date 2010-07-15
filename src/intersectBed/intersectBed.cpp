@@ -29,14 +29,15 @@ bool BedIntersect::processHits(const BED &a, const vector<BED> &hits, bool print
 		int e            = min(a.end, h->end);
 		int overlapBases = (e - s);				// the number of overlapping bases b/w a and b
 		int aLength      = (a.end - a.start);   // the length of a in b.p.
-		
+						    
 		// is there enough overlap relative to the user's request? (default ~ 1bp)
 		if ( ( (float) overlapBases / (float) aLength ) >= _overlapFraction ) { 
-		
 			// Report the hit if the user doesn't care about reciprocal overlap between A and B.
 			if (_reciprocal == false) {
 				hitsFound = true;
 				numOverlaps++;
+				if (printable == true)
+    				ReportOverlapDetail(overlapBases, a, *h, s, e);
 			}
 			// we require there to be sufficient __reciprocal__ overlap
 			else {			
@@ -45,11 +46,9 @@ bool BedIntersect::processHits(const BED &a, const vector<BED> &hits, bool print
 				if (bOverlap >= _overlapFraction) {
 					hitsFound = true;
 					numOverlaps++;
+					if (printable == true)
+        				ReportOverlapDetail(overlapBases, a, *h, s, e);
 				}
-			}
-			// report the overlap per the user's request.
-			if (printable == true) {
-				ReportOverlapDetail(overlapBases, a, *h, s, e);
 			}
 		}
 	}
@@ -131,25 +130,25 @@ bool BedIntersect::FindOverlaps(const BED &a, vector<BED> &hits) {
 
 void BedIntersect::ReportOverlapDetail(const int &overlapBases, const BED &a, const BED &b,
 									   const CHRPOS &s, const CHRPOS &e) {
-	// simple intersection only
+	// default. simple intersection only
 	if (_writeA == false && _writeB == false && _writeOverlap == false) {
 		_bedA->reportBedRangeNewLine(a,s,e);
 	}
-	// write the original A and B 
+	//  -wa -wbwrite the original A and B 
 	else if (_writeA == true && _writeB == true) {
 		_bedA->reportBedTab(a);
 		_bedB->reportBedNewLine(b);
 	}
-	// write just the original A
+	// -wa write just the original A
 	else if (_writeA == true) {
 		_bedA->reportBedNewLine(a);
 	}
-	// write the intersected portion of A and the original B 
+	// -wb write the intersected portion of A and the original B 
 	else if (_writeB == true) {
 		_bedA->reportBedRangeTab(a,s,e);
 		_bedB->reportBedNewLine(b);
 	}
-	// write the original A and B plus the no. of overlapping bases.
+	// -wo write the original A and B plus the no. of overlapping bases.
 	else if (_writeOverlap == true) {
 		_bedA->reportBedTab(a);
 		_bedB->reportBedTab(b);
@@ -287,6 +286,7 @@ void BedIntersect::IntersectBam(string bamFile) {
 			    // treat the BAM alignment as a single "block"
 			    if (_obeySplits == false) {
 				    overlapsFound = FindOneOrMoreOverlap(a);
+                    cerr << overlapsFound << endl;
 				}
 				// split the BAM alignment into discrete blocks and
 				// look for overlaps only within each block.
@@ -304,14 +304,14 @@ void BedIntersect::IntersectBam(string bamFile) {
                             overlapsFound = true;
             	    }
 				}
-				
 				if (overlapsFound == true) {
 					if (_noHit == false)
 						writer.SaveAlignment(bam);
 				}
 				else {
-					if (_noHit == true) 
-						writer.SaveAlignment(bam);	
+					if (_noHit == true) {
+						writer.SaveAlignment(bam);
+					}	
 				}
 			}
 			else {
