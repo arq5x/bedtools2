@@ -125,7 +125,22 @@ int main(int argc, char* argv[]) {
 		vector<int> groupColumnsInt;
 		Tokenize(groupColumnsString, groupColumnsInt, ",");
 		
+		// sanity check the group columns
+        vector<int>::const_iterator gIt  = groupColumnsInt.begin();
+        vector<int>::const_iterator gEnd = groupColumnsInt.end();
+        for (; gIt != gEnd; ++gIt) {
+            if (*gIt < 1) {
+    		    cerr << endl << "*****" << endl << "*****ERROR: group columns must be >=1. " << endl << "*****" << endl;	
+    		    ShowHelp();                
+            }
+        }
+        
+        // sanity check the op columns        
         int opColumnInt = atoi(opColumnString.c_str());
+        if (opColumnInt < 1) {
+		    cerr << endl << "*****" << endl << "*****ERROR: op columns must be >=1. " << endl << "*****" << endl;	
+		    ShowHelp();                
+        }
 
 		//DetermineInput(inFile, groupColumnsInt, opColumnInt, op);
 		GroupBy(inFile, groupColumnsInt, opColumnInt, op);
@@ -213,20 +228,38 @@ void GroupBy(const string &inFile, const vector<int> &groupColumns, int opColumn
     _tab->Open();
 	while ((tabLineStatus = _tab->GetNextTabLine(inFields, lineNum)) != TAB_INVALID) {
 		if (tabLineStatus == TAB_VALID) {
+		    
+		    // grab the number of columns in the line.
+            int lineWidth = inFields.size();
+		    
+		    // sanity check the op column
+		    if (opColumn > lineWidth) {
+		        cerr << endl << "*****" << endl << "*****ERROR: op column exceeds the number of columns in file at line " 
+		             << lineNum << ". Exiting." << endl << "*****" << endl;	
+    		    exit(1);
+		    }
+		    
 		    // build the group vector for the current line
 		    currGroup.clear();
             vector<int>::const_iterator gIt  = groupColumns.begin();
             vector<int>::const_iterator gEnd = groupColumns.end();
-            for (; gIt != gEnd; ++gIt) {currGroup.push_back(inFields[*gIt-1]);}
+            for (; gIt != gEnd; ++gIt) {
+                if (*gIt > lineWidth) {
+    		        cerr << endl << "*****" << endl << "*****ERROR: group column exceeds the number of columns in file at line " 
+    		             << lineNum << ". Exiting." << endl << "*****" << endl;	
+        		    exit(1);
+    		    }
+                currGroup.push_back(inFields[*gIt-1]);
+            }
 
-            // group change
+            // there has been a group change
             if ((currGroup != prevGroup) && (prevGroup.size() > 0)) {
                 // Summarize this group
                 ReportSummary(prevGroup, values, op);
                 values.clear();
                 values.push_back(inFields[opColumn-1].c_str());
             }
-            // same group
+            // we're still dealing with the same group
             else
                 values.push_back(inFields[opColumn-1].c_str());
 
@@ -237,7 +270,6 @@ void GroupBy(const string &inFile, const vector<int> &groupColumns, int opColumn
     }
     // report the last group
     ReportSummary(currGroup, values, op);
-    
     _tab->Close();
 }
 
