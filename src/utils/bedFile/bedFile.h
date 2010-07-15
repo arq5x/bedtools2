@@ -596,11 +596,11 @@ private:
     		if (this->bedType == 9 && _isGff) {
     			bed.chrom = lineVector[0];
     			// substract 1 to force the start to be BED-style
-    			bed.start = atoi(lineVector[3].c_str()) - 1;
-    			bed.end = atoi(lineVector[4].c_str());
-    			bed.name = lineVector[2];
-    			bed.score = lineVector[5];
-    			bed.strand = atoi(lineVector[6].c_str());
+    			bed.start  = atoi(lineVector[3].c_str()) - 1;
+    			bed.end    = atoi(lineVector[4].c_str());
+    			bed.name   = lineVector[2];
+    			bed.score  = lineVector[5];
+    			bed.strand = lineVector[6].c_str();
     			bed.otherFields.push_back(lineVector[1]);  // add GFF "source". unused in BED
     			bed.otherFields.push_back(lineVector[7]);  // add GFF "fname". unused in BED
     			bed.otherFields.push_back(lineVector[8]);  // add GFF "group". unused in BED
@@ -627,12 +627,11 @@ private:
     		if (this->bedType == 9 && _isGff) {
     			bed.chrom = lineVector[0];
     			// substract 1 to force the start to be BED-style
-    			bed.start = atoi(lineVector[3].c_str()) - 1;
-    			bed.end = atoi(lineVector[4].c_str());
-    			bed.name = lineVector[2];
-    			bed.score = lineVector[5];
-    			bed.strand = atoi(lineVector[6].c_str());
-
+    			bed.start  = atoi(lineVector[3].c_str()) - 1;
+    			bed.end    = atoi(lineVector[4].c_str());
+    			bed.name   = lineVector[2];
+    			bed.score  = lineVector[5];
+    			bed.strand = lineVector[6].c_str();
     			bed.otherFields.push_back(lineVector[1]);  // add GFF "source". unused in BED
     			bed.otherFields.push_back(lineVector[7]);  // add GFF "fname".  unused in BED
     			bed.otherFields.push_back(lineVector[8]);  // add GFF "group".  unused in BED
