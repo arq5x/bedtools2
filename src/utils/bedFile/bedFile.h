@@ -506,6 +506,12 @@ private:
     		bed.start  = atoi(lineVector[1].c_str()) - 1;  // VCF is one-based
             bed.end    = bed.start + lineVector[3].size(); // VCF 4.0 stores the size of the affected REF allele.
             bed.strand = "+";
+            // construct the name from the ref and alt alleles.  
+            // if it's an annotated variant, add the rsId as well.
+            bed.name   = lineVector[3] + "/" + lineVector[4];
+            if (lineVector[2] != ".") {
+                bed.name += "_" + lineVector[2];
+            }
 
     		if (this->bedType > 2) {		
     			for (unsigned int i = 2; i < lineVector.size(); ++i) {
