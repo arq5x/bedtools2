@@ -212,9 +212,9 @@ void ShowHelp(void) {
 	
 	cerr << "Author:  Aaron Quinlan (aaronquinlan@gmail.com)" << endl;
 
-	cerr << "Summary: Report overlaps between a.bed and b.bed." << endl << endl;
+	cerr << "Summary: Report overlaps between two feature files." << endl << endl;
 
-	cerr << "Usage:   " << PROGRAM_NAME << " [OPTIONS] -a <a.bed> -b <b.bed>" << endl << endl;
+	cerr << "Usage:   " << PROGRAM_NAME << " [OPTIONS] -a <bed/gff/vcf> -b <bed/gff/vcf>" << endl << endl;
 
 	cerr << "Options: " << endl;
 	

@@ -162,9 +162,9 @@ void ShowHelp(void) {
 	
 	cerr << "Author:  Aaron Quinlan (aaronquinlan@gmail.com)" << endl;
 
-	cerr << "Summary: Report overlaps between a BEDPE file and a BED file." << endl << endl;
+	cerr << "Summary: Report overlaps between a BEDPE file and a BED/GFF/VCF file." << endl << endl;
 
-	cerr << "Usage:   " << PROGRAM_NAME << " [OPTIONS] -a <BEDPE> -b <BED>" << endl << endl;
+	cerr << "Usage:   " << PROGRAM_NAME << " [OPTIONS] -a <bedpe> -b <bed/gff/vcf>" << endl << endl;
 
 	cerr << "Options: " << endl;
 

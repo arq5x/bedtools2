@@ -121,15 +121,15 @@ void ShowHelp(void) {
 	
 	cerr << "Author:  Aaron Quinlan (aaronquinlan@gmail.com)" << endl;
 	
-	cerr << "Summary: Extract DNA sequences into a fasta file based on BED coordinates." << endl << endl;
+	cerr << "Summary: Extract DNA sequences into a fasta file based on feature coordinates." << endl << endl;
 
-	cerr << "Usage:   " << PROGRAM_NAME << " [OPTIONS] -fi -bed -fo " << endl << endl;
+	cerr << "Usage:   " << PROGRAM_NAME << " [OPTIONS] -fi <fasta> -bed <bed/gff/vcf> -fo <fasta> " << endl << endl;
 
 	cerr << "Options: " << endl;
 	cerr << "\t-fi\tInput FASTA file" << endl;
-	cerr << "\t-bed\tBED file of ranges to extract from -fi" << endl;
+	cerr << "\t-bed\tBED/GFF/VCF file of ranges to extract from -fi" << endl;
 	cerr << "\t-fo\tOutput file (can be FASTA or TAB-delimited)" << endl;
-	cerr << "\t-name\tUse the BED name field (#4) for the FASTA header" << endl;
+	cerr << "\t-name\tUse the name field for the FASTA header" << endl;
 
 	cerr << "\t-tab\tWrite output in TAB delimited format." << endl;	
 	cerr << "\t\t- Default is FASTA format." << endl << endl;

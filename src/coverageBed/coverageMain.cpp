@@ -121,7 +121,7 @@ void ShowHelp(void) {
 	cerr << "Summary: Returns the depth and breadth of coverage of features from A" << endl;
 	cerr << "\t on the intervals in B." << endl << endl;
 	
-	cerr << "Usage:   " << PROGRAM_NAME << " [OPTIONS] -a <a.bed> -b <b.bed>" << endl << endl;
+	cerr << "Usage:   " << PROGRAM_NAME << " [OPTIONS] -a <bed/gff/vcf> -b <bed/gff/vcf>" << endl << endl;
 
 	cerr << "Options: " << endl;
 

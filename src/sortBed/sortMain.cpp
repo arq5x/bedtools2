@@ -143,8 +143,8 @@ void ShowHelp(void) {
 	cerr << endl << "Program: " << PROGRAM_NAME << " (v" << VERSION << ")" << endl;
 	
 	cerr << "Author:  Aaron Quinlan (aaronquinlan@gmail.com)" << endl;
-	cerr << "Summary: Sorts a BED file in various and useful ways." << endl << endl;
-	cerr << "Usage:   " << PROGRAM_NAME << " [OPTIONS] -i <input.bed>" << endl << endl;
+	cerr << "Summary: Sorts a feature file in various and useful ways." << endl << endl;
+	cerr << "Usage:   " << PROGRAM_NAME << " [OPTIONS] -i <bed/gff/vcf>" << endl << endl;
 
 	cerr << "Options: " << endl;
 	cerr << "\t" << "-sizeA\t\t"	<< "Sort by feature size in ascending order." << endl;

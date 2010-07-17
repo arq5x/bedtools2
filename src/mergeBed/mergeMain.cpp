@@ -114,9 +114,9 @@ void ShowHelp(void) {
 	
 	cerr << "Author:  Aaron Quinlan (aaronquinlan@gmail.com)" << endl;
 	
-	cerr << "Summary: Merges overlapping BED entries into a single interval." << endl << endl;
+	cerr << "Summary: Merges overlapping BED/GFF/VCF entries into a single interval." << endl << endl;
 
-	cerr << "Usage:   " << PROGRAM_NAME << " [OPTIONS] -i <input.bed>" << endl << endl;
+	cerr << "Usage:   " << PROGRAM_NAME << " [OPTIONS] -i <bed/gff/vcf>" << endl << endl;
 
 	cerr << "Options: " << endl;
 	cerr << "\t-s\t"      		<< "Force strandedness.  That is, only merge features" << endl;

@@ -142,9 +142,9 @@ void ShowHelp(void) {
 	
 	cerr << "Author:  Aaron Quinlan (aaronquinlan@gmail.com)" << endl;
 
-	cerr << "Summary: Converts BED records to BAM format." << endl << endl;
+	cerr << "Summary: Converts feature records to BAM format." << endl << endl;
 
-	cerr << "Usage:   " << PROGRAM_NAME << " [OPTIONS] -i <bed> -g <genome>" << endl << endl;
+	cerr << "Usage:   " << PROGRAM_NAME << " [OPTIONS] -i <bed/gff/vcf> -g <genome>" << endl << endl;
 
 	cerr << "Options: " << endl;
 

@@ -96,9 +96,9 @@ void ShowHelp(void) {
 	
 	cerr << "Author:  Aaron Quinlan (aaronquinlan@gmail.com)" << endl;
 	
-	cerr << "Summary: Returns the base pair complement of a BED file." << endl << endl;
+	cerr << "Summary: Returns the base pair complement of a feature file." << endl << endl;
 
-	cerr << "Usage:   " << PROGRAM_NAME << " [OPTIONS] -i <bed> -g <genome>" << endl << endl;
+	cerr << "Usage:   " << PROGRAM_NAME << " [OPTIONS] -i <bed/gff/vcf> -g <genome>" << endl << endl;
 	
 	cerr << "Notes: " << endl;
 	cerr << "\t(1)  The genome file should tab delimited and structured as follows:" << endl;

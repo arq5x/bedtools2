@@ -112,10 +112,10 @@ void ShowHelp(void) {
 	
 	cerr << "Author:  Aaron Quinlan (aaronquinlan@gmail.com)" << endl;
 
-	cerr << "Summary: For each feature in BED A, finds the closest " << endl;
-	cerr << "\t feature (upstream or downstream) in BED B." << endl << endl;
+	cerr << "Summary: For each feature in A, finds the closest " << endl;
+	cerr << "\t feature (upstream or downstream) in B." << endl << endl;
 
-	cerr << "Usage:   " << PROGRAM_NAME << " [OPTIONS] -a <a.bed> -b <b.bed>" << endl << endl;
+	cerr << "Usage:   " << PROGRAM_NAME << " [OPTIONS] -a <bed/gff/vcf> -b <bed/gff/vcf>" << endl << endl;
 
 	cerr << "Options: " << endl;
 	cerr << "\t-s\t"      		<< "Force strandedness.  That is, find the closest feature in B" << endl;
@@ -129,7 +129,6 @@ void ShowHelp(void) {
 	cerr 						<< "\t\t- \"all\"  Report all ties (default)." << endl;
 	cerr 						<< "\t\t- \"first\"  Report the first tie that occurred in the B file." << endl;
 	cerr 						<< "\t\t- \"last\"  Report the last tie that occurred in the B file." << endl << endl;
-
 	
 	cerr << "Notes: " << endl;
 	cerr << "\tReports \"none\" for chrom and \"-1\" for all other fields when a feature" << endl;

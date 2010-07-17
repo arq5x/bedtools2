@@ -195,7 +195,7 @@ void ShowHelp(void) {
 	cerr << "\t reports all features in B that overlap the window. For each" << endl;
 	cerr << "\t overlap the entire entry in A and B are reported." << endl << endl;
 
-	cerr << "Usage:   " << PROGRAM_NAME << " [OPTIONS] -a <a.bed> -b <b.bed>" << endl << endl;
+	cerr << "Usage:   " << PROGRAM_NAME << " [OPTIONS] -a <bed/gff/vcf> -b <bed/gff/vcf>" << endl << endl;
 
 	cerr << "Options: " << endl;
 	

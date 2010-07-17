@@ -109,8 +109,8 @@ void ShowHelp(void) {
 	
 	cerr << "Author:  Aaron Quinlan (aaronquinlan@gmail.com)" << endl;
 	
-	cerr << "Summary: Creates HTML links to an UCSC Genome Browser from a BED file." << endl << endl;
-	cerr << "Usage:   " << PROGRAM_NAME << " [OPTIONS] -i <input.bed> > out.html" << endl << endl;
+	cerr << "Summary: Creates HTML links to an UCSC Genome Browser from a feature file." << endl << endl;
+	cerr << "Usage:   " << PROGRAM_NAME << " [OPTIONS] -i <bed/gff/vcf> > out.html" << endl << endl;
 
 	cerr << "Options: " << endl;
 	cerr << "\t-base\t"	<< "The browser basename.  Default: http://genome.ucsc.edu " << endl;

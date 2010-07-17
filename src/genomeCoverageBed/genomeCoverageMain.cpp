@@ -161,9 +161,9 @@ void ShowHelp(void) {
 	cerr << "Authors: Aaron Quinlan (aaronquinlan@gmail.com)" << endl;
 	cerr << "         Gordon Assaf, CSHL" << endl << endl;
 
-	cerr << "Summary: Compute the coverage of a BED/BAM file among a genome." << endl << endl;
+	cerr << "Summary: Compute the coverage of a feature file among a genome." << endl << endl;
 
-	cerr << "Usage:   " << PROGRAM_NAME << " [OPTIONS] -i <bed> -g <genome>" << endl << endl;
+	cerr << "Usage:   " << PROGRAM_NAME << " [OPTIONS] -i <bed/gff/vcf> -g <genome>" << endl << endl;
 	
 	cerr << "Options: " << endl;
 	

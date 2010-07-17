@@ -100,7 +100,7 @@ void ShowHelp(void) {
 
 	cerr << "Summary: Splits BED12 features into discrete BED6 features." << endl << endl;
 
-	cerr << "Usage:   " << PROGRAM_NAME << " [OPTIONS] -i <bed>" << endl << endl;
+	cerr << "Usage:   " << PROGRAM_NAME << " [OPTIONS] -i <bed12>" << endl << endl;
 
 
 	// end the program here
