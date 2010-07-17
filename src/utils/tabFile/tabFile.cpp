@@ -1,5 +1,5 @@
 /*****************************************************************************
-  _tabFile.cpp
+  tabFile.cpp
 
   (c) 2009 - Aaron Quinlan
   Hall Laboratory

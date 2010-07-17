@@ -4,14 +4,14 @@ UTILITIES_DIR = ../../utils/
 # -------------------
 # define our includes
 # -------------------
-INCLUDES = -I$(UTILITIES_DIR)/lineFileUtilities/
+INCLUDES = -I$(UTILITIES_DIR)/lineFileUtilities/ -I$(UTILITIES_DIR)/fileType/
 
 # ----------------------------------
 # define our source and object files
 # ----------------------------------
 SOURCES= genomeFile.cpp
 OBJECTS= $(SOURCES:.cpp=.o)
-_EXT_OBJECTS=lineFileUtilities.o	
+_EXT_OBJECTS=lineFileUtilities.o fileType.o
 EXT_OBJECTS=$(patsubst %,$(OBJ_DIR)/%,$(_EXT_OBJECTS))
 BUILT_OBJECTS= $(patsubst %,$(OBJ_DIR)/%,$(OBJECTS))
 

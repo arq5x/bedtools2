@@ -133,10 +133,10 @@ void ShowHelp(void) {
 	cerr					<< "\t\tstart1,end1,start2,end2" << endl << endl;	
 
 	cerr << "Example: " << endl;
-	cerr << "\t$ cat test.out" << endl;
+	cerr << "\t$ windowBed -a A.bed -b B.bed -w 10" << endl;
 	cerr << "\tchr1	10	20	A	chr1	15	25	B" << endl;
 	cerr << "\tchr1	10	20	C	chr1	25	35	D" << endl << endl;
-	cerr << "\t$ cat test.out | overlaps -i stdin -cols 2,3,6,7" << endl;
+	cerr << "\t$ windowBed -a A.bed -b B.bed -w 10 | overlap -i stdin -cols 2,3,6,7" << endl;
 	cerr << "\tchr1	10	20	A	chr1	15	25	B	5" << endl;
 	cerr << "\tchr1	10	20	C	chr1	25	35	D	-5" << endl;
 	

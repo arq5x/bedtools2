@@ -12,7 +12,12 @@
 #ifndef BEDFILE_H
 #define BEDFILE_H
 
+// "local" includes
 #include "gzstream.h"
+#include "lineFileUtilities.h"
+#include "fileType.h"
+
+// standard includes
 #include <vector>
 #include <map>
 #include <set>
