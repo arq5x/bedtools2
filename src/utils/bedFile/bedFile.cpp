@@ -259,10 +259,11 @@ bool BedFile::FindOneOrMoreOverlapsPerBin(string chrom, CHRPOS start, CHRPOS end
 			vector<BED>::const_iterator bedItr = bedMap[chrom][j].begin();
 			vector<BED>::const_iterator bedEnd = bedMap[chrom][j].end();
 			for (; bedItr != bedEnd; ++bedItr) {
+			    
 				CHRPOS s = max(start, bedItr->start);
 				CHRPOS e = min(end, bedItr->end);
 				// the number of overlapping bases b/w a and b
-				CHRPOS overlapBases = (e - s);
+				int overlapBases = (e - s);
 
 				// do we have sufficient overlap?
 				if ( (float) overlapBases / (float) aLength  >= overlapFraction) {					
@@ -305,8 +306,9 @@ bool BedFile::FindOneOrMoreReciprocalOverlapsPerBin(string chrom, CHRPOS start, 
 			for (; bedItr != bedEnd; ++bedItr) {
 				CHRPOS s = max(start, bedItr->start);
 				CHRPOS e = min(end, bedItr->end);
+				
 				// the number of overlapping bases b/w a and b
-				CHRPOS overlapBases = (e - s);
+				int overlapBases = (e - s);
 				
 				// do we have sufficient overlap?
 				if ( (float) overlapBases / (float) aLength  >= overlapFraction) {					

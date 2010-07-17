@@ -286,7 +286,6 @@ void BedIntersect::IntersectBam(string bamFile) {
 			    // treat the BAM alignment as a single "block"
 			    if (_obeySplits == false) {
 				    overlapsFound = FindOneOrMoreOverlap(a);
-                    cerr << overlapsFound << endl;
 				}
 				// split the BAM alignment into discrete blocks and
 				// look for overlaps only within each block.
