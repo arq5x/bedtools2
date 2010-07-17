@@ -19,6 +19,8 @@
 #include <sstream>
 #include <stdlib.h>
 #include <math.h>
+#include <limits.h>
+#include <string.h>
 
 #include "version.h"
 #include "lineFileUtilities.h"

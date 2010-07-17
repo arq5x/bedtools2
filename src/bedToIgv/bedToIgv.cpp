@@ -32,7 +32,7 @@ void ShowHelp(void);
 
 void DetermineBedInput(BedFile *bed, string path, string sortType, string session, 
                         bool collapse, bool useNames, string imageType, int slop);
-void ProcessBed(istream &bedInput, BedFile *bed, string path, string sortType, string sortType,
+void ProcessBed(istream &bedInput, BedFile *bed, string path, string sortType, string session,
                         bool collapse, bool useNames, string imageType, int slop);
 
 
