@@ -13,7 +13,6 @@
 #include "bedFile.h"
 #include "genomeFile.h"
 #include "version.h"
-#include <omp.h>
 
 
 #include "BamWriter.h"

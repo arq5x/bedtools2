@@ -103,9 +103,10 @@ struct BamAlignment {
     // Tag data access methods
     public:
         bool GetEditDistance(uint8_t& editDistance) const;	     // get "NM" tag data - contributed by Aaron Quinlan
+        bool GetAlignmentScore(uint16_t& alignmentScore) const;   // get "AS" tag data - contributed by Aaron Quinlan
         bool GetReadGroup(std::string& readGroup) const;	     // get "RG" tag data
-		bool GetMateSequence(std::string& mateSequence) const;   // get "R2" tag data
-		bool GetMateQualities(std::string& mateSequence) const;  // get "Q2" tag data
+		bool GetMateSequence(std::string& mateSequence) const;   // get "R2" tag data - contributed by Aaron Quinlan
+		bool GetMateQualities(std::string& mateSequence) const;  // get "Q2" tag data - contributed by Aaron Quinlan
 		bool AddBamTag(const std::string &tag, const std::string &valType, const std::string &value);
 
     // Additional data access methods
@@ -332,6 +333,46 @@ bool BamAlignment::GetEditDistance(uint8_t& editDistance) const {
     std::memcpy(&editDistance, pTagData, 1);
     return true;
 }
+
+// get "AS" tag data - contributed by Aaron Quinlan
+// stores data in 'alignmentSvore', returns success/fail
+inline 
+bool BamAlignment::GetAlignmentScore(uint16_t& alignmentScore) const {
+
+    if ( TagData.empty() ) { return false; }
+
+    // localize the tag data
+    char* pTagData = (char*)TagData.data();
+    const unsigned int tagDataLen = TagData.size();
+    unsigned int numBytesParsed = 0;
+
+    bool foundAlignmentScoreTag = false;
+    while( numBytesParsed < tagDataLen ) {
+
+        const char* pTagType = pTagData;
+        const char* pTagStorageType = pTagData + 2;
+        pTagData       += 3;
+        numBytesParsed += 3;
+
+        // check the current tag
+        if ( strncmp(pTagType, "AS", 2) == 0 ) {
+            foundAlignmentScoreTag = true;
+            break;
+        }
+
+        // get the storage class and find the next tag
+        if (*pTagStorageType == '\0') { return false; }
+        SkipToNextTag( *pTagStorageType, pTagData, numBytesParsed );
+        if (*pTagData == '\0') { return false; }
+    }
+    // return if the alignment score tag was not present
+    if ( !foundAlignmentScoreTag ) { return false; }
+
+    // assign the alignmentScore value
+    std::memcpy(&alignmentScore, pTagData, 2);
+    return true;
+}
+
 
 // get "RG" tag data
 // stores data in 'readGroup', returns success/fail

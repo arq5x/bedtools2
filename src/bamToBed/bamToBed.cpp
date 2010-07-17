@@ -35,12 +35,12 @@ using namespace std;
 // function declarations
 void ShowHelp(void);
 
-void ConvertBamToBed(const string &bamFile, const bool &useEditDistance, 
+void ConvertBamToBed(const string &bamFile, const bool &useEditDistance, const bool &useAlignmentScore,
                      const bool &writeBed12, const bool &obeySplits, const string &color);
 void ConvertBamToBedpe(const string &bamFile, const bool &useEditDistance);
 					
-void PrintBed(const BamAlignment &bam, const RefVector &refs, bool useEditDistance, bool obeySplits);
-void PrintBed12(const BamAlignment &bam, const RefVector &refs, bool useEditDistance, string color = "255,0,0");
+void PrintBed(const BamAlignment &bam, const RefVector &refs, bool useEditDistance, bool useAlignmentScore, bool obeySplits);
+void PrintBed12(const BamAlignment &bam, const RefVector &refs, bool useEditDistance, bool useAlignmentScore, string color = "255,0,0");
 void PrintBedPE(const BamAlignment &bam1, const BamAlignment &bam2,
                 const RefVector &refs, bool useEditDistance);
 
@@ -58,12 +58,13 @@ int main(int argc, char* argv[]) {
 	string bamFile;
 	string color = "255,0,0";
 	
-	bool haveBam         = false;
-	bool haveColor       = false;	
-	bool writeBedPE      = false;
-	bool writeBed12      = false;	
-	bool useEditDistance = false;
-	bool obeySplits      = false;
+	bool haveBam           = false;
+	bool haveColor         = false;	
+	bool writeBedPE        = false;
+	bool writeBed12        = false;	
+	bool useEditDistance   = false;
+	bool useAlignmentScore = false;
+	bool obeySplits        = false;
 		
 	// check to see if we should print out some help
 	if(argc <= 1) showHelp = true;
@@ -103,6 +104,9 @@ int main(int argc, char* argv[]) {
 		else if(PARAMETER_CHECK("-ed", 3, parameterLength)) {
 				useEditDistance = true;
 		}
+		else if(PARAMETER_CHECK("-as", 3, parameterLength)) {
+				useAlignmentScore = true;
+		}
 		else if(PARAMETER_CHECK("-color", 6, parameterLength)) {
 			if ((i+1) < argc) {
 				haveColor = true;
@@ -129,11 +133,18 @@ int main(int argc, char* argv[]) {
 		cerr << endl << "*****" << endl << "*****ERROR: Cannot use -ed with -splits.  Edit distances cannot be computed for each \'chunk\'." << endl << "*****" << endl;
 		showHelp = true;
 	}
-	
+	if (useEditDistance == true && useAlignmentScore == true) {
+		cerr << endl << "*****" << endl << "*****ERROR: Cannot use -ed with -as.  Choose one or the other." << endl << "*****" << endl;
+		showHelp = true;
+	}
+	if (writeBedPE == true && useAlignmentScore == true) {
+		cerr << endl << "*****" << endl << "*****ERROR: Cannot use -as with -bedpe." << endl << "*****" << endl;
+		showHelp = true;
+	}
 	// if there are no problems, let's convert BAM to BED or BEDPE
 	if (!showHelp) {
 		if (writeBedPE == false) 
-			ConvertBamToBed(bamFile, useEditDistance, writeBed12, obeySplits, color);	// BED or "blocked BED"
+			ConvertBamToBed(bamFile, useEditDistance, useAlignmentScore, writeBed12, obeySplits, color);	// BED or "blocked BED"
 		else
 			ConvertBamToBedpe(bamFile, useEditDistance);                    // BEDPE
 	}	
@@ -170,6 +181,10 @@ void ShowHelp(void) {
 	cerr 					<< "\t\t- When -ed is used with -bedpe, the total edit" << endl;
 	cerr 					<< "\t\t  distance from the two mates is reported." << endl << endl;
 
+	cerr << "\t-as\t"		<< "Use BAM alignment score (AS tag) for BED score." << endl;
+	cerr 					<< "\t\t- Default for BED is to use mapping quality." << endl;
+	cerr 					<< "\t\t  Disallowed with BEDPE output." << endl << endl;
+
 	cerr << "\t-color\t"	<< "An R,G,B string for the color used with BED12 format." << endl;
 	cerr 					<< "\t\tDefault is (255,0,0)." << endl;
 
@@ -179,7 +194,7 @@ void ShowHelp(void) {
 }
 
 
-void ConvertBamToBed(const string &bamFile, const bool &useEditDistance, 
+void ConvertBamToBed(const string &bamFile, const bool &useEditDistance, const bool &useAlignmentScore,
                      const bool &writeBed12, const bool &obeySplits, const string &color) {
 	// open the BAM file
 	BamReader reader;
@@ -194,9 +209,9 @@ void ConvertBamToBed(const string &bamFile, const bool &useEditDistance,
 	while (reader.GetNextAlignment(bam)) {
 		if (bam.IsMapped() == true) {
 			if (writeBed12 == false)                 // BED
-				PrintBed(bam, refs, useEditDistance, obeySplits);
+				PrintBed(bam, refs, useEditDistance, useAlignmentScore, obeySplits);
 			else                                     //"blocked" BED
-				PrintBed12(bam, refs, useEditDistance, color);
+				PrintBed12(bam, refs, useEditDistance, useAlignmentScore, color);
 		}
 	}
 	reader.Close();	
@@ -277,7 +292,7 @@ void ParseCigarBed12(const vector<CigarOp> &cigar, vector<int> &blockStarts, vec
 }
 
 
-void PrintBed(const BamAlignment &bam,  const RefVector &refs, bool useEditDistance, bool obeySplits) {
+void PrintBed(const BamAlignment &bam,  const RefVector &refs, bool useEditDistance, bool useAlignmentScore, bool obeySplits) {
 
 	// set the strand
 	string strand = "+"; 
@@ -294,11 +309,11 @@ void PrintBed(const BamAlignment &bam,  const RefVector &refs, bool useEditDista
     // report the entire BAM footprint as a single BED entry
     if (obeySplits == false) {
     	// report the alignment in BED6 format.
-    	if (useEditDistance == false) {
+    	if (useEditDistance == false && useAlignmentScore == false) {
     		printf("%s\t%d\t%d\t\%s\t%d\t%s\n", refs.at(bam.RefID).RefName.c_str(), bam.Position,
     									  alignmentEnd, name.c_str(), bam.MapQuality, strand.c_str());
     	}
-    	else {
+    	else if (useEditDistance == true && useAlignmentScore == false) {
     		uint8_t editDistance;
     		if (bam.GetEditDistance(editDistance)) {
     			printf("%s\t%d\t%d\t\%s\t%u\t%s\n", refs.at(bam.RefID).RefName.c_str(), bam.Position,
@@ -306,6 +321,17 @@ void PrintBed(const BamAlignment &bam,  const RefVector &refs, bool useEditDista
     		}
     		else {
     			cerr << "The edit distance tag (NM) was not found in the BAM file.  Please disable -ed.  Exiting\n";
+    			exit(1);
+    		}
+    	}
+    	else if (useEditDistance == false && useAlignmentScore == true) {
+    		uint16_t alignmentScore;
+    		if (bam.GetAlignmentScore(alignmentScore)) {
+    			printf("%s\t%d\t%d\t\%s\t%u\t%s\n", refs.at(bam.RefID).RefName.c_str(), bam.Position,
+    										  alignmentEnd, name.c_str(), alignmentScore, strand.c_str());
+    		}
+    		else {
+    			cerr << "The alignment score tag (AS) was not found in the BAM file.  Please disable -as.  Exiting\n";
     			exit(1);
     		}
     	}
@@ -328,7 +354,7 @@ void PrintBed(const BamAlignment &bam,  const RefVector &refs, bool useEditDista
 }
 
 
-void PrintBed12(const BamAlignment &bam, const RefVector &refs, bool useEditDistance, string color) {
+void PrintBed12(const BamAlignment &bam, const RefVector &refs, bool useEditDistance, bool useAlignmentScore, string color) {
 
 	// set the strand
 	string strand = "+"; 
@@ -350,11 +376,11 @@ void PrintBed12(const BamAlignment &bam, const RefVector &refs, bool useEditDist
 	alignmentEnd += bam.Position;
 	
 	// write BED6 portion
-	if (useEditDistance == false) {
+	if (useEditDistance == false && useAlignmentScore == false) {
 		printf("%s\t%d\t%d\t\%s\t%d\t%s\t", refs.at(bam.RefID).RefName.c_str(), bam.Position,
 									  alignmentEnd, name.c_str(), bam.MapQuality, strand.c_str());
 	}
-	else {
+	else if (useEditDistance == true && useAlignmentScore == false) {
 		uint8_t editDistance;
 		if (bam.GetEditDistance(editDistance)) {
 			printf("%s\t%d\t%d\t\%s\t%u\t%s\t", refs.at(bam.RefID).RefName.c_str(), bam.Position,
@@ -362,6 +388,17 @@ void PrintBed12(const BamAlignment &bam, const RefVector &refs, bool useEditDist
 		}
 		else {
 			cerr << "The edit distance tag (NM) was not found in the BAM file.  Please disable -ed.  Exiting\n";
+			exit(1);
+		}
+	}
+	else if (useEditDistance == false && useAlignmentScore == true) {
+		uint16_t alignmentScore;
+		if (bam.GetAlignmentScore(alignmentScore)) {
+			printf("%s\t%d\t%d\t\%s\t%d\t%s\n", refs.at(bam.RefID).RefName.c_str(), bam.Position,
+										  alignmentEnd, name.c_str(), alignmentScore, strand.c_str());
+		}
+		else {
+			cerr << "The alignment score tag (AS) was not found in the BAM file.  Please disable -as.  Exiting\n";
 			exit(1);
 		}
 	}
