@@ -37,7 +37,8 @@ $(EXT_OBJECTS):
 	@$(MAKE) --no-print-directory -C $(UTILITIES_DIR)/bedFile/
 	@$(MAKE) --no-print-directory -C $(UTILITIES_DIR)/genomeFile/
 	@$(MAKE) --no-print-directory -C $(UTILITIES_DIR)/gzstream/
-			
+	@$(MAKE)  -C $(UTILITIES_DIR)/fileType/
+				
 clean:
 	@echo "Cleaning up."
 	@rm -f $(OBJ_DIR)/* $(BIN_DIR)/*

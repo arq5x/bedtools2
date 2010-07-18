@@ -876,7 +876,7 @@ bool BamReader::BamReaderPrivate::LoadNextAlignment(BamAlignment& bAlignment, Ba
     // read in character data - make sure proper data size was read
     if ( mBGZF.Read(allCharData, dataLength) != (signed int)dataLength) { return false; }
     else {
-     
+         
         // store alignment name and length
         bAlignment.Name.assign((const char*)(allCharData));
         bAlignment.Length = supportData.QuerySequenceLength;

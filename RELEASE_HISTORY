@@ -1,4 +1,14 @@
-Version 2.8.0 (July-05-2010)
+Version 2.8.2 (July-18-2010)
+1. Fixed a bug in bedFile.h preventing GFF strands from being read properly.
+2. Fixed a bug in intersectBed that occasionally caused spurious overlaps between BAM alignments and BED features.
+3. Fixed bug in intersectBed causing -r to not report the same result when files are swapped.
+4. Added checks to groupBy to prevent the selection of improper opCols and groups.
+5. Fixed various compilation issues, esp. for groupBy, bedToBam, and bedToIgv.
+6. Updated the usage statements to reflect bed/gff/vcf support.
+7. Added new fileType functions for auto-detecting gzipped or regular files.  Thanks to Assaf Gordon.
+
+
+Version 2.8.1 (July-05-2010)
 1.  Added bedToIgv.
 
 

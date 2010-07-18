@@ -103,7 +103,7 @@ struct BamAlignment {
     // Tag data access methods
     public:
         bool GetEditDistance(uint8_t& editDistance) const;	     // get "NM" tag data - contributed by Aaron Quinlan
-        bool GetAlignmentScore(uint16_t& alignmentScore) const;   // get "AS" tag data - contributed by Aaron Quinlan
+        bool GetAlignmentScore(uint32_t& alignmentScore) const;   // get "AS" tag data - contributed by Aaron Quinlan
         bool GetReadGroup(std::string& readGroup) const;	     // get "RG" tag data
 		bool GetMateSequence(std::string& mateSequence) const;   // get "R2" tag data - contributed by Aaron Quinlan
 		bool GetMateQualities(std::string& mateSequence) const;  // get "Q2" tag data - contributed by Aaron Quinlan
@@ -335,9 +335,9 @@ bool BamAlignment::GetEditDistance(uint8_t& editDistance) const {
 }
 
 // get "AS" tag data - contributed by Aaron Quinlan
-// stores data in 'alignmentSvore', returns success/fail
+// stores data in 'alignmentScore', returns success/fail
 inline 
-bool BamAlignment::GetAlignmentScore(uint16_t& alignmentScore) const {
+bool BamAlignment::GetAlignmentScore(uint32_t& alignmentScore) const {
 
     if ( TagData.empty() ) { return false; }
 

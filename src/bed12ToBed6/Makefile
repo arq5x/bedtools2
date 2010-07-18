@@ -35,6 +35,7 @@ $(EXT_OBJECTS):
 	@$(MAKE) --no-print-directory -C $(UTILITIES_DIR)/lineFileUtilities/
 	@$(MAKE) --no-print-directory -C $(UTILITIES_DIR)/bedFile/
 	@$(MAKE) --no-print-directory -C $(UTILITIES_DIR)/gzstream/
+	@$(MAKE) --no-print-directory -C $(UTILITIES_DIR)/fileType/
 			
 clean:
 	@echo "Cleaning up."
