@@ -12,7 +12,7 @@ INCLUDES = -I$(UTILITIES_DIR)/bedFile/ -I$(UTILITIES_DIR)/lineFileUtilities/ -I$
 # ----------------------------------
 SOURCES= linksMain.cpp linksBed.cpp
 OBJECTS= $(SOURCES:.cpp=.o)
-_EXT_OBJECTS=bedFile.o lineFileUtilities.o gzstream.o filetype.o
+_EXT_OBJECTS=bedFile.o lineFileUtilities.o gzstream.o fileType.o
 EXT_OBJECTS=$(patsubst %,$(OBJ_DIR)/%,$(_EXT_OBJECTS))
 BUILT_OBJECTS= $(patsubst %,$(OBJ_DIR)/%,$(OBJECTS))
 PROGRAM= linksBed

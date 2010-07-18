@@ -13,7 +13,7 @@ INCLUDES = -I$(UTILITIES_DIR)/tabFile/ -I$(UTILITIES_DIR)/lineFileUtilities/ -I$
 # ----------------------------------
 SOURCES= groupBy.cpp
 OBJECTS= $(SOURCES:.cpp=.o)
-_EXT_OBJECTS=tabFile.o lineFileUtilities.o gzstream.o filetype.o
+_EXT_OBJECTS=tabFile.o lineFileUtilities.o gzstream.o fileType.o
 EXT_OBJECTS=$(patsubst %,$(OBJ_DIR)/%,$(_EXT_OBJECTS))
 BUILT_OBJECTS= $(patsubst %,$(OBJ_DIR)/%,$(OBJECTS))
 PROGRAM= groupBy

@@ -12,7 +12,7 @@ INCLUDES = -I$(UTILITIES_DIR)/bedFile/ -I$(UTILITIES_DIR)/genomeFile/ -I$(UTILIT
 # ----------------------------------
 SOURCES= bedToBam.cpp
 OBJECTS= $(SOURCES:.cpp=.o)
-_EXT_OBJECTS=BamWriter.o BGZF.o bedFile.o genomeFile.o lineFileUtilities.o gzstream.o filetype.o
+_EXT_OBJECTS=BamWriter.o BGZF.o bedFile.o genomeFile.o lineFileUtilities.o gzstream.o fileType.o
 EXT_OBJECTS=$(patsubst %,$(OBJ_DIR)/%,$(_EXT_OBJECTS))
 BUILT_OBJECTS= $(patsubst %,$(OBJ_DIR)/%,$(OBJECTS))
 PROGRAM= bedToBam
@@ -37,7 +37,7 @@ $(EXT_OBJECTS):
 	@$(MAKE) --no-print-directory -C $(UTILITIES_DIR)/bedFile/
 	@$(MAKE) --no-print-directory -C $(UTILITIES_DIR)/genomeFile/
 	@$(MAKE) --no-print-directory -C $(UTILITIES_DIR)/gzstream/
-	@$(MAKE)  -C $(UTILITIES_DIR)/fileType/
+	@$(MAKE) --no-print-directory -C $(UTILITIES_DIR)/fileType/
 				
 clean:
 	@echo "Cleaning up."
