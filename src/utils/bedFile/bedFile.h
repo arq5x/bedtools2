@@ -190,16 +190,20 @@ typedef map<BIN, bedCovVector, std::less<BIN> > binsToBedCovs;
 
 typedef map<string, binsToBeds, std::less<string> >    masterBedMap;
 typedef map<string, binsToBedCovs, std::less<string> > masterBedCovMap;
-typedef map<string, bedVector, std::less<string> >   masterBedMapNoBin;
+typedef map<string, bedVector, std::less<string> >     masterBedMapNoBin;
 
 
-// EXPERIMENTAL
-//typedef tr1::unordered_map<int, vector<BED> > binsToBeds;
-//typedef tr1::unordered_map<string, binsToBeds> masterBedMap;
-//typedef map<string, bedVector, std::less<string> > masterBedMap;
-//typedef vector<BED> masterBedMapNew[_numBins];
-//typedef tr1::unordered_map<int, vector<BED> > binsToBedsNew;
-//typedef tr1::unordered_map<string, binsToBeds> masterBedMapNew;
+// EXPERIMENTAL - wait for TR1
+// typedef vector<BED>    bedVector;
+// typedef vector<BEDCOV> bedCovVector;
+// 
+// typedef tr1::unordered_map<BIN, bedVector> binsToBeds;
+// typedef tr1::unordered_map<BIN, bedCovVector> binsToBedCovs;
+// 
+// typedef tr1::unordered_map<string, binsToBeds>    masterBedMap;
+// typedef tr1::unordered_map<string, binsToBedCovs> masterBedCovMap;
+// typedef tr1::unordered_map<string, bedVector>     masterBedMapNoBin;
+
 
 
 // return the genome "bin" for a feature with this start and end

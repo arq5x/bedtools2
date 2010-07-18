@@ -181,9 +181,10 @@ void ShowHelp(void) {
 	cerr 					<< "\t\t- When -ed is used with -bedpe, the total edit" << endl;
 	cerr 					<< "\t\t  distance from the two mates is reported." << endl << endl;
 
-	cerr << "\t-as\t"		<< "Use BAM alignment score (AS tag) for BED score." << endl;
-	cerr 					<< "\t\t- Default for BED is to use mapping quality." << endl;
-	cerr 					<< "\t\t  Disallowed with BEDPE output." << endl << endl;
+    // unsupported for public release. experimental and buggy.
+	//cerr << "\t-as\t"		<< "Use BAM alignment score (AS tag) for BED score." << endl;
+	//cerr 					<< "\t\t- Default for BED is to use mapping quality." << endl;
+	//cerr 					<< "\t\t  Disallowed with BEDPE output." << endl << endl;
 
 	cerr << "\t-color\t"	<< "An R,G,B string for the color used with BED12 format." << endl;
 	cerr 					<< "\t\tDefault is (255,0,0)." << endl;
@@ -325,7 +326,7 @@ void PrintBed(const BamAlignment &bam,  const RefVector &refs, bool useEditDista
     		}
     	}
     	else if (useEditDistance == false && useAlignmentScore == true) {
-    		uint16_t alignmentScore;
+    		uint32_t alignmentScore;
     		if (bam.GetAlignmentScore(alignmentScore)) {
     			printf("%s\t%d\t%d\t\%s\t%u\t%s\n", refs.at(bam.RefID).RefName.c_str(), bam.Position,
     										  alignmentEnd, name.c_str(), alignmentScore, strand.c_str());
@@ -392,9 +393,9 @@ void PrintBed12(const BamAlignment &bam, const RefVector &refs, bool useEditDist
 		}
 	}
 	else if (useEditDistance == false && useAlignmentScore == true) {
-		uint16_t alignmentScore;
+		uint32_t alignmentScore;
 		if (bam.GetAlignmentScore(alignmentScore)) {
-			printf("%s\t%d\t%d\t\%s\t%d\t%s\n", refs.at(bam.RefID).RefName.c_str(), bam.Position,
+			printf("%s\t%d\t%d\t\%s\t%uh\t%s\n", refs.at(bam.RefID).RefName.c_str(), bam.Position,
 										  alignmentEnd, name.c_str(), alignmentScore, strand.c_str());
 		}
 		else {

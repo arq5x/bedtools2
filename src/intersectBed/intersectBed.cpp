@@ -18,18 +18,19 @@ Helper functions
 bool BedIntersect::processHits(const BED &a, const vector<BED> &hits, bool printable) {
 
     // how many overlaps are there b/w the bed and the set of hits?
+    int s, e, overlapBases;
 	int  numOverlaps = 0;		
     bool hitsFound   = false;
+	int aLength      = (a.end - a.start);   // the length of a in b.p.
     
 	// loop through the hits and report those that meet the user's criteria
 	vector<BED>::const_iterator h       = hits.begin();
 	vector<BED>::const_iterator hitsEnd = hits.end();
 	for (; h != hitsEnd; ++h) {
-		int s            = max(a.start, h->start);
-		int e            = min(a.end, h->end);
-		int overlapBases = (e - s);				// the number of overlapping bases b/w a and b
-		int aLength      = (a.end - a.start);   // the length of a in b.p.
-						    
+		s            = max(a.start, h->start);
+		e            = min(a.end, h->end);
+		overlapBases = (e - s);				// the number of overlapping bases b/w a and b
+
 		// is there enough overlap relative to the user's request? (default ~ 1bp)
 		if ( ( (float) overlapBases / (float) aLength ) >= _overlapFraction ) { 
 			// Report the hit if the user doesn't care about reciprocal overlap between A and B.
