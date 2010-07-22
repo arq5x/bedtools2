@@ -328,7 +328,7 @@ void PrintBed(const BamAlignment &bam,  const RefVector &refs, bool useEditDista
     	else if (useEditDistance == false && useAlignmentScore == true) {
     		uint32_t alignmentScore;
     		if (bam.GetAlignmentScore(alignmentScore)) {
-    			printf("%s\t%d\t%d\t\%s\t%u\t%s\n", refs.at(bam.RefID).RefName.c_str(), bam.Position,
+    			printf("%s\t%d\t%d\t\%s\t%d\t%s\n", refs.at(bam.RefID).RefName.c_str(), bam.Position,
     										  alignmentEnd, name.c_str(), alignmentScore, strand.c_str());
     		}
     		else {
@@ -392,17 +392,17 @@ void PrintBed12(const BamAlignment &bam, const RefVector &refs, bool useEditDist
 			exit(1);
 		}
 	}
-	else if (useEditDistance == false && useAlignmentScore == true) {
-		uint32_t alignmentScore;
-		if (bam.GetAlignmentScore(alignmentScore)) {
-			printf("%s\t%d\t%d\t\%s\t%uh\t%s\n", refs.at(bam.RefID).RefName.c_str(), bam.Position,
-										  alignmentEnd, name.c_str(), alignmentScore, strand.c_str());
-		}
-		else {
-			cerr << "The alignment score tag (AS) was not found in the BAM file.  Please disable -as.  Exiting\n";
-			exit(1);
-		}
-	}
+    else if (useEditDistance == false && useAlignmentScore == true) {
+     uint32_t alignmentScore;
+     if (bam.GetAlignmentScore(alignmentScore)) {
+         printf("%s\t%d\t%d\t\%s\t%uh\t%s\n", refs.at(bam.RefID).RefName.c_str(), bam.Position,
+                                       alignmentEnd, name.c_str(), alignmentScore, strand.c_str());
+     }
+     else {
+         cerr << "The alignment score tag (AS) was not found in the BAM file.  Please disable -as.  Exiting\n";
+         exit(1);
+     }
+    }
 	
 	// write the colors, etc.
 	printf("%d\t%d\t%s\t%d\t", bam.Position, alignmentEnd, color.c_str(), (int) blockStarts.size());
