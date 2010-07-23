@@ -116,7 +116,8 @@ Class methods
 
 // Constructor
 BedFile::BedFile(string &bedFile)
-: bedFile(bedFile)
+: bedFile(bedFile),
+  _typeIsKnown(false)
 {}
 
 // Destructor
@@ -131,18 +132,19 @@ void BedFile::Open(void) {
 	// New method thanks to Assaf Gordon
 	else if ((isGzipFile(bedFile) == false) && (isRegularFile(bedFile) == true)) {
        // open an ifstream
-		ifstream beds(bedFile.c_str(), ios::in);    
-		// can we open the file?
-		if ( !beds ) {
-			cerr << "Error: The requested bed file (" << bedFile << ") could not be opened. Exiting!" << endl;
-			exit (1);
-		}
-		else {
-			// if so, close it (this was just a test)
-			beds.close();		
-			// now set a pointer to the stream so that we
-			_bedStream = new ifstream(bedFile.c_str(), ios::in);
-		}
+        ifstream beds(bedFile.c_str(), ios::in);
+        
+        // can we open the file?
+        if ( !beds ) {
+            cerr << "Error: The requested bed file (" << bedFile << ") could not be opened. Exiting!" << endl;
+            exit (1);
+        }
+        else {
+            // if so, close it (this was just a test)
+            beds.close();       
+            // now set a pointer to the stream so that we
+            _bedStream = new ifstream(bedFile.c_str(), ios::in);
+        }
     } 
     else if ((isGzipFile(bedFile) == true) && (isRegularFile(bedFile) == true)) {        
        	igzstream beds(bedFile.c_str(), ios::in);
@@ -474,6 +476,17 @@ void BedFile::setGff (bool gff) {
 void BedFile::setVcf (bool vcf) {
 	if (vcf == true) this->_isVcf = true;
 	else this->_isVcf = false;
+}
+
+
+void BedFile::setFileType (FileType type) {
+    _fileType    = type;
+    _typeIsKnown = true;
+}
+
+
+void BedFile::setBedType (int colNums) {
+    bedType = colNums;
 }
 
 
