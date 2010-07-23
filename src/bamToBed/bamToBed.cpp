@@ -35,12 +35,12 @@ using namespace std;
 // function declarations
 void ShowHelp(void);
 
-void ConvertBamToBed(const string &bamFile, const bool &useEditDistance, const bool &useAlignmentScore,
+void ConvertBamToBed(const string &bamFile, const bool &useEditDistance, const string &bamTag,
                      const bool &writeBed12, const bool &obeySplits, const string &color);
 void ConvertBamToBedpe(const string &bamFile, const bool &useEditDistance);
 					
-void PrintBed(const BamAlignment &bam, const RefVector &refs, bool useEditDistance, bool useAlignmentScore, bool obeySplits);
-void PrintBed12(const BamAlignment &bam, const RefVector &refs, bool useEditDistance, bool useAlignmentScore, string color = "255,0,0");
+void PrintBed(const BamAlignment &bam, const RefVector &refs, bool useEditDistance, const string &bamTag, bool obeySplits);
+void PrintBed12(const BamAlignment &bam, const RefVector &refs, bool useEditDistance, const string &bamTag, string color = "255,0,0");
 void PrintBedPE(const BamAlignment &bam1, const BamAlignment &bam2,
                 const RefVector &refs, bool useEditDistance);
 
@@ -57,9 +57,11 @@ int main(int argc, char* argv[]) {
 	// input files
 	string bamFile;
 	string color = "255,0,0";
+    string tag   = "";
 	
 	bool haveBam           = false;
-	bool haveColor         = false;	
+	bool haveColor         = false;
+    bool haveOtherTag      = false;	
 	bool writeBedPE        = false;
 	bool writeBed12        = false;	
 	bool useEditDistance   = false;
@@ -113,6 +115,13 @@ int main(int argc, char* argv[]) {
 				color = argv[i + 1];
 				i++;
 			}	
+		}
+		else if(PARAMETER_CHECK("-tag", 4, parameterLength)) {
+			if ((i+1) < argc) {
+				haveOtherTag = true;
+				tag = argv[i + 1];
+				i++;
+			}	
 		}				
 		else {
 			cerr << endl << "*****ERROR: Unrecognized parameter: " << argv[i] << " *****" << endl << endl;
@@ -133,18 +142,18 @@ int main(int argc, char* argv[]) {
 		cerr << endl << "*****" << endl << "*****ERROR: Cannot use -ed with -splits.  Edit distances cannot be computed for each \'chunk\'." << endl << "*****" << endl;
 		showHelp = true;
 	}
-	if (useEditDistance == true && useAlignmentScore == true) {
-		cerr << endl << "*****" << endl << "*****ERROR: Cannot use -ed with -as.  Choose one or the other." << endl << "*****" << endl;
+	if (useEditDistance == true && haveOtherTag == true) {
+		cerr << endl << "*****" << endl << "*****ERROR: Cannot use -ed with -tag.  Choose one or the other." << endl << "*****" << endl;
 		showHelp = true;
 	}
-	if (writeBedPE == true && useAlignmentScore == true) {
-		cerr << endl << "*****" << endl << "*****ERROR: Cannot use -as with -bedpe." << endl << "*****" << endl;
+	if (writeBedPE == true && haveOtherTag == true) {
+		cerr << endl << "*****" << endl << "*****ERROR: Cannot use -tag with -bedpe." << endl << "*****" << endl;
 		showHelp = true;
 	}
 	// if there are no problems, let's convert BAM to BED or BEDPE
 	if (!showHelp) {
 		if (writeBedPE == false) 
-			ConvertBamToBed(bamFile, useEditDistance, useAlignmentScore, writeBed12, obeySplits, color);	// BED or "blocked BED"
+			ConvertBamToBed(bamFile, useEditDistance, tag, writeBed12, obeySplits, color);	// BED or "blocked BED"
 		else
 			ConvertBamToBedpe(bamFile, useEditDistance);                    // BEDPE
 	}	
@@ -181,10 +190,9 @@ void ShowHelp(void) {
 	cerr 					<< "\t\t- When -ed is used with -bedpe, the total edit" << endl;
 	cerr 					<< "\t\t  distance from the two mates is reported." << endl << endl;
 
-    // unsupported for public release. experimental and buggy.
-	//cerr << "\t-as\t"		<< "Use BAM alignment score (AS tag) for BED score." << endl;
-	//cerr 					<< "\t\t- Default for BED is to use mapping quality." << endl;
-	//cerr 					<< "\t\t  Disallowed with BEDPE output." << endl << endl;
+	cerr << "\t-tag\t"		<< "Use other NUMERIC BAM alignment tag for BED score." << endl;
+	cerr 					<< "\t\t- Default for BED is to use mapping quality." << endl;
+	cerr 					<< "\t\t  Disallowed with BEDPE output." << endl << endl;
 
 	cerr << "\t-color\t"	<< "An R,G,B string for the color used with BED12 format." << endl;
 	cerr 					<< "\t\tDefault is (255,0,0)." << endl;
@@ -195,7 +203,7 @@ void ShowHelp(void) {
 }
 
 
-void ConvertBamToBed(const string &bamFile, const bool &useEditDistance, const bool &useAlignmentScore,
+void ConvertBamToBed(const string &bamFile, const bool &useEditDistance, const string &bamTag,
                      const bool &writeBed12, const bool &obeySplits, const string &color) {
 	// open the BAM file
 	BamReader reader;
@@ -210,9 +218,9 @@ void ConvertBamToBed(const string &bamFile, const bool &useEditDistance, const b
 	while (reader.GetNextAlignment(bam)) {
 		if (bam.IsMapped() == true) {
 			if (writeBed12 == false)                 // BED
-				PrintBed(bam, refs, useEditDistance, useAlignmentScore, obeySplits);
+				PrintBed(bam, refs, useEditDistance, bamTag, obeySplits);
 			else                                     //"blocked" BED
-				PrintBed12(bam, refs, useEditDistance, useAlignmentScore, color);
+				PrintBed12(bam, refs, useEditDistance, bamTag, color);
 		}
 	}
 	reader.Close();	
@@ -293,7 +301,7 @@ void ParseCigarBed12(const vector<CigarOp> &cigar, vector<int> &blockStarts, vec
 }
 
 
-void PrintBed(const BamAlignment &bam,  const RefVector &refs, bool useEditDistance, bool useAlignmentScore, bool obeySplits) {
+void PrintBed(const BamAlignment &bam,  const RefVector &refs, bool useEditDistance, const string &bamTag, bool obeySplits) {
 
 	// set the strand
 	string strand = "+"; 
@@ -310,11 +318,11 @@ void PrintBed(const BamAlignment &bam,  const RefVector &refs, bool useEditDista
     // report the entire BAM footprint as a single BED entry
     if (obeySplits == false) {
     	// report the alignment in BED6 format.
-    	if (useEditDistance == false && useAlignmentScore == false) {
+    	if (useEditDistance == false && bamTag == "") {
     		printf("%s\t%d\t%d\t\%s\t%d\t%s\n", refs.at(bam.RefID).RefName.c_str(), bam.Position,
     									  alignmentEnd, name.c_str(), bam.MapQuality, strand.c_str());
     	}
-    	else if (useEditDistance == true && useAlignmentScore == false) {
+    	else if (useEditDistance == true && bamTag != "") {
     		uint8_t editDistance;
     		if (bam.GetEditDistance(editDistance)) {
     			printf("%s\t%d\t%d\t\%s\t%u\t%s\n", refs.at(bam.RefID).RefName.c_str(), bam.Position,
@@ -325,14 +333,14 @@ void PrintBed(const BamAlignment &bam,  const RefVector &refs, bool useEditDista
     			exit(1);
     		}
     	}
-    	else if (useEditDistance == false && useAlignmentScore == true) {
-    		uint32_t alignmentScore;
-    		if (bam.GetAlignmentScore(alignmentScore)) {
+    	else if (useEditDistance == false && bamTag != "") {
+    		int32_t tagValue;
+    		if (bam.GetTag(bamTag, tagValue)) {
     			printf("%s\t%d\t%d\t\%s\t%d\t%s\n", refs.at(bam.RefID).RefName.c_str(), bam.Position,
-    										  alignmentEnd, name.c_str(), alignmentScore, strand.c_str());
+    										  alignmentEnd, name.c_str(), tagValue, strand.c_str());
     		}
     		else {
-    			cerr << "The alignment score tag (AS) was not found in the BAM file.  Please disable -as.  Exiting\n";
+    			cerr << "The requested tag (" << bamTag << ") was not found in the BAM file.  Exiting\n";
     			exit(1);
     		}
     	}
@@ -355,7 +363,7 @@ void PrintBed(const BamAlignment &bam,  const RefVector &refs, bool useEditDista
 }
 
 
-void PrintBed12(const BamAlignment &bam, const RefVector &refs, bool useEditDistance, bool useAlignmentScore, string color) {
+void PrintBed12(const BamAlignment &bam, const RefVector &refs, bool useEditDistance, const string &bamTag, string color) {
 
 	// set the strand
 	string strand = "+"; 
@@ -376,34 +384,34 @@ void PrintBed12(const BamAlignment &bam, const RefVector &refs, bool useEditDist
 	ParseCigarBed12(bam.CigarData, blockStarts, blockLengths, alignmentEnd);
 	alignmentEnd += bam.Position;
 	
-	// write BED6 portion
-	if (useEditDistance == false && useAlignmentScore == false) {
-		printf("%s\t%d\t%d\t\%s\t%d\t%s\t", refs.at(bam.RefID).RefName.c_str(), bam.Position,
-									  alignmentEnd, name.c_str(), bam.MapQuality, strand.c_str());
-	}
-	else if (useEditDistance == true && useAlignmentScore == false) {
-		uint8_t editDistance;
-		if (bam.GetEditDistance(editDistance)) {
-			printf("%s\t%d\t%d\t\%s\t%u\t%s\t", refs.at(bam.RefID).RefName.c_str(), bam.Position,
-										  alignmentEnd, name.c_str(), editDistance, strand.c_str());
+    // write BED6 portion
+    if (useEditDistance == false && bamTag == "") {
+        printf("%s\t%d\t%d\t\%s\t%d\t%s\t", refs.at(bam.RefID).RefName.c_str(), bam.Position,
+            alignmentEnd, name.c_str(), bam.MapQuality, strand.c_str());
+    }
+    else if (useEditDistance == true && bamTag != "") {
+        uint8_t editDistance;
+        if (bam.GetEditDistance(editDistance)) {
+            printf("%s\t%d\t%d\t\%s\t%u\t%s\t", refs.at(bam.RefID).RefName.c_str(), bam.Position,
+                alignmentEnd, name.c_str(), editDistance, strand.c_str());
+        }
+        else {
+            cerr << "The edit distance tag (NM) was not found in the BAM file.  Please disable -ed.  Exiting\n";
+            exit(1);
+        }
+    }
+	else if (useEditDistance == false && bamTag != "") {
+		int32_t tagValue;
+		if (bam.GetTag(bamTag, tagValue)) {
+			printf("%s\t%d\t%d\t\%s\t%d\t%s\n", refs.at(bam.RefID).RefName.c_str(), bam.Position,
+										  alignmentEnd, name.c_str(), tagValue, strand.c_str());
 		}
 		else {
-			cerr << "The edit distance tag (NM) was not found in the BAM file.  Please disable -ed.  Exiting\n";
+			cerr << "The requested tag (" << bamTag << ") was not found in the BAM file.  Exiting\n";
 			exit(1);
 		}
 	}
-    else if (useEditDistance == false && useAlignmentScore == true) {
-     uint32_t alignmentScore;
-     if (bam.GetAlignmentScore(alignmentScore)) {
-         printf("%s\t%d\t%d\t\%s\t%uh\t%s\n", refs.at(bam.RefID).RefName.c_str(), bam.Position,
-                                       alignmentEnd, name.c_str(), alignmentScore, strand.c_str());
-     }
-     else {
-         cerr << "The alignment score tag (AS) was not found in the BAM file.  Please disable -as.  Exiting\n";
-         exit(1);
-     }
-    }
-	
+
 	// write the colors, etc.
 	printf("%d\t%d\t%s\t%d\t", bam.Position, alignmentEnd, color.c_str(), (int) blockStarts.size());
 	

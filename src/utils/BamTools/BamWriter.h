@@ -1,5 +1,5 @@
 // ***************************************************************************
-// BamWriter.h (c) 2009 Michael Strömberg, Derek Barnett
+// BamWriter.h (c) 2009 Michael Strï¿½mberg, Derek Barnett
 // Marth Lab, Department of Biology, Boston College
 // All rights reserved.
 // ---------------------------------------------------------------------------

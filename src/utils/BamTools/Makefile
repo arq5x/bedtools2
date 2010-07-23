@@ -7,7 +7,7 @@ INCLUDES = -I$(UTILITIES_DIR)/bedFile/ -I$(UTILITIES_DIR)/lineFileUtilities/ -I$
 # ----------------------------------
 # define our source and object files
 # ----------------------------------
-SOURCES= BamReader.cpp BamWriter.cpp	BGZF.cpp BamAncillary.cpp 
+SOURCES= BamReader.cpp BamWriter.cpp	BGZF.cpp BamAncillary.cpp BamIndex.cpp
 OBJECTS= $(SOURCES:.cpp=.o)
 BUILT_OBJECTS= $(patsubst %,$(OBJ_DIR)/%,$(OBJECTS))
 

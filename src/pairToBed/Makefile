@@ -12,7 +12,7 @@ INCLUDES = -I$(UTILITIES_DIR)/bedFilePE/ -I$(UTILITIES_DIR)/bedFile/ -I$(UTILITI
 # ----------------------------------
 SOURCES= pairToBedMain.cpp pairToBed.cpp
 OBJECTS= $(SOURCES:.cpp=.o)
-_EXT_OBJECTS=bedFilePE.o bedFile.o lineFileUtilities.o BamReader.o BamWriter.o BGZF.o gzstream.o fileType.o
+_EXT_OBJECTS=bedFilePE.o bedFile.o lineFileUtilities.o BamReader.o BamWriter.o BGZF.o  BamIndex.o gzstream.o fileType.o
 EXT_OBJECTS=$(patsubst %,$(OBJ_DIR)/%,$(_EXT_OBJECTS))
 BUILT_OBJECTS= $(patsubst %,$(OBJ_DIR)/%,$(OBJECTS))
 PROGRAM= pairToBed

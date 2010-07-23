@@ -3,7 +3,7 @@
 // Marth Lab, Department of Biology, Boston College
 // All rights reserved.
 // ---------------------------------------------------------------------------
-// Last modified: 11 January 2010 (DB)
+// Last modified: 19 July 2010 (DB)
 // ---------------------------------------------------------------------------
 // BGZF routines were adapted from the bgzf.c code developed at the Broad
 // Institute.
@@ -25,21 +25,33 @@
 // zlib includes
 #include "zlib.h"
 
+// Platform-specific large-file support
+#ifndef BAMTOOLS_LFS
+#define BAMTOOLS_LFS
+    #ifdef WIN32
+        #define ftell64(a)     _ftelli64(a)
+        #define fseek64(a,b,c) _fseeki64(a,b,c)
+    #else
+        #define ftell64(a)     ftello(a)
+        #define fseek64(a,b,c) fseeko(a,b,c) 
+    #endif
+#endif // BAMTOOLS_LFS
+
 // Platform-specific type definitions
 #ifndef BAMTOOLS_TYPES
 #define BAMTOOLS_TYPES
-	#ifdef _MSC_VER
-		typedef char                 int8_t;
-		typedef unsigned char       uint8_t;
-		typedef short               int16_t;
-		typedef unsigned short     uint16_t;
-		typedef int                 int32_t;
-		typedef unsigned int       uint32_t;
-		typedef long long           int64_t;
-		typedef unsigned long long uint64_t;
-	#else
-		#include <stdint.h>
-	#endif
+    #ifdef _MSC_VER
+        typedef char                 int8_t;
+        typedef unsigned char       uint8_t;
+        typedef short               int16_t;
+        typedef unsigned short     uint16_t;
+        typedef int                 int32_t;
+        typedef unsigned int       uint32_t;
+        typedef long long           int64_t;
+        typedef unsigned long long uint64_t;
+    #else    
+        #include <stdint.h>
+    #endif
 #endif // BAMTOOLS_TYPES
 
 namespace BamTools {
@@ -65,7 +77,9 @@ const int DEFAULT_BLOCK_SIZE  = 65536;
 
 struct BgzfData {
 
+    // ---------------------------------
     // data members
+    
     unsigned int UncompressedBlockSize;
     unsigned int CompressedBlockSize;
     unsigned int BlockLength;
@@ -77,47 +91,73 @@ struct BgzfData {
     char*    UncompressedBlock;
     char*    CompressedBlock;
 
+    // ---------------------------------
     // constructor & destructor
+    
     BgzfData(void);
     ~BgzfData(void);
 
+    // ---------------------------------
+    // main interface methods
+    
     // closes BGZF file
     void Close(void);
+    // opens the BGZF file (mode is either "rb" for reading, or "wb" for writing)
+    bool Open(const std::string& filename, const char* mode);
+    // reads BGZF data into a byte buffer
+    int Read(char* data, const unsigned int dataLength);
+    // seek to position in BGZF file
+    bool Seek(int64_t position);
+    // get file position in BGZF file
+    int64_t Tell(void);
+    // writes the supplied data into the BGZF buffer
+    unsigned int Write(const char* data, const unsigned int dataLen);
+
+    // ---------------------------------
+    // internal methods
+    
     // compresses the current block
     int DeflateBlock(void);
     // flushes the data in the BGZF block
     void FlushBlock(void);
     // de-compresses the current block
     int InflateBlock(const int& blockLength);
-    // opens the BGZF file for reading (mode is either "rb" for reading, or "wb" for writing
-    void Open(const std::string& filename, const char* mode);
-    // reads BGZF data into a byte buffer
-    int Read(char* data, const unsigned int dataLength);
-    // reads BGZF block
-    int ReadBlock(void);
-    // seek to position in BAM file
-    bool Seek(int64_t position);
-    // get file position in BAM file
-    int64_t Tell(void);
-    // writes the supplied data into the BGZF buffer
-    unsigned int Write(const char* data, const unsigned int dataLen);
-
+    // reads a BGZF block
+    bool ReadBlock(void);
+    
+    // ---------------------------------
+    // static 'utility' methods
+    
     // checks BGZF block header
     static inline bool CheckBlockHeader(char* header);
     // packs an unsigned integer into the specified buffer
     static inline void PackUnsignedInt(char* buffer, unsigned int value);
     // packs an unsigned short into the specified buffer
     static inline void PackUnsignedShort(char* buffer, unsigned short value);
+    // unpacks a buffer into a double
+    static inline double UnpackDouble(char* buffer);
+    static inline double UnpackDouble(const char* buffer);
+    // unpacks a buffer into a float
+    static inline float UnpackFloat(char* buffer);
+    static inline float UnpackFloat(const char* buffer);
     // unpacks a buffer into a signed int
     static inline signed int UnpackSignedInt(char* buffer);
-    // unpacks a buffer into a unsigned int
+    static inline signed int UnpackSignedInt(const char* buffer);
+    // unpacks a buffer into a signed short
+    static inline signed short UnpackSignedShort(char* buffer);
+    static inline signed short UnpackSignedShort(const char* buffer);
+    // unpacks a buffer into an unsigned int
     static inline unsigned int UnpackUnsignedInt(char* buffer);
-    // unpacks a buffer into a unsigned short
+    static inline unsigned int UnpackUnsignedInt(const char* buffer);
+    // unpacks a buffer into an unsigned short
     static inline unsigned short UnpackUnsignedShort(char* buffer);
+    static inline unsigned short UnpackUnsignedShort(const char* buffer);
 };
 
 // -------------------------------------------------------------
+// static 'utility' method implementations
 
+// checks BGZF block header
 inline
 bool BgzfData::CheckBlockHeader(char* header) {
     return (header[0] == GZIP_ID1 &&
@@ -146,7 +186,61 @@ void BgzfData::PackUnsignedShort(char* buffer, unsigned short value) {
     buffer[1] = (char)(value >> 8);
 }
 
-// 'unpacks' a buffer into a signed int
+// 'unpacks' a buffer into a double (includes both non-const & const char* flavors)
+inline
+double BgzfData::UnpackDouble(char* buffer) {
+    union { double value; unsigned char valueBuffer[sizeof(double)]; } un;
+    un.value = 0;
+    un.valueBuffer[0] = buffer[0];
+    un.valueBuffer[1] = buffer[1];
+    un.valueBuffer[2] = buffer[2];
+    un.valueBuffer[3] = buffer[3];
+    un.valueBuffer[4] = buffer[4];
+    un.valueBuffer[5] = buffer[5];
+    un.valueBuffer[6] = buffer[6];
+    un.valueBuffer[7] = buffer[7];
+    return un.value;
+}
+
+inline
+double BgzfData::UnpackDouble(const char* buffer) {
+    union { double value; unsigned char valueBuffer[sizeof(double)]; } un;
+    un.value = 0;
+    un.valueBuffer[0] = buffer[0];
+    un.valueBuffer[1] = buffer[1];
+    un.valueBuffer[2] = buffer[2];
+    un.valueBuffer[3] = buffer[3];
+    un.valueBuffer[4] = buffer[4];
+    un.valueBuffer[5] = buffer[5];
+    un.valueBuffer[6] = buffer[6];
+    un.valueBuffer[7] = buffer[7];
+    return un.value;
+}
+
+// 'unpacks' a buffer into a float (includes both non-const & const char* flavors)
+inline
+float BgzfData::UnpackFloat(char* buffer) {
+    union { float value; unsigned char valueBuffer[sizeof(float)]; } un;
+    un.value = 0;
+    un.valueBuffer[0] = buffer[0];
+    un.valueBuffer[1] = buffer[1];
+    un.valueBuffer[2] = buffer[2];
+    un.valueBuffer[3] = buffer[3];
+    return un.value;
+}
+
+inline
+float BgzfData::UnpackFloat(const char* buffer) {
+    union { float value; unsigned char valueBuffer[sizeof(float)]; } un;
+    un.value = 0;
+    un.valueBuffer[0] = buffer[0];
+    un.valueBuffer[1] = buffer[1];
+    un.valueBuffer[2] = buffer[2];
+    un.valueBuffer[3] = buffer[3];
+    return un.value;
+}
+
+// 'unpacks' a buffer into a signed int (includes both non-const & const char* flavors)
 inline
 signed int BgzfData::UnpackSignedInt(char* buffer) {
     union { signed int value; unsigned char valueBuffer[sizeof(signed int)]; } un;
@@ -158,7 +252,37 @@ signed int BgzfData::UnpackSignedInt(char* buffer) {
     return un.value;
 }
 
-// 'unpacks' a buffer into an unsigned int
+inline
+signed int BgzfData::UnpackSignedInt(const char* buffer) {
+    union { signed int value; unsigned char valueBuffer[sizeof(signed int)]; } un;
+    un.value = 0;
+    un.valueBuffer[0] = buffer[0];
+    un.valueBuffer[1] = buffer[1];
+    un.valueBuffer[2] = buffer[2];
+    un.valueBuffer[3] = buffer[3];
+    return un.value;
+}
+
+// 'unpacks' a buffer into a signed short (includes both non-const & const char* flavors)
+inline
+signed short BgzfData::UnpackSignedShort(char* buffer) {
+    union { signed short value; unsigned char valueBuffer[sizeof(signed short)]; } un;
+    un.value = 0;
+    un.valueBuffer[0] = buffer[0];
+    un.valueBuffer[1] = buffer[1];
+    return un.value;
+}
+
+inline
+signed short BgzfData::UnpackSignedShort(const char* buffer) {
+    union { signed short value; unsigned char valueBuffer[sizeof(signed short)]; } un;
+    un.value = 0;
+    un.valueBuffer[0] = buffer[0];
+    un.valueBuffer[1] = buffer[1];
+    return un.value;
+}
+
+// 'unpacks' a buffer into an unsigned int (includes both non-const & const char* flavors)
 inline
 unsigned int BgzfData::UnpackUnsignedInt(char* buffer) {
     union { unsigned int value; unsigned char valueBuffer[sizeof(unsigned int)]; } un;
@@ -170,9 +294,29 @@ unsigned int BgzfData::UnpackUnsignedInt(char* buffer) {
     return un.value;
 }
 
-// 'unpacks' a buffer into an unsigned short
+inline
+unsigned int BgzfData::UnpackUnsignedInt(const char* buffer) {
+    union { unsigned int value; unsigned char valueBuffer[sizeof(unsigned int)]; } un;
+    un.value = 0;
+    un.valueBuffer[0] = buffer[0];
+    un.valueBuffer[1] = buffer[1];
+    un.valueBuffer[2] = buffer[2];
+    un.valueBuffer[3] = buffer[3];
+    return un.value;
+}
+
+// 'unpacks' a buffer into an unsigned short (includes both non-const & const char* flavors)
 inline
 unsigned short BgzfData::UnpackUnsignedShort(char* buffer) {
+    union { unsigned short value; unsigned char valueBuffer[sizeof(unsigned short)]; } un;
+    un.value = 0;
+    un.valueBuffer[0] = buffer[0];
+    un.valueBuffer[1] = buffer[1];
+    return un.value;
+}
+
+inline
+unsigned short BgzfData::UnpackUnsignedShort(const char* buffer) {
     union { unsigned short value; unsigned char valueBuffer[sizeof(unsigned short)]; } un;
     un.value = 0;
     un.valueBuffer[0] = buffer[0];

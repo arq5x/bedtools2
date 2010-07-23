@@ -12,7 +12,7 @@ INCLUDES = -I$(UTILITIES_DIR)/bedFile/ -I$(UTILITIES_DIR)/BamTools/  -I$(UTILITI
 # ----------------------------------
 SOURCES= bamToBed.cpp
 OBJECTS= $(SOURCES:.cpp=.o)
-_EXT_OBJECTS=BamReader.o BamAncillary.o BGZF.o
+_EXT_OBJECTS=BamReader.o BamAncillary.o BGZF.o BamIndex.o
 EXT_OBJECTS=$(patsubst %,$(OBJ_DIR)/%,$(_EXT_OBJECTS))
 BUILT_OBJECTS= $(patsubst %,$(OBJ_DIR)/%,$(OBJECTS))
 PROGRAM= bamToBed

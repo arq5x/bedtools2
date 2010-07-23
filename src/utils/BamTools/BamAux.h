@@ -3,7 +3,7 @@
 // Marth Lab, Department of Biology, Boston College
 // All rights reserved.
 // ---------------------------------------------------------------------------
-// Last modified: 14 April 2010 (DB)
+// Last modified: 21 July 2010 (DB)
 // ---------------------------------------------------------------------------
 // Provides the basic constants, data structures, etc. for using BAM files
 // ***************************************************************************
@@ -12,10 +12,10 @@
 #define BAMAUX_H
 
 // C inclues
+#include <cctype>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
-#include <cctype>
 
 // C++ includes
 #include <exception>
@@ -23,6 +23,9 @@
 #include <string>
 #include <utility>
 #include <vector>
+
+#include <iostream>
+#include <typeinfo>
 
 // Platform-specific type definitions
 #ifndef BAMTOOLS_TYPES
@@ -75,17 +78,17 @@ struct BamAlignment {
 
     // Queries against alignment flags
     public:        
-        bool IsDuplicate(void) const;			// Returns true if this read is a PCR duplicate       
-        bool IsFailedQC(void) const;			// Returns true if this read failed quality control      
-        bool IsFirstMate(void) const;			// Returns true if alignment is first mate on read        
-        bool IsMapped(void) const;				// Returns true if alignment is mapped        
-        bool IsMateMapped(void) const;			// Returns true if alignment's mate is mapped        
+        bool IsDuplicate(void) const;		// Returns true if this read is a PCR duplicate       
+        bool IsFailedQC(void) const;		// Returns true if this read failed quality control      
+        bool IsFirstMate(void) const;		// Returns true if alignment is first mate on read        
+        bool IsMapped(void) const;		// Returns true if alignment is mapped        
+        bool IsMateMapped(void) const;		// Returns true if alignment's mate is mapped        
         bool IsMateReverseStrand(void) const;	// Returns true if alignment's mate mapped to reverse strand        
-        bool IsPaired(void) const;				// Returns true if alignment part of paired-end read        
+        bool IsPaired(void) const;		// Returns true if alignment part of paired-end read        
         bool IsPrimaryAlignment(void) const;	// Returns true if reported position is primary alignment       
-        bool IsProperPair(void) const;			// Returns true if alignment is part of read that satisfied paired-end resolution     
-        bool IsReverseStrand(void) const;		// Returns true if alignment mapped to reverse strand
-        bool IsSecondMate(void) const;			// Returns true if alignment is second mate on read
+        bool IsProperPair(void) const;		// Returns true if alignment is part of read that satisfied paired-end resolution     
+        bool IsReverseStrand(void) const;	// Returns true if alignment mapped to reverse strand
+        bool IsSecondMate(void) const;		// Returns true if alignment is second mate on read
 
     // Manipulate alignment flags
     public:        
@@ -95,7 +98,7 @@ struct BamAlignment {
         void SetIsMateUnmapped(bool ok);	// Sets "alignment's mate is mapped" flag        
         void SetIsMateReverseStrand(bool ok);	// Sets "alignment's mate mapped to reverse strand" flag        
         void SetIsPaired(bool ok);		// Sets "alignment part of paired-end read" flag        
-		void SetIsProperPair(bool ok);		// Sets "alignment is part of read that satisfied paired-end resolution" flag        
+	void SetIsProperPair(bool ok);		// Sets "alignment is part of read that satisfied paired-end resolution" flag        
         void SetIsReverseStrand(bool ok);	// Sets "alignment mapped to reverse strand" flag        
         void SetIsSecondaryAlignment(bool ok);	// Sets "position is primary alignment" flag        
         void SetIsSecondMate(bool ok);		// Sets "alignment is second mate on read" flag        
@@ -103,20 +106,24 @@ struct BamAlignment {
 
     // Tag data access methods
     public:
-        bool GetEditDistance(uint8_t& editDistance) const;	     // get "NM" tag data - contributed by Aaron Quinlan
-        bool GetAlignmentScore(uint32_t& alignmentScore) const;   // get "AS" tag data - contributed by Aaron Quinlan
-        bool GetReadGroup(std::string& readGroup) const;	     // get "RG" tag data
-		bool GetMateSequence(std::string& mateSequence) const;   // get "R2" tag data - contributed by Aaron Quinlan
-		bool GetMateQualities(std::string& mateSequence) const;  // get "Q2" tag data - contributed by Aaron Quinlan
-		bool AddBamTag(const std::string &tag, const std::string &valType, const std::string &value);
+        // generic tag data access methods 
+        bool GetTag(const std::string& tag, std::string& destination) const;    // access variable-length char or hex strings 
+        bool GetTag(const std::string& tag, uint32_t& destination) const;       // access unsigned integer data
+        bool GetTag(const std::string& tag, int32_t& destination) const;        // access signed integer data
+        bool GetTag(const std::string& tag, float& destination) const;          // access floating point data
+        
+        // specific tag data access methods - only remain here for legacy support
+        bool GetEditDistance(uint8_t& editDistance) const;      // get "NM" tag data - contributed by Aaron Quinlan
+        bool GetReadGroup(std::string& readGroup) const;        // get "RG" tag data
+
 
     // Additional data access methods
     public:
-		int GetEndPosition(bool usePadded = false) const;	// calculates alignment end position, based on starting position and CIGAR operations
-		
+	int GetEndPosition(bool usePadded = false) const;	// calculates alignment end position, based on starting position and CIGAR operations
+
     // 'internal' utility methods 
     private:
-        static void SkipToNextTag(const char storageType, char* &pTagData, unsigned int& numBytesParsed);
+        static bool SkipToNextTag(const char storageType, char* &pTagData, unsigned int& numBytesParsed);
 
     // Data members
     public:
@@ -135,6 +142,29 @@ struct BamAlignment {
         int32_t      MateRefID;         // ID number for reference sequence where alignment's mate was aligned
         int32_t      MatePosition;      // Position (0-based) where alignment's mate starts
         int32_t      InsertSize;        // Mate-pair insert size
+          
+          
+        struct BamAlignmentSupportData {
+      
+            // data members
+            std::string AllCharData;
+            uint32_t    BlockLength;
+            uint32_t    NumCigarOperations;
+            uint32_t    QueryNameLength;
+            uint32_t    QuerySequenceLength;
+            bool        HasCoreOnly;
+            
+            // constructor
+            BamAlignmentSupportData(void)
+                : BlockLength(0)
+                , NumCigarOperations(0)
+                , QueryNameLength(0)
+                , QuerySequenceLength(0)
+                , HasCoreOnly(false)
+            { }
+        };
+        
+        BamAlignmentSupportData SupportData;  // Contains raw character data & lengths 
 
     // Alignment flag query constants
     // Use the get/set methods above instead
@@ -157,8 +187,17 @@ struct BamAlignment {
 // Auxiliary data structs & typedefs
 
 struct CigarOp {
+  
+    // data members
     char     Type;   // Operation type (MIDNSHP)
     uint32_t Length; // Operation length (number of bases)
+    
+    // constructor
+    CigarOp(const char type = '\0', 
+            const uint32_t length = 0) 
+        : Type(type)
+        , Length(length) 
+    { }
 };
 
 struct RefData {
@@ -179,45 +218,25 @@ struct RefData {
 typedef std::vector<RefData>      RefVector;
 typedef std::vector<BamAlignment> BamAlignmentVector;
 
-// ----------------------------------------------------------------
-// Indexing structs & typedefs
-
-struct Chunk {
-
+struct BamRegion {
+  
     // data members
-    uint64_t Start;
-    uint64_t Stop;
-
+    int LeftRefID;
+    int LeftPosition;
+    int RightRefID;
+    int RightPosition;
+    
     // constructor
-    Chunk(const uint64_t& start = 0, 
-          const uint64_t& stop = 0)
-        : Start(start)
-        , Stop(stop)
+    BamRegion(const int& leftID   = -1, 
+              const int& leftPos  = -1,
+              const int& rightID  = -1,
+              const int& rightPos = -1)
+        : LeftRefID(leftID)
+        , LeftPosition(leftPos)
+        , RightRefID(rightID)
+        , RightPosition(rightPos)
     { }
 };
-
-inline
-bool ChunkLessThan(const Chunk& lhs, const Chunk& rhs) {
-    return lhs.Start < rhs.Start;
-}
-
-typedef std::vector<Chunk> ChunkVector;
-typedef std::map<uint32_t, ChunkVector> BamBinMap;
-typedef std::vector<uint64_t> LinearOffsetVector;
-
-struct ReferenceIndex {
-    // data members
-    BamBinMap Bins;
-    LinearOffsetVector Offsets;
-    // constructor
-    ReferenceIndex(const BamBinMap& binMap = BamBinMap(),
-                   const LinearOffsetVector& offsets = LinearOffsetVector())
-        : Bins(binMap)
-        , Offsets(offsets)
-    { }
-};
-
-typedef std::vector<ReferenceIndex> BamIndex;
 
 // ----------------------------------------------------------------
 // BamAlignment member methods
@@ -243,6 +262,7 @@ BamAlignment::BamAlignment(const BamAlignment& other)
     , MateRefID(other.MateRefID)
     , MatePosition(other.MatePosition)
     , InsertSize(other.InsertSize)
+    , SupportData(other.SupportData)
 { }
 
 inline 
@@ -285,10 +305,10 @@ int BamAlignment::GetEndPosition(bool usePadded) const {
     std::vector<CigarOp>::const_iterator cigarIter = CigarData.begin();
     std::vector<CigarOp>::const_iterator cigarEnd  = CigarData.end();
     for ( ; cigarIter != cigarEnd; ++cigarIter) {
-		const char cigarType = (*cigarIter).Type;
-		if ( cigarType == 'M' || cigarType == 'D' || cigarType == 'N' ) {
-		    alignEnd += (*cigarIter).Length;
-		} 
+	const char cigarType = (*cigarIter).Type;
+	if ( cigarType == 'M' || cigarType == 'D' || cigarType == 'N' ) {
+	    alignEnd += (*cigarIter).Length;
+	} 
         else if ( usePadded && cigarType == 'I' ) {
             alignEnd += (*cigarIter).Length;
         }
@@ -301,7 +321,8 @@ int BamAlignment::GetEndPosition(bool usePadded) const {
 inline 
 bool BamAlignment::GetEditDistance(uint8_t& editDistance) const {
 
-    if ( TagData.empty() ) { return false; }
+    // make sure tag data exists
+    if ( TagData.empty() ) return false;
 
     // localize the tag data
     char* pTagData = (char*)TagData.data();
@@ -309,7 +330,7 @@ bool BamAlignment::GetEditDistance(uint8_t& editDistance) const {
     unsigned int numBytesParsed = 0;
 
     bool foundEditDistanceTag = false;
-    while( numBytesParsed < tagDataLen ) {
+    while ( numBytesParsed < tagDataLen ) {
 
         const char* pTagType = pTagData;
         const char* pTagStorageType = pTagData + 2;
@@ -323,64 +344,25 @@ bool BamAlignment::GetEditDistance(uint8_t& editDistance) const {
         }
 
         // get the storage class and find the next tag
-        if (*pTagStorageType == '\0') { return false; }
-        SkipToNextTag( *pTagStorageType, pTagData, numBytesParsed );
-        if (*pTagData == '\0') { return false; }
+        if ( *pTagStorageType == '\0' ) return false;
+        if ( !SkipToNextTag(*pTagStorageType, pTagData, numBytesParsed) ) return false;
+        if ( *pTagData == '\0' ) return false;
     }
     // return if the edit distance tag was not present
-    if ( !foundEditDistanceTag ) { return false; }
+    if ( !foundEditDistanceTag ) return false;
 
     // assign the editDistance value
     std::memcpy(&editDistance, pTagData, 1);
     return true;
 }
 
-// get "AS" tag data - contributed by Aaron Quinlan
-// stores data in 'alignmentScore', returns success/fail
-inline 
-bool BamAlignment::GetAlignmentScore(uint32_t& alignmentScore) const {
-
-    if ( TagData.empty() ) { return false; }
-
-    // localize the tag data
-    char* pTagData = (char*)TagData.data();
-    const unsigned int tagDataLen = TagData.size();
-    unsigned int numBytesParsed = 0;
-
-    bool foundAlignmentScoreTag = false;
-    while( numBytesParsed < tagDataLen ) {
-
-        const char* pTagType = pTagData;
-        const char* pTagStorageType = pTagData + 2;
-        pTagData       += 3;
-        numBytesParsed += 3;
-
-        // check the current tag
-        if ( strncmp(pTagType, "AS", 2) == 0 ) {
-            foundAlignmentScoreTag = true;
-            break;
-        }
-
-        // get the storage class and find the next tag
-        if (*pTagStorageType == '\0') { return false; }
-        SkipToNextTag( *pTagStorageType, pTagData, numBytesParsed );
-        if (*pTagData == '\0') { return false; }
-    }
-    // return if the alignment score tag was not present
-    if ( !foundAlignmentScoreTag ) { return false; }
-
-    // assign the alignmentScore value
-    std::memcpy(&alignmentScore, pTagData, 2);
-    return true;
-}
-
-
 // get "RG" tag data
 // stores data in 'readGroup', returns success/fail
 inline 
 bool BamAlignment::GetReadGroup(std::string& readGroup) const {
 
-    if ( TagData.empty() ) { return false; }
+    // make sure tag data exists
+    if ( TagData.empty() ) return false;
 
     // localize the tag data
     char* pTagData = (char*)TagData.data();
@@ -402,13 +384,13 @@ bool BamAlignment::GetReadGroup(std::string& readGroup) const {
         }
 
         // get the storage class and find the next tag
-        if (*pTagStorageType == '\0') { return false; }
-        SkipToNextTag( *pTagStorageType, pTagData, numBytesParsed );
-        if (*pTagData == '\0') { return false; }
+        if ( *pTagStorageType == '\0' ) return false;
+        if ( !SkipToNextTag(*pTagStorageType, pTagData, numBytesParsed) ) return false;
+        if ( *pTagData == '\0' ) return false;
     }
 
     // return if the read group tag was not present
-    if ( !foundReadGroupTag ) { return false; }
+    if ( !foundReadGroupTag ) return false;
 
     // assign the read group
     const unsigned int readGroupLen = std::strlen(pTagData);
@@ -417,21 +399,19 @@ bool BamAlignment::GetReadGroup(std::string& readGroup) const {
     return true;
 }
 
-
-// get "R2" tag data
-// stores data in 'mateSequence', returns success/fail
-inline 
-bool BamAlignment::GetMateSequence(std::string& mateSequence) const {
-
-    if ( TagData.empty() ) { return false; }
+inline
+bool BamAlignment::GetTag(const std::string& tag, std::string& destination) const {
+  
+    // make sure tag data exists
+    if ( TagData.empty() ) return false;
 
     // localize the tag data
     char* pTagData = (char*)TagData.data();
     const unsigned int tagDataLen = TagData.size();
     unsigned int numBytesParsed = 0;
 
-    bool foundMateSequence = false;
-    while( numBytesParsed < tagDataLen ) {
+    bool foundReadGroupTag = false;
+    while ( numBytesParsed < tagDataLen ) {
 
         const char* pTagType = pTagData;
         const char* pTagStorageType = pTagData + 2;
@@ -439,123 +419,194 @@ bool BamAlignment::GetMateSequence(std::string& mateSequence) const {
         numBytesParsed += 3;
 
         // check the current tag
-        if ( std::strncmp(pTagType, "R2", 2) == 0 ) {
-            foundMateSequence = true;
+        if ( std::strncmp(pTagType, tag.c_str(), 2) == 0 ) {
+            foundReadGroupTag = true;
             break;
         }
 
         // get the storage class and find the next tag
-        if (*pTagStorageType == '\0') { return false; }
-        SkipToNextTag( *pTagStorageType, pTagData, numBytesParsed );
-        if (*pTagData == '\0') { return false; }
+        if ( *pTagStorageType == '\0' ) return false; 
+        if ( !SkipToNextTag(*pTagStorageType, pTagData, numBytesParsed) ) return false;
+        if ( *pTagData == '\0' ) return false;
     }
 
-    // return if the mate sequence tag was not present
-    if ( !foundMateSequence ) { return false; }
+    // return if the read group tag was not present
+    if ( !foundReadGroupTag ) return false;
 
-    // assign the mate sequence
-    const unsigned int mateSequenceLen = std::strlen(pTagData);
-    mateSequence.resize(mateSequenceLen);
-    std::memcpy( (char*)mateSequence.data(), pTagData, mateSequenceLen );
+    // assign the read group
+    const unsigned int dataLen = std::strlen(pTagData);
+    destination.resize(dataLen);
+    std::memcpy( (char*)destination.data(), pTagData, dataLen );
     return true;
 }
-
-// get "Q2" tag data
-// stores data in 'mateQualities', returns success/fail
-inline 
-bool BamAlignment::GetMateQualities(std::string& mateQualities) const {
-
-    if ( TagData.empty() ) { return false; }
-
-    // localize the tag data
-    char* pTagData = (char*)TagData.data();
-    const unsigned int tagDataLen = TagData.size();
-    unsigned int numBytesParsed = 0;
-
-    bool foundMateQualities = false;
-    while( numBytesParsed < tagDataLen ) {
-
-        const char* pTagType = pTagData;
-        const char* pTagStorageType = pTagData + 2;
-        pTagData       += 3;
-        numBytesParsed += 3;
-
-        // check the current tag
-        if ( std::strncmp(pTagType, "Q2", 2) == 0 ) {
-            foundMateQualities = true;
-            break;
-        }
-
-        // get the storage class and find the next tag
-        if (*pTagStorageType == '\0') { return false; }
-        SkipToNextTag( *pTagStorageType, pTagData, numBytesParsed );
-        if (*pTagData == '\0') { return false; }
-    }
-
-    // return if the mate qualities tag was not present
-    if ( !foundMateQualities ) { return false; }
-
-    // assign the mate qualities
-    const unsigned int mateQualitiesLen = std::strlen(pTagData);
-    mateQualities.resize(mateQualitiesLen);
-    std::memcpy( (char*)mateQualities.data(), pTagData, mateQualitiesLen );
-    return true;
-}
-
-
-// Add a new tag to a BAM alignment
-//   - allows third-party apps to add 
-//     custom tags to BAM records
-//   - returns false iff requested tag already exists
-//
-// Contributed by Aaron Quinlan
-inline 
-bool BamAlignment::AddBamTag(const std::string &tag, const std::string &valType, const std::string &value) {
-
-	// sanity check the requested tag values.
-	// this could be more strict. namely, we could enforce valid valTypes...
-	if ((tag.size() != 2) || (valType.size() != 1))
-		return false;
-
-	// :::Step 1:::
-	// Scan the existing tags to see if the requested 
-	// tag already exists. The SAM spec prohibits multiple 
-	// tags with the same key for a given alignment.
-
-	// localize the tag data
-	char* pTagData = (char*)TagData.data();
-	const unsigned int tagDataLen = TagData.size();
-	unsigned int numBytesParsed = 0;
-
-	while( numBytesParsed < tagDataLen ) {
-
-		const char* pTagType = pTagData;
-		const char* pTagStorageType = pTagData + 2;
-		pTagData       += 3;
-		numBytesParsed += 3;
-
-		// check the current tag.  if it matches the requested
-		// tag, then we should return false, as this is disallowed
-		if ( strncmp(pTagType, tag.c_str(), 2) == 0 ) {
-			return false;
-		}
-
-		// get the storage class and find the next tag
-		if (*pTagStorageType == '\0') { break; }
-		SkipToNextTag( *pTagStorageType, pTagData, numBytesParsed );
-		if (*pTagData == '\0') { break; }
-	}
-	
-	// :::Step 2:::
-	// Add the requested tag.  Note that a NULL terminator is needed for string tags (i.e. Z and H) 
-	std::string newTag = tag + valType + value + '\0';
-	TagData.append(newTag);
-	return true;
-}
-
 
 inline
-void BamAlignment::SkipToNextTag(const char storageType, char* &pTagData, unsigned int& numBytesParsed) {
+bool BamAlignment::GetTag(const std::string& tag, uint32_t& destination) const {
+  
+    // make sure data exists
+    if ( TagData.empty() ) return false;
+
+    // clear out destination
+    destination = 0;
+
+    // localize the tag data
+    char* pTagData = (char*)TagData.data();
+    const unsigned int tagDataLen = TagData.size();
+    unsigned int numBytesParsed = 0;
+
+    int destinationLength = 0;    
+    bool foundDesiredTag = false;
+    while ( numBytesParsed < tagDataLen ) {
+
+        const char* pTagType = pTagData;
+        const char* pTagStorageType = pTagData + 2;
+        pTagData       += 3;
+        numBytesParsed += 3;
+
+        // check the current tag
+        if ( strncmp(pTagType, tag.c_str(), 2) == 0 ) {
+            
+            // determine actual length of data depending on tag type
+            // this is necessary because some tags may be of variable byte-lengths (i.e. char or short)
+            const char type = *pTagStorageType;
+            switch(type) {
+
+                // 1 byte data
+                case 'A':
+                case 'c':
+                case 'C':
+                    destinationLength = 1;
+                    break;
+
+                // 2 byte data
+                case 's':
+                case 'S':
+                    destinationLength = 2;
+                    break;
+
+                // 4 byte data
+                case 'i':
+                case 'I':
+                    destinationLength = 4;
+                    break;
+
+                // unsupported type for integer destination (float & var-length strings)
+                case 'f':
+                case 'Z':
+                case 'H':
+                    printf("ERROR: Cannot store tag of type %c in integer destination\n", type);
+                    return false;
+
+                // unknown tag type
+                default:
+                    printf("ERROR: Unknown tag storage class encountered: [%c]\n", *pTagData);
+                    return false;
+            }
+            
+            foundDesiredTag = true;
+            break;
+        }
+
+        // get the storage class and find the next tag
+        if ( *pTagStorageType == '\0' ) return false;
+        if ( !SkipToNextTag(*pTagStorageType, pTagData, numBytesParsed) ) return false;
+        if ( *pTagData == '\0' ) return false;
+    }
+    // return if the edit distance tag was not present
+    if ( !foundDesiredTag ) return false; 
+
+    // assign the editDistance value
+    std::memcpy(&destination, pTagData, destinationLength);
+    return true;
+}
+
+inline
+bool BamAlignment::GetTag(const std::string& tag, int32_t& destination) const {
+    return GetTag(tag, (uint32_t&)destination);
+}
+
+inline
+bool BamAlignment::GetTag(const std::string& tag, float& destination) const {
+  
+    // make sure data exists
+    if ( TagData.empty() ) return false;
+
+    // clear out destination
+    destination = 0.0;
+
+    // localize the tag data
+    char* pTagData = (char*)TagData.data();
+    const unsigned int tagDataLen = TagData.size();
+    unsigned int numBytesParsed = 0;
+
+    int destinationLength = 0;
+    bool foundDesiredTag = false;
+    while( numBytesParsed < tagDataLen ) {
+
+        const char* pTagType = pTagData;
+        const char* pTagStorageType = pTagData + 2;
+        pTagData       += 3;
+        numBytesParsed += 3;
+
+        // check the current tag
+        if ( strncmp(pTagType, tag.c_str(), 2) == 0 ) {
+          
+            // determine actual length of data depending on tag type
+            // this is necessary because some tags may be of variable byte-lengths (i.e. char or short)
+            const char type = *pTagStorageType;
+            switch(type) {
+
+                // 1 byte data
+                case 'A':
+                case 'c':
+                case 'C':
+                    destinationLength = 1;
+                    break;
+
+                // 2 byte data
+                case 's':
+                case 'S':
+                    destinationLength = 2;
+                    break;
+
+                // 4 byte data
+                case 'f':
+                case 'i':
+                case 'I':
+                    destinationLength = 4;
+                    break;
+                
+                // unsupported type (var-length strings)
+                case 'Z':
+                case 'H':
+                    printf("ERROR: Cannot store tag of type %c in integer destination\n", type);
+                    return false;
+
+                // unknown tag type
+                default:
+                    printf("ERROR: Unknown tag storage class encountered: [%c]\n", *pTagData);
+                    return false;
+            }
+            
+            foundDesiredTag = true;
+            break;
+        }
+
+        // get the storage class and find the next tag
+        if ( *pTagStorageType == '\0' ) return false;
+        if ( !SkipToNextTag(*pTagStorageType, pTagData, numBytesParsed) ) return false;
+        if ( *pTagData == '\0' ) return false;
+    }
+    // return if the edit distance tag was not present
+    if ( !foundDesiredTag ) return false; 
+
+    // assign the editDistance value
+    std::memcpy(&destination, pTagData, destinationLength);
+    return true;
+}
+
+inline
+bool BamAlignment::SkipToNextTag(const char storageType, char* &pTagData, unsigned int& numBytesParsed) {
     
     switch(storageType) {
 
@@ -593,10 +644,14 @@ void BamAlignment::SkipToNextTag(const char storageType, char* &pTagData, unsign
         // ---------------------------
             break;
 
-        default:
+        default: 
+            // error case
             printf("ERROR: Unknown tag storage class encountered: [%c]\n", *pTagData);
-            exit(1);
+            return false;
     }
+    
+    // return success
+    return true;
 }
 
 // ----------------------------------------------------------------

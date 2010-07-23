@@ -1,9 +1,9 @@
 // ***************************************************************************
-// BGZF.cpp (c) 2009 Derek Barnett, Michael Strömberg
+// BGZF.cpp (c) 2009 Derek Barnett, Michael Strï¿½mberg
 // Marth Lab, Department of Biology, Boston College
 // All rights reserved.
 // ---------------------------------------------------------------------------
-// Last modified: 11 January 2010 (DB)
+// Last modified: 19 July 2010 (DB)
 // ---------------------------------------------------------------------------
 // BGZF routines were adapted from the bgzf.c code developed at the Broad
 // Institute.
@@ -33,34 +33,35 @@ BgzfData::BgzfData(void)
         CompressedBlock   = new char[CompressedBlockSize];
         UncompressedBlock = new char[UncompressedBlockSize];
     } catch( std::bad_alloc& ba ) {
-        printf("ERROR: Unable to allocate memory for our BGZF object.\n");
+        printf("BGZF ERROR: unable to allocate memory for our BGZF object.\n");
         exit(1);
     }
 }
 
 // destructor
 BgzfData::~BgzfData(void) {
-    if(CompressedBlock)   { delete[] CompressedBlock;   }
-    if(UncompressedBlock) { delete[] UncompressedBlock; }
+    if( CompressedBlock )   { delete[] CompressedBlock;   }
+    if( UncompressedBlock ) { delete[] UncompressedBlock; }
 }
 
 // closes BGZF file
 void BgzfData::Close(void) {
 
-	// skip if file not open, otherwise set flag
-    if (!IsOpen) { return; }
-    IsOpen = false;
+    // skip if file not open, otherwise set flag
+    if ( !IsOpen ) return;
 
-    // flush the current BGZF block
-    if (IsWriteOnly) { FlushBlock(); }
-
-	// write an empty block (as EOF marker)
-	int blockLength = DeflateBlock();
-	fwrite(CompressedBlock, 1, blockLength, Stream);
-	
+    // if writing to file, flush the current BGZF block,
+    // then write an empty block (as EOF marker)
+    if ( IsWriteOnly ) {
+        FlushBlock();
+        int blockLength = DeflateBlock();
+        fwrite(CompressedBlock, 1, blockLength, Stream);
+    }
+    
     // flush and close
     fflush(Stream);
     fclose(Stream);
+    IsOpen = false;
 }
 
 // compresses the current block
@@ -82,11 +83,11 @@ int BgzfData::DeflateBlock(void) {
     // loop to retry for blocks that do not compress enough
     int inputLength = BlockOffset;
     int compressedLength = 0;
-	unsigned int bufferSize = CompressedBlockSize;
+    unsigned int bufferSize = CompressedBlockSize;
 
     while(true) {
-		
-		// initialize zstream values
+        
+        // initialize zstream values
         z_stream zs;
         zs.zalloc    = NULL;
         zs.zfree     = NULL;
@@ -94,10 +95,10 @@ int BgzfData::DeflateBlock(void) {
         zs.avail_in  = inputLength;
         zs.next_out  = (Bytef*)&buffer[BLOCK_HEADER_LENGTH];
         zs.avail_out = bufferSize - BLOCK_HEADER_LENGTH - BLOCK_FOOTER_LENGTH;
-		
+
         // initialize the zlib compression algorithm
         if(deflateInit2(&zs, Z_DEFAULT_COMPRESSION, Z_DEFLATED, GZIP_WINDOW_BITS, Z_DEFAULT_MEM_LEVEL, Z_DEFAULT_STRATEGY) != Z_OK) {
-            printf("ERROR: zlib deflate initialization failed.\n");
+            printf("BGZF ERROR: zlib deflate initialization failed.\n");
             exit(1);
         }
 
@@ -111,27 +112,26 @@ int BgzfData::DeflateBlock(void) {
             if(status == Z_OK) {
                 inputLength -= 1024;
                 if(inputLength < 0) {
-                    printf("ERROR: input reduction failed.\n");
+                    printf("BGZF ERROR: input reduction failed.\n");
                     exit(1);
                 }
                 continue;
             }
 
-            printf("ERROR: zlib deflate failed.\n");
+            printf("BGZF ERROR: zlib::deflateEnd() failed.\n");
             exit(1);
         }
 
         // finalize the compression routine
         if(deflateEnd(&zs) != Z_OK) {
-            printf("ERROR: deflate end failed.\n");
+            printf("BGZF ERROR: zlib::deflateEnd() failed.\n");
             exit(1);
         }
 
         compressedLength = zs.total_out;
         compressedLength += BLOCK_HEADER_LENGTH + BLOCK_FOOTER_LENGTH;
-
         if(compressedLength > MAX_BLOCK_SIZE) {
-            printf("ERROR: deflate overflow.\n");
+            printf("BGZF ERROR: deflate overflow.\n");
             exit(1);
         }
 
@@ -151,7 +151,7 @@ int BgzfData::DeflateBlock(void) {
     int remaining = BlockOffset - inputLength;
     if(remaining > 0) {
         if(remaining > inputLength) {
-            printf("ERROR: remainder too large.\n");
+            printf("BGZF ERROR: after deflate, remainder too large.\n");
             exit(1);
         }
         memcpy(UncompressedBlock, UncompressedBlock + inputLength, remaining);
@@ -174,10 +174,10 @@ void BgzfData::FlushBlock(void) {
         int numBytesWritten = fwrite(CompressedBlock, 1, blockLength, Stream);
 
         if(numBytesWritten != blockLength) {
-            printf("ERROR: Expected to write %u bytes during flushing, but wrote %u bytes.\n", blockLength, numBytesWritten);
-            exit(1);
-		}
-		
+          printf("BGZF ERROR: expected to write %u bytes during flushing, but wrote %u bytes.\n", blockLength, numBytesWritten);
+          exit(1);
+        }
+              
         BlockAddress += blockLength;
     }
 }
@@ -196,27 +196,28 @@ int BgzfData::InflateBlock(const int& blockLength) {
 
     int status = inflateInit2(&zs, GZIP_WINDOW_BITS);
     if (status != Z_OK) {
-        printf("inflateInit failed\n");
-        exit(1);
+        printf("BGZF ERROR: could not decompress block - zlib::inflateInit() failed\n");
+        return -1;
     }
 
     status = inflate(&zs, Z_FINISH);
     if (status != Z_STREAM_END) {
         inflateEnd(&zs);
-        printf("inflate failed\n");
-        exit(1);
+        printf("BGZF ERROR: could not decompress block - zlib::inflate() failed\n");
+        return -1;
     }
 
     status = inflateEnd(&zs);
     if (status != Z_OK) {
-        printf("inflateEnd failed\n");
-        exit(1);
+        printf("BGZF ERROR: could not decompress block - zlib::inflateEnd() failed\n");
+        return -1;
     }
 
     return zs.total_out;
 }
 
-void BgzfData::Open(const string& filename, const char* mode) {
+// opens the BGZF file for reading (mode is either "rb" for reading, or "wb" for writing)
+bool BgzfData::Open(const string& filename, const char* mode) {
 
 	// determine open mode
     if ( strcmp(mode, "rb") == 0 ) {
@@ -224,46 +225,52 @@ void BgzfData::Open(const string& filename, const char* mode) {
     } else if ( strcmp(mode, "wb") == 0) {
         IsWriteOnly = true;
     } else {
-        printf("ERROR: Unknown file mode: %s\n", mode);
-        exit(1);
+        printf("BGZF ERROR: unknown file mode: %s\n", mode);
+        return false; 
     }
 
-	// open Stream to read to/write from file, stdin, or stdout
-	// stdin/stdout option contributed by Aaron Quinlan (2010-Jan-03)
-	if ( (filename != "stdin") && (filename != "stdout") ) {
-		// read/wrtie BGZF data to/from a file
-		Stream = fopen(filename.c_str(), mode);
-	}
-	else if ( (filename == "stdin") && (strcmp(mode, "rb") == 0 ) ) { 
-		// read BGZF data from stdin
-		Stream = freopen(NULL, mode, stdin);
-	}
-	else if ( (filename == "stdout") && (strcmp(mode, "wb") == 0) ) { 
-		// write BGZF data to stdout
-		Stream = freopen(NULL, mode, stdout);
-	}
-	
-    if(!Stream) {
-        printf("ERROR: Unable to open the BAM file %s\n", filename.c_str() );
-        exit(1);
+    // open Stream to read to/write from file, stdin, or stdout
+    // stdin/stdout option contributed by Aaron Quinlan (2010-Jan-03)
+    if ( (filename != "stdin") && (filename != "stdout") ) {
+        // read/write BGZF data to/from a file
+//         Stream = fopen64(filename.c_str(), mode);
+        Stream = fopen(filename.c_str(), mode);
     }
+    else if ( (filename == "stdin") && (strcmp(mode, "rb") == 0 ) ) { 
+        // read BGZF data from stdin
+//         Stream = freopen64(NULL, mode, stdin);
+        Stream = freopen(NULL, mode, stdin);
+    }
+    else if ( (filename == "stdout") && (strcmp(mode, "wb") == 0) ) { 
+        // write BGZF data to stdout
+//         Stream = freopen64(NULL, mode, stdout);
+        Stream = freopen(NULL, mode, stdout);
+    }
+
+    if(!Stream) {
+        printf("BGZF ERROR: unable to open file %s\n", filename.c_str() );
+        return false;
+    }
+    
+    // set flag, return success
     IsOpen = true;
+    return true;
 }
 
-
+// reads BGZF data into a byte buffer
 int BgzfData::Read(char* data, const unsigned int dataLength) {
 
-   if (dataLength == 0) { return 0; }
+   if (dataLength == 0) return 0;
 
    char* output = data;
    unsigned int numBytesRead = 0;
    while (numBytesRead < dataLength) {
 
        int bytesAvailable = BlockLength - BlockOffset;
-       if (bytesAvailable <= 0) {
-           if ( ReadBlock() != 0 ) { return -1; }
+       if ( bytesAvailable <= 0 ) {
+           if (!ReadBlock()) return -1; 
            bytesAvailable = BlockLength - BlockOffset;
-           if ( bytesAvailable <= 0 ) { break; }
+           if (bytesAvailable <= 0) break;
        }
 
        char* buffer   = UncompressedBlock;
@@ -276,7 +283,7 @@ int BgzfData::Read(char* data, const unsigned int dataLength) {
    }
 
    if ( BlockOffset == BlockLength ) {
-       BlockAddress = ftell(Stream);
+       BlockAddress = ftell64(Stream);
        BlockOffset  = 0;
        BlockLength  = 0;
    }
@@ -284,25 +291,26 @@ int BgzfData::Read(char* data, const unsigned int dataLength) {
    return numBytesRead;
 }
 
-int BgzfData::ReadBlock(void) {
+// reads a BGZF block
+bool BgzfData::ReadBlock(void) {
 
     char    header[BLOCK_HEADER_LENGTH];
-    int64_t blockAddress = ftell(Stream);
-
+    int64_t blockAddress = ftell64(Stream);
+    
     int count = fread(header, 1, sizeof(header), Stream);
     if (count == 0) {
         BlockLength = 0;
-        return 0;
+        return true;
     }
 
     if (count != sizeof(header)) {
-        printf("read block failed - count != sizeof(header)\n");
-        return -1;
+        printf("BGZF ERROR: read block failed - could not read block header\n");
+        return false;
     }
 
     if (!BgzfData::CheckBlockHeader(header)) {
-        printf("read block failed - CheckBlockHeader() returned false\n");
-        return -1;
+        printf("BGZF ERROR: read block failed - invalid block header\n");
+        return false;
     }
 
     int blockLength = BgzfData::UnpackUnsignedShort(&header[16]) + 1;
@@ -312,30 +320,33 @@ int BgzfData::ReadBlock(void) {
 
     count = fread(&compressedBlock[BLOCK_HEADER_LENGTH], 1, remaining, Stream);
     if (count != remaining) {
-        printf("read block failed - count != remaining\n");
-        return -1;
+        printf("BGZF ERROR: read block failed - could not read data from block\n");
+        return false;
     }
 
     count = InflateBlock(blockLength);
-    if (count < 0) { return -1; }
-
-    if ( BlockLength != 0 ) {
-        BlockOffset = 0;
+    if (count < 0) { 
+      printf("BGZF ERROR: read block failed - could not decompress block data\n");
+      return false;
     }
+
+    if ( BlockLength != 0 )
+        BlockOffset = 0;
 
     BlockAddress = blockAddress;
     BlockLength  = count;
-    return 0;
+    return true;
 }
 
+// seek to position in BGZF file
 bool BgzfData::Seek(int64_t position) {
 
     int     blockOffset  = (position & 0xFFFF);
     int64_t blockAddress = (position >> 16) & 0xFFFFFFFFFFFFLL;
 
-    if (fseek(Stream, blockAddress, SEEK_SET) != 0) {
-        printf("ERROR: Unable to seek in BAM file\n");
-        exit(1);
+    if (fseek64(Stream, blockAddress, SEEK_SET) != 0) {
+        printf("BGZF ERROR: unable to seek in file\n");
+        return false;
     }
 
     BlockLength  = 0;
@@ -344,6 +355,7 @@ bool BgzfData::Seek(int64_t position) {
     return true;
 }
 
+// get file position in BGZF file
 int64_t BgzfData::Tell(void) {
     return ( (BlockAddress << 16) | (BlockOffset & 0xFFFF) );
 }
@@ -358,6 +370,7 @@ unsigned int BgzfData::Write(const char* data, const unsigned int dataLen) {
 
     // copy the data to the buffer
     while(numBytesWritten < dataLen) {
+      
         unsigned int copyLength = min(blockLength - BlockOffset, dataLen - numBytesWritten);
         char* buffer = UncompressedBlock;
         memcpy(buffer + BlockOffset, input, copyLength);
@@ -366,9 +379,8 @@ unsigned int BgzfData::Write(const char* data, const unsigned int dataLen) {
         input           += copyLength;
         numBytesWritten += copyLength;
 
-        if(BlockOffset == blockLength) {
+        if(BlockOffset == blockLength)
             FlushBlock();
-        }
     }
 
     return numBytesWritten;
