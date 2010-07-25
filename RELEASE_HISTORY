@@ -1,3 +1,9 @@
+Version 2.8.3 (July-25-2010)
+1. Fixed bug that caused some GFF files to be misinterpreted as VCF.  This prevented the detection of overlaps.
+2. Added a new "-tag" option in bamToBed that allows one to choose the _numeric_ tag that will be used to populate the score field.  For example, one could populate the score field with the alignment score with "-tag AS".
+3. Updated the BamTools API. 
+
+
 Version 2.8.2 (July-18-2010)
 1. Fixed a bug in bedFile.h preventing GFF strands from being read properly.
 2. Fixed a bug in intersectBed that occasionally caused spurious overlaps between BAM alignments and BED features.
