@@ -467,7 +467,7 @@ private:
             }
             
             // sanity checks.
-            if ((bed.start <= bed.end) && (bed.start >= 0) && (bed.end > 0)) {
+            if ((bed.start <= bed.end) && (bed.start >= 0) && (bed.end >= 0)) {
                 return true;
             }
             else if (bed.start > bed.end) {
@@ -680,13 +680,13 @@ public:
     												bed.score.c_str(), bed.strand.c_str());
     		}
     		else if (this->bedType > 6) {
-    			printf ("%s\t%d\t%d\t%s\t%s\t%s\t", bed.chrom.c_str(), bed.start, bed.end, bed.name.c_str(), 
+    			printf ("%s\t%d\t%d\t%s\t%s\t%s", bed.chrom.c_str(), bed.start, bed.end, bed.name.c_str(), 
     												bed.score.c_str(), bed.strand.c_str());
 
     			vector<string>::const_iterator othIt = bed.otherFields.begin(); 
     			vector<string>::const_iterator othEnd = bed.otherFields.end(); 
     			for ( ; othIt != othEnd; ++othIt) {
-    				printf("%s\t", othIt->c_str());
+    				printf("\t%s", othIt->c_str());
     			}
     			printf("\n");
     		}
@@ -798,13 +798,13 @@ public:
     												bed.score.c_str(), bed.strand.c_str());
     		}
     		else if (this->bedType > 6) {
-    			printf ("%s\t%d\t%d\t%s\t%s\t%s\t", bed.chrom.c_str(), start, end, bed.name.c_str(), 
+    			printf ("%s\t%d\t%d\t%s\t%s\t%s", bed.chrom.c_str(), start, end, bed.name.c_str(), 
     												bed.score.c_str(), bed.strand.c_str());
 
     			vector<string>::const_iterator othIt = bed.otherFields.begin(); 
     			vector<string>::const_iterator othEnd = bed.otherFields.end(); 
     			for ( ; othIt != othEnd; ++othIt) {
-    				printf("%s\t", othIt->c_str());
+    				printf("\t%s", othIt->c_str());
     			}
     			printf("\n");
     		}
@@ -880,9 +880,9 @@ public:
     			printf (".\t-1\t-1\t.\t-1\t.\n");
     		}
     		else if (this->bedType > 6) {
-    			printf (".\t-1\t-1\t.\t-1\t.\n");
+    			printf (".\t-1\t-1\t.\t-1\t.");
     			for (unsigned int i = 6; i < this->bedType; ++i) {
-    				printf(".\t");
+    				printf("\t.");
     			}
     			printf("\n");
     		}

@@ -127,14 +127,14 @@ void BedFilePE::reportBedPETab(const BEDPE &a) {
 											a.name.c_str(), a.score.c_str(), a.strand1.c_str(), a.strand2.c_str());
 	}
 	else if (this->bedType > 10) {
-		printf("%s\t%d\t%d\t%s\t%d\t%d\t%s\t%s\t%s\t%s\t", a.chrom1.c_str(), a.start1, a.end1,
+		printf("%s\t%d\t%d\t%s\t%d\t%d\t%s\t%s\t%s\t%s", a.chrom1.c_str(), a.start1, a.end1,
 		 									a.chrom2.c_str(), a.start2, a.end2,
 											a.name.c_str(), a.score.c_str(), a.strand1.c_str(), a.strand2.c_str());
 											
 		vector<string>::const_iterator othIt = a.otherFields.begin(); 
 		vector<string>::const_iterator othEnd = a.otherFields.end(); 
 		for ( ; othIt != othEnd; ++othIt) {
-			printf("%s\t", othIt->c_str());
+			printf("\t%s", othIt->c_str());
 		}
 		printf("\t");
 	}
@@ -170,14 +170,14 @@ void BedFilePE::reportBedPENewLine(const BEDPE &a) {
 											a.name.c_str(), a.score.c_str(), a.strand1.c_str(), a.strand2.c_str());
 	}
 	else if (this->bedType > 10) {
-		printf("%s\t%d\t%d\t%s\t%d\t%d\t%s\t%s\t%s\t%s\t", a.chrom1.c_str(), a.start1, a.end1,
+		printf("%s\t%d\t%d\t%s\t%d\t%d\t%s\t%s\t%s\t%s", a.chrom1.c_str(), a.start1, a.end1,
 		 									a.chrom2.c_str(), a.start2, a.end2,
 											a.name.c_str(), a.score.c_str(), a.strand1.c_str(), a.strand2.c_str());
 											
 		vector<string>::const_iterator othIt  = a.otherFields.begin(); 
 		vector<string>::const_iterator othEnd = a.otherFields.end(); 
 		for ( ; othIt != othEnd; ++othIt) {
-			printf("%s\t", othIt->c_str());
+			printf("\t%s", othIt->c_str());
 		}
 		printf("\n");
 	}
