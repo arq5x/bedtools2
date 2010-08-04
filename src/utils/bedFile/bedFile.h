@@ -41,7 +41,7 @@ typedef uint32_t CHRPOS;
 typedef uint16_t BINLEVEL;
 typedef uint32_t BIN;
 typedef uint16_t USHORT;
-typedef uint16_t UINT;
+typedef uint32_t UINT;
 
 //*************************************************
 // Genome binning constants
