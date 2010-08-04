@@ -114,17 +114,21 @@ void PairToPair::FindOverlaps(const BEDPE &a, vector<BEDCOV> &hitsA1B1, vector<B
     }
 
 	// Find the _potential_ hits between each end of A and B
-	_bedB->FindOverlapsPerBin(1, a.chrom1, start1, end1, a.strand1, hitsA1B1, !(_ignoreStrand));	// hits between A1 to B1
-	_bedB->FindOverlapsPerBin(1, a.chrom2, start2, end2, a.strand2, hitsA2B1, !(_ignoreStrand));	// hits between A2 to B1
-	_bedB->FindOverlapsPerBin(2, a.chrom1, start1, end1, a.strand1, hitsA1B2, !(_ignoreStrand));	// hits between A1 to B2
-	_bedB->FindOverlapsPerBin(2, a.chrom2, start2, end2, a.strand2, hitsA2B2, !(_ignoreStrand));	// hits between A2 to B2	
+	_bedB->FindOverlapsPerBin(1, a.chrom1, start1, end1, a.strand1, hitsA1B1, !(_ignoreStrand));	// hits b/w A1 & B1
+	_bedB->FindOverlapsPerBin(1, a.chrom2, start2, end2, a.strand2, hitsA2B1, !(_ignoreStrand));	// hits b/w A2 & B1
+	_bedB->FindOverlapsPerBin(2, a.chrom1, start1, end1, a.strand1, hitsA1B2, !(_ignoreStrand));	// hits b/w A1 & B2
+	_bedB->FindOverlapsPerBin(2, a.chrom2, start2, end2, a.strand2, hitsA2B2, !(_ignoreStrand));	// hits b/w A2 & B2	
 
 	// Now, reduce to the set of hits on each end of A and B 
 	// that meet the required overlap fraction and orientation.
-	FindQualityHitsBetweenEnds(start1, end1, start2, end2, hitsA1B1, qualityHitsA1B1, numOverlapsA1B1);	   // quality hits between A1 to B1
-	FindQualityHitsBetweenEnds(start1, end1, start2, end2, hitsA1B2, qualityHitsA1B2, numOverlapsA1B2);	   // quality hits between A2 to B1
-	FindQualityHitsBetweenEnds(start1, end1, start2, end2, hitsA2B1, qualityHitsA2B1, numOverlapsA2B1);	   // quality hits between A1 to B2
-	FindQualityHitsBetweenEnds(start1, end1, start2, end2, hitsA2B2, qualityHitsA2B2, numOverlapsA2B2);	   // quality hits between A2 to B2
+    // FindQualityHitsBetweenEnds(start1, end1, start2, end2, hitsA1B1, qualityHitsA1B1, numOverlapsA1B1);     // quality hits b/w A1 & B1
+    // FindQualityHitsBetweenEnds(start1, end1, start2, end2, hitsA1B2, qualityHitsA1B2, numOverlapsA1B2);     // quality hits b/w A1 & B2
+    // FindQualityHitsBetweenEnds(start1, end1, start2, end2, hitsA2B1, qualityHitsA2B1, numOverlapsA2B1);     // quality hits b/w A2 & B1
+    // FindQualityHitsBetweenEnds(start1, end1, start2, end2, hitsA2B2, qualityHitsA2B2, numOverlapsA2B2);     // quality hits b/w A2 & B2
+	FindQualityHitsBetweenEnds(start1, end1, hitsA1B1, qualityHitsA1B1, numOverlapsA1B1);	   // quality hits b/w A1 & B1
+	FindQualityHitsBetweenEnds(start1, end1, hitsA1B2, qualityHitsA1B2, numOverlapsA1B2);	   // quality hits b/w A1 & B2
+	FindQualityHitsBetweenEnds(start2, end2, hitsA2B1, qualityHitsA2B1, numOverlapsA2B1);	   // quality hits b/w A2 & B1
+	FindQualityHitsBetweenEnds(start2, end2, hitsA2B2, qualityHitsA2B2, numOverlapsA2B2);	   // quality hits b/w A2 & B2
 
 
 	int matchCount1 = 0;	
@@ -147,32 +151,17 @@ void PairToPair::FindOverlaps(const BEDPE &a, vector<BEDCOV> &hitsA1B1, vector<B
 }
 
 
+void PairToPair::FindQualityHitsBetweenEnds(CHRPOS start, CHRPOS end, const vector<BEDCOV> &hits, 
+                                            vector<BEDCOV> &qualityHits, int &numOverlaps) {
 
-void PairToPair::FindQualityHitsBetweenEnds(CHRPOS start1, CHRPOS end1, CHRPOS start2, CHRPOS end2, 
-                                            const vector<BEDCOV> &hits, vector<BEDCOV> &qualityHits, int &numOverlaps) {
-
-    // end 1
-	vector<BEDCOV>::const_iterator h = hits.begin();
+	vector<BEDCOV>::const_iterator h       = hits.begin();
 	vector<BEDCOV>::const_iterator hitsEnd = hits.end();
 	for (; h != hitsEnd; ++h) {				
-		int s = max(start1, h->start);
-		int e = min(end1, h->end);
+		int s = max(start, h->start);
+		int e = min(end, h->end);
 
 		// is there enough overlap (default ~ 1bp)
-		if ( ((float)(e-s) / (float)(end1 - start1)) >= _overlapFraction ) {
-			numOverlaps++;
-			qualityHits.push_back(*h);
-		}
-	}
-	
-	// end 2
-	h = hits.begin();
-	hitsEnd = hits.end();
-	for (; h != hitsEnd; ++h) {				
-		int s = max(start2, h->start);
-		int e = min(end2, h->end);
-		// is there enough overlap (default ~ 1bp)
-		if ( ((float)(e-s) / (float)(end2 - start2)) >= _overlapFraction ) {
+		if ( ((float)(e-s) / (float)(end - start)) >= _overlapFraction ) {
 			numOverlaps++;
 			qualityHits.push_back(*h);
 		}

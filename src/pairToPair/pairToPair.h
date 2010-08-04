@@ -58,7 +58,7 @@ private:
 	void FindOverlaps(const BEDPE &a, vector<BEDCOV> &hitsA1B1, vector<BEDCOV> &hitsA1B2, 
 		vector<BEDCOV> &hitsA2B1, vector<BEDCOV> &hitsA2B2);
 
-    void FindQualityHitsBetweenEnds(CHRPOS start1, CHRPOS end1, CHRPOS start2, CHRPOS end2, 
+    void FindQualityHitsBetweenEnds(CHRPOS start, CHRPOS end,
         const vector<BEDCOV> &hits, vector<BEDCOV> &qualityHits, int &numOverlaps);
 	
 	void FindHitsOnBothEnds(const BEDPE &a, const vector<BEDCOV> &qualityHitsEnd1, 
