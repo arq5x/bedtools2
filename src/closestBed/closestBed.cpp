@@ -62,11 +62,15 @@ void BedClosest::FindWindowOverlaps(BED &a, vector<BED> &hits) {
 		
 			// add some slop (starting at 0 bases) to a in hopes
 			// of finding a hit in B
-			if ((a.start - slop) > 0) aFudgeStart = a.start - slop;
-			else aFudgeStart = 0;
+			if ((static_cast<int>(a.start) - slop) > 0) 
+			    aFudgeStart = a.start - slop;
+			else 
+			    aFudgeStart = 0;
 			
-			if ((a.start + slop) < 2 * MAXSLOP) aFudgeEnd = a.end + slop;
-			else aFudgeEnd = 2 * MAXSLOP;
+			if ((a.start + slop) < (2 * MAXSLOP)) 
+			    aFudgeEnd = a.end + slop;
+			else 
+			    aFudgeEnd = 2 * MAXSLOP;
 		
 			_bedB->FindOverlapsPerBin(a.chrom, aFudgeStart, aFudgeEnd, a.strand, hits, _forceStrand);
 	
