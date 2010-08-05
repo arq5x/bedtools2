@@ -62,20 +62,20 @@ void BedSlop::AddSlop(BED &bed) {
 	
 	if ( (_forceStrand) && (bed.strand == "-") ) {
 		// inspect the start
-		if ((bed.start - _rightSlop) > 0) bed.start -= _rightSlop;
+		if ( (static_cast<int>(bed.start) - _rightSlop) > 0 ) bed.start -= _rightSlop;
 		else bed.start = 0;
 
 		// inspect the start		
-		if ((bed.end + _leftSlop) <= chromSize) bed.end += _leftSlop;
+		if ( (static_cast<int>(bed.end) + _leftSlop) <= static_cast<int>(chromSize)) bed.end += _leftSlop;
 		else bed.end = chromSize;
 	}
 	else {		
 		// inspect the start
-		if ((bed.start - _leftSlop) > 0) bed.start -= _leftSlop;
+		if ( (static_cast<int>(bed.start) - _leftSlop) > 0) bed.start -= _leftSlop;
 		else bed.start = 0;
 		
 		// inspect the end
-		if ((bed.end + _rightSlop) <= chromSize) bed.end += _rightSlop;
+		if ( (static_cast<int>(bed.end) + _rightSlop) <= static_cast<int>(chromSize)) bed.end += _rightSlop;
 		else bed.end = chromSize;
 	}
 }
