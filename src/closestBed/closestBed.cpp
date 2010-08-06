@@ -57,7 +57,8 @@ void BedClosest::FindWindowOverlaps(BED &a, vector<BED> &hits) {
 	CHRPOS minDistance = INT_MAX;
 	vector<CHRPOS> distances;
 
-
+    // is there at least one feature in B on the same chrom
+    // as the current A feature?
 	if(_bedB->bedMap.find(a.chrom) != _bedB->bedMap.end()) {
 
 		while ((numOverlaps == 0) && (slop <= MAXSLOP)) {
@@ -74,6 +75,7 @@ void BedClosest::FindWindowOverlaps(BED &a, vector<BED> &hits) {
 			else 
 			    aFudgeEnd = 2 * MAXSLOP;
 		
+		    // THE HEAVY LIFTING
 		    // search for hits with the current slop added
 			_bedB->FindOverlapsPerBin(a.chrom, aFudgeStart, aFudgeEnd, a.strand, hits, _forceStrand);
 	
