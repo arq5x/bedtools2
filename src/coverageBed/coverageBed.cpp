@@ -13,8 +13,8 @@
 #include "coverageBed.h"
 
 // build
-BedCoverage::BedCoverage(string &bedAFile, string &bedBFile, bool &forceStrand, 
-                         bool &writeHistogram, bool &bamInput, bool &obeySplits) {
+BedCoverage::BedCoverage(string &bedAFile, string &bedBFile, bool forceStrand, 
+                         bool writeHistogram, bool bamInput, bool obeySplits, bool eachBase) {
 	
 	_bedAFile       = bedAFile;
 	_bedBFile       = bedBFile;
@@ -24,24 +24,15 @@ BedCoverage::BedCoverage(string &bedAFile, string &bedBFile, bool &forceStrand,
 	
 	_forceStrand    = forceStrand;
     _obeySplits     = obeySplits;
+    _eachBase       = eachBase;
 	_writeHistogram = writeHistogram;
 	_bamInput       = bamInput;
 	
-	if (_bedA->bedFile != "stdin") {   // process a file
-		if (_bamInput == false) { //bed/gff
-			CollectCoverageBed();
-		}
-		else {
-			CollectCoverageBam(_bedA->bedFile);
-		}
-	}
-	else {   // process stdin
-		if (_bamInput == false) 
-			CollectCoverageBed();
-		else {
-			CollectCoverageBam("stdin");	
-		}
-	}
+
+	if (_bamInput == false)
+		CollectCoverageBed();
+	else
+		CollectCoverageBam(_bedA->bedFile);
 }
 
 // destroy
@@ -144,20 +135,29 @@ void BedCoverage::ReportCoverage() {
 	map<unsigned int, unsigned int> allDepthHist;
 	unsigned int totalLength = 0;
 
+    // process each chromosome 
 	masterBedCovMap::const_iterator chromItr = _bedB->bedCovMap.begin();
 	masterBedCovMap::const_iterator chromEnd = _bedB->bedCovMap.end();
-	for (; chromItr != chromEnd; ++chromItr) {
-	
+	for (; chromItr != chromEnd; ++chromItr) 
+	{    
+	    // for each chrom, process each bin
 		binsToBedCovs::const_iterator binItr = chromItr->second.begin();
 		binsToBedCovs::const_iterator binEnd = chromItr->second.end();
-		for (; binItr != binEnd; ++binItr) {
-
+		for (; binItr != binEnd; ++binItr) 
+		{
+            // for each chrom & bin, compute and report  
+            // the observed coverage for each feature
 			vector<BEDCOV>::const_iterator bedItr = binItr->second.begin();
 			vector<BEDCOV>::const_iterator bedEnd = binItr->second.end();
-			for (; bedItr != bedEnd; ++bedItr) {
-									
-				int zeroDepthCount = 0;
-				int depth          = 0;
+			for (; bedItr != bedEnd; ++bedItr) 
+			{			
+				int zeroDepthCount = 0; // number of bases with zero depth
+				int depth          = 0; // tracks the depth at the current base
+				
+				// the start is either the first base in the feature OR
+				// the leftmost position of an overlapping feature. e.g. (s = start):
+				// A    ----------
+				// B    s    ------------
 				int start          = min(bedItr->minOverlapStart, bedItr->start);
 				
 				// track the numnber of bases in the feature covered by
@@ -165,51 +165,62 @@ void BedCoverage::ReportCoverage() {
 				map<unsigned int, unsigned int> depthHist;
 				map<unsigned int, DEPTH>::const_iterator depthItr;
 				
-				for (CHRPOS pos = start+1; pos <= bedItr->end; pos++) {
-					
+				// compute the coverage observed at each base in the feature marching from start to end.
+				for (CHRPOS pos = start+1; pos <= bedItr->end; pos++) 
+				{	
+					// map pointer grabbing the starts and ends observed at this position
 					depthItr = bedItr->depthMap.find(pos);
-					
-					if (depthItr != bedItr->depthMap.end()) {
+					// increment coverage if starts observed at this position.
+					if (depthItr != bedItr->depthMap.end())
 						depth += depthItr->second.starts;
-						if ((pos > bedItr->start) && (pos <= bedItr->end)) {	
-							if (depth == 0) zeroDepthCount++;
+					// update coverage assuming the current position is within the current B feature
+					if ((pos > bedItr->start) && (pos <= bedItr->end)) {	
+						if (depth == 0) zeroDepthCount++;
+						// update our histograms, assuming we are not reporting "per-base" coverage.
+						if (_eachBase == false) {
 							depthHist[depth]++;
 							allDepthHist[depth]++;
 						}
+						else {
+						    _bedB->reportBedTab(*bedItr);
+        					printf("%d\t%d\n", pos-bedItr->start, depth);
+						}
+					}
+					// decrement coverage if ends observed at this position.
+					if (depthItr != bedItr->depthMap.end())
 						depth = depth - depthItr->second.ends;
-					}
-					else {
-						if ((pos > bedItr->start) && (pos <= bedItr->end)) {	
-							if (depth == 0) zeroDepthCount++;
-							depthHist[depth]++;
-							allDepthHist[depth]++;
-						}
-					}
 				}
 
-				// Report the coverage for the current interval.
-				CHRPOS length   = bedItr->end - bedItr->start;
-				totalLength += length;
-				
-				int nonZeroBases   = (length - zeroDepthCount);
-				float fractCovered = (float) nonZeroBases / length;
-				
-				if (_writeHistogram == false) {
-					_bedB->reportBedTab(*bedItr);
-					printf("%d\t%d\t%d\t%0.7f\n", bedItr->count, nonZeroBases, length, fractCovered);
-				}
-				else {
-					map<unsigned int, unsigned int>::const_iterator histItr = depthHist.begin();
-					map<unsigned int, unsigned int>::const_iterator histEnd = depthHist.end();
-					for (; histItr != histEnd; ++histItr) {
-						float fractAtThisDepth = (float) histItr->second / length;
-						_bedB->reportBedTab(*bedItr);
-						printf("%d\t%d\t%d\t%0.7f\n", histItr->first, histItr->second, length, fractAtThisDepth);
-					}
+				// Summarize the coverage for the current interval,
+				// assuming the user has not requested "per-base" coverage.                
+                if (_eachBase == false) {
+    				CHRPOS length     = bedItr->end - bedItr->start;
+    				totalLength       += length;
+    				int nonZeroBases   = (length - zeroDepthCount);
+    				float fractCovered = (float) nonZeroBases / length;
+				    
+				    // print a summary of the coverage
+    				if (_writeHistogram == false) {
+    					_bedB->reportBedTab(*bedItr);
+    					printf("%d\t%d\t%d\t%0.7f\n", bedItr->count, nonZeroBases, length, fractCovered);
+    				}
+				    // report the number of bases with coverage == x
+    				else {
+    					map<unsigned int, unsigned int>::const_iterator histItr = depthHist.begin();
+    					map<unsigned int, unsigned int>::const_iterator histEnd = depthHist.end();
+    					for (; histItr != histEnd; ++histItr) 
+    					{
+    						float fractAtThisDepth = (float) histItr->second / length;
+    						_bedB->reportBedTab(*bedItr);
+    						printf("%d\t%d\t%d\t%0.7f\n", histItr->first, histItr->second, length, fractAtThisDepth);
+    					}
+    				}
 				}
 			}
 		}
 	}
+	// report a histogram of coverage among _all_
+	// features in B.
 	if (_writeHistogram == true) {
 		map<unsigned int, unsigned int>::const_iterator histItr = allDepthHist.begin();
 		map<unsigned int, unsigned int>::const_iterator histEnd = allDepthHist.end();

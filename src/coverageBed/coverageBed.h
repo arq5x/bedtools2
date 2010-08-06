@@ -36,8 +36,8 @@ class BedCoverage {
 public:
 
 	// constructor 
-	BedCoverage(string &bedAFile, string &bedBFile, bool &forceStrand, bool &writeHistogram, 
-	            bool &bamInput, bool &obeySplits);
+	BedCoverage(string &bedAFile, string &bedBFile, bool forceStrand, bool writeHistogram, 
+	            bool bamInput, bool obeySplits, bool eachBase);
 
 	// destructor
 	~BedCoverage(void);
@@ -62,6 +62,9 @@ private:
 	
 	// should we split BED/BAM into discrete blocks?
     bool _obeySplits;
+    
+    // should discrete coverage be reported for each base in each feature?
+    bool _eachBase;
 	
 	// private function for reporting coverage information
 	void ReportCoverage();
