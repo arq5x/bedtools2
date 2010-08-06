@@ -33,10 +33,11 @@ int main(int argc, char* argv[]) {
 	string bedBFile;
 	string tieMode = "all";
 	
-	bool haveBedA = false;
-	bool haveBedB = false;
-	bool haveTieMode = false;
-	bool forceStrand = false;
+	bool haveBedA       = false;
+	bool haveBedB       = false;
+	bool haveTieMode    = false;
+	bool forceStrand    = false;
+    bool reportDistance = false;
 
 
 	// check to see if we should print out some help
@@ -75,6 +76,9 @@ int main(int argc, char* argv[]) {
 		else if (PARAMETER_CHECK("-s", 2, parameterLength)) {
 			forceStrand = true;
 		}
+		else if (PARAMETER_CHECK("-d", 2, parameterLength)) {
+			reportDistance = true;
+		}
 		else if (PARAMETER_CHECK("-t", 2, parameterLength)) {
 			if ((i+1) < argc) {
 				haveTieMode = true;
@@ -97,7 +101,7 @@ int main(int argc, char* argv[]) {
 	}
 	
 	if (!showHelp) {
-		BedClosest *bc = new BedClosest(bedAFile, bedBFile, forceStrand, tieMode);
+		BedClosest *bc = new BedClosest(bedAFile, bedBFile, forceStrand, tieMode, reportDistance);
 		delete bc;
 		return 0;
 	}
@@ -110,7 +114,8 @@ void ShowHelp(void) {
 
 	cerr << endl << "Program: " << PROGRAM_NAME << " (v" << VERSION << ")" << endl;
 	
-	cerr << "Author:  Aaron Quinlan (aaronquinlan@gmail.com)" << endl;
+	cerr << "Authors: Aaron Quinlan (aaronquinlan@gmail.com)" << endl;
+	cerr       << "\t Erik Arner, Riken" << endl << endl;
 
 	cerr << "Summary: For each feature in A, finds the closest " << endl;
 	cerr << "\t feature (upstream or downstream) in B." << endl << endl;
@@ -121,6 +126,11 @@ void ShowHelp(void) {
 	cerr << "\t-s\t"      		<< "Force strandedness.  That is, find the closest feature in B" << endl;
 	cerr						<< "\t\tthat overlaps A on the same strand." << endl;
 	cerr						<< "\t\t- By default, overlaps are reported without respect to strand." << endl << endl;
+	
+	cerr << "\t-d\t"      		<< "In addition to the closest feature in B, " << endl;
+	cerr						<< "\t\treport its distance to A as an extra column." << endl;
+	cerr						<< "\t\t- The reported distance for overlapping features will be 0." << endl << endl;
+	
 
 	cerr << "\t-t\t"     		<< "How ties for closest feature are handled.  This occurs when two" << endl;
 	cerr 						<< "\t\tfeatures in B have exactly the same overlap with A." << endl;
@@ -137,5 +147,4 @@ void ShowHelp(void) {
 	
 	// end the program here
 	exit(1);
-
 }

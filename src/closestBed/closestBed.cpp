@@ -21,15 +21,16 @@ const int SLOPGROWTH = 2048000;
 /*
 	Constructor
 */
-BedClosest::BedClosest(string &bedAFile, string &bedBFile, bool &forceStrand, string &tieMode) {
+BedClosest::BedClosest(string &bedAFile, string &bedBFile, bool forceStrand, string &tieMode, bool reportDistance) {
 
-	_bedAFile = bedAFile;
-	_bedBFile = bedBFile;
-	_forceStrand = forceStrand;
-	_tieMode = tieMode;
+	_bedAFile       = bedAFile;
+	_bedBFile       = bedBFile;
+	_forceStrand    = forceStrand;
+	_tieMode        = tieMode;
+    _reportDistance = reportDistance;
 
-	_bedA = new BedFile(bedAFile);
-	_bedB = new BedFile(bedBFile);
+	_bedA           = new BedFile(bedAFile);
+	_bedB           = new BedFile(bedBFile);
 	
 	FindClosestBed();
 }
@@ -54,6 +55,7 @@ void BedClosest::FindWindowOverlaps(BED &a, vector<BED> &hits) {
 	vector<BED> closestB;
 	float maxOverlap = 0;
 	CHRPOS minDistance = INT_MAX;
+	vector<CHRPOS> distances;
 
 
 	if(_bedB->bedMap.find(a.chrom) != _bedB->bedMap.end()) {
@@ -67,7 +69,7 @@ void BedClosest::FindWindowOverlaps(BED &a, vector<BED> &hits) {
 			else 
 			    aFudgeStart = 0;
 			
-			if ((a.start + slop) < (2 * MAXSLOP)) 
+			if ((static_cast<int>(a.start) + slop) < (2 * MAXSLOP)) 
 			    aFudgeEnd = a.end + slop;
 			else 
 			    aFudgeEnd = 2 * MAXSLOP;
@@ -87,34 +89,55 @@ void BedClosest::FindWindowOverlaps(BED &a, vector<BED> &hits) {
 				int overlapBases = (e - s);				// the number of overlapping bases b/w a and b
 				int aLength = (a.end - a.start);		// the length of a in b.p.
 				
+				// there is overlap
 				if (s < e) {
 					// is there enough overlap (default ~ 1bp)
 					float overlap = (float) overlapBases / (float) aLength;
 					if ( overlap > 0 ) {			
 						// is this hit the closest?
 						if (overlap > maxOverlap) {
+							maxOverlap = overlap;
+
 							closestB.clear();
 							closestB.push_back(*h);
-							maxOverlap = overlap;
+							distances.clear();
+                            distances.push_back(0);
 						}
-						else if (overlap == maxOverlap) closestB.push_back(*h);
+						else if (overlap == maxOverlap) {
+						    closestB.push_back(*h);
+						    distances.push_back(0);
+					    }
 					}
 				}
+				// the hit is to the "left" of A
 				else if (h->end < a.start){
 					if ((a.start - h->end) < minDistance) {
+						minDistance = a.start - h->end;
+
 						closestB.clear();
 						closestB.push_back(*h);
-						minDistance = a.start - h->end;
+						distances.clear();
+                        distances.push_back(minDistance);
 					}
-					else if ((a.start - h->end) == minDistance) closestB.push_back(*h);
+					else if ((a.start - h->end) == minDistance) { 
+					    closestB.push_back(*h);
+					    distances.push_back(minDistance);
+				    }
 				}
+				// the hit is to the "right" of A				
 				else {
 					if ((h->start - a.end) < minDistance) {
+						minDistance = h->start - a.end;
+
 						closestB.clear();
 						closestB.push_back(*h);
-						minDistance = h->start - a.end;
+						distances.clear();
+                        distances.push_back(minDistance);
 					}
-					else if ((h->start - a.end) == minDistance) closestB.push_back(*h);	
+					else if ((h->start - a.end) == minDistance) {
+					    closestB.push_back(*h);
+					    distances.push_back(minDistance);
+				    }
 				}
 			}
 			// if no overlaps were found, we'll widen the range 
@@ -122,31 +145,51 @@ void BedClosest::FindWindowOverlaps(BED &a, vector<BED> &hits) {
 			slop += SLOPGROWTH;
 		}
 	}
+	// there is no feature in B on the same chromosome as A
 	else {
 		_bedA->reportBedTab(a);
-		_bedB->reportNullBedNewLine(); 
+	    if (_reportDistance == true) {
+	        _bedB->reportNullBedTab();
+	        cout << -1 << endl;
+        }
+        else
+		    _bedB->reportNullBedNewLine(); 
 	}
 
+    // report the closest feature(s) in B to the current A feature.
+    // obey the user's reporting request (_tieMode)
 	if (numOverlaps > 0) {
 		
-		if (closestB.size() == 1) {		
-			_bedA->reportBedTab(a); 
-			_bedB->reportBedNewLine(closestB[0]);
+		if (closestB.size() == 1 || _tieMode == "first") {
+			_bedA->reportBedTab(a);
+			if (_reportDistance == true) {
+			    _bedB->reportBedTab(closestB[0]);
+			    cout << distances[0] << endl;
+            }
+            else
+			    _bedB->reportBedNewLine(closestB[0]);
 		}
 		else {
 			if (_tieMode == "all") {
+                size_t i = 0;
 				for (vector<BED>::iterator b = closestB.begin(); b != closestB.end(); ++b) {
-					_bedA->reportBedTab(a); 
-					_bedB->reportBedNewLine(*b);
+					_bedA->reportBedTab(a);
+					if (_reportDistance == true) {
+					    _bedB->reportBedTab(*b);
+					    cout << distances[i++] <<endl;
+                    }
+                    else
+					    _bedB->reportBedNewLine(*b);
 				}
 			}
-			else if (_tieMode == "first") {
-				_bedA->reportBedTab(a); 
-				_bedB->reportBedNewLine(closestB[0]);
-			}
 			else if (_tieMode == "last") {
-				_bedA->reportBedTab(a); 
-				_bedB->reportBedNewLine(closestB[closestB.size()-1]);
+				_bedA->reportBedTab(a);
+				if (_reportDistance == true) {
+				    _bedB->reportBedTab(closestB[closestB.size()-1]);
+				    cout << distances[distances.size() - 1]<<endl;
+                }
+                else
+                    _bedB->reportBedNewLine(closestB[closestB.size()-1]);
 			}
 		}
 	}
