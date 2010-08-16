@@ -124,17 +124,38 @@ int main(int argc, char* argv[])
 		else if(PARAMETER_CHECK("-header", 7, parameterLength)) {
 			printHeader = true;
 		}
+		else if(PARAMETER_CHECK("-empty", 6, parameterLength)) {
+			printEmptyRegions = true;
+		}
 		else if(PARAMETER_CHECK("-examples", 9, parameterLength)) {
             ShowHelp();
             ShowExamples();
             exit(1);
 		}			
 	}
+	
+	//Sanity checks
+	if (inputFiles.empty() == true) {
+		cerr << "Error: missing BedGraph file names (-i) to combine." << endl;
+		exit(1);
+	}
+	if (inputFiles.size() == 1) {
+		cerr << "Error: Only a single BedGraph file was specified. Nothing to combine, exiting." << endl;
+		exit(1);
+	}
+	if (printEmptyRegions && (genomeFile.empty() == true)) {
+		cerr << "Error: when using -empty, the genome sizes file (-g) must be specified using '-g FILE'." << endl;
+		exit(1);
+	}
+	if ((haveTitles == true) && (inputFiles.size() != inputTitles.size())) {
+		cerr << "Error: The number of file titles (-names) does not match the number of files (-i)." << endl;
+		exit(1);
+	}
 
-	UnionBedGraphs mbg(cout, inputFiles, inputTitles, printEmptyRegions, genomeFile, noCoverageValue);
+	UnionBedGraphs ubg(cout, inputFiles, inputTitles, printEmptyRegions, genomeFile, noCoverageValue);
 	if (printHeader)
-		mbg.PrintHeader();
-	mbg.Union();
+		ubg.PrintHeader();
+	ubg.Union();
 }
 
 void ShowHelp(void) {
