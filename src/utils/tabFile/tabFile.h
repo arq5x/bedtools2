@@ -64,8 +64,9 @@ private:
     	if (lineVector.size() == 0) 
     		return TAB_BLANK;
         // real line with data
-    	if (lineVector[0].find("#") == string::npos)
+    	if (lineVector[0][0] != '#') {
             return TAB_VALID;
+        }
         // comment or header line
     	else {
     		lineNum--;

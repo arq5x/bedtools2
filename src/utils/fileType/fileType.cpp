@@ -12,8 +12,14 @@
 
 #include "fileType.h"
 
-bool isRegularFile(const string& filename)
-{
+
+/*
+   returns TRUE if the file is a regular file:
+     not a pipe/device.
+
+   This implies that the file can be opened/closed/seek'd multiple times without losing information
+ */
+bool isRegularFile(const string& filename) {
        struct stat buf ;
        int i;
 
@@ -28,8 +34,12 @@ bool isRegularFile(const string& filename)
        return false;
 }
 
-bool isGzipFile(const string& filename)
-{
+
+/*
+   returns TRUE if the file has a GZIP header.
+   Should only be run on regular files.
+ */
+bool isGzipFile(const string& filename) {
        //see http://www.gzip.org/zlib/rfc-gzip.html#file-format
        struct  {
                unsigned char id1;

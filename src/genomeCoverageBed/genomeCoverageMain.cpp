@@ -159,7 +159,7 @@ void ShowHelp(void) {
 	cerr << endl << "Program: " << PROGRAM_NAME << " (v" << VERSION << ")" << endl;
 	
 	cerr << "Authors: Aaron Quinlan (aaronquinlan@gmail.com)" << endl;
-	cerr << "         Gordon Assaf, CSHL" << endl << endl;
+	cerr << "         Assaf Gordon, CSHL" << endl << endl;
 
 	cerr << "Summary: Compute the coverage of a feature file among a genome." << endl << endl;
 

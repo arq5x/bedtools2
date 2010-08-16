@@ -88,10 +88,10 @@ TabLineStatus TabFile::GetNextTabLine(TAB_FIELDS &tabFields, int &lineNum) {
 		lineNum++;
 
 		// split into a string vector.
-		Tokenize(tabLine,tabFields);
-		
-        // parse the line and validate it.
-		return parseTabLine(tabFields, lineNum);
+		Tokenize(tabLine, tabFields);
+
+        // parse the line and validate it
+		return parseTabLine(tabFields, lineNum);		
 	}
 	
 	// default if file is closed or EOF

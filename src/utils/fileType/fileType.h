@@ -19,6 +19,9 @@
 #include <string.h>
 #include <errno.h>
 #include <sys/stat.h>
+#include <sys/types.h>
+#include <unistd.h>
+#include <sstream>
 
 using namespace std;
 
@@ -28,6 +31,7 @@ using namespace std;
   
   Kindly contributed by Assaf Gordon.
 ******************************************************************************/
+string string_error(int errnum);
 bool isRegularFile(const string& filename);
 bool isGzipFile(const string& filename);
 
