@@ -3,6 +3,6 @@
 
 // define the version.  All tools in the 
 // suite carry the same version number.
-#define VERSION "2.8.3"
+#define VERSION "2.9.0"
 
 #endif /* VERSION_H */
