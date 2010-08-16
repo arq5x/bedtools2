@@ -205,7 +205,7 @@ void ShowHelp(void) {
 	cerr << "\t$ groupBy -i ex1.out -grp 1,2,3,4 -opCols 9,9 -ops sum,max" << endl;
 	cerr << "\tchr1	10	20	A	11000	10000" << endl << endl;
 	cerr << "\t$ groupBy -i ex1.out -grp 1,2,3,4 -opCols 8,9 -ops collapse,mean" << endl;
-	cerr << "\tchr1	10	20	A	1000,10000," << endl << endl;
+	cerr << "\tchr1	10	20	A	B.1,B.2,	5500" << endl << endl;
 	
 	cerr << "Notes: " << endl;
 	cerr << "\t(1)  The input file/stream should be sorted/grouped by the -grp. columns" << endl << endl;
