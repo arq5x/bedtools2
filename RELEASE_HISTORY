@@ -1,3 +1,19 @@
+Version 2.9.1 (August-16-2010)
+==New tools==
+1. unionBedGraphs.  This is a very powerful new tool contributed by Assaf Gordon from  CSHL.  It will combine/merge multiple BEDGRAPH files into a single file, thus allowing comparisons of coverage (or any text-value) across multiple samples.
+
+==New features==
+1. New "distance feature" (-d) added to closestBed by Erik Arner.  In addition to finding the closest feature to each feature in A, the -d option will report the distance to the closest feature in B.  Overlapping features have a distance of 0.
+2. New "per base depth feature" (-d) added to coverageBed.  This reports the per base coverage (1-based) of each feature in file B based on the coverage of features found in file A.  For example, this could report the per-base depth of sequencing reads (-a) across each capture target (-b).
+
+
+==Bug Fixes==
+1. Fixed bug in closestBed preventing closest features from being found for A features with start coordinates < 2048000.  Thanks to Erik Arner for pointing this out.
+2. Fixed minor reporting annoyances in closestBed.  Thanks to Erik Arner.
+3. Fixed typo/bug in genomeCoverageBed that reported negative coverage owing to numeric overflow.  Thanks to Alexander Dobin for the detailed bug report.
+4. Fixed other minor parsing and reporting bugs/annoyances.
+
+
 Version 2.8.3 (July-25-2010)
 1. Fixed bug that caused some GFF files to be misinterpreted as VCF.  This prevented the detection of overlaps.
 2. Added a new "-tag" option in bamToBed that allows one to choose the _numeric_ tag that will be used to populate the score field.  For example, one could populate the score field with the alignment score with "-tag AS".

@@ -168,7 +168,9 @@ void ShowHelp(void) {
     cerr << "Summary: Combines multiple BedGraph files into a single file," << endl;
     cerr << "\t allowing coverage comparisons between them." << endl << endl;
 
-    cerr << "Usage:   " << PROGRAM_NAME << " [OPTIONS] -i FILE1 FILE2 .. FILEn" << endl << endl;
+    cerr << "Usage:   " << PROGRAM_NAME << " [OPTIONS] -i FILE1 FILE2 .. FILEn" << endl;
+    cerr << "\t Assumes that each BedGraph file is sorted by chrom/start " << endl;
+    cerr << "\t and that the intervals in each are non-overlapping." << endl << endl;
 
 	cerr << "Options: " << endl;
 	
