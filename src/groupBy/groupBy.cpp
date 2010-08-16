@@ -185,27 +185,26 @@ void ShowHelp(void) {
 	
 	cerr << "\t-grp\t"	    << "Specify the columns (1-based) for the grouping." << endl;
 	cerr 					<< "\t\tThe columns must be comma separated." << endl;
-	cerr					<< "\t\tDefault: 1,2,3" << endl << endl;	
+	cerr					<< "\t\t- Default: 1,2,3" << endl << endl;	
 
-	cerr << "\t-opCol\t"	<< "Specify the column (1-based) that should be summarized." << endl;
-	cerr 					<< "\t\tRequired." << endl << endl;
+	cerr << "\t-opCols\t"	<< "Specify the column (1-based) that should be summarized." << endl;
+	cerr 					<< "\t\t- Required." << endl << endl;
 
-	cerr << "\t-op\t"	    << "Specify the operation that should be applied to opCol." << endl;
+	cerr << "\t-ops\t"	    << "Specify the operation that should be applied to opCol." << endl;
 	cerr 					<< "\t\tValid operations: sum, count, min, max, mean, median," << endl;
-    cerr                    << "\t\tmode, antimode, stdev, collapse (i.e., print a comma separated list)" << endl;
-    cerr                    << "\t\tDefault: sum" << endl;
+    cerr                    << "\t\tmode, antimode, stdev, sstdev (sample standard dev.), and" << endl;
+    cerr                    << "\t\tcollapse (i.e., print a comma separated list)" << endl;
+    cerr                    << "\t\t- Default: sum" << endl << endl;
 
 	cerr << "Examples: " << endl;
-	cerr << "\t$ cat test.out" << endl;
-	cerr << "\tchr1	10	20	A	chr1	15	25	1000" << endl;
-	cerr << "\tchr1	10	20	A	chr1	25	35	10000" << endl << endl;
-	cerr << "\t$ cat test.out | groupBy -i stdin -grp 1,2,3,4 -opCol 8 -op sum" << endl;
+	cerr << "\t$ cat ex1.out" << endl;
+	cerr << "\tchr1	10	20	A	chr1	15	25	B.1 1000" << endl;
+	cerr << "\tchr1	10	20	A	chr1	25	35	B.2 10000" << endl << endl;
+	cerr << "\t$ groupBy -i ex1.out -grp 1,2,3,4 -opCols 9 -ops sum" << endl;
 	cerr << "\tchr1	10	20	A	11000" << endl << endl;
-	cerr << "\t$ cat test.out | groupBy -i stdin -grp 1,2,3,4 -opCol 8 -op max" << endl;
-	cerr << "\tchr1	10	20	A	1000" << endl << endl;
-	cerr << "\t$ cat test.out | groupBy -i stdin -grp 1,2,3,4 -opCol 8 -op mean" << endl;
-	cerr << "\tchr1	10	20	A	5500" << endl << endl;
-	cerr << "\t$ cat test.out | groupBy -i stdin -grp 1,2,3,4 -opCol 8 -op collapse" << endl;
+	cerr << "\t$ groupBy -i ex1.out -grp 1,2,3,4 -opCols 9,9 -ops sum,max" << endl;
+	cerr << "\tchr1	10	20	A	11000	10000" << endl << endl;
+	cerr << "\t$ groupBy -i ex1.out -grp 1,2,3,4 -opCols 8,9 -ops collapse,mean" << endl;
 	cerr << "\tchr1	10	20	A	1000,10000," << endl << endl;
 	
 	cerr << "Notes: " << endl;
