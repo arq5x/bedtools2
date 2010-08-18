@@ -1,5 +1,5 @@
 /*****************************************************************************
-  coverageMain.cpp
+  annotateMain.cpp
 
   (c) 2009 - Aaron Quinlan
   Hall Laboratory
@@ -9,13 +9,13 @@
 
   Licenced under the GNU General Public License 2.0+ license.
 ******************************************************************************/
-#include "coverageBed.h"
+#include "annotateBed.h"
 #include "version.h"
 
 using namespace std;
 
 // define the version
-#define PROGRAM_NAME "coverageBed"
+#define PROGRAM_NAME "annotateBed"
 
 // define our parameter checking macro
 #define PARAMETER_CHECK(param, paramLen, actualLen) (strncmp(argv[i], param, min(actualLen, paramLen))== 0) && (actualLen == paramLen)
@@ -28,15 +28,21 @@ int main(int argc, char* argv[]) {
 	// our configuration variables
 	bool showHelp = false;
 
-	// input files
-	string bedAFile;
-	string bedBFile;
-	bool forceStrand = false;
+	// input file
+	string mainFile;
+	
+	// parm flags
+	bool forceStrand    = false;
+	bool haveBed        = false;
+	bool haveFiles      = false;
+	bool haveTitles     = false;
+    bool reportCounts   = false;
+    bool reportBoth     = false;       
 
-	bool haveBedA = false;
-	bool haveBedB = false;
-
-
+    // list of annotation files / names
+	vector<string> inputFiles;
+	vector<string> inputTitles;
+	
 	// check to see if we should print out some help
 	if(argc <= 1) showHelp = true;
 
@@ -56,19 +62,46 @@ int main(int argc, char* argv[]) {
 
 		int parameterLength = (int)strlen(argv[i]);
 
-		if(PARAMETER_CHECK("-a", 2, parameterLength)) {
+		if(PARAMETER_CHECK("-i", 2, parameterLength)) {
 			if ((i+1) < argc) {
-				haveBedA = true;
-				bedAFile = argv[i + 1];
+				haveBed  = true;
+				mainFile = argv[i + 1];
 				i++;
 			}
 		}
-		else if(PARAMETER_CHECK("-b", 2, parameterLength)) {
+		else if(PARAMETER_CHECK("-files", 6, parameterLength)) {
 			if ((i+1) < argc) {
-				haveBedB = true;
-				bedBFile = argv[i + 1];
-				i++;
+				haveFiles = true;
+                i = i+1;
+                string file = argv[i];
+				while (file[0] != '-' && i < argc) {
+                    inputFiles.push_back(file);
+                    i++;
+                    if (i < argc)
+                        file = argv[i];
+				}
+                i--;
 			}
+		}
+		else if(PARAMETER_CHECK("-names", 6, parameterLength)) {
+			if ((i+1) < argc) {
+				haveTitles = true;
+                i = i+1;
+                string title = argv[i];
+				while (title[0] != '-' && i < argc) {
+                    inputTitles.push_back(title);
+                    i++;
+                    if (i < argc)
+                        title = argv[i];
+				}
+                i--;
+			}
+		}
+		else if(PARAMETER_CHECK("-counts", 7, parameterLength)) {
+			reportCounts = true;
+		}
+		else if(PARAMETER_CHECK("-both", 5, parameterLength)) {
+			reportBoth = true;
 		}
 		else if (PARAMETER_CHECK("-s", 2, parameterLength)) {
 			forceStrand = true;
@@ -80,15 +113,15 @@ int main(int argc, char* argv[]) {
 	}
 
 	// make sure we have both input files
-	if (!haveBedA || !haveBedB) {
-		cerr << endl << "*****" << endl << "*****ERROR: Need -a and -b files. " << endl << "*****" << endl;
+	if (!haveBed || !haveFiles) {
+		cerr << endl << "*****" << endl << "*****ERROR: Need -i and -files files. " << endl << "*****" << endl;
 		showHelp = true;
 	}
 
 	if (!showHelp) {
-
-		BedCoverage *bg = new BedCoverage(bedAFile, bedBFile, forceStrand);
-		bg->DetermineBedInput();
+		BedAnnotate *ba = new BedAnnotate(mainFile, inputFiles, inputTitles, forceStrand, reportCounts, reportBoth);
+        ba->AnnotateBed();
+		delete ba;
 		return 0;
 	}
 	else {
@@ -102,23 +135,25 @@ void ShowHelp(void) {
 	
 	cerr << "Author:  Aaron Quinlan (aaronquinlan@gmail.com)" << endl;
 	
-	cerr << "Summary: Returns the depth and breadth of coverage of features from A" << endl;
-	cerr << "\t on the intervals in B." << endl << endl;
+	cerr << "Summary: Annotates the depth & breadth of coverage of features from multiple files" << endl;
+	cerr << "\t on the intervals in -i." << endl << endl;
 	
-	cerr << "Usage:   " << PROGRAM_NAME << " [OPTIONS] -a <a.bed> -b <b.bed>" << endl << endl;
+	cerr << "Usage:   " << PROGRAM_NAME << " [OPTIONS] -i <bed/gff/vcf> -files FILE1 FILE2 .. FILEn" << endl << endl;
 
 	cerr << "Options: " << endl;
-	cerr << "\t-s\t"	 	    << "Force strandedness.  That is, only include hits in A that" << endl;
+
+	cerr << "\t-names\t"	    << "A list of names (one / file) to describe each file in -i." << endl;
+	cerr 						<< "\t\tThese names will be printed as a header line." << endl << endl;
+
+	cerr << "\t-counts\t"	    << "Report the count of features in each file that overlap -i." << endl;
+	cerr 						<< "\t\t- Default is to report the fraction of -i covered by each file." << endl << endl;
+
+	cerr << "\t-both\t" 	    << "Report the counts and % coverage." << endl;
+	cerr 						<< "\t\t- Default is to report the fraction of -i covered by each file." << endl << endl;
+	
+	cerr << "\t-s\t"      	 	<< "Force strandedness.  That is, only include hits in A that" << endl;
 	cerr						<< "\t\toverlap B on the same strand." << endl;
 	cerr						<< "\t\t- By default, hits are included without respect to strand." << endl << endl;
-
-	cerr << "Output:  " << endl;
-	cerr << "\t" << " After each entry in B, reports: " << endl; 
-	cerr << "\t  1) The number of features in A that overlapped the B interval." << endl;
-	cerr << "\t  2) The number of bases in B that had non-zero coverage." << endl;
-	cerr << "\t  3) The length of the entry in B." << endl;
-	cerr << "\t  4) The fraction of bases in B that had non-zero coverage." << endl;
 	
 	exit(1);
-
 }

@@ -286,7 +286,7 @@ bool BamMultiReader::Rewind(void) {
     return result;
 }
 
-// saves index data to BAM index files (".bai") where necessary, returns success/fail
+// saves index data to BAM index files (".bai"/".bti") where necessary, returns success/fail
 bool BamMultiReader::CreateIndexes(bool useDefaultIndex) {
     bool result = true;
     for (vector<pair<BamReader*, BamAlignment*> >::iterator it = readers.begin(); it != readers.end(); ++it) {

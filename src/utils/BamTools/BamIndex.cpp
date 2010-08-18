@@ -3,7 +3,7 @@
 // Marth Lab, Department of Biology, Boston College
 // All rights reserved.
 // ---------------------------------------------------------------------------
-// Last modified: 13 July 2010 (DB)
+// Last modified: 17 August 2010 (DB)
 // ---------------------------------------------------------------------------
 // Provides index functionality - both for the default (standardized) BAM 
 // index format (.bai) as well as a BamTools-specific (nonstandard) index 
@@ -13,7 +13,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <algorithm>
-#include <iostream>
+// #include <iostream>
 #include <map>
 #include "BamIndex.h"
 #include "BamReader.h"
@@ -52,6 +52,8 @@ bool BamIndex::HasAlignments(const int& referenceID) {
  
 namespace BamTools { 
 
+// --------------------------------------------------
+// BamDefaultIndex data structures & typedefs
 struct Chunk {
 
     // data members
@@ -88,7 +90,7 @@ struct ReferenceIndex {
     { }
 };
 
-typedef vector<ReferenceIndex> BamDefaultIndexData;  
+typedef vector<ReferenceIndex> BamDefaultIndexData;
 
 } // namespace BamTools
  

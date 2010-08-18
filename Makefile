@@ -11,7 +11,8 @@ export CXX      = g++
 export CXXFLAGS = -Wall -O2
 export LIBS     = -lz
 
-SUBDIRS = $(SRC_DIR)/bamToBed \
+SUBDIRS = $(SRC_DIR)/annotateBed \
+          $(SRC_DIR)/bamToBed \
           $(SRC_DIR)/bedToBam \
           $(SRC_DIR)/bedToIgv \
           $(SRC_DIR)/bed12ToBed6 \

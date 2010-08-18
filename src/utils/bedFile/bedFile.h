@@ -169,6 +169,31 @@ struct BEDCOV {
 };
 
 
+/*
+	Structure for BED COVERAGE records having lists of
+	multiple coverages
+*/
+struct BEDCOVLIST {
+
+	// Regular BED fields
+	CHRPOS start;
+	CHRPOS end;
+	
+	string chrom;
+	string name;
+	string score;
+	string strand;
+
+	// Add'l fields for BED12 and/or custom BED annotations	
+	vector<string> otherFields;
+
+    // Additional fields specific to computing coverage
+    vector< map<unsigned int, DEPTH> > depthMapList;
+    vector<unsigned int> counts;
+    vector<CHRPOS> minOverlapStarts;
+};
+
+
 // enum to flag the state of a given line in a BED file.
 enum BedLineStatus
 { 
@@ -191,12 +216,15 @@ enum FileType
 //*************************************************
 typedef vector<BED>    bedVector;
 typedef vector<BEDCOV> bedCovVector;
+typedef vector<BEDCOVLIST> bedCovListVector;
 
 typedef map<BIN, bedVector,    std::less<BIN> > binsToBeds;
 typedef map<BIN, bedCovVector, std::less<BIN> > binsToBedCovs;
+typedef map<BIN, bedCovListVector, std::less<BIN> > binsToBedCovLists;
 
 typedef map<string, binsToBeds, std::less<string> >    masterBedMap;
 typedef map<string, binsToBedCovs, std::less<string> > masterBedCovMap;
+typedef map<string, binsToBedCovLists, std::less<string> > masterBedCovListMap;
 typedef map<string, bedVector, std::less<string> >     masterBedMapNoBin;
 
 
@@ -291,6 +319,9 @@ public:
 
 	// load a BED file into a map keyed by chrom, then bin. value is vector of BEDCOVs
 	void loadBedCovFileIntoMap();
+	
+	// load a BED file into a map keyed by chrom, then bin. value is vector of BEDCOVLISTs
+	void loadBedCovListFileIntoMap();
 
 	// load a BED file into a map keyed by chrom. value is vector of BEDs
 	void loadBedFileIntoMapNoBin();	
@@ -320,6 +351,11 @@ public:
 	// if one read has four block, we only want to count the coverage as
 	// coming from one read, not four.
     void countSplitHits(const vector<BED> &bedBlock, bool forceStrand);
+
+	// Given a chrom, start, end and strand for a single feature,
+	// increment a the number of hits for each feature in B file
+	// that the feature overlaps	
+    void countListHits(const BED &a, int index, bool forceStrand);
 	
 	// the bedfile with which this instance is associated
 	string bedFile;
@@ -327,9 +363,10 @@ public:
 						   // 9 for GFF
 	
 	// Main data structires used by BEDTools
-    masterBedCovMap   bedCovMap;
-	masterBedMap      bedMap;
-	masterBedMapNoBin bedMapNoBin;
+    masterBedCovMap      bedCovMap;
+    masterBedCovListMap  bedCovListMap;
+	masterBedMap         bedMap;
+	masterBedMapNoBin    bedMapNoBin;
 						
 private:
 	

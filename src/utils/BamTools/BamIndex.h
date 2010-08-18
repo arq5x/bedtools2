@@ -3,7 +3,7 @@
 // Marth Lab, Department of Biology, Boston College
 // All rights reserved.
 // ---------------------------------------------------------------------------
-// Last modified: 13 July 2010 (DB)
+// Last modified: 17 August 2010 (DB)
 // ---------------------------------------------------------------------------
 // Provides index functionality - both for the default (standardized) BAM 
 // index format (.bai) as well as a BamTools-specific (nonstandard) index 
@@ -22,6 +22,7 @@ namespace BamTools {
 class BamReader;
 class BgzfData;
   
+// --------------------------------------------------  
 // BamIndex base class
 class BamIndex {
 
@@ -51,6 +52,7 @@ class BamIndex {
         bool m_isBigEndian;
 };
 
+// --------------------------------------------------
 // BamDefaultIndex class
 // 
 // implements default (per SAM/BAM spec) index file ops
@@ -82,6 +84,7 @@ class BamDefaultIndex : public BamIndex {
         BamDefaultIndexPrivate* d;
 };
 
+// --------------------------------------------------
 // BamToolsIndex class
 //
 // implements BamTools-specific index file ops

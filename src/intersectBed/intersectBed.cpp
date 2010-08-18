@@ -66,7 +66,7 @@ bool BedIntersect::processHits(const BED &a, const vector<BED> &hits, bool print
 BedIntersect::BedIntersect(string bedAFile, string bedBFile, bool anyHit, 
 						   bool writeA, bool writeB, bool writeOverlap, bool writeAllOverlap,
 						   float overlapFraction, bool noHit, bool writeCount, bool forceStrand, 
-						   bool reciprocal, bool obeySplits, bool bamInput, bool bamOutput) {
+						   bool reciprocal, bool obeySplits, bool bamInput, bool bamOutput, bool isUncompressedBam) {
 
 	_bedAFile            = bedAFile;
 	_bedBFile            = bedBFile;
@@ -83,6 +83,7 @@ BedIntersect::BedIntersect(string bedAFile, string bedBFile, bool anyHit,
     _obeySplits          = obeySplits;
 	_bamInput            = bamInput;
 	_bamOutput           = bamOutput;
+    _isUncompressedBam   = isUncompressedBam;
 	
 	// create new BED file objects for A and B
 	_bedA = new BedFile(bedAFile);
@@ -254,10 +255,10 @@ void BedIntersect::IntersectBam(string bamFile) {
 	// open a BAM output to stdout if we are writing BAM
 	if (_bamOutput == true) {
 		// open our BAM writer
-		writer.Open("stdout", header, refs);
+        writer.Open("stdout", header, refs, _isUncompressedBam);
 	}
 
-	vector<BED> hits;					// vector of potential hits
+	vector<BED> hits;
 	// reserve some space
 	hits.reserve(100);
 	

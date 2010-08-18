@@ -1,5 +1,5 @@
 /*****************************************************************************
-  coverageBed.h
+  annotateBed.h
 
   (c) 2009 - Aaron Quinlan
   Hall Laboratory
@@ -9,10 +9,16 @@
 
   Licenced under the GNU General Public License 2.0+ license.
 ******************************************************************************/
-#ifndef	COVERAGEBED_H
-#define COVERAGEBED_H
+#ifndef	ANNOTATEBED_H
+#define ANNOTATEBED_H
 
 #include "bedFile.h"
+
+#include "BamReader.h"
+#include "BamAux.h"
+#include "BamAncillary.h"
+using namespace BamTools;
+
 #include <vector>
 #include <algorithm>
 #include <iostream>
@@ -25,29 +31,45 @@ using namespace std;
 //************************************************
 // Class methods and elements
 //************************************************
-class BedCoverage {
+class BedAnnotate {
 
 public:
 
 	// constructor 
-	BedCoverage(string &, string &, bool &);
+	BedAnnotate(const string &mainFile, const vector<string> &annoFileNames, 
+	            const vector<string> &annoTitles, bool forceStrand, bool reportCounts, bool reportBoth);
 
 	// destructor
-	~BedCoverage(void);
+	~BedAnnotate(void);
 	
-	void GetCoverage(istream &bedInput);
-	
-	void DetermineBedInput();
+	// annotate the master file with all of the annotation files.
+	void AnnotateBed();
 	
 private:
 
-	string bedAFile;
-	string bedBFile;
-
+	// input files.
+	string _mainFile;
+    vector<string> _annoFileNames;
+    vector<string> _annoTitles;
+    
 	// instance of a bed file class.
-	BedFile *bedA, *bedB;
+    BedFile *_bed;
+    vector<BedFile*> _annoFiles;
 	
-	bool forceStrand;
-
+	// do we care about strandedness when counting coverage?
+	bool _forceStrand;
+    bool _reportCounts;
+    bool _reportBoth;
+	
+	// private function for reporting coverage information
+	void ReportAnnotations();
+		
+    void OpenAnnoFiles();
+    
+    void CloseAnnoFiles();
+    
+    void PrintHeader();
+    
+    void InitializeMainFile();
 };
-#endif /* COVERAGEBED_H */
+#endif /* ANNOTATEBED_H */

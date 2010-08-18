@@ -3,7 +3,7 @@
 // Marth Lab, Department of Biology, Boston College
 // All rights reserved.
 // ---------------------------------------------------------------------------
-// Last modified: 15 July 2010 (DB)
+// Last modified: 17 August 2010 (DB)
 // ---------------------------------------------------------------------------
 // Uses BGZF routines were adapted from the bgzf.c code developed at the Broad
 // Institute.
@@ -35,7 +35,7 @@ struct BamWriter::BamWriterPrivate {
 
     // "public" interface
     void Close(void);
-    void Open(const string& filename, const string& samHeader, const RefVector& referenceSequences);
+    bool Open(const string& filename, const string& samHeader, const RefVector& referenceSequences, bool isWriteUncompressed);
     void SaveAlignment(const BamAlignment& al);
 
     // internal methods
@@ -65,8 +65,8 @@ void BamWriter::Close(void) {
 }
 
 // opens the alignment archive
-void BamWriter::Open(const string& filename, const string& samHeader, const RefVector& referenceSequences) {
-    d->Open(filename, samHeader, referenceSequences);
+bool BamWriter::Open(const string& filename, const string& samHeader, const RefVector& referenceSequences, bool isWriteUncompressed) {
+    return d->Open(filename, samHeader, referenceSequences, isWriteUncompressed);
 }
 
 // saves the alignment to the alignment archive
@@ -202,10 +202,11 @@ void BamWriter::BamWriterPrivate::EncodeQuerySequence(const string& query, strin
 }
 
 // opens the alignment archive
-void BamWriter::BamWriterPrivate::Open(const string& filename, const string& samHeader, const RefVector& referenceSequences) {
+bool BamWriter::BamWriterPrivate::Open(const string& filename, const string& samHeader, const RefVector& referenceSequences, bool isWriteUncompressed) {
 
-    // open the BGZF file for writing
-    mBGZF.Open(filename, "wb");
+    // open the BGZF file for writing, return failure if error
+    if ( !mBGZF.Open(filename, "wb", isWriteUncompressed) )
+        return false;
 
     // ================
     // write the header
@@ -250,6 +251,9 @@ void BamWriter::BamWriterPrivate::Open(const string& filename, const string& sam
         if (IsBigEndian) SwapEndian_32(referenceLength);
         mBGZF.Write((char*)&referenceLength, BT_SIZEOF_INT);
     }
+    
+    // return success
+    return true;
 }
 
 // saves the alignment to the alignment archive

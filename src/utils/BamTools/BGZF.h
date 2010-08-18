@@ -3,7 +3,7 @@
 // Marth Lab, Department of Biology, Boston College
 // All rights reserved.
 // ---------------------------------------------------------------------------
-// Last modified: 19 July 2010 (DB)
+// Last modified: 16 August 2010 (DB)
 // ---------------------------------------------------------------------------
 // BGZF routines were adapted from the bgzf.c code developed at the Broad
 // Institute.
@@ -77,81 +77,77 @@ const int DEFAULT_BLOCK_SIZE  = 65536;
 
 struct BgzfData {
 
-    // ---------------------------------
     // data members
-    
-    unsigned int UncompressedBlockSize;
-    unsigned int CompressedBlockSize;
-    unsigned int BlockLength;
-    unsigned int BlockOffset;
-    uint64_t BlockAddress;
-    bool     IsOpen;
-    bool     IsWriteOnly;
-    FILE*    Stream;
-    char*    UncompressedBlock;
-    char*    CompressedBlock;
+    public:
+        unsigned int UncompressedBlockSize;
+        unsigned int CompressedBlockSize;
+        unsigned int BlockLength;
+        unsigned int BlockOffset;
+        uint64_t BlockAddress;
+        bool     IsOpen;
+        bool     IsWriteOnly;
+        bool     IsWriteUncompressed;
+        FILE*    Stream;
+        char*    UncompressedBlock;
+        char*    CompressedBlock;
 
-    // ---------------------------------
     // constructor & destructor
-    
-    BgzfData(void);
-    ~BgzfData(void);
+    public:
+        BgzfData(void);
+        ~BgzfData(void);
 
-    // ---------------------------------
     // main interface methods
-    
-    // closes BGZF file
-    void Close(void);
-    // opens the BGZF file (mode is either "rb" for reading, or "wb" for writing)
-    bool Open(const std::string& filename, const char* mode);
-    // reads BGZF data into a byte buffer
-    int Read(char* data, const unsigned int dataLength);
-    // seek to position in BGZF file
-    bool Seek(int64_t position);
-    // get file position in BGZF file
-    int64_t Tell(void);
-    // writes the supplied data into the BGZF buffer
-    unsigned int Write(const char* data, const unsigned int dataLen);
+    public:       
+        // closes BGZF file
+        void Close(void);
+        // opens the BGZF file (mode is either "rb" for reading, or "wb" for writing)
+        bool Open(const std::string& filename, const char* mode, bool isWriteUncompressed = false);
+        // reads BGZF data into a byte buffer
+        int Read(char* data, const unsigned int dataLength);
+        // seek to position in BGZF file
+        bool Seek(int64_t position);
+        // get file position in BGZF file
+        int64_t Tell(void);
+        // writes the supplied data into the BGZF buffer
+        unsigned int Write(const char* data, const unsigned int dataLen);
 
-    // ---------------------------------
     // internal methods
+    private:
+        // compresses the current block
+        int DeflateBlock(void);
+        // flushes the data in the BGZF block
+        void FlushBlock(void);
+        // de-compresses the current block
+        int InflateBlock(const int& blockLength);
+        // reads a BGZF block
+        bool ReadBlock(void);
     
-    // compresses the current block
-    int DeflateBlock(void);
-    // flushes the data in the BGZF block
-    void FlushBlock(void);
-    // de-compresses the current block
-    int InflateBlock(const int& blockLength);
-    // reads a BGZF block
-    bool ReadBlock(void);
-    
-    // ---------------------------------
     // static 'utility' methods
-    
-    // checks BGZF block header
-    static inline bool CheckBlockHeader(char* header);
-    // packs an unsigned integer into the specified buffer
-    static inline void PackUnsignedInt(char* buffer, unsigned int value);
-    // packs an unsigned short into the specified buffer
-    static inline void PackUnsignedShort(char* buffer, unsigned short value);
-    // unpacks a buffer into a double
-    static inline double UnpackDouble(char* buffer);
-    static inline double UnpackDouble(const char* buffer);
-    // unpacks a buffer into a float
-    static inline float UnpackFloat(char* buffer);
-    static inline float UnpackFloat(const char* buffer);
-    // unpacks a buffer into a signed int
-    static inline signed int UnpackSignedInt(char* buffer);
-    static inline signed int UnpackSignedInt(const char* buffer);
-    // unpacks a buffer into a signed short
-    static inline signed short UnpackSignedShort(char* buffer);
-    static inline signed short UnpackSignedShort(const char* buffer);
-    // unpacks a buffer into an unsigned int
-    static inline unsigned int UnpackUnsignedInt(char* buffer);
-    static inline unsigned int UnpackUnsignedInt(const char* buffer);
-    // unpacks a buffer into an unsigned short
-    static inline unsigned short UnpackUnsignedShort(char* buffer);
-    static inline unsigned short UnpackUnsignedShort(const char* buffer);
+    public:
+        // checks BGZF block header
+        static inline bool CheckBlockHeader(char* header);
+        // packs an unsigned integer into the specified buffer
+        static inline void PackUnsignedInt(char* buffer, unsigned int value);
+        // packs an unsigned short into the specified buffer
+        static inline void PackUnsignedShort(char* buffer, unsigned short value);
+        // unpacks a buffer into a double
+        static inline double UnpackDouble(char* buffer);
+        static inline double UnpackDouble(const char* buffer);
+        // unpacks a buffer into a float
+        static inline float UnpackFloat(char* buffer);
+        static inline float UnpackFloat(const char* buffer);
+        // unpacks a buffer into a signed int
+        static inline signed int UnpackSignedInt(char* buffer);
+        static inline signed int UnpackSignedInt(const char* buffer);
+        // unpacks a buffer into a signed short
+        static inline signed short UnpackSignedShort(char* buffer);
+        static inline signed short UnpackSignedShort(const char* buffer);
+        // unpacks a buffer into an unsigned int
+        static inline unsigned int UnpackUnsignedInt(char* buffer);
+        static inline unsigned int UnpackUnsignedInt(const char* buffer);
+        // unpacks a buffer into an unsigned short
+        static inline unsigned short UnpackUnsignedShort(char* buffer);
+        static inline unsigned short UnpackUnsignedShort(const char* buffer);
 };
 
 // -------------------------------------------------------------

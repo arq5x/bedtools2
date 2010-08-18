@@ -12,124 +12,189 @@
 #include "lineFileUtilities.h"
 #include "annotateBed.h"
 
+// build
+BedAnnotate::BedAnnotate(const string &mainFile, const vector<string> &annoFileNames, 
+            const vector<string> &annoTitles, bool forceStrand, bool reportCounts, bool reportBoth) :
 
-BedAnnotate::BedAnnotate (const string &bedFile, const vector<string> &annotationFiles, bool &forceStrand) {
+    _mainFile(mainFile),
+    _annoFileNames(annoFileNames),
+    _annoTitles(annoTitles),
+    _forceStrand(_forceStrand),
+    _reportCounts(reportCounts),
+    _reportBoth(reportBoth)
+{
+    _bed = new BedFile(_mainFile);
+}        
 
-	this->bedFile = bedFile;
-	this->annotationFiles = annotationFiles;
-	
-	this->bed = new BedFile(bedFile);
-	this->forceStrand = forceStrand;
+
+// destroy and delete the open file pointers
+BedAnnotate::~BedAnnotate(void) {
+	delete _bed;
+    CloseAnnoFiles();
 }
 
 
-
-BedAnnotate::~BedAnnotate (void) {
-}
-
-
-void BedAnnotate::ProcessAnnotations (istream &bedInput) {
-	
-	// loop through each of the annotation files and compute the coverage
-	// of each with respect to the input BED file.
-	vector<string>::const_iterator annotItr = this->annotationFiles.begin();
-	vector<string>::const_iterator annotEnd = this->annotationFiles.end();
-	for (; annotItr != annotEnd; ++annotItr) {
-		// create a BED file of the current annotation file.
-		BedFile annotation = new BedFile(*annotItr);
-		// compute the coverage of the annotation file with respect to the input file.
-		GetCoverage(annotation, bedInput);
-	}	
-}
-
- 
-void BedAnnotate::GetCoverage (const BedFile &annotation, istream &bedInput) {
-	
-	// load the annotation bed file into a map so
-	// that we can easily compare "A" to it for overlaps
-	annotation->loadBedFileIntoMap();
-
-	string bedLine;                                                                                                                    
-	int lineNum = 0;					// current input line number
-	vector<string> bedFields;			// vector for a BED entry
-	bedFields.reserve(12);	
-		
-	// process each entry in A
-	while (getline(bedInput, bedLine)) {
-
-		lineNum++;
-		Tokenize(bedLine,bedFields);
-		BED a;
-
-		if (bedA->parseLine(a, bedFields, lineNum)) {	
-			// count a as a hit with all the relevant features in B
-			bedB->countHits(a, this->forceStrand);
-		}	
-		// reset for the next input line
-		bedFields.clear();
+void BedAnnotate::OpenAnnoFiles() {
+	for (size_t i=0; i < _annoFileNames.size(); ++i) {
+		BedFile *file = new BedFile(_annoFileNames[i]);
+		file->Open();
+		_annoFiles.push_back(file);
 	}
-						
-	// now, report the count of hits for each feature in B.
-	masterBedMap::const_iterator chromItr = bedB->bedMap.begin();
-	masterBedMap::const_iterator chromEnd = bedB->bedMap.end();
-	for (; chromItr != chromEnd; ++chromItr) {
-	
-		binsToBeds::const_iterator binItr = chromItr->second.begin();
-		binsToBeds::const_iterator binEnd = chromItr->second.end();
+}
+
+
+void BedAnnotate::CloseAnnoFiles() {
+	for (size_t i=0; i < _annoFiles.size(); ++i) {
+		BedFile *file = _annoFiles[i];
+		delete file;
+		_annoFiles[i] = NULL;
+	}
+}
+
+
+void BedAnnotate::PrintHeader() {
+    // print a hash to indicate header and then write a tab 
+    // for each field in the main file.
+    printf("#");
+    for (size_t i = 0; i < _bed->bedType; ++i)
+        printf("\t");
+
+    // now print the label for each file.
+    for (size_t i = 0; i < _annoTitles.size(); ++i)
+        printf("%s\t", _annoTitles[i].c_str());
+    printf("\n");
+}
+
+
+void BedAnnotate::InitializeMainFile() {
+    // process each chromosome 
+	masterBedCovListMap::iterator chromItr = _bed->bedCovListMap.begin();
+	masterBedCovListMap::iterator chromEnd = _bed->bedCovListMap.end();
+	for (; chromItr != chromEnd; ++chromItr) {    
+	    // for each chrom, process each bin
+		binsToBedCovLists::iterator binItr = chromItr->second.begin();
+		binsToBedCovLists::iterator binEnd = chromItr->second.end();
 		for (; binItr != binEnd; ++binItr) {
-
-			vector<BED>::const_iterator bedItr = binItr->second.begin();
-			vector<BED>::const_iterator bedEnd = binItr->second.end();
+            // initialize BEDCOVLIST in this chrom/bin
+			vector<BEDCOVLIST>::iterator bedItr = binItr->second.begin();
+			vector<BEDCOVLIST>::iterator bedEnd = binItr->second.end();
 			for (; bedItr != bedEnd; ++bedItr) {
-									
-				int zeroDepthCount = 0;
-				int depth = 0;
-				int start = min(bedItr->minOverlapStart, bedItr->start);
-				
-				for (int pos = start+1; pos <= bedItr->end; pos++) {
-					
-					if (bedItr->depthMap.find(pos) != bedItr->depthMap.end()) {
-						
-						map<unsigned int, DEPTH> dMap = bedItr->depthMap;
-						depth += dMap[pos].starts;
-																				
-						if ((depth == 0) && (pos > bedItr->start) && (pos <= bedItr->end)) {
-							zeroDepthCount++;
-						}
-						
-						depth = depth - dMap[pos].ends;
-					}
-					else {
-						if ((depth == 0) && (pos > bedItr->start) && (pos <= bedItr->end)) {
-							zeroDepthCount++;
-						}
-					}
-				}
+			    // initialize the depthMaps, counts, etc. for each anno file.
+                for (size_t i = 0; i < _annoFiles.size(); ++i) {
+                    map<unsigned int, DEPTH> dummy;
+                    bedItr->depthMapList.push_back(dummy);
+                    bedItr->counts.push_back(0);
+                    bedItr->minOverlapStarts.push_back(INT_MAX);
+                }
+		    }
+	    }
+    }
+}
 
-				// Report the coverage for the current interval.
-				int length = bedItr->end - bedItr->start;
-				int nonZeroBases =  (length-zeroDepthCount);
-				float fractCovered = (float) nonZeroBases /length;
+
+void BedAnnotate::AnnotateBed() {
+	
+	// load the "main" bed file into a map so
+	// that we can easily compare each annoFile to it for overlaps
+	_bed->loadBedCovListFileIntoMap();
+    // open the annotations files for processing;
+    OpenAnnoFiles();    
+    // initialize counters, depths, etc. for the main file
+    InitializeMainFile();
+    
+	// annotate the main file with the coverage from the annotation files.
+    for (size_t annoIndex = 0; annoIndex < _annoFiles.size(); ++annoIndex) {
+        // grab the current annotation file.
+        BedFile *anno = _annoFiles[annoIndex];    
+        int lineNum = 0;
+    	BED a, nullBed;	
+    	BedLineStatus bedStatus;
+    	
+    	// process each entry in the current anno file
+    	while ((bedStatus = anno->GetNextBed(a, lineNum)) != BED_INVALID) {
+    		if (bedStatus == BED_VALID) {
+        		_bed->countListHits(a, annoIndex, _forceStrand);
+    			a = nullBed;
+    		}
+    	}	
+	}
+	
+	// report the annotations of the main file from the anno file.
+	ReportAnnotations();	
+	// close the annotations files;
+    CloseAnnoFiles();					
+}
+
+
+void BedAnnotate::ReportAnnotations() {
+    
+    if (_annoTitles.size() > 0) {
+        PrintHeader();
+    }
+
+    // process each chromosome 
+	masterBedCovListMap::const_iterator chromItr = _bed->bedCovListMap.begin();
+	masterBedCovListMap::const_iterator chromEnd = _bed->bedCovListMap.end();
+	for (; chromItr != chromEnd; ++chromItr) {    
+	    // for each chrom, process each bin
+		binsToBedCovLists::const_iterator binItr = chromItr->second.begin();
+		binsToBedCovLists::const_iterator binEnd = chromItr->second.end();
+		for (; binItr != binEnd; ++binItr) {
+            // for each chrom & bin, compute and report  
+            // the observed coverage for each feature
+			vector<BEDCOVLIST>::const_iterator bedItr = binItr->second.begin();
+			vector<BEDCOVLIST>::const_iterator bedEnd = binItr->second.end();
+			for (; bedItr != bedEnd; ++bedItr) {	
+			    // print the main BED entry.
+			    _bed->reportBedTab(*bedItr);
+                
+                // now report the coverage from each annotation file.
+                for (size_t i = 0; i < _annoFiles.size(); ++i) {
+                    unsigned int totalLength = 0;		
+    				int zeroDepthCount = 0; // number of bases with zero depth
+    				int depth          = 0; // tracks the depth at the current base
 				
-				bedB->reportBedTab(*bedItr);
-				printf("%d\t%d\t%d\t%0.7f\n", bedItr->count, nonZeroBases, length, fractCovered);			
+    				// the start is either the first base in the feature OR
+    				// the leftmost position of an overlapping feature. e.g. (s = start):
+    				// A    ----------
+    				// B    s    ------------
+    				int start          = min(bedItr->minOverlapStarts[i], bedItr->start);
+				
+    				map<unsigned int, DEPTH>::const_iterator depthItr;
+    				map<unsigned int, DEPTH>::const_iterator depthEnd;
+				
+    				// compute the coverage observed at each base in the feature marching from start to end.
+    				for (CHRPOS pos = start+1; pos <= bedItr->end; pos++) {	
+    					// map pointer grabbing the starts and ends observed at this position
+    					depthItr = bedItr->depthMapList[i].find(pos);
+                        depthEnd = bedItr->depthMapList[i].end();
+                        
+    					// increment coverage if starts observed at this position.
+    					if (depthItr != depthEnd)
+    						depth += depthItr->second.starts;
+    					// update zero depth
+    					if ((pos > bedItr->start) && (pos <= bedItr->end) && (depth == 0))	
+    						zeroDepthCount++;
+    					// decrement coverage if ends observed at this position.
+    					if (depthItr != depthEnd)
+    						depth = depth - depthItr->second.ends;
+    				}
+    				// Summarize the coverage for the current interval,
+    				CHRPOS length     = bedItr->end - bedItr->start;
+    				totalLength       += length;
+    				int nonZeroBases   = (length - zeroDepthCount);
+    				float fractCovered = (float) nonZeroBases / length;
+    				if (_reportCounts == false && _reportBoth == false)
+    				    printf("%f\t", fractCovered);
+    				else if (_reportCounts == true && _reportBoth == false)
+    				    printf("%d\t", bedItr->counts[i]);
+                    else if (_reportCounts == false && _reportBoth == true)
+    				    printf("%d,%f\t", bedItr->counts[i], fractCovered);    
+				}
+				// print newline for next feature.
+                printf("\n");
 			}
 		}
-	}
-}
-
-
-void BedAnnotate::DetermineBedInput () {
-	if (bedA->bedFile != "stdin") {   // process a file
-		ifstream beds(bedA->bedFile.c_str(), ios::in);
-		if ( !beds ) {
-			cerr << "Error: The requested bed file (" << bedA->bedFile << ") could not be opened. Exiting!" << endl;
-			exit (1);
-		}
-		GetCoverage(beds);
-	}
-	else {   						// process stdin
-		GetCoverage(cin);		
 	}
 }
 

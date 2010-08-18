@@ -3,7 +3,7 @@
 // Marth Lab, Department of Biology, Boston College
 // All rights reserved.
 // ---------------------------------------------------------------------------
-// Last modified: 8 December 2009 (DB)
+// Last modified: 17 August 2010 (DB)
 // ---------------------------------------------------------------------------
 // Uses BGZF routines were adapted from the bgzf.c code developed at the Broad
 // Institute.
@@ -34,7 +34,10 @@ class BamWriter {
         // closes the alignment archive
         void Close(void);
         // opens the alignment archive
-        void Open(const std::string& filename, const std::string& samHeader, const BamTools::RefVector& referenceSequences);
+        bool Open(const std::string& filename, 
+                  const std::string& samHeader, 
+                  const BamTools::RefVector& referenceSequences, 
+                  bool writeUncompressed = false);
         // saves the alignment to the alignment archive
         void SaveAlignment(const BamTools::BamAlignment& al);
 

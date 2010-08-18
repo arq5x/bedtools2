@@ -540,8 +540,10 @@ bool BamReader::BamReaderPrivate::Jump(int refID, int position) {
         
         // if this alignment corresponds to desired position
         // return success of seeking back to 'current offset'
-        if ( (bAlignment.RefID == refID && bAlignment.Position + bAlignment.Length > position) || (bAlignment.RefID > refID) )
+        if ( (bAlignment.RefID == refID && bAlignment.Position + bAlignment.Length > position) || (bAlignment.RefID > refID) ) {
+            if ( o != offsets.begin() ) --o;
             return mBGZF.Seek(*o);
+        }
     }
     
     return result;

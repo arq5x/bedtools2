@@ -322,9 +322,9 @@ void PrintBed(const BamAlignment &bam,  const RefVector &refs, bool useEditDista
     		printf("%s\t%d\t%d\t\%s\t%d\t%s\n", refs.at(bam.RefID).RefName.c_str(), bam.Position,
     									  alignmentEnd, name.c_str(), bam.MapQuality, strand.c_str());
     	}
-    	else if (useEditDistance == true && bamTag != "") {
-    		uint8_t editDistance;
-    		if (bam.GetEditDistance(editDistance)) {
+    	else if (useEditDistance == true && bamTag == "") {
+    		uint32_t editDistance;
+    		if (bam.GetTag("NM", editDistance)) {
     			printf("%s\t%d\t%d\t\%s\t%u\t%s\n", refs.at(bam.RefID).RefName.c_str(), bam.Position,
     										  alignmentEnd, name.c_str(), editDistance, strand.c_str());
     		}
@@ -390,8 +390,8 @@ void PrintBed12(const BamAlignment &bam, const RefVector &refs, bool useEditDist
             alignmentEnd, name.c_str(), bam.MapQuality, strand.c_str());
     }
     else if (useEditDistance == true && bamTag != "") {
-        uint8_t editDistance;
-        if (bam.GetEditDistance(editDistance)) {
+        uint32_t editDistance;
+        if (bam.GetTag("NM", editDistance)) {
             printf("%s\t%d\t%d\t\%s\t%u\t%s\t", refs.at(bam.RefID).RefName.c_str(), bam.Position,
                 alignmentEnd, name.c_str(), editDistance, strand.c_str());
         }
@@ -435,7 +435,7 @@ void PrintBedPE(const BamAlignment &bam1, const BamAlignment &bam2, const RefVec
 	// initialize BEDPE variables
 	string chrom1, chrom2, strand1, strand2;
 	int start1, start2, end1, end2;
-	uint8_t editDistance1, editDistance2;
+	uint32_t editDistance1, editDistance2;
 	start1 = start2 = end1 = end2 = -1;
 	chrom1 = chrom2 = strand1 = strand2 = ".";
 	editDistance1 = editDistance2 = 0;
@@ -451,7 +451,7 @@ void PrintBedPE(const BamAlignment &bam1, const BamAlignment &bam2, const RefVec
 		
 		// extract the edit distance from the NM tag
 		// if possible. otherwise, complain.
-		if (useEditDistance == true && bam1.GetEditDistance(editDistance1) == false) {
+		if (useEditDistance == true && bam1.GetTag("NM", editDistance1) == false) {
 			cerr << "The edit distance tag (NM) was not found in the BAM file.  Please disable -ed.  Exiting\n";
 			exit(1);
 		}
@@ -467,7 +467,7 @@ void PrintBedPE(const BamAlignment &bam1, const BamAlignment &bam2, const RefVec
 		
 		// extract the edit distance from the NM tag
 		// if possible. otherwise, complain.
-		if (useEditDistance == true && bam2.GetEditDistance(editDistance2) == false) {
+		if (useEditDistance == true && bam2.GetTag("NM", editDistance2) == false) {
 			cerr << "The edit distance tag (NM) was not found in the BAM file.  Please disable -ed.  Exiting\n";
 			exit(1);
 		}
