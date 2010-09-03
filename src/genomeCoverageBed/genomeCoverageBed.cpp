@@ -74,7 +74,8 @@ void BedGenomeCoverage::StartNewChrom(const string& newChrom) {
 	_currChromName = newChrom;
 
 	// get the current chrom size and allocate space
-	_currChromSize = _genome->getChromSize(newChrom);
+	_currChromSize = _genome->getChromSize(_currChromName);
+
 	if (_currChromSize >= 0)
 		_currChromCoverage.resize(_currChromSize);
 	else {
