@@ -148,7 +148,7 @@ void ShowHelp(void) {
 	cerr << "\t-counts\t"	    << "Report the count of features in each file that overlap -i." << endl;
 	cerr 						<< "\t\t- Default is to report the fraction of -i covered by each file." << endl << endl;
 
-	cerr << "\t-both\t" 	    << "Report the counts and % coverage." << endl;
+	cerr << "\t-both\t" 	    << "Report the counts followed by the % coverage." << endl;
 	cerr 						<< "\t\t- Default is to report the fraction of -i covered by each file." << endl << endl;
 	
 	cerr << "\t-s\t"      	 	<< "Force strandedness.  That is, only include hits in A that" << endl;

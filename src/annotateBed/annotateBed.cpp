@@ -60,9 +60,16 @@ void BedAnnotate::PrintHeader() {
         printf("\t");
 
     // now print the label for each file.
-    for (size_t i = 0; i < _annoTitles.size(); ++i)
-        printf("%s\t", _annoTitles[i].c_str());
-    printf("\n");
+    if (_reportBoth == false) {
+        for (size_t i = 0; i < _annoTitles.size(); ++i)
+            printf("%s\t", _annoTitles[i].c_str());
+        printf("\n");
+    }
+    else {
+        for (size_t i = 0; i < _annoTitles.size(); ++i)
+            printf("%s_cnt\t%s_pct", _annoTitles[i].c_str(), _annoTitles[i].c_str());
+        printf("\n");
+    }
 }
 
 
@@ -189,7 +196,7 @@ void BedAnnotate::ReportAnnotations() {
     				else if (_reportCounts == true && _reportBoth == false)
     				    printf("%d\t", bedItr->counts[i]);
                     else if (_reportCounts == false && _reportBoth == true)
-    				    printf("%d,%f\t", bedItr->counts[i], fractCovered);    
+    				    printf("%d\t%f\t", bedItr->counts[i], fractCovered);    
 				}
 				// print newline for next feature.
                 printf("\n");
