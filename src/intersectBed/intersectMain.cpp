@@ -222,7 +222,9 @@ void ShowHelp(void) {
 	cerr << "Options: " << endl;
 	
 	cerr << "\t-abam\t"			<< "The A input file is in BAM format.  Output will be BAM as well." << endl << endl;
-
+	
+	cerr << "\t-ubam\t"			<< "Write uncompressed BAM output. Default is to write compressed BAM." << endl << endl;
+	
 	cerr << "\t-bed\t"			<< "When using BAM input (-abam), write output as BED. The default" << endl;
 	cerr 						<< "\t\tis to write output in BAM when using -abam." << endl << endl;
 			

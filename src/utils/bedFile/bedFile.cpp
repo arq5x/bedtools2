@@ -197,7 +197,8 @@ BedLineStatus BedFile::GetNextBed(BED &bed, int &lineNum) {
 }
 
 
-void BedFile::FindOverlapsPerBin(string chrom, CHRPOS start, CHRPOS end, string strand, vector<BED> &hits, bool forceStrand) {
+void BedFile::FindOverlapsPerBin(string chrom, CHRPOS start, CHRPOS end, 
+                                 string strand, vector<BED> &hits, bool forceStrand) {
 
 	BIN startBin, endBin;
 	startBin = (start >> _binFirstShift);

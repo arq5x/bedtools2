@@ -1,5 +1,5 @@
 /*****************************************************************************
-  bamToBed.cpp
+  bedToBam.cpp
 
   (c) 2009 - Aaron Quinlan
   Hall Laboratory
@@ -36,8 +36,7 @@ using namespace std;
 
 // function declarations
 void ShowHelp(void);
-void DetermineBedInput(BedFile *bed, GenomeFile *genome, bool isBED12, int mapQual);
-void ProcessBed(istream &bedInput, BedFile *bed, GenomeFile *genome, bool isBED12, int mapQual);
+void ProcessBed(istream &bedInput, BedFile *bed, GenomeFile *genome, bool isBED12, int mapQual, bool uncompressedBam);
 void ConvertBedToBam(const BED &bed, BamAlignment &bam, map<string, int> &chromToId, bool isBED12, int mapQual, int lineNum);
 void MakeBamHeader(const string &genomeFile, RefVector &refs, string &header, map<string, int> &chromToInt);
 int  reg2bin(int beg, int end);
@@ -59,6 +58,7 @@ int main(int argc, char* argv[]) {
 	bool haveGenome      = false;	
 	bool haveMapQual     = false;
 	bool isBED12         = false;
+	bool uncompressedBam = false;	
 
 	for(int i = 1; i < argc; i++) {
 		int parameterLength = (int)strlen(argv[i]);
@@ -98,6 +98,9 @@ int main(int argc, char* argv[]) {
 		}	
 		else if(PARAMETER_CHECK("-bed12", 6, parameterLength)) {
 			isBED12 = true;
+		}
+		else if(PARAMETER_CHECK("-ubam", 5, parameterLength)) {
+            uncompressedBam = true;
 		}			
 		else {
 			cerr << endl << "*****ERROR: Unrecognized parameter: " << argv[i] << " *****" << endl << endl;
@@ -124,7 +127,7 @@ int main(int argc, char* argv[]) {
 		BedFile *bed       = new BedFile(bedFile);
 		GenomeFile *genome = new GenomeFile(genomeFile);
 		
-		DetermineBedInput(bed, genome, isBED12, mapQual);
+        ProcessBed(cin, bed, genome, isBED12, mapQual, uncompressedBam);
 	}	
 	else {
 		ShowHelp();
@@ -150,6 +153,7 @@ void ShowHelp(void) {
 	cerr << "\t-bed12\t"	<< "The BED file is in BED12 format.  The BAM CIGAR" << endl;
 	cerr 					<< "\t\tstring will reflect BED \"blocks\"." << endl << endl;
 
+	cerr << "\t-ubam\t"		<< "Write uncompressed BAM output. Default is to write compressed BAM." << endl << endl;
 
 	cerr << "Notes: " << endl;
 	cerr << "\t(1)  BED files must be at least BED4 to be amenable to BAM (needs name field)." << endl << endl;
@@ -160,26 +164,7 @@ void ShowHelp(void) {
 }
 
 
-void DetermineBedInput(BedFile *bed, GenomeFile *genome, bool isBED12, int mapQual) {
-	
-	// dealing with a proper file
-	if (bed->bedFile != "stdin") {   
-
-		ifstream bedStream(bed->bedFile.c_str(), ios::in);
-		if ( !bedStream ) {
-			cerr << "Error: The requested bed file (" << bed->bedFile << ") could not be opened. Exiting!" << endl;
-			exit (1);
-		}
-		ProcessBed(bedStream, bed, genome, isBED12, mapQual);
-	}
-	// reading from stdin
-	else {  					
-		ProcessBed(cin, bed, genome, isBED12, mapQual);
-	}
-}
-
-
-void ProcessBed(istream &bedInput, BedFile *bed, GenomeFile *genome, bool isBED12, int mapQual) {
+void ProcessBed(istream &bedInput, BedFile *bed, GenomeFile *genome, bool isBED12, int mapQual, bool uncompressedBam) {
 
 	BamWriter *writer = new BamWriter();
 	
@@ -190,7 +175,7 @@ void ProcessBed(istream &bedInput, BedFile *bed, GenomeFile *genome, bool isBED1
 	MakeBamHeader(genome->getGenomeFileName(), refs, bamHeader, chromToId);
 	
 	// open a BAM and add the reference headers to the BAM file
-	writer->Open("stdout", bamHeader, refs);
+	writer->Open("stdout", bamHeader, refs, uncompressedBam);
 
 
 	// process each BED entry and convert to BAM
