@@ -32,8 +32,9 @@ class BedWindow {
 public:
 
 	// constructor 
-	BedWindow(string bedAFile, string bedBFile, int leftSlop, int rightSlop, bool anyHit, bool noHit, 
-			  bool writeCount, bool strandWindows, bool matchOnStrand, bool bamInput, bool bamOutput);
+	BedWindow(string bedAFile, string bedBFile, int leftSlop, int rightSlop, 
+	          bool anyHit, bool noHit, bool writeCount, bool strandWindows, 
+	          bool matchOnStrand, bool bamInput, bool bamOutput, bool isUncompressedBam);
 
 	// destructor
 	~BedWindow(void);
@@ -51,6 +52,7 @@ private:
 	bool _matchOnStrand;
 	bool _bamInput;
 	bool _bamOutput;
+    bool  _isUncompressedBam;	
 
 	// instance of a bed file class.
 	BedFile *_bedA, *_bedB;
