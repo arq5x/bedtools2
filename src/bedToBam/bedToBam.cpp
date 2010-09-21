@@ -50,18 +50,15 @@ int main(int argc, char* argv[]) {
 	bool showHelp = false;
 
 	// input files
-	string bedFile;
+	string bedFile = "stdin";
 	string genomeFile;
 	
 	unsigned int mapQual = 255;
 	
-	bool haveBed         = false;
+	bool haveBed         = true;
 	bool haveGenome      = false;	
 	bool haveMapQual     = false;
 	bool isBED12         = false;
-
-	// check to see if we should print out some help
-	if(argc <= 1) showHelp = true;
 
 	for(int i = 1; i < argc; i++) {
 		int parameterLength = (int)strlen(argv[i]);
@@ -81,7 +78,6 @@ int main(int argc, char* argv[]) {
 
 		if(PARAMETER_CHECK("-i", 2, parameterLength)) {
 			if ((i+1) < argc) {
-				haveBed = true;
 				bedFile = argv[i + 1];
 				i++;
 			}
