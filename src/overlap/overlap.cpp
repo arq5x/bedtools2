@@ -35,16 +35,14 @@ void ComputeOverlaps(istream &input, short &s1Col, short &e1Col, short &s2Col, s
 int main(int argc, char* argv[]) {
 
 	// input files
-	string inFile;
+	string inFile = "stdin";
 	string columns;
 
 	// our configuration variables
 	bool showHelp = false;
-	bool haveInFile  = false;
+	bool haveInFile  = true;
 	bool haveColumns = false;
 	
-	// check to see if we should print out some help
-	if(argc <= 1) showHelp = true;
 
 	for(int i = 1; i < argc; i++) {
 		int parameterLength = (int)strlen(argv[i]);
@@ -64,7 +62,6 @@ int main(int argc, char* argv[]) {
 
 		if(PARAMETER_CHECK("-i", 2, parameterLength)) {
 			if ((i+1) < argc) {
-				haveInFile = true;
 				inFile     = argv[i + 1];
 				i++;
 			}
