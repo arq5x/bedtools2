@@ -30,18 +30,15 @@ int main(int argc, char* argv[]) {
 	bool showHelp = false;
 
 	// input files
-	string bedFile;
+	string bedFile  = "stdin";
 	int maxDistance = 0;
 
 	// input arguments
-	bool numEntries = false;
+	bool haveBed         = true;
+	bool numEntries      = false;
 	bool haveMaxDistance = false;
-	bool haveBed = false;
-	bool forceStrand = false;
-	bool reportNames = false;
-
-	// check to see if we should print out some help
-	if(argc <= 1) showHelp = true;
+	bool forceStrand     = false;
+	bool reportNames     = false;
 
 	for(int i = 1; i < argc; i++) {
 		int parameterLength = (int)strlen(argv[i]);
@@ -61,7 +58,6 @@ int main(int argc, char* argv[]) {
 
 		if(PARAMETER_CHECK("-i", 2, parameterLength)) {
 			if ((i+1) < argc) {
-				haveBed = true;
 				bedFile = argv[i + 1];
 				i++;
 			}
