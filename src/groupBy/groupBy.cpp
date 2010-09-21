@@ -30,6 +30,9 @@
 using namespace std;
 
 
+const int PRECISION = 21;
+
+
 // define our program name
 #define PROGRAM_NAME "groupBy"
 // define our parameter checking macro
@@ -345,7 +348,7 @@ void ReportSummary(const vector<string> &group, const vector<vector<string> > &d
         if (op == "sum") {
             // sum them up
             double total = accumulate(dataF.begin(), dataF.end(), 0.0);
-            buffer << setprecision (7) << total;
+            buffer << setprecision (PRECISION) << total;
             result.push_back(buffer.str());
         }
         else if (op == "collapse") {
@@ -357,17 +360,17 @@ void ReportSummary(const vector<string> &group, const vector<vector<string> > &d
             result.push_back(collapse);
         }
         else if (op == "min") {
-            buffer << setprecision (7) << *min_element( dataF.begin(), dataF.end() );
+            buffer << setprecision (PRECISION) << *min_element( dataF.begin(), dataF.end() );
             result.push_back(buffer.str());
         }
         else if (op == "max") {
-            buffer << setprecision (7) << *max_element( dataF.begin(), dataF.end() );
+            buffer << setprecision (PRECISION) << *max_element( dataF.begin(), dataF.end() );
             result.push_back(buffer.str());
         }
         else if (op == "mean") {
             double total = accumulate(dataF.begin(), dataF.end(), 0.0);
             double mean = total / dataF.size();
-            buffer << setprecision (7) << mean;
+            buffer << setprecision (PRECISION) << mean;
             result.push_back(buffer.str());
         }
         else if (op == "median") {
@@ -385,11 +388,11 @@ void ReportSummary(const vector<string> &group, const vector<vector<string> > &d
                 midHigh = (totalLines / 2);
                 median = (dataF[midLow] + dataF[midHigh]) / 2.0;
             }
-            buffer << setprecision (7) << median;
+            buffer << setprecision (PRECISION) << median;
             result.push_back(buffer.str());
         }
         else if (op == "count") {
-            buffer << setprecision (7) << data[i].size();
+            buffer << setprecision (PRECISION) << data[i].size();
             result.push_back(buffer.str());
         }
         else if ((op == "mode") || (op == "antimode") || 
@@ -418,11 +421,11 @@ void ReportSummary(const vector<string> &group, const vector<vector<string> > &d
             }
             // report
             if (op == "mode") {
-                buffer << setprecision (7) << mode;
+                buffer << setprecision (PRECISION) << mode;
                 result.push_back(buffer.str());
             }
             else if (op == "antimode") {
-                buffer << setprecision (7) << antiMode;
+                buffer << setprecision (PRECISION) << antiMode;
                 result.push_back(buffer.str());
             }
             else if (op == "freqdesc" || op == "freqasc") {
@@ -473,7 +476,7 @@ void ReportSummary(const vector<string> &group, const vector<vector<string> > &d
             }
             double stddev = sqrt(variance);
             // report
-            buffer << setprecision (7) << stddev;
+            buffer << setprecision (PRECISION) << stddev;
             result.push_back(buffer.str());
         }
     }
