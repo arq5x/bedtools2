@@ -30,15 +30,13 @@ int main(int argc, char* argv[]) {
 	bool showHelp = false;
 
 	// input files
-	string bedFile;
-	bool haveBed = false;
+	string bedFile = "stdin";
+	bool haveBed   = true;
 	
 	/* Defaults for everyone else */
 	string org = "human";
 	string db = "hg18";
 	string base = "http://genome.ucsc.edu";
-	
-	if(argc <= 1) showHelp = true;
 	
 	for(int i = 1; i < argc; i++) {
 		int parameterLength = (int)strlen(argv[i]);
@@ -58,7 +56,6 @@ int main(int argc, char* argv[]) {
 
 		if(PARAMETER_CHECK("-i", 2, parameterLength)) {
 			if ((i+1) < argc) {
-				haveBed = true;
 				bedFile = argv[i + 1];
 				i++;
 			}
