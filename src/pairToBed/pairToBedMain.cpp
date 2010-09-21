@@ -37,14 +37,15 @@ int main(int argc, char* argv[]) {
 	string searchType = "either";
 
 	// flags to track parameters
-	bool haveBedA        = false;
-	bool haveBedB        = false;
-	bool haveSearchType  = false;
-	bool haveFraction    = false;
-	bool forceStrand     = false;
-	bool useEditDistance = false;
-	bool inputIsBam      = false;
-	bool outputIsBam     = true;
+	bool haveBedA           = false;
+	bool haveBedB           = false;
+	bool haveSearchType     = false;
+	bool haveFraction       = false;
+	bool forceStrand        = false;
+	bool useEditDistance    = false;
+	bool inputIsBam         = false;
+	bool outputIsBam        = true;
+	bool uncompressedBam    = false;	
 	
 	// check to see if we should print out some help
 	if(argc <= 1) showHelp = true;
@@ -110,7 +111,10 @@ int main(int argc, char* argv[]) {
 		}
 		else if (PARAMETER_CHECK("-s", 2, parameterLength)) {
 			forceStrand = true;
-		}		
+		}
+		else if(PARAMETER_CHECK("-ubam", 5, parameterLength)) {
+            uncompressedBam = true;
+		}	
 		else {
 			cerr << endl << "*****ERROR: Unrecognized parameter: " << argv[i] << " *****" << endl << endl;
 			showHelp = true;
@@ -146,7 +150,7 @@ int main(int argc, char* argv[]) {
 
 		BedIntersectPE *bi = new BedIntersectPE(bedAFile, bedBFile, overlapFraction, 
 												searchType, forceStrand, inputIsBam, 
-												outputIsBam, useEditDistance);
+												outputIsBam, uncompressedBam, useEditDistance);
 		delete bi;
 		return 0;
 	}

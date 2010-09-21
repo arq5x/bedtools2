@@ -38,20 +38,10 @@ BedWindow::BedWindow(string bedAFile, string bedBFile, int leftSlop, int rightSl
 	_bedA          = new BedFile(bedAFile);
 	_bedB          = new BedFile(bedBFile);
 	
-	// dealing with a proper file
-	if (_bedA->bedFile != "stdin") {   
-		if (_bamInput == false) 
-			WindowIntersectBed();
-		else
-			WindowIntersectBam(_bedA->bedFile);
-	}
-	// reading from stdin
-	else {  
-		if (_bamInput == false)
-			WindowIntersectBed();
-		else
-			WindowIntersectBam("stdin");			
-	}
+	if (_bamInput == false)
+		WindowIntersectBed();
+	else
+		WindowIntersectBam(_bedAFile);			
 }
 
 

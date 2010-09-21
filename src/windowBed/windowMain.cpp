@@ -34,21 +34,22 @@ int main(int argc, char* argv[]) {
 	string bedBFile;
 
 	// input arguments
-	int leftSlop = 1000;
+	int leftSlop  = 1000;
 	int rightSlop = 1000;
 
-	bool haveBedA = false;
-	bool haveBedB = false;
-	bool noHit = false;
-	bool anyHit = false;
-	bool writeCount = false;
-	bool haveSlop = false;
-	bool haveLeft = false;
-	bool haveRight = false;
-	bool strandWindows = false;
-	bool matchOnStrand = false;
-	bool inputIsBam         = false;
-	bool outputIsBam        = true;	
+	bool haveBedA        = false;
+	bool haveBedB        = false;
+	bool noHit           = false;
+	bool anyHit          = false;
+	bool writeCount      = false;
+	bool haveSlop        = false;
+	bool haveLeft        = false;
+	bool haveRight       = false;
+	bool strandWindows   = false;
+	bool matchOnStrand   = false;
+	bool inputIsBam      = false;
+	bool outputIsBam     = true;	
+    bool uncompressedBam = false;
 
 	// check to see if we should print out some help
 	if(argc <= 1) showHelp = true;
@@ -130,6 +131,9 @@ int main(int argc, char* argv[]) {
 				rightSlop = atoi(argv[i + 1]);
 				i++;
 			}
+		}
+		else if(PARAMETER_CHECK("-ubam", 5, parameterLength)) {
+            uncompressedBam = true;
 		}		
 		else {
 			cerr << endl << "*****ERROR: Unrecognized parameter: " << argv[i] << " *****" << endl << endl;
@@ -175,7 +179,8 @@ int main(int argc, char* argv[]) {
 	
 	if (!showHelp) {
 		BedWindow *bi = new BedWindow(bedAFile, bedBFile, leftSlop, rightSlop, anyHit, 
-		                              noHit, writeCount, strandWindows, matchOnStrand, inputIsBam, outputIsBam);
+		                              noHit, writeCount, strandWindows, matchOnStrand, 
+		                              inputIsBam, outputIsBam, uncompressedBam);
 		delete bi;
 		return 0;
 	}
@@ -200,6 +205,8 @@ void ShowHelp(void) {
 	cerr << "Options: " << endl;
 	
 	cerr << "\t-abam\t"			<< "The A input file is in BAM format.  Output will be BAM as well." << endl << endl;
+	
+	cerr << "\t-ubam\t"			<< "Write uncompressed BAM output. Default is to write compressed BAM." << endl << endl;
 
 	cerr << "\t-bed\t"			<< "When using BAM input (-abam), write output as BED. The default" << endl;
 	cerr 						<< "\t\tis to write output in BAM when using -abam." << endl << endl;

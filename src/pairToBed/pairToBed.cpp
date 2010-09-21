@@ -33,35 +33,26 @@ bool IsCorrectMappingForBEDPE (const BamAlignment &bam) {
 */
 
 BedIntersectPE::BedIntersectPE(string bedAFilePE, string bedBFile, float overlapFraction, 
-						       string searchType, bool forceStrand, bool bamInput, bool bamOutput,
-						       bool useEditDistance) {
+						       string searchType, bool forceStrand, bool bamInput, 
+						       bool bamOutput,  bool uncompressedBam, bool useEditDistance) {
 
-	_bedAFilePE      = bedAFilePE;
-	_bedBFile        = bedBFile;
-	_overlapFraction = overlapFraction;
-	_forceStrand     = forceStrand;
-	_useEditDistance = useEditDistance;
-	_searchType      = searchType;
-	_bamInput        = bamInput;
-	_bamOutput       = bamOutput;
+	_bedAFilePE        = bedAFilePE;
+	_bedBFile          = bedBFile;
+	_overlapFraction   = overlapFraction;
+	_forceStrand       = forceStrand;
+	_useEditDistance   = useEditDistance;
+	_searchType        = searchType;
+	_bamInput          = bamInput;
+	_bamOutput         = bamOutput;
+    _isUncompressedBam = uncompressedBam;
 	
 	_bedA = new BedFilePE(bedAFilePE);
 	_bedB = new BedFile(bedBFile);
 	
-	// dealing with a proper file
-	if (_bedA->bedFile != "stdin") {   
-		if (_bamInput == false) 
-			IntersectBedPE();
-		else
-			IntersectBamPE(_bedA->bedFile);
-	}
-	// reading from stdin
-	else {  
-		if (_bamInput == false)
-			IntersectBedPE();
-		else
-			IntersectBamPE("stdin");			
-	}
+	if (_bamInput == false)
+		IntersectBedPE();
+	else
+		IntersectBamPE(_bedAFilePE);
 }
 
 
@@ -396,7 +387,7 @@ void BedIntersectPE::IntersectBamPE(string bamFile) {
 	// open a BAM output to stdout if we are writing BAM
 	if (_bamOutput == true) {
 		// open our BAM writer
-		writer.Open("stdout", header, refs);
+		writer.Open("stdout", header, refs, _isUncompressedBam);
 	}
 
 	// track the previous and current sequence

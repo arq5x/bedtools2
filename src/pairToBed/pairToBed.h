@@ -43,7 +43,7 @@ public:
 
 	// constructor 
 	BedIntersectPE(string bedAFilePE, string bedBFile, float overlapFraction, 
-		string searchType, bool forceStrand, bool bamInput, bool bamOutput, bool useEditDistance);
+		string searchType, bool forceStrand, bool bamInput, bool bamOutput, bool uncompressedBam, bool useEditDistance);
 
 	// destructor
 	~BedIntersectPE(void);
@@ -70,6 +70,7 @@ private:
 	bool _useEditDistance;
 	bool _bamInput;
 	bool _bamOutput;
+	bool  _isUncompressedBam;
 
 	// instance of a paired-end bed file class.
 	BedFilePE *_bedA;
