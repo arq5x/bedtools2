@@ -20,6 +20,7 @@ SUBDIRS = $(SRC_DIR)/annotateBed \
           $(SRC_DIR)/complementBed \
           $(SRC_DIR)/coverageBed \
           $(SRC_DIR)/fastaFromBed \
+          $(SRC_DIR)/fjoin \
           $(SRC_DIR)/genomeCoverageBed \
           $(SRC_DIR)/groupBy \
           $(SRC_DIR)/intersectBed \

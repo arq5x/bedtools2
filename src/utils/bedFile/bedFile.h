@@ -89,6 +89,12 @@ struct BED {
 
 	// Add'l fields for BED12 and/or custom BED annotations
 	vector<string> otherFields;
+
+	// experimental fields for the FJOIN approach.
+	bool   added;
+	bool   finished;
+	// list of hits from another file.
+    vector<BED> overlaps;
 	
 public:
     // constructors
@@ -101,7 +107,10 @@ public:
       name(""),
       score(""),
       strand(""),
-      otherFields()
+      otherFields(),
+      added(false),
+	  finished(false),
+      overlaps()
     {}
         
     // BED3
@@ -141,8 +150,8 @@ public:
       strand(strand),
       otherFields(otherFields)
     {}
+    
 }; // BED
-
 
 
 /*
