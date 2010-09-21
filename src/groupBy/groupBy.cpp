@@ -109,7 +109,7 @@ int main(int argc, char* argv[]) {
          	    i++;
             }
         }
-        else if(PARAMETER_CHECK("-grp", 4, parameterLength)) {
+        else if (PARAMETER_CHECK("-grp", 4, parameterLength) || PARAMETER_CHECK("-g", 2, parameterLength)) {
 			if ((i+1) >= argc || LOOKS_LIKE_A_PARAM(argv[i+1])) {
 				cerr << endl << "*****ERROR: -grp parameter requires a value." << endl << endl;
                 ShowHelp();
@@ -120,7 +120,7 @@ int main(int argc, char* argv[]) {
 				i++;			
 			}     
         }
-        else if(PARAMETER_CHECK("-opCols", 7, parameterLength)) {
+        else if(PARAMETER_CHECK("-opCols", 7, parameterLength) || PARAMETER_CHECK("-c", 2, parameterLength)) {
 			if ((i+1) >= argc || LOOKS_LIKE_A_PARAM(argv[i+1])) {
 				cerr << endl << "*****ERROR: -opCols parameter requires a value." << endl << endl;
                 ShowHelp();
@@ -132,7 +132,7 @@ int main(int argc, char* argv[]) {
 				i++;			
 			}           
         }
-        else if(PARAMETER_CHECK("-ops", 4, parameterLength)) {
+        else if(PARAMETER_CHECK("-ops", 4, parameterLength) || PARAMETER_CHECK("-o", 2, parameterLength)) {
 			if ((i+1) >= argc || LOOKS_LIKE_A_PARAM(argv[i+1])) {
 				cerr << endl << "*****ERROR: -ops parameter requires a value." << endl << endl;
                 ShowHelp();
@@ -215,41 +215,42 @@ void ShowHelp(void) {
     cerr << "Summary: Summarizes a dataset column based upon" << endl;
     cerr << "\t common column groupings. Akin to the SQL \"group by\" command." << endl << endl;
     
-    cerr << "Usage:   " << PROGRAM_NAME << " [OPTIONS] -i <input> -opCol <column> " << endl << endl;
+    cerr << "Usage:   " << PROGRAM_NAME << " -i <input> -g <group_column(s)> -c <op_column(s)> -o <ops> " << endl << endl;
 
     cerr << "Options: " << endl;
-    cerr << "\t-i\t"        << "Input file. Use \"stdin\" for pipes." << endl << endl;
+    cerr << "\t-i\t\t"        << "Input file. Use \"stdin\" for pipes." << endl << endl;
     
-    cerr << "\t-grp\t"      << "Specify the columns (1-based) for the grouping." << endl;
-    cerr                    << "\t\tThe columns must be comma separated." << endl;
-    cerr                    << "\t\t- Default: 1,2,3" << endl << endl;  
+    cerr << "\t-g -grp\t\t"      << "Specify the columns (1-based) for the grouping." << endl;
+    cerr                         << "\t\t\tThe columns must be comma separated." << endl;
+    cerr                         << "\t\t\t- Default: 1,2,3" << endl << endl;  
 
-    cerr << "\t-opCols\t"   << "Specify the column (1-based) that should be summarized." << endl;
-    cerr                    << "\t\t- Required." << endl << endl;
+    cerr << "\t-c -opCols\t"   << "Specify the column (1-based) that should be summarized." << endl;
+    cerr                         << "\t\t\t- Required." << endl << endl;
 
-    cerr << "\t-ops\t"      << "Specify the operation that should be applied to opCol." << endl;
-    cerr                    << "\t\tValid operations:" << endl;
-    cerr                    << "\t\t    sum, count, min, max," << endl;
-    cerr                    << "\t\t    mean, median, mode, antimode," << endl;
-    cerr                    << "\t\t    stdev, sstdev (sample standard dev.)," << endl;    
-    cerr                    << "\t\t    collapse (i.e., print a comma separated list), " << endl;
-    cerr                    << "\t\t    freqdesc (i.e., print desc. list of values:frequency)" << endl;
-    cerr                    << "\t\t    freqasc  (i.e., print asc. list of values:frequency), " << endl;
-    cerr                    << "\t\t- Default: sum" << endl << endl;
+    cerr << "\t-o -ops\t\t"      << "Specify the operation that should be applied to opCol." << endl;
+    cerr                         << "\t\t\tValid operations:" << endl;
+    cerr                         << "\t\t\t    sum, count, min, max," << endl;
+    cerr                         << "\t\t\t    mean, median, mode, antimode," << endl;
+    cerr                         << "\t\t\t    stdev, sstdev (sample standard dev.)," << endl;    
+    cerr                         << "\t\t\t    collapse (i.e., print a comma separated list), " << endl;
+    cerr                         << "\t\t\t    freqdesc (i.e., print desc. list of values:frequency)" << endl;
+    cerr                         << "\t\t\t    freqasc  (i.e., print asc. list of values:frequency), " << endl;
+    cerr                         << "\t\t\t- Default: sum" << endl << endl;
 
     cerr << "Examples: " << endl;
     cerr << "\t$ cat ex1.out" << endl;
     cerr << "\tchr1 10  20  A   chr1    15  25  B.1 1000" << endl;
     cerr << "\tchr1 10  20  A   chr1    25  35  B.2 10000" << endl << endl;
-    cerr << "\t$ groupBy -i ex1.out -grp 1,2,3,4 -opCols 9 -ops sum" << endl;
+    cerr << "\t$ groupBy -i ex1.out -g 1,2,3,4 -c 9 -o sum" << endl;
     cerr << "\tchr1 10  20  A   11000" << endl << endl;
     cerr << "\t$ groupBy -i ex1.out -grp 1,2,3,4 -opCols 9,9 -ops sum,max" << endl;
     cerr << "\tchr1 10  20  A   11000   10000" << endl << endl;
-    cerr << "\t$ groupBy -i ex1.out -grp 1,2,3,4 -opCols 8,9 -ops collapse,mean" << endl;
+    cerr << "\t$ groupBy -i ex1.out -g 1,2,3,4 -c 8,9 -o collapse,mean" << endl;
     cerr << "\tchr1 10  20  A   B.1,B.2,    5500" << endl << endl;
     
     cerr << "Notes: " << endl;
     cerr << "\t(1)  The input file/stream should be sorted/grouped by the -grp. columns" << endl << endl;
+    cerr << "\t(2)  If -i is unspecified, input is assumed to come from stdin." << endl << endl;
 
     
     // end the program here
