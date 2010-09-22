@@ -7,7 +7,7 @@
   University of Virginia
   aaronquinlan@gmail.com
 
-  Licenced under the GNU General Public License 2.0+ license.
+  Licenced under the GNU General Public License 2.0 license.
 ******************************************************************************/
 #include "pairToBed.h"
 #include "version.h"
@@ -174,6 +174,9 @@ void ShowHelp(void) {
 
 	cerr << "\t-abam\t"			<< "The A input file is in BAM format.  Output will be BAM as well." << endl;
 	cerr 					    << "\t\t- Requires BAM to be grouped or sorted by query." << endl << endl;
+
+	cerr << "\t-ubam\t"			<< "Write uncompressed BAM output. Default is to write compressed BAM." << endl << endl;
+	cerr 						<< "\t\tis to write output in BAM when using -abam." << endl << endl;
 	
 	cerr << "\t-bedpe\t"		<< "When using BAM input (-abam), write output as BEDPE. The default" << endl;
 	cerr 						<< "\t\tis to write output in BAM when using -abam." << endl << endl;

@@ -7,7 +7,7 @@
   University of Virginia
   aaronquinlan@gmail.com
 
-  Licenced under the GNU General Public License 2.0+ license.
+  Licenced under the GNU General Public License 2.0 license.
 ******************************************************************************/
 #ifndef INTERSECTBED_H
 #define INTERSECTBED_H

@@ -7,7 +7,7 @@
   University of Virginia
   aaronquinlan@gmail.com
 
-  Licenced under the GNU General Public License 2.0+ license.
+  Licenced under the GNU General Public License 2.0 license.
 ******************************************************************************/
 #include <vector>
 #include <map>
@@ -236,8 +236,8 @@ void ShowHelp(void) {
     cerr                         << "\t\t\t    mean, median, mode, antimode," << endl;
     cerr                         << "\t\t\t    stdev, sstdev (sample standard dev.)," << endl;    
     cerr                         << "\t\t\t    collapse (i.e., print a comma separated list), " << endl;
-    cerr                         << "\t\t\t    freqdesc (i.e., print desc. list of values:frequency)" << endl;
-    cerr                         << "\t\t\t    freqasc  (i.e., print asc. list of values:frequency), " << endl;
+    cerr                         << "\t\t\t    freqdesc (i.e., print desc. list of values:freq)" << endl;
+    cerr                         << "\t\t\t    freqasc (i.e., print asc. list of values:freq)" << endl;
     cerr                         << "\t\t\t- Default: sum" << endl << endl;
 
     cerr << "Examples: " << endl;

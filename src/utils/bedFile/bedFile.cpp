@@ -7,7 +7,7 @@
   University of Virginia
   aaronquinlan@gmail.com
 
-  Licensed under the GNU General Public License 2.0+ license.
+  Licensed under the GNU General Public License 2.0 license.
 ******************************************************************************/
 #include "bedFile.h"
 
@@ -448,6 +448,7 @@ void BedFile::countListHits(const BED &a, int index, bool forceStrand) {
             for (; bedItr != bedEnd; ++bedItr) {
 
                 // skip the hit if not on the same strand (and we care)
+                cout << a.strand << "\t" << bedItr->strand << "\t" << forceStrand << endl;
                 if (forceStrand && (a.strand != bedItr->strand)) {
                     continue;
                 }

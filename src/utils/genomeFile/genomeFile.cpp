@@ -7,7 +7,7 @@
   University of Virginia
   aaronquinlan@gmail.com
 
-  Licensed under the GNU General Public License 2.0+ license.
+  Licensed under the GNU General Public License 2.0 license.
 ******************************************************************************/
 #include "lineFileUtilities.h"
 #include "genomeFile.h"
