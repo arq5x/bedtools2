@@ -7,7 +7,7 @@
   University of Virginia
   aaronquinlan@gmail.com
 
-  Licenced under the GNU General Public License 2.0+ license.
+  Licenced under the GNU General Public License 2.0 license.
 ******************************************************************************/
 #include "lineFileUtilities.h"
 #include "annotateBed.h"
@@ -19,7 +19,7 @@ BedAnnotate::BedAnnotate(const string &mainFile, const vector<string> &annoFileN
     _mainFile(mainFile),
     _annoFileNames(annoFileNames),
     _annoTitles(annoTitles),
-    _forceStrand(_forceStrand),
+    _forceStrand(forceStrand),
     _reportCounts(reportCounts),
     _reportBoth(reportBoth)
 {
