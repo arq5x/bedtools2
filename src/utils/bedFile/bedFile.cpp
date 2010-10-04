@@ -447,8 +447,6 @@ void BedFile::countListHits(const BED &a, int index, bool forceStrand) {
             vector<BEDCOVLIST>::iterator bedEnd = bedCovListMap[a.chrom][j].end();		
             for (; bedItr != bedEnd; ++bedItr) {
 
-                // skip the hit if not on the same strand (and we care)
-                cout << a.strand << "\t" << bedItr->strand << "\t" << forceStrand << endl;
                 if (forceStrand && (a.strand != bedItr->strand)) {
                     continue;
                 }
