@@ -36,16 +36,18 @@ using namespace std;
 void ShowHelp(void);
 
 void ConvertBamToBed(const string &bamFile, const bool &useEditDistance, const string &bamTag,
-                     const bool &writeBed12, const bool &obeySplits, const string &color);
+                     const bool &writeBed12, const bool &obeySplits, const string &color, const bool &useCigar);
 void ConvertBamToBedpe(const string &bamFile, const bool &useEditDistance);
 					
-void PrintBed(const BamAlignment &bam, const RefVector &refs, bool useEditDistance, const string &bamTag, bool obeySplits);
+void PrintBed(const BamAlignment &bam, const RefVector &refs, bool useEditDistance, const string &bamTag, bool obeySplits, bool useCigar);
 void PrintBed12(const BamAlignment &bam, const RefVector &refs, bool useEditDistance, const string &bamTag, string color = "255,0,0");
 void PrintBedPE(const BamAlignment &bam1, const BamAlignment &bam2,
                 const RefVector &refs, bool useEditDistance);
 
 void ParseCigarBed12(const vector<CigarOp> &cigar, vector<int> &blockStarts, 
                      vector<int> &blockEnds, int &alignmentEnd);
+string BuildCigarString(const vector<CigarOp> &cigar);
+                 
 bool IsCorrectMappingForBEDPE (const BamAlignment &bam);
 
 
@@ -66,6 +68,7 @@ int main(int argc, char* argv[]) {
 	bool writeBed12        = false;	
 	bool useEditDistance   = false;
 	bool useAlignmentScore = false;
+    bool useCigar          = false;
 	bool obeySplits        = false;
 		
 	// check to see if we should print out some help
@@ -104,6 +107,9 @@ int main(int argc, char* argv[]) {
 		else if(PARAMETER_CHECK("-ed", 3, parameterLength)) {
 				useEditDistance = true;
 		}
+		else if(PARAMETER_CHECK("-cigar", 6, parameterLength)) {
+				useCigar = true;
+		}
 		else if(PARAMETER_CHECK("-as", 3, parameterLength)) {
 				useAlignmentScore = true;
 		}
@@ -140,6 +146,10 @@ int main(int argc, char* argv[]) {
 		cerr << endl << "*****" << endl << "*****ERROR: Cannot use -ed with -splits.  Edit distances cannot be computed for each \'chunk\'." << endl << "*****" << endl;
 		showHelp = true;
 	}
+	if (useEditDistance == true && useCigar == true) {
+		cerr << endl << "*****" << endl << "*****ERROR: Cannot use -cigar with -splits.  Not yet supported." << endl << "*****" << endl;
+		showHelp = true;
+	}
 	if (useEditDistance == true && haveOtherTag == true) {
 		cerr << endl << "*****" << endl << "*****ERROR: Cannot use -ed with -tag.  Choose one or the other." << endl << "*****" << endl;
 		showHelp = true;
@@ -151,7 +161,7 @@ int main(int argc, char* argv[]) {
 	// if there are no problems, let's convert BAM to BED or BEDPE
 	if (!showHelp) {
 		if (writeBedPE == false) 
-			ConvertBamToBed(bamFile, useEditDistance, tag, writeBed12, obeySplits, color);	// BED or "blocked BED"
+			ConvertBamToBed(bamFile, useEditDistance, tag, writeBed12, obeySplits, color, useCigar);	// BED or "blocked BED"
 		else
 			ConvertBamToBedpe(bamFile, useEditDistance);                    // BEDPE
 	}	
@@ -194,6 +204,8 @@ void ShowHelp(void) {
 
 	cerr << "\t-color\t"	<< "An R,G,B string for the color used with BED12 format." << endl;
 	cerr 					<< "\t\tDefault is (255,0,0)." << endl;
+	
+	cerr << "\t-cigar\t"	<< "Add the CIGAR string to the BED entry as a 7th column." << endl << endl;
 
 
 	// end the program here
@@ -202,7 +214,7 @@ void ShowHelp(void) {
 
 
 void ConvertBamToBed(const string &bamFile, const bool &useEditDistance, const string &bamTag,
-                     const bool &writeBed12, const bool &obeySplits, const string &color) {
+                     const bool &writeBed12, const bool &obeySplits, const string &color, const bool &useCigar) {
 	// open the BAM file
 	BamReader reader;
 	reader.Open(bamFile);
@@ -216,7 +228,7 @@ void ConvertBamToBed(const string &bamFile, const bool &useEditDistance, const s
 	while (reader.GetNextAlignment(bam)) {
 		if (bam.IsMapped() == true) {
 			if (writeBed12 == false)                 // BED
-				PrintBed(bam, refs, useEditDistance, bamTag, obeySplits);
+				PrintBed(bam, refs, useEditDistance, bamTag, obeySplits, useCigar);
 			else                                     //"blocked" BED
 				PrintBed12(bam, refs, useEditDistance, bamTag, color);
 		}
@@ -299,7 +311,28 @@ void ParseCigarBed12(const vector<CigarOp> &cigar, vector<int> &blockStarts, vec
 }
 
 
-void PrintBed(const BamAlignment &bam,  const RefVector &refs, bool useEditDistance, const string &bamTag, bool obeySplits) {
+string BuildCigarString(const vector<CigarOp> &cigar) {
+
+    stringstream cigarString;
+    
+	for (size_t i = 0; i < cigar.size(); ++i) {
+        //cerr << cigar[i].Type << " " << cigar[i].Length << endl;	    
+	    switch (cigar[i].Type) {
+			case ('M') : 
+			case ('I') :
+		    case ('D') :
+			case ('N') :
+		    case ('S') :
+		    case ('H') :
+		    case ('P') :
+                cigarString << cigar[i].Length << cigar[i].Type;
+        }
+	}
+    return cigarString.str();
+}
+
+
+void PrintBed(const BamAlignment &bam,  const RefVector &refs, bool useEditDistance, const string &bamTag, bool obeySplits, bool useCigar) {
 
 	// set the strand
 	string strand = "+"; 
@@ -317,13 +350,13 @@ void PrintBed(const BamAlignment &bam,  const RefVector &refs, bool useEditDista
     if (obeySplits == false) {
     	// report the alignment in BED6 format.
     	if (useEditDistance == false && bamTag == "") {
-    		printf("%s\t%d\t%d\t\%s\t%d\t%s\n", refs.at(bam.RefID).RefName.c_str(), bam.Position,
+    		printf("%s\t%d\t%d\t\%s\t%d\t%s", refs.at(bam.RefID).RefName.c_str(), bam.Position,
     									  alignmentEnd, name.c_str(), bam.MapQuality, strand.c_str());
     	}
     	else if (useEditDistance == true && bamTag == "") {
     		uint32_t editDistance;
     		if (bam.GetTag("NM", editDistance)) {
-    			printf("%s\t%d\t%d\t\%s\t%u\t%s\n", refs.at(bam.RefID).RefName.c_str(), bam.Position,
+    			printf("%s\t%d\t%d\t\%s\t%u\t%s", refs.at(bam.RefID).RefName.c_str(), bam.Position,
     										  alignmentEnd, name.c_str(), editDistance, strand.c_str());
     		}
     		else {
@@ -334,13 +367,22 @@ void PrintBed(const BamAlignment &bam,  const RefVector &refs, bool useEditDista
     	else if (useEditDistance == false && bamTag != "") {
     		int32_t tagValue;
     		if (bam.GetTag(bamTag, tagValue)) {
-    			printf("%s\t%d\t%d\t\%s\t%d\t%s\n", refs.at(bam.RefID).RefName.c_str(), bam.Position,
+    			printf("%s\t%d\t%d\t\%s\t%d\t%s", refs.at(bam.RefID).RefName.c_str(), bam.Position,
     										  alignmentEnd, name.c_str(), tagValue, strand.c_str());
     		}
     		else {
     			cerr << "The requested tag (" << bamTag << ") was not found in the BAM file.  Exiting\n";
     			exit(1);
     		}
+    	}
+    	
+    	// does the user want CIGAR as well?
+    	if (useCigar == false) {
+            printf("\n");
+    	}
+    	else {
+            string cigar = BuildCigarString(bam.CigarData);
+            printf("\t%s\n", cigar.c_str());
     	}
 	}
     // Report each chunk of the BAM alignment as a discrete BED entry

@@ -95,7 +95,7 @@ struct BamAlignment {
         void SetIsMateUnmapped(bool ok);	// Sets "alignment's mate is mapped" flag        
         void SetIsMateReverseStrand(bool ok);	// Sets "alignment's mate mapped to reverse strand" flag        
         void SetIsPaired(bool ok);		// Sets "alignment part of paired-end read" flag        
-	void SetIsProperPair(bool ok);		// Sets "alignment is part of read that satisfied paired-end resolution" flag        
+	    void SetIsProperPair(bool ok);		// Sets "alignment is part of read that satisfied paired-end resolution" flag        
         void SetIsReverseStrand(bool ok);	// Sets "alignment mapped to reverse strand" flag        
         void SetIsSecondaryAlignment(bool ok);	// Sets "position is primary alignment" flag        
         void SetIsSecondMate(bool ok);		// Sets "alignment is second mate on read" flag        
@@ -418,7 +418,7 @@ int BamAlignment::GetEndPosition(bool usePadded) const {
 	if ( cigarType == 'M' || cigarType == 'D' || cigarType == 'N' ) {
 	    alignEnd += (*cigarIter).Length;
 	} 
-        else if ( usePadded && cigarType == 'I' ) {
+    else if ( usePadded && cigarType == 'I' ) {
             alignEnd += (*cigarIter).Length;
         }
     }

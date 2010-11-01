@@ -207,11 +207,11 @@ void PairToPair::FindHitsOnEitherEnd(const BEDPE &a, const vector<BEDCOV> &quali
 	map<unsigned int, vector<BEDCOV>, less<int> > hitsMap;
 	
 	for (vector<BEDCOV>::const_iterator h = qualityHitsEnd1.begin(); h != qualityHitsEnd1.end(); ++h) {
-		hitsMap[h->count].push_back(*h);
+		hitsMap[h->lineNum].push_back(*h);
 		matchCount++;
 	}
 	for (vector<BEDCOV>::const_iterator h = qualityHitsEnd2.begin(); h != qualityHitsEnd2.end(); ++h) {
-		hitsMap[h->count].push_back(*h);
+		hitsMap[h->lineNum].push_back(*h);
 		matchCount++;
 	}
 
