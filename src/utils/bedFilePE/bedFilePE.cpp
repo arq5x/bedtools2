@@ -421,7 +421,7 @@ bool BedFilePE::parseBedPELine (BEDPE &bed, const vector<string> &lineVector, co
 /*
 	Adapted from kent source "binKeeperFind"
 */
-void BedFilePE::FindOverlapsPerBin(int bEnd, string chrom, CHRPOS start, CHRPOS end, string strand, vector<BEDCOV> &hits, bool forceStrand) {
+void BedFilePE::FindOverlapsPerBin(int bEnd, string chrom, CHRPOS start, CHRPOS end, string strand, vector<MATE> &hits, bool forceStrand) {
 
 	int startBin, endBin;
 	startBin = (start >> _binFirstShift);
@@ -437,8 +437,8 @@ void BedFilePE::FindOverlapsPerBin(int bEnd, string chrom, CHRPOS start, CHRPOS 
 			// loop through each feature in this chrom/bin and see if it overlaps
 			// with the feature that was passed in.  if so, add the feature to 
 			// the list of hits.
-			vector<BEDCOV>::const_iterator bedItr;
-			vector<BEDCOV>::const_iterator bedEnd;
+			vector<MATE>::const_iterator bedItr;
+			vector<MATE>::const_iterator bedEnd;
 			if (bEnd == 1) {
 				bedItr = bedMapEnd1[chrom][j].begin();
 				bedEnd = bedMapEnd1[chrom][j].end();
@@ -453,10 +453,10 @@ void BedFilePE::FindOverlapsPerBin(int bEnd, string chrom, CHRPOS start, CHRPOS 
 			for (; bedItr != bedEnd; ++bedItr) {
 				
 				// skip the hit if not on the same strand (and we care)
-				if (forceStrand && (strand != bedItr->strand)) {
+				if (forceStrand && (strand != bedItr->bed.strand)) {
 					continue;
 				}
-				else if (overlaps(bedItr->start, bedItr->end, start, end) > 0) {
+				else if (overlaps(bedItr->bed.start, bedItr->bed.end, start, end) > 0) {
 					hits.push_back(*bedItr);	// it's a hit, add it.
 				}
 							
@@ -480,18 +480,19 @@ void BedFilePE::loadBedPEFileIntoMap() {
 	while (bedStatus != BED_INVALID) {
 		
 		if (bedStatus == BED_VALID) {
-			BEDCOV bedEntry1, bedEntry2;
+            MATE *bedEntry1 = new MATE();
+            MATE *bedEntry2 = new MATE();
 			// separate the BEDPE entry into separate
 			// BED entries
 			splitBedPEIntoBeds(bedpeEntry, lineNum, bedEntry1, bedEntry2);
 
 			// load end1 into a UCSC bin map
-			bin1 = getBin(bedEntry1.start, bedEntry1.end);
-			this->bedMapEnd1[bedEntry1.chrom][bin1].push_back(bedEntry1);	
+			bin1 = getBin(bedEntry1->bed.start, bedEntry1->bed.end);
+			this->bedMapEnd1[bedEntry1->bed.chrom][bin1].push_back(*bedEntry1);	
 		
 			// load end2 into a UCSC bin map
-			bin2 = getBin(bedEntry2.start, bedEntry2.end);
-			this->bedMapEnd2[bedEntry2.chrom][bin2].push_back(bedEntry2);
+			bin2 = getBin(bedEntry2->bed.start, bedEntry2->bed.end);
+			this->bedMapEnd2[bedEntry2->bed.chrom][bin2].push_back(*bedEntry2);
 
 			bedpeEntry = nullBedPE;
 		}
@@ -501,7 +502,7 @@ void BedFilePE::loadBedPEFileIntoMap() {
 }
 
 
-void BedFilePE::splitBedPEIntoBeds(const BEDPE &bedpeEntry, const int &lineNum, BEDCOV &bedEntry1, BEDCOV &bedEntry2) {
+void BedFilePE::splitBedPEIntoBeds(const BEDPE &bedpeEntry, const int &lineNum, MATE *bedEntry1, MATE *bedEntry2) {
 	
 	/* 
 	   Split the BEDPE entry into separate BED entries
@@ -515,23 +516,22 @@ void BedFilePE::splitBedPEIntoBeds(const BEDPE &bedpeEntry, const int &lineNum, 
 	   read-pair.
 	*/
 	
-	bedEntry1.chrom           = bedpeEntry.chrom1;
-	bedEntry1.start           = bedpeEntry.start1;
-	bedEntry1.end             = bedpeEntry.end1;
-	bedEntry1.name            = bedpeEntry.name;
-	bedEntry1.score           = bedpeEntry.score;
-	bedEntry1.strand          = bedpeEntry.strand1;
-	bedEntry1.count           = lineNum;
-	bedEntry1.minOverlapStart = INT_MAX;
+	bedEntry1->bed.chrom           = bedpeEntry.chrom1;
+	bedEntry1->bed.start           = bedpeEntry.start1;
+	bedEntry1->bed.end             = bedpeEntry.end1;
+	bedEntry1->bed.name            = bedpeEntry.name;         // only store the name in end1 to save memory
+	bedEntry1->bed.score           = bedpeEntry.score;        // only store the score in end1 to save memory
+	bedEntry1->bed.strand          = bedpeEntry.strand1;
+	bedEntry1->bed.otherFields     = bedpeEntry.otherFields;  // only store the otherFields in end1 to save memory    
+	bedEntry1->lineNum             = lineNum;
+    bedEntry1->mate                = bedEntry2;               // keep a pointer to end2
 	
-	bedEntry2.chrom           = bedpeEntry.chrom2;
-	bedEntry2.start           = bedpeEntry.start2;
-	bedEntry2.end             = bedpeEntry.end2;
-	bedEntry2.name            = bedpeEntry.name;
-	bedEntry2.score           = bedpeEntry.score;
-	bedEntry2.strand          = bedpeEntry.strand2;		
-	bedEntry2.count           = lineNum;
-	bedEntry2.minOverlapStart = INT_MAX;
+	bedEntry2->bed.chrom           = bedpeEntry.chrom2;
+	bedEntry2->bed.start           = bedpeEntry.start2;
+	bedEntry2->bed.end             = bedpeEntry.end2;
+	bedEntry2->bed.strand          = bedpeEntry.strand2;
+	bedEntry2->lineNum             = lineNum;
+    bedEntry2->mate                = bedEntry1;               // keep a pointer to end1
 }
 
 

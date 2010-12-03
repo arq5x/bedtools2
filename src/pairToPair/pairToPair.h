@@ -20,6 +20,8 @@
 
 using namespace std;
 
+
+
 //************************************************
 // Class methods and elements
 //************************************************
@@ -55,17 +57,17 @@ private:
 	BedFilePE *_bedB;
 	
 	// methods
-	void FindOverlaps(const BEDPE &a, vector<BEDCOV> &hitsA1B1, vector<BEDCOV> &hitsA1B2, 
-		vector<BEDCOV> &hitsA2B1, vector<BEDCOV> &hitsA2B2);
+	void FindOverlaps(const BEDPE &a, vector<MATE> &hitsA1B1, vector<MATE> &hitsA1B2, 
+		vector<MATE> &hitsA2B1, vector<MATE> &hitsA2B2);
 
     void FindQualityHitsBetweenEnds(CHRPOS start, CHRPOS end,
-        const vector<BEDCOV> &hits, vector<BEDCOV> &qualityHits, int &numOverlaps);
+        const vector<MATE> &hits, vector<MATE> &qualityHits, int &numOverlaps);
 	
-	void FindHitsOnBothEnds(const BEDPE &a, const vector<BEDCOV> &qualityHitsEnd1, 
-		const vector<BEDCOV> &qualityHitsEnd2, int &matchCount);
+	void FindHitsOnBothEnds(const BEDPE &a, const vector<MATE> &qualityHitsEnd1, 
+		const vector<MATE> &qualityHitsEnd2, int &matchCount);
 		
-	void FindHitsOnEitherEnd(const BEDPE &a, const vector<BEDCOV> &qualityHitsEnd1, 
-        const vector<BEDCOV> &qualityHitsEnd2, int &matchCount);
+	void FindHitsOnEitherEnd(const BEDPE &a, const vector<MATE> &qualityHitsEnd1, 
+        const vector<MATE> &qualityHitsEnd2, int &matchCount);
         
 };
 

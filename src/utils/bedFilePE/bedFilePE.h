@@ -69,18 +69,18 @@ public:
 	void reportBedPETab(const BEDPE &a);
 	void reportBedPENewLine(const BEDPE &a);
 	void loadBedPEFileIntoMap();
-	void splitBedPEIntoBeds(const BEDPE &a, const int &lineNum, BEDCOV &bedEntry1, BEDCOV &bedEntry2);
+	void splitBedPEIntoBeds(const BEDPE &a, const int &lineNum, MATE *bedEntry1, MATE *bedEntry2);
 		 
 		
 	void FindOverlapsPerBin(int bEnd, string chrom, CHRPOS start, CHRPOS end, string strand, 
-		vector<BEDCOV> &hits, bool forceStrand);
+		vector<MATE> &hits, bool forceStrand);
 		
 		
 	string bedFile;
 	unsigned int bedType;
 	
-	masterBedCovMap bedMapEnd1;
-	masterBedCovMap bedMapEnd2;
+	masterMateMap bedMapEnd1;
+	masterMateMap bedMapEnd2;
 	
 private:
 	istream *_bedStream;
