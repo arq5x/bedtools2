@@ -161,8 +161,9 @@ void ShowHelp(void) {
 	cerr 								<< "\t\tboth\tReport overlaps if both ends of A overlap B." << endl;
 	cerr								<< "\t\t\t- Default = both." << endl << endl;
 
-	cerr << "\t-slop \t"				<< "The amount of slop (in b.p.). to be added to each footprint." << endl << endl;
-
+    cerr << "\t-slop \t"				<< "The amount of slop (in b.p.). to be added to each footprint." << endl;
+    cerr                                << "\t\t*Note*: Slop is subtracted from start1 and start2 and added to end1 and end2." << endl << endl;
+    
 	cerr << "\t-ss\t"	    			<< "Add slop based to each BEDPE footprint based on strand." << endl;
 	cerr 								<< "\t\t- If strand is \"+\", slop is only added to the end coordinates." << endl;
 	cerr 								<< "\t\t- If strand is \"-\", slop is only added to the start coordinates." << endl;

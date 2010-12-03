@@ -49,7 +49,7 @@ void PairToPair::IntersectPairs() {
 	_bedB->loadBedPEFileIntoMap();
 	
 	int lineNum = 0;	
-	vector<BEDCOV> hitsA1B1, hitsA1B2, hitsA2B1, hitsA2B2;
+	vector<MATE> hitsA1B1, hitsA1B2, hitsA2B1, hitsA2B2;
 	// reserve some space
 	hitsA1B1.reserve(100); hitsA1B2.reserve(100); hitsA2B1.reserve(100); hitsA2B2.reserve(100);
 	
@@ -73,15 +73,18 @@ void PairToPair::IntersectPairs() {
 
 
 
-void PairToPair::FindOverlaps(const BEDPE &a, vector<BEDCOV> &hitsA1B1, vector<BEDCOV> &hitsA1B2, 
-							  vector<BEDCOV> &hitsA2B1, vector<BEDCOV> &hitsA2B2) {
+void PairToPair::FindOverlaps(const BEDPE &a, 
+                              vector<MATE> &hitsA1B1, 
+                              vector<MATE> &hitsA1B2, 
+							  vector<MATE> &hitsA2B1, 
+							  vector<MATE> &hitsA2B2) {
 
 	// list of hits on each end of BEDPE
 	// that exceed the requested overlap fraction
-	vector<BEDCOV> qualityHitsA1B1;
-	vector<BEDCOV> qualityHitsA1B2;
-	vector<BEDCOV> qualityHitsA2B1;
-	vector<BEDCOV> qualityHitsA2B2;
+	vector<MATE> qualityHitsA1B1;
+	vector<MATE> qualityHitsA1B2;
+	vector<MATE> qualityHitsA2B1;
+	vector<MATE> qualityHitsA2B2;
 
 	// count of hits on each end of BEDPE
 	// that exceed the requested overlap fraction
@@ -151,14 +154,14 @@ void PairToPair::FindOverlaps(const BEDPE &a, vector<BEDCOV> &hitsA1B1, vector<B
 }
 
 
-void PairToPair::FindQualityHitsBetweenEnds(CHRPOS start, CHRPOS end, const vector<BEDCOV> &hits, 
-                                            vector<BEDCOV> &qualityHits, int &numOverlaps) {
+void PairToPair::FindQualityHitsBetweenEnds(CHRPOS start, CHRPOS end, const vector<MATE> &hits, 
+                                            vector<MATE> &qualityHits, int &numOverlaps) {
 
-	vector<BEDCOV>::const_iterator h       = hits.begin();
-	vector<BEDCOV>::const_iterator hitsEnd = hits.end();
+	vector<MATE>::const_iterator h       = hits.begin();
+	vector<MATE>::const_iterator hitsEnd = hits.end();
 	for (; h != hitsEnd; ++h) {				
-		int s = max(start, h->start);
-		int e = min(end, h->end);
+		int s = max(start, h->bed.start);
+		int e = min(end, h->bed.end);
 
 		// is there enough overlap (default ~ 1bp)
 		if ( ((float)(e-s) / (float)(end - start)) >= _overlapFraction ) {
@@ -169,71 +172,82 @@ void PairToPair::FindQualityHitsBetweenEnds(CHRPOS start, CHRPOS end, const vect
 }
 
 
-void PairToPair::FindHitsOnBothEnds(const BEDPE &a, const vector<BEDCOV> &qualityHitsEnd1, 
-									const vector<BEDCOV> &qualityHitsEnd2, int &matchCount) {
+void PairToPair::FindHitsOnBothEnds(const BEDPE &a, const vector<MATE> &qualityHitsEnd1, 
+									const vector<MATE> &qualityHitsEnd2, int &matchCount) {
 	
-	map<unsigned int, vector<BEDCOV>, less<int> > hitsMap;
+	map<unsigned int, vector<MATE>, less<int> > hitsMap;
 	
-	for (vector<BEDCOV>::const_iterator h = qualityHitsEnd1.begin(); h != qualityHitsEnd1.end(); ++h) {
-		hitsMap[h->count].push_back(*h);
+	for (vector<MATE>::const_iterator h = qualityHitsEnd1.begin(); h != qualityHitsEnd1.end(); ++h) {
+		hitsMap[h->lineNum].push_back(*h);
 		matchCount++;
 	}
-	for (vector<BEDCOV>::const_iterator h = qualityHitsEnd2.begin(); h != qualityHitsEnd2.end(); ++h) {
-		hitsMap[h->count].push_back(*h);
+	for (vector<MATE>::const_iterator h = qualityHitsEnd2.begin(); h != qualityHitsEnd2.end(); ++h) {
+		hitsMap[h->lineNum].push_back(*h);
 		matchCount++;
 	}
 
-	for (map<unsigned int, vector<BEDCOV>, less<unsigned int> >::iterator m = hitsMap.begin(); m != hitsMap.end(); ++m) {
+	for (map<unsigned int, vector<MATE>, less<unsigned int> >::iterator m = hitsMap.begin(); m != hitsMap.end(); ++m) {
 		if (m->second.size() == 2) {
 			
-			BEDCOV b1 = m->second[0];
-			BEDCOV b2 = m->second[1];
+			MATE b1 = m->second[0];
+			MATE b2 = m->second[1];
 			
 			if (_searchType == "both") {
 				_bedA->reportBedPETab(a);
-				printf("%s\t%d\t%d\t%s\t%d\t%d\t%s\t%s\t%s\t%s\n", b1.chrom.c_str(), b1.start, b1.end,
-																   b2.chrom.c_str(), b2.start, b2.end,
-																   b1.name.c_str(), b1.score.c_str(), 
-																   b1.strand.c_str(), b2.strand.c_str());
+				printf("%s\t%d\t%d\t%s\t%d\t%d\t%s\t%s\t%s\t%s", b1.bed.chrom.c_str(), b1.bed.start, b1.bed.end,
+																   b2.bed.chrom.c_str(), b2.bed.start, b2.bed.end,
+																   b1.bed.name.c_str(), b1.bed.score.c_str(), 
+																   b1.bed.strand.c_str(), b2.bed.strand.c_str());
+				for (size_t i = 0; i < b1.bed.otherFields.size(); ++i)
+                    printf("\t%s", b1.bed.otherFields[i].c_str());
+                printf("\n");
 			}
 		}
 	}
 }
 
 
-void PairToPair::FindHitsOnEitherEnd(const BEDPE &a, const vector<BEDCOV> &qualityHitsEnd1, 
-									const vector<BEDCOV> &qualityHitsEnd2, int &matchCount) {
+void PairToPair::FindHitsOnEitherEnd(const BEDPE &a, const vector<MATE> &qualityHitsEnd1, 
+									const vector<MATE> &qualityHitsEnd2, int &matchCount) {
 	
-	map<unsigned int, vector<BEDCOV>, less<int> > hitsMap;
+	map<unsigned int, vector<MATE>, less<int> > hitsMap;
 	
-	for (vector<BEDCOV>::const_iterator h = qualityHitsEnd1.begin(); h != qualityHitsEnd1.end(); ++h) {
+	for (vector<MATE>::const_iterator h = qualityHitsEnd1.begin(); h != qualityHitsEnd1.end(); ++h) {
 		hitsMap[h->lineNum].push_back(*h);
 		matchCount++;
 	}
-	for (vector<BEDCOV>::const_iterator h = qualityHitsEnd2.begin(); h != qualityHitsEnd2.end(); ++h) {
+	for (vector<MATE>::const_iterator h = qualityHitsEnd2.begin(); h != qualityHitsEnd2.end(); ++h) {
 		hitsMap[h->lineNum].push_back(*h);
 		matchCount++;
 	}
 
-	for (map<unsigned int, vector<BEDCOV>, less<unsigned int> >::iterator m = hitsMap.begin(); m != hitsMap.end(); ++m) {
+	for (map<unsigned int, vector<MATE>, less<unsigned int> >::iterator m = hitsMap.begin(); m != hitsMap.end(); ++m) {
 		if (m->second.size() >= 1) {
 			
 			if ((m->second.size()) == 2) {
-    			BEDCOV b1 = m->second[0];
-    			BEDCOV b2 = m->second[1];
-			
-    			_bedA->reportBedPETab(a);
-    			printf("%s\t%d\t%d\t%s\t%d\t%d\t%s\t%s\t%s\t%s\n", b1.chrom.c_str(), b1.start, b1.end,
-    															   b2.chrom.c_str(), b2.start, b2.end,
-    															   b1.name.c_str(), b1.score.c_str(), 
-    															   b1.strand.c_str(), b2.strand.c_str());
-			}
-			else {
-			    BEDCOV b1 = m->second[0];
+    			MATE b1 = m->second[0];
+    			MATE b2 = m->second[1];
 			    
     			_bedA->reportBedPETab(a);
-    			printf("%s\t%d\t%d\t.\t-1\t-1\t%s\t%s\t%s\t.\n", b1.chrom.c_str(), b1.start, b1.end,
-    															 b1.name.c_str(), b1.score.c_str(), b1.strand.c_str());			
+    			printf("%s\t%d\t%d\t%s\t%d\t%d\t%s\t%s\t%s\t%s", b1.bed.chrom.c_str(), b1.bed.start, b1.bed.end,
+    															   b2.bed.chrom.c_str(), b2.bed.start, b2.bed.end,
+    															   b1.bed.name.c_str(), b1.bed.score.c_str(), 
+                                                                   b1.bed.strand.c_str(), b2.bed.strand.c_str());
+                for (size_t i = 0; i < b1.bed.otherFields.size(); ++i)
+    				printf("\t%s", b1.bed.otherFields[i].c_str());
+                printf("\n");
+			}
+			else {
+			    MATE b1 = m->second[0];
+			    
+    			_bedA->reportBedPETab(a);
+    			printf("%s\t%d\t%d\t%s\t%d\t%d\t%s\t%s\t%s\t%s", b1.bed.chrom.c_str(), b1.bed.start, b1.bed.end,
+    															   b1.mate->bed.chrom.c_str(), b1.mate->bed.start, b1.mate->bed.end,
+    															   b1.bed.name.c_str(), b1.bed.score.c_str(), 
+                                                                   b1.bed.strand.c_str(), b1.mate->bed.strand.c_str());
+                for (size_t i = 0; i < b1.bed.otherFields.size(); ++i)
+    				printf("\t%s", b1.bed.otherFields[i].c_str());
+                printf("\n");		
             }
 		}
 	}

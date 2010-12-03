@@ -155,6 +155,17 @@ public:
 
 
 /*
+	Structure for each end of a paired BED record
+	mate points to the other end.
+*/
+struct MATE {
+    BED bed;
+    int lineNum;
+    MATE *mate;
+};
+
+
+/*
 	Structure for regular BED COVERAGE records
 */
 struct BEDCOV {
@@ -225,14 +236,17 @@ enum FileType
 //*************************************************
 typedef vector<BED>    bedVector;
 typedef vector<BEDCOV> bedCovVector;
+typedef vector<MATE> mateVector;
 typedef vector<BEDCOVLIST> bedCovListVector;
 
 typedef map<BIN, bedVector,    std::less<BIN> > binsToBeds;
 typedef map<BIN, bedCovVector, std::less<BIN> > binsToBedCovs;
+typedef map<BIN, mateVector, std::less<BIN> > binsToMates;
 typedef map<BIN, bedCovListVector, std::less<BIN> > binsToBedCovLists;
 
 typedef map<string, binsToBeds, std::less<string> >    masterBedMap;
 typedef map<string, binsToBedCovs, std::less<string> > masterBedCovMap;
+typedef map<string, binsToMates, std::less<string> > masterMateMap;
 typedef map<string, binsToBedCovLists, std::less<string> > masterBedCovListMap;
 typedef map<string, bedVector, std::less<string> >     masterBedMapNoBin;
 
