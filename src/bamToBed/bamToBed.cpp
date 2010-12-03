@@ -203,7 +203,7 @@ void ShowHelp(void) {
 	cerr 					<< "\t\t  Disallowed with BEDPE output." << endl << endl;
 
 	cerr << "\t-color\t"	<< "An R,G,B string for the color used with BED12 format." << endl;
-	cerr 					<< "\t\tDefault is (255,0,0)." << endl;
+	cerr 					<< "\t\tDefault is (255,0,0)." << endl << endl;
 	
 	cerr << "\t-cigar\t"	<< "Add the CIGAR string to the BED entry as a 7th column." << endl << endl;
 
