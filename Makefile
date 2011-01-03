@@ -11,6 +11,11 @@ export CXX      = g++
 export CXXFLAGS = -Wall -O2
 export LIBS     = -lz
 
+# make obj/ and bin/ if non-existent
+[ -d $(OBJ_DIR) ] || mkdir -p $(OBJ_DIR)
+[ -d $(BIN_DIR) ] || mkdir -p $(BIN_DIR)
+
+
 SUBDIRS = $(SRC_DIR)/annotateBed \
           $(SRC_DIR)/bamToBed \
           $(SRC_DIR)/bedToBam \
