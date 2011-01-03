@@ -29,46 +29,48 @@ class PairToPair {
 
 public:
 
-	// constructor 
-	PairToPair(string &bedAFilePE, string &bedBFilePE, float &overlapFraction, 
-        string searchType, bool ignoreStrand, int slop, bool strandedSlop);
+    // constructor
+    PairToPair(string &bedAFilePE, string &bedBFilePE, float &overlapFraction,
+        string searchType, bool ignoreStrand, bool reqDiffNames, int slop, bool strandedSlop);
 
-	// destructor
-	~PairToPair(void);
+    // destructor
+    ~PairToPair(void);
 
- 	void IntersectPairs();
+    void IntersectPairs();
 
-		
+
 private:
 
-	string _bedAFilePE;
-	string _bedBFilePE;
-	
-	float _overlapFraction;
-	string _searchType;
-	bool _ignoreStrand;
+    string _bedAFilePE;
+    string _bedBFilePE;
+
+    float _overlapFraction;
+    string _searchType;
+    bool _ignoreStrand;
+    bool _reqDiffNames;
     int _slop;
     bool _strandedSlop;
 
-	// instance of a paired-end bed file class.
-	BedFilePE *_bedA;
+    // instance of a paired-end bed file class.
+    BedFilePE *_bedA;
 
-	// instance of a bed file class.
-	BedFilePE *_bedB;
-	
-	// methods
-	void FindOverlaps(const BEDPE &a, vector<MATE> &hitsA1B1, vector<MATE> &hitsA1B2, 
-		vector<MATE> &hitsA2B1, vector<MATE> &hitsA2B2);
+    // instance of a bed file class.
+    BedFilePE *_bedB;
+
+    // methods
+    // void FindOverlaps(const BEDPE &a, vector<MATE> &hitsA1B1, vector<MATE> &hitsA1B2,
+    //  vector<MATE> &hitsA2B1, vector<MATE> &hitsA2B2);
+    void FindOverlaps(const BEDPE &a);
 
     void FindQualityHitsBetweenEnds(CHRPOS start, CHRPOS end,
         const vector<MATE> &hits, vector<MATE> &qualityHits, int &numOverlaps);
-	
-	void FindHitsOnBothEnds(const BEDPE &a, const vector<MATE> &qualityHitsEnd1, 
-		const vector<MATE> &qualityHitsEnd2, int &matchCount);
-		
-	void FindHitsOnEitherEnd(const BEDPE &a, const vector<MATE> &qualityHitsEnd1, 
-        const vector<MATE> &qualityHitsEnd2, int &matchCount);
-        
+
+    void FindHitsOnBothEnds(const BEDPE &a, const vector<MATE> &qualityHitsEnd1,
+        const vector<MATE> &qualityHitsEnd2);
+
+    void FindHitsOnEitherEnd(const BEDPE &a, const vector<MATE> &qualityHitsEnd1,
+        const vector<MATE> &qualityHitsEnd2);
+
 };
 
 #endif /* PAIRTOPAIR_H */

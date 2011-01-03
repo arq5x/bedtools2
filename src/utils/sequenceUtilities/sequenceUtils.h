@@ -19,4 +19,4 @@ void toLowerCase(string &);
 // Converts every character in a string to uppercase
 void toUpperCase(string &);
 
-#endif	
+#endif

@@ -16,26 +16,26 @@ using namespace std;
 // acccctttggacct---ataggga.................aaaa
 // acccc---ggaccttttataggga.................aaaa
 // 5M   3D 6M    2I 7M      20N             4M
-  
+
 namespace BamTools {
-    void getBamBlocks(const BamAlignment &bam, const RefVector &refs, 
+    void getBamBlocks(const BamAlignment &bam, const RefVector &refs,
                       vector<BED> &blocks, bool breakOnDeletionOps) {
-    
-    	CHRPOS currPosition = bam.Position;
+
+        CHRPOS currPosition = bam.Position;
         CHRPOS blockStart   = bam.Position;
         string chrom        = refs.at(bam.RefID).RefName;
         string name         = bam.Name;
         string strand       = "+";
         string score        = ToString(bam.MapQuality);
-        if (bam.IsReverseStrand()) strand = "-"; 
-    	
-    	vector<CigarOp>::const_iterator cigItr = bam.CigarData.begin();
-    	vector<CigarOp>::const_iterator cigEnd = bam.CigarData.end();
+        if (bam.IsReverseStrand()) strand = "-";
+
+        vector<CigarOp>::const_iterator cigItr = bam.CigarData.begin();
+        vector<CigarOp>::const_iterator cigEnd = bam.CigarData.end();
         for ( ; cigItr != cigEnd; ++cigItr ) {
             if (cigItr->Type == 'M') {
                 currPosition += cigItr->Length;
-    			blocks.push_back( BED(chrom, blockStart, currPosition, name, score, strand) );
-    			blockStart    = currPosition;
+                blocks.push_back( BED(chrom, blockStart, currPosition, name, score, strand) );
+                blockStart    = currPosition;
             }
             else if (cigItr->Type == 'D') {
                 if (breakOnDeletionOps == false)
@@ -53,9 +53,9 @@ namespace BamTools {
             }
             else {
                 cerr << "Input error: invalid CIGAR type (" << cigItr->Type
-    				<< ") for: " << bam.Name << endl;
-    			exit(1);
+                    << ") for: " << bam.Name << endl;
+                exit(1);
             }
-    	}
+        }
     }
 }

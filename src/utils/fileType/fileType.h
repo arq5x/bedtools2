@@ -26,9 +26,9 @@
 using namespace std;
 
 /*****************************************************************************
-  Convenience functions to detect whether a given file is 
+  Convenience functions to detect whether a given file is
   "regular" and/or "gzipped".
-  
+
   Kindly contributed by Assaf Gordon.
 ******************************************************************************/
 string string_error(int errnum);

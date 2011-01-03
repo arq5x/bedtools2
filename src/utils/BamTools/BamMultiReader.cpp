@@ -137,7 +137,7 @@ bool BamMultiReader::GetNextAlignmentCore(BamAlignment& nextAlignment) {
 
     // and add another entry if we can get another alignment from the reader
     if (reader->GetNextAlignmentCore(*alignment)) {
-        alignments.insert(make_pair(make_pair(alignment->RefID, alignment->Position), 
+        alignments.insert(make_pair(make_pair(alignment->RefID, alignment->Position),
                                     make_pair(reader, alignment)));
     } else { // do nothing
         //cerr << "reached end of file " << lowestReader->GetFilename() << endl;
@@ -201,7 +201,7 @@ void BamMultiReader::UpdateAlignments(void) {
         BamReader* br = it->first;
         BamAlignment* ba = it->second;
         if (br->GetNextAlignment(*ba)) {
-            alignments.insert(make_pair(make_pair(ba->RefID, ba->Position), 
+            alignments.insert(make_pair(make_pair(ba->RefID, ba->Position),
                                         make_pair(br, ba)));
         } else {
             // assume BamReader end of region / EOF
@@ -211,7 +211,7 @@ void BamMultiReader::UpdateAlignments(void) {
 
 // opens BAM files
 bool BamMultiReader::Open(const vector<string> filenames, bool openIndexes, bool coreMode, bool useDefaultIndex) {
-    
+
     // for filename in filenames
     fileNames = filenames; // save filenames in our multireader
     for (vector<string>::const_iterator it = filenames.begin(); it != filenames.end(); ++it) {
@@ -222,15 +222,15 @@ bool BamMultiReader::Open(const vector<string> filenames, bool openIndexes, bool
         if (openIndexes) {
             if (useDefaultIndex)
                 openedOK = reader->Open(filename, filename + ".bai");
-            else 
+            else
                 openedOK = reader->Open(filename, filename + ".bti");
         } else {
             openedOK = reader->Open(filename); // for merging, jumping is disallowed
         }
-        
+
         // if file opened ok, check that it can be read
         if ( openedOK ) {
-           
+
             bool fileOK = true;
             BamAlignment* alignment = new BamAlignment;
             if (coreMode) {
@@ -238,7 +238,7 @@ bool BamMultiReader::Open(const vector<string> filenames, bool openIndexes, bool
             } else {
                 fileOK &= reader->GetNextAlignment(*alignment);
             }
-            
+
             if (fileOK) {
                 readers.push_back(make_pair(reader, alignment)); // store pointers to our readers for cleanup
                 alignments.insert(make_pair(make_pair(alignment->RefID, alignment->Position),
@@ -248,11 +248,11 @@ bool BamMultiReader::Open(const vector<string> filenames, bool openIndexes, bool
                 // if only file available & could not be read, return failure
                 if ( filenames.size() == 1 ) return false;
             }
-        
-        } 
-       
+
+        }
+
         // TODO; any more error handling on openedOK ??
-        else 
+        else
             return false;
     }
 
@@ -277,7 +277,7 @@ void BamMultiReader::DumpAlignmentIndex(void) {
 }
 
 // returns BAM file pointers to beginning of alignment data
-bool BamMultiReader::Rewind(void) { 
+bool BamMultiReader::Rewind(void) {
     bool result = true;
     for (vector<pair<BamReader*, BamAlignment*> >::iterator it = readers.begin(); it != readers.end(); ++it) {
         BamReader* reader = it->first;
@@ -351,7 +351,7 @@ const string BamMultiReader::GetHeaderText(void) const {
                     // warn iff we are reading one file and discover duplicated @RG tags in the header
                     // otherwise, we emit no warning, as we might be merging multiple BAM files with identical @RG tags
                     if (currentFileReadGroups.find(readGroup) != currentFileReadGroups.end()) {
-                        cerr << "WARNING: duplicate @RG tag " << readGroup 
+                        cerr << "WARNING: duplicate @RG tag " << readGroup
                             << " entry in header of " << reader->GetFilename() << endl;
                     }
                 }
@@ -377,7 +377,7 @@ void BamMultiReader::ValidateReaders(void) const {
         BamTools::RefVector::const_iterator c = currentRefData.begin();
         if (reader->GetReferenceCount() != firstRefCount || firstRefData.size() != currentRefData.size()) {
             cerr << "ERROR: mismatched number of references in " << reader->GetFilename()
-                      << " expected " << firstRefCount 
+                      << " expected " << firstRefCount
                       << " reference sequences but only found " << reader->GetReferenceCount() << endl;
             exit(1);
         }
@@ -415,6 +415,6 @@ const BamTools::RefVector BamMultiReader::GetReferenceData(void) const {
     return readers.front().first->GetReferenceData();
 }
 
-const int BamMultiReader::GetReferenceID(const string& refName) const { 
+const int BamMultiReader::GetReferenceID(const string& refName) const {
     return readers.front().first->GetReferenceID(refName);
 }

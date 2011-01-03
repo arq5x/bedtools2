@@ -34,9 +34,9 @@ class BamWriter {
         // closes the alignment archive
         void Close(void);
         // opens the alignment archive
-        bool Open(const std::string& filename, 
-                  const std::string& samHeader, 
-                  const BamTools::RefVector& referenceSequences, 
+        bool Open(const std::string& filename,
+                  const std::string& samHeader,
+                  const BamTools::RefVector& referenceSequences,
                   bool writeUncompressed = false);
         // saves the alignment to the alignment archive
         void SaveAlignment(const BamTools::BamAlignment& al);

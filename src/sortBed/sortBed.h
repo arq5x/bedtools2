@@ -25,26 +25,26 @@ class BedSort {
 
 public:
 
-	// constructor 
-	BedSort(string &);
+    // constructor
+    BedSort(string &);
 
-	// destructor
-	~BedSort(void);
+    // destructor
+    ~BedSort(void);
 
-	void SortBed();				// the default.  sorts by chrom (asc.) then by start (asc.)
-	void SortBedBySizeAsc();
-	void SortBedBySizeDesc();
-	void SortBedByChromThenSizeAsc();
-	void SortBedByChromThenSizeDesc();
-	void SortBedByChromThenScoreAsc();
-	void SortBedByChromThenScoreDesc();
-	
-private:	
-	string _bedFile;
+    void SortBed();             // the default.  sorts by chrom (asc.) then by start (asc.)
+    void SortBedBySizeAsc();
+    void SortBedBySizeDesc();
+    void SortBedByChromThenSizeAsc();
+    void SortBedByChromThenSizeDesc();
+    void SortBedByChromThenScoreAsc();
+    void SortBedByChromThenScoreDesc();
 
-	// instance of a bed file class.
-	BedFile *_bed;
+private:
+    string _bedFile;
 
-	// methods
+    // instance of a bed file class.
+    BedFile *_bed;
+
+    // methods
 
 };

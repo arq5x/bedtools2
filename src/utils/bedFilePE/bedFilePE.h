@@ -16,26 +16,26 @@ using namespace std;
 
 
 /*
-	Structure for paired-end records
+    Structure for paired-end records
 */
 struct BEDPE {
 
-	// UCSC BED fields
-	string chrom1;
-	CHRPOS start1;
-	CHRPOS end1;
-	
-	string chrom2;
-	CHRPOS start2;
-	CHRPOS end2;
-	 
-	string name;
-	string score;
-	
-	string strand1;
-	string strand2;
-	
-	vector<string> otherFields;
+    // UCSC BED fields
+    string chrom1;
+    CHRPOS start1;
+    CHRPOS end1;
+
+    string chrom2;
+    CHRPOS start2;
+    CHRPOS end2;
+
+    string name;
+    string score;
+
+    string strand1;
+    string strand2;
+
+    vector<string> otherFields;
 };
 
 
@@ -48,46 +48,46 @@ class BedFilePE {
 
 public:
 
-	// Constructor 
-	BedFilePE(string &);
+    // Constructor
+    BedFilePE(string &);
 
-	// Destructor
-	~BedFilePE(void);
+    // Destructor
+    ~BedFilePE(void);
 
-	// Open a BEDPE file for reading (creates an istream pointer)
-	void Open(void);
-	
-	// Close an opened BEDPE file.
-	void Close(void);
-	
-	// Get the next BED entry in an opened BED file.
-	BedLineStatus GetNextBedPE (BEDPE &bedpe, int &lineNum);
-	
-	
-	// Methods
+    // Open a BEDPE file for reading (creates an istream pointer)
+    void Open(void);
 
-	void reportBedPETab(const BEDPE &a);
-	void reportBedPENewLine(const BEDPE &a);
-	void loadBedPEFileIntoMap();
-	void splitBedPEIntoBeds(const BEDPE &a, const int &lineNum, MATE *bedEntry1, MATE *bedEntry2);
-		 
-		
-	void FindOverlapsPerBin(int bEnd, string chrom, CHRPOS start, CHRPOS end, string strand, 
-		vector<MATE> &hits, bool forceStrand);
-		
-		
-	string bedFile;
-	unsigned int bedType;
-	
-	masterMateMap bedMapEnd1;
-	masterMateMap bedMapEnd2;
-	
+    // Close an opened BEDPE file.
+    void Close(void);
+
+    // Get the next BED entry in an opened BED file.
+    BedLineStatus GetNextBedPE (BEDPE &bedpe, int &lineNum);
+
+
+    // Methods
+
+    void reportBedPETab(const BEDPE &a);
+    void reportBedPENewLine(const BEDPE &a);
+    void loadBedPEFileIntoMap();
+    void splitBedPEIntoBeds(const BEDPE &a, const int &lineNum, MATE *bedEntry1, MATE *bedEntry2);
+
+
+    void FindOverlapsPerBin(int bEnd, string chrom, CHRPOS start, CHRPOS end, string name, string strand,
+        vector<MATE> &hits, float overlapFraction, bool forceStrand, bool enforceDiffNames);
+
+
+    string bedFile;
+    unsigned int bedType;
+
+    masterMateMap bedMapEnd1;
+    masterMateMap bedMapEnd2;
+
 private:
-	istream *_bedStream;
-	
-	// methods
-	BedLineStatus parseLine (BEDPE &bedpe, const vector<string> &lineVector, int &lineNum);
-	bool parseBedPELine (BEDPE &bed, const vector<string> &lineVector, const int &lineNum);
+    istream *_bedStream;
+
+    // methods
+    BedLineStatus parseLine (BEDPE &bedpe, const vector<string> &lineVector, int &lineNum);
+    bool parseBedPELine (BEDPE &bed, const vector<string> &lineVector, const int &lineNum);
 };
 
 #endif /* BEDFILEPE_H */

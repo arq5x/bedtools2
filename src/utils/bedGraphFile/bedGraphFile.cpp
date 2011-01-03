@@ -14,26 +14,26 @@
 
 // Constructor
 BedGraphFile::BedGraphFile(string &_file) :
-	bedGraphFile(_file),
-	_bedGraphStream(NULL)
+    bedGraphFile(_file),
+    _bedGraphStream(NULL)
 {}
 
 
 // Destructor
 BedGraphFile::~BedGraphFile() {
-	Close();
+    Close();
 }
 
 
 // Open the BEDGRAPH file
 void BedGraphFile::Open() {
-	if (bedGraphFile == "stdin") {
-		_bedGraphStream = &cin;
-		return;
-	}
-	// unzipped, regular
+    if (bedGraphFile == "stdin") {
+        _bedGraphStream = &cin;
+        return;
+    }
+    // unzipped, regular
     else if ((isGzipFile(bedGraphFile) == false) && (isRegularFile(bedGraphFile) == true)) {
-	    _bedGraphStream = new ifstream(bedGraphFile.c_str(), ios::in);
+        _bedGraphStream = new ifstream(bedGraphFile.c_str(), ios::in);
 
         // open an ifstream
         ifstream bedg(bedGraphFile.c_str(), ios::in);
@@ -45,24 +45,24 @@ void BedGraphFile::Open() {
          }
          else {
              // if so, close it (this was just a test)
-             bedg.close();       
+             bedg.close();
              // now set a pointer to the stream so that we
              _bedGraphStream = new ifstream(bedGraphFile.c_str(), ios::in);
          }
      }
-     else if ((isGzipFile(bedGraphFile) == true) && (isRegularFile(bedGraphFile) == true)) {        
-        
+     else if ((isGzipFile(bedGraphFile) == true) && (isRegularFile(bedGraphFile) == true)) {
+
         igzstream bedg(bedGraphFile.c_str(), ios::in);
- 		if ( !bedg ) {
- 			cerr << "Error: The requested bedgraph file (" << bedGraphFile << ") could not be opened. Exiting!" << endl;
- 			exit (1);
- 		}
- 		else {
- 			// if so, close it (this was just a test)
- 			bedg.close();		
- 			// now set a pointer to the stream so that we
- 			_bedGraphStream = new igzstream(bedGraphFile.c_str(), ios::in);
- 		}
+        if ( !bedg ) {
+            cerr << "Error: The requested bedgraph file (" << bedGraphFile << ") could not be opened. Exiting!" << endl;
+            exit (1);
+        }
+        else {
+            // if so, close it (this was just a test)
+            bedg.close();
+            // now set a pointer to the stream so that we
+            _bedGraphStream = new igzstream(bedGraphFile.c_str(), ios::in);
+        }
      }
      else {
          cerr << "Error: Unexpected file type (" << bedGraphFile << "). Exiting!" << endl;
@@ -73,11 +73,11 @@ void BedGraphFile::Open() {
 
 // Close the BEDGRAPH file
 void BedGraphFile::Close() {
-	if (bedGraphFile != "stdin") {
-		if (_bedGraphStream) {
-			delete _bedGraphStream;
-			_bedGraphStream = NULL ;
-		}
-	}
+    if (bedGraphFile != "stdin") {
+        if (_bedGraphStream) {
+            delete _bedGraphStream;
+            _bedGraphStream = NULL ;
+        }
+    }
 }
 

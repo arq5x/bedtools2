@@ -26,29 +26,29 @@ using namespace std;
 class Bed2Fa {
 
 public:
-	
-	// constructor 
-	Bed2Fa(bool &useName, string &dbFile, string &bedFile, string &fastaOutFile, 
-		bool &useFasta, bool &useStrand);
 
-	// destructor
-	~Bed2Fa(void);
+    // constructor
+    Bed2Fa(bool &useName, string &dbFile, string &bedFile, string &fastaOutFile,
+        bool &useFasta, bool &useStrand);
 
-	void ExtractDNA();
+    // destructor
+    ~Bed2Fa(void);
+
+    void ExtractDNA();
     void ReportDNA(const BED &bed, const string &currDNA, const string &currChrom);
-    
+
 
 private:
-	
-	bool _useName;
-	string _dbFile;
-	string _bedFile;
-	string _fastaOutFile;
-	bool _useFasta;
-	bool _useStrand;
-	
-	// instance of a bed file class.
-	BedFile  *_bed;
+
+    bool _useName;
+    string _dbFile;
+    string _bedFile;
+    string _fastaOutFile;
+    bool _useFasta;
+    bool _useStrand;
+
+    // instance of a bed file class.
+    BedFile  *_bed;
     ostream *_faOut;
 };
 

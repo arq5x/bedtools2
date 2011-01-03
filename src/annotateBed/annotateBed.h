@@ -9,7 +9,7 @@
 
   Licenced under the GNU General Public License 2.0 license.
 ******************************************************************************/
-#ifndef	ANNOTATEBED_H
+#ifndef ANNOTATEBED_H
 #define ANNOTATEBED_H
 
 #include "bedFile.h"
@@ -35,41 +35,41 @@ class BedAnnotate {
 
 public:
 
-	// constructor 
-	BedAnnotate(const string &mainFile, const vector<string> &annoFileNames, 
-	            const vector<string> &annoTitles, bool forceStrand, bool reportCounts, bool reportBoth);
+    // constructor
+    BedAnnotate(const string &mainFile, const vector<string> &annoFileNames,
+                const vector<string> &annoTitles, bool forceStrand, bool reportCounts, bool reportBoth);
 
-	// destructor
-	~BedAnnotate(void);
-	
-	// annotate the master file with all of the annotation files.
-	void AnnotateBed();
-	
+    // destructor
+    ~BedAnnotate(void);
+
+    // annotate the master file with all of the annotation files.
+    void AnnotateBed();
+
 private:
 
-	// input files.
-	string _mainFile;
+    // input files.
+    string _mainFile;
     vector<string> _annoFileNames;
     vector<string> _annoTitles;
-    
-	// instance of a bed file class.
+
+    // instance of a bed file class.
     BedFile *_bed;
     vector<BedFile*> _annoFiles;
-	
-	// do we care about strandedness when counting coverage?
-	bool _forceStrand;
+
+    // do we care about strandedness when counting coverage?
+    bool _forceStrand;
     bool _reportCounts;
     bool _reportBoth;
-	
-	// private function for reporting coverage information
-	void ReportAnnotations();
-		
+
+    // private function for reporting coverage information
+    void ReportAnnotations();
+
     void OpenAnnoFiles();
-    
+
     void CloseAnnoFiles();
-    
+
     void PrintHeader();
-    
+
     void InitializeMainFile();
 };
 #endif /* ANNOTATEBED_H */

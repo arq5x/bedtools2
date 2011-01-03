@@ -16,8 +16,8 @@
 #include <queue>
 
 enum COORDINATE_TYPE {
-	START,
-	END
+    START,
+    END
 };
 
 /*
@@ -28,32 +28,32 @@ enum COORDINATE_TYPE {
 class IntervalItem
 {
 private:
-	IntervalItem();
+    IntervalItem();
 
 public:
-	int source_index;           // which source BedGraph file this came from
-	COORDINATE_TYPE coord_type; // is this the start or the end position?
-	CHRPOS coord;
-	std::string depth;
+    int source_index;           // which source BedGraph file this came from
+    COORDINATE_TYPE coord_type; // is this the start or the end position?
+    CHRPOS coord;
+    std::string depth;
 
-	IntervalItem(int _index, COORDINATE_TYPE _type, CHRPOS _coord, std::string _depth) :
-		source_index(_index),
-		coord_type(_type),
-		coord(_coord),
-		depth(_depth)
-	{}
+    IntervalItem(int _index, COORDINATE_TYPE _type, CHRPOS _coord, std::string _depth) :
+        source_index(_index),
+        coord_type(_type),
+        coord(_coord),
+        depth(_depth)
+    {}
 
-	IntervalItem(const IntervalItem &other) :
-		source_index(other.source_index),
-		coord_type(other.coord_type),
-		coord(other.coord),
-		depth(other.depth)
-	{}
+    IntervalItem(const IntervalItem &other) :
+        source_index(other.source_index),
+        coord_type(other.coord_type),
+        coord(other.coord),
+        depth(other.depth)
+    {}
 
-	bool operator< ( const IntervalItem& other ) const
-	{
-		return this->coord > other.coord;
-	}
+    bool operator< ( const IntervalItem& other ) const
+    {
+        return this->coord > other.coord;
+    }
 };
 
 // our priority queue

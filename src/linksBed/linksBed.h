@@ -24,21 +24,21 @@ class BedLinks {
 
 public:
 
-	// constructor 
-	BedLinks(string &bedFile, string &base, string &org, string &db);
+    // constructor
+    BedLinks(string &bedFile, string &base, string &org, string &db);
 
-	// destructor
-	~BedLinks(void);
-	
-private:	
-	string _bedFile;
-	string _base;
-	string _org;
-	string _db;
+    // destructor
+    ~BedLinks(void);
 
-	// instance of a bed file class.
-	BedFile *_bed;
+private:
+    string _bedFile;
+    string _base;
+    string _org;
+    string _db;
 
-	void WriteURL(BED &bed, string &base);
-	void CreateLinks();				// the default.  sorts by chrom (asc.) then by start (asc.)
+    // instance of a bed file class.
+    BedFile *_bed;
+
+    void WriteURL(BED &bed, string &base);
+    void CreateLinks();             // the default.  sorts by chrom (asc.) then by start (asc.)
 };

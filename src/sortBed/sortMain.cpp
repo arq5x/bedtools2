@@ -26,132 +26,132 @@ void ShowHelp(void);
 
 int main(int argc, char* argv[]) {
 
-	// our configuration variables
-	bool showHelp = false;
+    // our configuration variables
+    bool showHelp = false;
 
-	// input files
-	string bedFile  = "stdin";
-	bool haveBed    = true;
-	int sortChoices = 0;
+    // input files
+    string bedFile  = "stdin";
+    bool haveBed    = true;
+    int sortChoices = 0;
 
-	bool sortBySizeAsc            = false;
-	bool sortBySizeDesc           = false;
-	bool sortByChromThenSizeAsc   = false;
-	bool sortByChromThenSizeDesc  = false;
-	bool sortByChromThenScoreAsc  = false;
-	bool sortByChromThenScoreDesc = false;
-
-	
-	for(int i = 1; i < argc; i++) {
-		int parameterLength = (int)strlen(argv[i]);
-
-		if((PARAMETER_CHECK("-h", 2, parameterLength)) || 
-		(PARAMETER_CHECK("--help", 5, parameterLength))) {
-			showHelp = true;
-		}
-	}
-
-	if(showHelp) ShowHelp();
-
-	// do some parsing (all of these parameters require 2 strings)
-	for(int i = 1; i < argc; i++) {
-
-		int parameterLength = (int)strlen(argv[i]);
-
-		if(PARAMETER_CHECK("-i", 2, parameterLength)) {
-			if ((i+1) < argc) {
-				bedFile = argv[i + 1];
-				i++;
-			}
-		}
-		else if(PARAMETER_CHECK("-sizeA", 6, parameterLength)) {
-			sortBySizeAsc = true;
-			sortChoices++;
-		}
-		else if(PARAMETER_CHECK("-sizeD", 6, parameterLength)) {
-			sortBySizeDesc = true;
-			sortChoices++;
-		}
-		else if(PARAMETER_CHECK("-chrThenSizeA", 13, parameterLength)) {
-			sortByChromThenSizeAsc = true;
-			sortChoices++;
-		}
-		else if(PARAMETER_CHECK("-chrThenSizeD", 13, parameterLength)) {
-			sortByChromThenSizeDesc = true;
-			sortChoices++;
-		}	
-		else if(PARAMETER_CHECK("-chrThenScoreA", 14, parameterLength)) {
-			sortByChromThenScoreAsc = true;
-			sortChoices++;
-		}
-		else if(PARAMETER_CHECK("-chrThenScoreD", 14, parameterLength)) {
-			sortByChromThenScoreDesc = true;
-			sortChoices++;
-		}	
-		else {
-			cerr << endl << "*****ERROR: Unrecognized parameter: " << argv[i] << " *****" << endl << endl;
-			showHelp = true;
-		}		
-	}
-
-	// make sure we have both input files
-	if (!haveBed) {
-		cerr << endl << "*****" << endl << "*****ERROR: Need -i BED file. " << endl << "*****" << endl;
-		showHelp = true;
-	}
-	if (sortChoices > 1) {
-		cerr << endl << "*****" << endl << "*****ERROR: Sorting options are mutually exclusive.  Please choose just one. " << endl << "*****" << endl;
-		showHelp = true;
-	}
+    bool sortBySizeAsc            = false;
+    bool sortBySizeDesc           = false;
+    bool sortByChromThenSizeAsc   = false;
+    bool sortByChromThenSizeDesc  = false;
+    bool sortByChromThenScoreAsc  = false;
+    bool sortByChromThenScoreDesc = false;
 
 
-	if (!showHelp) {
-		BedSort *bm = new BedSort(bedFile);
+    for(int i = 1; i < argc; i++) {
+        int parameterLength = (int)strlen(argv[i]);
 
-		if (sortBySizeAsc) {
-			bm->SortBedBySizeAsc();
-		}
-		else if (sortBySizeDesc) {
-			bm->SortBedBySizeDesc();
-		}
-		else if (sortByChromThenSizeAsc) {
-			bm->SortBedByChromThenSizeAsc();
-		}
-		else if (sortByChromThenSizeDesc) {
-			bm->SortBedByChromThenSizeDesc();
-		}
-		else if (sortByChromThenScoreAsc) {
-			bm->SortBedByChromThenScoreAsc();
-		}
-		else if (sortByChromThenScoreDesc) {
-			bm->SortBedByChromThenScoreDesc();
-		}
-		else {
-			bm->SortBed();			
-		}
-		return 0;
-	}
-	else {
-		ShowHelp();
-	}
+        if((PARAMETER_CHECK("-h", 2, parameterLength)) ||
+        (PARAMETER_CHECK("--help", 5, parameterLength))) {
+            showHelp = true;
+        }
+    }
+
+    if(showHelp) ShowHelp();
+
+    // do some parsing (all of these parameters require 2 strings)
+    for(int i = 1; i < argc; i++) {
+
+        int parameterLength = (int)strlen(argv[i]);
+
+        if(PARAMETER_CHECK("-i", 2, parameterLength)) {
+            if ((i+1) < argc) {
+                bedFile = argv[i + 1];
+                i++;
+            }
+        }
+        else if(PARAMETER_CHECK("-sizeA", 6, parameterLength)) {
+            sortBySizeAsc = true;
+            sortChoices++;
+        }
+        else if(PARAMETER_CHECK("-sizeD", 6, parameterLength)) {
+            sortBySizeDesc = true;
+            sortChoices++;
+        }
+        else if(PARAMETER_CHECK("-chrThenSizeA", 13, parameterLength)) {
+            sortByChromThenSizeAsc = true;
+            sortChoices++;
+        }
+        else if(PARAMETER_CHECK("-chrThenSizeD", 13, parameterLength)) {
+            sortByChromThenSizeDesc = true;
+            sortChoices++;
+        }
+        else if(PARAMETER_CHECK("-chrThenScoreA", 14, parameterLength)) {
+            sortByChromThenScoreAsc = true;
+            sortChoices++;
+        }
+        else if(PARAMETER_CHECK("-chrThenScoreD", 14, parameterLength)) {
+            sortByChromThenScoreDesc = true;
+            sortChoices++;
+        }
+        else {
+            cerr << endl << "*****ERROR: Unrecognized parameter: " << argv[i] << " *****" << endl << endl;
+            showHelp = true;
+        }
+    }
+
+    // make sure we have both input files
+    if (!haveBed) {
+        cerr << endl << "*****" << endl << "*****ERROR: Need -i BED file. " << endl << "*****" << endl;
+        showHelp = true;
+    }
+    if (sortChoices > 1) {
+        cerr << endl << "*****" << endl << "*****ERROR: Sorting options are mutually exclusive.  Please choose just one. " << endl << "*****" << endl;
+        showHelp = true;
+    }
+
+
+    if (!showHelp) {
+        BedSort *bm = new BedSort(bedFile);
+
+        if (sortBySizeAsc) {
+            bm->SortBedBySizeAsc();
+        }
+        else if (sortBySizeDesc) {
+            bm->SortBedBySizeDesc();
+        }
+        else if (sortByChromThenSizeAsc) {
+            bm->SortBedByChromThenSizeAsc();
+        }
+        else if (sortByChromThenSizeDesc) {
+            bm->SortBedByChromThenSizeDesc();
+        }
+        else if (sortByChromThenScoreAsc) {
+            bm->SortBedByChromThenScoreAsc();
+        }
+        else if (sortByChromThenScoreDesc) {
+            bm->SortBedByChromThenScoreDesc();
+        }
+        else {
+            bm->SortBed();
+        }
+        return 0;
+    }
+    else {
+        ShowHelp();
+    }
 }
 
 void ShowHelp(void) {
 
-	cerr << endl << "Program: " << PROGRAM_NAME << " (v" << VERSION << ")" << endl;
-	
-	cerr << "Author:  Aaron Quinlan (aaronquinlan@gmail.com)" << endl;
-	cerr << "Summary: Sorts a feature file in various and useful ways." << endl << endl;
-	cerr << "Usage:   " << PROGRAM_NAME << " [OPTIONS] -i <bed/gff/vcf>" << endl << endl;
+    cerr << endl << "Program: " << PROGRAM_NAME << " (v" << VERSION << ")" << endl;
 
-	cerr << "Options: " << endl;
-	cerr << "\t" << "-sizeA\t\t"	<< "Sort by feature size in ascending order." << endl;
-	cerr << "\t" << "-sizeD\t\t"	<< "Sort by feature size in descending order." << endl;
-	cerr << "\t" << "-chrThenSizeA\t"	<< "Sort by chrom (asc), then feature size (asc)." << endl;
-	cerr << "\t" << "-chrThenSizeD\t"	<< "Sort by chrom (asc), then feature size (desc)." << endl;
-	cerr << "\t" << "-chrThenScoreA\t"	<< "Sort by chrom (asc), then score (asc)." << endl;
-	cerr << "\t" << "-chrThenScoreD\t"	<< "Sort by chrom (asc), then score (desc)." << endl << endl;
-	
-	exit(1);
+    cerr << "Author:  Aaron Quinlan (aaronquinlan@gmail.com)" << endl;
+    cerr << "Summary: Sorts a feature file in various and useful ways." << endl << endl;
+    cerr << "Usage:   " << PROGRAM_NAME << " [OPTIONS] -i <bed/gff/vcf>" << endl << endl;
+
+    cerr << "Options: " << endl;
+    cerr << "\t" << "-sizeA\t\t"    << "Sort by feature size in ascending order." << endl;
+    cerr << "\t" << "-sizeD\t\t"    << "Sort by feature size in descending order." << endl;
+    cerr << "\t" << "-chrThenSizeA\t"   << "Sort by chrom (asc), then feature size (asc)." << endl;
+    cerr << "\t" << "-chrThenSizeD\t"   << "Sort by chrom (asc), then feature size (desc)." << endl;
+    cerr << "\t" << "-chrThenScoreA\t"  << "Sort by chrom (asc), then score (asc)." << endl;
+    cerr << "\t" << "-chrThenScoreD\t"  << "Sort by chrom (asc), then score (desc)." << endl << endl;
+
+    exit(1);
 
 }

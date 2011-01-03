@@ -58,7 +58,7 @@ void BgzfData::Close(void) {
         int blockLength = DeflateBlock();
         fwrite(CompressedBlock, 1, blockLength, Stream);
     }
-    
+
     // flush and close
     fflush(Stream);
     fclose(Stream);
@@ -84,14 +84,14 @@ int BgzfData::DeflateBlock(void) {
 
     // set compression level
     const int compressionLevel = ( IsWriteUncompressed ? 0 : Z_DEFAULT_COMPRESSION );
-    
+
     // loop to retry for blocks that do not compress enough
     int inputLength = BlockOffset;
     int compressedLength = 0;
     unsigned int bufferSize = CompressedBlockSize;
 
     while ( true ) {
-        
+
         // initialize zstream values
         z_stream zs;
         zs.zalloc    = NULL;
@@ -182,7 +182,7 @@ void BgzfData::FlushBlock(void) {
           printf("BGZF ERROR: expected to write %u bytes during flushing, but wrote %u bytes.\n", blockLength, numBytesWritten);
           exit(1);
         }
-              
+
         BlockAddress += blockLength;
     }
 }
@@ -227,25 +227,25 @@ bool BgzfData::Open(const string& filename, const char* mode, bool isWriteUncomp
     // determine open mode
     if ( strcmp(mode, "rb") == 0 )
         IsWriteOnly = false;
-    else if ( strcmp(mode, "wb") == 0) 
+    else if ( strcmp(mode, "wb") == 0)
         IsWriteOnly = true;
     else {
         printf("BGZF ERROR: unknown file mode: %s\n", mode);
-        return false; 
+        return false;
     }
 
     // ----------------------------------------------------------------
     // open Stream to read to/write from file, stdin, or stdout
     // stdin/stdout option contributed by Aaron Quinlan (2010-Jan-03)
-    
+
     // read/write BGZF data to/from a file
     if ( (filename != "stdin") && (filename != "stdout") )
         Stream = fopen(filename.c_str(), mode);
-    
+
     // read BGZF data from stdin
     else if ( (filename == "stdin") && (strcmp(mode, "rb") == 0 ) )
         Stream = freopen(NULL, mode, stdin);
-    
+
     // write BGZF data to stdout
     else if ( (filename == "stdout") && (strcmp(mode, "wb") == 0) )
         Stream = freopen(NULL, mode, stdout);
@@ -254,7 +254,7 @@ bool BgzfData::Open(const string& filename, const char* mode, bool isWriteUncomp
         printf("BGZF ERROR: unable to open file %s\n", filename.c_str() );
         return false;
     }
-    
+
     // set flags, return success
     IsOpen = true;
     IsWriteUncompressed = isWriteUncompressed;
@@ -272,7 +272,7 @@ int BgzfData::Read(char* data, const unsigned int dataLength) {
 
        int bytesAvailable = BlockLength - BlockOffset;
        if ( bytesAvailable <= 0 ) {
-           if ( !ReadBlock() ) return -1; 
+           if ( !ReadBlock() ) return -1;
            bytesAvailable = BlockLength - BlockOffset;
            if ( bytesAvailable <= 0 ) break;
        }
@@ -300,7 +300,7 @@ bool BgzfData::ReadBlock(void) {
 
     char    header[BLOCK_HEADER_LENGTH];
     int64_t blockAddress = ftell64(Stream);
-    
+
     int count = fread(header, 1, sizeof(header), Stream);
     if ( count == 0 ) {
         BlockLength = 0;
@@ -329,7 +329,7 @@ bool BgzfData::ReadBlock(void) {
     }
 
     count = InflateBlock(blockLength);
-    if ( count < 0 ) { 
+    if ( count < 0 ) {
       printf("BGZF ERROR: read block failed - could not decompress block data\n");
       return false;
     }
@@ -346,7 +346,7 @@ bool BgzfData::ReadBlock(void) {
 bool BgzfData::Seek(int64_t position) {
 
     if ( !IsOpen ) return false;
-  
+
     int     blockOffset  = (position & 0xFFFF);
     int64_t blockAddress = (position >> 16) & 0xFFFFFFFFFFFFLL;
 
@@ -363,9 +363,9 @@ bool BgzfData::Seek(int64_t position) {
 
 // get file position in BGZF file
 int64_t BgzfData::Tell(void) {
-    if ( !IsOpen ) 
+    if ( !IsOpen )
         return false;
-    else 
+    else
         return ( (BlockAddress << 16) | (BlockOffset & 0xFFFF) );
 }
 
@@ -373,7 +373,7 @@ int64_t BgzfData::Tell(void) {
 unsigned int BgzfData::Write(const char* data, const unsigned int dataLen) {
 
     if ( !IsOpen || !IsWriteOnly ) return false;
-  
+
     // initialize
     unsigned int numBytesWritten = 0;
     const char* input = data;
@@ -381,7 +381,7 @@ unsigned int BgzfData::Write(const char* data, const unsigned int dataLen) {
 
     // copy the data to the buffer
     while ( numBytesWritten < dataLen ) {
-      
+
         unsigned int copyLength = min(blockLength - BlockOffset, dataLen - numBytesWritten);
         char* buffer = UncompressedBlock;
         memcpy(buffer + BlockOffset, input, copyLength);

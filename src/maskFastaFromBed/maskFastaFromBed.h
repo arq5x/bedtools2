@@ -16,7 +16,7 @@
 #include <vector>
 #include <iostream>
 #include <fstream>
-#include <cctype>	/* for tolower */
+#include <cctype>   /* for tolower */
 
 using namespace std;
 
@@ -26,28 +26,28 @@ using namespace std;
 class MaskFastaFromBed {
 
 public:
-	
-	// constructor 
-	MaskFastaFromBed(string &fastaInFile, string &bedFile, string &fastaOutFile, bool &softMask);
 
-	// destructor
-	~MaskFastaFromBed(void);
+    // constructor
+    MaskFastaFromBed(string &fastaInFile, string &bedFile, string &fastaOutFile, bool &softMask);
 
-	
+    // destructor
+    ~MaskFastaFromBed(void);
+
+
 private:
-	
-	bool _softMask;
-	
-	string _fastaInFile;
-	string _bedFile;
-	string _fastaOutFile;
-	
-	// instance of a bed file class.
-	BedFile *_bed;
 
-	void MaskFasta();
-	
-	void PrettyPrintChrom(ofstream &out, string chrom, const string &sequence, int width);
+    bool _softMask;
+
+    string _fastaInFile;
+    string _bedFile;
+    string _fastaOutFile;
+
+    // instance of a bed file class.
+    BedFile *_bed;
+
+    void MaskFasta();
+
+    void PrettyPrintChrom(ofstream &out, string chrom, const string &sequence, int width);
 
 };
 

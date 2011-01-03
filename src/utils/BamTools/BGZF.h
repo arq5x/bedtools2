@@ -33,7 +33,7 @@
         #define fseek64(a,b,c) _fseeki64(a,b,c)
     #else
         #define ftell64(a)     ftello(a)
-        #define fseek64(a,b,c) fseeko(a,b,c) 
+        #define fseek64(a,b,c) fseeko(a,b,c)
     #endif
 #endif // BAMTOOLS_LFS
 
@@ -49,7 +49,7 @@
         typedef unsigned int       uint32_t;
         typedef long long           int64_t;
         typedef unsigned long long uint64_t;
-    #else    
+    #else
         #include <stdint.h>
     #endif
 #endif // BAMTOOLS_TYPES
@@ -97,7 +97,7 @@ struct BgzfData {
         ~BgzfData(void);
 
     // main interface methods
-    public:       
+    public:
         // closes BGZF file
         void Close(void);
         // opens the BGZF file (mode is either "rb" for reading, or "wb" for writing)
@@ -121,7 +121,7 @@ struct BgzfData {
         int InflateBlock(const int& blockLength);
         // reads a BGZF block
         bool ReadBlock(void);
-    
+
     // static 'utility' methods
     public:
         // checks BGZF block header
