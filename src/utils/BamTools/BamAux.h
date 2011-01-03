@@ -169,7 +169,7 @@ struct BamAlignment {
         int32_t     InsertSize;        // Mate-pair insert size
 
     // internal data
-    private:
+    public:
         struct BamAlignmentSupportData {
 
             // data members
