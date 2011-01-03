@@ -11,9 +11,6 @@ export CXX      = g++
 export CXXFLAGS = -Wall -O2
 export LIBS     = -lz
 
-# make obj/ and bin/ if non-existent
-[ -d $(OBJ_DIR) ] || mkdir -p $(OBJ_DIR)
-[ -d $(BIN_DIR) ] || mkdir -p $(BIN_DIR)
 
 
 SUBDIRS = $(SRC_DIR)/annotateBed \
@@ -53,27 +50,30 @@ UTIL_SUBDIRS =  $(SRC_DIR)/utils/lineFileUtilities \
                 $(SRC_DIR)/utils/BamTools
 
 all:
+    # make obj/ and bin/ if non-existent
+    [ -d $(OBJ_DIR) ] || mkdir -p $(OBJ_DIR)
+    [ -d $(BIN_DIR) ] || mkdir -p $(BIN_DIR)
+    
+    @echo "Building BEDTools:"
+    @echo "========================================================="
+    
+    @for dir in $(UTIL_SUBDIRS); do \
+        echo "- Building in $$dir"; \
+        $(MAKE) --no-print-directory -C $$dir; \
+        echo ""; \
+    done
 
-	@echo "Building BEDTools:"
-	@echo "========================================================="
-	
-	@for dir in $(UTIL_SUBDIRS); do \
-		echo "- Building in $$dir"; \
-		$(MAKE) --no-print-directory -C $$dir; \
-		echo ""; \
-	done
-
-	@for dir in $(SUBDIRS); do \
-		echo "- Building in $$dir"; \
-		$(MAKE) --no-print-directory -C $$dir; \
-		echo ""; \
-	done
+    @for dir in $(SUBDIRS); do \
+        echo "- Building in $$dir"; \
+        $(MAKE) --no-print-directory -C $$dir; \
+        echo ""; \
+    done
 
 
 .PHONY: all
 
 clean:
-	@echo "Cleaning up."
-	@rm -f $(OBJ_DIR)/* $(BIN_DIR)/*
+    @echo "Cleaning up."
+    @rm -f $(OBJ_DIR)/* $(BIN_DIR)/*
 
 .PHONY: clean
