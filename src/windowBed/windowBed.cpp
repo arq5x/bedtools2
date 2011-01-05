@@ -221,19 +221,22 @@ void BedWindow::AddWindow(const BED &a, CHRPOS &fudgeStart, CHRPOS &fudgeEnd) {
     // if "-", the left is right and right is left.
     if (_strandWindows) {
         if (a.strand == "+") {
-            if ((a.start - _leftSlop) > 0) fudgeStart = a.start - _leftSlop;
+            if ((int) (a.start - _leftSlop) > 0) 
+                fudgeStart = a.start - _leftSlop;
             else fudgeStart = 0;
             fudgeEnd = a.end + _rightSlop;
         }
         else {
-            if ((a.start - _rightSlop) > 0) fudgeStart = a.start - _rightSlop;
+            if ((int) (a.start - _rightSlop) > 0) 
+                fudgeStart = a.start - _rightSlop;
             else fudgeStart = 0;
             fudgeEnd = a.end + _leftSlop;
         }
     }
     // If not, add the windows irrespective of strand
     else {
-        if ((a.start - _leftSlop) > 0) fudgeStart = a.start - _leftSlop;
+        if ((int) (a.start - _leftSlop) > 0) 
+            fudgeStart = a.start - _leftSlop;
         else fudgeStart = 0;
         fudgeEnd = a.end + _rightSlop;
     }
