@@ -4,7 +4,7 @@
 
 Created by Aaron Quinlan Spring 2009.
 
-Copyright 2009,2010,2001 Aaron Quinlan. All rights reserved.
+Copyright 2009,2010,2011 Aaron Quinlan. All rights reserved.
 
 Stable releases: http://code.google.com/p/bedtools
 
