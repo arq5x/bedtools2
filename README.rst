@@ -26,21 +26,21 @@ http://code.google.com/p/bedtools/wiki/UsageAdvanced
 
 Installation
 ------------
-  #.  Unpack the source downloaded tarball.
-  #.  cd into the expanded folder.
-  #.  Type "make clean" and hit enter.
-  #.  Type "make all" and hit enter.
-  #.  If you encountered no errors, then all of the BED Tools should now be in bin/
-	If not, try to troubleshoot then email me: aaronquinlan at gmail dot com
-  #.  Copy the files in bin/ to ~/bin or if you have the privileges, to /usr/local/bin.
-  #.  Use the tools.
+  #  Unpack the source downloaded tarball.
+  #  cd into the expanded folder.
+  #  Type "make clean" and hit enter.
+  #  Type "make all" and hit enter.
+  #  If you encountered no errors, then all of the BED Tools should now be in bin/
+	 If not, try to troubleshoot then email me: aaronquinlan at gmail dot com
+  #  Copy the files in bin/ to ~/bin or if you have the privileges, to /usr/local/bin.
+  #  Use the tools.
 
 
 List of available tools
 -----------------------
 
 *Utility*                  *Description*
-=========================  ====================================================
+=========================  =======================================================================================================
 *intersectBed (BAM)*       Returns overlaps between two BED/GFF/VCF files. 
 *pairToBed (BAM)*          Returns overlaps between a paired-end BED file and a 
                            regular BED/VCF/GFF file.
