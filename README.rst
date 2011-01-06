@@ -26,14 +26,14 @@ http://code.google.com/p/bedtools/wiki/UsageAdvanced
 
 Installation
 ------------
-  #  Unpack the source downloaded tarball.
-  #  cd into the expanded folder.
-  #  Type "make clean" and hit enter.
-  #  Type "make all" and hit enter.
-  #  If you encountered no errors, then all of the BED Tools should now be in bin/
-	 If not, try to troubleshoot then email me: aaronquinlan at gmail dot com
-  #  Copy the files in bin/ to ~/bin or if you have the privileges, to /usr/local/bin.
-  #  Use the tools.
+  # Unpack the source downloaded tarball.
+  # cd into the expanded folder.
+  # Type "make clean" and hit enter.
+  # Type "make all" and hit enter.
+  # If you encountered no errors, then all of the BED Tools should now be in bin/
+	If not, try to troubleshoot then email me: aaronquinlan at gmail dot com
+  # Copy the files in bin/ to ~/bin or if you have the privileges, to /usr/local/bin.
+  # Use the tools.
 
 
 List of available tools
