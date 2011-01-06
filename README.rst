@@ -3,8 +3,11 @@
 ==============================
 
 Created by Aaron Quinlan Spring 2009.
+
 Copyright 2009,2010,2001 Aaron Quinlan. All rights reserved.
+
 Stable releases: http://code.google.com/p/bedtools
+
 Repository:      https://github.com/arq5x/bedtools
 
 Released under GNU public license version 2 (GPL v2).
