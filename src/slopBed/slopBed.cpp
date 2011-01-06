@@ -15,11 +15,11 @@
 
 BedSlop::BedSlop(string &bedFile, string &genomeFile, bool &forceStrand, int &leftSlop, int &rightSlop) {
 
-    _bedFile = bedFile;
-    _genomeFile = genomeFile;
+    _bedFile     = bedFile;
+    _genomeFile  = genomeFile;
     _forceStrand = forceStrand;
 
-    _leftSlop = leftSlop;
+    _leftSlop  = leftSlop;
     _rightSlop = rightSlop;
 
     _bed    = new BedFile(bedFile);
