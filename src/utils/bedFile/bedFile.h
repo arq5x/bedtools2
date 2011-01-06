@@ -460,7 +460,7 @@ private:
                         if (parseVcfLine(bed, lineVector, lineNum, numFields) == true) return BED_VALID;
                     }
                     // it's GFF, assuming columns columns 4 and 5 are numeric and we have 9 fields total.
-                    else if ((numFields == 9) && isInteger(lineVector[3]) && isInteger(lineVector[4])) {
+                    else if ((numFields >= 8) && isInteger(lineVector[3]) && isInteger(lineVector[4])) {
                         setGff(true);
                         setFileType(GFF_FILETYPE);
                         setBedType(numFields);       // we now expect numFields columns in each line
@@ -612,7 +612,7 @@ private:
     template <typename T>
     inline bool parseGffLine (T &bed, const vector<string> &lineVector, int lineNum, unsigned int numFields) {
         if (numFields == this->bedType) {
-            if (this->bedType == 9 && _isGff) {
+            if (this->bedType >= 8 && _isGff) {
                 bed.chrom = lineVector[0];
                 // substract 1 to force the start to be BED-style
                 bed.start  = atoi(lineVector[3].c_str()) - 1;
@@ -622,11 +622,13 @@ private:
                 bed.strand = lineVector[6].c_str();
                 bed.otherFields.push_back(lineVector[1]);  // add GFF "source". unused in BED
                 bed.otherFields.push_back(lineVector[7]);  // add GFF "fname". unused in BED
-                bed.otherFields.push_back(lineVector[8]);  // add GFF "group". unused in BED
+                // handle the optional 9th field.
+                if (this->bedType == 9)
+                    bed.otherFields.push_back(lineVector[8]);  // add GFF "group". unused in BED
             }
             else {
                 cerr << "Error: unexpected number of fields at line: " << lineNum <<
-                        ".  Verify that your files are TAB-delimited and that your GFF file has 9 fields.  Exiting..." << endl;
+                        ".  Verify that your files are TAB-delimited and that your GFF file has 8 or 9 fields.  Exiting..." << endl;
                 exit(1);
             }
             if (bed.start > bed.end) {
@@ -647,8 +649,8 @@ private:
             cerr << "Differing number of GFF fields encountered at line: " << lineNum << ".  Exiting..." << endl;
             exit(1);
         }
-        else if ((numFields < 9) && (numFields != 0)) {
-            cerr << "TAB delimited GFF file with 9 fields is required at line: "<< lineNum << ".  Exiting..." << endl;
+        else if ((numFields < 8) && (numFields != 0)) {
+            cerr << "TAB delimited GFF file with 8 or 9 fields is required at line: "<< lineNum << ".  Exiting..." << endl;
             exit(1);
         }
         return false;
@@ -704,11 +706,21 @@ public:
             }
         }
         // GFF
-        else if (this->bedType == 9) {
-            printf ("%s\t%s\t%s\t%d\t%d\t%s\t%s\t%s\t%s\t", bed.chrom.c_str(), bed.otherFields[0].c_str(),
-                                                             bed.name.c_str(), bed.start+1, bed.end,
-                                                             bed.score.c_str(), bed.strand.c_str(),
-                                                             bed.otherFields[1].c_str(), bed.otherFields[2].c_str());
+        else if (_isGff == true) {
+            // "GFF-8"
+            if (this->bedType == 8) {
+                printf ("%s\t%s\t%s\t%d\t%d\t%s\t%s\t%s\t", bed.chrom.c_str(), bed.otherFields[0].c_str(),
+                                                                 bed.name.c_str(), bed.start+1, bed.end,
+                                                                 bed.score.c_str(), bed.strand.c_str(),
+                                                                 bed.otherFields[1].c_str());
+            }
+            // "GFF-9"
+            else if (this->bedType == 9) {
+                printf ("%s\t%s\t%s\t%d\t%d\t%s\t%s\t%s\t%s\t", bed.chrom.c_str(), bed.otherFields[0].c_str(),
+                                                                 bed.name.c_str(), bed.start+1, bed.end,
+                                                                 bed.score.c_str(), bed.strand.c_str(),
+                                                                 bed.otherFields[1].c_str(), bed.otherFields[2].c_str());
+            }
         }
     }
 
@@ -762,12 +774,22 @@ public:
             }
             printf("\n");
         }
-        //GFF
-        else if (this->bedType == 9) {
-            printf ("%s\t%s\t%s\t%d\t%d\t%s\t%s\t%s\t%s\n", bed.chrom.c_str(), bed.otherFields[0].c_str(),
-                                                             bed.name.c_str(), bed.start+1, bed.end,
-                                                             bed.score.c_str(), bed.strand.c_str(),
-                                                             bed.otherFields[1].c_str(), bed.otherFields[2].c_str());
+        // GFF
+        else if (_isGff == true) {
+            // "GFF-8"
+            if (this->bedType == 8) {
+                printf ("%s\t%s\t%s\t%d\t%d\t%s\t%s\t%s\n", bed.chrom.c_str(), bed.otherFields[0].c_str(),
+                                                                 bed.name.c_str(), bed.start+1, bed.end,
+                                                                 bed.score.c_str(), bed.strand.c_str(),
+                                                                 bed.otherFields[1].c_str());
+            }
+            // "GFF-9"
+            else if (this->bedType == 9) {
+                printf ("%s\t%s\t%s\t%d\t%d\t%s\t%s\t%s\t%s\n", bed.chrom.c_str(), bed.otherFields[0].c_str(),
+                                                                 bed.name.c_str(), bed.start+1, bed.end,
+                                                                 bed.score.c_str(), bed.strand.c_str(),
+                                                                 bed.otherFields[1].c_str(), bed.otherFields[2].c_str());
+            }
         }
     }
 
@@ -821,11 +843,21 @@ public:
             }
         }
         // GFF
-        else if (this->bedType == 9) {
-            printf ("%s\t%s\t%s\t%d\t%d\t%s\t%s\t%s\t%s\t", bed.chrom.c_str(), bed.otherFields[0].c_str(),
+        else if (_isGff == true) {
+            // "GFF-8"
+            if (this->bedType == 8) {
+                printf ("%s\t%s\t%s\t%d\t%d\t%s\t%s\t%s\t", bed.chrom.c_str(), bed.otherFields[0].c_str(),
+                                                             bed.name.c_str(), start+1, end,
+                                                             bed.score.c_str(), bed.strand.c_str(),
+                                                             bed.otherFields[1].c_str());
+            }
+            // "GFF-9"
+            else if (this->bedType == 9) {
+                printf ("%s\t%s\t%s\t%d\t%d\t%s\t%s\t%s\t%s\t", bed.chrom.c_str(), bed.otherFields[0].c_str(),
                                                              bed.name.c_str(), start+1, end,
                                                              bed.score.c_str(), bed.strand.c_str(),
                                                              bed.otherFields[1].c_str(), bed.otherFields[2].c_str());
+            }
         }
     }
 
@@ -881,11 +913,21 @@ public:
             printf("\n");
         }
         // GFF
-        else if (this->bedType == 9) {  // add 1 to the start for GFF
-            printf ("%s\t%s\t%s\t%d\t%d\t%s\t%s\t%s\t%s\n", bed.chrom.c_str(), bed.otherFields[0].c_str(),
+        else if (_isGff == true) {
+            // "GFF-9"
+            if (this->bedType == 8) {
+                printf ("%s\t%s\t%s\t%d\t%d\t%s\t%s\t%s\n", bed.chrom.c_str(), bed.otherFields[0].c_str(),
+                                                             bed.name.c_str(), start+1, end,
+                                                             bed.score.c_str(), bed.strand.c_str(),
+                                                             bed.otherFields[1].c_str());
+            }
+            // "GFF-8"
+            else if (this->bedType == 9) {
+                printf ("%s\t%s\t%s\t%d\t%d\t%s\t%s\t%s\t%s\n", bed.chrom.c_str(), bed.otherFields[0].c_str(),
                                                              bed.name.c_str(), start+1, end,
                                                              bed.score.c_str(), bed.strand.c_str(),
                                                              bed.otherFields[1].c_str(), bed.otherFields[2].c_str());
+            }
         }
     }
 
@@ -895,7 +937,7 @@ public:
     */
     void reportNullBedTab() {
 
-        if (_isGff == false) {
+        if (_isGff == false && _isVcf == false) {
             if (this->bedType == 3) {
                 printf (".\t-1\t-1\t");
             }
@@ -915,8 +957,13 @@ public:
                 }
             }
         }
-        else if (this->bedType == 9) {
-            printf (".\t.\t.\t-1\t-1\t-1\t.\t.\t.\t");
+        else if (_isGff == true && _isVcf == false) {
+            if (this->bedType == 8) {
+                printf (".\t.\t.\t-1\t-1\t-1\t.\t.\t");
+            }
+            else if (this->bedType == 9) {
+                printf (".\t.\t.\t-1\t-1\t-1\t.\t.\t.\t");
+            }
         }
     }
 
@@ -926,7 +973,7 @@ public:
     */
     void reportNullBedNewLine() {
 
-        if (_isGff == false) {
+        if (_isGff == false && _isVcf == false) {
             if (this->bedType == 3) {
                 printf (".\t-1\t-1\n");
             }
@@ -947,8 +994,13 @@ public:
                 printf("\n");
             }
         }
-        else if (this->bedType == 9) {
-            printf (".\t.\t.\t-1\t-1\t-1\t.\t.\t.\n");
+        else if (_isGff == true && _isVcf == false) {
+            if (this->bedType == 8) {
+                printf (".\t.\t.\t-1\t-1\t-1\t.\t.\n");
+            }
+            else if (this->bedType == 9) {
+                printf (".\t.\t.\t-1\t-1\t-1\t.\t.\t.\n");
+            }
         }
     }
 
