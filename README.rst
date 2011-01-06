@@ -39,20 +39,16 @@ Installation
 List of available tools
 -----------------------
 
-*Utility*                  *Description*
+=========================  =======================================================================================================
+Utility                    Description
 =========================  =======================================================================================================
 *intersectBed (BAM)*       Returns overlaps between two BED/GFF/VCF files. 
-*pairToBed (BAM)*          Returns overlaps between a paired-end BED file and a 
-                           regular BED/VCF/GFF file.
-*bamToBed (BAM)*           Converts BAM alignments to BED6, BED12, 
-                           or BEDPE format.
+*pairToBed (BAM)*          Returns overlaps between a paired-end BED file and a regular BED/VCF/GFF file.
+*bamToBed (BAM)*           Converts BAM alignments to BED6, BED12, or BEDPE format.
 *bedToBam (BAM)*           Converts BED/GFF/VCF features to BAM format.
-*bed12ToBed6*              Converts "blocked" BED12 features to discrete 
-                           BED6 features.
-*bedToIgv*                 Creates IGV batch scripts for taking multiple 
-                           snapshots from BED/GFF/VCF features.
-*coverageBed (BAM)*        Summarizes the depth and breadth of coverage of features in one BED versus features 
-                           (e.g, "windows", exons, etc.) defined in another BED/GFF/VCF file. 
+*bed12ToBed6*              Converts "blocked" BED12 features to discrete BED6 features.
+*bedToIgv*                 Creates IGV batch scripts for taking multiple snapshots from BED/GFF/VCF features.
+*coverageBed (BAM)*        Summarizes the depth and breadth of coverage of features in one BED versus features (e.g, "windows", exons, etc.) defined in another BED/GFF/VCF file. 
 *genomeCoverageBed (BAM)*  Creates either a histogram, BEDGRAPH, or a "per base" report of genome coverage. 
 *unionBedGraphs*           Combines multiple BedGraph files into a single file, allowing coverage/other comparisons between them. 
 *annotateBed*              Annotates one BED/VCF/GFF file with overlaps from many others. 
