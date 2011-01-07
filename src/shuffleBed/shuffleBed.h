@@ -19,7 +19,8 @@
 #include <cstdlib>
 #include <ctime>
 #include <sys/time.h>
-
+#include <unistd.h>
+#include <sys/types.h>
 using namespace std;
 
 const int MAX_TRIES = 1000000;
