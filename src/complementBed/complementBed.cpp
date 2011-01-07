@@ -36,38 +36,33 @@ void BedComplement::ComplementBed() {
     // that we can easily compare "A" to it for overlaps
     _bed->loadBedFileIntoMapNoBin();
 
-    vector<short> chromMasks;
-    string currChrom;
+    // get a list of the chroms in the user's genome
+    vector<string> chromList =  _genome->getChromList();
 
-    // loop through each chromosome and merge their BED entries
-    masterBedMapNoBin::const_iterator m    = _bed->bedMapNoBin.begin();
-    masterBedMapNoBin::const_iterator mEnd = _bed->bedMapNoBin.end();
-    for (; m != mEnd; ++m) {
-        currChrom = m->first;
+    // process each chrom in the genome
+    for (size_t c = 0; c < chromList.size(); ++c) {
+        string currChrom = chromList[c];
+        
+        // create a "bit vector" for the chrom
         CHRPOS currChromSize = _genome->getChromSize(currChrom);
-
-        // bedList is already sorted by start position.
-        vector<BED> bedList = m->second;
-
-        // create a flag for every base on the chrom.
         vector<short> chromMasks(currChromSize, 0);
-
-        vector<BED>::const_iterator bIt  = bedList.begin();
-        vector<BED>::const_iterator bEnd = bedList.end();
-        for ( ; bIt != bEnd; ++bIt) {
-
-            // sanity check the end of the bed entry
-            if (bIt->end > currChromSize) {
-                cout << "End of BED entry exceeds chromosome length. Please correct." << endl;
-                _bed->reportBedNewLine(*bIt);
+        
+        // mask the chrom for every feature in the BED file
+        bedVector::const_iterator bItr = _bed->bedMapNoBin[currChrom].begin();
+        bedVector::const_iterator bEnd = _bed->bedMapNoBin[currChrom].end();
+        for (; bItr != bEnd; ++bItr) {
+            if (bItr->end > currChromSize) {
+                cout << "Warninge: end of BED entry exceeds chromosome length. Please correct." << endl;
+                _bed->reportBedNewLine(*bItr);
                 exit(1);
             }
 
             // mask all of the positions spanned by this BED entry.
-            for (CHRPOS b = bIt->start; b < bIt->end; b++)
+            for (CHRPOS b = bItr->start; b < bItr->end; b++)
                 chromMasks[b] = 1;
         }
-
+        
+        // report the unmasked, that is, complemented parts of the chrom
         CHRPOS i = 0;
         CHRPOS start;
         while (i < chromMasks.size()) {
