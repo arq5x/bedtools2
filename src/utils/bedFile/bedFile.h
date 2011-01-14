@@ -857,9 +857,8 @@ public:
         // correct the start and end coords to what they were
         // in the original file
         if (bed.zeroLength) {
-            if (_isGff == false)
-                start++;
-            end--;
+            start = bed.start + 1;
+            end   = bed.end - 1;
         }
         
         // BED
@@ -935,9 +934,8 @@ public:
         // correct the start and end coords to what they were
         // in the original file
         if (bed.zeroLength) {
-            if (_isGff == false)
-                start++;
-            end--;
+            start = bed.start + 1;
+            end   = bed.end - 1;
         }
         
         // BED
