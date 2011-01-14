@@ -332,8 +332,8 @@ void BedIntersect::IntersectBed() {
             FlushOutputBuffer(true);
         }
         if (prevA!=NULL&&prevB!=NULL)
-            cout << prevA->chrom << " " << a->chrom << " " << a->start << " "
-                 << prevB->chrom << " " << b->chrom << " " << b->start << "\n";
+            //cout << prevA->chrom << " " << a->chrom << " " << a->start << " "
+            //     << prevB->chrom << " " << b->chrom << " " << b->start << "\n";
         if (aStatus == BED_INVALID) a->start = INT_MAX;
         if (bStatus == BED_INVALID) b->start = INT_MAX;
     }
