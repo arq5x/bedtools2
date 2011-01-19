@@ -218,7 +218,7 @@ void BedShuffle::ChooseLocusFromInclusionFile(BED &bedEntry) {
         size_t size            =  _include->bedMapNoBin[randomChrom].size();
         // grab a random interval on the chosen chromosome.
         size_t interval        = rand() % size;
-        //cout << interval << endl;
+        // retreive a ranom -incl interval on the selected chrom
         includeInterval        = _include->bedMapNoBin[randomChrom][interval];
 
         bedEntry.chrom = randomChrom;        
