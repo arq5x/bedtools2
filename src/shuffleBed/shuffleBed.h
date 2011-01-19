@@ -33,8 +33,9 @@ class BedShuffle {
 public:
 
     // constructor
-    BedShuffle(string &bedFile, string &genomeFile, string &excludeFile,
-        bool &haveSeed, bool &haveExclude, bool &sameChrom, int &seed);
+    BedShuffle(string &bedFile, string &genomeFile, string &excludeFile, string &includeFile, 
+                           bool haveSeed, bool haveExclude, bool haveInclude, bool sameChrom, 
+                           float overlapFraction, int seed);
 
     // destructor
     ~BedShuffle(void);
@@ -44,24 +45,32 @@ private:
     string _bedFile;
     string _genomeFile;
     string _excludeFile;
+    string _includeFile;
+    float  _overlapFraction;
     int _seed;
     bool _sameChrom;
     bool _haveExclude;
+    bool _haveInclude;
     bool _haveSeed;
 
 
     // The BED file from which to compute coverage.
     BedFile *_bed;
     BedFile *_exclude;
+    BedFile *_include;
 
     GenomeFile *_genome;
 
     vector<string> _chroms;
     int _numChroms;
+    vector<string> _includeChroms;
+    int _numIncludeChroms;
 
     // methods
     void Shuffle();
     void ShuffleWithExclusions();
+    void ShuffleWithInclusions();
 
     void ChooseLocus(BED &);
+    void ChooseLocusFromInclusionFile(BED &);
 };

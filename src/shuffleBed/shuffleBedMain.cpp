@@ -32,14 +32,17 @@ int main(int argc, char* argv[]) {
     // input files
     string bedFile = "stdin";
     string excludeFile;
+    string includeFile;
     string genomeFile;
 
-    bool haveBed     = true;
-    bool haveGenome  = false;
-    bool haveExclude = false;
-    bool haveSeed    = false;
-    int seed         = -1;
-    bool sameChrom   = false;
+    bool haveBed          = true;
+    bool haveGenome       = false;
+    bool haveExclude      = false;
+    bool haveInclude      = false;
+    bool haveSeed         = false;
+    float overlapFraction = 0.0;
+    int seed              = -1;
+    bool sameChrom        = false;
 
 
     for(int i = 1; i < argc; i++) {
@@ -78,6 +81,13 @@ int main(int argc, char* argv[]) {
                 i++;
             }
         }
+        else if(PARAMETER_CHECK("-incl", 5, parameterLength)) {
+            if ((i+1) < argc) {
+                haveInclude = true;
+                includeFile = argv[i + 1];
+                i++;
+            }
+        }
         else if(PARAMETER_CHECK("-seed", 5, parameterLength)) {
             if ((i+1) < argc) {
                 haveSeed = true;
@@ -87,6 +97,12 @@ int main(int argc, char* argv[]) {
         }
         else if(PARAMETER_CHECK("-chrom", 6, parameterLength)) {
             sameChrom = true;
+        }
+        else if(PARAMETER_CHECK("-f", 2, parameterLength)) {
+            if ((i+1) < argc) {
+                overlapFraction = atof(argv[i + 1]);
+                i++;
+            }
         }
         else {
           cerr << endl << "*****ERROR: Unrecognized parameter: " << argv[i] << " *****" << endl << endl;
@@ -99,9 +115,16 @@ int main(int argc, char* argv[]) {
       cerr << endl << "*****" << endl << "*****ERROR: Need both a BED (-i) and a genome (-g) file. " << endl << "*****" << endl;
       showHelp = true;
     }
+    
+    if (!haveInclude && !haveExclude) {
+      cerr << endl << "*****" << endl << "*****ERROR: Cannot use -incl and -excl together." << endl << "*****" << endl;
+      showHelp = true;
+    }
 
     if (!showHelp) {
-        BedShuffle *bc = new BedShuffle(bedFile, genomeFile, excludeFile, haveSeed, haveExclude, sameChrom, seed);
+        BedShuffle *bc = new BedShuffle(bedFile, genomeFile, excludeFile, includeFile, 
+                                        haveSeed, haveExclude, haveInclude, sameChrom, 
+                                        overlapFraction, seed);
         delete bc;
         return 0;
     }
@@ -124,6 +147,10 @@ void ShowHelp(void) {
     cerr << "\t-excl\t"             << "A BED/GFF/VCF file of coordinates in which features in -i" << endl;
     cerr                            << "\t\tshould not be placed (e.g. gaps.bed)." << endl << endl;
 
+    cerr << "\t-incl\t"             << "Instead of randomly placing features in a genome, the -incl" << endl;
+    cerr                            << "\t\toptions defines a BED/GFF/VCF file of coordinates in which " << endl;
+    cerr                            << "\t\tfeatures in -i should be randomly placed (e.g. genes.bed). " << endl << endl;
+
     cerr << "\t-chrom\t"            << "Keep features in -i on the same chromosome."<< endl;
     cerr                            << "\t\t- By default, the chrom and position are randomly chosen." << endl << endl;
 
@@ -131,6 +158,13 @@ void ShowHelp(void) {
     cerr                            << "\t\t- By default, the seed is chosen automatically." << endl;
     cerr                            << "\t\t- (INTEGER)" << endl << endl;
 
+    cerr << "\t-f\t"                << "Maximum overlap (as a fraction of the -i feature) with an -excl" << endl;
+    cerr                            << "\t\tfeature that is tolerated before searching for a new, " << endl;
+    cerr                            << "\t\trandomized locus. For example, -f 0.10 allows up to 10%" << endl;
+    cerr                            << "\t\tof a randomized feature to overlap with a given feature" << endl;
+    cerr                            << "\t\tin the -excl file. **Cannot be used with -incl file.**" << endl;
+    cerr                            << "\t\t- Default is 1E-9 (i.e., 1bp)." << endl;
+    cerr                            << "\t\t- FLOAT (e.g. 0.50)" << endl << endl;
 
     cerr << "Notes: " << endl;
     cerr << "\t(1)  The genome file should tab delimited and structured as follows:" << endl;
