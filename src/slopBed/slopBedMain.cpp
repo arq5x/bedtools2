@@ -40,8 +40,9 @@ int main(int argc, char* argv[]) {
     bool haveBoth   = false;
 
     bool forceStrand = false;
-    int leftSlop = 0;
-    int rightSlop = 0;
+    float leftSlop   = 0.0;
+    float rightSlop  = 0.0;
+    bool  fractional = false;
 
     for(int i = 1; i < argc; i++) {
         int parameterLength = (int)strlen(argv[i]);
@@ -75,27 +76,30 @@ int main(int argc, char* argv[]) {
         else if(PARAMETER_CHECK("-l", 2, parameterLength)) {
             if ((i+1) < argc) {
                 haveLeft = true;
-                leftSlop = atoi(argv[i + 1]);
+                leftSlop = atof(argv[i + 1]);
                 i++;
             }
         }
         else if(PARAMETER_CHECK("-r", 2, parameterLength)) {
             if ((i+1) < argc) {
                 haveRight = true;
-                rightSlop = atoi(argv[i + 1]);
+                rightSlop = atof(argv[i + 1]);
                 i++;
             }
         }
         else if(PARAMETER_CHECK("-b", 2, parameterLength)) {
             if ((i+1) < argc) {
                 haveBoth = true;
-                leftSlop = atoi(argv[i + 1]);
-                rightSlop = atoi(argv[i + 1]);
+                leftSlop = atof(argv[i + 1]);
+                rightSlop = atof(argv[i + 1]);
                 i++;
             }
         }
         else if(PARAMETER_CHECK("-s", 2, parameterLength)) {
             forceStrand = true;
+        }
+        else if(PARAMETER_CHECK("-pct", 4, parameterLength)) {
+            fractional = true;
         }
         else {
           cerr << endl << "*****ERROR: Unrecognized parameter: " << argv[i] << " *****" << endl << endl;
@@ -122,7 +126,7 @@ int main(int argc, char* argv[]) {
     }
 
     if (!showHelp) {
-        BedSlop *bc = new BedSlop(bedFile, genomeFile, forceStrand, leftSlop, rightSlop);
+        BedSlop *bc = new BedSlop(bedFile, genomeFile, forceStrand, leftSlop, rightSlop, fractional);
         delete bc;
 
         return 0;
@@ -144,17 +148,21 @@ void ShowHelp(void) {
 
     cerr << "Options: " << endl;
     cerr << "\t-b\t"                << "Increase the BED/GFF/VCF entry by -b base pairs in each direction." << endl;
-    cerr                            << "\t\t- (Integer)" << endl;
+    cerr                            << "\t\t- (Integer) or (Float, e.g. 0.1) if used with -pct." << endl << endl;
 
     cerr << "\t-l\t"                << "The number of base pairs to subtract from the start coordinate." << endl;
-    cerr                            << "\t\t- (Integer)" << endl;
-
+    cerr                            << "\t\t- (Integer) or (Float, e.g. 0.1) if used with -pct." << endl << endl;
+        
     cerr << "\t-r\t"                << "The number of base pairs to add to the end coordinate." << endl;
-    cerr                            << "\t\t- (Integer)" << endl;
-
+    cerr                            << "\t\t- (Integer) or (Float, e.g. 0.1) if used with -pct." << endl << endl;
+        
     cerr << "\t-s\t"                << "Define -l and -r based on strand." << endl;
     cerr                            << "\t\tE.g. if used, -l 500 for a negative-stranded feature, " << endl;
     cerr                            << "\t\tit will add 500 bp downstream.  Default = false." << endl << endl;
+
+    cerr << "\t-pct\t"              << "Define -l and -r as a fraction of the feature's length." << endl;
+    cerr                            << "\t\tE.g. if used on a 1000bp feature, -l 0.50, " << endl;
+    cerr                            << "\t\twill add 500 bp \"upstream\".  Default = false." << endl << endl;
 
     cerr << "Notes: " << endl;
     cerr << "\t(1)  Starts will be set to 0 if options would force it below 0." << endl;

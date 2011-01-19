@@ -30,7 +30,7 @@ class BedSlop {
 public:
 
     // constructor
-    BedSlop(string &bedFile, string &genomeFile, bool &forceStrand, int &leftSlop, int &rightSlop) ;
+    BedSlop(string &bedFile, string &genomeFile, bool forceStrand, float leftSlop, float rightSlop, bool fractional);
 
     // destructor
     ~BedSlop(void);
@@ -42,9 +42,10 @@ private:
     string _bedFile;
     string _genomeFile;
 
-    bool _forceStrand;
-    int _leftSlop;
-    int _rightSlop;
+    bool   _forceStrand;
+    float  _leftSlop;
+    float  _rightSlop;
+    bool   _fractional;
 
     BedFile *_bed;
     GenomeFile *_genome;
@@ -54,5 +55,5 @@ private:
     void SlopBed();
 
     // method to add requested "slop" to a single BED entry
-    void AddSlop(BED &bed);
+    void AddSlop(BED &bed, int leftSlop, int rightSlop);
 };

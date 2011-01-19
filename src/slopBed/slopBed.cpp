@@ -7,24 +7,25 @@
   University of Virginia
   aaronquinlan@gmail.com
 
-  Licenced under the GNU General Public License 2.0 license.
+  Licensed under the GNU General Public License 2.0 license.
 ******************************************************************************/
 #include "lineFileUtilities.h"
 #include "slopBed.h"
 
 
-BedSlop::BedSlop(string &bedFile, string &genomeFile, bool &forceStrand, int &leftSlop, int &rightSlop) {
+BedSlop::BedSlop(string &bedFile, string &genomeFile, bool forceStrand, float leftSlop, float rightSlop, bool fractional) {
 
     _bedFile     = bedFile;
     _genomeFile  = genomeFile;
     _forceStrand = forceStrand;
-
-    _leftSlop  = leftSlop;
-    _rightSlop = rightSlop;
+    _leftSlop    = leftSlop;
+    _rightSlop   = rightSlop;
+    _fractional  = fractional; 
 
     _bed    = new BedFile(bedFile);
     _genome = new GenomeFile(genomeFile);
 
+    // get going, slop it up.
     SlopBed();
 }
 
@@ -44,7 +45,14 @@ void BedSlop::SlopBed() {
     bedStatus = _bed->GetNextBed(bedEntry, lineNum);
     while (bedStatus != BED_INVALID) {
         if (bedStatus == BED_VALID) {
-            AddSlop(bedEntry);
+            if (_fractional == false) {
+                AddSlop(bedEntry, _leftSlop, _rightSlop);
+            }
+            else {
+                int leftSlop  = (int) (_leftSlop  * bedEntry.size());
+                int rightSlop = (int) (_rightSlop * bedEntry.size());
+                AddSlop(bedEntry, leftSlop, rightSlop);
+            }
             _bed->reportBedNewLine(bedEntry);
             bedEntry = nullBed;
         }
@@ -54,7 +62,7 @@ void BedSlop::SlopBed() {
 }
 
 
-void BedSlop::AddSlop(BED &bed) {
+void BedSlop::AddSlop(BED &bed, int leftSlop, int rightSlop) {
 
     // special handling if the BED entry is on the negative
     // strand and the user cares about strandedness.
@@ -62,20 +70,20 @@ void BedSlop::AddSlop(BED &bed) {
 
     if ( (_forceStrand) && (bed.strand == "-") ) {
         // inspect the start
-        if ( (static_cast<int>(bed.start) - _rightSlop) > 0 ) bed.start -= _rightSlop;
+        if ( (static_cast<int>(bed.start) - rightSlop) > 0 ) bed.start -= rightSlop;
         else bed.start = 0;
 
         // inspect the start
-        if ( (static_cast<int>(bed.end) + _leftSlop) <= static_cast<int>(chromSize)) bed.end += _leftSlop;
+        if ( (static_cast<int>(bed.end) + leftSlop) <= static_cast<int>(chromSize)) bed.end += leftSlop;
         else bed.end = chromSize;
     }
     else {
         // inspect the start
-        if ( (static_cast<int>(bed.start) - _leftSlop) > 0) bed.start -= _leftSlop;
+        if ( (static_cast<int>(bed.start) - leftSlop) > 0) bed.start -= leftSlop;
         else bed.start = 0;
 
         // inspect the end
-        if ( (static_cast<int>(bed.end) + _rightSlop) <= static_cast<int>(chromSize)) bed.end += _rightSlop;
+        if ( (static_cast<int>(bed.end) + rightSlop) <= static_cast<int>(chromSize)) bed.end += rightSlop;
         else bed.end = chromSize;
     }
 }
