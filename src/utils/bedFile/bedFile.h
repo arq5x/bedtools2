@@ -152,6 +152,10 @@ public:
       strand(strand),
       otherFields(otherFields)
     {}
+    
+    int size() {
+        return end-start;
+    }
 
 }; // BED
 
