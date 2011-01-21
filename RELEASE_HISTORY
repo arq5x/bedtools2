@@ -1,3 +1,35 @@
+Version 2.11.0 (January-21-2010)
+
+Enhancements:
+=============
+1. Support for zero length features (i.e., start = end)
+   - For example, this allows overlaps to be detected with insertions in the reference genome, as reported by dbSNP. 
+2. Both 8 and 9 column GFF files are now supported.
+3. slopBed can now extend the size of features by a percentage of it's size (-pct) instead of just a fixed number of bases.
+4. Two improvements to shuffleBed:
+   3a. A -f (overlapFraction) parameter that defines the maximum overlap that a randomized feature can have with an -excl feature. 
+       That is, if a chosen locus has more than -f overlap with an -excl feature, a new locus is sought.
+   3b. A new -incl option (thanks to Michael Hoffman and Davide Cittaro) that, defines intervals in which the randomized features should        be placed.  This is used instead of placing the features randomly in the genome.  Note that a genome file is still required so 
+       that a randomized feature does not go beyond the end of a chromosome. 
+5. bamToBed can now optionally report the CIGAR string as an additional field.
+6. pairToPair can now report the entire paired feature from the B file when overlaps are found.
+7. complementBed now reports all chromosomes, not just those with features in the BED file.
+8. Improved randomization seeding in shuffleBed.  This prevents identical output for runs of shuffleBed that
+   occur in the same second (often the case).
+
+
+Bug Fixes:
+==========
+1. Fixed the "BamAlignmentSupportData is private" compilation issue.
+2. Fixed a bug in windowBed that caused positions to run off the end of a chromosome.
+ 
+
+Major Changes:
+==============
+1. The groupBy command is now part of the filo package (https://github.com/arq5x/filo) and will no longer be distributed with BEDTools.
+
+
+
 Version 2.10.0 (September-21-2010)
 ==New tools==
 1. annotateBed. Annotates one BED/VCF/GFF file with the coverage and number of overlaps observed
