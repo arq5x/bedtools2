@@ -466,17 +466,12 @@ void BedFile::countListHits(const BED &a, int index, bool forceStrand) {
     }
 }
 
+void BedFile::setZeroBased(bool zeroBased) { this->isZeroBased = zeroBased; }
 
-void BedFile::setGff (bool gff) {
-    if (gff == true) this->_isGff = true;
-    else this->_isGff = false;
-}
+void BedFile::setGff (bool gff) { this->_isGff = gff; }
 
 
-void BedFile::setVcf (bool vcf) {
-    if (vcf == true) this->_isVcf = true;
-    else this->_isVcf = false;
-}
+void BedFile::setVcf (bool vcf) { this->_isVcf = vcf; }
 
 
 void BedFile::setFileType (FileType type) {

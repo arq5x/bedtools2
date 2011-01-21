@@ -396,6 +396,7 @@ public:
     string bedFile;
     unsigned int bedType;  // 3-6, 12 for BED
                            // 9 for GFF
+    bool isZeroBased;
 
     // Main data structires used by BEDTools
     masterBedCovMap      bedCovMap;
@@ -412,6 +413,7 @@ private:
     FileType   _fileType;     // what is the file type? (BED? GFF? VCF?)
     istream   *_bedStream;
 
+    void setZeroBased(bool zeroBased);
     void setGff (bool isGff);
     void setVcf (bool isVcf);
     void setFileType (FileType type);
@@ -459,6 +461,7 @@ private:
                     // it's BED format if columns 2 and 3 are integers
                     if (isInteger(lineVector[1]) && isInteger(lineVector[2])) {
                         setGff(false);
+                        setZeroBased(true);
                         setFileType(BED_FILETYPE);
                         setBedType(numFields);       // we now expect numFields columns in each line
                         if (parseBedLine(bed, lineVector, lineNum, numFields) == true) return BED_VALID;
@@ -467,6 +470,7 @@ private:
                     else if (isInteger(lineVector[1]) && numFields >= 8) {
                         setGff(false);
                         setVcf(true);
+                        setZeroBased(false);
                         setFileType(VCF_FILETYPE);
                         setBedType(numFields);       // we now expect numFields columns in each line
                         if (parseVcfLine(bed, lineVector, lineNum, numFields) == true) return BED_VALID;
@@ -474,6 +478,7 @@ private:
                     // it's GFF, assuming columns columns 4 and 5 are numeric and we have 9 fields total.
                     else if ((numFields >= 8) && isInteger(lineVector[3]) && isInteger(lineVector[4])) {
                         setGff(true);
+                        setZeroBased(false);
                         setFileType(GFF_FILETYPE);
                         setBedType(numFields);       // we now expect numFields columns in each line
                         if (parseGffLine(bed, lineVector, lineNum, numFields) == true) return BED_VALID;

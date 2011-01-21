@@ -47,4 +47,6 @@ private:
     // instance of a bed file class.
     BedFile *_bed;
 
+    void Report(string chrom, int start, int end, const map<string, bool> &names, int mergeCount);
+    void ReportStranded(string chrom, int start, int end, const map<string, bool> &names, int mergeCount, string strand);
 };
