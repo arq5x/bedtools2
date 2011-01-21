@@ -32,15 +32,13 @@
 # As an alternative, gzstream.C and gzstream.h can be edited.
 # ----------------------------------------------------------------------------
 
-CXX = g++ 
-CXXFLAGS = -I. -O -Wall
-LDFLAGS  =  -L. -lgzstream -lz
+INCLUDES = -I.
 OBJ_DIR = ../../../obj/
 BIN_DIR = ../../../bin/
 UTILITIES_DIR = ../../utils/
 	
 ${OBJ_DIR}/gzstream.o : gzstream.C gzstream.h
-	${CXX} ${CXXFLAGS} -c -o ${OBJ_DIR}/gzstream.o gzstream.C
+	${CXX} ${CXXFLAGS} -c -o ${OBJ_DIR}/gzstream.o gzstream.C $(INCLUDES)
 
 clean:
 	@echo "Cleaning up."
