@@ -46,7 +46,7 @@ void BedSlop::SlopBed() {
     while (bedStatus != BED_INVALID) {
         if (bedStatus == BED_VALID) {
             if (_fractional == false) {
-                AddSlop(bedEntry, _leftSlop, _rightSlop);
+                AddSlop(bedEntry, (int) _leftSlop, (int) _rightSlop);
             }
             else {
                 int leftSlop  = (int) (_leftSlop  * bedEntry.size());
