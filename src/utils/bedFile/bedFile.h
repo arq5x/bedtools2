@@ -176,11 +176,11 @@ struct MATE {
 */
 struct BEDCOV {
 
+    string chrom;
+    
     // Regular BED fields
     CHRPOS start;
     CHRPOS end;
-
-    string chrom;
     string name;
     string score;
     string strand;
@@ -195,6 +195,24 @@ struct BEDCOV {
     map<unsigned int, DEPTH> depthMap;
     unsigned int count;
     CHRPOS minOverlapStart;
+    
+    
+    public:
+    // constructors
+    // Null
+    BEDCOV()
+    : chrom(""),
+      start(0),
+      end(0),
+      name(""),
+      score(""),
+      strand(""),
+      otherFields(),
+      zeroLength(false),
+      depthMap(),
+      count(0),
+      minOverlapStart(0)
+    {}
 };
 
 
@@ -205,10 +223,9 @@ struct BEDCOV {
 struct BEDCOVLIST {
 
     // Regular BED fields
+    string chrom;
     CHRPOS start;
     CHRPOS end;
-
-    string chrom;
     string name;
     string score;
     string strand;
@@ -223,6 +240,24 @@ struct BEDCOVLIST {
     vector< map<unsigned int, DEPTH> > depthMapList;
     vector<unsigned int> counts;
     vector<CHRPOS> minOverlapStarts;
+    
+    
+    public:
+    // constructors
+    // Null
+    BEDCOVLIST()
+    : chrom(""),
+      start(0),
+      end(0),
+      name(""),
+      score(""),
+      strand(""),
+      otherFields(),
+      zeroLength(false),
+      depthMapList(),
+      counts(0),
+      minOverlapStarts(0)
+    {}
 };
 
 
