@@ -13,6 +13,7 @@
 #include "genomeFile.h"
 
 #include <vector>
+#include <bitset>
 #include <algorithm>
 #include <iostream>
 #include <fstream>
