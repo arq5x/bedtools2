@@ -42,11 +42,11 @@ void BedComplement::ComplementBed() {
     // process each chrom in the genome
     for (size_t c = 0; c < chromList.size(); ++c) {
         string currChrom = chromList[c];
-        
+
         // create a "bit vector" for the chrom
         CHRPOS currChromSize = _genome->getChromSize(currChrom);
-        vector<short> chromMasks(currChromSize, 0);
-        
+        vector<bool> chromMasks(currChromSize, 0);
+
         // mask the chrom for every feature in the BED file
         bedVector::const_iterator bItr = _bed->bedMapNoBin[currChrom].begin();
         bedVector::const_iterator bEnd = _bed->bedMapNoBin[currChrom].end();
@@ -61,7 +61,7 @@ void BedComplement::ComplementBed() {
             for (CHRPOS b = bItr->start; b < bItr->end; b++)
                 chromMasks[b] = 1;
         }
-        
+
         // report the unmasked, that is, complemented parts of the chrom
         CHRPOS i = 0;
         CHRPOS start;
