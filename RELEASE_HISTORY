@@ -1,3 +1,9 @@
+Version 2.11.2 (January-31-2010)
+Fixed a coordinate reporting bug in coverageBed.
+Added "max distance (-d)" argument back to the new implementation of mergeBed.
+
+
+
 Version 2.11.0 (January-21-2010)
 
 Enhancements:
