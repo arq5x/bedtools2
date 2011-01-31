@@ -37,7 +37,7 @@ BedMerge::BedMerge(string &bedFile, bool &numEntries, int &maxDistance, bool &fo
 
     _bedFile = bedFile;
     _numEntries = numEntries;
-    _maxDistance = -1 * maxDistance;
+    _maxDistance = maxDistance;
     _forceStrand = forceStrand;
     _reportNames = reportNames;
 
@@ -123,7 +123,8 @@ void BedMerge::MergeBed() {
         vector<BED>::const_iterator bedItr = bedList.begin();
         vector<BED>::const_iterator bedEnd = bedList.end();
         for (; bedItr != bedEnd; ++bedItr) {
-            if ((int) bedItr->start > end) {
+            // new block, no overlap
+            if ( (((int) bedItr->start - end) > _maxDistance) || (end < 0)) {
                 if (start >= 0) {
                     Report(chrom, start, end, names, mergeCount);
                     // reset
@@ -134,8 +135,9 @@ void BedMerge::MergeBed() {
                 end   = bedItr->end;
                 names[bedItr->name] = true;
             }
+            // same block, overlaps
             else {
-                end = bedItr->end;
+                if ((int) bedItr-> end > end) end = bedItr->end;
                 mergeCount++;
                 names[bedItr->name] = true;
             }
@@ -189,7 +191,7 @@ void BedMerge::MergeBedStranded() {
                 if (bedItr->strand != strands[s]) { continue; }
                 else { numOnStrand++; }
                 
-                if ((int) bedItr->start > end) {
+                if ( (((int) bedItr->start - end) > _maxDistance) || (end < 0)) {
                     if (start >= 0) {
                         ReportStranded(chrom, start, end, names, mergeCount, strands[s]);
                         // reset
@@ -201,7 +203,7 @@ void BedMerge::MergeBedStranded() {
                     names[bedItr->name] = true;
                 }
                 else {
-                    end = bedItr->end;
+                    if ((int) bedItr-> end > end) end = bedItr->end;
                     mergeCount++;
                     names[bedItr->name] = true;
                 }
