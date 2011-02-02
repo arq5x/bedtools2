@@ -144,7 +144,8 @@ void BedIntersect::ReportOverlapDetail(const int &overlapBases, const BED &a, co
     else if (_writeOverlap == true) {
         _bedA->reportBedTab(a);
         _bedB->reportBedTab(b);
-        printf("%d\n", overlapBases);
+        if (b.zeroLength == false) printf("%d\n", overlapBases);
+        else printf("0\n");
     }
 }
 
