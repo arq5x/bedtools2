@@ -12,6 +12,7 @@
 #include "bedFile.h"
 #include <vector>
 #include <algorithm>
+#include <numeric>
 #include <iostream>
 #include <fstream>
 #include <limits.h>
@@ -19,7 +20,6 @@
 
 using namespace std;
 
-void ReportMergedNames(const map<string, bool> &names);
 
 //************************************************
 // Class methods and elements
@@ -29,7 +29,9 @@ class BedMerge {
 public:
 
   // constructor
-  BedMerge(string &bedFile, bool &numEntries, int &maxDistance, bool &forceStrand, bool &reportNames);
+  BedMerge(string &bedFile, bool numEntries, 
+           int maxDistance, bool forceStrand, 
+           bool reportNames, bool reportScores, const string &scoreOp);
 
   // destructor
   ~BedMerge(void);
@@ -40,13 +42,18 @@ public:
 private:
 
     string _bedFile;
-    bool _numEntries;
-    bool _forceStrand;
-    bool _reportNames;
-    int _maxDistance;
+    bool   _numEntries;
+    bool   _forceStrand;
+    bool   _reportNames;
+    bool   _reportScores;
+    string _scoreOp;
+    int    _maxDistance;
     // instance of a bed file class.
     BedFile *_bed;
 
-    void Report(string chrom, int start, int end, const map<string, bool> &names, int mergeCount);
-    void ReportStranded(string chrom, int start, int end, const map<string, bool> &names, int mergeCount, string strand);
+    void Report(string chrom, int start, int end, const vector<string> &names, const vector<string> &scores, int mergeCount);
+    void ReportStranded(string chrom, int start, int end, const vector<string> &names, const vector<string> &scores, int mergeCount, string strand);
+    void ReportMergedNames(const vector<string> &names);
+    void ReportMergedScores(const vector<string> &scores);
+    
 };

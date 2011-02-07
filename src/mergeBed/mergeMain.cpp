@@ -32,6 +32,7 @@ int main(int argc, char* argv[]) {
     // input files
     string bedFile  = "stdin";
     int maxDistance = 0;
+    string scoreOp  = "";
 
     // input arguments
     bool haveBed         = true;
@@ -39,6 +40,7 @@ int main(int argc, char* argv[]) {
     bool haveMaxDistance = false;
     bool forceStrand     = false;
     bool reportNames     = false;
+    bool reportScores    = false;
 
     for(int i = 1; i < argc; i++) {
         int parameterLength = (int)strlen(argv[i]);
@@ -78,6 +80,13 @@ int main(int argc, char* argv[]) {
         else if (PARAMETER_CHECK("-nms", 4, parameterLength)) {
             reportNames = true;
         }
+        else if (PARAMETER_CHECK("-scores", 7, parameterLength)) {
+            reportScores = true;
+            if ((i+1) < argc) {
+                scoreOp      = argv[i + 1];
+                i++;
+            }
+        }
         else {
             cerr << endl << "*****ERROR: Unrecognized parameter: " << argv[i] << " *****" << endl << endl;
             showHelp = true;
@@ -93,9 +102,15 @@ int main(int argc, char* argv[]) {
         cerr << endl << "*****" << endl << "*****ERROR: Request either -n OR -nms, not both." << endl << "*****" << endl;
         showHelp = true;
     }
+    if ((reportScores == true) && (scoreOp != "sum")  && (scoreOp != "max")    && (scoreOp != "min") && (scoreOp != "mean") &&
+        (scoreOp != "mode") && (scoreOp != "median") && (scoreOp != "antimode") && (scoreOp != "collapse")) 
+    {
+        cerr << endl << "*****" << endl << "*****ERROR: Invalid scoreOp selection \"" << scoreOp << endl << "\"  *****" << endl;
+        showHelp = true;
+    }
 
     if (!showHelp) {
-        BedMerge *bm = new BedMerge(bedFile, numEntries, maxDistance, forceStrand, reportNames);
+        BedMerge *bm = new BedMerge(bedFile, numEntries, maxDistance, forceStrand, reportNames, reportScores, scoreOp);
         delete bm;
         return 0;
     }
@@ -115,21 +130,27 @@ void ShowHelp(void) {
     cerr << "Usage:   " << PROGRAM_NAME << " [OPTIONS] -i <bed/gff/vcf>" << endl << endl;
 
     cerr << "Options: " << endl;
-    cerr << "\t-s\t"            << "Force strandedness.  That is, only merge features" << endl;
-    cerr                        << "\t\tthat are the same strand." << endl;
-    cerr                        << "\t\t- By default, merging is done without respect to strand." << endl << endl;
+    cerr << "\t-s\t"                     << "Force strandedness.  That is, only merge features" << endl;
+    cerr                                 << "\t\tthat are the same strand." << endl;
+    cerr                                 << "\t\t- By default, merging is done without respect to strand." << endl << endl;
 
-    cerr << "\t-n\t"            << "Report the number of BED entries that were merged." << endl;
-    cerr                        << "\t\t- Note: \"1\" is reported if no merging occurred." << endl << endl;
+    cerr << "\t-n\t"                     << "Report the number of BED entries that were merged." << endl;
+    cerr                                 << "\t\t- Note: \"1\" is reported if no merging occurred." << endl << endl;
 
 
-    cerr << "\t-d\t"            << "Maximum distance between features allowed for features" << endl;
-    cerr                        << "\t\tto be merged." << endl;
-    cerr                        << "\t\t- Def. 0. That is, overlapping & book-ended features are merged." << endl;
-    cerr                        << "\t\t- (INTEGER)" << endl << endl;
+    cerr << "\t-d\t"                     << "Maximum distance between features allowed for features" << endl;
+    cerr                                 << "\t\tto be merged." << endl;
+    cerr                                 << "\t\t- Def. 0. That is, overlapping & book-ended features are merged." << endl;
+    cerr                                 << "\t\t- (INTEGER)" << endl << endl;
 
-    cerr << "\t-nms\t"          << "Report the names of the merged features separated by semicolons." << endl << endl;
-
+    cerr << "\t-nms\t"                   << "Report the names of the merged features separated by semicolons." << endl << endl;
+    
+    cerr << "\t-scores [STRING]\t"       << "Report the scores of the merged features. Specify one of " << endl;
+    cerr                                 << "\t\tthe following options for reporting scores:" << endl;
+    cerr                                 << "\t\t\t    sum, min, max," << endl;
+    cerr                                 << "\t\t\t    mean, median, mode, antimode," << endl;
+    cerr                                 << "\t\t\t    collapse (i.e., print a semicolon-separated list)," << endl << endl;
+    
 
     // end the program here
     exit(1);
