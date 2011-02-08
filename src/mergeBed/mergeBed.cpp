@@ -15,97 +15,116 @@
 
 
 void BedMerge::ReportMergedNames(const vector<string> &names) {
-    printf("\t");
-    vector<string>::const_iterator nameItr = names.begin();
-    vector<string>::const_iterator nameEnd = names.end();
-    for (; nameItr != nameEnd; ++nameItr) {
-        if (nameItr < (nameEnd - 1))
-            cout << *nameItr << ";";
-        else
-            cout << *nameItr;
+    if (names.size() > 0) {
+        printf("\t");
+        vector<string>::const_iterator nameItr = names.begin();
+        vector<string>::const_iterator nameEnd = names.end();
+        for (; nameItr != nameEnd; ++nameItr) {
+            if (nameItr < (nameEnd - 1))
+                cout << *nameItr << ";";
+            else
+                cout << *nameItr;
+        }
+    }
+    else {
+        cerr << endl 
+             << "*****" << endl 
+             << "*****ERROR: No names found to report for the -names option. Exiting." << endl 
+             << "*****" << endl;
+        exit(1);
     }
 }
 
+
 void BedMerge::ReportMergedScores(const vector<string> &scores) {
-    printf("\t");
-    
-    // convert the scores to floats
-    vector<float> data;
-    for (size_t i = 0 ; i < scores.size() ; i++) {
-        data.push_back(atof(scores[i].c_str()));
-    }    
+    if (scores.size() > 0) {
+        printf("\t");
 
-    if (_scoreOp == "sum") {
-        printf("%.3f", accumulate(data.begin(), data.end(), 0.0));
-    }
-    else if (_scoreOp == "min") {
-        printf("%.3f", *min_element( data.begin(), data.end() ));
-    }
-    else if (_scoreOp == "max") {
-        printf("%.3f", *max_element( data.begin(), data.end() ));
-    }
-    else if (_scoreOp == "mean") {
-        double total = accumulate(data.begin(), data.end(), 0.0);
-        double mean = total / data.size();
-        printf("%.3f", mean);
-    }
-    else if (_scoreOp == "median") {
-        double median = 0.0;
-        sort(data.begin(), data.end());
-        int totalLines = data.size();
-        if ((totalLines % 2) > 0) {
-            long mid;
-            mid = totalLines / 2;
-            median = data[mid];
-        }
-        else {
-            long midLow, midHigh;
-            midLow = (totalLines / 2) - 1;
-            midHigh = (totalLines / 2);
-            median = (data[midLow] + data[midHigh]) / 2.0;
-        }
-        printf("%.3f", median);
-    }
-    else if ((_scoreOp == "mode") || (_scoreOp == "antimode")) {
-         // compute the frequency of each unique value
-         map<string, int> freqs;
-         vector<string>::const_iterator dIt  = scores.begin();
-         vector<string>::const_iterator dEnd = scores.end();
-         for (; dIt != dEnd; ++dIt) {
-             freqs[*dIt]++;
-         }
+        // convert the scores to floats
+        vector<float> data;
+        for (size_t i = 0 ; i < scores.size() ; i++) {
+            data.push_back(atof(scores[i].c_str()));
+        }    
 
-         // grab the mode and the anti mode
-         string mode, antiMode;
-         int    count = 0;
-         int minCount = INT_MAX;
-         for(map<string,int>::const_iterator iter = freqs.begin(); iter != freqs.end(); ++iter) {
-             if (iter->second > count) {
-                 mode = iter->first;
-                 count = iter->second;
-             }
-             if (iter->second < minCount) {
-                 antiMode = iter->first;
-                 minCount = iter->second;
-             }
-         }
-         // report
-         if (_scoreOp == "mode") {
-             printf("%s", mode.c_str());
-         }
-         else if (_scoreOp == "antimode") {
-             printf("%s", antiMode.c_str());
-         }
-     }
-     else if (_scoreOp == "collapse") {    
-        vector<string>::const_iterator scoreItr = scores.begin();
-        vector<string>::const_iterator scoreEnd = scores.end();
-        for (; scoreItr != scoreEnd; ++scoreItr) {
-            if (scoreItr < (scoreEnd - 1))
-                cout << *scoreItr << ";";
-            else
-                cout << *scoreItr;
+        if (_scoreOp == "sum") {
+            printf("%.3f", accumulate(data.begin(), data.end(), 0.0));
         }
+        else if (_scoreOp == "min") {
+            printf("%.3f", *min_element( data.begin(), data.end() ));
+        }
+        else if (_scoreOp == "max") {
+            printf("%.3f", *max_element( data.begin(), data.end() ));
+        }
+        else if (_scoreOp == "mean") {
+            double total = accumulate(data.begin(), data.end(), 0.0);
+            double mean = total / data.size();
+            printf("%.3f", mean);
+        }
+        else if (_scoreOp == "median") {
+            double median = 0.0;
+            sort(data.begin(), data.end());
+            int totalLines = data.size();
+            if ((totalLines % 2) > 0) {
+                long mid;
+                mid = totalLines / 2;
+                median = data[mid];
+            }
+            else {
+                long midLow, midHigh;
+                midLow = (totalLines / 2) - 1;
+                midHigh = (totalLines / 2);
+                median = (data[midLow] + data[midHigh]) / 2.0;
+            }
+            printf("%.3f", median);
+        }
+        else if ((_scoreOp == "mode") || (_scoreOp == "antimode")) {
+             // compute the frequency of each unique value
+             map<string, int> freqs;
+             vector<string>::const_iterator dIt  = scores.begin();
+             vector<string>::const_iterator dEnd = scores.end();
+             for (; dIt != dEnd; ++dIt) {
+                 freqs[*dIt]++;
+             }
+
+             // grab the mode and the anti mode
+             string mode, antiMode;
+             int    count = 0;
+             int minCount = INT_MAX;
+             for(map<string,int>::const_iterator iter = freqs.begin(); iter != freqs.end(); ++iter) {
+                 if (iter->second > count) {
+                     mode = iter->first;
+                     count = iter->second;
+                 }
+                 if (iter->second < minCount) {
+                     antiMode = iter->first;
+                     minCount = iter->second;
+                 }
+             }
+             // report
+             if (_scoreOp == "mode") {
+                 printf("%s", mode.c_str());
+             }
+             else if (_scoreOp == "antimode") {
+                 printf("%s", antiMode.c_str());
+             }
+         }
+         else if (_scoreOp == "collapse") {    
+            vector<string>::const_iterator scoreItr = scores.begin();
+            vector<string>::const_iterator scoreEnd = scores.end();
+            for (; scoreItr != scoreEnd; ++scoreItr) {
+                if (scoreItr < (scoreEnd - 1))
+                    cout << *scoreItr << ";";
+                else
+                    cout << *scoreItr;
+            }
+        }
+    }
+    else {        
+        cerr << endl 
+             << "*****" << endl 
+             << "*****ERROR: No scores found to report for the -scores option. Exiting." << endl 
+             << "*****" << endl;
+        exit(1);
     }
 }
 
@@ -254,15 +273,15 @@ void BedMerge::MergeBed() {
                 }
                 start = bedItr->start;
                 end   = bedItr->end;
-                names.push_back(bedItr->name);
-                scores.push_back(bedItr->score);
+                if (!bedItr->name.empty())  names.push_back(bedItr->name);
+                if (!bedItr->score.empty()) scores.push_back(bedItr->score);
             }
             // same block, overlaps
             else {
                 if ((int) bedItr-> end > end) end = bedItr->end;
                 mergeCount++;
-                names.push_back(bedItr->name);
-                scores.push_back(bedItr->score);
+                if (!bedItr->name.empty())  names.push_back(bedItr->name);
+                if (!bedItr->score.empty()) scores.push_back(bedItr->score);
             }
         }
         if (start >= 0) {
@@ -325,14 +344,14 @@ void BedMerge::MergeBedStranded() {
                     }
                     start = bedItr->start;
                     end   = bedItr->end;
-                    names.push_back(bedItr->name);
-                    scores.push_back(bedItr->score);
+                    if (!bedItr->name.empty())  names.push_back(bedItr->name);
+                    if (!bedItr->score.empty()) scores.push_back(bedItr->score);
                 }
                 else {
                     if ((int) bedItr-> end > end) end = bedItr->end;
                     mergeCount++;
-                    names.push_back(bedItr->name);
-                    scores.push_back(bedItr->score);
+                    if (!bedItr->name.empty())  names.push_back(bedItr->name);
+                    if (!bedItr->score.empty()) scores.push_back(bedItr->score);
                 }
             }
             if (start >= 0) {
