@@ -116,7 +116,7 @@ int main(int argc, char* argv[]) {
       showHelp = true;
     }
     
-    if (!haveInclude && !haveExclude) {
+    if (haveInclude && haveExclude) {
       cerr << endl << "*****" << endl << "*****ERROR: Cannot use -incl and -excl together." << endl << "*****" << endl;
       showHelp = true;
     }
