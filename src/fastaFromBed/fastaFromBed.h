@@ -14,6 +14,7 @@
 
 #include "bedFile.h"
 #include "sequenceUtils.h"
+#include "Fasta.h"
 #include <vector>
 #include <iostream>
 #include <fstream>
@@ -35,7 +36,7 @@ public:
     ~Bed2Fa(void);
 
     void ExtractDNA();
-    void ReportDNA(const BED &bed, const string &currDNA, const string &currChrom);
+    void ReportDNA(const BED &bed, string &dna);
 
 
 private:

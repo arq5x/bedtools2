@@ -10,7 +10,7 @@ INCLUDES = -I$(UTILITIES_DIR)/bedFile/ -I$(UTILITIES_DIR)/sequenceUtilities/ -I$
 # ----------------------------------
 # define our source and object files
 # ----------------------------------
-SOURCES= fastaFromBedMain.cpp fastaFromBed.cpp
+SOURCES= fastaFromBedMain.cpp fastaFromBed.cpp Fasta.cpp split.cpp
 OBJECTS= $(SOURCES:.cpp=.o)
 _EXT_OBJECTS=bedFile.o sequenceUtils.o lineFileUtilities.o gzstream.o fileType.o
 EXT_OBJECTS=$(patsubst %,$(OBJ_DIR)/%,$(_EXT_OBJECTS))
