@@ -202,9 +202,7 @@ void BedShuffle::ChooseLocus(BED &bedEntry) {
 void BedShuffle::ChooseLocusFromInclusionFile(BED &bedEntry) {
 
     string chrom    = bedEntry.chrom;
-    CHRPOS start    = bedEntry.start;
-    CHRPOS end      = bedEntry.end;
-    CHRPOS length   = end - start;
+    CHRPOS length   = bedEntry.end - bedEntry.start;
 
     string randomChrom;
     CHRPOS randomStart;
@@ -233,9 +231,12 @@ void BedShuffle::ChooseLocusFromInclusionFile(BED &bedEntry) {
     randomStart    = includeInterval.start + rand() % (includeInterval.size());
     bedEntry.start = randomStart;
     bedEntry.end   = randomStart + length;
-    // ensure that the chosen location doesn't go past
+    
+    // use recursion to ensure that the chosen location 
+    // doesn't go past the end of the chrom
     if (bedEntry.end > ((size_t) _genome->getChromSize(chrom))) {
-        bedEntry.end = _genome->getChromSize(chrom);            
+        //bedEntry.end = _genome->getChromSize(chrom);
+        ChooseLocusFromInclusionFile(bedEntry);
     }
 }
 
