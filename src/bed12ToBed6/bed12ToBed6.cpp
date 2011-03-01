@@ -34,6 +34,7 @@ void DetermineBedInput(BedFile *bed);
 void ProcessBed(istream &bedInput, BedFile *bed);
 
 
+bool addBlockNums = false;
 
 int main(int argc, char* argv[]) {
 
@@ -66,6 +67,10 @@ int main(int argc, char* argv[]) {
                 i++;
             }
         }
+        else if(PARAMETER_CHECK("-n", 2, parameterLength)) {
+            addBlockNums = true;
+            i++;
+        }
         else {
             cerr << endl << "*****ERROR: Unrecognized parameter: " << argv[i] << " *****" << endl << endl;
             showHelp = true;
@@ -97,6 +102,10 @@ void ShowHelp(void) {
     cerr << "Summary: Splits BED12 features into discrete BED6 features." << endl << endl;
 
     cerr << "Usage:   " << PROGRAM_NAME << " [OPTIONS] -i <bed12>" << endl << endl;
+
+    cerr << "Options: " << endl;
+
+    cerr << "\t-n\t"        << "Force the score to be the (1-based) block number from the BED12." << endl << endl;
 
 
     // end the program here
@@ -137,11 +146,19 @@ void ProcessBed(istream &bedInput, BedFile *bed) {
             bedVector bedBlocks;  // vec to store the discrete BED "blocks" from a
             splitBedIntoBlocks(bedEntry, lineNum, bedBlocks);
 
-            vector<BED>::const_iterator bedItr  = bedBlocks.begin();
-            vector<BED>::const_iterator bedEnd  = bedBlocks.end();
-            for (; bedItr != bedEnd; ++bedItr) {
-                printf ("%s\t%d\t%d\t%s\t%s\t%s\n", bedItr->chrom.c_str(), bedItr->start, bedItr->end, bedItr->name.c_str(),
-                                                    bedItr->score.c_str(), bedItr->strand.c_str());
+            for (int i = 0; i < (int) bedBlocks.size(); ++i) {
+                if (addBlockNums == false) {
+                    printf ("%s\t%d\t%d\t%s\t%s\t%s\n", bedBlocks[i].chrom.c_str(), bedBlocks[i].start, bedBlocks[i].end, bedBlocks[i].name.c_str(),
+                                                        bedBlocks[i].score.c_str(), bedBlocks[i].strand.c_str());
+                }
+                else {
+                    if (bedBlocks[i].strand == "+")
+                        printf ("%s\t%d\t%d\t%s\t%d\t%s\n", bedBlocks[i].chrom.c_str(), bedBlocks[i].start, bedBlocks[i].end, bedBlocks[i].name.c_str(),
+                                                        i+1, bedBlocks[i].strand.c_str());
+                    else 
+                        printf ("%s\t%d\t%d\t%s\t%d\t%s\n", bedBlocks[i].chrom.c_str(), bedBlocks[i].start, bedBlocks[i].end, bedBlocks[i].name.c_str(),
+                                                        (int) ((bedBlocks.size()+1)-i), bedBlocks[i].strand.c_str());
+                }
             }
             bedEntry = nullBed;
         }
