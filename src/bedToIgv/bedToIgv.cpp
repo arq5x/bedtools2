@@ -232,7 +232,7 @@ void ProcessBed(istream &bedInput, BedFile *bed, string path, string sortType, s
     while ((bedStatus = bed->GetNextBed(bedEntry, lineNum)) != BED_INVALID) {
         if (bedStatus == BED_VALID) {
 
-            string filename = bedEntry.chrom + ":" + ToString(bedEntry.start) + "-" + ToString(bedEntry.end);
+            string filename = bedEntry.chrom + "_" + ToString(bedEntry.start) + "_" + ToString(bedEntry.end);
             string locus    = bedEntry.chrom + ":" + ToString(bedEntry.start - slop) + "-" + ToString(bedEntry.end + slop);
 
             if (useNames == true) {
