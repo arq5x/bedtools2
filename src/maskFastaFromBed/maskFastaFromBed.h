@@ -28,7 +28,8 @@ class MaskFastaFromBed {
 public:
 
     // constructor
-    MaskFastaFromBed(string &fastaInFile, string &bedFile, string &fastaOutFile, bool &softMask);
+    MaskFastaFromBed(const string &fastaInFile,  const string &bedFile, 
+                     const string &fastaOutFile, bool softMask, char maskChar);
 
     // destructor
     ~MaskFastaFromBed(void);
@@ -41,6 +42,7 @@ private:
     string _fastaInFile;
     string _bedFile;
     string _fastaOutFile;
+    char   _maskChar;     // typically "N", but user's can choose something else, e.g., "X"
 
     // instance of a bed file class.
     BedFile *_bed;

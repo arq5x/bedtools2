@@ -36,11 +36,12 @@ int main(int argc, char* argv[]) {
     // output files
     string fastaOutFile;
 
-    // checks for existence of parameters
-    bool haveFastaIn = false;
-    bool haveBed = false;
+    // defaults for parameters
+    bool haveFastaIn  = false;
+    bool haveBed      = false;
     bool haveFastaOut = false;
-    bool softMask = false;
+    bool softMask     = false;
+    char maskChar     = 'N';
 
     // check to see if we should print out some help
     if(argc <= 1) showHelp = true;
@@ -85,6 +86,19 @@ int main(int argc, char* argv[]) {
         else if(PARAMETER_CHECK("-soft", 5, parameterLength)) {
             softMask = true;
         }
+        else if(PARAMETER_CHECK("-mc", 3, parameterLength)) {
+            if ((i+1) < argc) {
+                string mask = argv[i + 1];
+                if (mask.size() > 1) {
+                    cerr << "*****ERROR: The mask character (-mc) should be a single character.*****" << endl << endl;
+                    showHelp = true;
+                }
+                else {
+                    maskChar = mask[0];
+                }
+                i++;
+            }
+        }
         else {
             cerr << "*****ERROR: Unrecognized parameter: " << argv[i] << " *****" << endl << endl;
             showHelp = true;
@@ -97,7 +111,7 @@ int main(int argc, char* argv[]) {
 
     if (!showHelp) {
 
-        MaskFastaFromBed *maskFasta = new MaskFastaFromBed(fastaInFile, bedFile, fastaOutFile, softMask);
+        MaskFastaFromBed *maskFasta = new MaskFastaFromBed(fastaInFile, bedFile, fastaOutFile, softMask, maskChar);
         delete maskFasta;
         return 0;
     }
@@ -124,6 +138,7 @@ void ShowHelp(void) {
     cerr << "\t-fo\tOutput FASTA file" << endl;
     cerr << "\t-soft\tEnforce \"soft\" masking.  That is, instead of masking with Ns," << endl;
     cerr << "\t\tmask with lower-case bases." << endl;
+    cerr << "\t-mc\tReplace masking character.  That is, instead of masking with Ns, use another character." << endl;
 
     // end the program here
     exit(1);

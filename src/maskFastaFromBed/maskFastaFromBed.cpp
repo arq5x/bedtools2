@@ -13,21 +13,17 @@
 #include "maskFastaFromBed.h"
 
 
-MaskFastaFromBed::MaskFastaFromBed(string &fastaInFile, string &bedFile, string &fastaOutFile, bool &softMask) {
-
-    _softMask = false;
-    if (softMask) {
-        _softMask = true;
-    }
-
-    _fastaInFile = fastaInFile;
-    _bedFile = bedFile;
+MaskFastaFromBed::MaskFastaFromBed(const string &fastaInFile,  const string &bedFile, 
+                                   const string &fastaOutFile, bool softMask, char maskChar) {
+    _softMask     = softMask;
+    _fastaInFile  = fastaInFile;
+    _bedFile      = bedFile;
     _fastaOutFile = fastaOutFile;
-
-    _bed = new BedFile(_bedFile);
+    _maskChar     = maskChar;
+    _bed          = new BedFile(_bedFile);
 
     _bed->loadBedFileIntoMapNoBin();
-
+    // start masking.
     MaskFasta();
 }
 
@@ -102,7 +98,7 @@ void MaskFastaFromBed::MaskFasta() {
                         currDNA.replace(start, length, replacement);
                     }
                     else {
-                        string hardmask(length, 'N');
+                        string hardmask(length, _maskChar);
                         currDNA.replace(start, length, hardmask);
                     }
                 }
@@ -133,7 +129,7 @@ void MaskFastaFromBed::MaskFasta() {
                 currDNA.replace(start, length, replacement);
             }
             else {
-                string hardmask(length, 'N');
+                string hardmask(length, _maskChar);
                 currDNA.replace(start, length, hardmask);
             }
         }
