@@ -112,7 +112,7 @@ void BedClosest::FindWindowOverlaps(BED &a, vector<BED> &hits) {
                     }
                 }
                 // the hit is to the "left" of A
-                else if (h->end < a.start){
+                else if (h->end <= a.start){
                     if ((a.start - h->end) < minDistance) {
                         minDistance = a.start - h->end;
 
