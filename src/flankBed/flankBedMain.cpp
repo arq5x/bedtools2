@@ -142,23 +142,23 @@ void ShowHelp(void) {
 
     cerr << "Author:  Aaron Quinlan (aaronquinlan@gmail.com)" << endl;
 
-    cerr << "Summary: Add requested base pairs of \"slop\" to each feature." << endl << endl;
+    cerr << "Summary: Creates flanking interval(s) for each BED/GFF/VCF feature." << endl << endl;
 
     cerr << "Usage:   " << PROGRAM_NAME << " [OPTIONS] -i <bed/gff/vcf> -g <genome> [-b <int> or (-l and -r)]" << endl << endl;
 
     cerr << "Options: " << endl;
-    cerr << "\t-b\t"                << "Increase the BED/GFF/VCF entry by -b base pairs in each direction." << endl;
+    cerr << "\t-b\t"                << "Create flanking intervak using -b base pairs in each direction." << endl;
     cerr                            << "\t\t- (Integer) or (Float, e.g. 0.1) if used with -pct." << endl << endl;
 
-    cerr << "\t-l\t"                << "The number of base pairs to subtract from the start coordinate." << endl;
+    cerr << "\t-l\t"                << "The number of base pairs that a flank should start from orig. start coordinate." << endl;
     cerr                            << "\t\t- (Integer) or (Float, e.g. 0.1) if used with -pct." << endl << endl;
         
-    cerr << "\t-r\t"                << "The number of base pairs to add to the end coordinate." << endl;
+    cerr << "\t-r\t"                << "The number of base pairs that a flank should end from orig. end coordinate." << endl;
     cerr                            << "\t\t- (Integer) or (Float, e.g. 0.1) if used with -pct." << endl << endl;
         
     cerr << "\t-s\t"                << "Define -l and -r based on strand." << endl;
     cerr                            << "\t\tE.g. if used, -l 500 for a negative-stranded feature, " << endl;
-    cerr                            << "\t\tit will add 500 bp downstream.  Default = false." << endl << endl;
+    cerr                            << "\t\tit will start the flank 500 bp downstream.  Default = false." << endl << endl;
 
     cerr << "\t-pct\t"              << "Define -l and -r as a fraction of the feature's length." << endl;
     cerr                            << "\t\tE.g. if used on a 1000bp feature, -l 0.50, " << endl;
@@ -166,7 +166,7 @@ void ShowHelp(void) {
 
     cerr << "Notes: " << endl;
     cerr << "\t(1)  Starts will be set to 0 if options would force it below 0." << endl;
-    cerr << "\t(2)  Ends will be set to the chromosome length if  requested slop would" << endl;
+    cerr << "\t(2)  Ends will be set to the chromosome length if requested flank would" << endl;
     cerr <<        "\tforce it above the max chrom length." << endl;
 
     cerr << "\t(3)  The genome file should tab delimited and structured as follows:" << endl;
