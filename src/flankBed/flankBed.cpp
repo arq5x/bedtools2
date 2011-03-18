@@ -45,23 +45,21 @@ void BedFlank::FlankBed() {
     bedStatus = _bed->GetNextBed(bedEntry, lineNum);
     while (bedStatus != BED_INVALID) {
         if (bedStatus == BED_VALID) {
-            if (_fractional == false) {
-                if (_forceStrand == false) {
-                    AddFlank(bedEntry,  (int) _leftFlank, (int) _rightFlank);
-                }
-                else {
-                    AddStrandedFlank(bedEntry,  (int) _leftFlank, (int) _rightFlank);                    
-                }
+
+            int leftFlank  = _leftFlank;
+            int rightFlank = _rightFlank;            
+            if (_fractional == true) {
+                leftFlank  = (int) (_leftFlank  * bedEntry.size());
+                rightFlank = (int) (_rightFlank * bedEntry.size());
             }
-            else {
-                int leftFlank  = (int) (_leftFlank  * bedEntry.size());
-                int rightFlank = (int) (_rightFlank * bedEntry.size());
-                if (_forceStrand == false) {
-                    AddFlank(bedEntry, leftFlank, rightFlank);
-                }
-                else {
-                    AddStrandedFlank(bedEntry, leftFlank, rightFlank);                    
-                }
+            
+            if ((_forceStrand == false) || (bedEntry.strand == "+"))
+            {
+                AddFlank(bedEntry,  leftFlank, rightFlank);
+            }
+            else if ((_forceStrand == true) && (bedEntry.strand == "-" ))
+            {
+                AddStrandedFlank(bedEntry,  leftFlank, rightFlank);                    
             }
             bedEntry = nullBed;
         }
@@ -73,7 +71,11 @@ void BedFlank::FlankBed() {
 
 void BedFlank::AddFlank(BED &bed, int leftFlank, int rightFlank) {
 
-    CHRPOS chromSize = _genome->getChromSize(bed.chrom);
+    int chromSize = _genome->getChromSize(bed.chrom);
+    if (chromSize == -1) {
+        cerr << "ERROR: chrom \"" << bed.chrom << "\" not found in genome file. Exiting." << endl;
+        exit(1);
+    }
 
     // init. our left and right flanks to the original BED entry.
     // we'll create the flanks from these coordinates.
@@ -115,7 +117,11 @@ void BedFlank::AddFlank(BED &bed, int leftFlank, int rightFlank) {
 
 void BedFlank::AddStrandedFlank(BED &bed, int leftFlank, int rightFlank) {
 
-    CHRPOS chromSize = _genome->getChromSize(bed.chrom);
+    int chromSize = _genome->getChromSize(bed.chrom);
+    if (chromSize == -1) {
+        cerr << "ERROR: chrom \"" << bed.chrom << "\" not found in genome file. Exiting." << endl;
+        exit(1);
+    }
 
     // init. our left and right flanks to the original BED entry.
     // we'll create the flanks from these coordinates.
@@ -140,10 +146,10 @@ void BedFlank::AddStrandedFlank(BED &bed, int leftFlank, int rightFlank) {
     
     // make the left flank (if necessary)
     if (leftFlank > 0) {
-        if ( (static_cast<int>(right.end) + (leftFlank+1)) <= static_cast<int>(chromSize)) 
+        if ( (static_cast<int>(right.end) + leftFlank) <= static_cast<int>(chromSize)) 
         {
             right.start    = right.end;
-            right.end     += (leftFlank);
+            right.end     += leftFlank;
         }
         else {
             right.start    = right.end;
