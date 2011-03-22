@@ -278,6 +278,10 @@ void BedIntersect::IntersectBam(string bamFile) {
                 bool overlapsFound = false;
                 // treat the BAM alignment as a single "block"
                 if (_obeySplits == false) {
+                    // Toying with adding tags.  Need new version of FindOverlaps.
+                    // FindOverlaps(a, hits);
+                    // bam.AddTag("YB", "i", static_cast<int>(hits.size()));
+                    // hits.clear();
                     overlapsFound = FindOneOrMoreOverlap(a);
                 }
                 // split the BAM alignment into discrete blocks and
@@ -326,6 +330,10 @@ void BedIntersect::IntersectBam(string bamFile) {
                     }
                 }
             }
+        }
+        // BAM IsMapped() is false
+        else if (_noHit == true) {
+            writer.SaveAlignment(bam);
         }
     }
 

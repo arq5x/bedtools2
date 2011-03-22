@@ -204,6 +204,10 @@ void BedWindow::WindowIntersectBam(string bamFile) {
                 hits.clear();
             }
         }
+        // BAM IsMapped() is false
+        else if (_noHit == true) {
+            writer.SaveAlignment(bam);
+        }
     }
 
     // close the relevant BAM files.
