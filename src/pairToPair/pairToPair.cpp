@@ -88,8 +88,8 @@ void PairToPair::FindOverlaps(const BEDPE &a) {
             start2 -= _slop;
     }
     else {
-        (start1 -= _slop) >= 0 ? start1 -= _slop : start1 = 0;
-        (start2 -= _slop) >= 0 ? start2 -= _slop : start2 = 0;
+        (start1 - _slop) >= 0 ? start1 -= _slop : start1 = 0;
+        (start2 - _slop) >= 0 ? start2 -= _slop : start2 = 0;
         end1   += _slop;
         end2   += _slop;
     }
