@@ -37,7 +37,8 @@ BedShuffle::BedShuffle(string &bedFile, string &genomeFile, string &excludeFile,
     }
     else {
         // thanks to Rob Long for the tip.
-        srand((unsigned)time(0)+(unsigned)getpid());
+        _seed = (unsigned)time(0)+(unsigned)getpid();
+        srand(_seed);
     }
 
     _bed         = new BedFile(bedFile);
@@ -53,7 +54,8 @@ BedShuffle::BedShuffle(string &bedFile, string &genomeFile, string &excludeFile,
     if (_haveInclude) {
         _include = new BedFile(includeFile);
         _include->loadBedFileIntoMapNoBin();
-
+        
+        _numIncludeChroms = 0;
         masterBedMapNoBin::const_iterator it    = _include->bedMapNoBin.begin(); 
         masterBedMapNoBin::const_iterator itEnd = _include->bedMapNoBin.end();
         for(; it != itEnd; ++it) {

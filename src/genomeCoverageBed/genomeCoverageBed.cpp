@@ -29,6 +29,8 @@ BedGenomeCoverage::BedGenomeCoverage(string bedFile, string genomeFile, bool eac
     _obeySplits      = obeySplits;
     _filterByStrand  = filterByStrand;
     _requestedStrand = requestedStrand;
+    _currChromName   = "";
+    _currChromSize   = 0 ;
 
     _bed        = new BedFile(bedFile);
     _genome     = new GenomeFile(genomeFile);

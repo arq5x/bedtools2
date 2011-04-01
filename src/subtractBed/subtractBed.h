@@ -38,7 +38,6 @@ private:
     string _bedAFile;
     string _bedBFile;
     float _overlapFraction;
-    bool _noHit;
     bool _forceStrand;
 
     // instances of bed file class.
