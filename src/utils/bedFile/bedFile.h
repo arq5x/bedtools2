@@ -119,7 +119,15 @@ public:
     BED(string chrom, CHRPOS start, CHRPOS end)
     : chrom(chrom),
       start(start),
-      end(end)
+      end(end),
+      name(""),
+      score(""),
+      strand(""),
+      otherFields(),
+      zeroLength(false),
+      added(false),
+      finished(false),
+      overlaps()
     {}
 
     // BED4
@@ -127,7 +135,14 @@ public:
     : chrom(chrom),
       start(start),
       end(end),
-      strand(strand)
+      name(""),
+      score(""),
+      strand(strand),
+      otherFields(),
+      zeroLength(false),
+      added(false),
+      finished(false),
+      overlaps()
     {}
 
     // BED6
@@ -138,7 +153,12 @@ public:
       end(end),
       name(name),
       score(score),
-      strand(strand)
+      strand(strand),
+      otherFields(),
+      zeroLength(false),
+      added(false),
+      finished(false),
+      overlaps()
     {}
 
     // BEDALL
@@ -150,7 +170,11 @@ public:
       name(name),
       score(score),
       strand(strand),
-      otherFields(otherFields)
+      otherFields(otherFields),
+      zeroLength(false),
+      added(false),
+      finished(false),
+      overlaps()
     {}
     
     int size() {
