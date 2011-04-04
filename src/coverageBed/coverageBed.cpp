@@ -160,7 +160,7 @@ void BedCoverage::ReportCoverage() {
                 // B    s    ------------
                 int start          = min(bedItr->minOverlapStart, bedItr->start);
 
-                // track the numnber of bases in the feature covered by
+                // track the number of bases in the feature covered by
                 // 0, 1, 2, ... n features in A
                 map<unsigned int, unsigned int> depthHist;
                 map<unsigned int, DEPTH>::const_iterator depthItr;
@@ -181,7 +181,8 @@ void BedCoverage::ReportCoverage() {
                             depthHist[depth]++;
                             allDepthHist[depth]++;
                         }
-                        else {
+                        else if ((_eachBase == true) && (bedItr->zeroLength == false))
+                        {
                             _bedB->reportBedTab(*bedItr);
                             printf("%d\t%d\n", pos-bedItr->start, depth);
                         }
@@ -191,28 +192,51 @@ void BedCoverage::ReportCoverage() {
                         depth = depth - depthItr->second.ends;
                 }
 
+                // handle the special case where the user wants "per-base" depth
+                // but the current feature is length = 0.
+                if ((_eachBase == true) && (bedItr->zeroLength == true)) {
+                    _bedB->reportBedTab(*bedItr);
+                    printf("1\t%d\n",depth);
+                }
                 // Summarize the coverage for the current interval,
                 // assuming the user has not requested "per-base" coverage.
-                if (_eachBase == false) {
+                else if (_eachBase == false) 
+                {
                     CHRPOS length     = bedItr->end - bedItr->start;
+                    if (bedItr->zeroLength == true) {
+                        length = 0;
+                    }
                     totalLength       += length;
                     int nonZeroBases   = (length - zeroDepthCount);
-                    float fractCovered = (float) nonZeroBases / length;
-
+                    
+                    float fractCovered = 0.0;
+                    if (bedItr->zeroLength == false) {
+                        fractCovered = (float) nonZeroBases / length;
+                    }
+                    
                     // print a summary of the coverage
                     if (_writeHistogram == false) {
                         _bedB->reportBedTab(*bedItr);
                         printf("%d\t%d\t%d\t%0.7f\n", bedItr->count, nonZeroBases, length, fractCovered);
                     }
+                    // HISTOGRAM
                     // report the number of bases with coverage == x
                     else {
-                        map<unsigned int, unsigned int>::const_iterator histItr = depthHist.begin();
-                        map<unsigned int, unsigned int>::const_iterator histEnd = depthHist.end();
-                        for (; histItr != histEnd; ++histItr)
-                        {
-                            float fractAtThisDepth = (float) histItr->second / length;
+                        // produce a histogram when not a zero length feature.
+                        if (bedItr->zeroLength == false) {
+                            map<unsigned int, unsigned int>::const_iterator histItr = depthHist.begin();
+                            map<unsigned int, unsigned int>::const_iterator histEnd = depthHist.end();
+                            for (; histItr != histEnd; ++histItr)
+                            {
+                                float fractAtThisDepth = (float) histItr->second / length;
+                                _bedB->reportBedTab(*bedItr);
+                                printf("%d\t%d\t%d\t%0.7f\n", histItr->first, histItr->second, length, fractAtThisDepth);
+                            }
+                        }
+                        // special case when it is a zero length feauture.
+                        else {
                             _bedB->reportBedTab(*bedItr);
-                            printf("%d\t%d\t%d\t%0.7f\n", histItr->first, histItr->second, length, fractAtThisDepth);
+                            printf("%d\t%d\t%d\t%0.7f\n", bedItr->count, 0, 0, 1.0000000);
                         }
                     }
                 }

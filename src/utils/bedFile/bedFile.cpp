@@ -354,8 +354,15 @@ void BedFile::countHits(const BED &a, bool forceStrand) {
                 else if (overlaps(bedItr->start, bedItr->end, a.start, a.end) > 0) {
 
                     bedItr->count++;
-                    bedItr->depthMap[a.start+1].starts++;
-                    bedItr->depthMap[a.end].ends++;
+                    if (a.zeroLength == false) {
+                        bedItr->depthMap[a.start+1].starts++;
+                        bedItr->depthMap[a.end].ends++;
+                    }
+                    else {
+                        // correct for the fact that we artificially expanded the zeroLength feature
+                        bedItr->depthMap[a.start+2].starts++;
+                        bedItr->depthMap[a.end-1].ends++;                        
+                    }
 
                     if (a.start < bedItr->minOverlapStart) {
                         bedItr->minOverlapStart = a.start;
@@ -403,8 +410,16 @@ void BedFile::countSplitHits(const vector<BED> &bedBlocks, bool forceStrand) {
                         continue;
                     }
                     else if (overlaps(bedItr->start, bedItr->end, blockItr->start, blockItr->end) > 0) {
-                        bedItr->depthMap[blockItr->start+1].starts++;
-                        bedItr->depthMap[blockItr->end].ends++;
+                        if (blockItr->zeroLength == false) {
+                            bedItr->depthMap[blockItr->start+1].starts++;
+                            bedItr->depthMap[blockItr->end].ends++;
+                        }
+                        else {
+                            // correct for the fact that we artificially expanded the zeroLength feature
+                            bedItr->depthMap[blockItr->start+2].starts++;
+                            bedItr->depthMap[blockItr->end-1].ends++;
+                        }
+
                         validHits.insert(bedItr);
                         if (blockItr->start < bedItr->minOverlapStart)
                             bedItr->minOverlapStart = blockItr->start;
@@ -452,8 +467,15 @@ void BedFile::countListHits(const BED &a, int index, bool forceStrand) {
                 }
                 else if (overlaps(bedItr->start, bedItr->end, a.start, a.end) > 0) {
                     bedItr->counts[index]++;
-                    bedItr->depthMapList[index][a.start+1].starts++;
-                    bedItr->depthMapList[index][a.end].ends++;
+                    if (a.zeroLength == false) {
+                        bedItr->depthMapList[index][a.start+1].starts++;
+                        bedItr->depthMapList[index][a.end].ends++;
+                    }
+                    else {
+                        // correct for the fact that we artificially expanded the zeroLength feature
+                        bedItr->depthMapList[index][a.start+2].starts++;
+                        bedItr->depthMapList[index][a.end-1].ends++;                        
+                    }
 
                     if (a.start < bedItr->minOverlapStarts[index]) {
                         bedItr->minOverlapStarts[index] = a.start;
@@ -522,6 +544,7 @@ void BedFile::loadBedCovFileIntoMap() {
             bedCov.score        = bedEntry.score;
             bedCov.strand       = bedEntry.strand;
             bedCov.otherFields  = bedEntry.otherFields;
+            bedCov.zeroLength   = bedEntry.zeroLength;
             bedCov.count = 0;
             bedCov.minOverlapStart = INT_MAX;
 
@@ -551,6 +574,7 @@ void BedFile::loadBedCovListFileIntoMap() {
             bedCovList.score        = bedEntry.score;
             bedCovList.strand       = bedEntry.strand;
             bedCovList.otherFields  = bedEntry.otherFields;
+            bedCovList.zeroLength   = bedEntry.zeroLength;
 
             bedCovListMap[bedEntry.chrom][bin].push_back(bedCovList);
             bedEntry = nullBed;
