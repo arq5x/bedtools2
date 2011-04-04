@@ -1,3 +1,44 @@
+Version 2.12.0 (April-3-2011)
+
+New Tool
+========
+1. Added new tool called "flankBed", which allows one to extract solely the flanking regions that are upstream and downstream of a given feature. Unlike slopBed, flankBed does not include the original feature itself.  A new feature is created for each flabking region.  For example, imagine the following feature:
+
+chr1   100 200
+
+The following would create features for solely the 10 bp regions flanking this feature.  
+$ bin/flankBed -i a.bed -b 10 -g genomes/human.hg18.genome 
+chr1	90	100
+chr1	200	210
+
+In contrast, slopBed would return:
+bin/slopBed -i a.bed -b 10 -g genomes/human.hg18.genome 
+chr1	90	210
+
+FlankBed has all of the same features as slopBed.
+
+
+New Features
+============
+1. Added new "-scores" feature to mergeBed.  This allows one to take the sum, min, max,
+mean, median, mode, or antimode of merged feature scores.  In addition, one can use the "collapse" operation to get a comma-separated list of the merged scores.
+2. mergeBed now tolerates multiple features in a merged block to have the same feature name.
+3. Thanks to Erik Garrison's "fastahack" library, fastaFromBed now reports its output in the order of the input file.  
+4. Added a "-n" option to bed12ToBed6, which forces the score field to be the 1-based block number from the original BED12 feature.  This is useful for tracking exon numbers, for example.
+5. Thanks to Can Alkan, added a new "-mc" option to maskFastaFromBed that allows one to define a custom mask character, such as "X" (-n X).
+
+
+Bug Fixes
+=========
+1. Thanks to Davide Cittaro, intersectBed and windowBed now properly capture unmapped BAM alignments when using the "-v" option.
+2. ClosestBed now properly handles cases where b.end == a.start
+3. Thanks to John Marshall, the default constructors are much safer and less buggy.
+4. Fixed bug in shuffleBed that complained about a lack of -incl and -excl.
+5. Fixed bug in shuffleBed for features that would go beyond the end of a chromosome.
+6. Tweaked bedToIgv to make it more Windows friendly.
+
+
+
 Version 2.11.2 (January-31-2010)
 Fixed a coordinate reporting bug in coverageBed.
 Added "max distance (-d)" argument back to the new implementation of mergeBed.
