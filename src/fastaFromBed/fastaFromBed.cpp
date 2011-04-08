@@ -114,9 +114,27 @@ void Bed2Fa::ExtractDNA() {
     _bed->Open();
     while ((bedStatus = _bed->GetNextBed(bed, lineNum)) != BED_INVALID) {
         if (bedStatus == BED_VALID) {
-            int length = bed.end - bed.start;
-            sequence = fr.getSubSequence(bed.chrom, bed.start, length);
-            ReportDNA(bed, sequence);
+            // make sure we are extracting >= 1 bp
+            if (bed.zeroLength == false) {
+                size_t seqLength = fr.sequenceLength(bed.chrom);
+                // make sure this feature will not exceed the end of the chromosome.
+                if ( (bed.start <= seqLength) && (bed.end <= seqLength) ) 
+                {
+                    int length = bed.end - bed.start;
+                    sequence = fr.getSubSequence(bed.chrom, bed.start, length);
+                    ReportDNA(bed, sequence);
+                    bed = nullBed;
+                }
+                else
+                {
+                    cerr << "Feature (" << bed.chrom << ":" << bed.start << "-" << bed.end << ") beyond the length of "
+                        << bed.chrom << " size (" << seqLength << " bp).  Skipping." << endl;
+                }
+            }
+            // handle zeroLength 
+            else {
+                cerr << "Feature (" << bed.chrom << ":" << bed.start+1 << "-" << bed.end-1 << ") has length = 0, Skipping." << endl;
+            }
             bed = nullBed;
         }
     }
