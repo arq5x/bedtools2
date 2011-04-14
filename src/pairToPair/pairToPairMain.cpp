@@ -122,8 +122,8 @@ int main(int argc, char* argv[]) {
         showHelp = true;
     }
 
-    if (haveSearchType && (searchType != "neither") && (searchType != "both") && (searchType != "either")) {
-        cerr << endl << "*****" << endl << "*****ERROR: Request \"both\" or \"neither\"" << endl << "*****" << endl;
+    if (haveSearchType && (searchType != "neither") && (searchType != "both") && (searchType != "either") && (searchType != "notboth")) {
+        cerr << endl << "*****" << endl << "*****ERROR: Request \"both\",\"neither\",\"either\",or \"notboth\"" << endl << "*****" << endl;
         showHelp = true;
     }
 
@@ -160,11 +160,11 @@ void ShowHelp(void) {
 
     cerr << "\t-type \t"                << "Approach to reporting overlaps between A and B." << endl << endl;
     cerr                                << "\t\tneither\tReport overlaps if neither end of A overlaps B." << endl;
-
     cerr                                << "\t\teither\tReport overlaps if either ends of A overlap B." << endl;
-
     cerr                                << "\t\tboth\tReport overlaps if both ends of A overlap B." << endl;
-    cerr                                << "\t\t\t- Default = both." << endl << endl;
+    cerr                                << "\t\tnotboth\tReport overlaps if one or neither of ends of A overlap B." << endl;
+    
+    cerr                                << "\t\t- Default = both." << endl << endl;
 
     cerr << "\t-slop \t"                << "The amount of slop (in b.p.). to be added to each footprint." << endl;
     cerr                                << "\t\t*Note*: Slop is subtracted from start1 and start2 and added to end1 and end2." << endl << endl;

@@ -124,7 +124,7 @@ void PairToPair::FindOverlaps(const BEDPE &a) {
         if ((hitsA2B1.size() > 0) || (hitsA1B2.size() > 0))
             found2 = FindHitsOnBothEnds(a, hitsA2B1, hitsA1B2);
 
-        if (!found1 && !found2)
+        if (!found1 || !found2)
             _bedA->reportBedPENewLine(a);
     }
     else if (_searchType == "either") {

@@ -65,7 +65,7 @@ private:
     void FindQualityHitsBetweenEnds(CHRPOS start, CHRPOS end,
         const vector<MATE> &hits, vector<MATE> &qualityHits, int &numOverlaps);
 
-    void FindHitsOnBothEnds(const BEDPE &a, const vector<MATE> &qualityHitsEnd1,
+    bool FindHitsOnBothEnds(const BEDPE &a, const vector<MATE> &qualityHitsEnd1,
         const vector<MATE> &qualityHitsEnd2);
 
     void FindHitsOnEitherEnd(const BEDPE &a, const vector<MATE> &qualityHitsEnd1,

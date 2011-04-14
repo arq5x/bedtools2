@@ -21,10 +21,8 @@ SUBDIRS = $(SRC_DIR)/annotateBed \
 		  $(SRC_DIR)/closestBed \
 		  $(SRC_DIR)/complementBed \
 		  $(SRC_DIR)/coverageBed \
-		  $(SRC_DIR)/cuffToTrans \
 		  $(SRC_DIR)/fastaFromBed \
 		  $(SRC_DIR)/flankBed \
-		  $(SRC_DIR)/fjoin \
 		  $(SRC_DIR)/genomeCoverageBed \
 		  $(SRC_DIR)/intersectBed \
 		  $(SRC_DIR)/linksBed \
