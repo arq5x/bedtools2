@@ -13,42 +13,42 @@
 #include "sequenceUtils.h"
 
 // Performs an in-place sequence reversal
-void reverseSequence(string &sequence) {
-    std::reverse(sequence.begin(), sequence.end());
+void reverseSequence(string &seq) {
+    std::reverse(seq.begin(), seq.end());
 }
 
 // Performs an in-place reverse complement conversion
-void reverseComplement(string &sequence) {
+void reverseComplement(string &seq) {
 
     // reverse the sequence
-    reverseSequence(sequence);
+    reverseSequence(seq);
 
     // swap the bases
-    for(unsigned int i = 0; i < sequence.length(); i++) {
-        switch(sequence[i]) {
+    for(unsigned int i = 0; i < seq.length(); i++) {
+        switch(seq[i]) {
             case 'A':
-                sequence[i] = 'T';
+                seq[i] = 'T';
                 break;
             case 'C':
-                sequence[i] = 'G';
+                seq[i] = 'G';
                 break;
             case 'G':
-                sequence[i] = 'C';
+                seq[i] = 'C';
                 break;
             case 'T':
-                sequence[i] = 'A';
+                seq[i] = 'A';
                 break;
             case 'a':
-                sequence[i] = 't';
+                seq[i] = 't';
                 break;
             case 'c':
-                sequence[i] = 'g';
+                seq[i] = 'g';
                 break;
             case 'g':
-                sequence[i] = 'c';
+                seq[i] = 'c';
                 break;
             case 't':
-                sequence[i] = 'a';
+                seq[i] = 'a';
                 break;
             default:
                 break;
@@ -57,29 +57,54 @@ void reverseComplement(string &sequence) {
 }
 
 
-void toLowerCase(std::string &str)
+void toLowerCase(std::string &seq)
 {
-
-    const int length = str.length();
+    const int length = seq.length();
     for(int i=0; i < length; ++i)
     {
-        str[i] = std::tolower(str[i]);
+        seq[i] = std::tolower(seq[i]);
     }
-
-    // alternate, C++ style.
-    //transform(str.start(), str.end(), str.start(), std::tolower);
 }
 
 
-void toUpperCase(std::string &str)
+void toUpperCase(std::string &seq)
 {
-
-    const int length = str.length();
+    const int length = seq.length();
     for(int i=0; i < length; ++i)
     {
-        str[i] = std::toupper(str[i]);
+        seq[i] = std::toupper(seq[i]);
     }
+}
 
-    // alternate, C++ style.
-    //transform(str.start(), str.end(), str.start(), std::toupper);
+
+void getDnaContent(const string &seq, int &a, int &c, int &g, int &t, int &n, int &other)
+{
+    // swap the bases
+    for(unsigned int i = 0; i < seq.length(); i++) {
+        switch(seq[i]) {
+            case 'A':
+            case 'a':
+                a++;
+                break;
+            case 'C':
+            case 'c':
+                c++;
+                break;
+            case 'G':
+            case 'g':
+                g++;
+                break;
+            case 'T':
+            case 't':
+                t++;
+                break;
+            case 'N':
+            case 'n':
+                n++;
+                break;
+            default:
+                other++;
+                break;
+        }
+    }    
 }
