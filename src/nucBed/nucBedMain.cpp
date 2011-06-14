@@ -109,6 +109,19 @@ void ShowHelp(void) {
     cerr << "Options: " << endl;
     cerr << "\t-fi\tInput FASTA file" << endl;
     cerr << "\t-bed\tBED/GFF/VCF file of ranges to extract from -fi" << endl << endl;
+    
+    cerr << "Output format: " << endl;
+    cerr << "\tThe following information will be reported after each original BED entry:" << endl;
+    cerr << "\t    1) %AT content" << endl;
+    cerr << "\t    2) %GC content" << endl;
+    cerr << "\t    3) Number of As observed" << endl;
+    cerr << "\t    4) Number of Cs observed" << endl;
+    cerr << "\t    5) Number of Gs observed" << endl;
+    cerr << "\t    6) Number of Ts observed" << endl;
+    cerr << "\t    7) Number of Ns observed" << endl;
+    cerr << "\t    8) Number of other bases observed" << endl;
+    cerr << "\t    9) The length of the explored sequence/interval." << endl << endl;
+
 
     // end the program here
     exit(1);
