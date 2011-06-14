@@ -21,19 +21,19 @@ const int SLOPGROWTH = 2048000;
 /*
     Constructor
 */
-BedClosest::BedClosest(string &bedAFile, string &bedBFile, bool forceStrand, string &tieMode, bool reportDistance) {
-
-    _bedAFile       = bedAFile;
-    _bedBFile       = bedBFile;
-    _forceStrand    = forceStrand;
-    _tieMode        = tieMode;
-    _reportDistance = reportDistance;
-
-    _bedA           = new BedFile(bedAFile);
-    _bedB           = new BedFile(bedBFile);
-
+BedClosest::BedClosest(string &bedAFile, string &bedBFile, bool forceStrand, string &tieMode, bool reportDistance, bool ignoreOverlaps) 
+    : _bedAFile(bedAFile)
+    , _bedBFile(bedBFile)
+    , _tieMode(tieMode)
+    , _forceStrand(forceStrand)
+    , _reportDistance(reportDistance)
+    , _ignoreOverlaps(ignoreOverlaps)
+{
+    _bedA           = new BedFile(_bedAFile);
+    _bedB           = new BedFile(_bedBFile);
     FindClosestBed();
 }
+
 
 /*
     Destructor
@@ -53,7 +53,6 @@ void BedClosest::FindWindowOverlaps(BED &a, vector<BED> &hits) {
     CHRPOS aFudgeEnd;
     int numOverlaps = 0;
     vector<BED> closestB;
-    float maxOverlap = 0;
     CHRPOS minDistance = INT_MAX;
     vector<CHRPOS> distances;
 
@@ -83,36 +82,24 @@ void BedClosest::FindWindowOverlaps(BED &a, vector<BED> &hits) {
             vector<BED>::const_iterator hitsEnd = hits.end();
             for (; h != hitsEnd; ++h) {
 
-                numOverlaps++;
-
                 // do the actual features overlap?
                 int s = max(a.start, h->start);
                 int e = min(a.end, h->end);
                 int overlapBases = (e - s);             // the number of overlapping bases b/w a and b
-                int aLength = (a.end - a.start);        // the length of a in b.p.
 
-                // there is overlap
-                if (s < e) {
-                    // is there enough overlap (default ~ 1bp)
-                    float overlap = (float) overlapBases / (float) aLength;
-                    if ( overlap > 0 ) {
-                        // is this hit the closest?
-                        if (overlap > maxOverlap) {
-                            maxOverlap = overlap;
+                // make sure we allow overlapping features.
+                if ((overlapBases > 0) && (_ignoreOverlaps == true))
+                    continue;
+                else
+                    numOverlaps++;
 
-                            closestB.clear();
-                            closestB.push_back(*h);
-                            distances.clear();
-                            distances.push_back(0);
-                        }
-                        else if (overlap == maxOverlap) {
-                            closestB.push_back(*h);
-                            distances.push_back(0);
-                        }
-                    }
+                // there is overlap. make sure we allow overlapping features ()
+                if (overlapBases > 0) {
+                    closestB.push_back(*h);
+                    distances.push_back(0);
                 }
                 // the hit is to the "left" of A
-                else if (h->end <= a.start){
+                else if (h->end <= a.start) {
                     if ((a.start - h->end) < minDistance) {
                         minDistance = a.start - h->end;
 
@@ -127,7 +114,7 @@ void BedClosest::FindWindowOverlaps(BED &a, vector<BED> &hits) {
                     }
                 }
                 // the hit is to the "right" of A
-                else {
+                else if (h->start >= a.end) {
                     if ((h->start - a.end) < minDistance) {
                         minDistance = h->start - a.end;
 
@@ -161,7 +148,6 @@ void BedClosest::FindWindowOverlaps(BED &a, vector<BED> &hits) {
     // report the closest feature(s) in B to the current A feature.
     // obey the user's reporting request (_tieMode)
     if (numOverlaps > 0) {
-
         if (closestB.size() == 1 || _tieMode == "first") {
             _bedA->reportBedTab(a);
             if (_reportDistance == true) {

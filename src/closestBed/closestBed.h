@@ -27,7 +27,9 @@ class BedClosest {
 public:
 
     // constructor
-    BedClosest(string &bedAFile, string &bedBFile, bool forceStrand, string &tieMode, bool reportDistance);
+    BedClosest(string &bedAFile, string &bedBFile, 
+               bool forceStrand, string &tieMode, 
+               bool reportDistance, bool ignoreOverlaps);
 
     // destructor
     ~BedClosest(void);
@@ -43,6 +45,7 @@ private:
     string _tieMode;
     bool   _forceStrand;
     bool   _reportDistance;
+    bool   _ignoreOverlaps;
 
     BedFile *_bedA, *_bedB;
 

@@ -37,6 +37,7 @@ int main(int argc, char* argv[]) {
     bool haveBedB       = false;
     bool haveTieMode    = false;
     bool forceStrand    = false;
+    bool ignoreOverlaps = false;
     bool reportDistance = false;
 
 
@@ -79,12 +80,19 @@ int main(int argc, char* argv[]) {
         else if (PARAMETER_CHECK("-d", 2, parameterLength)) {
             reportDistance = true;
         }
+        else if (PARAMETER_CHECK("-io", 3, parameterLength)) {
+            ignoreOverlaps = true;
+        }
         else if (PARAMETER_CHECK("-t", 2, parameterLength)) {
             if ((i+1) < argc) {
                 haveTieMode = true;
                 tieMode = argv[i + 1];
                 i++;
             }
+        }
+        else {
+            cerr << endl << "*****ERROR: Unrecognized parameter: " << argv[i] << " *****" << endl << endl;
+            showHelp = true;
         }
     }
 
@@ -101,7 +109,7 @@ int main(int argc, char* argv[]) {
     }
 
     if (!showHelp) {
-        BedClosest *bc = new BedClosest(bedAFile, bedBFile, forceStrand, tieMode, reportDistance);
+        BedClosest *bc = new BedClosest(bedAFile, bedBFile, forceStrand, tieMode, reportDistance, ignoreOverlaps);
         delete bc;
         return 0;
     }
@@ -131,14 +139,16 @@ void ShowHelp(void) {
     cerr                        << "\t\treport its distance to A as an extra column." << endl;
     cerr                        << "\t\t- The reported distance for overlapping features will be 0." << endl << endl;
 
+    cerr << "\t-no\t"           << "Ignore features in B that overlap A.  That is, we want close, but " << endl;
+    cerr                        << "\t\tnot touching features only." << endl << endl;
 
     cerr << "\t-t\t"            << "How ties for closest feature are handled.  This occurs when two" << endl;
-    cerr                        << "\t\tfeatures in B have exactly the same overlap with A." << endl;
+    cerr                        << "\t\tfeatures in B have exactly the same \"closeness\" with A." << endl;
     cerr                        << "\t\tBy default, all such features in B are reported." << endl;
     cerr                        << "\t\tHere are all the options:" << endl;
-    cerr                        << "\t\t- \"all\"  Report all ties (default)." << endl;
+    cerr                        << "\t\t- \"all\"    Report all ties (default)." << endl;
     cerr                        << "\t\t- \"first\"  Report the first tie that occurred in the B file." << endl;
-    cerr                        << "\t\t- \"last\"  Report the last tie that occurred in the B file." << endl << endl;
+    cerr                        << "\t\t- \"last\"   Report the last tie that occurred in the B file." << endl << endl;
 
     cerr << "Notes: " << endl;
     cerr << "\tReports \"none\" for chrom and \"-1\" for all other fields when a feature" << endl;
