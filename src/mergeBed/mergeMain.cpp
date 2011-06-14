@@ -145,12 +145,17 @@ void ShowHelp(void) {
 
     cerr << "\t-nms\t"                   << "Report the names of the merged features separated by semicolons." << endl << endl;
     
-    cerr << "\t-scores [STRING]\t"       << "Report the scores of the merged features. Specify one of " << endl;
+    cerr << "\t-scores\t"                << "Report the scores of the merged features. Specify one of " << endl;
     cerr                                 << "\t\tthe following options for reporting scores:" << endl;
-    cerr                                 << "\t\t\t    sum, min, max," << endl;
-    cerr                                 << "\t\t\t    mean, median, mode, antimode," << endl;
-    cerr                                 << "\t\t\t    collapse (i.e., print a semicolon-separated list)," << endl << endl;
+    cerr                                 << "\t\t  sum, min, max," << endl;
+    cerr                                 << "\t\t  mean, median, mode, antimode," << endl;
+    cerr                                 << "\t\t  collapse (i.e., print a semicolon-separated list)," << endl;
+    cerr                                 << "\t\t- (INTEGER)" << endl << endl;
     
+    cerr << "Notes: " << endl;
+    cerr << "\t(1) All output, regardless of input type (e.g., GFF or VCF)" << endl;
+    cerr << "\t    will in BED format with zero-based starts" << endl << endl;
+
 
     // end the program here
     exit(1);

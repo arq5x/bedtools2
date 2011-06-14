@@ -168,7 +168,8 @@ BedMerge::~BedMerge(void) {
 void BedMerge::Report(string chrom, int start, int end, 
                       const vector<string> &names, const vector<string> &scores, int mergeCount) 
 {
-    if (_bed->isZeroBased == false) {start++;}
+    // ARQ: removed to force all output to be zero-based, BED format, reagrdless of input type
+    //if (_bed->isZeroBased == false) {start++;}
     
     printf("%s\t%d\t%d", chrom.c_str(), start, end);
     // just the merged intervals
@@ -205,7 +206,8 @@ void BedMerge::ReportStranded(string chrom, int start, int end,
                               const vector<string> &names, const vector<string> &scores,
                               int mergeCount, string strand) 
 {
-    if (_bed->isZeroBased == false) {start++;}
+    // ARQ: removed to force all output to be zero-based, BED format, reagrdless of input type
+    //if (_bed->isZeroBased == false) {start++;}
     
     printf("%s\t%d\t%d", chrom.c_str(), start, end);
     // just the merged intervals

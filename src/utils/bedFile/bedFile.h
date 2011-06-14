@@ -697,7 +697,6 @@ private:
         if (numFields == this->bedType) {
             if (this->bedType >= 8 && _isGff) {
                 bed.chrom = lineVector[0];
-                // substract 1 to force the start to be BED-style
                 bed.start  = atoi(lineVector[3].c_str());
                 bed.end    = atoi(lineVector[4].c_str());
                 bed.name   = lineVector[2];
@@ -714,7 +713,7 @@ private:
                     bed.end++;
                     bed.zeroLength = true;
                 }
-                // GFF uses 1-based starts
+                // GFF uses 1-based starts, covert to zero-based
                 bed.start--;
             }
             else {
