@@ -29,8 +29,7 @@ class NucBed {
 public:
 
     // constructor
-    NucBed(string &dbFile, string &bedFile, bool printSeq);
-
+    NucBed(string &dbFile, string &bedFile, bool printSeq, bool hasPattern, const string &pattern);
     // destructor
     ~NucBed(void);
 
@@ -41,10 +40,12 @@ private:
     string _dbFile;
     string _bedFile;
     bool   _printSeq;
+    bool   _hasPattern;
+    string _pattern;
 
     // instance of a bed file class.
     BedFile  *_bed;
-    
+    void PrintHeader(void);
     void ReportDnaProfile(const BED& bed, const string &sequence, int seqLength);
 };
 

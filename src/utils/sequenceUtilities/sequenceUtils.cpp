@@ -108,3 +108,19 @@ void getDnaContent(const string &seq, int &a, int &c, int &g, int &t, int &n, in
         }
     }    
 }
+
+
+int countPattern(const string &seq, const string &pattern)
+{
+    // swap the bases
+    int patternLength = pattern.size();
+    int patternCount = 0;
+    for(unsigned int i = 0; i < seq.length(); i++) {
+        if (seq.substr(i,patternLength) == pattern) {
+            patternCount++;
+        }
+    }
+    return patternCount;
+}
+        
+

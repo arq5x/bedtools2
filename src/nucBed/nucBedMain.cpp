@@ -32,11 +32,13 @@ int main(int argc, char* argv[]) {
     // input files
     string fastaDbFile;
     string bedFile;
+    string pattern;
 
     // checks for existence of parameters
     bool haveFastaDb = false;
     bool haveBed     = false;
     bool printSeq    = false;
+    bool hasPattern  = false;
 
     // check to see if we should print out some help
     if(argc <= 1) showHelp = true;
@@ -74,6 +76,13 @@ int main(int argc, char* argv[]) {
         else if(PARAMETER_CHECK("-seq", 4, parameterLength)) {
             printSeq = true;
         }
+        else if(PARAMETER_CHECK("-pattern", 8, parameterLength)) {
+            if ((i+1) < argc) {
+                hasPattern = true;
+                pattern = argv[i + 1];
+                i++;
+            }
+        }
         else {
             cerr << "*****ERROR: Unrecognized parameter: " << argv[i] << " *****" << endl << endl;
             showHelp = true;
@@ -86,7 +95,7 @@ int main(int argc, char* argv[]) {
 
     if (!showHelp) {
 
-        NucBed *nuc = new NucBed(fastaDbFile, bedFile, printSeq);
+        NucBed *nuc = new NucBed(fastaDbFile, bedFile, printSeq, hasPattern, pattern);
         delete nuc;
 
         return 0;
@@ -107,8 +116,11 @@ void ShowHelp(void) {
     cerr << "Usage:   " << PROGRAM_NAME << " [OPTIONS] -fi <fasta> -bed <bed/gff/vcf>" << endl << endl;
 
     cerr << "Options: " << endl;
-    cerr << "\t-fi\tInput FASTA file" << endl;
+    cerr << "\t-fi\tInput FASTA file" << endl << endl;
     cerr << "\t-bed\tBED/GFF/VCF file of ranges to extract from -fi" << endl << endl;
+    cerr << "\t-seq\tPrint the extracted sequence" << endl << endl;
+    cerr << "\t-pattern\tReport the number of times a user-defined sequence is observed (case-insensitive)." << endl << endl;
+    
     
     cerr << "Output format: " << endl;
     cerr << "\tThe following information will be reported after each original BED entry:" << endl;
@@ -120,8 +132,9 @@ void ShowHelp(void) {
     cerr << "\t    6) Number of Ts observed" << endl;
     cerr << "\t    7) Number of Ns observed" << endl;
     cerr << "\t    8) Number of other bases observed" << endl;
-    cerr << "\t    9) The length of the explored sequence/interval." << endl << endl;
-
+    cerr << "\t    9) The length of the explored sequence/interval." << endl;
+    cerr << "\t    10) The sequence extracted from the FASTA file. (optional, if -seq is used)" << endl;
+    cerr << "\t    11) The number of times a user defined pattern was observed. (optional, if -pattern is used.)" << endl;
 
     // end the program here
     exit(1);

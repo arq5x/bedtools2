@@ -13,12 +13,14 @@
 #include "nucBed.h"
 
 
-NucBed::NucBed(string &dbFile, string &bedFile, bool printSeq) {
+NucBed::NucBed(string &dbFile, string &bedFile, bool printSeq, bool hasPattern, const string &pattern) {
 
     _dbFile       = dbFile;
     _bedFile      = bedFile;
     _printSeq     = printSeq;
-
+    _hasPattern   = hasPattern;
+    _pattern      = pattern;
+    
     _bed = new BedFile(_bedFile);
 
     // Compute the DNA content in each BED/GFF/VCF interval
@@ -32,10 +34,14 @@ NucBed::~NucBed(void)
 
 void NucBed::ReportDnaProfile(const BED& bed, const string &sequence, int seqLength)
 {
-    int a,c,g,t,n,other;
-    a = c = g = t = n = other = 0;
+    int a,c,g,t,n,other,userPatternCount;
+    a = c = g = t = n = other = userPatternCount = 0;
     
     getDnaContent(sequence,a,c,g,t,n,other);
+    
+    if (_hasPattern)
+        userPatternCount = countPattern(sequence, _pattern);
+    
     
     // report the original interval
     _bed->reportBedTab(bed);
@@ -44,12 +50,41 @@ void NucBed::ReportDnaProfile(const BED& bed, const string &sequence, int seqLen
     // report raw nucleotide counts
     printf("%d\t%d\t%d\t%d\t%d\t%d\t%d",a,c,g,t,n,other,seqLength);
     // add the original sequence if requested.
-    if (_printSeq) {
-        printf("\t%s\n",sequence.c_str());
+
+    if (_printSeq)
+        printf("\t%s",sequence.c_str());
+    if (_hasPattern)
+        printf("\t%d",userPatternCount);
+    printf("\n");
+
+}
+
+
+void NucBed::PrintHeader(void) {
+    printf("#");
+    
+    int numOrigColumns = (int) _bed->bedType;
+    for (int i = 1; i <= numOrigColumns; ++i) {
+        printf("%d_usercol\t", i);
     }
-    else {
-        printf("\n");
-    }
+    printf("%d_pct_at\t", numOrigColumns + 1);
+    printf("%d_pct_gc\t", numOrigColumns + 2);
+    printf("%d_num_A\t", numOrigColumns + 3);
+    printf("%d_num_C\t", numOrigColumns + 4);
+    printf("%d_num_G\t", numOrigColumns + 5);
+    printf("%d_num_T\t", numOrigColumns + 6);
+    printf("%d_num_N\t", numOrigColumns + 7);
+    printf("%d_num_oth\t", numOrigColumns + 8);
+    printf("%d_seq_len\t", numOrigColumns + 9);
+    
+    if (_printSeq)
+        printf("%d_seq", numOrigColumns + 10);
+    if (_hasPattern && !_printSeq)
+        printf("%d_user_patt_count\n", numOrigColumns + 10);
+    else if (_hasPattern && _printSeq)
+        printf("\t%d_user_patt_count\n", numOrigColumns + 11);
+    printf("\n");
+
 }
 
 
@@ -69,9 +104,10 @@ void NucBed::ProfileDNA() {
 
     // open and memory-map genome file
     FastaReference fr;
-    bool memmap = true;
+    bool memmap = true;    
     fr.open(_dbFile, memmap);
 
+    bool headerReported = false;
     BED bed, nullBed;
     int lineNum = 0;
     BedLineStatus bedStatus;
@@ -80,6 +116,10 @@ void NucBed::ProfileDNA() {
     _bed->Open();
     while ((bedStatus = _bed->GetNextBed(bed, lineNum)) != BED_INVALID) {
         if (bedStatus == BED_VALID) {
+            if (headerReported == false) {
+                PrintHeader();
+                headerReported = true;
+            }
             // make sure we are extracting >= 1 bp
             if (bed.zeroLength == false) {
                 size_t seqLength = fr.sequenceLength(bed.chrom);
