@@ -181,7 +181,7 @@ void ShowHelp(void) {
     cerr << "Tips: " << endl;
     cerr << "\tOne can use the UCSC Genome Browser's MySQL database to extract" << endl;
     cerr << "\tchromosome sizes. For example, H. sapiens:" << endl << endl;
-    cerr << "\tmysql --user=genome --host=genome-mysql.cse.ucsc.edu -A -e /" << endl;
+    cerr << "\tmysql --user=genome --host=genome-mysql.cse.ucsc.edu -A -e \" << endl;
     cerr << "\t\"select chrom, size from hg19.chromInfo\"  > hg19.genome" << endl << endl;
 
 
