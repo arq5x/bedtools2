@@ -443,7 +443,7 @@ void PrintBed12(const BamAlignment &bam, const RefVector &refs, bool useEditDist
     else if (useEditDistance == false && bamTag != "") {
         int32_t tagValue;
         if (bam.GetTag(bamTag, tagValue)) {
-            printf("%s\t%d\t%d\t\%s\t%d\t%s\n", refs.at(bam.RefID).RefName.c_str(), bam.Position,
+            printf("%s\t%d\t%d\t\%s\t%d\t%s\t", refs.at(bam.RefID).RefName.c_str(), bam.Position,
                                           alignmentEnd, name.c_str(), tagValue, strand.c_str());
         }
         else {
