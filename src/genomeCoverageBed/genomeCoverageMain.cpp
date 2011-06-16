@@ -134,19 +134,19 @@ int main(int argc, char* argv[]) {
         else if(PARAMETER_CHECK("-5", 2, parameterLength)) {
                 only_5p_end = true;
         }
-else if(PARAMETER_CHECK("-trackline", 10, parameterLength)) {
-add_gb_track_line = true;
-}
-else if(PARAMETER_CHECK("-trackopts", 10, parameterLength)) {
-if ((i+1) < argc) {
-add_gb_track_line = true;
-gb_track_opts = argv[i+1];
-i++;
-} else {
-cerr << "*****ERROR: -trackopts options requires a value (UCSC/GB track definition parameters)" << endl;
-showHelp = true;
-}
-}
+        else if(PARAMETER_CHECK("-trackline", 10, parameterLength)) {
+                add_gb_track_line = true;
+        }
+        else if(PARAMETER_CHECK("-trackopts", 10, parameterLength)) {
+                if ((i+1) < argc) {
+                    add_gb_track_line = true;
+                    gb_track_opts = argv[i+1];
+                    i++;
+                } else {
+                    cerr << "*****ERROR: -trackopts options requires a value (UCSC/GB track definition parameters)" << endl;
+                    showHelp = true;
+                }
+        }
         else {
           cerr << endl << "*****ERROR: Unrecognized parameter: " << argv[i] << " *****" << endl << endl;
             showHelp = true;

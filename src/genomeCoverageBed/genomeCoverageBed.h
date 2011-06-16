@@ -44,9 +44,9 @@ public:
     BedGenomeCoverage(string bedFile, string genomeFile, bool eachBase, bool startSites,
                       bool bedGraph, bool bedGraphAll, int max, bool bamInput, bool obeySplits,
                       bool filterByStrand, string requestedStrand,
-bool only_5p_end, bool only_3p_end,
-bool eachBaseZeroBased,
-bool add_gb_track_line, string gb_track_line_opts);
+                      bool only_5p_end, bool only_3p_end,
+                      bool eachBaseZeroBased,
+                      bool add_gb_track_line, string gb_track_line_opts);
 
     // destructor
     ~BedGenomeCoverage(void);

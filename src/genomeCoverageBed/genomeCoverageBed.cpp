@@ -19,7 +19,7 @@ BedGenomeCoverage::BedGenomeCoverage(string bedFile, string genomeFile, bool eac
                                      bool filterByStrand, string requestedStrand,
                                      bool only_5p_end, bool only_3p_end,
                                      bool eachBaseZeroBased,
-bool add_gb_track_line, string gb_track_line_opts) {
+                                     bool add_gb_track_line, string gb_track_line_opts) {
 
     _bedFile = bedFile;
     _genomeFile = genomeFile;
@@ -55,12 +55,12 @@ void BedGenomeCoverage::PrintTrackDefinitionLine()
 {
     //Print Track Definition line (if requested)
     if ( (_bedGraph||_bedGraphAll) && _add_gb_track_line) {
-string line = "track type=bedGraph";
-if (!_gb_track_line_opts.empty()) {
-line += " " ;
-line += _gb_track_line_opts ;
-}
-cout << line << endl;
+        string line = "track type=bedGraph";
+        if (!_gb_track_line_opts.empty()) {
+            line += " " ;
+            line += _gb_track_line_opts ;
+        }
+        cout << line << endl;
     }
 
 }
