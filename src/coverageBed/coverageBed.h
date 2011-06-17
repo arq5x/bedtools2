@@ -14,8 +14,8 @@
 
 #include "bedFile.h"
 
-#include "BamReader.h"
-#include "BamAux.h"
+#include "api/BamReader.h"
+#include "api/BamAux.h"
 #include "BamAncillary.h"
 using namespace BamTools;
 
