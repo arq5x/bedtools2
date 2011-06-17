@@ -15,8 +15,9 @@
 #include "version.h"
 
 
-#include "BamWriter.h"
-#include "BamAux.h"
+#include "api/BamReader.h"
+#include "api/BamAux.h"
+#include "api/BamWriter.h"
 using namespace BamTools;
 
 #include <vector>
@@ -175,7 +176,11 @@ void ProcessBed(istream &bedInput, BedFile *bed, GenomeFile *genome, bool isBED1
     MakeBamHeader(genome->getGenomeFileName(), refs, bamHeader, chromToId);
 
     // open a BAM and add the reference headers to the BAM file
-    writer->Open("stdout", bamHeader, refs, uncompressedBam);
+    writer->Open("stdout", bamHeader, refs);
+	// set compression mode
+    BamWriter::CompressionMode compressionMode = BamWriter::Compressed;
+    if ( uncompressedBam ) compressionMode = BamWriter::Uncompressed;
+	writer->SetCompressionMode(compressionMode);
 
 
     // process each BED entry and convert to BAM
@@ -332,7 +337,6 @@ void MakeBamHeader(const string &genomeFile, RefVector &refs, string &header,
         RefData chrom;
         chrom.RefName            = *genomeItr;
         chrom.RefLength          = size;
-        chrom.RefHasAlignments   = false;
         refs.push_back(chrom);
     }
 }
