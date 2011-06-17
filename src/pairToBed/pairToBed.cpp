@@ -381,13 +381,17 @@ void BedIntersectPE::IntersectBamPE(string bamFile) {
     reader.Open(bamFile);
 
     // get header & reference information
-    string header = reader.GetHeaderText();
-    RefVector refs = reader.GetReferenceData();
+    string bamHeader = reader.GetHeaderText();
+    RefVector refs   = reader.GetReferenceData();
 
     // open a BAM output to stdout if we are writing BAM
     if (_bamOutput == true) {
         // open our BAM writer
-        writer.Open("stdout", header, refs, _isUncompressedBam);
+        writer.Open("stdout", bamHeader, refs);
+        // set compression mode
+        BamWriter::CompressionMode compressionMode = BamWriter::Compressed;
+        if ( _isUncompressedBam ) compressionMode = BamWriter::Uncompressed;
+        writer.SetCompressionMode(compressionMode);
     }
 
     // track the previous and current sequence

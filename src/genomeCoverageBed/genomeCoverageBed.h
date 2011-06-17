@@ -12,9 +12,9 @@ Licenced under the GNU General Public License 2.0 license.
 #include "bedFile.h"
 #include "genomeFile.h"
 
-#include "BamReader.h"
 #include "BamAncillary.h"
-#include "BamAux.h"
+#include "api/BamReader.h"
+#include "api/BamAux.h"
 using namespace BamTools;
 
 #include <vector>

@@ -13,10 +13,11 @@
 #define INTERSECTBED_H
 
 #include "bedFile.h"
-#include "BamReader.h"
-#include "BamWriter.h"
+
+#include "api/BamReader.h"
+#include "api/BamWriter.h"
+#include "api/BamAux.h"
 #include "BamAncillary.h"
-#include "BamAux.h"
 using namespace BamTools;
 
 

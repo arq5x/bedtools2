@@ -12,9 +12,9 @@
 #ifndef WINDOWBED_H
 #define WINDOWBED_H
 
-#include "BamReader.h"
-#include "BamWriter.h"
-#include "BamAux.h"
+#include "api/BamReader.h"
+#include "api/BamWriter.h"
+#include "api/BamAux.h"
 using namespace BamTools;
 
 #include "bedFile.h"
