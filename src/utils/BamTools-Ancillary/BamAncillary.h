@@ -11,9 +11,9 @@
 ******************************************************************************/
 #include "bedFile.h"
 #include "lineFileUtilities.h"
-#include "BamAux.h"
+#include "api/BamAlignment.h"
 
 namespace BamTools {
     void getBamBlocks(const BamAlignment &bam, const RefVector &refs,
-                  vector<BED> &blocks, bool includeDeletions = true);
+                        vector<BED> &blocks, bool includeDeletions = true);
 }

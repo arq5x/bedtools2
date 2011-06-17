@@ -10,9 +10,9 @@
   Licenced under the GNU General Public License 2.0 license.
 ******************************************************************************/
 #include "version.h"
-#include "BamReader.h"
+#include "api/BamReader.h"
+#include "api/BamAux.h"
 #include "BamAncillary.h"
-#include "BamAux.h"
 #include "bedFile.h"
 using namespace BamTools;
 

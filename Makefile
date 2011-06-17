@@ -10,7 +10,7 @@ export SRC_DIR	= src
 export CXX		= g++
 export CXXFLAGS = -Wall -O2
 export LIBS		= -lz
-
+export BT_ROOT  = src/utils/BamTools/
 
 
 SUBDIRS = $(SRC_DIR)/annotateBed \
@@ -27,7 +27,8 @@ SUBDIRS = $(SRC_DIR)/annotateBed \
 		  $(SRC_DIR)/intersectBed \
 		  $(SRC_DIR)/linksBed \
 		  $(SRC_DIR)/maskFastaFromBed \
-		  $(SRC_DIR)/mergeBed	\
+		  $(SRC_DIR)/multiBamCov \
+		  $(SRC_DIR)/mergeBed \
 		  $(SRC_DIR)/nucBed \
 		  $(SRC_DIR)/overlap \
 		  $(SRC_DIR)/pairToBed \
@@ -48,7 +49,8 @@ UTIL_SUBDIRS =	$(SRC_DIR)/utils/lineFileUtilities \
 				$(SRC_DIR)/utils/fileType \
 				$(SRC_DIR)/utils/bedFilePE \
 				$(SRC_DIR)/utils/sequenceUtilities \
-				$(SRC_DIR)/utils/BamTools
+				$(SRC_DIR)/utils/BamTools \
+				$(SRC_DIR)/utils/BamTools-Ancillary
 
 all:
 	[ -d $(OBJ_DIR) ] || mkdir -p $(OBJ_DIR)

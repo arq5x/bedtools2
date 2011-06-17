@@ -13,12 +13,6 @@
 #define ANNOTATEBED_H
 
 #include "bedFile.h"
-
-#include "BamReader.h"
-#include "BamAux.h"
-#include "BamAncillary.h"
-using namespace BamTools;
-
 #include <vector>
 #include <algorithm>
 #include <iostream>

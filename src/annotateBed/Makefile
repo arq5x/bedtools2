@@ -12,7 +12,7 @@ INCLUDES = -I$(UTILITIES_DIR)/bedFile/ -I$(UTILITIES_DIR)/lineFileUtilities/ -I$
 # ----------------------------------
 SOURCES= annotateMain.cpp annotateBed.cpp
 OBJECTS= $(SOURCES:.cpp=.o)
-_EXT_OBJECTS=bedFile.o lineFileUtilities.o BamReader.o BamAncillary.o BGZF.o  BamIndex.o gzstream.o fileType.o
+_EXT_OBJECTS=bedFile.o lineFileUtilities.o gzstream.o fileType.o
 EXT_OBJECTS=$(patsubst %,$(OBJ_DIR)/%,$(_EXT_OBJECTS))
 BUILT_OBJECTS= $(patsubst %,$(OBJ_DIR)/%,$(OBJECTS))
 PROGRAM= annotateBed
@@ -33,7 +33,6 @@ $(BUILT_OBJECTS): $(SOURCES)
 $(EXT_OBJECTS):
 	@$(MAKE) --no-print-directory -C $(UTILITIES_DIR)/bedFile/
 	@$(MAKE) --no-print-directory -C $(UTILITIES_DIR)/lineFileUtilities/
-	@$(MAKE) --no-print-directory -C $(UTILITIES_DIR)/BamTools/	
 	@$(MAKE) --no-print-directory -C $(UTILITIES_DIR)/gzstream/
 	@$(MAKE) --no-print-directory -C $(UTILITIES_DIR)/fileType/	
 		
