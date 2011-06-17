@@ -1,0 +1,61 @@
+--------------------------------------------------------------------------------
+README : BAMTOOLS
+--------------------------------------------------------------------------------
+
+BamTools provides both a programmer's API and an end-user's toolkit for handling
+BAM files.
+
+I.   Learn More
+
+II.  License
+
+III. Acknowledgements
+
+IV.  Contact
+
+--------------------------------------------------------------------------------
+I. Learn More:
+--------------------------------------------------------------------------------
+
+Installation steps, tutorial, API documentation, etc. are all now available 
+through the BamTools project wiki:
+
+https://github.com/pezmaster31/bamtools/wiki
+
+Join the mailing list(s) to stay informed of updates or get involved with 
+contributing:
+
+https://github.com/pezmaster31/bamtools/wiki/Mailing-lists
+
+--------------------------------------------------------------------------------
+II. License :
+--------------------------------------------------------------------------------
+
+Both the BamTools API and toolkit are released under the MIT License.
+Copyright (c) 2009-2010 Derek Barnett, Erik Garrison, Gabor Marth,
+    Michael Stromberg
+
+See included file LICENSE for details.
+
+--------------------------------------------------------------------------------
+III. Acknowledgements :
+--------------------------------------------------------------------------------
+
+ * Aaron Quinlan for several key feature ideas and bug fix contributions
+ * Baptiste Lepilleur for the public-domain JSON parser (JsonCPP)
+ * Heng Li, author of SAMtools - the original C-language BAM API/toolkit.
+
+--------------------------------------------------------------------------------
+IV. Contact :
+--------------------------------------------------------------------------------
+
+Feel free to contact me with any questions, comments, suggestions, bug reports,
+    etc.
+
+Derek Barnett
+Marth Lab
+Biology Dept., Boston College
+
+Email: barnetde@bc.edu
+Project Websites: http://github.com/pezmaster31/bamtools   (ACTIVE SUPPORT)
+                  http://sourceforge.net/projects/bamtools (major updates only)
