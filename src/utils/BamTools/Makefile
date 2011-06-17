@@ -39,12 +39,11 @@ OBJECTS= $(SOURCES:.cpp=.o)
 LIBRARY=libbamtools.a
 
 all: $(LIBRARY)
-
+    
 .PHONY: all
 
-[ -d lib ] || mkdir -p lib
-
 $(LIBRARY): $(OBJECTS)
+	[ -d lib ] || mkdir -p lib
 	@echo "  * linking $(LIBRARY)"
 	ar cr lib/$@  $^
 		
