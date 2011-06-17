@@ -42,6 +42,8 @@ all: $(LIBRARY)
 
 .PHONY: all
 
+[ -d lib ] || mkdir -p lib
+
 $(LIBRARY): $(OBJECTS)
 	@echo "  * linking $(LIBRARY)"
 	ar cr lib/$@  $^
