@@ -228,7 +228,7 @@ void BedGenomeCoverage::CoverageBam(string bamFile) {
         // extract the chrom, start and end from the BAM alignment
         string chrom(refs.at(bam.RefID).RefName);
         CHRPOS start = bam.Position;
-        CHRPOS end = bam.GetEndPosition() - 1;
+        CHRPOS end = bam.GetEndPosition(false, false) - 1;
         
         // are we on a new chromosome?
         if ( chrom != _currChromName )

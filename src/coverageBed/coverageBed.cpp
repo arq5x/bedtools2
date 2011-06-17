@@ -103,7 +103,7 @@ void BedCoverage::CollectCoverageBam(string bamFile) {
                 BED a;
                 a.chrom  = refs.at(bam.RefID).RefName;
                 a.start  = bam.Position;
-                a.end    = bam.GetEndPosition(false);
+                a.end    = bam.GetEndPosition(false, false);
                 a.strand = "+";
                 if (bam.IsReverseStrand()) a.strand = "-";
 

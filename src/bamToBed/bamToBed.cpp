@@ -344,7 +344,7 @@ void PrintBed(const BamAlignment &bam,  const RefVector &refs, bool useEditDista
     if (bam.IsSecondMate() == true) name += "/2";
 
     // get the unpadded (parm = false) end position based on the CIGAR
-    unsigned int alignmentEnd = bam.GetEndPosition(false);
+    unsigned int alignmentEnd = bam.GetEndPosition(false, false);
 
     // report the entire BAM footprint as a single BED entry
     if (obeySplits == false) {
