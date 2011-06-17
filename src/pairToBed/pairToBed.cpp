@@ -386,12 +386,12 @@ void BedIntersectPE::IntersectBamPE(string bamFile) {
 
     // open a BAM output to stdout if we are writing BAM
     if (_bamOutput == true) {
-        // open our BAM writer
-        writer.Open("stdout", bamHeader, refs);
         // set compression mode
         BamWriter::CompressionMode compressionMode = BamWriter::Compressed;
         if ( _isUncompressedBam ) compressionMode = BamWriter::Uncompressed;
         writer.SetCompressionMode(compressionMode);
+        // open our BAM writer
+        writer.Open("stdout", bamHeader, refs);
     }
 
     // track the previous and current sequence

@@ -175,12 +175,12 @@ void ProcessBed(istream &bedInput, BedFile *bed, GenomeFile *genome, bool isBED1
     map<string, int, std::less<string> > chromToId;
     MakeBamHeader(genome->getGenomeFileName(), refs, bamHeader, chromToId);
 
-    // open a BAM and add the reference headers to the BAM file
-    writer->Open("stdout", bamHeader, refs);
-	// set compression mode
+    // set compression mode
     BamWriter::CompressionMode compressionMode = BamWriter::Compressed;
     if ( uncompressedBam ) compressionMode = BamWriter::Uncompressed;
-	writer->SetCompressionMode(compressionMode);
+    writer->SetCompressionMode(compressionMode);
+    // open a BAM and add the reference headers to the BAM file
+    writer->Open("stdout", bamHeader, refs);
 
 
     // process each BED entry and convert to BAM
