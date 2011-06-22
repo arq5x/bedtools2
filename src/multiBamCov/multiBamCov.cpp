@@ -70,7 +70,7 @@ void MultiCovBam::CollectCoverage()
                     // everything checks out, just iterate through specified region, counting alignments
                     vector<int> counts(_bam_files.size());
                     BamAlignment al;
-                    while ( reader.GetNextAlignmentCore(al) )
+                    while ( reader.GetNextAlignment(al) )
                     {
                         // lookup the offset of the file name and tabulate coverage
                         // for the appropriate file

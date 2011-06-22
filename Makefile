@@ -77,5 +77,6 @@ all:
 clean:
 	@echo "Cleaning up."
 	@rm -f $(OBJ_DIR)/* $(BIN_DIR)/*
+	@rm -Rf $(BT_ROOT)/lib
 
 .PHONY: clean
