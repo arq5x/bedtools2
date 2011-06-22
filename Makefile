@@ -78,5 +78,8 @@ clean:
 	@echo "Cleaning up."
 	@rm -f $(OBJ_DIR)/* $(BIN_DIR)/*
 	@rm -Rf $(BT_ROOT)/lib
+	@rm -f $(BT_ROOT)/src/*.o
+	@rm -f $(BT_ROOT)/src/internal/*.o
+	
 
 .PHONY: clean
