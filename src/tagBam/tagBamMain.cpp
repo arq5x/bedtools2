@@ -139,7 +139,7 @@ void ShowHelp(void) {
     cerr << "Summary: Annotates a BAM file based on overlaps with multiple BED/GFF/VCF files" << endl;
     cerr << "\t on the intervals in -i." << endl << endl;
 
-    cerr << "Usage:   " << PROGRAM_NAME << " [OPTIONS] -i <BAM> -files FILE1 FILE2 .. FILEn -labels LAB1 LAB2 ,,, LABn" << endl << endl;
+    cerr << "Usage:   " << PROGRAM_NAME << " [OPTIONS] -i <BAM> -files FILE1 FILE2 .. FILEn -tags LAB1 LAB2 ,,, LABn" << endl << endl;
 
     cerr << "Options: " << endl;
 
