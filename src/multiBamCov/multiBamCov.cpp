@@ -75,7 +75,7 @@ void MultiCovBam::CollectCoverage()
                     while ( reader.GetNextAlignment(al) )
                     {
                         if (al.MapQuality >= _minQual) {
-                            if (_properOnly && !IsProperPair())
+                            if (_properOnly && !al.IsProperPair())
                                 continue;
                             // lookup the offset of the file name and tabulate coverage
                             // for the appropriate file

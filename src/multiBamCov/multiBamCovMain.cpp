@@ -32,7 +32,7 @@ int main(int argc, char* argv[]) {
     // input files
     string bedFile;
     vector<string> bamFiles;
-    minQual = 0;
+    int minQual = 0;
 
     // input arguments
     bool haveBed           = false;
