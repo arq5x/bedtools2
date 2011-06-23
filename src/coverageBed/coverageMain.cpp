@@ -35,11 +35,12 @@ int main(int argc, char* argv[]) {
     // parm flags
     bool forceStrand    = false;
     bool writeHistogram = false;
-    bool eachBase          = false;
+    bool eachBase       = false;
     bool obeySplits     = false;
     bool bamInput       = false;
     bool haveBedA       = false;
     bool haveBedB       = false;
+    bool countsOnly     = false;
 
     // check to see if we should print out some help
     if(argc <= 1) showHelp = true;
@@ -94,6 +95,9 @@ int main(int argc, char* argv[]) {
         else if (PARAMETER_CHECK("-split", 6, parameterLength)) {
             obeySplits = true;
         }
+        else if (PARAMETER_CHECK("-counts", 7, parameterLength)) {
+            countsOnly = true;
+        }
         else {
             cerr << endl << "*****ERROR: Unrecognized parameter: " << argv[i] << " *****" << endl << endl;
             showHelp = true;
@@ -107,7 +111,7 @@ int main(int argc, char* argv[]) {
     }
 
     if (!showHelp) {
-        BedCoverage *bg = new BedCoverage(bedAFile, bedBFile, forceStrand, writeHistogram, bamInput, obeySplits, eachBase);
+        BedCoverage *bg = new BedCoverage(bedAFile, bedBFile, forceStrand, writeHistogram, bamInput, obeySplits, eachBase, countsOnly);
         delete bg;
         return 0;
     }
@@ -143,6 +147,8 @@ void ShowHelp(void) {
     cerr << "\t-d\t"            << "Report the depth at each position in each B feature." << endl;
     cerr                        << "\t\tPositions reported are one based.  Each position" << endl;
     cerr                        << "\t\tand depth follow the complete B feature." << endl << endl;
+    
+    cerr << "\t-counts\t"       << "Only report the count of overlaps, don't compute fraction, etc." << endl << endl;
 
     cerr << "\t-split\t"        << "Treat \"split\" BAM or BED12 entries as distinct BED intervals." << endl;
     cerr                        << "\t\twhen computing coverage." << endl;

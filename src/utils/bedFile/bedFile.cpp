@@ -327,7 +327,7 @@ bool BedFile::FindOneOrMoreReciprocalOverlapsPerBin(string chrom, CHRPOS start, 
 }
 
 
-void BedFile::countHits(const BED &a, bool forceStrand) {
+void BedFile::countHits(const BED &a, bool forceStrand, bool countsOnly) {
 
     BIN startBin, endBin;
     startBin = (a.start >> _binFirstShift);
@@ -354,18 +354,20 @@ void BedFile::countHits(const BED &a, bool forceStrand) {
                 else if (overlaps(bedItr->start, bedItr->end, a.start, a.end) > 0) {
 
                     bedItr->count++;
-                    if (a.zeroLength == false) {
-                        bedItr->depthMap[a.start+1].starts++;
-                        bedItr->depthMap[a.end].ends++;
-                    }
-                    else {
-                        // correct for the fact that we artificially expanded the zeroLength feature
-                        bedItr->depthMap[a.start+2].starts++;
-                        bedItr->depthMap[a.end-1].ends++;                        
-                    }
+                    if (countsOnly == false) {
+                        if (a.zeroLength == false) {
+                            bedItr->depthMap[a.start+1].starts++;
+                            bedItr->depthMap[a.end].ends++;
+                        }
+                        else {
+                            // correct for the fact that we artificially expanded the zeroLength feature
+                            bedItr->depthMap[a.start+2].starts++;
+                            bedItr->depthMap[a.end-1].ends++;                        
+                        }
 
-                    if (a.start < bedItr->minOverlapStart) {
-                        bedItr->minOverlapStart = a.start;
+                        if (a.start < bedItr->minOverlapStart) {
+                            bedItr->minOverlapStart = a.start;
+                        }
                     }
                 }
             }
@@ -376,7 +378,7 @@ void BedFile::countHits(const BED &a, bool forceStrand) {
 }
 
 
-void BedFile::countSplitHits(const vector<BED> &bedBlocks, bool forceStrand) {
+void BedFile::countSplitHits(const vector<BED> &bedBlocks, bool forceStrand, bool countsOnly) {
 
     // set to track the distinct B features that had coverage.
     // we'll update the counts of coverage for these features by one
@@ -410,14 +412,16 @@ void BedFile::countSplitHits(const vector<BED> &bedBlocks, bool forceStrand) {
                         continue;
                     }
                     else if (overlaps(bedItr->start, bedItr->end, blockItr->start, blockItr->end) > 0) {
-                        if (blockItr->zeroLength == false) {
-                            bedItr->depthMap[blockItr->start+1].starts++;
-                            bedItr->depthMap[blockItr->end].ends++;
-                        }
-                        else {
-                            // correct for the fact that we artificially expanded the zeroLength feature
-                            bedItr->depthMap[blockItr->start+2].starts++;
-                            bedItr->depthMap[blockItr->end-1].ends++;
+                        if (countsOnly == false) {
+                            if (blockItr->zeroLength == false) {
+                                bedItr->depthMap[blockItr->start+1].starts++;
+                                bedItr->depthMap[blockItr->end].ends++;
+                            }
+                            else {
+                                // correct for the fact that we artificially expanded the zeroLength feature
+                                bedItr->depthMap[blockItr->start+2].starts++;
+                                bedItr->depthMap[blockItr->end-1].ends++;
+                            }
                         }
 
                         validHits.insert(bedItr);

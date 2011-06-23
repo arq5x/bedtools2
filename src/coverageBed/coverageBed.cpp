@@ -14,7 +14,8 @@
 
 // build
 BedCoverage::BedCoverage(string &bedAFile, string &bedBFile, bool forceStrand,
-                         bool writeHistogram, bool bamInput, bool obeySplits, bool eachBase) {
+                         bool writeHistogram, bool bamInput, bool obeySplits, 
+                         bool eachBase, bool countsOnly) {
 
     _bedAFile       = bedAFile;
     _bedBFile       = bedBFile;
@@ -27,6 +28,7 @@ BedCoverage::BedCoverage(string &bedAFile, string &bedBFile, bool forceStrand,
     _eachBase       = eachBase;
     _writeHistogram = writeHistogram;
     _bamInput       = bamInput;
+    _countsOnly     = countsOnly;
 
 
     if (_bamInput == false)
@@ -58,7 +60,7 @@ void BedCoverage::CollectCoverageBed() {
         if (bedStatus == BED_VALID) {
             // process the BED entry as a single block
             if (_obeySplits == false)
-                _bedB->countHits(a, _forceStrand);
+                _bedB->countHits(a, _forceStrand, _countsOnly);
             // split the BED into discrete blocksand process each independently.
             else {
                 bedVector bedBlocks;
@@ -66,7 +68,7 @@ void BedCoverage::CollectCoverageBed() {
 
                 // use countSplitHits to avoid over-counting each split chunk
                 // as distinct read coverage.
-                _bedB->countSplitHits(bedBlocks, _forceStrand);
+                _bedB->countSplitHits(bedBlocks, _forceStrand, _countsOnly);
             }
             a = nullBed;
         }
@@ -74,7 +76,10 @@ void BedCoverage::CollectCoverageBed() {
     _bedA->Close();
 
     // report the coverage (summary or histogram) for BED B.
-    ReportCoverage();
+    if (_countsOnly == true)
+        ReportCounts();
+    else 
+        ReportCoverage();
 }
 
 
@@ -107,7 +112,7 @@ void BedCoverage::CollectCoverageBam(string bamFile) {
                 a.strand = "+";
                 if (bam.IsReverseStrand()) a.strand = "-";
 
-                _bedB->countHits(a, _forceStrand);
+                _bedB->countHits(a, _forceStrand, _countsOnly);
             }
             // split the BAM alignment into discrete blocks and
             // look for overlaps only within each block.
@@ -119,16 +124,45 @@ void BedCoverage::CollectCoverageBam(string bamFile) {
                 getBamBlocks(bam, refs, bedBlocks, true);
                 // use countSplitHits to avoid over-counting each split chunk
                 // as distinct read coverage.
-                _bedB->countSplitHits(bedBlocks, _forceStrand);
+                _bedB->countSplitHits(bedBlocks, _forceStrand, _countsOnly);
             }
         }
     }
     // report the coverage (summary or histogram) for BED B.
-    ReportCoverage();
+    if (_countsOnly == true)
+        ReportCounts();
+    else 
+        ReportCoverage();
     // close the BAM file
     reader.Close();
 }
 
+
+void BedCoverage::ReportCounts() {
+
+
+    // process each chromosome
+    masterBedCovMap::const_iterator chromItr = _bedB->bedCovMap.begin();
+    masterBedCovMap::const_iterator chromEnd = _bedB->bedCovMap.end();
+    for (; chromItr != chromEnd; ++chromItr)
+    {
+        // for each chrom, process each bin
+        binsToBedCovs::const_iterator binItr = chromItr->second.begin();
+        binsToBedCovs::const_iterator binEnd = chromItr->second.end();
+        for (; binItr != binEnd; ++binItr)
+        {
+            // for each chrom & bin, compute and report
+            // the observed coverage for each feature
+            vector<BEDCOV>::const_iterator bedItr = binItr->second.begin();
+            vector<BEDCOV>::const_iterator bedEnd = binItr->second.end();
+            for (; bedItr != bedEnd; ++bedItr)
+            {
+                _bedB->reportBedTab(*bedItr);
+                printf("%d\n", bedItr->count);
+            }
+        }
+    }
+}
 
 void BedCoverage::ReportCoverage() {
 

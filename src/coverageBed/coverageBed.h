@@ -37,7 +37,7 @@ public:
 
     // constructor
     BedCoverage(string &bedAFile, string &bedBFile, bool forceStrand, bool writeHistogram,
-                bool bamInput, bool obeySplits, bool eachBase);
+                bool bamInput, bool obeySplits, bool eachBase, bool countsOnly);
 
     // destructor
     ~BedCoverage(void);
@@ -65,9 +65,15 @@ private:
 
     // should discrete coverage be reported for each base in each feature?
     bool _eachBase;
+    
+    // should we just count overlaps and not try to describe the breadth?
+    bool _countsOnly;
 
     // private function for reporting coverage information
     void ReportCoverage();
+    
+    // private function for reporting overlap counts
+    void ReportCounts();
 
     void CollectCoverageBed();
 
