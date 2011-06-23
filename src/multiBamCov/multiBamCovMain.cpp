@@ -32,11 +32,13 @@ int main(int argc, char* argv[]) {
     // input files
     string bedFile;
     vector<string> bamFiles;
+    minQual = 0;
 
     // input arguments
     bool haveBed           = false;
     bool haveBams          = false;
-
+    bool properOnly        = false;
+    
     // check to see if we should print out some help
     if(argc <= 1) showHelp = true;
 
@@ -77,10 +79,19 @@ int main(int argc, char* argv[]) {
                 i--;
             }
         }
+        else if(PARAMETER_CHECK("-q", 2, parameterLength)) {
+            if ((i+1) < argc) {
+                minQual = atoi(argv[i + 1]);
+                i++;
+            }
+        }
+        else if(PARAMETER_CHECK("-p", 2, parameterLength)) {
+            properOnly = true;
+        }
     }
 
     if (!showHelp) {
-        MultiCovBam *mc = new MultiCovBam(bamFiles, bedFile);
+        MultiCovBam *mc = new MultiCovBam(bamFiles, bedFile, minQual, properOnly);
         mc->CollectCoverage();
         delete mc;
         return 0;
@@ -102,11 +113,13 @@ void ShowHelp(void) {
 
     cerr << "Options: " << endl;
 
-    cerr << "\t-bams\t"         << "The bam files." << endl << endl;
+    cerr << "\t-bams\t"        << "The bam files." << endl << endl;
 
     cerr << "\t-bed\t"         << "The bed file." << endl << endl;
 
+    cerr << "\t-q [INT]\t"     << "Minimum mapping quality allowed. Default is 0." << endl << endl;
 
+    cerr << "\t-p\t"           << "Omly count proper pairs.  Default is to count all alignments >= -q" << endl << endl;
 
     // end the program here
     exit(1);

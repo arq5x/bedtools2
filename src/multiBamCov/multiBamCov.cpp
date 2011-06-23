@@ -17,10 +17,12 @@
 /*
     Constructor
 */
-MultiCovBam::MultiCovBam(const vector<string> &bam_files, const string bed_file) 
+MultiCovBam::MultiCovBam(const vector<string> &bam_files, const string bed_file, int minQual, bool properOnly) 
 :
 _bam_files(bam_files),
-_bed_file(bed_file)  
+_bed_file(bed_file),
+_minQual(minQual),
+_properOnly(properOnly)
 {
 	_bed = new BedFile(_bed_file);
     LoadBamFileMap();
@@ -72,9 +74,13 @@ void MultiCovBam::CollectCoverage()
                     BamAlignment al;
                     while ( reader.GetNextAlignment(al) )
                     {
-                        // lookup the offset of the file name and tabulate coverage
-                        // for the appropriate file
-                        counts[bamFileMap[al.Filename]]++;
+                        if (al.MapQuality >= _minQual) {
+                            if (_properOnly && !IsProperPair())
+                                continue;
+                            // lookup the offset of the file name and tabulate coverage
+                            // for the appropriate file
+                            counts[bamFileMap[al.Filename]]++;
+                        }
                     }
                     // report the cov at this interval for each file and reset
                     _bed->reportBedTab(bed);
