@@ -14,12 +14,13 @@
 
 // build
 TagBam::TagBam(const string &bamFile, const vector<string> &annoFileNames,
-            const vector<string> &annoLables, bool forceStrand) :
+            const vector<string> &annoLables, bool forceStrand, float overlapFraction) :
 
     _bamFile(bamFile),
     _annoFileNames(annoFileNames),
     _annoLabels(annoLables),
-    _forceStrand(forceStrand)
+    _forceStrand(forceStrand),
+    _overlapFraction(overlapFraction)
 {}
 
 
@@ -49,7 +50,7 @@ void TagBam::CloseAnnoFiles() {
 
 bool TagBam::FindOneOrMoreOverlap(const BED &a, BedFile *bedFile) {
     return bedFile->FindOneOrMoreOverlapsPerBin(a.chrom, a.start, a.end, a.strand,
-                                                _forceStrand, 0);
+                                                _forceStrand, _overlapFraction);
 }
 
 void TagBam::Tag() {

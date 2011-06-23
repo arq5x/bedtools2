@@ -40,7 +40,7 @@ public:
 
     // constructor
     TagBam(const string &bamFile, const vector<string> &annoFileNames,
-                const vector<string> &annoLabels, bool forceStrand);
+                const vector<string> &annoLabels, bool forceStrand, float overlapFraction);
 
     // destructor
     ~TagBam(void);
@@ -61,6 +61,7 @@ private:
 
     // do we care about strandedness when tagging?
     bool _forceStrand;
+    float _overlapFraction;
 
     // private function for reporting coverage information
     void ReportAnnotations();

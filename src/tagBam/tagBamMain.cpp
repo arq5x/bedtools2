@@ -30,8 +30,10 @@ int main(int argc, char* argv[]) {
 
     // input file
     string bamFile;
+    float overlapFraction = 1E-9;
 
     // parm flags
+    bool haveFraction       = false;
     bool forceStrand    = false;
     bool haveBam        = false;
     bool haveFiles      = false;
@@ -98,6 +100,13 @@ int main(int argc, char* argv[]) {
         else if (PARAMETER_CHECK("-s", 2, parameterLength)) {
             forceStrand = true;
         }
+        else if(PARAMETER_CHECK("-f", 2, parameterLength)) {
+            if ((i+1) < argc) {
+                haveFraction = true;
+                overlapFraction = atof(argv[i + 1]);
+                i++;
+            }
+        }
         else {
             cerr << endl << "*****ERROR: Unrecognized parameter: " << argv[i] << " *****" << endl << endl;
             showHelp = true;
@@ -111,7 +120,7 @@ int main(int argc, char* argv[]) {
     }
 
     if (!showHelp) {
-        TagBam *ba = new TagBam(bamFile, inputFiles, inputLabels, forceStrand);
+        TagBam *ba = new TagBam(bamFile, inputFiles, inputLabels, forceStrand, overlapFraction);
         ba->Tag();
         delete ba;
         return 0;
@@ -137,5 +146,8 @@ void ShowHelp(void) {
     cerr << "\t-s\t"            << "Force strandedness.  That is, only tag alignments that have the same" << endl;
     cerr                        << "\t\tstrand as a feature in the annotation file(s)." << endl << endl;
 
+    cerr << "\t-f\t"            << "Minimum overlap required as a fraction of the alignment." << endl;
+    cerr                        << "\t\t- Default is 1E-9 (i.e., 1bp)." << endl;
+    cerr                        << "\t\t- FLOAT (e.g. 0.50)" << endl << endl;
     exit(1);
 }
