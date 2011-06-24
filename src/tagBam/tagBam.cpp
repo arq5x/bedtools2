@@ -14,11 +14,13 @@
 
 // build
 TagBam::TagBam(const string &bamFile, const vector<string> &annoFileNames,
-            const vector<string> &annoLables, bool forceStrand, float overlapFraction) :
+            const vector<string> &annoLables, const string &tag,
+            bool forceStrand, float overlapFraction) :
 
     _bamFile(bamFile),
     _annoFileNames(annoFileNames),
     _annoLabels(annoLables),
+    _tag(tag),
     _forceStrand(forceStrand),
     _overlapFraction(overlapFraction)
 {}
@@ -97,7 +99,7 @@ void TagBam::Tag() {
             }
             // were there any overlaps with which to make a tag?
             if (annotations.str().size() > 0) {
-                al.AddTag("YB", "Z", annotations.str().substr(0, annotations.str().size() - 1)); // get rid of the last ";"
+                al.AddTag(_tag, "Z", annotations.str().substr(0, annotations.str().size() - 1)); // get rid of the last ";"
             }
             writer.SaveAlignment(al);
         }

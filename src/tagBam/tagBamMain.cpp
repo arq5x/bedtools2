@@ -31,9 +31,11 @@ int main(int argc, char* argv[]) {
     // input file
     string bamFile;
     float overlapFraction = 1E-9;
+    string tag = "YB";
 
     // parm flags
-    bool haveFraction       = false;
+    bool haveTag        = false;
+    bool haveFraction   = false;
     bool forceStrand    = false;
     bool haveBam        = false;
     bool haveFiles      = false;
@@ -83,7 +85,7 @@ int main(int argc, char* argv[]) {
                 i--;
             }
         }
-        else if(PARAMETER_CHECK("-tags", 5, parameterLength)) {
+        else if(PARAMETER_CHECK("-labels", 7, parameterLength)) {
             if ((i+1) < argc) {
                 haveLabels = true;
                 i = i+1;
@@ -107,6 +109,13 @@ int main(int argc, char* argv[]) {
                 i++;
             }
         }
+        else if(PARAMETER_CHECK("-tag", 4, parameterLength)) {
+            if ((i+1) < argc) {
+                haveTag = true;
+                tag = argv[i + 1];
+                i++;
+            }
+        }
         else {
             cerr << endl << "*****ERROR: Unrecognized parameter: " << argv[i] << " *****" << endl << endl;
             showHelp = true;
@@ -118,9 +127,13 @@ int main(int argc, char* argv[]) {
         cerr << endl << "*****" << endl << "*****ERROR: Need -i, -files, and -labels. " << endl << "*****" << endl;
         showHelp = true;
     }
+    if (haveTag && tag.size() > 2) {
+        cerr << endl << "*****" << endl << "*****ERROR: Custom tags should be at most two characters per the SAM specification. " << endl << "*****" << endl;
+        showHelp = true;
+    }
 
     if (!showHelp) {
-        TagBam *ba = new TagBam(bamFile, inputFiles, inputLabels, forceStrand, overlapFraction);
+        TagBam *ba = new TagBam(bamFile, inputFiles, inputLabels, tag, forceStrand, overlapFraction);
         ba->Tag();
         delete ba;
         return 0;
@@ -139,7 +152,7 @@ void ShowHelp(void) {
     cerr << "Summary: Annotates a BAM file based on overlaps with multiple BED/GFF/VCF files" << endl;
     cerr << "\t on the intervals in -i." << endl << endl;
 
-    cerr << "Usage:   " << PROGRAM_NAME << " [OPTIONS] -i <BAM> -files FILE1 FILE2 .. FILEn -tags LAB1 LAB2 ,,, LABn" << endl << endl;
+    cerr << "Usage:   " << PROGRAM_NAME << " [OPTIONS] -i <BAM> -files FILE1 FILE2 .. FILEn -labels LAB1 LAB2 ,,, LABn" << endl << endl;
 
     cerr << "Options: " << endl;
 
@@ -149,6 +162,9 @@ void ShowHelp(void) {
     cerr << "\t-f\t"            << "Minimum overlap required as a fraction of the alignment." << endl;
     cerr                        << "\t\t- Default is 1E-9 (i.e., 1bp)." << endl;
     cerr                        << "\t\t- FLOAT (e.g. 0.50)" << endl << endl;
+
+    cerr << "\t-tag\t"          << "Dictate what the tag should be. Default is YB." << endl;
+    cerr                        << "\t\t- STRING (two characters, e.g., YK)" << endl << endl;
     
     exit(1);
 }

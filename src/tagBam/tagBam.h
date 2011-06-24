@@ -40,7 +40,8 @@ public:
 
     // constructor
     TagBam(const string &bamFile, const vector<string> &annoFileNames,
-                const vector<string> &annoLabels, bool forceStrand, float overlapFraction);
+                const vector<string> &annoLabels, const string &tag,
+                bool forceStrand, float overlapFraction);
 
     // destructor
     ~TagBam(void);
@@ -54,6 +55,7 @@ private:
     string _bamFile;
     vector<string> _annoFileNames;
     vector<string> _annoLabels;
+    string _tag;
 
     // instance of a bed file class.
     BedFile *_bed;
