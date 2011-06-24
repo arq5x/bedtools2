@@ -149,5 +149,6 @@ void ShowHelp(void) {
     cerr << "\t-f\t"            << "Minimum overlap required as a fraction of the alignment." << endl;
     cerr                        << "\t\t- Default is 1E-9 (i.e., 1bp)." << endl;
     cerr                        << "\t\t- FLOAT (e.g. 0.50)" << endl << endl;
+    
     exit(1);
 }

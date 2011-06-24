@@ -74,11 +74,14 @@ void MultiCovBam::CollectCoverage()
                     BamAlignment al;
                     while ( reader.GetNextAlignment(al) )
                     {
+                        // map qual must exceed minimum
                         if (al.MapQuality >= _minQual) {
+                            // ignore if not properly paired and we actually care.
                             if (_properOnly && !al.IsProperPair())
                                 continue;
-                            // lookup the offset of the file name and tabulate coverage
-                            // for the appropriate file
+
+                            // lookup the offset of the file name and tabulate 
+                            //coverage for the appropriate file
                             counts[bamFileMap[al.Filename]]++;
                         }
                     }
