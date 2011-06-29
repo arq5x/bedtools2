@@ -8,7 +8,7 @@ export OBJ_DIR	= obj
 export BIN_DIR	= bin
 export SRC_DIR	= src
 export CXX		= g++
-export CXXFLAGS = -Wall -O2
+export CXXFLAGS = -Wall -O2 -D_FILE_OFFSET_BITS=64 -fPIC
 export LIBS		= -lz
 export BT_ROOT  = src/utils/BamTools/
 
@@ -80,7 +80,7 @@ clean:
 	@echo "Cleaning up."
 	@rm -f $(OBJ_DIR)/* $(BIN_DIR)/*
 	@rm -Rf $(BT_ROOT)/lib
-	@rm -f $(BT_ROOT)/src/*.o
+	@rm -f $(BT_ROOT)/src/api/*.o
 	@rm -f $(BT_ROOT)/src/internal/*.o
 	@rm -Rf $(BT_ROOT)/include
 
