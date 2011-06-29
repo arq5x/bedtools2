@@ -29,7 +29,7 @@ void FastaIndexEntry::clear(void)
     offset = -1;  // no real offset will ever be below 0, so this allows us to
                   // check if we have already recorded a real offset
     line_blen = NULL;
-    line_len = NULL;
+    line_len  = NULL;
 }
 
 ostream& operator<<(ostream& output, const FastaIndexEntry& e) {
