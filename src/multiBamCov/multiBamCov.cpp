@@ -64,25 +64,28 @@ void MultiCovBam::CollectCoverage()
             {
                 if (bedStatus == BED_VALID)
                 {
-                    reader.SetRegion(reader.GetReferenceID(bed.chrom),
-                                           (int) bed.start,
-                                           reader.GetReferenceID(bed.chrom),
-                                           (int) bed.end);
-                                           
+                    // initialize counts for each file to 0
+                    vector<int> counts(_bam_files.size(), 0);
+                    // get the BAM refId for this chrom.
+                    int refId = reader.GetReferenceID(bed.chrom);
+                    // set up a BamRegion to which to attempt to jump
+                    BamRegion region(refId, (int)bed.start, refId, (int)bed.end);
+                    
                     // everything checks out, just iterate through specified region, counting alignments
-                    vector<int> counts(_bam_files.size());
-                    BamAlignment al;
-                    while ( reader.GetNextAlignment(al) )
-                    {
-                        // map qual must exceed minimum
-                        if (al.MapQuality >= _minQual) {
-                            // ignore if not properly paired and we actually care.
-                            if (_properOnly && !al.IsProperPair())
-                                continue;
+                    if ( (refId != -1) && (reader.SetRegion(region)) ) {
+                        BamAlignment al;
+                        while ( reader.GetNextAlignment(al) )
+                        {
+                            // map qual must exceed minimum
+                            if (al.MapQuality >= _minQual) {
+                                // ignore if not properly paired and we actually care.
+                                if (_properOnly && !al.IsProperPair())
+                                    continue;
 
-                            // lookup the offset of the file name and tabulate 
-                            //coverage for the appropriate file
-                            counts[bamFileMap[al.Filename]]++;
+                                // lookup the offset of the file name and tabulate 
+                                //coverage for the appropriate file
+                                counts[bamFileMap[al.Filename]]++;
+                            }
                         }
                     }
                     // report the cov at this interval for each file and reset
