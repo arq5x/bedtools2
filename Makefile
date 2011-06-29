@@ -82,6 +82,6 @@ clean:
 	@rm -Rf $(BT_ROOT)/lib
 	@rm -f $(BT_ROOT)/src/*.o
 	@rm -f $(BT_ROOT)/src/internal/*.o
-	
+	@rm -Rf $(BT_ROOT)/include
 
 .PHONY: clean

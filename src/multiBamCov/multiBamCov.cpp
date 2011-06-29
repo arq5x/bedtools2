@@ -40,11 +40,11 @@ MultiCovBam::~MultiCovBam(void)
 void MultiCovBam::CollectCoverage()
 {
     BamMultiReader reader;
-    reader.SetIndexCacheMode(BamIndex::NoIndexCaching);
     
     if ( !reader.Open(_bam_files) )
     {
-        cerr << "Could not open input BAM files." << endl; return;
+        cerr << "Could not open input BAM files." << endl;
+        exit(1);
     }
     else
     {

@@ -44,6 +44,14 @@ all: $(LIBRARY)
 
 $(LIBRARY): $(OBJECTS)
 	[ -d lib ] || mkdir -p lib
+	[ -d include ] || mkdir -p include
+	[ -d include/api ] || mkdir -p include/api
+	[ -d include/shared ] || mkdir -p include/shared
+	
+	@cp src/api/*.h include/api
+	@cp src/shared/*.h include/shared
+	
+		
 	@echo "  * linking $(LIBRARY)"
 	ar cr lib/$@  $^
 		
@@ -51,10 +59,3 @@ $(OBJECTS): $(SOURCES)
 	@echo "  * compiling" $(*F).cpp
 	@$(CXX) -c $(*D)/$(*F).cpp $(LDFLAGS) $(CXXFLAGS) $(INCLUDES) -o $(*D)/$(*F).o
 	
-clean:
-	@echo "Cleaning up."
-	@rm -f lib/*
-	@rm -f src/api/*.o
-	@rm -f src/api/internal/*.o
-
-.PHONY: clean
