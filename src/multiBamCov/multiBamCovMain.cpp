@@ -117,9 +117,10 @@ void ShowHelp(void) {
 
     cerr << "\t-bed\t"         << "The bed file." << endl << endl;
 
-    cerr << "\t-q [INT]\t"     << "Minimum mapping quality allowed. Default is 0." << endl << endl;
+    cerr << "\t-q\t"           << "Minimum mapping quality allowed. Default is 0." << endl << endl;
 
-    cerr << "\t-p\t"           << "Omly count proper pairs.  Default is to count all alignments >= -q" << endl << endl;
+    cerr << "\t-p\t"           << "Only count proper pairs.  Default is to count all alignments with MAPQ" << endl;
+    cerr << "\t\t"             << "greater than the -q argument, regardless of the BAM FLAG field." << endl << endl;
 
     // end the program here
     exit(1);
