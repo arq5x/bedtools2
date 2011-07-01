@@ -575,19 +575,8 @@ private:
         // line matches what we expect for this file.
         if (numFields == this->bedType) {
             bed.chrom = lineVector[0];
-            int i;
-            i = atoi(lineVector[1].c_str());
-            if (i<0) {
-                 cerr << "Error: malformed BED entry at line " << lineNum << ". Start Coordinate detected that is < 0. Exiting." << endl;
-                 exit(1);
-            }
-            bed.start = (CHRPOS)i;
-            i = atoi(lineVector[2].c_str());
-            if (i<0) {
-                cerr << "Error: malformed BED entry at line " << lineNum << ". End Coordinate detected that is < 0. Exiting." << endl;
-                exit(1);
-            }
-            bed.end = (CHRPOS)i;
+            bed.start = atoi(lineVector[1].c_str());
+            bed.end = atoi(lineVector[2].c_str());
             
             // handle starts == end (e.g., insertions in reference genome)
             if (bed.start == bed.end) {
@@ -623,11 +612,15 @@ private:
             }
 
             // sanity checks.
-            if (bed.start <= bed.end) {
+            if ((bed.start <= bed.end) && (bed.start >= 0) && (bed.end >= 0)) {
                 return true;
             }
-            else {
+            else if (bed.start > bed.end) {
                 cerr << "Error: malformed BED entry at line " << lineNum << ". Start was greater than end. Exiting." << endl;
+                exit(1);
+            }
+            else if ( (bed.start < 0) || (bed.end < 0) ) {
+                cerr << "Error: malformed BED entry at line " << lineNum << ". Coordinate detected that is < 0. Exiting." << endl;
                 exit(1);
             }
         }

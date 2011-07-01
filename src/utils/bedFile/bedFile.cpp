@@ -126,6 +126,9 @@ BedFile::~BedFile(void) {
 
 
 void BedFile::Open(void) {
+    
+    _bedFields.reserve(12);
+    
     if (bedFile == "stdin") {
         _bedStream = &cin;
     }
@@ -176,20 +179,17 @@ BedLineStatus BedFile::GetNextBed(BED &bed, int &lineNum) {
 
     // make sure there are still lines to process.
     // if so, tokenize, validate and return the BED entry.
+    _bedFields.clear();
     if (_bedStream->good()) {
-        string bedLine;
-        vector<string> bedFields;
-        bedFields.reserve(12);
-
         // parse the bedStream pointer
-        getline(*_bedStream, bedLine);
+        getline(*_bedStream, _bedLine);
         lineNum++;
 
         // split into a string vector.
-        Tokenize(bedLine,bedFields);
+        Tokenize(_bedLine, _bedFields);
 
         // load the BED struct as long as it's a valid BED entry.
-        return parseLine(bed, bedFields, lineNum);
+        return parseLine(bed, _bedFields, lineNum);
     }
 
     // default if file is closed or EOF
