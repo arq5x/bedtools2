@@ -33,6 +33,7 @@ int main(int argc, char* argv[]) {
     string bedFile;
     string genomeFile;
     int max = INT_MAX;
+    float scale = 1.0;
 
     bool haveBed = false;
     bool bamInput = false;
@@ -43,6 +44,7 @@ int main(int argc, char* argv[]) {
     bool eachBase = false;
     bool eachBaseZeroBased = false;
     bool obeySplits = false;
+    bool haveScale = false;
     bool filterByStrand = false;
     bool only_5p_end = false;
     bool only_3p_end = false;
@@ -107,6 +109,13 @@ int main(int argc, char* argv[]) {
         else if(PARAMETER_CHECK("-max", 4, parameterLength)) {
             if ((i+1) < argc) {
                 max = atoi(argv[i + 1]);
+                i++;
+            }
+        }
+        else if(PARAMETER_CHECK("-scale", 6, parameterLength)) {
+            if ((i+1) < argc) {
+                haveScale = true;
+                scale = atof(argv[i + 1]);
                 i++;
             }
         }
@@ -182,11 +191,16 @@ int main(int argc, char* argv[]) {
       showHelp = true;
     }
 
+    if (haveScale && !(bedGraph||bedGraphAll||eachBase)) {
+      cerr << endl << "*****" << endl << "*****ERROR: Using -scale requires bedGraph output (use -bg or -bga) or per base depth (-d)." << endl << "*****" << endl;
+      showHelp = true;
+    }
+    
     if (!showHelp) {
 
         BedGenomeCoverage *bc = new BedGenomeCoverage(bedFile, genomeFile, eachBase,
                                                       startSites, bedGraph, bedGraphAll,
-                                                      max, bamInput, obeySplits,
+                                                      max, scale, bamInput, obeySplits,
                                                       filterByStrand, requestedStrand,
                                                       only_5p_end, only_3p_end,
                                                       eachBaseZeroBased,
@@ -251,6 +265,12 @@ void ShowHelp(void) {
     cerr << "\t\t\ta single bin in the histogram. Irrelevant" << endl;
     cerr << "\t\t\tfor -d and -bedGraph" << endl;
     cerr << "\t\t\t- (INTEGER)" << endl << endl;
+
+    cerr << "\t-scale\t\t" << "Scale the coverage by a constant factor." << endl;
+    cerr << "\t\t\tEach coverage value is multiplied by this factor before being reported." << endl;
+    cerr << "\t\t\tUseful for normalizing coverage by, e.g., reads per million (RPM)." << endl;
+    cerr << "\t\t\t- Default is 1.0; i.e., unscaled." << endl;
+    cerr << "\t\t\t- (FLOAT)" << endl << endl;
 
     cerr << "\t-trackline\t" << "Adds a UCSC/Genome-Browser track line definition in the first line of the output." << endl;
     cerr <<"\t\t\t- See here for more details about track line definition:" << endl;

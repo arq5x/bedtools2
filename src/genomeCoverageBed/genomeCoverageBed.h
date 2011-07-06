@@ -41,8 +41,11 @@ class BedGenomeCoverage {
 public:
 
     // constructor
-    BedGenomeCoverage(string bedFile, string genomeFile, bool eachBase, bool startSites,
-                      bool bedGraph, bool bedGraphAll, int max, bool bamInput, bool obeySplits,
+    BedGenomeCoverage(string bedFile, string genomeFile, 
+                      bool eachBase, bool startSites,
+                      bool bedGraph, bool bedGraphAll, 
+                      int max, float scale, 
+                      bool bamInput, bool obeySplits,
                       bool filterByStrand, string requestedStrand,
                       bool only_5p_end, bool only_3p_end,
                       bool eachBaseZeroBased,
@@ -63,6 +66,7 @@ private:
     bool _bedGraph;
     bool _bedGraphAll;
     int _max;
+    float _scale;
     bool _obeySplits;
     bool _filterByStrand;
     bool _only_5p_end;
