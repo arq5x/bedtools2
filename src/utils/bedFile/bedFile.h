@@ -669,7 +669,7 @@ private:
                     bed.otherFields.push_back(lineVector[i]);
             }
 
-            if ((bed.start <= bed.end) && (bed.start > 0) && (bed.end > 0)) {
+            if ((bed.start <= bed.end) && (bed.start >= 0) && (bed.end >= 0)) {
                 return true;
             }
             else if (bed.start > bed.end) {
