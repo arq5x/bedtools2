@@ -39,8 +39,8 @@ int main(int argc, char* argv[]) {
     // checks for existence of parameters
     bool haveFastaDb = false;
     bool haveBed = false;
-    bool haveFastaOut = false;
     bool useNameOnly = false;
+    bool useFullBedEntry = false;
     bool useFasta = true;
     bool useStrand = false;
 
@@ -70,13 +70,6 @@ int main(int argc, char* argv[]) {
                 i++;
             }
         }
-        else if(PARAMETER_CHECK("-fo", 3, parameterLength)) {
-            if ((i+1) < argc) {
-                haveFastaOut = true;
-                fastaOutFile = argv[i + 1];
-                i++;
-            }
-        }
         else if(PARAMETER_CHECK("-bed", 4, parameterLength)) {
             if ((i+1) < argc) {
                 haveBed = true;
@@ -86,6 +79,10 @@ int main(int argc, char* argv[]) {
         }
         else if(PARAMETER_CHECK("-name", 5, parameterLength)) {
             useNameOnly = true;
+        }
+        else if(PARAMETER_CHECK("-full", 5, parameterLength)) {
+            useFullBedEntry = true;
+            useFasta = false;
         }
         else if(PARAMETER_CHECK("-tab", 4, parameterLength)) {
             useFasta = false;
@@ -99,13 +96,17 @@ int main(int argc, char* argv[]) {
         }
     }
 
-    if (!haveFastaDb || !haveFastaOut || !haveBed) {
+    if (!haveFastaDb || !haveBed) {
+        showHelp = true;
+    }
+    if (useFullBedEntry && useNameOnly) {
+        cerr << "*****ERROR: Cannot use both -name and -full. Choose one or the other.*****" << endl << endl;
         showHelp = true;
     }
 
     if (!showHelp) {
 
-        Bed2Fa *b2f = new Bed2Fa(useNameOnly, fastaDbFile, bedFile, fastaOutFile, useFasta, useStrand);
+        Bed2Fa *b2f = new Bed2Fa(fastaDbFile, bedFile, useFasta, useStrand, useNameOnly, useFullBedEntry);
         delete b2f;
 
         return 0;
@@ -123,16 +124,16 @@ void ShowHelp(void) {
 
     cerr << "Summary: Extract DNA sequences into a fasta file based on feature coordinates." << endl << endl;
 
-    cerr << "Usage:   " << PROGRAM_NAME << " [OPTIONS] -fi <fasta> -bed <bed/gff/vcf> -fo <fasta> " << endl << endl;
+    cerr << "Usage:   " << PROGRAM_NAME << " [OPTIONS] -fi <fasta> -bed <bed/gff/vcf> " << endl << endl;
 
     cerr << "Options: " << endl;
     cerr << "\t-fi\tInput FASTA file" << endl;
     cerr << "\t-bed\tBED/GFF/VCF file of ranges to extract from -fi" << endl;
-    cerr << "\t-fo\tOutput file (can be FASTA or TAB-delimited)" << endl;
     cerr << "\t-name\tUse the name field for the FASTA header" << endl;
 
     cerr << "\t-tab\tWrite output in TAB delimited format." << endl;
     cerr << "\t\t- Default is FASTA format." << endl << endl;
+    cerr << "\t-full\tUse the full BED entry when using -tab. Default is chr:start-end." << endl;
 
     cerr << "\t-s\tForce strandedness. If the feature occupies the antisense strand," << endl;
     cerr << "\t\tthe sequence will be reverse complemented." << endl;
