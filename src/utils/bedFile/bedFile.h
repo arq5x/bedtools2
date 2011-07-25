@@ -718,10 +718,10 @@ private:
                     bed.otherFields.push_back(lineVector[8]);  // add GFF "group". unused in BED
                     
                 // handle starts == end (e.g., insertions in reference genome)
-                if (bed.start == bed.end) {
-                    bed.end++;
-                    bed.zeroLength = true;
-                }
+                // if (bed.start == bed.end) {
+                //     bed.end++;
+                //     bed.zeroLength = true;
+                // }
                 // GFF uses 1-based starts, covert to zero-based
                 bed.start--;
             }
