@@ -46,7 +46,8 @@ int main(int argc, char* argv[]) {
     bool haveLeft        = false;
     bool haveRight       = false;
     bool strandWindows   = false;
-    bool matchOnStrand   = false;
+    bool matchOnSameStrand   = false;
+    bool matchOnDiffStrand   = false;
     bool inputIsBam      = false;
     bool outputIsBam     = true;
     bool uncompressedBam = false;
@@ -108,7 +109,10 @@ int main(int argc, char* argv[]) {
             strandWindows = true;
         }
         else if (PARAMETER_CHECK("-sm", 3, parameterLength)) {
-            matchOnStrand = true;
+            matchOnSameStrand = true;
+        }
+        else if (PARAMETER_CHECK("-sm", 3, parameterLength)) {
+            matchOnDiffStrand = true;
         }
         else if (PARAMETER_CHECK("-w", 2, parameterLength)) {
             if ((i+1) < argc) {
@@ -177,9 +181,14 @@ int main(int argc, char* argv[]) {
         showHelp = true;
     }
 
+    if (matchOnSameStrand && matchOnDiffStrand) {
+        cerr << endl << "*****" << endl << "*****ERROR: Use either -sm or -Sm, not both." << endl << "*****" << endl;
+        showHelp = true;
+    }
+
     if (!showHelp) {
         BedWindow *bi = new BedWindow(bedAFile, bedBFile, leftSlop, rightSlop, anyHit,
-                                      noHit, writeCount, strandWindows, matchOnStrand,
+                                      noHit, writeCount, strandWindows, matchOnSameStrand, matchOnDiffStrand,
                                       inputIsBam, outputIsBam, uncompressedBam);
         delete bi;
         return 0;
@@ -233,7 +242,10 @@ void ShowHelp(void) {
     cerr                        << "\t\tfor a negative-stranded feature will add 500 bp downstream." << endl;
     cerr                        << "\t\t- Default = disabled." << endl << endl;
 
-    cerr << "\t-sm\t"           << "Only report hits in B that overlap A on the same strand." << endl;
+    cerr << "\t-sm\t"           << "Only report hits in B that overlap A on the _same_ strand." << endl;
+    cerr                        << "\t\t- By default, overlaps are reported without respect to strand." << endl << endl;
+
+    cerr << "\t-Sm\t"           << "Only report hits in B that overlap A on the _opposite_ strand." << endl;
     cerr                        << "\t\t- By default, overlaps are reported without respect to strand." << endl << endl;
 
     cerr << "\t-u\t"            << "Write the original A entry _once_ if _any_ overlaps found in B." << endl;

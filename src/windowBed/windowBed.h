@@ -34,7 +34,7 @@ public:
     // constructor
     BedWindow(string bedAFile, string bedBFile, int leftSlop, int rightSlop,
               bool anyHit, bool noHit, bool writeCount, bool strandWindows,
-              bool matchOnStrand, bool bamInput, bool bamOutput, bool isUncompressedBam);
+              bool matchOnSameStrand, bool matchOnDiffStrand, bool bamInput, bool bamOutput, bool isUncompressedBam);
 
     // destructor
     ~BedWindow(void);
@@ -49,7 +49,8 @@ private:
     int _rightSlop;
     bool _noHit;
     bool _strandWindows;
-    bool _matchOnStrand;
+    bool _matchOnSameStrand;
+    bool _matchOnDiffStrand;
     bool _bamInput;
     bool _bamOutput;
     bool  _isUncompressedBam;
