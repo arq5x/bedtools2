@@ -39,7 +39,8 @@ int main(int argc, char* argv[]) {
     bool haveBedA = false;
     bool haveBedB = false;
     bool haveFraction = false;
-    bool forceStrand = false;
+    bool sameStrand = false;
+    bool diffStrand = false;
 
     // check to see if we should print out some help
     if(argc <= 1) showHelp = true;
@@ -82,7 +83,10 @@ int main(int argc, char* argv[]) {
             }
         }
         else if (PARAMETER_CHECK("-s", 2, parameterLength)) {
-            forceStrand = true;
+            sameStrand = true;
+        }
+        else if (PARAMETER_CHECK("-S", 2, parameterLength)) {
+            diffStrand = true;
         }
         else {
             cerr << endl << "*****ERROR: Unrecognized parameter: " << argv[i] << " *****" << endl << endl;
@@ -95,10 +99,15 @@ int main(int argc, char* argv[]) {
         cerr << endl << "*****" << endl << "*****ERROR: Need -a and -b files. " << endl << "*****" << endl;
         showHelp = true;
     }
+    
+    if (sameStrand && diffStrand) {
+        cerr << endl << "*****" << endl << "*****ERROR: Request either -s OR -S, not both." << endl << "*****" << endl;
+        showHelp = true;
+    }
 
     if (!showHelp) {
 
-        BedSubtract *bs = new BedSubtract(bedAFile, bedBFile, overlapFraction, forceStrand);
+        BedSubtract *bs = new BedSubtract(bedAFile, bedBFile, overlapFraction, sameStrand, diffStrand);
         delete bs;
         return 0;
     }
@@ -123,10 +132,13 @@ void ShowHelp(void) {
     cerr                        << "\t\t- Default is 1E-9 (i.e., 1bp)." << endl;
     cerr                        << "\t\t- (FLOAT) (e.g. 0.50)" << endl << endl;
 
-    cerr << "\t-s\t"            << "Force strandedness.  That is, only report hits in B that" << endl;
-    cerr                        << "\t\toverlap A on the same strand." << endl;
-    cerr                        << "\t\t- By default, overlaps are reported without respect to strand." << endl << endl;
+    cerr << "\t-s\t"            << "Require same strandedness.  That is, only subtract hits in B that" << endl;
+    cerr                        << "\t\toverlap A on the _same_ strand." << endl;
+    cerr                        << "\t\t- By default, overlaps are subtracted without respect to strand." << endl << endl;
 
+    cerr << "\t-S\t"            << "Force strandedness.  That is, only subtract hits in B that" << endl;
+    cerr                        << "\t\toverlap A on the _opposite_ strand." << endl;
+    cerr                        << "\t\t- By default, overlaps are subtracted without respect to strand." << endl << endl;
 
     // end the program here
     exit(1);

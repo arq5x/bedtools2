@@ -16,12 +16,13 @@
 /*
     Constructor
 */
-BedSubtract::BedSubtract(string &bedAFile, string &bedBFile, float &overlapFraction, bool &forceStrand) {
+BedSubtract::BedSubtract(string &bedAFile, string &bedBFile, float overlapFraction, bool sameStrand, bool diffStrand) {
 
     _bedAFile = bedAFile;
     _bedBFile = bedBFile;
     _overlapFraction = overlapFraction;
-    _forceStrand = forceStrand;
+    _sameStrand = sameStrand;
+    _diffStrand = diffStrand;
 
     _bedA = new BedFile(bedAFile);
     _bedB = new BedFile(bedBFile);
@@ -40,7 +41,7 @@ BedSubtract::~BedSubtract(void) {
 void BedSubtract::FindAndSubtractOverlaps(BED &a, vector<BED> &hits) {
 
     // find all of the overlaps between a and B.
-    _bedB->FindOverlapsPerBin(a.chrom, a.start, a.end, a.strand, hits, _forceStrand);
+    _bedB->FindOverlapsPerBin(a.chrom, a.start, a.end, a.strand, hits, _sameStrand, _diffStrand);
 
     //  is A completely spanned by an entry in B?
     //  if so, A should not be reported.
