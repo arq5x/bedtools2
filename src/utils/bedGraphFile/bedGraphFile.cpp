@@ -27,7 +27,7 @@ BedGraphFile::~BedGraphFile() {
 
 // Open the BEDGRAPH file
 void BedGraphFile::Open() {
-    if (bedGraphFile == "stdin") {
+    if (bedGraphFile == "stdin" || bedGraphFile == "-") {
         _bedGraphStream = &cin;
         return;
     }

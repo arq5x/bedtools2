@@ -253,15 +253,15 @@ bool BgzfStream::Open(const string& filename, const char* mode) {
     }
 
     // open BGZF stream on a file
-    if ( (filename != "stdin") && (filename != "stdout") )
+    if ( (filename != "stdin") && (filename != "stdout") && (filename != "-") )
         Stream = fopen(filename.c_str(), mode);
 
     // open BGZF stream on stdin
-    else if ( (filename == "stdin") && (strcmp(mode, "rb") == 0 ) )
+    else if ( (filename == "stdin" || filename == "-") && (strcmp(mode, "rb") == 0 ) )
         Stream = freopen(NULL, mode, stdin);
 
     // open BGZF stream on stdout
-    else if ( (filename == "stdout") && (strcmp(mode, "wb") == 0) )
+    else if ( (filename == "stdout" || filename == "-") && (strcmp(mode, "wb") == 0) )
         Stream = freopen(NULL, mode, stdout);
 
     if ( !Stream ) {

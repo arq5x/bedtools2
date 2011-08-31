@@ -129,7 +129,7 @@ void BedFile::Open(void) {
     
     _bedFields.reserve(12);
     
-    if (bedFile == "stdin") {
+    if (bedFile == "stdin" || bedFile == "-") {
         _bedStream = &cin;
     }
     // New method thanks to Assaf Gordon

@@ -25,7 +25,7 @@ BedFilePE::~BedFilePE(void) {
 }
 
 void BedFilePE::Open(void) {
-    if (bedFile == "stdin") {
+    if (bedFile == "stdin" || bedFile == "-") {
         _bedStream = &cin;
     }
     else {
