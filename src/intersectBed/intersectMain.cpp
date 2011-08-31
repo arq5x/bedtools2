@@ -47,7 +47,8 @@ int main(int argc, char* argv[]) {
     bool writeAllOverlap    = false;
     bool haveFraction       = false;
     bool reciprocalFraction = false;
-    bool forceStrand        = false;
+    bool sameStrand         = false;
+    bool diffStrand         = false;
     bool obeySplits         = false;
     bool inputIsBam         = false;
     bool outputIsBam        = true;
@@ -130,7 +131,10 @@ int main(int argc, char* argv[]) {
             noHit = true;
         }
         else if (PARAMETER_CHECK("-s", 2, parameterLength)) {
-            forceStrand = true;
+            sameStrand = true;
+        }
+        else if (PARAMETER_CHECK("-S", 2, parameterLength)) {
+            diffStrand = true;
         }
         else if (PARAMETER_CHECK("-split", 6, parameterLength)) {
             obeySplits = true;
@@ -195,11 +199,15 @@ int main(int argc, char* argv[]) {
         showHelp = true;
     }
 
+    if (sameStrand && diffStrand) {
+        cerr << endl << "*****" << endl << "*****ERROR: Request either -s OR -S, not both." << endl << "*****" << endl;
+        showHelp = true;
+    }
 
     if (!showHelp) {
 
         BedIntersect *bi = new BedIntersect(bedAFile, bedBFile, anyHit, writeA, writeB, writeOverlap,
-                                            writeAllOverlap, overlapFraction, noHit, writeCount, forceStrand,
+                                            writeAllOverlap, overlapFraction, noHit, writeCount, sameStrand, diffStrand,
                                             reciprocalFraction, obeySplits, inputIsBam, outputIsBam, uncompressedBam);
         delete bi;
         return 0;
@@ -263,8 +271,12 @@ void ShowHelp(void) {
     cerr                        << "\t\t- In other words, if -f is 0.90 and -r is used, this requires" << endl;
     cerr                        << "\t\t  that B overlap 90% of A and A _also_ overlaps 90% of B." << endl << endl;
 
-    cerr << "\t-s\t"            << "Force strandedness.  That is, only report hits in B that" << endl;
-    cerr                        << "\t\toverlap A on the same strand." << endl;
+    cerr << "\t-s\t"            << "Require same strandedness.  That is, only report hits in B that" << endl;
+    cerr                        << "\t\toverlap A on the _same_ strand." << endl;
+    cerr                        << "\t\t- By default, overlaps are reported without respect to strand." << endl << endl;
+
+    cerr << "\t-S\t"            << "Require different strandedness.  That is, only report hits in B that" << endl;
+    cerr                        << "\t\toverlap A on the _opposite_ strand." << endl;
     cerr                        << "\t\t- By default, overlaps are reported without respect to strand." << endl << endl;
 
     cerr << "\t-split\t"        << "Treat \"split\" BAM or BED12 entries as distinct BED intervals." << endl << endl;

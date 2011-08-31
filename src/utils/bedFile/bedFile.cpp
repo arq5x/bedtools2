@@ -198,7 +198,7 @@ BedLineStatus BedFile::GetNextBed(BED &bed, int &lineNum) {
 
 
 void BedFile::FindOverlapsPerBin(string chrom, CHRPOS start, CHRPOS end,
-                                 string strand, vector<BED> &hits, bool forceStrand) {
+                                 string strand, vector<BED> &hits, bool sameStrand, bool diffStrand) {
 
     BIN startBin, endBin;
     startBin = (start >> _binFirstShift);
@@ -220,10 +220,18 @@ void BedFile::FindOverlapsPerBin(string chrom, CHRPOS start, CHRPOS end,
             for (; bedItr != bedEnd; ++bedItr) {
                 // do we have sufficient overlap?
                 if (overlaps(bedItr->start, bedItr->end, start, end) > 0) {
-                    // skip the hit if not on the same strand (and we care)
-                    if (forceStrand == false) hits.push_back(*bedItr);
-                    else if ( (forceStrand == true) && (strand == bedItr->strand)) {
-                         hits.push_back(*bedItr);
+                    
+                    bool strands_are_same = (strand == bedItr->strand);
+                    
+                    // test for necessary strandedness
+                    if ( (sameStrand == false && diffStrand == false)
+                         ||
+                         (sameStrand == true && strands_are_same == true)
+                         ||
+                         (diffStrand == true && strands_are_same == false)
+                       )
+                    {
+                        hits.push_back(*bedItr);
                     }
                 }
             }
@@ -235,7 +243,7 @@ void BedFile::FindOverlapsPerBin(string chrom, CHRPOS start, CHRPOS end,
 
 
 bool BedFile::FindOneOrMoreOverlapsPerBin(string chrom, CHRPOS start, CHRPOS end, string strand,
-    bool forceStrand, float overlapFraction) {
+                                          bool sameStrand, bool diffStrand, float overlapFraction) {
 
     BIN startBin, endBin;
     startBin = (start   >> _binFirstShift);
@@ -264,9 +272,17 @@ bool BedFile::FindOneOrMoreOverlapsPerBin(string chrom, CHRPOS start, CHRPOS end
 
                 // do we have sufficient overlap?
                 if ( (float) overlapBases / (float) aLength  >= overlapFraction) {
-                    // skip the hit if not on the same strand (and we care)
-                    if (forceStrand == false) return true;
-                    else if ( (forceStrand == true) && (strand == bedItr->strand)) {
+                    
+                    bool strands_are_same = (strand == bedItr->strand);
+                    
+                    // test for necessary strandedness
+                    if ( (sameStrand == false && diffStrand == false)
+                         ||
+                         (sameStrand == true && strands_are_same == true)
+                         ||
+                         (diffStrand == true && strands_are_same == false)
+                       )
+                    {
                         return true;
                     }
                 }
@@ -280,7 +296,7 @@ bool BedFile::FindOneOrMoreOverlapsPerBin(string chrom, CHRPOS start, CHRPOS end
 
 
 bool BedFile::FindOneOrMoreReciprocalOverlapsPerBin(string chrom, CHRPOS start, CHRPOS end, string strand,
-    bool forceStrand, float overlapFraction) {
+                                                    bool sameStrand, bool diffStrand, float overlapFraction) {
 
     BIN startBin, endBin;
     startBin = (start >> _binFirstShift);
@@ -311,10 +327,17 @@ bool BedFile::FindOneOrMoreReciprocalOverlapsPerBin(string chrom, CHRPOS start, 
                 if ( (float) overlapBases / (float) aLength  >= overlapFraction) {
                     CHRPOS bLength = (bedItr->end - bedItr->start);
                     float bOverlap = ( (float) overlapBases / (float) bLength );
-                    if ((forceStrand == false) && (bOverlap >= overlapFraction)) {
-                        return true;
-                    }
-                    else if ( (forceStrand == true) && (strand == bedItr->strand) && (bOverlap >= overlapFraction)) {
+                    bool strands_are_same = (strand == bedItr->strand);
+                    
+                    // test for sufficient reciprocal overlap and strandedness
+                    if ( (bOverlap >= overlapFraction) && 
+                         ((sameStrand == false && diffStrand == false)
+                             ||
+                         (sameStrand == true && strands_are_same == true)
+                             ||
+                         (diffStrand == true && strands_are_same == false))
+                    )
+                    {
                         return true;
                     }
                 }
@@ -327,7 +350,7 @@ bool BedFile::FindOneOrMoreReciprocalOverlapsPerBin(string chrom, CHRPOS start, 
 }
 
 
-void BedFile::countHits(const BED &a, bool forceStrand, bool countsOnly) {
+void BedFile::countHits(const BED &a, bool sameStrand, bool diffStrand, bool countsOnly) {
 
     BIN startBin, endBin;
     startBin = (a.start >> _binFirstShift);
@@ -346,9 +369,13 @@ void BedFile::countHits(const BED &a, bool forceStrand, bool countsOnly) {
             vector<BEDCOV>::iterator bedItr = bedCovMap[a.chrom][j].begin();
             vector<BEDCOV>::iterator bedEnd = bedCovMap[a.chrom][j].end();
             for (; bedItr != bedEnd; ++bedItr) {
-
+                
+                bool strands_are_same = (a.strand == bedItr->strand);
                 // skip the hit if not on the same strand (and we care)
-                if (forceStrand && (a.strand != bedItr->strand)) {
+                if ((sameStrand == true && strands_are_same == false) ||
+                    (diffStrand == true && strands_are_same == true)
+                   ) 
+                {
                     continue;
                 }
                 else if (overlaps(bedItr->start, bedItr->end, a.start, a.end) > 0) {
@@ -378,7 +405,7 @@ void BedFile::countHits(const BED &a, bool forceStrand, bool countsOnly) {
 }
 
 
-void BedFile::countSplitHits(const vector<BED> &bedBlocks, bool forceStrand, bool countsOnly) {
+void BedFile::countSplitHits(const vector<BED> &bedBlocks, bool sameStrand, bool diffStrand, bool countsOnly) {
 
     // set to track the distinct B features that had coverage.
     // we'll update the counts of coverage for these features by one
@@ -407,8 +434,12 @@ void BedFile::countSplitHits(const vector<BED> &bedBlocks, bool forceStrand, boo
                 vector<BEDCOV>::iterator bedEnd = bedCovMap[blockItr->chrom][j].end();
                 for (; bedItr != bedEnd; ++bedItr) {
 
+                    bool strands_are_same = (blockItr->strand == bedItr->strand);
                     // skip the hit if not on the same strand (and we care)
-                    if (forceStrand && (blockItr->strand != bedItr->strand)) {
+                    if ((sameStrand == true && strands_are_same == false) ||
+                        (diffStrand == true && strands_are_same == true)
+                       ) 
+                    {
                         continue;
                     }
                     else if (overlaps(bedItr->start, bedItr->end, blockItr->start, blockItr->end) > 0) {
@@ -446,7 +477,7 @@ void BedFile::countSplitHits(const vector<BED> &bedBlocks, bool forceStrand, boo
 }
 
 
-void BedFile::countListHits(const BED &a, int index, bool forceStrand) {
+void BedFile::countListHits(const BED &a, int index, bool sameStrand, bool diffStrand) {
 
     BIN startBin, endBin;
     startBin = (a.start >> _binFirstShift);
@@ -466,7 +497,12 @@ void BedFile::countListHits(const BED &a, int index, bool forceStrand) {
             vector<BEDCOVLIST>::iterator bedEnd = bedCovListMap[a.chrom][j].end();
             for (; bedItr != bedEnd; ++bedItr) {
 
-                if (forceStrand && (a.strand != bedItr->strand)) {
+                bool strands_are_same = (a.strand == bedItr->strand);
+                // skip the hit if not on the same strand (and we care)
+                if ((sameStrand == true && strands_are_same == false) ||
+                    (diffStrand == true && strands_are_same == true)
+                   ) 
+                {
                     continue;
                 }
                 else if (overlaps(bedItr->start, bedItr->end, a.start, a.end) > 0) {

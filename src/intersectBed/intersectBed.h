@@ -36,7 +36,7 @@ public:
     // constructor
     BedIntersect(string bedAFile, string bedBFile, bool anyHit,
                                bool writeA, bool writeB, bool writeOverlap, bool writeAllOverlap,
-                               float overlapFraction, bool noHit, bool writeCount, bool forceStrand,
+                               float overlapFraction, bool noHit, bool writeCount, bool sameStrand, bool diffStrand,
                                bool reciprocal, bool obeySplits, bool bamInput, bool bamOutput, bool isUncompressedBam);
 
     // destructor
@@ -55,7 +55,8 @@ private:
     bool  _writeOverlap;
     bool  _writeAllOverlap;
 
-    bool  _forceStrand;
+    bool  _sameStrand;
+    bool  _diffStrand;
     bool  _reciprocal;
     float _overlapFraction;
 

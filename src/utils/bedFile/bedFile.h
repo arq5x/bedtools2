@@ -424,32 +424,32 @@ public:
     // search for all overlapping features in another BED file.
     // Searches through each relevant genome bin on the same chromosome
     // as the single feature. Note: Adapted from kent source "binKeeperFind"
-    void FindOverlapsPerBin(string chrom, CHRPOS start, CHRPOS end, string strand, vector<BED> &hits, bool forceStrand);
+    void FindOverlapsPerBin(string chrom, CHRPOS start, CHRPOS end, string strand, vector<BED> &hits, bool sameStrand, bool diffStrand);
 
     // return true if at least one overlap was found.  otherwise, return false.
     bool FindOneOrMoreOverlapsPerBin(string chrom, CHRPOS start, CHRPOS end, string strand,
-                                        bool forceStrand, float overlapFraction = 0.0);
+                                        bool sameStrand, bool diffStrand, float overlapFraction = 0.0);
 
     // return true if at least one __reciprocal__ overlap was found.  otherwise, return false.
     bool FindOneOrMoreReciprocalOverlapsPerBin(string chrom, CHRPOS start, CHRPOS end, string strand,
-                                                    bool forceStrand, float overlapFraction = 0.0);
+                                                    bool sameStrand, bool diffStrand, float overlapFraction = 0.0);
 
     // Given a chrom, start, end and strand for a single feature,
     // increment a the number of hits for each feature in B file
     // that the feature overlaps
-    void countHits(const BED &a, bool forceStrand = false, bool countsOnly = false);
+    void countHits(const BED &a, bool sameStrand = false, bool diffStrand = false, bool countsOnly = false);
 
     // same as above, but has special logic that processes a set of
     // BED "blocks" from a single entry so as to avoid over-counting
     // each "block" of a single BAM/BED12 as distinct coverage.  That is,
     // if one read has four block, we only want to count the coverage as
     // coming from one read, not four.
-    void countSplitHits(const vector<BED> &bedBlock, bool forceStrand = false, bool countsOnly = false);
+    void countSplitHits(const vector<BED> &bedBlock, bool sameStrand = false, bool diffStrand = false, bool countsOnly = false);
 
     // Given a chrom, start, end and strand for a single feature,
     // increment a the number of hits for each feature in B file
     // that the feature overlaps
-    void countListHits(const BED &a, int index, bool forceStrand);
+    void countListHits(const BED &a, int index, bool sameStrand, bool diffStrand);
 
     // the bedfile with which this instance is associated
     string bedFile;
