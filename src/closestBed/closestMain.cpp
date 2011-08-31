@@ -36,7 +36,8 @@ int main(int argc, char* argv[]) {
     bool haveBedA       = false;
     bool haveBedB       = false;
     bool haveTieMode    = false;
-    bool forceStrand    = false;
+    bool sameStrand     = false;
+    bool diffStrand     = false;
     bool ignoreOverlaps = false;
     bool reportDistance = false;
 
@@ -75,7 +76,10 @@ int main(int argc, char* argv[]) {
             }
         }
         else if (PARAMETER_CHECK("-s", 2, parameterLength)) {
-            forceStrand = true;
+            sameStrand = true;
+        }
+        else if (PARAMETER_CHECK("-S", 2, parameterLength)) {
+            diffStrand = true;
         }
         else if (PARAMETER_CHECK("-d", 2, parameterLength)) {
             reportDistance = true;
@@ -108,8 +112,13 @@ int main(int argc, char* argv[]) {
         showHelp = true;
     }
 
+    if (sameStrand && diffStrand) {
+        cerr << endl << "*****" << endl << "*****ERROR: Request either -s OR -S, not both." << endl << "*****" << endl;
+        showHelp = true;
+    }
+    
     if (!showHelp) {
-        BedClosest *bc = new BedClosest(bedAFile, bedBFile, forceStrand, tieMode, reportDistance, ignoreOverlaps);
+        BedClosest *bc = new BedClosest(bedAFile, bedBFile, sameStrand, diffStrand, tieMode, reportDistance, ignoreOverlaps);
         delete bc;
         return 0;
     }
@@ -131,8 +140,12 @@ void ShowHelp(void) {
     cerr << "Usage:   " << PROGRAM_NAME << " [OPTIONS] -a <bed/gff/vcf> -b <bed/gff/vcf>" << endl << endl;
 
     cerr << "Options: " << endl;
-    cerr << "\t-s\t"            << "Force strandedness.  That is, find the closest feature in B" << endl;
-    cerr                        << "\t\tthat overlaps A on the same strand." << endl;
+    cerr << "\t-s\t"            << "Require same strandedness.  That is, find the closest feature in B" << endl;
+    cerr                        << "\t\tthat overlaps A on the _same_ strand." << endl;
+    cerr                        << "\t\t- By default, overlaps are reported without respect to strand." << endl << endl;
+
+    cerr << "\t-s\t"            << "Require opposite strandedness.  That is, find the closest feature in B" << endl;
+    cerr                        << "\t\tthat overlaps A on the _opposite_ strand." << endl;
     cerr                        << "\t\t- By default, overlaps are reported without respect to strand." << endl << endl;
 
     cerr << "\t-d\t"            << "In addition to the closest feature in B, " << endl;

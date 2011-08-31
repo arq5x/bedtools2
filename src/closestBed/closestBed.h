@@ -28,7 +28,7 @@ public:
 
     // constructor
     BedClosest(string &bedAFile, string &bedBFile, 
-               bool forceStrand, string &tieMode, 
+               bool sameStrand, bool diffStrand, string &tieMode, 
                bool reportDistance, bool ignoreOverlaps);
 
     // destructor
@@ -43,7 +43,8 @@ private:
     string _bedAFile;
     string _bedBFile;
     string _tieMode;
-    bool   _forceStrand;
+    bool   _sameStrand;
+    bool   _diffStrand;
     bool   _reportDistance;
     bool   _ignoreOverlaps;
 

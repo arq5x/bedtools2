@@ -21,11 +21,13 @@ const int SLOPGROWTH = 2048000;
 /*
     Constructor
 */
-BedClosest::BedClosest(string &bedAFile, string &bedBFile, bool forceStrand, string &tieMode, bool reportDistance, bool ignoreOverlaps) 
+BedClosest::BedClosest(string &bedAFile, string &bedBFile, bool sameStrand, bool diffStrand,
+                       string &tieMode, bool reportDistance, bool ignoreOverlaps) 
     : _bedAFile(bedAFile)
     , _bedBFile(bedBFile)
     , _tieMode(tieMode)
-    , _forceStrand(forceStrand)
+    , _sameStrand(sameStrand)
+    , _diffStrand(diffStrand)
     , _reportDistance(reportDistance)
     , _ignoreOverlaps(ignoreOverlaps)
 {
@@ -76,7 +78,7 @@ void BedClosest::FindWindowOverlaps(BED &a, vector<BED> &hits) {
 
             // THE HEAVY LIFTING
             // search for hits with the current slop added
-            _bedB->FindOverlapsPerBin(a.chrom, aFudgeStart, aFudgeEnd, a.strand, hits, _forceStrand);
+            _bedB->FindOverlapsPerBin(a.chrom, aFudgeStart, aFudgeEnd, a.strand, hits, _sameStrand, _diffStrand);
 
             vector<BED>::const_iterator h = hits.begin();
             vector<BED>::const_iterator hitsEnd = hits.end();
