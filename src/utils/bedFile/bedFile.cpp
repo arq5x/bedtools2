@@ -132,39 +132,18 @@ void BedFile::Open(void) {
     if (bedFile == "stdin" || bedFile == "-") {
         _bedStream = &cin;
     }
-    // New method thanks to Assaf Gordon
-    else if ((isGzipFile(bedFile) == false) && (isRegularFile(bedFile) == true)) {
-       // open an ifstream
-        ifstream beds(bedFile.c_str(), ios::in);
-
-        // can we open the file?
-        if ( !beds ) {
-            cerr << "Error: The requested bed file (" << bedFile << ") could not be opened. Exiting!" << endl;
-            exit (1);
-        }
-        else {
-            // if so, close it (this was just a test)
-            beds.close();
-            // now set a pointer to the stream so that we
-            _bedStream = new ifstream(bedFile.c_str(), ios::in);
-        }
-    }
-    else if ((isGzipFile(bedFile) == true) && (isRegularFile(bedFile) == true)) {
-        igzstream beds(bedFile.c_str(), ios::in);
-        if ( !beds ) {
-            cerr << "Error: The requested bed file (" << bedFile << ") could not be opened. Exiting!" << endl;
-            exit (1);
-        }
-        else {
-            // if so, close it (this was just a test)
-            beds.close();
-            // now set a pointer to the stream so that we
+    else {
+        _bedStream = new ifstream(bedFile.c_str(), ios::in);
+        
+        if (isGzipFile(_bedStream) == true) {
+            delete _bedStream;
             _bedStream = new igzstream(bedFile.c_str(), ios::in);
         }
-    }
-    else {
-        cerr << "Error: Unexpected file type (" << bedFile << "). Exiting!" << endl;
-        exit(1);
+        // can we open the file?
+        if ( !(_bedStream->good()) ) {
+            cerr << "Error: The requested bed file (" << bedFile << ") could not be opened. Exiting!" << endl;
+            exit (1);
+        }
     }
 }
 

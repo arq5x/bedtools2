@@ -33,6 +33,6 @@ using namespace std;
 ******************************************************************************/
 string string_error(int errnum);
 bool isRegularFile(const string& filename);
-bool isGzipFile(const string& filename);
+bool isGzipFile(istream *file);
 
 #endif /* FILETYPE_H */
