@@ -43,7 +43,7 @@ public:
 
     // constructor
     BedIntersectPE(string bedAFilePE, string bedBFile, float overlapFraction,
-        string searchType, bool forceStrand, bool bamInput, bool bamOutput, bool uncompressedBam, bool useEditDistance);
+        string searchType, bool sameStrand, bool diffStrand, bool bamInput, bool bamOutput, bool uncompressedBam, bool useEditDistance);
 
     // destructor
     ~BedIntersectPE(void);
@@ -66,7 +66,8 @@ private:
     string _bedBFile;
     float _overlapFraction;
     string _searchType;
-    bool _forceStrand;
+    bool _sameStrand;
+    bool _diffStrand;
     bool _useEditDistance;
     bool _bamInput;
     bool _bamOutput;

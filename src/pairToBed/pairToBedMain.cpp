@@ -41,7 +41,8 @@ int main(int argc, char* argv[]) {
     bool haveBedB           = false;
     bool haveSearchType     = false;
     bool haveFraction       = false;
-    bool forceStrand        = false;
+    bool sameStrand         = false;
+    bool diffStrand         = false;
     bool useEditDistance    = false;
     bool inputIsBam         = false;
     bool outputIsBam        = true;
@@ -110,7 +111,10 @@ int main(int argc, char* argv[]) {
             }
         }
         else if (PARAMETER_CHECK("-s", 2, parameterLength)) {
-            forceStrand = true;
+            sameStrand = true;
+        }
+        else if (PARAMETER_CHECK("-S", 2, parameterLength)) {
+            diffStrand = true;
         }
         else if(PARAMETER_CHECK("-ubam", 5, parameterLength)) {
             uncompressedBam = true;
@@ -136,7 +140,7 @@ int main(int argc, char* argv[]) {
     }
 
     if ( ((searchType == "ispan") || (searchType == "ospan") || (searchType == "notispan") || (searchType == "notospan"))
-         && forceStrand ) {
+         && (sameStrand || diffStrand) ) {
         cerr << endl << "*****" << endl << "*****ERROR: Cannot enforce strandedness with selected searchtype" << endl << "*****" << endl;
         showHelp = true;
     }
@@ -145,11 +149,16 @@ int main(int argc, char* argv[]) {
         cerr << endl << "*****" << endl << "*****ERROR: -ed must be used with -bedpe and -abam." << endl << "*****" << endl;
         showHelp = true;
     }
+    
+    if (sameStrand && diffStrand) {
+        cerr << endl << "*****" << endl << "*****ERROR: Request either -s OR -S, not both." << endl << "*****" << endl;
+        showHelp = true;
+    }
 
     if (!showHelp) {
 
         BedIntersectPE *bi = new BedIntersectPE(bedAFile, bedBFile, overlapFraction,
-                                                searchType, forceStrand, inputIsBam,
+                                                searchType, sameStrand, diffStrand, inputIsBam,
                                                 outputIsBam, uncompressedBam, useEditDistance);
         delete bi;
         return 0;
@@ -190,7 +199,11 @@ void ShowHelp(void) {
     cerr << "\t-f\t"                    << "Minimum overlap required as fraction of A (e.g. 0.05)." << endl;
     cerr                                << "\t\tDefault is 1E-9 (effectively 1bp)." << endl << endl;
 
-    cerr << "\t-s\t"                    << "Enforce strandedness when finding overlaps." << endl;
+    cerr << "\t-s\t"                    << "Require same strandedness when finding overlaps." << endl;
+    cerr                                << "\t\tDefault is to ignore stand." << endl;
+    cerr                                << "\t\tNot applicable with -type inspan or -type outspan." << endl << endl;
+
+    cerr << "\t-S\t"                    << "Require different strandedness when finding overlaps." << endl;
     cerr                                << "\t\tDefault is to ignore stand." << endl;
     cerr                                << "\t\tNot applicable with -type inspan or -type outspan." << endl << endl;
 
