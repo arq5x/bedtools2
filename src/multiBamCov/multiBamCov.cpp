@@ -17,12 +17,16 @@
 /*
     Constructor
 */
-MultiCovBam::MultiCovBam(const vector<string> &bam_files, const string bed_file, int minQual, bool properOnly) 
+MultiCovBam::MultiCovBam(const vector<string> &bam_files, const string bed_file, 
+                         int minQual, bool properOnly,
+                         bool keepDuplicates, bool keepFailedQC)
 :
 _bam_files(bam_files),
 _bed_file(bed_file),
 _minQual(minQual),
-_properOnly(properOnly)
+_properOnly(properOnly),
+_keepDuplicates(keepDuplicates),
+_keepFailedQC(keepFailedQC)
 {
 	_bed = new BedFile(_bed_file);
     LoadBamFileMap();
@@ -76,8 +80,12 @@ void MultiCovBam::CollectCoverage()
                         BamAlignment al;
                         while ( reader.GetNextAlignment(al) )
                         {
+                            bool duplicate = al.IsDuplicate();
+                            bool failedQC  = al.IsFailedQC();
+                            if (_keepDuplicates) duplicate = false;
+                            if (_keepFailedQC)    failedQC = false;
                             // map qual must exceed minimum
-                            if (al.MapQuality >= _minQual) {
+                            if ((al.MapQuality >= _minQual) && (!duplicate) && (!failedQC)) {
                                 // ignore if not properly paired and we actually care.
                                 if (_properOnly && !al.IsProperPair())
                                     continue;

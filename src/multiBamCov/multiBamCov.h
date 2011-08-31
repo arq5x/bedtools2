@@ -30,7 +30,9 @@ class MultiCovBam {
 public:
 
     // constructor
-    MultiCovBam(const vector<string> &bam_files, const string bed_file, int minQual, bool properOnly);
+    MultiCovBam(const vector<string> &bam_files, const string bed_file, 
+                int minQual, bool properOnly, 
+                bool keepDuplicates, bool keepFailedQC);
 
     // destructor
     ~MultiCovBam(void);
@@ -49,6 +51,9 @@ private:
 	// attributes to control what is counted
     int _minQual;
     bool _properOnly;
+    bool _keepDuplicates;
+    bool _keepFailedQC;
+    
 
     map<string, int> bamFileMap;
     

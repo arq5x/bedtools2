@@ -38,6 +38,8 @@ int main(int argc, char* argv[]) {
     bool haveBed           = false;
     bool haveBams          = false;
     bool properOnly        = false;
+    bool keepDuplicates    = false;
+    bool keepFailedQC      = false;
     
     // check to see if we should print out some help
     if(argc <= 1) showHelp = true;
@@ -88,10 +90,21 @@ int main(int argc, char* argv[]) {
         else if(PARAMETER_CHECK("-p", 2, parameterLength)) {
             properOnly = true;
         }
+        else if(PARAMETER_CHECK("-D", 2, parameterLength)) {
+            keepDuplicates = true;
+        }
+        
+        else if(PARAMETER_CHECK("-F", 2, parameterLength)) {
+            keepFailedQC = true;
+        }
+        else {
+            cerr << endl << "*****ERROR: Unrecognized parameter: " << argv[i] << " *****" << endl << endl;
+            showHelp = true;
+        }
     }
 
     if (!showHelp) {
-        MultiCovBam *mc = new MultiCovBam(bamFiles, bedFile, minQual, properOnly);
+        MultiCovBam *mc = new MultiCovBam(bamFiles, bedFile, minQual, properOnly, keepDuplicates, keepFailedQC);
         mc->CollectCoverage();
         delete mc;
         return 0;
@@ -118,6 +131,10 @@ void ShowHelp(void) {
     cerr << "\t-bed\t"         << "The bed file." << endl << endl;
 
     cerr << "\t-q\t"           << "Minimum mapping quality allowed. Default is 0." << endl << endl;
+
+    cerr << "\t-D\t"           << "Include duplicate-marked reads.  Default is to count non-duplicates only" << endl << endl;
+
+    cerr << "\t-F\t"           << "Include failed-QC reads.  Default is to count pass-QC reads only" << endl << endl;
 
     cerr << "\t-p\t"           << "Only count proper pairs.  Default is to count all alignments with MAPQ" << endl;
     cerr << "\t\t"             << "greater than the -q argument, regardless of the BAM FLAG field." << endl << endl;
