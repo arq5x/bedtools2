@@ -13,7 +13,7 @@
 #include "coverageBed.h"
 
 // build
-BedCoverage::BedCoverage(string &bedAFile, string &bedBFile, bool forceStrand,
+BedCoverage::BedCoverage(string &bedAFile, string &bedBFile, bool sameStrand, bool diffStrand,
                          bool writeHistogram, bool bamInput, bool obeySplits, 
                          bool eachBase, bool countsOnly) {
 
@@ -23,7 +23,8 @@ BedCoverage::BedCoverage(string &bedAFile, string &bedBFile, bool forceStrand,
     _bedA           = new BedFile(bedAFile);
     _bedB           = new BedFile(bedBFile);
 
-    _forceStrand    = forceStrand;
+    _sameStrand     = sameStrand;
+    _diffStrand     = diffStrand;
     _obeySplits     = obeySplits;
     _eachBase       = eachBase;
     _writeHistogram = writeHistogram;
@@ -60,7 +61,7 @@ void BedCoverage::CollectCoverageBed() {
         if (bedStatus == BED_VALID) {
             // process the BED entry as a single block
             if (_obeySplits == false)
-                _bedB->countHits(a, _forceStrand, _countsOnly);
+                _bedB->countHits(a, _sameStrand, _diffStrand, _countsOnly);
             // split the BED into discrete blocksand process each independently.
             else {
                 bedVector bedBlocks;
@@ -68,7 +69,7 @@ void BedCoverage::CollectCoverageBed() {
 
                 // use countSplitHits to avoid over-counting each split chunk
                 // as distinct read coverage.
-                _bedB->countSplitHits(bedBlocks, _forceStrand, _countsOnly);
+                _bedB->countSplitHits(bedBlocks, _sameStrand, _diffStrand, _countsOnly);
             }
             a = nullBed;
         }
@@ -112,7 +113,7 @@ void BedCoverage::CollectCoverageBam(string bamFile) {
                 a.strand = "+";
                 if (bam.IsReverseStrand()) a.strand = "-";
 
-                _bedB->countHits(a, _forceStrand, _countsOnly);
+                _bedB->countHits(a, _sameStrand, _diffStrand, _countsOnly);
             }
             // split the BAM alignment into discrete blocks and
             // look for overlaps only within each block.
@@ -124,7 +125,7 @@ void BedCoverage::CollectCoverageBam(string bamFile) {
                 getBamBlocks(bam, refs, bedBlocks, true);
                 // use countSplitHits to avoid over-counting each split chunk
                 // as distinct read coverage.
-                _bedB->countSplitHits(bedBlocks, _forceStrand, _countsOnly);
+                _bedB->countSplitHits(bedBlocks, _sameStrand, _diffStrand, _countsOnly);
             }
         }
     }

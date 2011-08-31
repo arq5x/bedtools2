@@ -33,7 +33,8 @@ int main(int argc, char* argv[]) {
     string bedBFile;
 
     // parm flags
-    bool forceStrand    = false;
+    bool sameStrand    = false;
+    bool diffStrand    = false;
     bool writeHistogram = false;
     bool eachBase       = false;
     bool obeySplits     = false;
@@ -84,7 +85,10 @@ int main(int argc, char* argv[]) {
             }
         }
         else if (PARAMETER_CHECK("-s", 2, parameterLength)) {
-            forceStrand = true;
+            sameStrand = true;
+        }
+        else if (PARAMETER_CHECK("-S", 2, parameterLength)) {
+            diffStrand = true;
         }
         else if (PARAMETER_CHECK("-hist", 5, parameterLength)) {
             writeHistogram = true;
@@ -109,9 +113,15 @@ int main(int argc, char* argv[]) {
         cerr << endl << "*****" << endl << "*****ERROR: Need -a and -b files. " << endl << "*****" << endl;
         showHelp = true;
     }
+    
+    if (sameStrand && diffStrand) {
+        cerr << endl << "*****" << endl << "*****ERROR: Request either -s OR -S, not both." << endl << "*****" << endl;
+        showHelp = true;
+    }
 
     if (!showHelp) {
-        BedCoverage *bg = new BedCoverage(bedAFile, bedBFile, forceStrand, writeHistogram, bamInput, obeySplits, eachBase, countsOnly);
+        BedCoverage *bg = new BedCoverage(bedAFile, bedBFile, sameStrand, diffStrand,
+                                          writeHistogram, bamInput, obeySplits, eachBase, countsOnly);
         delete bg;
         return 0;
     }
@@ -135,9 +145,13 @@ void ShowHelp(void) {
 
     cerr << "\t-abam\t"         << "The A input file is in BAM format." << endl << endl;
 
-    cerr << "\t-s\t"            << "Force strandedness.  That is, only include hits in A that" << endl;
-    cerr                        << "\t\toverlap B on the same strand." << endl;
-    cerr                        << "\t\t- By default, hits are included without respect to strand." << endl << endl;
+    cerr << "\t-s\t"            << "Require same strandedness.  That is, only counts hits in A that" << endl;
+    cerr                        << "\t\toverlap B on the _same_ strand." << endl;
+    cerr                        << "\t\t- By default, overlaps are counted without respect to strand." << endl << endl;
+
+    cerr << "\t-S\t"            << "Require different strandedness.  That is, only report hits in A that" << endl;
+    cerr                        << "\t\toverlap B on the _opposite_ strand." << endl;
+    cerr                        << "\t\t- By default, overlaps are counted without respect to strand." << endl << endl;
 
     cerr << "\t-hist\t"         << "Report a histogram of coverage for each feature in B" << endl;
     cerr                        << "\t\tas well as a summary histogram for _all_ features in B." << endl << endl;

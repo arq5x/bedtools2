@@ -36,7 +36,7 @@ class BedCoverage {
 public:
 
     // constructor
-    BedCoverage(string &bedAFile, string &bedBFile, bool forceStrand, bool writeHistogram,
+    BedCoverage(string &bedAFile, string &bedBFile, bool sameStrand, bool diffStrand, bool writeHistogram,
                 bool bamInput, bool obeySplits, bool eachBase, bool countsOnly);
 
     // destructor
@@ -51,8 +51,9 @@ private:
     // instance of a bed file class.
     BedFile *_bedA, *_bedB;
 
-    // do we care about strandedness when counting coverage?
-    bool _forceStrand;
+    // do we care about same or opposite strandedness when counting coverage?
+    bool _sameStrand;
+    bool _diffStrand;
 
     // should we write a histogram for each feature in B?
     bool _writeHistogram;
