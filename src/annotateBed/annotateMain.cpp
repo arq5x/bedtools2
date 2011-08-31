@@ -32,7 +32,8 @@ int main(int argc, char* argv[]) {
     string mainFile;
 
     // parm flags
-    bool forceStrand    = false;
+    bool sameStrand     = false;
+    bool diffStrand     = false;
     bool haveBed        = false;
     bool haveFiles      = false;
     bool haveTitles     = false;
@@ -104,7 +105,10 @@ int main(int argc, char* argv[]) {
             reportBoth = true;
         }
         else if (PARAMETER_CHECK("-s", 2, parameterLength)) {
-            forceStrand = true;
+            sameStrand = true;
+        }
+        else if (PARAMETER_CHECK("-S", 2, parameterLength)) {
+            diffStrand = true;
         }
         else {
             cerr << endl << "*****ERROR: Unrecognized parameter: " << argv[i] << " *****" << endl << endl;
@@ -117,9 +121,13 @@ int main(int argc, char* argv[]) {
         cerr << endl << "*****" << endl << "*****ERROR: Need -i and -files files. " << endl << "*****" << endl;
         showHelp = true;
     }
+    if (sameStrand && diffStrand) {
+        cerr << endl << "*****" << endl << "*****ERROR: Request either -s OR -S, not both." << endl << "*****" << endl;
+        showHelp = true;
+    }
 
     if (!showHelp) {
-        BedAnnotate *ba = new BedAnnotate(mainFile, inputFiles, inputTitles, forceStrand, reportCounts, reportBoth);
+        BedAnnotate *ba = new BedAnnotate(mainFile, inputFiles, inputTitles, sameStrand, diffStrand, reportCounts, reportBoth);
         ba->AnnotateBed();
         delete ba;
         return 0;
@@ -151,9 +159,12 @@ void ShowHelp(void) {
     cerr << "\t-both\t"         << "Report the counts followed by the % coverage." << endl;
     cerr                        << "\t\t- Default is to report the fraction of -i covered by each file." << endl << endl;
 
-    cerr << "\t-s\t"            << "Force strandedness.  That is, only include hits in A that" << endl;
-    cerr                        << "\t\toverlap B on the same strand." << endl;
-    cerr                        << "\t\t- By default, hits are included without respect to strand." << endl << endl;
+    cerr << "\t-s\t"            << "Require same strandedness.  That is, only counts overlaps" << endl;
+    cerr                        << "\t\ton the _same_ strand." << endl;
+    cerr                        << "\t\t- By default, overlaps are counted without respect to strand." << endl << endl;
 
+    cerr << "\t-S\t"            << "Require different strandedness.  That is, only count overlaps" << endl;
+    cerr                        << "\t\ton the _opposite_ strand." << endl;
+    cerr                        << "\t\t- By default, overlaps are counted without respect to strand." << endl << endl;
     exit(1);
 }
