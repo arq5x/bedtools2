@@ -13,16 +13,37 @@
 #include "fastaFromBed.h"
 
 
-Bed2Fa::Bed2Fa(const string &dbFile, const string &bedFile, bool useFasta, bool useStrand, bool useName, bool useFull) {
+Bed2Fa::Bed2Fa(bool &useName, string &dbFile, string &bedFile,
+    string &fastaOutFile, bool &useFasta, bool &useStrand) {
+
+    if (useName) {
+        _useName = true;
+    }
 
     _dbFile       = dbFile;
     _bedFile      = bedFile;
+    _fastaOutFile = fastaOutFile;
     _useFasta     = useFasta;
     _useStrand    = useStrand;
-    _useName      = useName;
-    _useFull      = useFull;
 
     _bed = new BedFile(_bedFile);
+
+    // Figure out what the output file should be.
+    if (fastaOutFile == "stdout") {
+        _faOut = &cout;
+    }
+    else {
+        // Make sure we can open the file.
+        ofstream fa(fastaOutFile.c_str(), ios::out);
+        if ( !fa ) {
+            cerr << "Error: The requested fasta output file (" << fastaOutFile << ") could not be opened. Exiting!" << endl;
+            exit (1);
+        }
+        else {
+            fa.close();
+            _faOut = new ofstream(fastaOutFile.c_str(), ios::out);
+        }
+    }
 
     // Extract the requested intervals from the FASTA input file.
     ExtractDNA();
@@ -45,28 +66,22 @@ void Bed2Fa::ReportDNA(const BED &bed, string &dna) {
     if (!(_useName)) {
         if (_useFasta == true) {
             if (_useStrand == true)
-                cout << ">" << bed.chrom << ":" << bed.start << "-" << bed.end   << "(" << bed.strand << ")" << endl << dna << endl;
+                *_faOut << ">" << bed.chrom << ":" << bed.start << "-" << bed.end   << "(" << bed.strand << ")" << endl << dna << endl;
             else
-                cout << ">" << bed.chrom << ":" << bed.start << "-" << bed.end << endl << dna << endl;
+                *_faOut << ">" << bed.chrom << ":" << bed.start << "-" << bed.end << endl << dna << endl;
         }
         else {
-            if (_useFull == true) {
-                _bed->reportBedTab(bed);
-                cout << dna << endl;
-            }
-            else {
-                if (_useStrand == true)
-                    cout << bed.chrom << ":" << bed.start << "-" << bed.end << "(" << bed.strand << ")" << "\t" << dna << endl;
-                else
-                    cout << bed.chrom << ":" << bed.start << "-" << bed.end << "\t" << dna << endl;
-            }
+            if (_useStrand == true)
+                *_faOut << bed.chrom << ":" << bed.start << "-" << bed.end << "(" << bed.strand << ")" << "\t" << dna << endl;
+            else
+                *_faOut << bed.chrom << ":" << bed.start << "-" << bed.end << "\t" << dna << endl;
         }
     }
     else {
         if (_useFasta == true)
-            cout << ">" << bed.name << endl << dna << endl;
+            *_faOut << ">" << bed.name << endl << dna << endl;
         else
-            cout << bed.name << "\t" << dna << endl;
+            *_faOut << bed.name << "\t" << dna << endl;
     }
 }
 

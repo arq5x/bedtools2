@@ -29,8 +29,8 @@ class Bed2Fa {
 public:
 
     // constructor
-    Bed2Fa(const string &dbFile, const string &bedFile, 
-           bool useFasta, bool useStrand, bool useName, bool useFull);
+    Bed2Fa(bool &useName, string &dbFile, string &bedFile, string &fastaOutFile,
+        bool &useFasta, bool &useStrand);
 
     // destructor
     ~Bed2Fa(void);
@@ -40,15 +40,17 @@ public:
 
 
 private:
+
+    bool _useName;
     string _dbFile;
     string _bedFile;
+    string _fastaOutFile;
     bool _useFasta;
-    bool _useStrand;  // should we extract a specific strand?
-    bool _useName;    // should we use the BED name for the FASTA header?
-    bool _useFull;    // should we use the full BED entry for the tabular output?
+    bool _useStrand;
 
     // instance of a bed file class.
     BedFile  *_bed;
+    ostream *_faOut;
 };
 
 #endif
