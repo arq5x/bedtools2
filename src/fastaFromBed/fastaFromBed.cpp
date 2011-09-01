@@ -13,13 +13,10 @@
 #include "fastaFromBed.h"
 
 
-Bed2Fa::Bed2Fa(bool &useName, string &dbFile, string &bedFile,
-    string &fastaOutFile, bool &useFasta, bool &useStrand) {
+Bed2Fa::Bed2Fa(bool useName, const string &dbFile, const string &bedFile,
+    const string &fastaOutFile, bool useFasta, bool useStrand) {
 
-    if (useName) {
-        _useName = true;
-    }
-
+    _useName      = useName;
     _dbFile       = dbFile;
     _bedFile      = bedFile;
     _fastaOutFile = fastaOutFile;
@@ -102,9 +99,9 @@ void Bed2Fa::ExtractDNA() {
     }
 
     // open and memory-map genome file
-    FastaReference fr;
+    FastaReference *fr = new FastaReference;
     bool memmap = true;
-    fr.open(_dbFile, memmap);
+    fr->open(_dbFile, memmap);
 
     BED bed, nullBed;
     int lineNum = 0;
@@ -116,14 +113,13 @@ void Bed2Fa::ExtractDNA() {
         if (bedStatus == BED_VALID) {
             // make sure we are extracting >= 1 bp
             if (bed.zeroLength == false) {
-                size_t seqLength = fr.sequenceLength(bed.chrom);
+                size_t seqLength = fr->sequenceLength(bed.chrom);
                 // make sure this feature will not exceed the end of the chromosome.
                 if ( (bed.start <= seqLength) && (bed.end <= seqLength) ) 
                 {
                     int length = bed.end - bed.start;
-                    sequence = fr.getSubSequence(bed.chrom, bed.start, length);
+                    sequence = fr->getSubSequence(bed.chrom, bed.start, length);
                     ReportDNA(bed, sequence);
-                    bed = nullBed;
                 }
                 else
                 {
