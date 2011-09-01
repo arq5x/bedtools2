@@ -37,10 +37,6 @@ void BedGraphFile::Open() {
             delete _bedGraphStream;
             _bedGraphStream = new igzstream(bedGraphFile.c_str(), ios::in);
         }
-        
-        // bytes were consumed.  rewind.
-        _bedGraphStream->seekg(0);
-        
         // can we open the file?
         if ( !(_bedGraphStream->good()) ) {
             cerr << "Error: The requested bed file (" << bedGraphFile << ") could not be opened. Exiting!" << endl;

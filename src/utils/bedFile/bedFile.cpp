@@ -135,7 +135,7 @@ void BedFile::Open(void) {
     else {
         _bedStream = new ifstream(bedFile.c_str(), ios::in);
         
-        if(bedFile.substr(bedFile.find_last_of(".") + 1) == "gz") {
+        if( isGzipFile(_bedStream) ) {
             delete _bedStream;
             _bedStream = new igzstream(bedFile.c_str(), ios::in);
         }
