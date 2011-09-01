@@ -47,7 +47,7 @@ void BedFilePE::Open(void) {
 
 // Close the BEDPE file
 void BedFilePE::Close(void) {
-    if (bedFile != "stdin") delete _bedStream;
+    if (bedFile != "stdin" && bedFile != "-") delete _bedStream;
 }
 
 

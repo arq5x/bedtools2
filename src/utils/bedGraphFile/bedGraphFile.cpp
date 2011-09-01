@@ -48,7 +48,7 @@ void BedGraphFile::Open() {
 
 // Close the BEDGRAPH file
 void BedGraphFile::Close() {
-    if (bedGraphFile != "stdin") {
+    if (bedGraphFile != "stdin" && bedGraphFile != "-") {
         if (_bedGraphStream) {
             delete _bedGraphStream;
             _bedGraphStream = NULL ;

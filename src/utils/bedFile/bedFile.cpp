@@ -149,7 +149,7 @@ void BedFile::Open(void) {
 
 // Close the BED file
 void BedFile::Close(void) {
-    if (bedFile != "stdin") delete _bedStream;
+    if (bedFile != "stdin" && bedFile != "-") delete _bedStream;
 }
 
 
