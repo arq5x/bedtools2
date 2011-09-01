@@ -34,17 +34,24 @@ bool isRegularFile(const string& filename) {
     return false;
 }
 
-
 /*
 returns TRUE if the file has a GZIP header.
 Should only be run on regular files.
 */
 bool isGzipFile(istream *file) {
     //see http://www.gzip.org/zlib/rfc-gzip.html#file-format
+    
+    /*
+       11-Sep-2011: 
+       We now only peek at the first byte and test for GZIPiness.
+       This is because I can only putback() one byte into an istream
+       without triggering the "fail" bit.  This was necessary to support
+       FIFOs, per version 2.13.0
+    */
     struct  {
         unsigned char id1;
-//        unsigned char id2;
-//        unsigned char cm;
+//      unsigned char id2;
+//      unsigned char cm;
     } gzip_header;
 
     if (!file->read((char*)&gzip_header, sizeof(gzip_header))) {
@@ -52,10 +59,10 @@ bool isGzipFile(istream *file) {
     }
 
     if ( gzip_header.id1 == 0x1f )
-//        &&
-//        gzip_header.id2 == 0x8b
-//        &&
-//        gzip_header.cm == 8 )
+//       &&
+//       gzip_header.id2 == 0x8b
+//       &&
+//       gzip_header.cm == 8 )
     {
         return true;
     }
