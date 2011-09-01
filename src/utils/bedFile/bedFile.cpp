@@ -135,13 +135,10 @@ void BedFile::Open(void) {
     else {
         _bedStream = new ifstream(bedFile.c_str(), ios::in);
         
-        //if (isGzipFile(_bedStream) == true) {
         if(bedFile.substr(bedFile.find_last_of(".") + 1) == "gz") {
             delete _bedStream;
             _bedStream = new igzstream(bedFile.c_str(), ios::in);
         }
-        
-        // can we open the file?
         if ( !(_bedStream->good()) ) {
             cerr << "Error: The requested bed file (" << bedFile << ") could not be opened. Exiting!" << endl;
             exit (1);

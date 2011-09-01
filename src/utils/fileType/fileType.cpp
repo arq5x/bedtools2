@@ -40,22 +40,25 @@ returns TRUE if the file has a GZIP header.
 Should only be run on regular files.
 */
 bool isGzipFile(istream *file) {
-       //see http://www.gzip.org/zlib/rfc-gzip.html#file-format
+    //see http://www.gzip.org/zlib/rfc-gzip.html#file-format
     struct  {
         unsigned char id1;
-        unsigned char id2;
-        unsigned char cm;
+//        unsigned char id2;
+//        unsigned char cm;
     } gzip_header;
 
-    if (!file->read((char*)&gzip_header, sizeof(gzip_header)))
+    if (!file->read((char*)&gzip_header, sizeof(gzip_header))) {
         return false;
+    }
 
-    if ( gzip_header.id1 == 0x1f
-        &&
-        gzip_header.id2 == 0x8b
-        &&
-        gzip_header.cm == 8 )
+    if ( gzip_header.id1 == 0x1f )
+//        &&
+//        gzip_header.id2 == 0x8b
+//        &&
+//        gzip_header.cm == 8 )
+    {
         return true;
-
+    }
+    file->putback(gzip_header.id1);
     return false;
 }
