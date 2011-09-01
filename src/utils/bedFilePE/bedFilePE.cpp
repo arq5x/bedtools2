@@ -35,6 +35,10 @@ void BedFilePE::Open(void) {
             delete _bedStream;
             _bedStream = new igzstream(bedFile.c_str(), ios::in);
         }
+        
+        // bytes were consumed.  rewind.
+        _bedStream->seekg(0);
+        
         // can we open the file?
         if ( !(_bedStream->good()) ) {
             cerr << "Error: The requested bed file (" << bedFile << ") could not be opened. Exiting!" << endl;

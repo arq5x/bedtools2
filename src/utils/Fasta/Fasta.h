@@ -70,9 +70,9 @@ class FastaReference {
         string getSequence(string seqname);
         // potentially useful for performance, investigate
         // void getSequence(string seqname, string& sequence);
-        string getSubSequence(const string &seqname, int start, int length);
+        string getSubSequence(string seqname, int start, int length);
         string sequenceNameStartingWith(string seqnameStart);
-        long unsigned int sequenceLength(const string &seqname);
+        long unsigned int sequenceLength(string seqname);
 };
 
 #endif
