@@ -41,7 +41,7 @@ public:
     // constructor
     TagBam(const string &bamFile, const vector<string> &annoFileNames,
                 const vector<string> &annoLabels, const string &tag,
-                bool forceStrand, float overlapFraction);
+                bool useNames, bool sameStrand, bool diffStrand, float overlapFraction);
 
     // destructor
     ~TagBam(void);
@@ -61,8 +61,12 @@ private:
     BedFile *_bed;
     vector<BedFile*> _annoFiles;
 
+    // should we use the name field from the annotation files?
+    bool _useNames;
+    
     // do we care about strandedness when tagging?
-    bool _forceStrand;
+    bool _sameStrand;
+    bool _diffStrand;
     float _overlapFraction;
 
     // private function for reporting coverage information
@@ -71,7 +75,6 @@ private:
     void OpenAnnoFiles();
 
     void CloseAnnoFiles();
-    
-    bool FindOneOrMoreOverlap(const BED &a, BedFile *bedFile);
+
 };
 #endif /* TAGBAM_H */

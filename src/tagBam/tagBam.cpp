@@ -15,13 +15,15 @@
 // build
 TagBam::TagBam(const string &bamFile, const vector<string> &annoFileNames,
             const vector<string> &annoLables, const string &tag,
-            bool forceStrand, float overlapFraction) :
+            bool useNames, bool sameStrand, bool diffStrand, float overlapFraction):
 
     _bamFile(bamFile),
     _annoFileNames(annoFileNames),
     _annoLabels(annoLables),
     _tag(tag),
-    _forceStrand(forceStrand),
+    _useNames(useNames),
+    _sameStrand(sameStrand),
+    _diffStrand(diffStrand),
     _overlapFraction(overlapFraction)
 {}
 
@@ -50,10 +52,6 @@ void TagBam::CloseAnnoFiles() {
     }
 }
 
-bool TagBam::FindOneOrMoreOverlap(const BED &a, BedFile *bedFile) {
-    return bedFile->FindOneOrMoreOverlapsPerBin(a.chrom, a.start, a.end, a.strand,
-                                                _forceStrand, _overlapFraction);
-}
 
 void TagBam::Tag() {
 
@@ -77,14 +75,15 @@ void TagBam::Tag() {
 
     // rip through the BAM file and test for overlaps with each annotation file.
     BamAlignment al;
+    vector<BED> hits;
     while (reader.GetNextAlignment(al)) {
         if (al.IsMapped() == true) {
             BED a;
             a.chrom = refs.at(al.RefID).RefName;
             a.start = al.Position;
             a.end   = al.GetEndPosition(false, false);
-            if (al.IsReverseStrand()) a.strand = "-";
             a.strand = "+";
+            if (al.IsReverseStrand()) a.strand = "-";
             
             ostringstream annotations;
             // annotate the BAM file based on overlaps with the annotation files.
@@ -92,9 +91,23 @@ void TagBam::Tag() {
             {
                 // grab the current annotation file.
                 BedFile *anno = _annoFiles[i];
-                // add the label for this annotation file to tag if there is overlap
-                if (FindOneOrMoreOverlap(a, anno)) {
-                    annotations << _annoLabels[i] << ";";
+                
+                if (!_useNames) {
+                    // add the label for this annotation file to tag if there is overlap
+                    if (anno->FindOneOrMoreOverlapsPerBin(a.chrom, a.start, a.end, a.strand, _sameStrand, _diffStrand, _overlapFraction)) 
+                    {
+                        annotations << _annoLabels[i] << ";";
+                    }
+                }
+                // use the name field from the annotation files to populate tag
+                else {
+                    anno->FindOverlapsPerBin(a.chrom, a.start, a.end, a.strand, hits, _sameStrand, _diffStrand);
+                    for (size_t i = 0; i < hits.size(); ++i) {
+                        annotations << hits[i].name;
+                        if (i < hits.size() - 1) annotations << ",";
+                    }
+                    if (hits.size() > 0) annotations << ";";
+                    hits.clear();
                 }
             }
             // were there any overlaps with which to make a tag?

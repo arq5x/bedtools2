@@ -36,7 +36,9 @@ int main(int argc, char* argv[]) {
     // parm flags
     bool haveTag        = false;
     bool haveFraction   = false;
-    bool forceStrand    = false;
+    bool useNames       = false;
+    bool sameStrand     = false;
+    bool diffStrand     = false;
     bool haveBam        = false;
     bool haveFiles      = false;
     bool haveLabels     = false;
@@ -99,8 +101,14 @@ int main(int argc, char* argv[]) {
                 i--;
             }
         }
+        else if (PARAMETER_CHECK("-names", 6, parameterLength)) {
+            useNames = true;
+        }
         else if (PARAMETER_CHECK("-s", 2, parameterLength)) {
-            forceStrand = true;
+            sameStrand = true;
+        }
+        else if (PARAMETER_CHECK("-S", 2, parameterLength)) {
+            diffStrand = true;
         }
         else if(PARAMETER_CHECK("-f", 2, parameterLength)) {
             if ((i+1) < argc) {
@@ -123,8 +131,20 @@ int main(int argc, char* argv[]) {
     }
 
     // make sure we have both input files
-    if (!haveBam || !haveFiles || !haveLabels) {
-        cerr << endl << "*****" << endl << "*****ERROR: Need -i, -files, and -labels. " << endl << "*****" << endl;
+    if (!haveBam || !haveFiles) {
+        cerr << endl << "*****" << endl << "*****ERROR: Need -i, -files" << endl << "*****" << endl;
+        showHelp = true;
+    }
+    if (!useNames && !haveLabels) {
+        cerr << endl << "*****" << endl << "*****ERROR: Need -labels or -names" << endl << "*****" << endl;
+        showHelp = true;
+    }
+    if (sameStrand && diffStrand) {
+        cerr << endl << "*****" << endl << "*****ERROR: Use -s or -S, not both. " << endl << "*****" << endl;
+        showHelp = true;
+    }
+    if (haveLabels && useNames) {
+        cerr << endl << "*****" << endl << "*****ERROR: Use -labels or -names, not both. " << endl << "*****" << endl;
         showHelp = true;
     }
     if (haveTag && tag.size() > 2) {
@@ -133,7 +153,7 @@ int main(int argc, char* argv[]) {
     }
 
     if (!showHelp) {
-        TagBam *ba = new TagBam(bamFile, inputFiles, inputLabels, tag, forceStrand, overlapFraction);
+        TagBam *ba = new TagBam(bamFile, inputFiles, inputLabels, tag, useNames, sameStrand, diffStrand, overlapFraction);
         ba->Tag();
         delete ba;
         return 0;
@@ -156,7 +176,10 @@ void ShowHelp(void) {
 
     cerr << "Options: " << endl;
 
-    cerr << "\t-s\t"            << "Force strandedness.  That is, only tag alignments that have the same" << endl;
+    cerr << "\t-s\t"            << "Require overlaps on the same strand.  That is, only tag alignments that have the same" << endl;
+    cerr                        << "\t\tstrand as a feature in the annotation file(s)." << endl << endl;
+
+    cerr << "\t-S\t"            << "Require overlaps on the opposite strand.  That is, only tag alignments that have the opposite" << endl;
     cerr                        << "\t\tstrand as a feature in the annotation file(s)." << endl << endl;
 
     cerr << "\t-f\t"            << "Minimum overlap required as a fraction of the alignment." << endl;
@@ -165,6 +188,10 @@ void ShowHelp(void) {
 
     cerr << "\t-tag\t"          << "Dictate what the tag should be. Default is YB." << endl;
     cerr                        << "\t\t- STRING (two characters, e.g., YK)" << endl << endl;
+    
+    cerr << "\t-names\t"        << "Use the name field from the annotation files to populate tags." << endl;
+    cerr                        << "\t\tBy default, the -labels values are used." << endl << endl;
+    
     
     exit(1);
 }
