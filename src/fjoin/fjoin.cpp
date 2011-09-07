@@ -286,8 +286,9 @@ void BedIntersect::IntersectBed() {
     aStatus = _bedA->GetNextBed(*a, aLineNum);
     bStatus = _bedB->GetNextBed(*b, bLineNum);
 
+    cout << a->chrom << " " << a->start << " " << a->chrom << " " << b->start << endl;
     while (aStatus != BED_INVALID || bStatus != BED_INVALID) {
-
+        
         if ((a->start <= b->start) && (a->chrom == b->chrom)) {
             prevA = a;
             _lastPick = 0;

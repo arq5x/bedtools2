@@ -1,3 +1,145 @@
+Version 2.13.1 (6-Sept-2011)
+
+New options
+===========
+1. tagBam now has -s and -S options for only annotating alignments with features on the same and opposite strand, respectively.
+2. tagBam now has a -names option for annotating alignments with the "name" field in annotation files.  This overrides the default behavior, which is to use the -labels associated with the annotation files passed in on the command line.  Currently, this works well with BED files, but given the limited metadata support for GFF files, annotating with -names and GFF files may not work as well as wished, depending on the type of GFF file used.
+
+
+
+Version 2.13.0 (1-Sept-2011)
+
+New tools
+=========
+1. tagBam. This tool annotates a BAM file with custom tag fields based on overlaps with BED/GFF/VCF files.
+For example:
+$ tagBam -i aln.bam -files exons.bed introns.bed cpg.bed utrs.bed \
+                    -tags exonic intonic cpg utr \
+                    > aln.tagged.bam
+For alignments that have overlaps, you should see new BAM tags like "YB:Z:exonic", "YB:Z:cpg;utr"
+
+2. multiBamCov. The new tool counts sequence coverage for multiple bams at specific loci defined in a BED/GFF/VCF file.
+For example:
+
+$ multiBamCov -bams aln.1.bam aln.2.bam aln3.bam -bed exons.bed
+chr1	861306	861409	SAMD11	1	+	181	280	236
+chr1	865533	865718	SAMD11	2	+	249	365	374
+chr1	866393	866496	SAMD11	3	+	162	298	322
+
+where the last 3 columns represent the number of alignments overlapping each interval from the three BAM file.
+
+The following options are available to control which types of alignments are are counted.
+-q	Minimum mapping quality allowed. Default is 0.
+
+-D	Include duplicate-marked reads.  Default is to count non-duplicates only
+
+-F	Include failed-QC reads.  Default is to count pass-QC reads only
+
+-p	Only count proper pairs.  Default is to count all alignments with MAPQ
+	greater than the -q argument, regardless of the BAM FLAG field.
+
+3. nucBed. This new tool profiles the nucleotide content of intervals in a fasta file. 	The following information will be reported after each original BED/GFF/VCF entry:
+	    1) %AT content
+	    2) %GC content
+	    3) Number of As observed
+	    4) Number of Cs observed
+	    5) Number of Gs observed
+	    6) Number of Ts observed
+	    7) Number of Ns observed
+	    8) Number of other bases observed
+	    9) The length of the explored sequence/interval.
+	    10) The sequence extracted from the FASTA file. (optional, if -seq is used)
+	    11) The number of times a user defined pattern was observed. (optional, if -pattern is used.)
+
+
+
+For example:
+$ nucBed -fi ~/data/genomes/hg18/hg18.fa -bed simrep.bed | head -3
+#1_usercol	2_usercol	3_usercol	4_usercol	5_usercol	6_usercol	7_pct_at	8_pct_gc	9_num_A	10_num_C	11_num_G	12_num_T	13_num_N	14_num_oth	15_seq_len	
+chr1	10000	10468	trf	789	+	0.540598	0.459402	155	96	119	98	0	0	468
+chr1	10627	10800	trf	346	+	0.445087	0.554913	54	55	41	23	0	0	173
+
+
+One can also report the sequence itself:
+$ nucBed -fi ~/data/genomes/hg18/hg18.fa -bed simrep.bed -seq | head -3
+#1_usercol	2_usercol	3_usercol	4_usercol	5_usercol	6_usercol	7_pct_at	8_pct_gc	9_num_A	10_num_C	11_num_G	12_num_T	13_num_N	14_num_oth	15_seq_len	16_seq
+chr1	10000	10468	trf	789	+	0.540598	0.459402	155	96	119	98	0	0	468	ccagggg...
+chr1	10627	10800	trf	346	+	0.445087	0.554913	54	55	41	23	0	0	173	TCTTTCA...
+
+Or, one can count the number of times that a specific pattern occur in the intervals (reported as the last column):
+$ nucBed -fi ~/data/genomes/hg18/hg18.fa -bed simrep.bed -pattern CGTT | head
+#1_usercol	2_usercol	3_usercol	4_usercol	5_usercol	6_usercol	7_pct_at	8_pct_gc	9_num_A	10_num_C	11_num_G	12_num_T	13_num_N	14_num_oth	15_seq_len	16_user_patt_count
+chr1	10000	10468	trf	789	+	0.540598	0.459402	155	96	119	98	0	0	468	0
+chr1	10627	10800	trf	346	+	0.445087	0.554913	54	55	41	23	0	0	173	0
+chr1	10757	10997	trf	434	+	0.370833	0.629167	49	70	81	40	0	0	240	0
+chr1	11225	11447	trf	273	+	0.463964	0.536036	44	86	33	59	0	0	222	0
+chr1	11271	11448	trf	187	+	0.463277	0.536723	37	69	26	45	0	0	177	0
+chr1	11283	11448	trf	199	+	0.466667	0.533333	37	64	24	40	0	0	165	0
+chr1	19305	19443	trf	242	+	0.282609	0.717391	17	57	42	22	0	0	138	1
+chr1	20828	20863	trf	70	+	0.428571	0.571429	10	7	13	5	0	0	35	0
+chr1	30862	30959	trf	79	+	0.556701	0.443299	35	22	21	19	0	0	97	0
+
+
+
+New options
+===========
+1. Support for named pipes and FIFOs.
+2. "-" is now allowable to indicate that data is being sent via stdin.
+
+3. Multiple tools. Added new -S option to annotateBed, closestBed, coverageBed, intersectBed, pairToBed, subtractBed, and windowBed (-Sm). This new option does the opposite of the -s option: that is, overlaps are only processed if they are on _opposite_ strands.  Thanks to Sol Katzman for the great suggestion.  Very useful for certain RNA-seq analyses.
+
+4. coverageBed. Added a new -counts option to coverageBed that only reports the count of overlaps, instead of also computing fractions, etc. This is much faster and uses much less memory.
+
+5. fastaFromBed. Added a new -full option that uses the full BED entry when naming each output sequence.  Also removed the -fo option such that all output is now written to stdout.
+
+6. genomeCoverageBed.
+	- Added new -scale option that allows the coverage values to be scaled by a constant.  Useful for normalizing coverage with RPM, RPKM, etc.  Thanks to Ryan Dale for the useful suggestion.
+	- Added new -5, -3, -trackline, -trackopts, and -dz options.  Many thanks to Assaf Gordon for these improvements.
+		-5: Calculate coverage of 5" positions (instead of entire interval)
+		-3: Calculate coverage of 3" positions (instead of entire interval).
+		-trackline: Adds a UCSC/Genome-Browser track line definition in the first line of the output.
+		-trackopts: rites additional track line definition parameters in the first line.
+		-dz: Report the depth at each genome position with zero-based coordinates, instead of zero-based.
+
+7. closestBed.  See below, thanks to Brent Pedersen, Assaf Gordon, Ryan Layer and Dan Webster for the helpful discussions.
+	- closestBed now reports _all_ features in B that overlap A by default.  This allows folks to decide which is the "best" overlapping feature on their own.
+
+	2. closestBed now has a "-io" option that ignores overlapping features.  In other words, it will only report the closest, non-overlapping feature.
+
+	An example:
+
+	$ cat a.bed
+	chr1    10      20
+
+	$ cat b.bed
+	chr1    15      16
+	chr1    16      40
+	chr1    100     1000
+	chr1    200     1000
+
+	$ bin/closestBed -a a.bed -b b.bed
+	chr1    10      20      chr1    15      16
+	chr1    10      20      chr1    16      40
+
+	$ bin/closestBed -a a.bed -b b.bed -io
+	chr1    10      20      chr1    100     1000
+	
+Updates
+=======
+1.  Updated to the latest version of BamTools.  This allows greater functionality and will facilitate new options and tools in the future.
+
+	- 
+Bug Fixes
+=========
+1. GFF files cannot have zero-length features.
+2. Corrected an erroneous check on the start coordinates in VCF files.  Thanks to Jan Vogel for the correction.
+3. mergeBed now always reports output in BED format.
+3. Updated the text file Tokenizer function to yield 15% speed improvement.
+4. Various tweaks and improvements.
+
+
+
+
 Version 2.12.0 (April-3-2011)
 
 New Tool
