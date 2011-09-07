@@ -123,8 +123,7 @@ void PairToPair::FindOverlaps(const BEDPE &a) {
             found1 = FindHitsOnBothEnds(a, hitsA1B1, hitsA2B2);
         if ((hitsA2B1.size() > 0) || (hitsA1B2.size() > 0))
             found2 = FindHitsOnBothEnds(a, hitsA2B1, hitsA1B2);
-
-        if (!found1 || !found2)
+        if (found1 == false && found2 == false)
             _bedA->reportBedPENewLine(a);
     }
     else if (_searchType == "either") {
@@ -151,7 +150,7 @@ bool PairToPair::FindHitsOnBothEnds(const BEDPE &a, const vector<MATE> &qualityH
     for (map<unsigned int, vector<MATE>, less<unsigned int> >::iterator m = hitsMap.begin(); m != hitsMap.end(); ++m) {
         
         // hits on both sides
-        if (m->second.size() == 2) {
+        if (m->second.size() >= 2) {
             bothFound = true;
             MATE b1 = m->second[0];
             MATE b2 = m->second[1];
