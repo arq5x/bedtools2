@@ -34,14 +34,16 @@ int main(int argc, char* argv[]) {
     string tag = "YB";
 
     // parm flags
-    bool haveTag        = false;
-    bool haveFraction   = false;
-    bool useNames       = false;
-    bool sameStrand     = false;
-    bool diffStrand     = false;
-    bool haveBam        = false;
-    bool haveFiles      = false;
-    bool haveLabels     = false;
+    bool haveTag          = false;
+    bool haveFraction     = false;
+    bool useNames         = false;
+    bool useScores        = false;
+    bool sameStrand       = false;
+    bool diffStrand       = false;
+    bool haveBam          = false;
+    bool haveFiles        = false;
+    bool haveLabels       = false;
+
 
     // list of annotation files / names
     vector<string> inputFiles;
@@ -104,6 +106,9 @@ int main(int argc, char* argv[]) {
         else if (PARAMETER_CHECK("-names", 6, parameterLength)) {
             useNames = true;
         }
+        else if (PARAMETER_CHECK("-scores", 7, parameterLength)) {
+            useScores = true;
+        }
         else if (PARAMETER_CHECK("-s", 2, parameterLength)) {
             sameStrand = true;
         }
@@ -135,8 +140,8 @@ int main(int argc, char* argv[]) {
         cerr << endl << "*****" << endl << "*****ERROR: Need -i, -files" << endl << "*****" << endl;
         showHelp = true;
     }
-    if (!useNames && !haveLabels) {
-        cerr << endl << "*****" << endl << "*****ERROR: Need -labels or -names" << endl << "*****" << endl;
+    if (!useNames && !haveLabels && !useScores) {
+        cerr << endl << "*****" << endl << "*****ERROR: Need -labels or -names or -scores" << endl << "*****" << endl;
         showHelp = true;
     }
     if (sameStrand && diffStrand) {
@@ -147,13 +152,17 @@ int main(int argc, char* argv[]) {
         cerr << endl << "*****" << endl << "*****ERROR: Use -labels or -names, not both. " << endl << "*****" << endl;
         showHelp = true;
     }
+    if (useScores && useNames) {
+        cerr << endl << "*****" << endl << "*****ERROR: Use -scores or -names, not both. " << endl << "*****" << endl;
+        showHelp = true;
+    }
     if (haveTag && tag.size() > 2) {
         cerr << endl << "*****" << endl << "*****ERROR: Custom tags should be at most two characters per the SAM specification. " << endl << "*****" << endl;
         showHelp = true;
     }
 
     if (!showHelp) {
-        TagBam *ba = new TagBam(bamFile, inputFiles, inputLabels, tag, useNames, sameStrand, diffStrand, overlapFraction);
+        TagBam *ba = new TagBam(bamFile, inputFiles, inputLabels, tag, useNames, useScores, sameStrand, diffStrand, overlapFraction);
         ba->Tag();
         delete ba;
         return 0;
@@ -191,6 +200,9 @@ void ShowHelp(void) {
     
     cerr << "\t-names\t"        << "Use the name field from the annotation files to populate tags." << endl;
     cerr                        << "\t\tBy default, the -labels values are used." << endl << endl;
+
+    cerr << "\t-scores\t"    << "A list of 1-based columns for each annotation file" << endl;
+    cerr                        << "\t\tin which a color can be found." << endl << endl;
     
     
     exit(1);

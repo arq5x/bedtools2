@@ -15,13 +15,14 @@
 // build
 TagBam::TagBam(const string &bamFile, const vector<string> &annoFileNames,
             const vector<string> &annoLables, const string &tag,
-            bool useNames, bool sameStrand, bool diffStrand, float overlapFraction):
+            bool useNames, bool useScores, bool sameStrand, bool diffStrand, float overlapFraction):
 
     _bamFile(bamFile),
     _annoFileNames(annoFileNames),
     _annoLabels(annoLables),
     _tag(tag),
     _useNames(useNames),
+    _useScores(useScores),
     _sameStrand(sameStrand),
     _diffStrand(diffStrand),
     _overlapFraction(overlapFraction)
@@ -92,15 +93,25 @@ void TagBam::Tag() {
                 // grab the current annotation file.
                 BedFile *anno = _annoFiles[i];
                 
-                if (!_useNames) {
+                if (!_useNames && !_useScores) {
                     // add the label for this annotation file to tag if there is overlap
                     if (anno->FindOneOrMoreOverlapsPerBin(a.chrom, a.start, a.end, a.strand, _sameStrand, _diffStrand, _overlapFraction)) 
                     {
                         annotations << _annoLabels[i] << ";";
                     }
                 }
+                // use the score field
+                else if (!_useNames && _useScores) {
+                    anno->FindOverlapsPerBin(a.chrom, a.start, a.end, a.strand, hits, _sameStrand, _diffStrand);
+                    for (size_t i = 0; i < hits.size(); ++i) {
+                        annotations << hits[i].score;
+                        if (i < hits.size() - 1) annotations << ",";
+                    }
+                    if (hits.size() > 0) annotations << ";";
+                    hits.clear();
+                }
                 // use the name field from the annotation files to populate tag
-                else {
+                else if (_useNames && !_useScores) {
                     anno->FindOverlapsPerBin(a.chrom, a.start, a.end, a.strand, hits, _sameStrand, _diffStrand);
                     for (size_t i = 0; i < hits.size(); ++i) {
                         annotations << hits[i].name;

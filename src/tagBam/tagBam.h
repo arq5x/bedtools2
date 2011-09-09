@@ -40,8 +40,9 @@ public:
 
     // constructor
     TagBam(const string &bamFile, const vector<string> &annoFileNames,
-                const vector<string> &annoLabels, const string &tag,
-                bool useNames, bool sameStrand, bool diffStrand, float overlapFraction);
+                const vector<string> &annoLabels, const string &tag, 
+                bool useNames, bool useScores, bool sameStrand, 
+                bool diffStrand, float overlapFraction);
 
     // destructor
     ~TagBam(void);
@@ -55,6 +56,7 @@ private:
     string _bamFile;
     vector<string> _annoFileNames;
     vector<string> _annoLabels;
+        
     string _tag;
 
     // instance of a bed file class.
@@ -63,6 +65,7 @@ private:
 
     // should we use the name field from the annotation files?
     bool _useNames;
+    bool _useScores;
     
     // do we care about strandedness when tagging?
     bool _sameStrand;
