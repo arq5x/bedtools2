@@ -401,6 +401,12 @@ public:
 
     // Open a BED file for reading (creates an istream pointer)
     void Open(void);
+    
+    // Rewind the pointer back to the beginning of the file
+    void Rewind(void);
+
+    // Jump to a specific byte in the file
+    void Seek(unsigned long offset);
 
     // Close an opened BED file.
     void Close(void);

@@ -146,6 +146,16 @@ void BedFile::Open(void) {
     }
 }
 
+// Rewind the pointer back to the beginning of the file
+void BedFile::Rewind(void) {
+    _bedStream->seekg(0, ios::beg);
+}
+
+// Jump to a specific byte in the file
+void BedFile::Seek(unsigned long offset) {
+    _bedStream->seekg(offset);
+}
+
 
 // Close the BED file
 void BedFile::Close(void) {
