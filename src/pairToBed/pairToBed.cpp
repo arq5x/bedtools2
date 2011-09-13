@@ -32,6 +32,7 @@ bool IsCorrectMappingForBEDPE (const BamAlignment &bam) {
     Constructor
 */
 
+
 BedIntersectPE::BedIntersectPE(string bedAFilePE, string bedBFile, float overlapFraction,
                                string searchType, bool sameStrand, bool diffStrand, bool bamInput,
                                bool bamOutput,  bool uncompressedBam, bool useEditDistance) {
@@ -419,7 +420,7 @@ void BedIntersectPE::IntersectBamPE(string bamFile) {
                 ProcessBamBlock(bam1, bam2, refs, writer);
             }
             else {
-                cerr << "*****ERROR: -bedpe requires BAM to be sorted or grouped by query name. " << endl;
+                cerr << "*****ERROR: BAM must be sorted by query name. " << endl;
                 exit(1);
             }
         }
