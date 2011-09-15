@@ -168,7 +168,7 @@ void ChromSweep::Sweep() {
             db_cache.push_back(curr_db);
             db_status = _bedB->GetNextBed(curr_db, db_lineNum);
         }
-        // report the hits for this query and reset for the next.
+        // report the hits for this query and reset for the next query
         ReportHits(curr_qy, hits);
         hits.clear();
         qy_status = _bedA->GetNextBed(curr_qy, qy_lineNum);
