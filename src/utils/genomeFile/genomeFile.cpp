@@ -18,6 +18,16 @@ GenomeFile::GenomeFile(const string &genomeFile) {
     loadGenomeFileIntoMap();
 }
 
+GenomeFile::GenomeFile(const RefVector &genome) {
+    for (size_t i = 0; i < genome.size(); ++i) {
+        string chrom = genome[i].RefName;
+        int length = genome[i].RefLength;
+        
+        _chromSizes[chrom] = length;
+        _chromList.push_back(chrom);
+    }
+}
+
 // Destructor
 GenomeFile::~GenomeFile(void) {
 }

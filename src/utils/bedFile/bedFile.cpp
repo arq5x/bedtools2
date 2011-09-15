@@ -156,6 +156,11 @@ void BedFile::Seek(unsigned long offset) {
     _bedStream->seekg(offset);
 }
 
+// Jump to a specific byte in the file
+bool BedFile::Empty() {
+    return _bedStream->eof();
+}
+
 
 // Close the BED file
 void BedFile::Close(void) {

@@ -203,7 +203,7 @@ void ProcessBed(istream &bedInput, BedFile *bed, GenomeFile *genome, bool isBED1
             bedEntry = nullBed;
         }
     }
-    // close up
+    //close up
     bed->Close();
     writer->Close();
 }

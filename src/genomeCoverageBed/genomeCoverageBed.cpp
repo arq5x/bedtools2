@@ -13,7 +13,7 @@ Licenced under the GNU General Public License 2.0 license.
 #include "genomeCoverageBed.h"
 
 
-BedGenomeCoverage::BedGenomeCoverage(string bedFile, string genomeFile, 
+BedGenomeCoverage::BedGenomeCoverage(string bedFile, string genomeFile,
                                      bool eachBase, bool startSites, 
                                      bool bedGraph, bool bedGraphAll,
                                      int max, float scale,
@@ -43,15 +43,20 @@ BedGenomeCoverage::BedGenomeCoverage(string bedFile, string genomeFile,
     _currChromName = "";
     _currChromSize = 0 ;
 
-    _bed = new BedFile(bedFile);
-    _genome = new GenomeFile(genomeFile);
-
+    
+    if (_bamInput == false) {
+        _genome = new GenomeFile(genomeFile);
+    }
+    
     PrintTrackDefinitionLine();
 
-    if (_bamInput == false)
+    if (_bamInput == false) {
+        _bed = new BedFile(bedFile);
         CoverageBed();
-    else
-        CoverageBam(_bed->bedFile);
+    }
+    else {
+        CoverageBam(_bedFile);
+    }
 }
 
 void BedGenomeCoverage::PrintTrackDefinitionLine()
@@ -214,6 +219,8 @@ void BedGenomeCoverage::CoverageBam(string bamFile) {
     string header = reader.GetHeaderText();
     RefVector refs = reader.GetReferenceData();
 
+    // load the BAM header references into a BEDTools "genome file"
+    _genome = new GenomeFile(refs);
     // convert each aligned BAM entry to BED
     // and compute coverage on B
     BamAlignment bam;

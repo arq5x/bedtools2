@@ -44,7 +44,6 @@ public:
     // constructor
     BedIntersectPE(string bedAFilePE, string bedBFile, float overlapFraction,
         string searchType, bool sameStrand, bool diffStrand, bool bamInput, bool bamOutput, bool uncompressedBam, bool useEditDistance);
-
     // destructor
     ~BedIntersectPE(void);
 

@@ -90,6 +90,7 @@ private:
     // methods
     void CoverageBed();
     void CoverageBam(string bamFile);
+    void LoadBamHeaderIntoGenomeFile(const string &bamFile);
     void ReportChromCoverage(const vector<DEPTH> &, const int &chromSize, const string &chrom, chromHistMap&);
     void ReportGenomeCoverage(chromHistMap &chromDepthHist);
     void ReportChromCoverageBedGraph(const vector<DEPTH> &chromCov, const int &chromSize, const string &chrom);

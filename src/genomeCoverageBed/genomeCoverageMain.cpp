@@ -163,7 +163,7 @@ int main(int argc, char* argv[]) {
     }
 
     // make sure we have both input files
-    if (!haveBed || !haveGenome) {
+    if (!haveBed && !haveGenome && !bamInput) {
       cerr << endl << "*****" << endl << "*****ERROR: Need both a BED (-i) and a genome (-g) file. " << endl << "*****" << endl;
       showHelp = true;
     }
@@ -197,7 +197,6 @@ int main(int argc, char* argv[]) {
     }
     
     if (!showHelp) {
-
         BedGenomeCoverage *bc = new BedGenomeCoverage(bedFile, genomeFile, eachBase,
                                                       startSites, bedGraph, bedGraphAll,
                                                       max, scale, bamInput, obeySplits,

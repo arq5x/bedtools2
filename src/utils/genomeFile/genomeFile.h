@@ -19,6 +19,9 @@
 #include <fstream>
 #include <cstring>
 #include <cstdio>
+#include "api/BamReader.h"
+#include "api/BamAux.h"
+using namespace BamTools;
 
 using namespace std;
 
@@ -31,8 +34,11 @@ class GenomeFile {
 
 public:
 
-    // Constructor
+    // Constructor using a file
     GenomeFile(const string &genomeFile);
+    
+    // Constructor using a vector of BamTools RefVector
+    GenomeFile(const RefVector &genome);
 
     // Destructor
     ~GenomeFile(void);

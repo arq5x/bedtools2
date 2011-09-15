@@ -154,7 +154,6 @@ int main(int argc, char* argv[]) {
         cerr << endl << "*****" << endl << "*****ERROR: Request either -s OR -S, not both." << endl << "*****" << endl;
         showHelp = true;
     }
-
     if (!showHelp) {
 
         BedIntersectPE *bi = new BedIntersectPE(bedAFile, bedBFile, overlapFraction,

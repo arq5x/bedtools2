@@ -407,6 +407,8 @@ public:
 
     // Jump to a specific byte in the file
     void Seek(unsigned long offset);
+    
+    bool Empty();
 
     // Close an opened BED file.
     void Close(void);
