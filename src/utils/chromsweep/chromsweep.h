@@ -24,8 +24,11 @@ using namespace std;
 
 class ChromSweep {
 
+// public interface.
 public:
 
+    // A is the query and B is the database
+    
     // constructor using existing BedFile pointers
     ChromSweep(BedFile *bedA, BedFile *bedB);
     
@@ -49,40 +52,11 @@ public:
     //        // magic happens here!
     //        processHits(hit_set.first, hit_set.second);
     //     }
+    
+// private variables.
 private:
 
-    //------------------------------------------------
-    // private attributes
-    //------------------------------------------------
-    string _bedAFile;
-    string _bedBFile;
-
-    bool  _writeA;            // should the original A feature be reported?
-    bool  _writeB;            // should the original B feature be reported?
-    bool  _writeOverlap;
-    bool  _writeAllOverlap;
-
-    bool  _sameStrand;
-    bool  _diffStrand;
-    bool  _reciprocal;
-    float _overlapFraction;
-
-    bool  _anyHit;
-    bool  _noHit;
-    bool  _writeCount;        // do we want a count of the number of overlaps in B?
-    bool  _obeySplits;
-    bool  _bamInput;
-    bool  _bamOutput;
-
-    bool _printable;
-
-    queue<BED*> _outputBuffer;
-    bool  _lastPick;
-
-    map<string, vector<BED*> > _windowA;
-    map<string, vector<BED*> > _windowB;
-
-    // instance of a bed file class.
+    // instances of a bed file class.
     BedFile *_bedA, *_bedB;
 
     vector<BED> _cache;
@@ -96,6 +70,9 @@ private:
     BedLineStatus _qy_status, _db_status;
     int _qy_lineNum, _db_lineNum;
 
+// private methods.
+private:
+    
     void ScanCache();
     void ChromCheck();
 };
