@@ -77,6 +77,7 @@ bool after(const BED &a, const BED &b) {
     return (a.start >= b.end);
 }
 
+
 void ChromSweep::ScanCache() {
     if (_qy_status != BED_INVALID) {
         vector<BED>::iterator c        = _cache.begin();
@@ -94,24 +95,6 @@ void ChromSweep::ScanCache() {
         }
     }
 }
-
-// void ChromSweep::ScanCache(const BED &curr_qy, BedLineStatus qy_status, vector<BED> &db_cache, vector<BED> &hits) {
-//     if (qy_status != BED_INVALID) {
-//         vector<BED>::iterator c        = db_cache.begin();
-//         while (c != db_cache.end())
-//         {
-//             if ((curr_qy.chrom == c->chrom) && !(after(curr_qy, *c))) {
-//                 if (overlaps(curr_qy.start, curr_qy.end, c->start, c->end) > 0) {
-//                     hits.push_back(*c);
-//                 }
-//                 ++c;
-//             }
-//             else {
-//                 c = db_cache.erase(c);
-//             }
-//         }
-//     }
-// }
 
 
 void ChromSweep::ChromCheck() 
@@ -149,7 +132,6 @@ void ChromSweep::ChromCheck()
 }
 
 
-
 void ChromSweep::ReportQuery(const BED &query) {
     _bedA->reportBedTab(query);
 }
@@ -183,46 +165,3 @@ bool ChromSweep::Next(pair<BED, vector<BED> > &next) {
     else {return false;}
 }
 
-
-// void ChromSweep::Sweep() {
-// 
-//     int qy_lineNum = 0;
-//     int db_lineNum = 0;
-// 
-//     // current feature from each file
-//     BED curr_qy, curr_db;
-//     
-//     // status of the current lines
-//     BedLineStatus qy_status, db_status;
-//     vector<BED> db_cache;
-//     vector<BED> hits;
-//     
-//     // open the files; get the first line from each
-//     _bedA->Open();
-//     _bedB->Open();
-//     qy_status = _bedA->GetNextBed(_curr_qy, _qy_lineNum);
-//     db_status = _bedB->GetNextBed(_curr_db, _db_lineNum);
-//     while (!_bedA->Empty()) {
-//         // have we changed chromosomes?
-//         ChromCheck(curr_qy, curr_db, qy_status, db_status, qy_lineNum, db_lineNum, db_cache, hits);
-//         // scan the database cache for hits
-//         //db_cache = ScanCache(curr_qy, qy_status, db_cache, hits);
-//         ScanCache(curr_qy, qy_status, db_cache, hits);
-//         // advance the db until we are ahead of the query. update hits and cache as necessary
-//         while (!_bedB->Empty() && 
-//                curr_qy.chrom == curr_db.chrom &&
-//                !(after(curr_db, curr_qy)))
-//         {
-//             if (overlaps(curr_qy.start, curr_qy.end, curr_db.start, curr_db.end) > 0) {
-//                 hits.push_back(curr_db);
-//             }
-//             db_cache.push_back(curr_db);
-//             db_status = _bedB->GetNextBed(curr_db, db_lineNum);
-//         }
-//         // report the hits for this query and reset for the next query
-//         //ReportHits(curr_qy, hits);
-//         _results.push(make_pair(curr_qy, hits));
-//         hits.clear();
-//         qy_status = _bedA->GetNextBed(curr_qy, qy_lineNum);
-//     }
-// }
