@@ -173,6 +173,9 @@ BedLineStatus BedFile::GetNextBed(BED &bed, int &lineNum) {
     // make sure there are still lines to process.
     // if so, tokenize, validate and return the BED entry.
     _bedFields.clear();
+    // clear out the previous bed's data
+    BED null;
+    bed = null;
     if (_bedStream->good()) {
         // parse the bedStream pointer
         getline(*_bedStream, _bedLine);

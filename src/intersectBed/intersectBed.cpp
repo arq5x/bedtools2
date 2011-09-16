@@ -200,7 +200,7 @@ void BedIntersect::IntersectBed() {
         int lineNum = 0;
         vector<BED> hits;
         hits.reserve(100);
-        BED a, nullBed;
+        BED a;
         BedLineStatus bedStatus;
 
         // open the "A" file, process each BED entry and searh for overlaps.
@@ -211,7 +211,6 @@ void BedIntersect::IntersectBed() {
                 if (_obeySplits == false) {
                     FindOverlaps(a, hits);
                     hits.clear();
-                    a = nullBed;
                 }
                 // split the BED12 into blocks and look for overlaps in each discrete block
                 else {
@@ -224,7 +223,6 @@ void BedIntersect::IntersectBed() {
                         FindOverlaps(*bedItr, hits);
                         hits.clear();
                     }
-                    a = nullBed;
                 }
             }
         }
