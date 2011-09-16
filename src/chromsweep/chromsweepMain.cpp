@@ -195,10 +195,20 @@ int main(int argc, char* argv[]) {
 
     if (!showHelp) {
 
-        ChromSweep *bi = new ChromSweep(bedAFile, bedBFile, anyHit, writeA, writeB, writeOverlap,
+        ChromSweep *sweep = new ChromSweep(bedAFile, bedBFile, anyHit, writeA, writeB, writeOverlap,
                                             writeAllOverlap, overlapFraction, noHit, writeCount, forceStrand,
                                             reciprocalFraction, obeySplits, inputIsBam, outputIsBam);
-        delete bi;
+        
+        pair<BED, vector<BED> > hit_set;
+        while (sweep->Next(hit_set)) {
+            cout << hit_set.first.chrom << "\t" 
+                 << hit_set.first.start << "\t"
+                 << hit_set.first.end << "\t"
+                 << hit_set.second.size() << "\n";
+        }
+        
+        
+        delete sweep;
         return 0;
     }
     else {

@@ -41,6 +41,10 @@ public:
 
     // destructor
     ~ChromSweep(void);
+    
+    bool Next(pair<BED, vector<BED> > &next);
+    
+    //pair<BED, vector<BED> > GetNextResult(void);
 
 private:
 
@@ -77,15 +81,27 @@ private:
     // instance of a bed file class.
     BedFile *_bedA, *_bedB;
 
+    vector<BED> _cache;
+    vector<BED> _hits;
+    queue< pair<BED, vector<BED> > > _results;
+    
+    // variables for the current query and db entries.
+    BED _curr_qy, _curr_db;
+    BedLineStatus _qy_status, _db_status;
+    int _qy_lineNum, _db_lineNum;
+
     //------------------------------------------------
     // private methods
     //------------------------------------------------
-    void ScanCache(const BED &curr_qy, BedLineStatus qy_status, vector<BED> &db_cache, vector<BED> &hits);
+    // void ScanCache(const BED &curr_qy, BedLineStatus qy_status, vector<BED> &db_cache, vector<BED> &hits);
+    // 
+    // void ChromCheck(BED &curr_qy, BED &curr_db, 
+    //                 BedLineStatus &qy_status, BedLineStatus &db_status,
+    //                 int &qy_lineNum, int &db_lineNum,
+    //                 vector<BED> &db_cache, vector<BED> &hits);
 
-    void ChromCheck(BED &curr_qy, BED &curr_db, 
-                    BedLineStatus &qy_status, BedLineStatus &db_status,
-                    int &qy_lineNum, int &db_lineNum,
-                    vector<BED> &db_cache, vector<BED> &hits);
+    void ScanCache();
+    void ChromCheck();
     
     void Sweep();
     void ReportHits(const BED &curr_qy, const vector<BED> &hits);
