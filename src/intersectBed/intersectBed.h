@@ -13,7 +13,7 @@
 #define INTERSECTBED_H
 
 #include "bedFile.h"
-
+#include "chromsweep.h"
 #include "api/BamReader.h"
 #include "api/BamWriter.h"
 #include "api/BamAux.h"
@@ -37,7 +37,8 @@ public:
     BedIntersect(string bedAFile, string bedBFile, bool anyHit,
                                bool writeA, bool writeB, bool writeOverlap, bool writeAllOverlap,
                                float overlapFraction, bool noHit, bool writeCount, bool sameStrand, bool diffStrand,
-                               bool reciprocal, bool obeySplits, bool bamInput, bool bamOutput, bool isUncompressedBam);
+                               bool reciprocal, bool obeySplits, bool bamInput, bool bamOutput, bool isUncompressedBam,
+                               bool sortedInput);
 
     // destructor
     ~BedIntersect(void);
@@ -67,7 +68,9 @@ private:
     bool  _bamInput;
     bool  _bamOutput;
     bool  _isUncompressedBam;
-
+    bool  _sortedInput;
+    bool  _printable;
+    
     // instance of a bed file class.
     BedFile *_bedA, *_bedB;
 
@@ -80,7 +83,7 @@ private:
 
     void IntersectBam(string bamFile);
 
-    bool processHits(const BED &a, const vector<BED> &hits, bool printable);
+    bool processHits(const BED &a, const vector<BED> &hits);
 
     bool FindOverlaps(const BED &a, vector<BED> &hits);
 

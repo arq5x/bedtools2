@@ -13,13 +13,6 @@
 #define CHROMSWEEP_H
 
 #include "bedFile.h"
-// #include "BamReader.h"
-// #include "BamWriter.h"
-// #include "BamAncillary.h"
-// #include "BamAux.h"
-// using namespace BamTools;
-
-
 #include <vector>
 #include <queue>
 #include <iostream>
@@ -34,9 +27,9 @@ class ChromSweep {
 public:
 
     // constructor
-    ChromSweep(string bedAFile, string bedBFile, bool anyHit,
+    ChromSweep(BedFile *bedA, BedFile *bedB, bool anyHit,
                                bool writeA, bool writeB, bool writeOverlap, bool writeAllOverlap,
-                               float overlapFraction, bool noHit, bool writeCount, bool forceStrand,
+                               float overlapFraction, bool noHit, bool writeCount, bool sameStrand, bool diffStrand,
                                bool reciprocal, bool obeySplits, bool bamInput, bool bamOutput);
 
     // destructor
@@ -59,7 +52,8 @@ private:
     bool  _writeOverlap;
     bool  _writeAllOverlap;
 
-    bool  _forceStrand;
+    bool  _sameStrand;
+    bool  _diffStrand;
     bool  _reciprocal;
     float _overlapFraction;
 

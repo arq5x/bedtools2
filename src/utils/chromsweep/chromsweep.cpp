@@ -12,7 +12,6 @@
 #include "lineFileUtilities.h"
 #include "chromsweep.h"
 #include <queue>
-#include <set>
 
 bool after(const BED &a, const BED &b);
 void report_hits(const BED &curr_qy, const vector<BED> &hits);
@@ -22,13 +21,13 @@ vector<BED> scan_cache(const BED &curr_qy, BedLineStatus qy_status, const vector
 /*
     Constructor
 */
-ChromSweep::ChromSweep(string bedAFile, string bedBFile, bool anyHit,
+ChromSweep::ChromSweep(BedFile *bedA, BedFile *bedB, bool anyHit,
                            bool writeA, bool writeB, bool writeOverlap, bool writeAllOverlap,
-                           float overlapFraction, bool noHit, bool writeCount, bool forceStrand,
+                           float overlapFraction, bool noHit, bool writeCount, bool sameStrand, bool diffStrand,
                            bool reciprocal, bool obeySplits, bool bamInput, bool bamOutput) {
 
-    _bedAFile            = bedAFile;
-    _bedBFile            = bedBFile;
+    _bedA                = bedA;
+    _bedB                = bedB;
     _anyHit              = anyHit;
     _noHit               = noHit;
     _writeA              = writeA;
@@ -37,20 +36,12 @@ ChromSweep::ChromSweep(string bedAFile, string bedBFile, bool anyHit,
     _writeAllOverlap     = writeAllOverlap;
     _writeCount          = writeCount;
     _overlapFraction     = overlapFraction;
-    _forceStrand         = forceStrand;
+    _sameStrand          = sameStrand;
+    _diffStrand          = diffStrand;
     _reciprocal          = reciprocal;
     _obeySplits          = obeySplits;
     _bamInput            = bamInput;
     _bamOutput           = bamOutput;
-
-    if (_anyHit || _noHit || _writeCount)
-        _printable = false;
-    else
-        _printable = true;
-
-    // create new BED file objects for A and B
-    _bedA = new BedFile(bedAFile);
-    _bedB = new BedFile(bedBFile);
     
     // prime the results pump.
     _qy_lineNum = 0;

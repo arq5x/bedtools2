@@ -18,7 +18,6 @@ SUBDIRS = $(SRC_DIR)/annotateBed \
 		  $(SRC_DIR)/bedToBam \
 		  $(SRC_DIR)/bedToIgv \
 		  $(SRC_DIR)/bed12ToBed6 \
-		  $(SRC_DIR)/chromsweep \
 		  $(SRC_DIR)/closestBed \
 		  $(SRC_DIR)/complementBed \
 		  $(SRC_DIR)/coverageBed \
@@ -45,6 +44,7 @@ SUBDIRS = $(SRC_DIR)/annotateBed \
 UTIL_SUBDIRS =	$(SRC_DIR)/utils/lineFileUtilities \
 				$(SRC_DIR)/utils/bedFile \
 				$(SRC_DIR)/utils/bedGraphFile \
+				$(SRC_DIR)/utils/chromsweep \
 				$(SRC_DIR)/utils/gzstream \
 				$(SRC_DIR)/utils/fileType \
 				$(SRC_DIR)/utils/bedFilePE \
