@@ -19,30 +19,12 @@ vector<BED> scan_cache(const BED &curr_qy, BedLineStatus qy_status, const vector
 
 
 /*
-    Constructor
+    // constructor using existing BedFile pointers
 */
-ChromSweep::ChromSweep(BedFile *bedA, BedFile *bedB, bool anyHit,
-                           bool writeA, bool writeB, bool writeOverlap, bool writeAllOverlap,
-                           float overlapFraction, bool noHit, bool writeCount, bool sameStrand, bool diffStrand,
-                           bool reciprocal, bool obeySplits, bool bamInput, bool bamOutput) {
-
-    _bedA                = bedA;
-    _bedB                = bedB;
-    _anyHit              = anyHit;
-    _noHit               = noHit;
-    _writeA              = writeA;
-    _writeB              = writeB;
-    _writeOverlap        = writeOverlap;
-    _writeAllOverlap     = writeAllOverlap;
-    _writeCount          = writeCount;
-    _overlapFraction     = overlapFraction;
-    _sameStrand          = sameStrand;
-    _diffStrand          = diffStrand;
-    _reciprocal          = reciprocal;
-    _obeySplits          = obeySplits;
-    _bamInput            = bamInput;
-    _bamOutput           = bamOutput;
-    
+ChromSweep::ChromSweep(BedFile *bedA, BedFile *bedB) 
+: _bedA(bedA)
+, _bedB(bedB)
+{
     // prime the results pump.
     _qy_lineNum = 0;
     _db_lineNum = 0;
@@ -56,16 +38,33 @@ ChromSweep::ChromSweep(BedFile *bedA, BedFile *bedB, bool anyHit,
     _db_status = _bedB->GetNextBed(_curr_db, _db_lineNum);
 }
 
+/*
+    Constructor with filenames
+*/
+ChromSweep::ChromSweep(string &bedAFile, string &bedBFile) 
+{
+    // prime the results pump.
+    _qy_lineNum = 0;
+    _db_lineNum = 0;
+    
+    _hits.reserve(1000);
+    _cache.reserve(1000);
+    
+    _bedA = new BedFile(bedAFile);
+    _bedB = new BedFile(bedBFile);
+    
+    _bedA->Open();
+    _bedB->Open();
+    
+    _qy_status = _bedA->GetNextBed(_curr_qy, _qy_lineNum);
+    _db_status = _bedB->GetNextBed(_curr_db, _db_lineNum);
+}
+
 
 /*
     Destructor
 */
 ChromSweep::~ChromSweep(void) {
-}
-
-
-bool after(const BED &a, const BED &b) {
-    return (a.start >= b.end);
 }
 
 
@@ -90,10 +89,13 @@ void ChromSweep::ScanCache() {
 
 void ChromSweep::ChromCheck() 
 {
+    // the files are on the chrom
     if ((_curr_qy.chrom == _curr_db.chrom) || (_db_status == BED_INVALID) || (_qy_status == BED_INVALID)) {
         return;
     }
     
+    // the query is ahead of the database.
+    // fast-forward the database to catch-up.
     if (_curr_qy.chrom > _curr_db.chrom) {
         while (!_bedB->Empty() && _curr_db.chrom < _curr_qy.chrom)
         {
@@ -101,6 +103,9 @@ void ChromSweep::ChromCheck()
         }
         _cache.clear();
     }
+    // the database is ahead of the query.
+    // 1. scan the cache for remaining hits on the query's current chrom.
+    // 2. fast-forward until we catch up and report 0 hits until we do.
     else if (_curr_qy.chrom < _curr_db.chrom) {
         // report hits for the remaining queries on this chrom
         string curr_chrom = _curr_qy.chrom;
@@ -123,11 +128,6 @@ void ChromSweep::ChromCheck()
 }
 
 
-void ChromSweep::ReportQuery(const BED &query) {
-    _bedA->reportBedTab(query);
-}
-
-
 bool ChromSweep::Next(pair<BED, vector<BED> > &next) {
     if (!_bedA->Empty()) {
         // have we changed chromosomes?
@@ -143,16 +143,19 @@ bool ChromSweep::Next(pair<BED, vector<BED> > &next) {
             _cache.push_back(_curr_db);
             _db_status = _bedB->GetNextBed(_curr_db, _db_lineNum);
         }
-        // report the hits for this query and reset for the next query
+        // add the hits for this query to the pump
         _results.push(make_pair(_curr_qy, _hits));
+        // reset for the next query
         _hits.clear();
         _qy_status = _bedA->GetNextBed(_curr_qy, _qy_lineNum);
     }
+    // report the next set if hits if there are still overlaps in the pump
     if (!_results.empty()) {
         next = _results.front();
         _results.pop();
         return true;
     }
+    // otherwise, the party is over.
     else {return false;}
 }
 

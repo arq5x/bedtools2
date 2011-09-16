@@ -370,6 +370,12 @@ int overlaps(CHRPOS aS, CHRPOS aE, CHRPOS bS, CHRPOS bE) {
     return min(aE, bE) - max(aS, bS);
 }
 
+// is A after (to the right of) B?
+inline
+bool after(const BED &a, const BED &b) {
+    return (a.start >= b.end);
+}
+
 
 // Ancillary functions
 void splitBedIntoBlocks(const BED &bed, int lineNum, bedVector &bedBlocks);

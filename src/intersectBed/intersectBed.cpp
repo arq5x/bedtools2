@@ -230,12 +230,8 @@ void BedIntersect::IntersectBed() {
     }
     else {
         // use the chromsweep algorithm to detect overlaps on the fly.
-        ChromSweep sweep = ChromSweep(_bedA, _bedB, _anyHit, _writeA, _writeB, _writeOverlap,
-                                      _writeAllOverlap, _overlapFraction, _noHit, _writeCount, _sameStrand, _diffStrand,
-                                      _reciprocal, _obeySplits, _bamInput, _bamOutput);
-        
-        // hit_set.first  = current entry (a) from A
-        // hit_set.second = list of hits in B for this a
+        ChromSweep sweep = ChromSweep(_bedA, _bedB);
+
         pair<BED, vector<BED> > hit_set;
         while (sweep.Next(hit_set)) {
             processHits(hit_set.first, hit_set.second);

@@ -26,19 +26,29 @@ class ChromSweep {
 
 public:
 
-    // constructor
-    ChromSweep(BedFile *bedA, BedFile *bedB, bool anyHit,
-                               bool writeA, bool writeB, bool writeOverlap, bool writeAllOverlap,
-                               float overlapFraction, bool noHit, bool writeCount, bool sameStrand, bool diffStrand,
-                               bool reciprocal, bool obeySplits, bool bamInput, bool bamOutput);
-
+    // constructor using existing BedFile pointers
+    ChromSweep(BedFile *bedA, BedFile *bedB);
+    
+    // constructor using filenames
+    ChromSweep(string &bedAFile, string &bedBFile);
+    
     // destructor
     ~ChromSweep(void);
     
+    // loads next (a pair) with the current query and it's overlaps
+    //   next.first is the current query interval
+    //   next.second is a vector of the current query's hits.
+    // returns true if overlap
     bool Next(pair<BED, vector<BED> > &next);
     
-    void ReportQuery(const BED &query);
-
+    // Usage:
+    //     ChromSweep sweep = ChromSweep(_bedA, _bedB);
+    //     pair<BED, vector<BED> > hit_set;
+    //     while (sweep.Next(hit_set)) 
+    //     {
+    //        // magic happens here!
+    //        processHits(hit_set.first, hit_set.second);
+    //     }
 private:
 
     //------------------------------------------------
