@@ -44,7 +44,7 @@ public:
     
     bool Next(pair<BED, vector<BED> > &next);
     
-    //pair<BED, vector<BED> > GetNextResult(void);
+    void ReportQuery(const BED &query);
 
 private:
 
@@ -90,23 +90,8 @@ private:
     BedLineStatus _qy_status, _db_status;
     int _qy_lineNum, _db_lineNum;
 
-    //------------------------------------------------
-    // private methods
-    //------------------------------------------------
-    // void ScanCache(const BED &curr_qy, BedLineStatus qy_status, vector<BED> &db_cache, vector<BED> &hits);
-    // 
-    // void ChromCheck(BED &curr_qy, BED &curr_db, 
-    //                 BedLineStatus &qy_status, BedLineStatus &db_status,
-    //                 int &qy_lineNum, int &db_lineNum,
-    //                 vector<BED> &db_cache, vector<BED> &hits);
-
     void ScanCache();
     void ChromCheck();
-    
-    void Sweep();
-    void ReportHits(const BED &curr_qy, const vector<BED> &hits);
-
-
 };
 
 #endif /* CHROMSWEEP_H */

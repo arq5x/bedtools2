@@ -201,13 +201,9 @@ int main(int argc, char* argv[]) {
         
         pair<BED, vector<BED> > hit_set;
         while (sweep->Next(hit_set)) {
-            cout << hit_set.first.chrom << "\t" 
-                 << hit_set.first.start << "\t"
-                 << hit_set.first.end << "\t"
-                 << hit_set.second.size() << "\n";
+            sweep->ReportQuery(hit_set.first);
+            cout << hit_set.second.size() << "\n";
         }
-        
-        
         delete sweep;
         return 0;
     }

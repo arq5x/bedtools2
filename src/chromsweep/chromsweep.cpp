@@ -55,6 +55,10 @@ ChromSweep::ChromSweep(string bedAFile, string bedBFile, bool anyHit,
     // prime the results pump.
     _qy_lineNum = 0;
     _db_lineNum = 0;
+    
+    _hits.reserve(1000);
+    _cache.reserve(1000);
+    
     _bedA->Open();
     _bedB->Open();
     _qy_status = _bedA->GetNextBed(_curr_qy, _qy_lineNum);
@@ -125,72 +129,29 @@ void ChromSweep::ChromCheck()
     }
     else if (_curr_qy.chrom < _curr_db.chrom) {
         // report hits for the remaining queries on this chrom
-        BED tmp_curr_qy = _curr_qy;
-        while (!_bedA->Empty() && tmp_curr_qy.chrom == _curr_qy.chrom)
+        string curr_chrom = _curr_qy.chrom;
+        while (!_bedA->Empty() && _curr_qy.chrom == curr_chrom)
         {
             ScanCache();
-            _results.push(make_pair(tmp_curr_qy, _hits));
-            _qy_status = _bedA->GetNextBed(tmp_curr_qy, _qy_lineNum);
+            _results.push(make_pair(_curr_qy, _hits));
+            _qy_status = _bedA->GetNextBed(_curr_qy, _qy_lineNum);
             _hits.clear();
         }
         // now fast forward query to catch up to database
-        while (!_bedA->Empty() && tmp_curr_qy.chrom < _curr_db.chrom)
+        while (!_bedA->Empty() && _curr_qy.chrom < _curr_db.chrom)
         {
             // hits is empty to reflect the fact that no hits are found in catch-up mode
-            _results.push(make_pair(tmp_curr_qy, _hits));
-            _qy_status = _bedA->GetNextBed(tmp_curr_qy, _qy_lineNum);
+            _results.push(make_pair(_curr_qy, _hits));
+            _qy_status = _bedA->GetNextBed(_curr_qy, _qy_lineNum);
         }
-        _curr_qy = tmp_curr_qy;
         _cache.clear();
     }
 }
 
-// 
-// void ChromSweep::ChromCheck(BED &curr_qy, BED &curr_db, 
-//                             BedLineStatus &qy_status, BedLineStatus &db_status,
-//                             int &qy_lineNum, int &db_lineNum,
-//                             vector<BED> &db_cache, vector<BED> &hits) 
-// {
-//     if ((curr_qy.chrom == curr_db.chrom) || (db_status == BED_INVALID) || (qy_status == BED_INVALID)) {
-//         return;
-//     }
-//     
-//     if (curr_qy.chrom > curr_db.chrom) {
-//         while (!_bedB->Empty() && curr_db.chrom < curr_qy.chrom)
-//         {
-//             db_status = _bedB->GetNextBed(curr_db, db_lineNum);
-//         }
-//         db_cache.clear();
-//     }
-//     else if (curr_qy.chrom < curr_db.chrom) {
-//         // report hits for the remaining queries on this chrom
-//         BED tmp_curr_qy = curr_qy;
-//         while (!_bedA->Empty() && tmp_curr_qy.chrom == curr_qy.chrom)
-//         {
-//             //db_cache = ScanCache(tmp_curr_qy, qy_status, db_cache, hits);
-//             ScanCache(tmp_curr_qy, qy_status, db_cache, hits);
-// 
-//             //ReportHits(tmp_curr_qy, hits);
-//             _results.push(make_pair(tmp_curr_qy, hits));
-//             qy_status = _bedA->GetNextBed(tmp_curr_qy, qy_lineNum);
-//             hits.clear();
-//         }
-//         // now fast forward query to catch up to database
-//         while (!_bedA->Empty() && tmp_curr_qy.chrom < curr_db.chrom)
-//         {
-//             // hits is empty to reflect the fact that no hits are found in catch-up mode
-//             ReportHits(tmp_curr_qy, hits);
-//             qy_status = _bedA->GetNextBed(tmp_curr_qy, qy_lineNum);
-//         }
-//         curr_qy = tmp_curr_qy;
-//         db_cache.clear();
-//     }
-// }
 
 
-void ChromSweep::ReportHits(const BED &curr_qy, const vector<BED> &hits) {
-    _bedA->reportBedTab(curr_qy);
-    cout << hits.size() << endl;
+void ChromSweep::ReportQuery(const BED &query) {
+    _bedA->reportBedTab(query);
 }
 
 
@@ -201,9 +162,7 @@ bool ChromSweep::Next(pair<BED, vector<BED> > &next) {
         // scan the database cache for hits
         ScanCache();
         // advance the db until we are ahead of the query. update hits and cache as necessary
-        while (!_bedB->Empty() && 
-               _curr_qy.chrom == _curr_db.chrom &&
-               !(after(_curr_db, _curr_qy)))
+        while (!_bedB->Empty() && _curr_qy.chrom == _curr_db.chrom && !(after(_curr_db, _curr_qy)))
         {
             if (overlaps(_curr_qy.start, _curr_qy.end, _curr_db.start, _curr_db.end) > 0) {
                 _hits.push_back(_curr_db);
