@@ -89,6 +89,8 @@ private:
     vector<BED> _hits;
     queue< pair<BED, vector<BED> > > _results;
     
+    BED _nullBed;
+    
     // variables for the current query and db entries.
     BED _curr_qy, _curr_db;
     BedLineStatus _qy_status, _db_status;

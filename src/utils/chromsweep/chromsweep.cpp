@@ -147,6 +147,7 @@ bool ChromSweep::Next(pair<BED, vector<BED> > &next) {
         _results.push(make_pair(_curr_qy, _hits));
         // reset for the next query
         _hits.clear();
+        _curr_qy = _nullBed;
         _qy_status = _bedA->GetNextBed(_curr_qy, _qy_lineNum);
     }
     // report the next set if hits if there are still overlaps in the pump

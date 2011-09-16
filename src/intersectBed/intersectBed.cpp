@@ -200,7 +200,7 @@ void BedIntersect::IntersectBed() {
         int lineNum = 0;
         vector<BED> hits;
         hits.reserve(100);
-        BED a;
+        BED a, nullBed;
         BedLineStatus bedStatus;
 
         // open the "A" file, process each BED entry and searh for overlaps.
@@ -225,6 +225,7 @@ void BedIntersect::IntersectBed() {
                     }
                 }
             }
+            a = nullBed;
         }
         _bedA->Close();
     }
