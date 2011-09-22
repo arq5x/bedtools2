@@ -173,7 +173,7 @@ void BedIntersect::ReportOverlapSummary(const BED &a, const int &numOverlapsFoun
 
 
 bool BedIntersect::FindOneOrMoreOverlap(const BED &a) {
-    bool overlapsFound;
+    bool overlapsFound = false;
     if (_reciprocal == false) {
         overlapsFound = _bedB->FindOneOrMoreOverlapsPerBin(a.chrom, a.start, a.end, a.strand,
                                                           _sameStrand, _diffStrand, _overlapFraction);
@@ -245,11 +245,13 @@ void BedIntersect::IntersectBam(string bamFile) {
 
     // load the "B" bed file into a map so
     // that we can easily compare "A" to it for overlaps
+    _bedB = new BedFile(_bedBFile);
     _bedB->loadBedFileIntoMap();
 
     // open the BAM file
     BamReader reader;
     BamWriter writer;
+    
     reader.Open(bamFile);
 
     // get header & reference information
@@ -270,8 +272,10 @@ void BedIntersect::IntersectBam(string bamFile) {
     // reserve some space
     hits.reserve(100);
 
-    _bedA->bedType = 6;
+    //_bedA->bedType = 6;
+    
     BamAlignment bam;
+    
     // get each set of alignments for each pair.
     while (reader.GetNextAlignment(bam)) {
 
@@ -312,7 +316,7 @@ void BedIntersect::IntersectBam(string bamFile) {
                     vector<BED>::const_iterator bedItr  = bedBlocks.begin();
                     vector<BED>::const_iterator bedEnd  = bedBlocks.end();
                     for (; bedItr != bedEnd; ++bedItr) {
-                        overlapFoundForBlock = FindOneOrMoreOverlap(a);
+                        overlapFoundForBlock = FindOneOrMoreOverlap(*bedItr);
                         if (overlapFoundForBlock == true)
                             overlapsFound = true;
                     }
