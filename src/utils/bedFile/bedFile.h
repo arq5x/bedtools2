@@ -720,8 +720,10 @@ private:
         if (numFields == this->bedType) {
             if (this->bedType >= 8 && _isGff) {
                 bed.chrom = lineVector[0];
-                bed.start  = atoi(lineVector[3].c_str());
-                bed.end    = atoi(lineVector[4].c_str());
+                if (isInteger(lineVector[3]))
+                    bed.start  = atoi(lineVector[3].c_str());
+                if (isInteger(lineVector[4]))
+                    bed.end  = atoi(lineVector[4].c_str());
                 bed.name   = lineVector[2];
                 bed.score  = lineVector[5];
                 bed.strand = lineVector[6].c_str();
@@ -730,13 +732,6 @@ private:
                 // handle the optional 9th field.
                 if (this->bedType == 9)
                     bed.otherFields.push_back(lineVector[8]);  // add GFF "group". unused in BED
-                    
-                // handle starts == end (e.g., insertions in reference genome)
-                // if (bed.start == bed.end) {
-                //     bed.end++;
-                //     bed.zeroLength = true;
-                // }
-                // GFF uses 1-based starts, covert to zero-based
                 bed.start--;
             }
             else {
@@ -748,11 +743,11 @@ private:
                 cerr << "Error: malformed GFF entry at line " << lineNum << ". Start was greater than end. Exiting." << endl;
                 exit(1);
             }
-            else if ( (bed.start < 0) || (bed.end < 0) ) {
+            if ( (bed.start < 0) || (bed.end < 0) ) {
                 cerr << "Error: malformed GFF entry at line " << lineNum << ". Coordinate detected that is < 1. Exiting." << endl;
                 exit(1);
             }
-            else return true;
+            return true;
         }
         else if (numFields == 1) {
             cerr << "Only one GFF field detected: " << lineNum << ".  Verify that your files are TAB-delimited.  Exiting..." << endl;
