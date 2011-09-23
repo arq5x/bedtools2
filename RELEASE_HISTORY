@@ -1,3 +1,21 @@
+Version 2.13.2 (23-Sept-2011)
+
+New algorithm
+=============
+1. Preliminary release of the chrom_sweep algorithm.
+
+New options
+===========
+1. genomeCoverageBed no longer requires a genome file when working with BAM input.  It instead uses the BAM header.
+2. tagBam now has a -score option for annotating alignments with the BED "scores" field in annotation files.  This overrides the default behavior, which is to use the -labels associated with the annotation files passed in on the command line.
+
+Bug fixes
+=========
+1. Correct a bug that prevented proper BAM support in intersectBed.
+2. Improved detection of GFF features with negative coordinates.
+
+
+
 Version 2.13.1 (6-Sept-2011)
 
 New options
