@@ -18,7 +18,8 @@ Helper functions
 bool BedIntersect::processHits(const BED &a, const vector<BED> &hits) {
 
     // how many overlaps are there b/w the bed and the set of hits?
-    int s, e, overlapBases;
+    CHRPOS s, e;
+    int overlapBases;
     int  numOverlaps = 0;
     bool hitsFound   = false;
     int aLength      = (a.end - a.start);   // the length of a in b.p.
@@ -108,24 +109,21 @@ BedIntersect::~BedIntersect(void) {
 
 
 bool BedIntersect::FindOverlaps(const BED &a, vector<BED> &hits) {
-
     bool hitsFound = false;
-
+    
     // collect and report the sufficient hits
     _bedB->FindOverlapsPerBin(a.chrom, a.start, a.end, a.strand, hits, _sameStrand, _diffStrand);
     hitsFound = processHits(a, hits);
-
     return hitsFound;
 }
 
 
-void BedIntersect::ReportOverlapDetail(const int &overlapBases, const BED &a, const BED &b,
-                                       const CHRPOS &s, const CHRPOS &e) {
+void BedIntersect::ReportOverlapDetail(int overlapBases, const BED &a, const BED &b, CHRPOS s, CHRPOS e) {
     // default. simple intersection only
     if (_writeA == false && _writeB == false && _writeOverlap == false) {
         _bedA->reportBedRangeNewLine(a,s,e);
     }
-    //  -wa -wbwrite the original A and B
+    //  -wa -wb write the original A and B
     else if (_writeA == true && _writeB == true) {
         _bedA->reportBedTab(a);
         _bedB->reportBedNewLine(b);
@@ -248,6 +246,13 @@ void BedIntersect::IntersectBam(string bamFile) {
     _bedB = new BedFile(_bedBFile);
     _bedB->loadBedFileIntoMap();
 
+    // create a dummy BED A file for printing purposes if not
+    // using BAM output.
+    if (_bamOutput == false) {
+        _bedA = new BedFile(_bedAFile);
+        _bedA->bedType = 6;
+    }
+
     // open the BAM file
     BamReader reader;
     BamWriter writer;
@@ -272,10 +277,8 @@ void BedIntersect::IntersectBam(string bamFile) {
     // reserve some space
     hits.reserve(100);
 
-    //_bedA->bedType = 6;
     
-    BamAlignment bam;
-    
+    BamAlignment bam;    
     // get each set of alignments for each pair.
     while (reader.GetNextAlignment(bam)) {
 
@@ -299,10 +302,6 @@ void BedIntersect::IntersectBam(string bamFile) {
                 bool overlapsFound = false;
                 // treat the BAM alignment as a single "block"
                 if (_obeySplits == false) {
-                    // Toying with adding tags.  Need new version of FindOverlaps.
-                    // FindOverlaps(a, hits);
-                    // bam.AddTag("YB", "i", static_cast<int>(hits.size()));
-                    // hits.clear();
                     overlapsFound = FindOneOrMoreOverlap(a);
                 }
                 // split the BAM alignment into discrete blocks and
