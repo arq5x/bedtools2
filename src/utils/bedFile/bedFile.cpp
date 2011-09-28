@@ -117,6 +117,8 @@ Class methods
 // Constructor
 BedFile::BedFile(string &bedFile)
 : bedFile(bedFile),
+  _isGff(false),
+  _isVcf(false),
   _typeIsKnown(false)
 {}
 

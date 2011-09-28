@@ -945,7 +945,6 @@ public:
             start = bed.start + 1;
             end   = bed.end - 1;
         }
-        
         // BED
         if (_isGff == false && _isVcf == false) {
             if (this->bedType == 3) {
@@ -1022,7 +1021,6 @@ public:
             start = bed.start + 1;
             end   = bed.end - 1;
         }
-        
         // BED
         if (_isGff == false && _isVcf == false) {
             if (this->bedType == 3) {
