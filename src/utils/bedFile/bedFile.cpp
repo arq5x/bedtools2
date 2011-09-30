@@ -270,7 +270,6 @@ bool BedFile::FindOneOrMoreOverlapsPerBin(string chrom, CHRPOS start, CHRPOS end
                 if ( (float) overlapBases / (float) aLength  >= overlapFraction) {
                     
                     bool strands_are_same = (strand == bedItr->strand);
-                    
                     // test for necessary strandedness
                     if ( (sameStrand == false && diffStrand == false)
                          ||

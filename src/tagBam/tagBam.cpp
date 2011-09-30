@@ -77,6 +77,7 @@ void TagBam::Tag() {
     // rip through the BAM file and test for overlaps with each annotation file.
     BamAlignment al;
     vector<BED> hits;
+
     while (reader.GetNextAlignment(al)) {
         if (al.IsMapped() == true) {
             BED a;
@@ -95,7 +96,7 @@ void TagBam::Tag() {
                 
                 if (!_useNames && !_useScores) {
                     // add the label for this annotation file to tag if there is overlap
-                    if (anno->FindOneOrMoreOverlapsPerBin(a.chrom, a.start, a.end, a.strand, _sameStrand, _diffStrand, _overlapFraction)) 
+                    if (anno->FindOneOrMoreOverlapsPerBin(a.chrom, a.start, a.end, a.strand, _sameStrand, _diffStrand, _overlapFraction))
                     {
                         annotations << _annoLabels[i] << ";";
                     }
