@@ -1,3 +1,13 @@
+Version 2.13.3 (30-Sept-2011)
+Bug Fixes
+============
+1. intersectBed detected, but did not report overlaps when using BAM input and -bed.
+
+Other
+=====
+1. Warning that -sorted trusts, but does not enforce that data is actually sorted.
+
+
 Version 2.13.2 (23-Sept-2011)
 
 New algorithm
