@@ -111,7 +111,7 @@ int main(int argc, char* argv[]) {
         else if (PARAMETER_CHECK("-sm", 3, parameterLength)) {
             matchOnSameStrand = true;
         }
-        else if (PARAMETER_CHECK("-sm", 3, parameterLength)) {
+        else if (PARAMETER_CHECK("-Sm", 3, parameterLength)) {
             matchOnDiffStrand = true;
         }
         else if (PARAMETER_CHECK("-w", 2, parameterLength)) {
