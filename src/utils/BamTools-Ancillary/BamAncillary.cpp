@@ -27,15 +27,21 @@ namespace BamTools {
         string name         = bam.Name;
         string strand       = "+";
         string score        = ToString(bam.MapQuality);
+        char  prevOp        = '\0';
         if (bam.IsReverseStrand()) strand = "-";
+        bool blocksFound = false;
 
         vector<CigarOp>::const_iterator cigItr = bam.CigarData.begin();
         vector<CigarOp>::const_iterator cigEnd = bam.CigarData.end();
         for ( ; cigItr != cigEnd; ++cigItr ) {
             if (cigItr->Type == 'M') {
                 currPosition += cigItr->Length;
-                blocks.push_back( BED(chrom, blockStart, currPosition, name, score, strand) );
-                blockStart    = currPosition;
+                // we only want to create a new block if the current M op
+                // was preceded by an N op or a D op (and we are breaking on D ops)
+                if ((prevOp == 'D' && breakOnDeletionOps == true) || (prevOp == 'N')) {
+                    blocks.push_back( BED(chrom, blockStart, currPosition, name, score, strand) );
+                    blockStart = currPosition;
+                }
             }
             else if (cigItr->Type == 'D') {
                 if (breakOnDeletionOps == false)
@@ -47,7 +53,8 @@ namespace BamTools {
             }
             else if (cigItr->Type == 'N') {
                 currPosition += cigItr->Length;
-                blockStart    = currPosition;            }
+                blockStart    = currPosition;
+            }
             else if (cigItr->Type == 'S' || cigItr->Type == 'H' || cigItr->Type == 'P' || cigItr->Type == 'I') {
                 // do nothing
             }
@@ -56,6 +63,11 @@ namespace BamTools {
                     << ") for: " << bam.Name << endl;
                 exit(1);
             }
+            prevOp = cigItr->Type;
+        }
+        // if there were no splits, we just create a block representing the contiguous alignment.
+        if (blocksFound == false) {
+            blocks.push_back( BED(chrom, bam.Position, currPosition, name, score, strand) );
         }
     }
 }
