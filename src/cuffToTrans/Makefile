@@ -5,23 +5,17 @@ BIN_DIR = ../../bin/
 # -------------------
 # define our includes
 # -------------------
-INCLUDES = -I$(UTILITIES_DIR)/bedFile/ \
-           -I$(UTILITIES_DIR)/version/ \
-           -I$(UTILITIES_DIR)/gzstream/ \
-           -I$(UTILITIES_DIR)/genomeFile/ \
-           -I$(UTILITIES_DIR)/lineFileUtilities/ \
-           -I$(UTILITIES_DIR)/fileType/ \
-           -I$(UTILITIES_DIR)/BamTools/include \
-           -I$(UTILITIES_DIR)/BamTools-Ancillary
+INCLUDES = -I$(UTILITIES_DIR)/bedFile/ -I$(UTILITIES_DIR)/sequenceUtilities/ -I$(UTILITIES_DIR)/lineFileUtilities/ -I$(UTILITIES_DIR)/version/ -I$(UTILITIES_DIR)/gzstream/ -I$(UTILITIES_DIR)/fileType/
+
 # ----------------------------------
 # define our source and object files
 # ----------------------------------
-SOURCES= tagBamMain.cpp tagBam.cpp
+SOURCES= cuffToTransMain.cpp cuffToTrans.cpp Fasta.cpp split.cpp
 OBJECTS= $(SOURCES:.cpp=.o)
-_EXT_OBJECTS=bedFile.o lineFileUtilities.o gzstream.o fileType.o
+_EXT_OBJECTS=bedFile.o sequenceUtils.o lineFileUtilities.o gzstream.o fileType.o
 EXT_OBJECTS=$(patsubst %,$(OBJ_DIR)/%,$(_EXT_OBJECTS))
 BUILT_OBJECTS= $(patsubst %,$(OBJ_DIR)/%,$(OBJECTS))
-PROGRAM= tagBam
+PROGRAM= cuffToTrans
 
 
 all: $(PROGRAM)
@@ -30,18 +24,17 @@ all: $(PROGRAM)
 
 $(PROGRAM): $(BUILT_OBJECTS) $(EXT_OBJECTS)
 	@echo "  * linking $(PROGRAM)"
-	@$(CXX) $(LDFLAGS) $(CXXFLAGS) -o $(BIN_DIR)/$@ $^ -L$(UTILITIES_DIR)/BamTools/lib/ -lbamtools $(LIBS)
+	@$(CXX) $(LDFLAGS) $(CXXFLAGS) -o $(BIN_DIR)/$@ $^ $(LIBS)
 
 $(BUILT_OBJECTS): $(SOURCES)
 	@echo "  * compiling" $(*F).cpp
 	@$(CXX) -c -o $@ $(*F).cpp $(LDFLAGS) $(CXXFLAGS) $(INCLUDES)
 
 $(EXT_OBJECTS):
-	@$(MAKE) --no-print-directory -C $(UTILITIES_DIR)/bedFile/
+	@$(MAKE) --no-print-directory -C $(UTILITIES_DIR)/sequenceUtilities/
 	@$(MAKE) --no-print-directory -C $(UTILITIES_DIR)/lineFileUtilities/
+	@$(MAKE) --no-print-directory -C $(UTILITIES_DIR)/bedFile/
 	@$(MAKE) --no-print-directory -C $(UTILITIES_DIR)/gzstream/
-	@$(MAKE) --no-print-directory -C $(UTILITIES_DIR)/BamTools/
-	@$(MAKE) --no-print-directory -C $(UTILITIES_DIR)/BamTools-Ancillary/
 	@$(MAKE) --no-print-directory -C $(UTILITIES_DIR)/fileType/	
 		
 clean:

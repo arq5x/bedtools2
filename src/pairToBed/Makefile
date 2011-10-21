@@ -30,7 +30,7 @@ all: $(PROGRAM)
 
 $(PROGRAM): $(BUILT_OBJECTS) $(EXT_OBJECTS)
 	@echo "  * linking $(PROGRAM)"
-	@$(CXX) $(LDFLAGS) $(CXXFLAGS) -o $(BIN_DIR)/$@ $^ $(LIBS)  -L$(UTILITIES_DIR)/BamTools/lib/ -lbamtools
+	@$(CXX) $(LDFLAGS) $(CXXFLAGS) -o $(BIN_DIR)/$@ $^ -L$(UTILITIES_DIR)/BamTools/lib/ -lbamtools $(LIBS)
 
 $(BUILT_OBJECTS): $(SOURCES)
 	@echo "  * compiling" $(*F).cpp
