@@ -21,9 +21,11 @@ vector<BED> scan_cache(const BED &curr_qy, BedLineStatus qy_status, const vector
 /*
     // constructor using existing BedFile pointers
 */
-ChromSweep::ChromSweep(BedFile *bedA, BedFile *bedB) 
+ChromSweep::ChromSweep(BedFile *bedA, BedFile *bedB, bool sameStrand, bool diffStrand)
 : _bedA(bedA)
 , _bedB(bedB)
+, _sameStrand(sameStrand)
+, _diffStrand(diffStrand)
 {
     // prime the results pump.
     _qy_lineNum = 0;
@@ -75,7 +77,17 @@ void ChromSweep::ScanCache() {
         {
             if ((_curr_qy.chrom == c->chrom) && !(after(_curr_qy, *c))) {
                 if (overlaps(_curr_qy.start, _curr_qy.end, c->start, c->end) > 0) {
-                    _hits.push_back(*c);
+                    bool strands_are_same = (_curr_qy.strand == c->strand);
+                    // test for necessary strandedness
+                    if ( (_sameStrand == false && _diffStrand == false)
+                         ||
+                         (_sameStrand == true && strands_are_same == true)
+                         ||
+                         (_diffStrand == true && strands_are_same == false)
+                       )
+                    {
+                        _hits.push_back(*c);
+                    }
                 }
                 ++c;
             }
@@ -114,8 +126,7 @@ bool ChromSweep::ChromChange()
         // 2. fast-forward until we catch up and report 0 hits until we do.
         else if (_curr_qy.chrom < _curr_db.chrom)
         {
-            _hits.clear();
-            _results.push(make_pair(_curr_qy, _hits));
+            _results.push(make_pair(_curr_qy, _no_hits));
             _cache.clear();
         }
         _qy_status = _bedA->GetNextBed(_curr_qy, _qy_lineNum);
@@ -134,8 +145,19 @@ bool ChromSweep::Next(pair<BED, vector<BED> > &next) {
             // advance the db until we are ahead of the query. update hits and cache as necessary
             while (!_bedB->Empty() && _curr_qy.chrom == _curr_db.chrom && !(after(_curr_db, _curr_qy)))
             {
+                // do we have an overlap in the DB?
                 if (overlaps(_curr_qy.start, _curr_qy.end, _curr_db.start, _curr_db.end) > 0) {
-                    _hits.push_back(_curr_db);
+                    // Now test for necessary strandedness.
+                    bool strands_are_same = (_curr_qy.strand == _curr_db.strand);
+                    if ( (_sameStrand == false && _diffStrand == false)
+                         ||
+                         (_sameStrand == true && strands_are_same == true)
+                         ||
+                         (_diffStrand == true && strands_are_same == false)
+                       )
+                    {
+                        _hits.push_back(_curr_db);
+                    }
                 }
                 _cache.push_back(_curr_db);
                 _db_status = _bedB->GetNextBed(_curr_db, _db_lineNum);
