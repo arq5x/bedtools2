@@ -67,6 +67,7 @@ private:
     
     // variables for the current query and db entries.
     BED _curr_qy, _curr_db;
+    string _curr_chrom;
     BedLineStatus _qy_status, _db_status;
     int _qy_lineNum, _db_lineNum;
 
@@ -74,7 +75,7 @@ private:
 private:
     
     void ScanCache();
-    void ChromCheck();
+    bool ChromChange();
 };
 
 #endif /* CHROMSWEEP_H */
