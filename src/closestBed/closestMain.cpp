@@ -160,7 +160,7 @@ void ShowHelp(void) {
     cerr << "\t-D\t"            << "Like -d, report the closest feature in B, and its distance to A" << endl;
     cerr                        << "\t\tas an extra column. Unlike -d, use negative distances to report" << endl;
     cerr                        << "\t\tif feature B is upstream of A. Note: Upstream B features are" << endl;
-    cerr                        << "\"to the right\" of features on the - strand" << endl; << endl;
+    cerr                        << "\"to the right\" of features on the - strand" << endl << endl;
 
     cerr << "\t-no\t"           << "Ignore features in B that overlap A.  That is, we want close, but " << endl;
     cerr                        << "\t\tnot touching features only." << endl << endl;
