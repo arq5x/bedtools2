@@ -40,6 +40,7 @@ int main(int argc, char* argv[]) {
     bool diffStrand     = false;
     bool ignoreOverlaps = false;
     bool reportDistance = false;
+    bool signDistance   = false;
 
 
     // check to see if we should print out some help
@@ -84,6 +85,10 @@ int main(int argc, char* argv[]) {
         else if (PARAMETER_CHECK("-d", 2, parameterLength)) {
             reportDistance = true;
         }
+        else if (PARAMETER_CHECK("-D", 2, parameterLength)) {
+            reportDistance = true;
+            signDistance = true;
+        }
         else if (PARAMETER_CHECK("-io", 3, parameterLength)) {
             ignoreOverlaps = true;
         }
@@ -118,7 +123,7 @@ int main(int argc, char* argv[]) {
     }
     
     if (!showHelp) {
-        BedClosest *bc = new BedClosest(bedAFile, bedBFile, sameStrand, diffStrand, tieMode, reportDistance, ignoreOverlaps);
+        BedClosest *bc = new BedClosest(bedAFile, bedBFile, sameStrand, diffStrand, tieMode, reportDistance, signDistance, ignoreOverlaps);
         delete bc;
         return 0;
     }
@@ -151,6 +156,11 @@ void ShowHelp(void) {
     cerr << "\t-d\t"            << "In addition to the closest feature in B, " << endl;
     cerr                        << "\t\treport its distance to A as an extra column." << endl;
     cerr                        << "\t\t- The reported distance for overlapping features will be 0." << endl << endl;
+    
+    cerr << "\t-D\t"            << "Like -d, report the closest feature in B, and its distance to A" << endl;
+    cerr                        << "\t\tas an extra column. Unlike -d, use negative distances to report" << endl;
+    cerr                        << "\t\tif feature B is upstream of A. Note: Upstream B features are" << endl;
+    cerr                        << "\"to the right\" of features on the - strand" << endl; << endl;
 
     cerr << "\t-no\t"           << "Ignore features in B that overlap A.  That is, we want close, but " << endl;
     cerr                        << "\t\tnot touching features only." << endl << endl;
