@@ -149,7 +149,7 @@ void ShowHelp(void) {
     cerr                        << "\t\tthat overlaps A on the _same_ strand." << endl;
     cerr                        << "\t\t- By default, overlaps are reported without respect to strand." << endl << endl;
 
-    cerr << "\t-s\t"            << "Require opposite strandedness.  That is, find the closest feature in B" << endl;
+    cerr << "\t-S\t"            << "Require opposite strandedness.  That is, find the closest feature in B" << endl;
     cerr                        << "\t\tthat overlaps A on the _opposite_ strand." << endl;
     cerr                        << "\t\t- By default, overlaps are reported without respect to strand." << endl << endl;
 
