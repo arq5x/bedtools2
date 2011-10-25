@@ -22,7 +22,8 @@ const int SLOPGROWTH = 2048000;
     Constructor
 */
 BedClosest::BedClosest(string &bedAFile, string &bedBFile, bool sameStrand, bool diffStrand,
-                       string &tieMode, bool reportDistance, bool signDistance, bool ignoreOverlaps) 
+                       string &tieMode, bool reportDistance, bool signDistance, string &_strandedDistMode,
+                       bool ignoreOverlaps) 
     : _bedAFile(bedAFile)
     , _bedBFile(bedBFile)
     , _tieMode(tieMode)
@@ -30,6 +31,7 @@ BedClosest::BedClosest(string &bedAFile, string &bedBFile, bool sameStrand, bool
     , _diffStrand(diffStrand)
     , _reportDistance(reportDistance)
     , _signDistance(signDistance)
+    , _strandedDistMode(_strandedDistMode)
     , _ignoreOverlaps(ignoreOverlaps)
 {
     _bedA           = new BedFile(_bedAFile);
@@ -56,7 +58,8 @@ void BedClosest::FindWindowOverlaps(BED &a, vector<BED> &hits) {
     CHRPOS aFudgeEnd;
     int numOverlaps = 0;
     vector<BED> closestB;
-    int32_t minDistance = INT_MAX;
+    CHRPOS minDistance = INT_MAX;
+    int32_t curDistance = INT_MAX;
     vector<int32_t> distances;
 
     // is there at least one feature in B on the same chrom
@@ -103,73 +106,48 @@ void BedClosest::FindWindowOverlaps(BED &a, vector<BED> &hits) {
                 }
                 // the hit is to the "left" of A
                 else if (h->end <= a.start) {
-                    if ((a.start - h->end) < abs(minDistance)) {
-                        if (_signDistance) {
-                            if (a.strand == "+") {
-                                minDistance = h->end - a.start;
-                            }
-                            else {
-                                minDistance = a.start - h->end;
-                            }
+                    curDistance = a.start - h->end;
+                    if (_signDistance) {
+                        if ((_strandedDistMode == "ref")
+                                || (_strandedDistMode == "a" && a.strand != "-")
+                                || (_strandedDistMode == "b" && h->strand == "-")) {
+                            curDistance = -curDistance;
                         }
-                        else {
-                            minDistance = a.start - h->end;
-                        }
-
+                    }
+                    
+                    if (abs(curDistance) < minDistance) {
+                        minDistance = abs(curDistance);
+                        
                         closestB.clear();
                         closestB.push_back(*h);
                         distances.clear();
-                        distances.push_back(minDistance);
+                        distances.push_back(curDistance);
                     }
-                    else if ((a.start - h->end) == abs(minDistance)) {
-                        if (_signDistance) {
-                            if (a.strand == "+") {
-                                minDistance = h->end - a.start;
-                            }
-                            else {
-                                minDistance = a.start - h->end;
-                            }
-                        }
-                        else {
-                            minDistance = h->end - a.start;
-                        }
+                    else if (abs(curDistance) == minDistance) {
+                        minDistance = abs(curDistance);
                         closestB.push_back(*h);
-                        distances.push_back(minDistance);
+                        distances.push_back(curDistance);
                     }
                 }
                 // the hit is to the "right" of A
                 else if (h->start >= a.end) {
-                    if ((h->start - a.end) < abs(minDistance)) {
-                        if (_signDistance) {
-                            if (a.strand == "+") {
-                                minDistance = h->start - a.end;
-                            }
-                            else {
-                                minDistance = a.end - h->start;
-                            }
+                    curDistance = h->start - a.end;
+                    if (_signDistance) {
+                        if ((_strandedDistMode == "a" && a.strand == "-")
+                                || (_strandedDistMode == "b" && h->strand != "-")) {
+                            curDistance = -curDistance;
                         }
-                        else {
-                            minDistance = h->start - a.end;
-                        }
+                    }
+                    
+                    if (abs(curDistance) < minDistance) {
                         closestB.clear();
                         closestB.push_back(*h);
                         distances.clear();
-                        distances.push_back(minDistance);
+                        distances.push_back(curDistance);
                     }
-                    else if ((h->start - a.end) == abs(minDistance)) {
-                        if (_signDistance) {
-                            if (a.strand == "+") {
-                                minDistance = h->start - a.end;
-                            }
-                            else {
-                                minDistance = a.end - h->start;
-                            }
-                        }
-                        else {
-                            minDistance = h->start - a.end;
-                        }
+                    else if (abs(curDistance) == minDistance) {
                         closestB.push_back(*h);
-                        distances.push_back(minDistance);
+                        distances.push_back(curDistance);
                     }
                 }
             }
