@@ -32,6 +32,7 @@ int main(int argc, char* argv[]) {
     string bedAFile;
     string bedBFile;
     string tieMode = "all";
+    string strandedDistMode = "ref";
 
     bool haveBedA       = false;
     bool haveBedB       = false;
@@ -40,6 +41,8 @@ int main(int argc, char* argv[]) {
     bool diffStrand     = false;
     bool ignoreOverlaps = false;
     bool reportDistance = false;
+    bool signDistance   = false;
+    bool haveStrandedDistMode = false;
 
 
     // check to see if we should print out some help
@@ -84,6 +87,15 @@ int main(int argc, char* argv[]) {
         else if (PARAMETER_CHECK("-d", 2, parameterLength)) {
             reportDistance = true;
         }
+        else if (PARAMETER_CHECK("-D", 2, parameterLength)) {
+            if ((i+1) < argc) {
+                reportDistance = true;
+                signDistance = true;
+                haveStrandedDistMode = true;
+                strandedDistMode = argv[i + 1];
+                i++;
+            }
+        }
         else if (PARAMETER_CHECK("-io", 3, parameterLength)) {
             ignoreOverlaps = true;
         }
@@ -111,6 +123,12 @@ int main(int argc, char* argv[]) {
         cerr << endl << "*****" << endl << "*****ERROR: Request \"all\" or \"first\" or \"last\" for Tie Mode (-t)" << endl << "*****" << endl;
         showHelp = true;
     }
+    
+    if (haveStrandedDistMode && (strandedDistMode != "a") && (strandedDistMode != "b")
+                             && (strandedDistMode != "ref")) {
+        cerr << endl << "*****" << endl << "*****ERROR: Request \"a\" or \"b\" or \"ref\" for Stranded Distance Mode (-D)" << endl << "*****" << endl;
+        showHelp = true;
+    }
 
     if (sameStrand && diffStrand) {
         cerr << endl << "*****" << endl << "*****ERROR: Request either -s OR -S, not both." << endl << "*****" << endl;
@@ -118,7 +136,7 @@ int main(int argc, char* argv[]) {
     }
     
     if (!showHelp) {
-        BedClosest *bc = new BedClosest(bedAFile, bedBFile, sameStrand, diffStrand, tieMode, reportDistance, ignoreOverlaps);
+        BedClosest *bc = new BedClosest(bedAFile, bedBFile, sameStrand, diffStrand, tieMode, reportDistance, signDistance, strandedDistMode, ignoreOverlaps);
         delete bc;
         return 0;
     }
@@ -144,13 +162,24 @@ void ShowHelp(void) {
     cerr                        << "\t\tthat overlaps A on the _same_ strand." << endl;
     cerr                        << "\t\t- By default, overlaps are reported without respect to strand." << endl << endl;
 
-    cerr << "\t-s\t"            << "Require opposite strandedness.  That is, find the closest feature in B" << endl;
+    cerr << "\t-S\t"            << "Require opposite strandedness.  That is, find the closest feature in B" << endl;
     cerr                        << "\t\tthat overlaps A on the _opposite_ strand." << endl;
     cerr                        << "\t\t- By default, overlaps are reported without respect to strand." << endl << endl;
 
     cerr << "\t-d\t"            << "In addition to the closest feature in B, " << endl;
     cerr                        << "\t\treport its distance to A as an extra column." << endl;
     cerr                        << "\t\t- The reported distance for overlapping features will be 0." << endl << endl;
+    
+    cerr << "\t-D\t"            << "Like -d, report the closest feature in B, and its distance to A" << endl;
+    cerr                        << "\t\tas an extra column. Unlike -d, use negative distances to report" << endl;
+    cerr                        << "\t\tupstream features. You must specify which orientation defines \"upstream\"." << endl;
+    cerr                        << "\t\tThe options are:" << endl;
+    cerr                        << "\t\t- \"ref\"   Report distance with respect to the reference genome. " << endl;
+    cerr                        << "\t\t            B features with a lower (start, stop) are upstream" << endl;
+    cerr                        << "\t\t- \"a\"     Report distance with respect to A." << endl;
+    cerr                        << "\t\t            When A is on the - strand, \"upstream\" means B has a higher (start,stop)." << endl;
+    cerr                        << "\t\t- \"b\"     Report distance with respect to B." << endl;
+    cerr                        << "\t\t            When B is on the - strand, \"upstream\" means A has a higher (start,stop)." << endl << endl;
 
     cerr << "\t-no\t"           << "Ignore features in B that overlap A.  That is, we want close, but " << endl;
     cerr                        << "\t\tnot touching features only." << endl << endl;
