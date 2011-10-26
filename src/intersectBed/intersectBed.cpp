@@ -232,6 +232,7 @@ void BedIntersect::IntersectBed() {
         ChromSweep sweep = ChromSweep(_bedA, _bedB, _sameStrand, _diffStrand);
 
         pair<BED, vector<BED> > hit_set;
+        hit_set.second.reserve(10000);
         while (sweep.Next(hit_set)) {
             processHits(hit_set.first, hit_set.second);
         }

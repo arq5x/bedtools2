@@ -83,6 +83,7 @@ private:
     
     void ScanCache();
     bool ChromChange();
+    bool IsValidHit(const BED &query, const BED &db);
 };
 
 #endif /* CHROMSWEEP_H */

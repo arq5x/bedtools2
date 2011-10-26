@@ -49,8 +49,8 @@ ChromSweep::ChromSweep(string &bedAFile, string &bedBFile)
     _qy_lineNum = 0;
     _db_lineNum = 0;
     
-    _hits.reserve(1000);
-    _cache.reserve(1000);
+    _hits.reserve(100000);
+    _cache.reserve(100000);
     
     _bedA = new BedFile(bedAFile);
     _bedB = new BedFile(bedBFile);
@@ -76,18 +76,8 @@ void ChromSweep::ScanCache() {
         while (c != _cache.end())
         {
             if ((_curr_qy.chrom == c->chrom) && !(after(_curr_qy, *c))) {
-                if (overlaps(_curr_qy.start, _curr_qy.end, c->start, c->end) > 0) {
-                    bool strands_are_same = (_curr_qy.strand == c->strand);
-                    // test for necessary strandedness
-                    if ( (_sameStrand == false && _diffStrand == false)
-                         ||
-                         (_sameStrand == true && strands_are_same == true)
-                         ||
-                         (_diffStrand == true && strands_are_same == false)
-                       )
-                    {
-                        _hits.push_back(*c);
-                    }
+                if (IsValidHit(_curr_qy, *c)) {
+                    _hits.push_back(*c);
                 }
                 ++c;
             }
@@ -99,7 +89,7 @@ void ChromSweep::ScanCache() {
 }
 
 
-bool ChromSweep::ChromChange() 
+bool ChromSweep::ChromChange()
 {
     // the files are on the same chrom
     if ((_curr_qy.chrom == _curr_db.chrom) || (_db_status == BED_INVALID) || (_qy_status == BED_INVALID)) {
@@ -135,6 +125,24 @@ bool ChromSweep::ChromChange()
     }
 }
 
+bool ChromSweep::IsValidHit(const BED &query, const BED &db) {
+    // do we have an overlap in the DB?
+    if (overlaps(query.start, query.end, db.start, db.end) > 0) {
+        // Now test for necessary strandedness.
+        bool strands_are_same = (query.strand == db.strand);
+        if ( (_sameStrand == false && _diffStrand == false)
+             ||
+             (_sameStrand == true && strands_are_same == true)
+             ||
+             (_diffStrand == true && strands_are_same == false)
+           )
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
 
 bool ChromSweep::Next(pair<BED, vector<BED> > &next) {
     if (!_bedA->Empty()) {
@@ -145,19 +153,8 @@ bool ChromSweep::Next(pair<BED, vector<BED> > &next) {
             // advance the db until we are ahead of the query. update hits and cache as necessary
             while (!_bedB->Empty() && _curr_qy.chrom == _curr_db.chrom && !(after(_curr_db, _curr_qy)))
             {
-                // do we have an overlap in the DB?
-                if (overlaps(_curr_qy.start, _curr_qy.end, _curr_db.start, _curr_db.end) > 0) {
-                    // Now test for necessary strandedness.
-                    bool strands_are_same = (_curr_qy.strand == _curr_db.strand);
-                    if ( (_sameStrand == false && _diffStrand == false)
-                         ||
-                         (_sameStrand == true && strands_are_same == true)
-                         ||
-                         (_diffStrand == true && strands_are_same == false)
-                       )
-                    {
-                        _hits.push_back(_curr_db);
-                    }
+                if (IsValidHit(_curr_qy, _curr_db)) {
+                    _hits.push_back(_curr_db);
                 }
                 _cache.push_back(_curr_db);
                 _db_status = _bedB->GetNextBed(_curr_db, _db_lineNum);
