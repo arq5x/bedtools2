@@ -173,7 +173,7 @@ void ShowHelp(void) {
     cerr << "\t-D\t"            << "Like -d, report the closest feature in B, and its distance to A" << endl;
     cerr                        << "\t\tas an extra column. Unlike -d, use negative distances to report" << endl;
     cerr                        << "\t\tupstream features. You must specify which orientation defines \"upstream\"." << endl;
-    cerr                        << "\t\tThe options are:" << endl;
+    cerr                        << "\t\tThe options are (default = ref):" << endl;
     cerr                        << "\t\t- \"ref\"   Report distance with respect to the reference genome. " << endl;
     cerr                        << "\t\t            B features with a lower (start, stop) are upstream" << endl;
     cerr                        << "\t\t- \"a\"     Report distance with respect to A." << endl;
