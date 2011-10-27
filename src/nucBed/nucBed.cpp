@@ -13,13 +13,15 @@
 #include "nucBed.h"
 
 
-NucBed::NucBed(string &dbFile, string &bedFile, bool printSeq, bool hasPattern, const string &pattern) {
+NucBed::NucBed(string &dbFile, string &bedFile, bool printSeq, 
+               bool hasPattern, const string &pattern, bool forceStrand) {
 
     _dbFile       = dbFile;
     _bedFile      = bedFile;
     _printSeq     = printSeq;
     _hasPattern   = hasPattern;
     _pattern      = pattern;
+    _forceStrand  = forceStrand;
     
     _bed = new BedFile(_bedFile);
 
@@ -129,7 +131,10 @@ void NucBed::ProfileDNA() {
                     // grab the dna at this interval
                     int length = bed.end - bed.start;
                     // report the sequence's content
-                    ReportDnaProfile(bed, fr.getSubSequence(bed.chrom, bed.start, length), length);
+                    string dna = fr.getSubSequence(bed.chrom, bed.start, length);
+                    if ((_forceStrand == true) && (bed.strand == "-"))
+                        reverseComplement(dna);
+                    ReportDnaProfile(bed, dna, length);
                     bed = nullBed;
                 }
                 else

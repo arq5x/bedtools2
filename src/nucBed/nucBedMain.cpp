@@ -39,6 +39,7 @@ int main(int argc, char* argv[]) {
     bool haveBed     = false;
     bool printSeq    = false;
     bool hasPattern  = false;
+    bool forceStrand = false;
 
     // check to see if we should print out some help
     if(argc <= 1) showHelp = true;
@@ -76,6 +77,9 @@ int main(int argc, char* argv[]) {
         else if(PARAMETER_CHECK("-seq", 4, parameterLength)) {
             printSeq = true;
         }
+        else if(PARAMETER_CHECK("-s", 2, parameterLength)) {
+            forceStrand = true;
+        }
         else if(PARAMETER_CHECK("-pattern", 8, parameterLength)) {
             if ((i+1) < argc) {
                 hasPattern = true;
@@ -95,7 +99,7 @@ int main(int argc, char* argv[]) {
 
     if (!showHelp) {
 
-        NucBed *nuc = new NucBed(fastaDbFile, bedFile, printSeq, hasPattern, pattern);
+        NucBed *nuc = new NucBed(fastaDbFile, bedFile, printSeq, hasPattern, pattern, forceStrand);
         delete nuc;
 
         return 0;
@@ -118,6 +122,7 @@ void ShowHelp(void) {
     cerr << "Options: " << endl;
     cerr << "\t-fi\tInput FASTA file" << endl << endl;
     cerr << "\t-bed\tBED/GFF/VCF file of ranges to extract from -fi" << endl << endl;
+    cerr << "\t-s\tProfile the sequence according to strand." << endl << endl;
     cerr << "\t-seq\tPrint the extracted sequence" << endl << endl;
     cerr << "\t-pattern\tReport the number of times a user-defined sequence is observed (case-insensitive)." << endl << endl;
     
