@@ -132,6 +132,7 @@ void NucBed::ProfileDNA() {
                     int length = bed.end - bed.start;
                     // report the sequence's content
                     string dna = fr.getSubSequence(bed.chrom, bed.start, length);
+                    // rev comp si necessaire
                     if ((_forceStrand == true) && (bed.strand == "-"))
                         reverseComplement(dna);
                     ReportDnaProfile(bed, dna, length);
