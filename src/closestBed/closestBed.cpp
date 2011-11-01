@@ -82,6 +82,7 @@ void BedClosest::FindWindowOverlaps(BED &a, vector<BED> &hits) {
 
             // THE HEAVY LIFTING
             // search for hits with the current slop added
+            cout << _sameStrand << _diffStrand << _signDistance<< endl;
             _bedB->FindOverlapsPerBin(a.chrom, aFudgeStart, aFudgeEnd, a.strand, hits, _sameStrand, _diffStrand);
 
             vector<BED>::const_iterator h = hits.begin();
@@ -138,14 +139,15 @@ void BedClosest::FindWindowOverlaps(BED &a, vector<BED> &hits) {
                             curDistance = -curDistance;
                         }
                     }
-                    
                     if (abs(curDistance) < minDistance) {
+                        minDistance = abs(curDistance);
                         closestB.clear();
                         closestB.push_back(*h);
                         distances.clear();
                         distances.push_back(curDistance);
                     }
                     else if (abs(curDistance) == minDistance) {
+                        minDistance = abs(curDistance);
                         closestB.push_back(*h);
                         distances.push_back(curDistance);
                     }
