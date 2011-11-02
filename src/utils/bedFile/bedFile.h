@@ -420,7 +420,7 @@ public:
     void Close(void);
 
     // Get the next BED entry in an opened BED file.
-    BedLineStatus GetNextBed (BED &bed, int &lineNum);
+    BedLineStatus GetNextBed (BED &bed, int &lineNum, bool forceSorted = false);
     
     // Returns the next MERGED (i.e., non-overlapping) interval in an opened BED file
     // NOTE: assumes input file is sorted by chrom then start
@@ -494,6 +494,8 @@ private:
     int _merged_start;
     int _merged_end;
     string _merged_chrom;
+    int _prev_start;
+    string _prev_chrom;
 
     void setZeroBased(bool zeroBased);
     void setGff (bool isGff);

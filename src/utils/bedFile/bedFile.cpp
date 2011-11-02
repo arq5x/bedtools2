@@ -122,7 +122,9 @@ BedFile::BedFile(string &bedFile)
   _typeIsKnown(false),
   _merged_start(-1),
   _merged_end(-1),
-  _merged_chrom("")
+  _merged_chrom(""),
+  _prev_start(-1),
+  _prev_chrom("")
 {}
 
 // Destructor
@@ -173,7 +175,7 @@ void BedFile::Close(void) {
 }
 
 
-BedLineStatus BedFile::GetNextBed(BED &bed, int &lineNum) {
+BedLineStatus BedFile::GetNextBed(BED &bed, int &lineNum, bool forceSorted) {
 
     // make sure there are still lines to process.
     // if so, tokenize, validate and return the BED entry.
@@ -188,7 +190,25 @@ BedLineStatus BedFile::GetNextBed(BED &bed, int &lineNum) {
         Tokenize(_bedLine, _bedFields);
 
         // load the BED struct as long as it's a valid BED entry.
-        return parseLine(bed, _bedFields, lineNum);
+        BedLineStatus status = parseLine(bed, _bedFields, lineNum);
+        if (!forceSorted) {
+            return status;
+        }
+        else if (status == BED_VALID) {
+            if ((int) bed.start >= _prev_start) {
+                _prev_chrom = bed.chrom;
+                _prev_start = bed.start;
+                return status;
+            }
+            else if ((bed.chrom == _prev_chrom) && ((int) bed.start < _prev_start)) {
+                cerr << "ERROR: input file: (" << bedFile << ") is not sorted by chrom then start" << endl;
+                exit(1);
+            }
+            else if (bed.chrom < _prev_chrom) {
+                cerr << "ERROR: input file: (" << bedFile << ") is not sorted by chrom then start" << endl;
+                exit(1);
+            }
+        }
     }
 
     // default if file is closed or EOF
@@ -201,7 +221,8 @@ bool BedFile::GetNextMergedBed(BED &merged_bed, int &lineNum) {
     if (_bedStream->good()) {
         BED bed;
         BedLineStatus bedStatus;
-        while ((bedStatus = GetNextBed(bed, lineNum)) != BED_INVALID) {
+        // force sorting; hence third param = true
+        while ((bedStatus = GetNextBed(bed, lineNum, true)) != BED_INVALID) {
             if (bedStatus == BED_VALID) {
                 if (((int) bed.start - _merged_end > 0) || 
                    (_merged_end < 0) || 
