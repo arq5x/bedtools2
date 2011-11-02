@@ -119,7 +119,10 @@ BedFile::BedFile(string &bedFile)
 : bedFile(bedFile),
   _isGff(false),
   _isVcf(false),
-  _typeIsKnown(false)
+  _typeIsKnown(false),
+  _merged_start(-1),
+  _merged_end(-1),
+  _merged_chrom("")
 {}
 
 // Destructor
@@ -190,6 +193,53 @@ BedLineStatus BedFile::GetNextBed(BED &bed, int &lineNum) {
 
     // default if file is closed or EOF
     return BED_INVALID;
+}
+
+
+bool BedFile::GetNextMergedBed(BED &merged_bed, int &lineNum) {
+
+    if (_bedStream->good()) {
+        BED bed;
+        BedLineStatus bedStatus;
+        while ((bedStatus = GetNextBed(bed, lineNum)) != BED_INVALID) {
+            if (bedStatus == BED_VALID) {
+                if (((int) bed.start - _merged_end > 0) || 
+                   (_merged_end < 0) || 
+                   (bed.chrom != _merged_chrom))
+                {
+                    if (_merged_start >= 0) {
+                        merged_bed.chrom = _merged_chrom;
+                        merged_bed.start = _merged_start;
+                        merged_bed.end   = _merged_end;
+                        
+                        _merged_chrom = bed.chrom;
+                        _merged_start = bed.start;
+                        _merged_end   = bed.end;
+                
+                        return true;
+                    }
+                    else {
+                        _merged_start = bed.start;
+                        _merged_chrom = bed.chrom;
+                        _merged_end = bed.end;
+                    }
+                }
+                else if ((int) bed.end > _merged_end) 
+                {
+                    _merged_end = bed.end;
+                }
+            }
+        }
+        // handle the last merged block in the file.
+        if (bedStatus == BED_INVALID)
+        {
+            merged_bed.chrom = _merged_chrom;
+            merged_bed.start = _merged_start;
+            merged_bed.end   = _merged_end;
+            return true;
+        }
+    }
+    return false;
 }
 
 
