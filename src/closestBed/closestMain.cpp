@@ -32,7 +32,7 @@ int main(int argc, char* argv[]) {
     string bedAFile;
     string bedBFile;
     string tieMode = "all";
-    string strandedDistMode = "ref";
+    string strandedDistMode = "";
 
     bool haveBedA       = false;
     bool haveBedB       = false;
@@ -181,7 +181,7 @@ void ShowHelp(void) {
     cerr                        << "\t\t- \"b\"     Report distance with respect to B." << endl;
     cerr                        << "\t\t            When B is on the - strand, \"upstream\" means A has a higher (start,stop)." << endl << endl;
 
-    cerr << "\t-no\t"           << "Ignore features in B that overlap A.  That is, we want close, but " << endl;
+    cerr << "\t-io\t"           << "Ignore features in B that overlap A.  That is, we want close, but " << endl;
     cerr                        << "\t\tnot touching features only." << endl << endl;
 
     cerr << "\t-t\t"            << "How ties for closest feature are handled.  This occurs when two" << endl;
