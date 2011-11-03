@@ -216,6 +216,9 @@ BedLineStatus BedFile::GetNextBed(BED &bed, int &lineNum, bool forceSorted) {
                 exit(1);
             }
         }
+        else {
+            return status;
+        }
     }
 
     // default if file is closed or EOF
