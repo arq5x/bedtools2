@@ -33,6 +33,7 @@ MultiIntersectBed::MultiIntersectBed(std::ostream& _output,
     output(_output),
     current_non_zero_inputs(0),
     print_empty_regions(_print_empty_regions),
+    haveTitles(false),
     genome_sizes(NULL),
     no_coverage_value(_no_coverage_value)
 {
@@ -40,6 +41,10 @@ MultiIntersectBed::MultiIntersectBed(std::ostream& _output,
         assert(!_genome_size_filename.empty());
 
         genome_sizes = new GenomeFile(_genome_size_filename);
+    }
+    
+    if (titles.size() > 0) {
+        haveTitles = true;
     }
 }
 
@@ -118,12 +123,14 @@ void MultiIntersectBed::UpdateInformation(const IntervalItem &item) {
     case START:
         current_depth[item.source_index] = 1;
         current_non_zero_inputs++;
+        files_with_coverage[item.source_index] = true;
         break;
     case END:
         //Read the next interval from this file
         AddInterval(item.source_index);
         current_depth[item.source_index] = 0;
         current_non_zero_inputs--;
+        files_with_coverage.erase(item.source_index);
         break;
     default:
         assert(0);
@@ -155,7 +162,7 @@ void MultiIntersectBed::AddInterval(int index) {
 
 
 void MultiIntersectBed::PrintHeader() {
-    output << "chrom\tstart\tend" ;
+    output << "chrom\tstart\tend\tnum\tlist" ;
     for (size_t i=0;i<titles.size();++i)
         output << "\t" <<titles[i];
     output << endl;
@@ -168,23 +175,44 @@ void MultiIntersectBed::PrintCoverage(CHRPOS start, CHRPOS end) {
 
     output << current_chrom << "\t"
         << start << "\t"
-        << end;
-        
-    for (size_t i=0;i<current_depth.size();++i)
-        output << "\t" << current_depth[i] ;
-
-    output << endl;
+        << end   << "\t"
+        << current_non_zero_inputs << "\t";
+    
+    ostringstream file_list_string;
+    ostringstream file_bool_string;
+    int depth_count = 0;
+    for (size_t i = 0; i < current_depth.size(); ++i)
+    {
+        if (current_depth[i] > 0) {
+            if (depth_count < current_non_zero_inputs - 1) {
+                if (!haveTitles)
+                    file_list_string << i+1 << ",";
+                else 
+                    file_list_string << titles[i] << ",";
+            }
+            else {
+                if (!haveTitles)
+                    file_list_string << i+1;
+                else 
+                    file_list_string << titles[i];
+            }
+            depth_count++;
+        }
+        file_bool_string << "\t" << current_depth[i];
+    }
+    cout << file_list_string.str() << file_bool_string.str() << endl;
 }
 
 
 void MultiIntersectBed::PrintEmptyCoverage(CHRPOS start, CHRPOS end) {
     output << current_chrom << "\t"
         << start << "\t"
-        << end;
+        << end   << "\t"
+        << "0"   << "\t" << "none";
         
     for (size_t i=0;i<current_depth.size();++i)
         output << "\t0";
-    
+
     output << endl;
 }
 

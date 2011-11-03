@@ -35,9 +35,11 @@ private:
 
     INTERVALS_PRIORITY_QUEUE queue;
     std::string              current_chrom;
+    map<int, bool>           files_with_coverage;
     int                      current_non_zero_inputs;
     bool                     print_empty_regions;
-
+    bool                     haveTitles;
+    
     GenomeFile* genome_sizes;
 
     std::string no_coverage_value;
