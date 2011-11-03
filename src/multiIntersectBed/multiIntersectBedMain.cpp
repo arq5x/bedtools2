@@ -21,7 +21,7 @@
 #include "version.h"
 
 #include "genomeFile.h"
-#include "MultiIntersectBed.h"
+#include "multiIntersectBed.h"
 
 using namespace std;
 

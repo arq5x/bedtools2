@@ -200,7 +200,12 @@ void MultiIntersectBed::PrintCoverage(CHRPOS start, CHRPOS end) {
         }
         file_bool_string << "\t" << current_depth[i];
     }
-    cout << file_list_string.str() << file_bool_string.str() << endl;
+    if (current_non_zero_inputs > 0) {
+        cout << file_list_string.str() << file_bool_string.str() << endl;
+    }
+    else {
+        cout << "none" << file_bool_string.str() << endl;
+    }
 }
 
 
