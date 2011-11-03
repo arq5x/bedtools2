@@ -199,22 +199,17 @@ BedLineStatus BedFile::GetNextBed(BED &bed, int &lineNum, bool forceSorted) {
                 if ((int) bed.start >= _prev_start) {
                     _prev_chrom = bed.chrom;
                     _prev_start = bed.start;
-                    return status;
                 }
                 else {
                     cerr << "ERROR: input file: (" << bedFile << ") is not sorted by chrom then start" << endl;
                     exit(1);
                 }
             }
-            else if (bed.chrom > _prev_chrom) {
+            else if (bed.chrom != _prev_chrom) {
                 _prev_chrom = bed.chrom;
                 _prev_start = bed.start;
-                return status;
             }
-            else if (bed.chrom < _prev_chrom) {
-                cerr << "ERROR: input file: (" << bedFile << ") is not sorted by chrom then start" << endl;
-                exit(1);
-            }
+            return status;
         }
         else {
             return status;
