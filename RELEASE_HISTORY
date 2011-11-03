@@ -1,3 +1,16 @@
+Version 2.14.1 (2-Nov-2011)
+
+Bug Fixes
+=========
+1. Corrected the help for closestBed. It now correctly reads -io instead of -no.
+2. Fixed regression in closestBed injected in version 2.13.4 whereby B features to the right of an A feature were missed.
+
+New tool.
+============
+1. Added the multiIntersectBed tool for reporting common intervals among multiple **sorted** BED/GFF/VCF files.
+
+
+
 Version 2.13.4 (26-Oct-2011)
 Bug Fixes
 =========
