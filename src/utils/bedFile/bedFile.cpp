@@ -195,14 +195,21 @@ BedLineStatus BedFile::GetNextBed(BED &bed, int &lineNum, bool forceSorted) {
             return status;
         }
         else if (status == BED_VALID) {
-            if ((int) bed.start >= _prev_start) {
+            if (bed.chrom == _prev_chrom) {
+                if ((int) bed.start >= _prev_start) {
+                    _prev_chrom = bed.chrom;
+                    _prev_start = bed.start;
+                    return status;
+                }
+                else {
+                    cerr << "ERROR: input file: (" << bedFile << ") is not sorted by chrom then start" << endl;
+                    exit(1);
+                }
+            }
+            else if (bed.chrom > _prev_chrom) {
                 _prev_chrom = bed.chrom;
                 _prev_start = bed.start;
                 return status;
-            }
-            else if ((bed.chrom == _prev_chrom) && ((int) bed.start < _prev_start)) {
-                cerr << "ERROR: input file: (" << bedFile << ") is not sorted by chrom then start" << endl;
-                exit(1);
             }
             else if (bed.chrom < _prev_chrom) {
                 cerr << "ERROR: input file: (" << bedFile << ") is not sorted by chrom then start" << endl;
@@ -232,11 +239,11 @@ bool BedFile::GetNextMergedBed(BED &merged_bed, int &lineNum) {
                         merged_bed.chrom = _merged_chrom;
                         merged_bed.start = _merged_start;
                         merged_bed.end   = _merged_end;
-                        
+
                         _merged_chrom = bed.chrom;
                         _merged_start = bed.start;
                         _merged_end   = bed.end;
-                
+
                         return true;
                     }
                     else {
@@ -245,8 +252,8 @@ bool BedFile::GetNextMergedBed(BED &merged_bed, int &lineNum) {
                         _merged_end = bed.end;
                     }
                 }
-                else if ((int) bed.end > _merged_end) 
-                {
+                else if ((int) bed.end > _merged_end)
+                {   
                     _merged_end = bed.end;
                 }
             }
