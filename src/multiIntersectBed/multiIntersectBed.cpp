@@ -123,14 +123,12 @@ void MultiIntersectBed::UpdateInformation(const IntervalItem &item) {
     case START:
         current_depth[item.source_index] = 1;
         current_non_zero_inputs++;
-        files_with_coverage[item.source_index] = true;
         break;
     case END:
         //Read the next interval from this file
         AddInterval(item.source_index);
         current_depth[item.source_index] = 0;
         current_non_zero_inputs--;
-        files_with_coverage.erase(item.source_index);
         break;
     default:
         assert(0);
@@ -162,9 +160,15 @@ void MultiIntersectBed::AddInterval(int index) {
 
 
 void MultiIntersectBed::PrintHeader() {
-    output << "chrom\tstart\tend\tnum\tlist" ;
-    for (size_t i=0;i<titles.size();++i)
-        output << "\t" <<titles[i];
+    output << "chrom\tstart\tend\tnum\tlist";
+    if (titles.size() > 0) {
+        for (size_t i = 0; i < titles.size(); ++i)
+            output << "\t" << titles[i];
+    }
+    else {
+        for (size_t i = 0;i < filenames.size(); ++i)
+            output << "\t" << filenames[i];
+    }
     output << endl;
 }
 
