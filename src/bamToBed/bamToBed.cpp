@@ -35,11 +35,15 @@ using namespace std;
 // function declarations
 void ShowHelp(void);
 
-void ConvertBamToBed(const string &bamFile, const bool &useEditDistance, const string &bamTag,
-                     const bool &writeBed12, const bool &obeySplits, const string &color, const bool &useCigar);
+void ConvertBamToBed(const string &bamFile, bool useEditDistance, const string &bamTag,
+                     bool writeBed12, bool obeySplits, const string &color, 
+                     bool useCigar,   bool useNovoalign);
+                     
 void ConvertBamToBedpe(const string &bamFile, const bool &useEditDistance);
 
-void PrintBed(const BamAlignment &bam, const RefVector &refs, bool useEditDistance, const string &bamTag, bool obeySplits, bool useCigar);
+void PrintBed(const BamAlignment &bam, const RefVector &refs, bool useEditDistance, 
+              const string &bamTag, bool obeySplits, bool useCigar, bool useNovoalign);
+              
 void PrintBed12(const BamAlignment &bam, const RefVector &refs, bool useEditDistance, const string &bamTag, string color = "255,0,0");
 void PrintBedPE(const BamAlignment &bam1, const BamAlignment &bam2,
                 const RefVector &refs, bool useEditDistance);
@@ -70,6 +74,7 @@ int main(int argc, char* argv[]) {
     bool useAlignmentScore = false;
     bool useCigar          = false;
     bool obeySplits        = false;
+    bool useNovoalign      = false;  // custom for Quinlan/Hall research
 
     // check to see if we should print out some help
 
@@ -112,6 +117,9 @@ int main(int argc, char* argv[]) {
         }
         else if(PARAMETER_CHECK("-as", 3, parameterLength)) {
                 useAlignmentScore = true;
+        }
+        else if(PARAMETER_CHECK("-novo", 5, parameterLength)) {
+                useNovoalign = true;
         }
         else if(PARAMETER_CHECK("-color", 6, parameterLength)) {
             if ((i+1) < argc) {
@@ -161,7 +169,7 @@ int main(int argc, char* argv[]) {
     // if there are no problems, let's convert BAM to BED or BEDPE
     if (!showHelp) {
         if (writeBedPE == false)
-            ConvertBamToBed(bamFile, useEditDistance, tag, writeBed12, obeySplits, color, useCigar);    // BED or "blocked BED"
+            ConvertBamToBed(bamFile, useEditDistance, tag, writeBed12, obeySplits, color, useCigar, useNovoalign);    // BED or "blocked BED"
         else
             ConvertBamToBedpe(bamFile, useEditDistance);                    // BEDPE
     }
@@ -213,8 +221,9 @@ void ShowHelp(void) {
 }
 
 
-void ConvertBamToBed(const string &bamFile, const bool &useEditDistance, const string &bamTag,
-                     const bool &writeBed12, const bool &obeySplits, const string &color, const bool &useCigar) {
+void ConvertBamToBed(const string &bamFile, bool useEditDistance, const string &bamTag,
+                     bool writeBed12, bool obeySplits, const string &color, 
+                     bool useCigar,   bool useNovoalign) {
     // open the BAM file
     BamReader reader;
     reader.Open(bamFile);
@@ -228,7 +237,7 @@ void ConvertBamToBed(const string &bamFile, const bool &useEditDistance, const s
     while (reader.GetNextAlignment(bam)) {
         if (bam.IsMapped() == true) {
             if (writeBed12 == false)                 // BED
-                PrintBed(bam, refs, useEditDistance, bamTag, obeySplits, useCigar);
+                PrintBed(bam, refs, useEditDistance, bamTag, obeySplits, useCigar, useNovoalign);
             else                                     //"blocked" BED
                 PrintBed12(bam, refs, useEditDistance, bamTag, color);
         }
@@ -332,7 +341,8 @@ string BuildCigarString(const vector<CigarOp> &cigar) {
 }
 
 
-void PrintBed(const BamAlignment &bam,  const RefVector &refs, bool useEditDistance, const string &bamTag, bool obeySplits, bool useCigar) {
+void PrintBed(const BamAlignment &bam,  const RefVector &refs, bool useEditDistance, 
+              const string &bamTag, bool obeySplits, bool useCigar, bool useNovoalign) {
 
     // set the strand
     string strand = "+";
@@ -348,41 +358,62 @@ void PrintBed(const BamAlignment &bam,  const RefVector &refs, bool useEditDista
 
     // report the entire BAM footprint as a single BED entry
     if (obeySplits == false) {
-        // report the alignment in BED6 format.
-        if (useEditDistance == false && bamTag == "") {
-            printf("%s\t%d\t%d\t\%s\t%d\t%s", refs.at(bam.RefID).RefName.c_str(), bam.Position,
-                                          alignmentEnd, name.c_str(), bam.MapQuality, strand.c_str());
-        }
-        else if (useEditDistance == true && bamTag == "") {
-            uint32_t editDistance;
-            if (bam.GetTag("NM", editDistance)) {
-                printf("%s\t%d\t%d\t\%s\t%u\t%s", refs.at(bam.RefID).RefName.c_str(), bam.Position,
-                                              alignmentEnd, name.c_str(), editDistance, strand.c_str());
-            }
-            else {
-                cerr << "The edit distance tag (NM) was not found in the BAM file.  Please disable -ed.  Exiting\n";
-                exit(1);
-            }
-        }
-        else if (useEditDistance == false && bamTag != "") {
-            int32_t tagValue;
-            if (bam.GetTag(bamTag, tagValue)) {
+        
+        if (!useNovoalign) {
+            // report the alignment in BED6 format.
+            if (useEditDistance == false && bamTag == "") {
                 printf("%s\t%d\t%d\t\%s\t%d\t%s", refs.at(bam.RefID).RefName.c_str(), bam.Position,
-                                              alignmentEnd, name.c_str(), tagValue, strand.c_str());
+                                              alignmentEnd, name.c_str(), bam.MapQuality, strand.c_str());
+            }
+            else if (useEditDistance == true && bamTag == "") {
+                uint32_t editDistance;
+                if (bam.GetTag("NM", editDistance)) {
+                    printf("%s\t%d\t%d\t\%s\t%u\t%s", refs.at(bam.RefID).RefName.c_str(), bam.Position,
+                                                  alignmentEnd, name.c_str(), editDistance, strand.c_str());
+                }
+                else {
+                    cerr << "The edit distance tag (NM) was not found in the BAM file.  Please disable -ed.  Exiting\n";
+                    exit(1);
+                }
+            }
+            else if (useEditDistance == false && bamTag != "") {
+                int32_t tagValue;
+                if (bam.GetTag(bamTag, tagValue)) {
+                    printf("%s\t%d\t%d\t\%s\t%d\t%s", refs.at(bam.RefID).RefName.c_str(), bam.Position,
+                                                  alignmentEnd, name.c_str(), tagValue, strand.c_str());
+                }
+                else {
+                    cerr << "The requested tag (" << bamTag << ") was not found in the BAM file.  Exiting\n";
+                    exit(1);
+                }
+            }
+
+            // does the user want CIGAR as well?
+            if (useCigar == false) {
+                printf("\n");
             }
             else {
-                cerr << "The requested tag (" << bamTag << ") was not found in the BAM file.  Exiting\n";
-                exit(1);
+                string cigar = BuildCigarString(bam.CigarData);
+                printf("\t%s\n", cigar.c_str());
             }
-        }
-
-        // does the user want CIGAR as well?
-        if (useCigar == false) {
-            printf("\n");
         }
         else {
-            string cigar = BuildCigarString(bam.CigarData);
-            printf("\t%s\n", cigar.c_str());
+            // special BED format for Hydra using Novoalign.
+            uint32_t editDistance;
+            uint32_t numMappings;
+            
+            if (!bam.GetTag("NM", editDistance)) {
+                cerr << "Unable to extract NM.  Verify that your BAM was generated by Novoalign." << endl;
+                exit(1);
+            }
+            if (!bam.GetTag("ZN", numMappings)) {
+                // if ZN is missing, this means just one alignment was found.
+                numMappings = 1;
+            }
+            printf("%s\t%d\t%d\t\%s\t%u_%u_%u\t%s\n", 
+                   refs.at(bam.RefID).RefName.c_str(), bam.Position,
+                   alignmentEnd, name.c_str(), 
+                   bam.MapQuality, editDistance, numMappings, strand.c_str());
         }
     }
     // Report each chunk of the BAM alignment as a discrete BED entry

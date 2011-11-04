@@ -125,6 +125,7 @@ bool ChromSweep::ChromChange()
     }
 }
 
+
 bool ChromSweep::IsValidHit(const BED &query, const BED &db) {
     // do we have an overlap in the DB?
     if (overlaps(query.start, query.end, db.start, db.end) > 0) {
