@@ -37,12 +37,12 @@ void ShowHelp(void);
 
 void ConvertBamToBed(const string &bamFile, bool useEditDistance, const string &bamTag,
                      bool writeBed12, bool obeySplits, const string &color, 
-                     bool useCigar,   bool useNovoalign);
+                     bool useCigar,   bool useNovoalign, bool useBWA);
                      
 void ConvertBamToBedpe(const string &bamFile, const bool &useEditDistance);
 
 void PrintBed(const BamAlignment &bam, const RefVector &refs, bool useEditDistance, 
-              const string &bamTag, bool obeySplits, bool useCigar, bool useNovoalign);
+              const string &bamTag, bool obeySplits, bool useCigar, bool useNovoalign, bool useBWA);
               
 void PrintBed12(const BamAlignment &bam, const RefVector &refs, bool useEditDistance, const string &bamTag, string color = "255,0,0");
 void PrintBedPE(const BamAlignment &bam1, const BamAlignment &bam2,
@@ -75,6 +75,7 @@ int main(int argc, char* argv[]) {
     bool useCigar          = false;
     bool obeySplits        = false;
     bool useNovoalign      = false;  // custom for Quinlan/Hall research
+    bool useBWA            = false;  // custom for Quinlan/Hall research
 
     // check to see if we should print out some help
 
@@ -120,6 +121,9 @@ int main(int argc, char* argv[]) {
         }
         else if(PARAMETER_CHECK("-novo", 5, parameterLength)) {
                 useNovoalign = true;
+        }
+        else if(PARAMETER_CHECK("-bwa", 4, parameterLength)) {
+                useBWA = true;
         }
         else if(PARAMETER_CHECK("-color", 6, parameterLength)) {
             if ((i+1) < argc) {
@@ -169,7 +173,7 @@ int main(int argc, char* argv[]) {
     // if there are no problems, let's convert BAM to BED or BEDPE
     if (!showHelp) {
         if (writeBedPE == false)
-            ConvertBamToBed(bamFile, useEditDistance, tag, writeBed12, obeySplits, color, useCigar, useNovoalign);    // BED or "blocked BED"
+            ConvertBamToBed(bamFile, useEditDistance, tag, writeBed12, obeySplits, color, useCigar, useNovoalign, useBWA);    // BED or "blocked BED"
         else
             ConvertBamToBedpe(bamFile, useEditDistance);                    // BEDPE
     }
@@ -223,7 +227,7 @@ void ShowHelp(void) {
 
 void ConvertBamToBed(const string &bamFile, bool useEditDistance, const string &bamTag,
                      bool writeBed12, bool obeySplits, const string &color, 
-                     bool useCigar,   bool useNovoalign) {
+                     bool useCigar,   bool useNovoalign, bool useBWA) {
     // open the BAM file
     BamReader reader;
     reader.Open(bamFile);
@@ -237,7 +241,7 @@ void ConvertBamToBed(const string &bamFile, bool useEditDistance, const string &
     while (reader.GetNextAlignment(bam)) {
         if (bam.IsMapped() == true) {
             if (writeBed12 == false)                 // BED
-                PrintBed(bam, refs, useEditDistance, bamTag, obeySplits, useCigar, useNovoalign);
+                PrintBed(bam, refs, useEditDistance, bamTag, obeySplits, useCigar, useNovoalign, useBWA);
             else                                     //"blocked" BED
                 PrintBed12(bam, refs, useEditDistance, bamTag, color);
         }
@@ -342,7 +346,7 @@ string BuildCigarString(const vector<CigarOp> &cigar) {
 
 
 void PrintBed(const BamAlignment &bam,  const RefVector &refs, bool useEditDistance, 
-              const string &bamTag, bool obeySplits, bool useCigar, bool useNovoalign) {
+              const string &bamTag, bool obeySplits, bool useCigar, bool useNovoalign, bool useBWA) {
 
     // set the strand
     string strand = "+";
@@ -359,7 +363,7 @@ void PrintBed(const BamAlignment &bam,  const RefVector &refs, bool useEditDista
     // report the entire BAM footprint as a single BED entry
     if (obeySplits == false) {
         
-        if (!useNovoalign) {
+        if (!useNovoalign && !useBWA) {
             // report the alignment in BED6 format.
             if (useEditDistance == false && bamTag == "") {
                 printf("%s\t%d\t%d\t\%s\t%d\t%s", refs.at(bam.RefID).RefName.c_str(), bam.Position,
@@ -397,7 +401,7 @@ void PrintBed(const BamAlignment &bam,  const RefVector &refs, bool useEditDista
                 printf("\t%s\n", cigar.c_str());
             }
         }
-        else {
+        else if (useNovoalign && !useBWA) {
             // special BED format for Hydra using Novoalign.
             uint32_t editDistance;
             uint32_t numMappings;
@@ -409,6 +413,29 @@ void PrintBed(const BamAlignment &bam,  const RefVector &refs, bool useEditDista
             if (!bam.GetTag("ZN", numMappings)) {
                 // if ZN is missing, this means just one alignment was found.
                 numMappings = 1;
+            }
+            printf("%s\t%d\t%d\t\%s\t%u_%u_%u\t%s\n", 
+                   refs.at(bam.RefID).RefName.c_str(), bam.Position,
+                   alignmentEnd, name.c_str(), 
+                   bam.MapQuality, editDistance, numMappings, strand.c_str());
+        }
+        else if (!useNovoalign && useBWA) {
+            // special BED format for Hydra using Novoalign.
+            uint32_t editDistance;
+            uint32_t numMappings;
+            uint32_t x0 = 1;
+            uint32_t x1 = 0;
+            
+            if (!bam.GetTag("NM", editDistance)) {
+                cerr << "Unable to extract NM.  Verify that your BAM was generated by Novoalign." << endl;
+                exit(1);
+            }
+            if (!bam.GetTag("X0", x0) && !bam.GetTag("X1", x1)) {
+                // if ZN is missing, this means just one alignment was found.
+                numMappings = 1;
+            }
+            else {
+                numMappings = x0 + x1;
             }
             printf("%s\t%d\t%d\t\%s\t%u_%u_%u\t%s\n", 
                    refs.at(bam.RefID).RefName.c_str(), bam.Position,
