@@ -60,6 +60,8 @@ public:
         else if (this->coord < other.coord) {
             return false;
         }
+        // prefer ENDs to come before STARTS if the same coordinate.
+        // needed for stability of the -cluster algorithm.
         else {
             if (this->coord_type == END) {
                 return false;
