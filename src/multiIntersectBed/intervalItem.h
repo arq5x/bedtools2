@@ -39,7 +39,7 @@ public:
        coord_type(START),
        coord(0)
     {}
-    
+
     IntervalItem(int _index, COORDINATE_TYPE _type, CHRPOS _coord) :
         source_index(_index),
         coord_type(_type),
@@ -54,7 +54,20 @@ public:
 
     bool operator< ( const IntervalItem& other ) const
     {
-        return this->coord > other.coord;
+        if (this->coord > other.coord) {
+            return true;
+        }
+        else if (this->coord < other.coord) {
+            return false;
+        }
+        else {
+            if (this->coord_type == END) {
+                return false;
+            }
+            else {
+                return true;
+            }
+        }
     }
 };
 
