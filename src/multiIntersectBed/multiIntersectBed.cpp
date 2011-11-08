@@ -58,84 +58,6 @@ MultiIntersectBed::~MultiIntersectBed() {
 }
 
 
-void MultiIntersectBed::MultiIntersect() {
-    OpenFiles();
-
-    // Add the first interval from each file
-    for(size_t i = 0;i < input_files.size(); ++i)
-        LoadNextItem(i);
-
-    // Chromosome loop - once per chromosome
-    do {
-        // Find the first chromosome to use
-        current_chrom = DetermineNextChrom();
-
-        // Populate the queue with initial values from all files
-        // (if they belong to the correct chromosome)
-        for(size_t i = 0; i < input_files.size(); ++i)
-            AddInterval(i);
-
-        CHRPOS current_start = ConsumeNextCoordinate();
-
-        // User wanted empty regions, and the first coordinate is not 0 - print a dummy empty coverage
-        if (print_empty_regions && current_start > 0)
-            PrintEmptyCoverage(0,current_start);
-
-        // Intervals loop - until all intervals (of current chromosome) from all files are used.
-        do {
-            CHRPOS current_end = queue.top().coord;
-            PrintCoverage(current_start, current_end);
-            current_start = ConsumeNextCoordinate();
-        } while (!queue.empty());
-
-        // User wanted empty regions, and the last coordinate is not the last coordinate of the chromosome
-            // print a dummy empty coverage
-        if (print_empty_regions) {
-            CHRPOS chrom_size = genome_sizes->getChromSize(current_chrom);
-            if (current_start < chrom_size)
-                PrintEmptyCoverage(current_start, chrom_size);
-        }
-
-    } while (!AllFilesDone());
-}
-
-
-CHRPOS MultiIntersectBed::ConsumeNextCoordinate() {
-    assert(!queue.empty());
-
-    CHRPOS new_position = queue.top().coord;
-    do {
-        IntervalItem item = queue.top();
-        UpdateInformation(item);
-        queue.pop();
-    } while (!queue.empty() && queue.top().coord == new_position);
-
-    return new_position;
-}
-
-
-void MultiIntersectBed::UpdateInformation(const IntervalItem &item) {
-    // Update the depth coverage for this file
-
-    // Which coordinate is it - start or end?
-    switch (item.coord_type)
-    {
-    case START:
-        current_depth[item.source_index] = 1;
-        current_non_zero_inputs++;
-        break;
-    case END:
-        //Read the next interval from this file
-        AddInterval(item.source_index);
-        current_depth[item.source_index] = 0;
-        current_non_zero_inputs--;
-        break;
-    default:
-        assert(0);
-    }
-}
-
-
 void MultiIntersectBed::AddInterval(int index) {
     assert(static_cast<unsigned int>(index) < input_files.size());
 
@@ -234,12 +156,6 @@ void MultiIntersectBed::LoadNextItem(int index) {
     BedFile *file = input_files[index];
     BED merged_bed;
     int lineNum = 0;
-    //
-    // TO DO: Do the mergeing on the fly.  How best to do this?
-    // 
-    // IDEA: Implement a Merge class with GetNextMerge element.
-    //
-
     while (file->GetNextMergedBed(merged_bed, lineNum))
     {
         current_item[index] = merged_bed;
@@ -291,3 +207,110 @@ void MultiIntersectBed::CloseFiles() {
     }
     input_files.clear();
 }
+
+
+void MultiIntersectBed::MultiIntersect() {
+    OpenFiles();
+
+    // Add the first interval from each file
+    for(size_t i = 0;i < input_files.size(); ++i)
+        LoadNextItem(i);
+
+    // Chromosome loop - once per chromosome
+    IntervalItem curr_point;
+    do {
+        // Find the first chromosome to use
+        current_chrom = DetermineNextChrom();
+
+        // Populate the queue with initial values from all files
+        // (if they belong to the correct chromosome)
+        for(size_t i = 0; i < input_files.size(); ++i)
+            AddInterval(i);
+
+        CHRPOS prev_start    = 0;
+        do {
+            // get the current point in the queue
+            curr_point    = queue.top();
+            // if we have moved, report the interval
+            if (curr_point.coord > prev_start) {
+                PrintCoverage(prev_start, curr_point.coord);
+            }
+            // update depending on the type of interval we encountered.
+            if (curr_point.coord_type == START) {
+                current_depth[curr_point.source_index] = 1;
+                current_non_zero_inputs++;
+            }
+            else {
+                //Read the next interval from this file
+                AddInterval(curr_point.source_index);
+                current_depth[curr_point.source_index] = 0;
+                current_non_zero_inputs--;
+            }
+            // reset for the next point
+            prev_start = curr_point.coord;
+            queue.pop();
+        } while (!queue.empty());
+
+        // want empty regions, and the last coordinate is not the last coordinate of the chromosome
+        if (print_empty_regions) {
+            CHRPOS chrom_size = genome_sizes->getChromSize(current_chrom);
+            if (curr_point.coord < chrom_size)
+                PrintEmptyCoverage(curr_point.coord, chrom_size);
+        }
+    } while (!AllFilesDone());
+}
+
+
+void MultiIntersectBed::Cluster() {
+    OpenFiles();
+
+    // Add the first interval from each file
+    for(size_t i = 0;i < input_files.size(); ++i)
+        LoadNextItem(i);
+
+    // Chromosome loop - once per chromosome
+    IntervalItem curr_point;
+    short last_direction = 0;
+    do {
+        // Find the first chromosome to use
+        current_chrom = DetermineNextChrom();
+
+        // Populate the queue with initial values from all files
+        // (if they belong to the correct chromosome)
+        for(size_t i = 0; i < input_files.size(); ++i)
+            AddInterval(i);
+
+        CHRPOS prev_start = 0;
+        do {
+            // get the current point in the queue
+            curr_point = queue.top();
+            if (curr_point.coord_type == START) {
+                current_depth[curr_point.source_index] = 1;
+                current_non_zero_inputs++;
+                // reset for the next point
+                prev_start = curr_point.coord;
+                last_direction = 1;
+            }
+            else {
+                if (last_direction == 1) {
+                    PrintCoverage(prev_start, curr_point.coord);
+                }
+                //Read the next interval from this file
+                AddInterval(curr_point.source_index);
+                current_depth[curr_point.source_index] = 0;
+                current_non_zero_inputs--;
+                last_direction = -1;
+            }
+            queue.pop();
+        } while (!queue.empty());
+
+        // want empty regions, and the last coordinate is not the last coordinate of the chromosome
+        if (print_empty_regions) {
+            CHRPOS chrom_size = genome_sizes->getChromSize(current_chrom);
+            if (curr_point.coord < chrom_size)
+                PrintEmptyCoverage(curr_point.coord, chrom_size);
+        }
+    } while (!AllFilesDone());
+}
+
+

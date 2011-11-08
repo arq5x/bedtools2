@@ -49,6 +49,7 @@ int main(int argc, char* argv[])
     bool haveFiller        = true;
     bool printHeader       = false;
     bool printEmptyRegions = false;
+    bool cluster           = false;
     bool showHelp          = false;
     string genomeFile;
     string basePath;
@@ -127,6 +128,9 @@ int main(int argc, char* argv[])
         else if(PARAMETER_CHECK("-empty", 6, parameterLength)) {
             printEmptyRegions = true;
         }
+        else if(PARAMETER_CHECK("-cluster", 8, parameterLength)) {
+            cluster = true;
+        }
         else if(PARAMETER_CHECK("-examples", 9, parameterLength)) {
             ShowHelp();
             ShowExamples();
@@ -155,7 +159,10 @@ int main(int argc, char* argv[])
     MultiIntersectBed mbi(cout, inputFiles, inputTitles, printEmptyRegions, genomeFile, noCoverageValue);
     if (printHeader)
         mbi.PrintHeader();
-    mbi.MultiIntersect();
+    if (!cluster)
+        mbi.MultiIntersect();
+    else
+        mbi.Cluster();
 }
 
 void ShowHelp(void) {
@@ -172,6 +179,8 @@ void ShowHelp(void) {
     cerr << "\t Requires that each interval file is sorted by chrom/start. " << endl << endl;
 
     cerr << "Options: " << endl;
+
+    cerr << "\t-cluster\t\t"     << "Invoke Ryan's algorithm." << endl << endl;
 
     cerr << "\t-header\t\t"     << "Print a header line." << endl;
     cerr                        << "\t\t\t(chrom/start/end + names of each file)." << endl << endl;
