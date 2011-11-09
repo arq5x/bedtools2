@@ -377,7 +377,7 @@ bool after(const BED &a, const BED &b) {
 
 
 // Ancillary functions
-void splitBedIntoBlocks(const BED &bed, int lineNum, bedVector &bedBlocks);
+void splitBedIntoBlocks(const BED &bed, bedVector &bedBlocks);
 
 
 // BED Sorting Methods
@@ -404,27 +404,34 @@ public:
     // Destructor
     ~BedFile(void);
 
+    /********* File management ********/
     // Open a BED file for reading (creates an istream pointer)
     void Open(void);
+
+    // Close an opened BED file.
+    void Close(void);
+
+    // are the any intervals left in the file?
+    bool Empty(void);
 
     // Rewind the pointer back to the beginning of the file
     void Rewind(void);
 
     // Jump to a specific byte in the file
     void Seek(unsigned long offset);
-   
 
-    bool Empty();
+    // dump the header, which is collected as part of Open()
+    void PrintHeader(void);
 
-    // Close an opened BED file.
-    void Close(void);
+    // get the next line in the file. splits a line in _bedFields
+    void GetLine(void);
 
     // Get the next BED entry in an opened BED file.
-    BedLineStatus GetNextBed (BED &bed, int &lineNum, bool forceSorted = false);
+    BedLineStatus GetNextBed (BED &bed, bool forceSorted = false);
     
     // Returns the next MERGED (i.e., non-overlapping) interval in an opened BED file
     // NOTE: assumes input file is sorted by chrom then start
-    bool GetNextMergedBed(BED &merged_bed, int &lineNum);
+    bool GetNextMergedBed(BED &merged_bed);
 
     // load a BED file into a map keyed by chrom, then bin. value is vector of BEDs
     void loadBedFileIntoMap();
@@ -490,6 +497,8 @@ private:
     FileType   _fileType;     // what is the file type? (BED? GFF? VCF?)
     istream   *_bedStream;
     string _bedLine;
+    int _lineNum;
+    vector<string> _header;
     vector<string> _bedFields;
     int _merged_start;
     int _merged_end;
@@ -503,6 +512,9 @@ private:
     void setFileType (FileType type);
     void setBedType (int colNums);
 
+    /************ Private utilities ***********************/
+    void GetHeader(void);
+
     /******************************************************
     Private definitions to circumvent linker issues with
     templated member functions.
@@ -512,10 +524,8 @@ private:
         parseLine: converts a lineVector into either BED or BEDCOV (templated, hence in header to avoid linker issues.)
     */
     template <typename T>
-    inline BedLineStatus parseLine (T &bed, const vector<string> &lineVector, int &lineNum) {
+    inline BedLineStatus parseLine (T &bed, const vector<string> &lineVector) {
 
-        //char *p2End, *p3End, *p4End, *p5End;
-        //long l2, l3, l4, l5;
         unsigned int numFields = lineVector.size();
 
         // bail out if we have a blank line
@@ -523,65 +533,59 @@ private:
             return BED_BLANK;
         }
 
-        if ((lineVector[0].find("track") == string::npos) && (lineVector[0].find("browser") == string::npos) && (lineVector[0].find("#") == string::npos) ) {
 
-            if (numFields >= 3) {
-                // line parsing for all lines after the first non-header line
-                if (_typeIsKnown == true) {
-                    switch(_fileType) {
-                        case BED_FILETYPE:
-                            if (parseBedLine(bed, lineVector, lineNum, numFields) == true) return BED_VALID;
-                        case VCF_FILETYPE:
-                            if (parseVcfLine(bed, lineVector, lineNum, numFields) == true) return BED_VALID;
-                        case GFF_FILETYPE:
-                            if (parseGffLine(bed, lineVector, lineNum, numFields) == true) return BED_VALID;
-                        default:
-                            printf("ERROR: file type encountered. Exiting\n");
-                            exit(1);
-                    }
-                }
-                // line parsing for first non-header line: figure out file contents
-                else {
-                    // it's BED format if columns 2 and 3 are integers
-                    if (isInteger(lineVector[1]) && isInteger(lineVector[2])) {
-                        setGff(false);
-                        setZeroBased(true);
-                        setFileType(BED_FILETYPE);
-                        setBedType(numFields);       // we now expect numFields columns in each line
-                        if (parseBedLine(bed, lineVector, lineNum, numFields) == true) return BED_VALID;
-                    }
-                    // it's VCF, assuming the second column is numeric and there are at least 8 fields.
-                    else if (isInteger(lineVector[1]) && numFields >= 8) {
-                        setGff(false);
-                        setVcf(true);
-                        setZeroBased(false);
-                        setFileType(VCF_FILETYPE);
-                        setBedType(numFields);       // we now expect numFields columns in each line
-                        if (parseVcfLine(bed, lineVector, lineNum, numFields) == true) return BED_VALID;
-                    }
-                    // it's GFF, assuming columns columns 4 and 5 are numeric and we have 9 fields total.
-                    else if ((numFields >= 8) && isInteger(lineVector[3]) && isInteger(lineVector[4])) {
-                        setGff(true);
-                        setZeroBased(false);
-                        setFileType(GFF_FILETYPE);
-                        setBedType(numFields);       // we now expect numFields columns in each line
-                        if (parseGffLine(bed, lineVector, lineNum, numFields) == true) return BED_VALID;
-                    }
-                    else {
-                        cerr << "Unexpected file format.  Please use tab-delimited BED, GFF, or VCF. " <<
-                                "Perhaps you have non-integer starts or ends at line " << lineNum << "?" << endl;
+        if (numFields >= 3) {
+            // line parsing for all lines after the first non-header line
+            if (_typeIsKnown == true) {
+                switch(_fileType) {
+                    case BED_FILETYPE:
+                        if (parseBedLine(bed, lineVector, _lineNum, numFields) == true) return BED_VALID;
+                    case VCF_FILETYPE:
+                        if (parseVcfLine(bed, lineVector, _lineNum, numFields) == true) return BED_VALID;
+                    case GFF_FILETYPE:
+                        if (parseGffLine(bed, lineVector, _lineNum, numFields) == true) return BED_VALID;
+                    default:
+                        printf("ERROR: file type encountered. Exiting\n");
                         exit(1);
-                    }
                 }
             }
+            // line parsing for first non-header line: figure out file contents
             else {
-                cerr << "It looks as though you have less than 3 columns at line: " << lineNum << ".  Are you sure your files are tab-delimited?" << endl;
-                exit(1);
+                // it's BED format if columns 2 and 3 are integers
+                if (isInteger(lineVector[1]) && isInteger(lineVector[2])) {
+                    setGff(false);
+                    setZeroBased(true);
+                    setFileType(BED_FILETYPE);
+                    setBedType(numFields);       // we now expect numFields columns in each line
+                    if (parseBedLine(bed, lineVector, _lineNum, numFields) == true) return BED_VALID;
+                }
+                // it's VCF, assuming the second column is numeric and there are at least 8 fields.
+                else if (isInteger(lineVector[1]) && numFields >= 8) {
+                    setGff(false);
+                    setVcf(true);
+                    setZeroBased(false);
+                    setFileType(VCF_FILETYPE);
+                    setBedType(numFields);       // we now expect numFields columns in each line
+                    if (parseVcfLine(bed, lineVector, _lineNum, numFields) == true) return BED_VALID;
+                }
+                // it's GFF, assuming columns columns 4 and 5 are numeric and we have 9 fields total.
+                else if ((numFields >= 8) && isInteger(lineVector[3]) && isInteger(lineVector[4])) {
+                    setGff(true);
+                    setZeroBased(false);
+                    setFileType(GFF_FILETYPE);
+                    setBedType(numFields);       // we now expect numFields columns in each line
+                    if (parseGffLine(bed, lineVector, _lineNum, numFields) == true) return BED_VALID;
+                }
+                else {
+                    cerr << "Unexpected file format.  Please use tab-delimited BED, GFF, or VCF. " <<
+                            "Perhaps you have non-integer starts or ends at line " << _lineNum << "?" << endl;
+                    exit(1);
+                }
             }
         }
         else {
-            lineNum--;
-            return BED_HEADER;
+            cerr << "It looks as though you have less than 3 columns at line: " << _lineNum << ".  Are you sure your files are tab-delimited?" << endl;
+            exit(1);
         }
         // default
         return BED_INVALID;
@@ -592,7 +596,7 @@ private:
         parseBedLine: converts a lineVector into either BED or BEDCOV (templated, hence in header to avoid linker issues.)
     */
     template <typename T>
-    inline bool parseBedLine (T &bed, const vector<string> &lineVector, int lineNum, unsigned int numFields) {
+    inline bool parseBedLine (T &bed, const vector<string> &lineVector, int _lineNum, unsigned int numFields) {
 
         // process as long as the number of fields in this
         // line matches what we expect for this file.
@@ -601,13 +605,13 @@ private:
             int i;
             i = atoi(lineVector[1].c_str());
             if (i<0) {
-                 cerr << "Error: malformed BED entry at line " << lineNum << ". Start Coordinate detected that is < 0. Exiting." << endl;
+                 cerr << "Error: malformed BED entry at line " << _lineNum << ". Start Coordinate detected that is < 0. Exiting." << endl;
                  exit(1);
             }
             bed.start = (CHRPOS)i;
             i = atoi(lineVector[2].c_str());
             if (i<0) {
-                cerr << "Error: malformed BED entry at line " << lineNum << ". End Coordinate detected that is < 0. Exiting." << endl;
+                cerr << "Error: malformed BED entry at line " << _lineNum << ". End Coordinate detected that is < 0. Exiting." << endl;
                 exit(1);
             }
             bed.end = (CHRPOS)i;
@@ -640,7 +644,7 @@ private:
                 }
             }
             else if (this->bedType != 3) {
-                cerr << "Error: unexpected number of fields at line: " << lineNum
+                cerr << "Error: unexpected number of fields at line: " << _lineNum
                      << ".  Verify that your files are TAB-delimited.  Exiting..." << endl;
                 exit(1);
             }
@@ -650,20 +654,20 @@ private:
                 return true;
             }
             else {
-                cerr << "Error: malformed BED entry at line " << lineNum << ". Start was greater than end. Exiting." << endl;
+                cerr << "Error: malformed BED entry at line " << _lineNum << ". Start was greater than end. Exiting." << endl;
                 exit(1);
             }
         }
         else if (numFields == 1) {
-            cerr << "Only one BED field detected: " << lineNum << ".  Verify that your files are TAB-delimited.  Exiting..." << endl;
+            cerr << "Only one BED field detected: " << _lineNum << ".  Verify that your files are TAB-delimited.  Exiting..." << endl;
             exit(1);
         }
         else if ((numFields != this->bedType) && (numFields != 0)) {
-            cerr << "Differing number of BED fields encountered at line: " << lineNum << ".  Exiting..." << endl;
+            cerr << "Differing number of BED fields encountered at line: " << _lineNum << ".  Exiting..." << endl;
             exit(1);
         }
         else if ((numFields < 3) && (numFields != 0)) {
-            cerr << "TAB delimited BED file with at least 3 fields (chrom, start, end) is required at line: "<< lineNum << ".  Exiting..." << endl;
+            cerr << "TAB delimited BED file with at least 3 fields (chrom, start, end) is required at line: "<< _lineNum << ".  Exiting..." << endl;
             exit(1);
         }
         return false;
@@ -674,7 +678,7 @@ private:
         parseVcfLine: converts a lineVector into either BED or BEDCOV (templated, hence in header to avoid linker issues.)
     */
     template <typename T>
-    inline bool parseVcfLine (T &bed, const vector<string> &lineVector, int lineNum, unsigned int numFields) {
+    inline bool parseVcfLine (T &bed, const vector<string> &lineVector, int _lineNum, unsigned int numFields) {
         if (numFields == this->bedType) {
             bed.chrom  = lineVector[0];
             bed.start  = atoi(lineVector[1].c_str()) - 1;  // VCF is one-based
@@ -696,24 +700,24 @@ private:
                 return true;
             }
             else if (bed.start > bed.end) {
-                cerr << "Error: malformed VCF entry at line " << lineNum << ". Start was greater than end. Exiting." << endl;
+                cerr << "Error: malformed VCF entry at line " << _lineNum << ". Start was greater than end. Exiting." << endl;
                 exit(1);
             }
             else if ( (bed.start < 0) || (bed.end < 0) ) {
-                cerr << "Error: malformed VCF entry at line " << lineNum << ". Coordinate detected that is < 0. Exiting." << endl;
+                cerr << "Error: malformed VCF entry at line " << _lineNum << ". Coordinate detected that is < 0. Exiting." << endl;
                 exit(1);
             }
         }
         else if (numFields == 1) {
-            cerr << "Only one VCF field detected: " << lineNum << ".  Verify that your files are TAB-delimited.  Exiting..." << endl;
+            cerr << "Only one VCF field detected: " << _lineNum << ".  Verify that your files are TAB-delimited.  Exiting..." << endl;
             exit(1);
         }
         else if ((numFields != this->bedType) && (numFields != 0)) {
-            cerr << "Differing number of VCF fields encountered at line: " << lineNum << ".  Exiting..." << endl;
+            cerr << "Differing number of VCF fields encountered at line: " << _lineNum << ".  Exiting..." << endl;
             exit(1);
         }
         else if ((numFields < 2) && (numFields != 0)) {
-            cerr << "TAB delimited VCF file with at least 2 fields (chrom, pos) is required at line: "<< lineNum << ".  Exiting..." << endl;
+            cerr << "TAB delimited VCF file with at least 2 fields (chrom, pos) is required at line: "<< _lineNum << ".  Exiting..." << endl;
             exit(1);
         }
         return false;

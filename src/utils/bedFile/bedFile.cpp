@@ -15,16 +15,16 @@
 /************************************************
 Helper functions
 *************************************************/
-void splitBedIntoBlocks(const BED &bed, int lineNum, bedVector &bedBlocks) {
+void splitBedIntoBlocks(const BED &bed, bedVector &bedBlocks) {
 
     if (bed.otherFields.size() < 6) {
-        cerr << "Input error: Cannot split into blocks. Found interval with fewer than 12 columns on line " << lineNum << "." << endl;
+        cerr << "Input error: Cannot split into blocks. Found interval with fewer than 12 columns." << endl;
         exit(1);
     }
 
     int blockCount = atoi(bed.otherFields[3].c_str());
     if ( blockCount <= 0 ) {
-        cerr << "Input error: found interval having <= 0 blocks on line " << lineNum << "." << endl;
+        cerr << "Input error: found interval having <= 0 blocks." << endl;
         exit(1);
     }
     else if ( blockCount == 1 ) {
@@ -42,7 +42,7 @@ void splitBedIntoBlocks(const BED &bed, int lineNum, bedVector &bedBlocks) {
         Tokenize(blockStarts, starts, ",");
 
         if ( sizes.size() != (size_t) blockCount || starts.size() != (size_t) blockCount ) {
-            cerr << "Input error: found interval with block-counts not matching starts/sizes on line " << lineNum << "." << endl;
+            cerr << "Input error: found interval with block-counts not matching starts/sizes on line." << endl;
             exit(1);
         }
 
@@ -151,6 +151,8 @@ void BedFile::Open(void) {
             exit (1);
         }
     }
+    // save the file's header (if there is one)
+    GetHeader();
 }
 
 // Rewind the pointer back to the beginning of the file
@@ -164,7 +166,7 @@ void BedFile::Seek(unsigned long offset) {
 }
 
 // Jump to a specific byte in the file
-bool BedFile::Empty() {
+bool BedFile::Empty(void) {
     return _bedStream->eof();
 }
 
@@ -173,23 +175,46 @@ void BedFile::Close(void) {
     if (bedFile != "stdin" && bedFile != "-") delete _bedStream;
 }
 
+void BedFile::GetLine(void) {
+    // parse the bedStream pointer
+    getline(*_bedStream, _bedLine);
+    // increment the line number
+    _lineNum++;
+    // split into a string vector.
+    Tokenize(_bedLine, _bedFields);
+}
 
-BedLineStatus BedFile::GetNextBed(BED &bed, int &lineNum, bool forceSorted) {
+// Extract and store the header for the file.
+void BedFile::GetHeader(void) {
+        GetLine();
+        while ((_bedLine.find("#") != string::npos) ||
+               (_bedLine.find("browser") != string::npos) ||
+               (_bedLine.find("track") != string::npos) ) 
+        {
+            _header.push_back(_bedLine);
+            GetLine();
+        }
+}
+
+// Dump the header
+void BedFile::PrintHeader(void) {
+    for (size_t i = 0; i < _header.size(); ++i) {
+        cout << _header[i] << endl;
+    }
+}
+
+
+BedLineStatus BedFile::GetNextBed(BED &bed, bool forceSorted) {
 
     // make sure there are still lines to process.
     // if so, tokenize, validate and return the BED entry.
     _bedFields.clear();
     // clear out the previous bed's data
     if (_bedStream->good()) {
-        // parse the bedStream pointer
-        getline(*_bedStream, _bedLine);
-        lineNum++;
-
-        // split into a string vector.
-        Tokenize(_bedLine, _bedFields);
-
+        // read the next line in the file and parse into discrete fields
+        GetLine();
         // load the BED struct as long as it's a valid BED entry.
-        BedLineStatus status = parseLine(bed, _bedFields, lineNum);
+        BedLineStatus status = parseLine(bed, _bedFields);
         if (!forceSorted) {
             return status;
         }
@@ -220,13 +245,13 @@ BedLineStatus BedFile::GetNextBed(BED &bed, int &lineNum, bool forceSorted) {
 }
 
 
-bool BedFile::GetNextMergedBed(BED &merged_bed, int &lineNum) {
+bool BedFile::GetNextMergedBed(BED &merged_bed) {
 
     if (_bedStream->good()) {
         BED bed;
         BedLineStatus bedStatus;
         // force sorting; hence third param = true
-        while ((bedStatus = GetNextBed(bed, lineNum, true)) != BED_INVALID) {
+        while ((bedStatus = GetNextBed(bed, true)) != BED_INVALID) {
             if (bedStatus == BED_VALID) {
                 if (((int) bed.start - _merged_end > 0) || 
                    (_merged_end < 0) || 

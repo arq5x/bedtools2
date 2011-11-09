@@ -38,7 +38,7 @@ public:
                                bool writeA, bool writeB, bool writeOverlap, bool writeAllOverlap,
                                float overlapFraction, bool noHit, bool writeCount, bool sameStrand, bool diffStrand,
                                bool reciprocal, bool obeySplits, bool bamInput, bool bamOutput, bool isUncompressedBam,
-                               bool sortedInput);
+                               bool sortedInput, bool printHeader);
 
     // destructor
     ~BedIntersect(void);
@@ -70,6 +70,7 @@ private:
     bool  _isUncompressedBam;
     bool  _sortedInput;
     bool  _printable;
+    bool  _printHeader;
     
     // instance of a bed file class.
     BedFile *_bedA, *_bedB;
