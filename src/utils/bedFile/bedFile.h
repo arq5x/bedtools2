@@ -46,7 +46,6 @@ typedef uint32_t UINT;
 //*************************************************
 // Genome binning constants
 //*************************************************
-
 const BIN      _numBins   = 37450;
 const BINLEVEL _binLevels = 7;
 
@@ -407,13 +406,14 @@ public:
 
     // Open a BED file for reading (creates an istream pointer)
     void Open(void);
-    
+
     // Rewind the pointer back to the beginning of the file
     void Rewind(void);
 
     // Jump to a specific byte in the file
     void Seek(unsigned long offset);
-    
+   
+
     bool Empty();
 
     // Close an opened BED file.

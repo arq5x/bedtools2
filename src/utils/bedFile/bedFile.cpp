@@ -168,7 +168,6 @@ bool BedFile::Empty() {
     return _bedStream->eof();
 }
 
-
 // Close the BED file
 void BedFile::Close(void) {
     if (bedFile != "stdin" && bedFile != "-") delete _bedStream;
