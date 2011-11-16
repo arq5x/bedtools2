@@ -1,7 +1,7 @@
 /*****************************************************************************
-  bedToBam.cpp
+  bedpeToBam.cpp
 
-  (c) 2009 - Aaron Quinlan
+  (c) 2009 - Royden Clark, Aaron Quinlan
   Hall Laboratory
   Department of Biochemistry and Molecular Genetics
   University of Virginia
@@ -10,7 +10,7 @@
   Licenced under the GNU General Public License 2.0 license.
 ******************************************************************************/
 #include "lineFileUtilities.h"
-#include "bedFile.h"
+#include "bedFilePE.h"
 #include "genomeFile.h"
 #include "version.h"
 
@@ -29,16 +29,21 @@ using namespace std;
 
 
 // define our program name
-#define PROGRAM_NAME "bedToBam"
+#define PROGRAM_NAME "bedpeToBam"
 
 // define our parameter checking macro
 #define PARAMETER_CHECK(param, paramLen, actualLen) (strncmp(argv[i], param, min(actualLen, paramLen))== 0) && (actualLen == paramLen)
 
+//ROYDEN
+//NEED TO ADD A IS TYPE12+ check or fail
+//END ROYDEN
+
 
 // function declarations
 void ShowHelp(void);
-void ProcessBed(BedFile *bed, GenomeFile *genome, bool isBED12, int mapQual, bool uncompressedBam);
-void ConvertBedToBam(const BED &bed, BamAlignment &bam, map<string, int> &chromToId, bool isBED12, int mapQual, int lineNum);
+void ProcessBedPE(BedFilePE *bedpe, GenomeFile *genome,  int mapQual, bool uncompressedBam);
+void ConvertBedPEToBam(const BEDPE &bedpe, BamAlignment &bam1,BamAlignment &bam2, map<string, int> &chromToId, int mapQual, int lineNum);
+
 void MakeBamHeader(const string &genomeFile, RefVector &refs, string &header, map<string, int> &chromToInt);
 int  reg2bin(int beg, int end);
 
@@ -50,15 +55,15 @@ int main(int argc, char* argv[]) {
     bool showHelp = false;
 
     // input files
-    string bedFile = "stdin";
+    string bedpeFile = "stdin";
     string genomeFile;
 
     unsigned int mapQual = 255;
 
-    bool haveBed         = true;
+    bool haveBedPE         = true;
     bool haveGenome      = false;
     bool haveMapQual     = false;
-    bool isBED12         = false;
+   // bool isBED12         = false;
     bool uncompressedBam = false;
 
     for(int i = 1; i < argc; i++) {
@@ -79,7 +84,7 @@ int main(int argc, char* argv[]) {
 
         if(PARAMETER_CHECK("-i", 2, parameterLength)) {
             if ((i+1) < argc) {
-                bedFile = argv[i + 1];
+                bedpeFile = argv[i + 1];
                 i++;
             }
         }
@@ -97,9 +102,6 @@ int main(int argc, char* argv[]) {
                 i++;
             }
         }
-        else if(PARAMETER_CHECK("-bed12", 6, parameterLength)) {
-            isBED12 = true;
-        }
         else if(PARAMETER_CHECK("-ubam", 5, parameterLength)) {
             uncompressedBam = true;
         }
@@ -110,8 +112,8 @@ int main(int argc, char* argv[]) {
     }
 
     // make sure we have an input files
-    if (!haveBed ) {
-        cerr << endl << "*****" << endl << "*****ERROR: Need -i (BED) file. " << endl << "*****" << endl;
+    if (!haveBedPE ) {
+        cerr << endl << "*****" << endl << "*****ERROR: Need -i (BEDPE) file. " << endl << "*****" << endl;
         showHelp = true;
     }
     if (!haveGenome ) {
@@ -125,10 +127,10 @@ int main(int argc, char* argv[]) {
 
 
     if (!showHelp) {
-        BedFile *bed       = new BedFile(bedFile);
+        BedFilePE *bedpe= new BedFilePE(bedpeFile);
         GenomeFile *genome = new GenomeFile(genomeFile);
 
-        ProcessBed(bed, genome, isBED12, mapQual, uncompressedBam);
+       ProcessBedPE(bedpe, genome,  mapQual, uncompressedBam);
     }
     else {
         ShowHelp();
@@ -151,9 +153,6 @@ void ShowHelp(void) {
     cerr << "\t-mapq\t" << "Set the mappinq quality for the BAM records." << endl;
     cerr                    << "\t\t(INT) Default: 255" << endl << endl;
 
-    cerr << "\t-bed12\t"    << "The BED file is in BED12 format.  The BAM CIGAR" << endl;
-    cerr                    << "\t\tstring will reflect BED \"blocks\"." << endl << endl;
-
     cerr << "\t-ubam\t"     << "Write uncompressed BAM output. Default is to write compressed BAM." << endl << endl;
 
     cerr << "Notes: " << endl;
@@ -164,8 +163,7 @@ void ShowHelp(void) {
     exit(1);
 }
 
-
-void ProcessBed(BedFile *bed, GenomeFile *genome, bool isBED12, int mapQual, bool uncompressedBam) {
+void ProcessBedPE(BedFilePE *bedpe, GenomeFile *genome,  int mapQual, bool uncompressedBam) {
 
     BamWriter *writer = new BamWriter();
 
@@ -184,124 +182,115 @@ void ProcessBed(BedFile *bed, GenomeFile *genome, bool isBED12, int mapQual, boo
 
 
     // process each BED entry and convert to BAM
-    BED bedEntry, nullBed;
+    BEDPE bedpeEntry, nullBedpe;
     int lineNum = 0;
-    BedLineStatus bedStatus;
+    BedLineStatus bedpeStatus;
     // open the BED file for reading.
-    bed->Open();
-    while ((bedStatus = bed->GetNextBed(bedEntry, lineNum)) != BED_INVALID) {
-        if (bedStatus == BED_VALID) {
-            BamAlignment bamEntry;
-            if (bed->bedType >= 4) {
-                ConvertBedToBam(bedEntry, bamEntry, chromToId, isBED12, mapQual, lineNum);
-                writer->SaveAlignment(bamEntry);
+    bedpe->Open();
+    while ((bedpeStatus = bedpe->GetNextBedPE(bedpeEntry, lineNum)) != BED_INVALID) {
+        if (bedpeStatus == BED_VALID) {
+            BamAlignment bamEntry1;
+           	BamAlignment bamEntry2;
+
+            if (bedpe->bedType >= 10) {
+                ConvertBedPEToBam(bedpeEntry, bamEntry1, bamEntry2, chromToId,  mapQual, lineNum);
+                writer->SaveAlignment(bamEntry1);
+                writer->SaveAlignment(bamEntry2);
+
             }
             else {
-                cerr << "Error: BED entry without name found at line: " << lineNum << ".  Exiting!" << endl;
+                cerr << "Error: BEDPE entry without name found at line: " << lineNum << ".  Exiting!" << endl;
                 exit (1);
             }
-            bedEntry = nullBed;
+            bedpeEntry = nullBedpe;
         }
     }
     //close up
-    bed->Close();
+    bedpe->Close();
     writer->Close();
 }
 
 
-void ConvertBedToBam(const BED &bed, BamAlignment &bam, map<string, int, std::less<string> > &chromToId,
-                     bool isBED12, int mapQual, int lineNum) {
+//void ConvertBedPEToBam(const BEDPE &bedpe, BamAlignment &bam1,BamAlignment &bam2, map<string, int, std::less<string> > &chromToId,
+ //                    bool isBED12, int mapQual, int lineNum) {
+void ConvertBedPEToBam(const BEDPE &bedpe, BamAlignment &bam1,BamAlignment &bam2, map<string, int, std::less<string> > &chromToId,
+	                    int mapQual, int lineNum) {
 
-    bam.Name       = bed.name;
-    bam.Position   = bed.start;
-    bam.Bin        = reg2bin(bed.start, bed.end);
+    bam1.Name       = bedpe.name;
+    bam1.Position   = bedpe.start1;
+    bam1.Bin        = reg2bin(bedpe.start1, bedpe.end1);
+    bam2.Name       = bedpe.name;
+    bam2.Position   = bedpe.start2;
+    bam2.Bin        = reg2bin(bedpe.start2, bedpe.end2);
 
     // hard-code the sequence and qualities.
-    int bedLength  = bed.end - bed.start;
+    int bedpeLength1  = bedpe.end1 - bedpe.start1;
+    int bedpeLength2  = bedpe.end2 - bedpe.start2;
 
     // set dummy seq and qual strings.  the input is BED,
     // so the sequence is inherently the same as it's
     // reference genome.
     // Thanks to James M. Ward for pointing this out.
-    bam.QueryBases = "";
-    bam.Qualities  = "";
+    bam1.QueryBases = "";
+    bam1.Qualities  = "";
+ 	bam2.QueryBases = "";
+    bam2.Qualities  = "";
 
     // chrom and map quality
-    bam.RefID      = chromToId[bed.chrom];
-    bam.MapQuality = mapQual;
+    bam1.RefID      = chromToId[bedpe.chrom1];
+    bam1.MapQuality = mapQual;
+    bam2.RefID      = chromToId[bedpe.chrom2];
+    bam2.MapQuality = mapQual;
 
     // set the BAM FLAG
-    bam.AlignmentFlag = 0;
-    if (bed.strand == "-")
-        bam.SetIsReverseStrand(true);
+    bam1.AlignmentFlag = 0;
+    bam2.AlignmentFlag = 0;
+ 
+   if (bedpe.strand1 == "-"){
+        bam1.SetIsReverseStrand(true);
+		bam2.SetIsMateReverseStrand(true);
+		
+	}
+	
+   if (bedpe.strand2 == "-"){
+        bam2.SetIsReverseStrand(true);
+		bam1.SetIsMateReverseStrand(true);
+	}
+    bam1.MatePosition = bedpe.start2;
+    
+	if(chromToId[bedpe.chrom1] == chromToId[bedpe.chrom2]){
+		bam1.InsertSize   = bedpe.start2-bedpe.start1;
+		bam2.InsertSize   = bedpe.start2-bedpe.start1;
+		if((bedpe.strand1 == "+") && (bedpe.strand2 == "-")){
+			bam1.SetIsProperPair(true);
+			bam2.SetIsProperPair(true);
+		}
+	}
+	else{
+		bam1.InsertSize   = 0;
+		bam2.InsertSize   = 0;
+		
+	}
+    bam1.MateRefID    = chromToId[bedpe.chrom2];
+    bam2.MatePosition = bedpe.start1;
+    bam2.MateRefID    = chromToId[bedpe.chrom1];
+	
+	bam1.SetIsFirstMate(true);
+	bam2.SetIsSecondMate(true);
+	bam1.SetIsPaired(true);
+	bam2.SetIsPaired(true);
+	
+    bam1.CigarData.clear();
+	bam2.CigarData.clear();
 
-    bam.MatePosition = -1;
-    bam.InsertSize   = 0;
-    bam.MateRefID    = -1;
-
-    bam.CigarData.clear();
-
-    if (isBED12 == false) {
-        CigarOp cOp;
-        cOp.Type = 'M';
-        cOp.Length = bedLength;
-        bam.CigarData.push_back(cOp);
-    }
-    // we're being told that the input is BED12.
-    else{
-
-        // does it smell like BED12?  if so, process it.
-        if (bed.otherFields.size() == 6) {
-
-            // extract the relevant BED fields to convert BED12 to BAM
-            // namely: blockCount, blockStarts, blockEnds
-            unsigned int blockCount = atoi(bed.otherFields[3].c_str());
-
-            vector<int> blockSizes, blockStarts;
-            Tokenize(bed.otherFields[4], blockSizes, ",");
-            Tokenize(bed.otherFields[5], blockStarts, ",");
-
-            // make sure this is a well-formed BED12 entry.
-            if (blockSizes.size() != blockCount) {
-                cerr << "Error: Number of BED blocks does not match blockCount at line: " << lineNum << ".  Exiting!" << endl;
-                exit (1);
-            }
-            else {
-                // does the first block start after the bed.start?
-                // if so, we need to do some "splicing"
-                if (blockStarts[0] > 0) {
-                    CigarOp cOp;
-                    cOp.Length = blockStarts[0];
-                    cOp.Type = 'N';
-                    bam.CigarData.push_back(cOp);
-                }
-                // handle the "middle" blocks
-                for (unsigned int i = 0; i < blockCount - 1; ++i) {
-                    CigarOp cOp;
-                    cOp.Length = blockSizes[i];
-                    cOp.Type = 'M';
-                    bam.CigarData.push_back(cOp);
-
-                    if (blockStarts[i+1] > (blockStarts[i] + blockSizes[i])) {
-                        CigarOp cOp;
-                        cOp.Length = (blockStarts[i+1] - (blockStarts[i] + blockSizes[i]));
-                        cOp.Type = 'N';
-                        bam.CigarData.push_back(cOp);
-                    }
-                }
-                // handle the last block.
-                CigarOp cOp;
-                cOp.Length = blockSizes[blockCount - 1];
-                cOp.Type = 'M';
-                bam.CigarData.push_back(cOp);
-            }
-        }
-        // it doesn't smell like BED12.  complain.
-        else {
-            cerr << "You've indicated that the input file is in BED12 format, yet the relevant fields cannot be found.  Exiting." << endl << endl;
-            exit(1);
-        }
-    }
+    CigarOp cOp1;
+    cOp1.Type = 'M';
+    cOp1.Length = bedpeLength1;
+    bam1.CigarData.push_back(cOp1);
+    CigarOp cOp2;
+    cOp2.Type = 'M';
+    cOp2.Length = bedpeLength2;
+    bam2.CigarData.push_back(cOp2);
 }
 
 
@@ -312,7 +301,7 @@ void MakeBamHeader(const string &genomeFile, RefVector &refs, string &header,
     GenomeFile genome(genomeFile);
 
     header += "@HD\tVN:1.0\tSO:unsorted\n";
-    header += "@PG\tID:BEDTools_bedToBam\tVN:V";
+    header += "@PG\tID:BEDTools_bedpeToBam\tVN:V";
     header += VERSION;
     header += "\n";
 
