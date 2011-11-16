@@ -6,6 +6,7 @@ BIN_DIR = ../../bin/
 # define our includes
 # -------------------
 INCLUDES = -I$(UTILITIES_DIR)/bedFile/ \
+           -I$(UTILITIES_DIR)/bedFilePE/ \
            -I$(UTILITIES_DIR)/version/ \
            -I$(UTILITIES_DIR)/gzstream/ \
            -I$(UTILITIES_DIR)/genomeFile/ \
@@ -17,12 +18,12 @@ INCLUDES = -I$(UTILITIES_DIR)/bedFile/ \
 # ----------------------------------
 # define our source and object files
 # ----------------------------------
-SOURCES= bedToBam.cpp
+SOURCES= bedpeToBam.cpp
 OBJECTS= $(SOURCES:.cpp=.o)
-_EXT_OBJECTS=bedFile.o genomeFile.o lineFileUtilities.o gzstream.o fileType.o
+_EXT_OBJECTS=bedFile.o bedFilePE.o genomeFile.o lineFileUtilities.o gzstream.o fileType.o
 EXT_OBJECTS=$(patsubst %,$(OBJ_DIR)/%,$(_EXT_OBJECTS))
 BUILT_OBJECTS= $(patsubst %,$(OBJ_DIR)/%,$(OBJECTS))
-PROGRAM= bedToBam
+PROGRAM= bedpeToBam
 
 
 all: $(PROGRAM)
