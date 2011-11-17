@@ -47,11 +47,14 @@ namespace BamTools {
                 if (breakOnDeletionOps == false)
                     currPosition += cigItr->Length;
                 else {
+                    blocksFound = true;
                     currPosition += cigItr->Length;
                     blockStart    = currPosition;
                 }
             }
             else if (cigItr->Type == 'N') {
+                blocks.push_back( BED(chrom, blockStart, currPosition, name, score, strand) );
+                blocksFound = true;
                 currPosition += cigItr->Length;
                 blockStart    = currPosition;
             }
