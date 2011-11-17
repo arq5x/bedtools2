@@ -15,7 +15,8 @@
 // build
 TagBam::TagBam(const string &bamFile, const vector<string> &annoFileNames,
             const vector<string> &annoLables, const string &tag,
-            bool useNames, bool useScores, bool sameStrand, bool diffStrand, float overlapFraction):
+            bool useNames, bool useScores, bool useIntervals, 
+            bool sameStrand, bool diffStrand, float overlapFraction):
 
     _bamFile(bamFile),
     _annoFileNames(annoFileNames),
@@ -23,6 +24,7 @@ TagBam::TagBam(const string &bamFile, const vector<string> &annoFileNames,
     _tag(tag),
     _useNames(useNames),
     _useScores(useScores),
+    _useIntervals(useIntervals),
     _sameStrand(sameStrand),
     _diffStrand(diffStrand),
     _overlapFraction(overlapFraction)
@@ -94,7 +96,7 @@ void TagBam::Tag() {
                 // grab the current annotation file.
                 BedFile *anno = _annoFiles[i];
                 
-                if (!_useNames && !_useScores) {
+                if (!_useNames && !_useScores && !_useIntervals) {
                     // add the label for this annotation file to tag if there is overlap
                     if (anno->FindOneOrMoreOverlapsPerBin(a.chrom, a.start, a.end, a.strand, _sameStrand, _diffStrand, _overlapFraction))
                     {
@@ -102,7 +104,7 @@ void TagBam::Tag() {
                     }
                 }
                 // use the score field
-                else if (!_useNames && _useScores) {
+                else if (!_useNames && _useScores && !_useIntervals) {
                     anno->FindOverlapsPerBin(a.chrom, a.start, a.end, a.strand, hits, _sameStrand, _diffStrand);
                     for (size_t i = 0; i < hits.size(); ++i) {
                         annotations << hits[i].score;
@@ -112,11 +114,27 @@ void TagBam::Tag() {
                     hits.clear();
                 }
                 // use the name field from the annotation files to populate tag
-                else if (_useNames && !_useScores) {
+                else if (_useNames && !_useScores && !_useIntervals) {
                     anno->FindOverlapsPerBin(a.chrom, a.start, a.end, a.strand, hits, _sameStrand, _diffStrand);
-                    for (size_t i = 0; i < hits.size(); ++i) {
-                        annotations << hits[i].name;
-                        if (i < hits.size() - 1) annotations << ",";
+                    for (size_t j = 0; j < hits.size(); ++i) {
+                        annotations << hits[j].name;
+                        if (j < hits.size() - 1) annotations << ",";
+                    }
+                    if (hits.size() > 0) annotations << ";";
+                    hits.clear();
+                }
+                // use the name field from the annotation files to populate tag
+                else if (!_useNames && !_useScores && _useIntervals) {
+                    anno->FindOverlapsPerBin(a.chrom, a.start, a.end, a.strand, hits, _sameStrand, _diffStrand);
+                    for (size_t j = 0; j < hits.size(); ++j) {
+                        annotations << _annoLabels[i]  << ":" << 
+                                        hits[j].chrom  << ":" <<
+                                        hits[j].start  << "-" <<
+                                        hits[j].end    << "," <<
+                                        hits[j].name   << "," <<
+                                        hits[j].score  << "," <<
+                                        hits[j].strand;
+                        if (j < hits.size() - 1) annotations << ",";
                     }
                     if (hits.size() > 0) annotations << ";";
                     hits.clear();
@@ -126,11 +144,11 @@ void TagBam::Tag() {
             if (annotations.str().size() > 0) {
                 al.AddTag(_tag, "Z", annotations.str().substr(0, annotations.str().size() - 1)); // get rid of the last ";"
             }
-            writer.SaveAlignment(al);
         }
+        writer.SaveAlignment(al);
     }
     reader.Close();
-
+    writer.Close();
     // close the annotations files;
     CloseAnnoFiles();
 }
