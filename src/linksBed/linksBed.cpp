@@ -43,7 +43,7 @@ void BedLinks::WriteURL(BED &bed, string &base) {
     cout << "<tr>" << endl;
         cout << "\t<td>" << endl;
             cout << "\t\t<a href=" << base << position << ">";
-            cout << bed.chrom << ":" << bed.start << "-" << bed.end;
+            cout << bed.chrom << ":" << bed.start+1 << "-" << bed.end;
             cout << "</a>" << endl;
         cout << "\t</td>" << endl;
 
