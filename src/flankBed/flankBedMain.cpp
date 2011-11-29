@@ -43,6 +43,7 @@ int main(int argc, char* argv[]) {
     float leftSlop   = 0.0;
     float rightSlop  = 0.0;
     bool  fractional = false;
+    bool printHeader        = false;
 
     for(int i = 1; i < argc; i++) {
         int parameterLength = (int)strlen(argv[i]);
@@ -101,6 +102,9 @@ int main(int argc, char* argv[]) {
         else if(PARAMETER_CHECK("-pct", 4, parameterLength)) {
             fractional = true;
         }
+        else if(PARAMETER_CHECK("-header", 7, parameterLength)) {
+            printHeader = true;
+        }
         else {
           cerr << endl << "*****ERROR: Unrecognized parameter: " << argv[i] << " *****" << endl << endl;
             showHelp = true;
@@ -126,7 +130,8 @@ int main(int argc, char* argv[]) {
     }
 
     if (!showHelp) {
-        BedFlank *bc = new BedFlank(bedFile, genomeFile, forceStrand, leftSlop, rightSlop, fractional);
+        BedFlank *bc = new BedFlank(bedFile, genomeFile, forceStrand, 
+                                    leftSlop, rightSlop, fractional, printHeader);
         delete bc;
 
         return 0;
@@ -163,6 +168,8 @@ void ShowHelp(void) {
     cerr << "\t-pct\t"              << "Define -l and -r as a fraction of the feature's length." << endl;
     cerr                            << "\t\tE.g. if used on a 1000bp feature, -l 0.50, " << endl;
     cerr                            << "\t\twill add 500 bp \"upstream\".  Default = false." << endl << endl;
+    
+    cerr << "\t-header\t"           << "Print the header from the input file prior to results." << endl << endl;
 
     cerr << "Notes: " << endl;
     cerr << "\t(1)  Starts will be set to 0 if options would force it below 0." << endl;

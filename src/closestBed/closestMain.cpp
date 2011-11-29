@@ -43,6 +43,7 @@ int main(int argc, char* argv[]) {
     bool reportDistance = false;
     bool signDistance   = false;
     bool haveStrandedDistMode = false;
+    bool printHeader        = false;
 
 
     // check to see if we should print out some help
@@ -106,6 +107,9 @@ int main(int argc, char* argv[]) {
                 i++;
             }
         }
+        else if(PARAMETER_CHECK("-header", 7, parameterLength)) {
+            printHeader = true;
+        }
         else {
             cerr << endl << "*****ERROR: Unrecognized parameter: " << argv[i] << " *****" << endl << endl;
             showHelp = true;
@@ -136,7 +140,9 @@ int main(int argc, char* argv[]) {
     }
     
     if (!showHelp) {
-        BedClosest *bc = new BedClosest(bedAFile, bedBFile, sameStrand, diffStrand, tieMode, reportDistance, signDistance, strandedDistMode, ignoreOverlaps);
+        BedClosest *bc = new BedClosest(bedAFile, bedBFile, sameStrand, 
+                                        diffStrand, tieMode, reportDistance, 
+                                        signDistance, strandedDistMode, ignoreOverlaps, printHeader);
         delete bc;
         return 0;
     }
@@ -191,6 +197,8 @@ void ShowHelp(void) {
     cerr                        << "\t\t- \"all\"    Report all ties (default)." << endl;
     cerr                        << "\t\t- \"first\"  Report the first tie that occurred in the B file." << endl;
     cerr                        << "\t\t- \"last\"   Report the last tie that occurred in the B file." << endl << endl;
+    
+    cerr << "\t-header\t"       << "Print the header from the A file prior to results." << endl << endl;
 
     cerr << "Notes: " << endl;
     cerr << "\tReports \"none\" for chrom and \"-1\" for all other fields when a feature" << endl;

@@ -23,7 +23,7 @@ const int SLOPGROWTH = 2048000;
 */
 BedClosest::BedClosest(string &bedAFile, string &bedBFile, bool sameStrand, bool diffStrand,
                        string &tieMode, bool reportDistance, bool signDistance, string &_strandedDistMode,
-                       bool ignoreOverlaps) 
+                       bool ignoreOverlaps, bool printHeader) 
     : _bedAFile(bedAFile)
     , _bedBFile(bedBFile)
     , _tieMode(tieMode)
@@ -33,6 +33,7 @@ BedClosest::BedClosest(string &bedAFile, string &bedBFile, bool sameStrand, bool
     , _signDistance(signDistance)
     , _strandedDistMode(_strandedDistMode)
     , _ignoreOverlaps(ignoreOverlaps)
+    , _printHeader(printHeader)
 {
     _bedA           = new BedFile(_bedAFile);
     _bedB           = new BedFile(_bedBFile);
@@ -220,6 +221,10 @@ void BedClosest::FindClosestBed() {
     BedLineStatus bedStatus;
 
     _bedA->Open();
+    // report A's header first if asked.
+    if (_printHeader == true) {
+        _bedA->PrintHeader();
+    }
     // process each entry in A in search of the closest feature in B
     while ((bedStatus = _bedA->GetNextBed(a, lineNum)) != BED_INVALID) {
         if (bedStatus == BED_VALID) {

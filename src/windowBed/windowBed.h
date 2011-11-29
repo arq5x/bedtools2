@@ -34,7 +34,8 @@ public:
     // constructor
     BedWindow(string bedAFile, string bedBFile, int leftSlop, int rightSlop,
               bool anyHit, bool noHit, bool writeCount, bool strandWindows,
-              bool matchOnSameStrand, bool matchOnDiffStrand, bool bamInput, bool bamOutput, bool isUncompressedBam);
+              bool matchOnSameStrand, bool matchOnDiffStrand, bool bamInput,
+              bool bamOutput, bool isUncompressedBam, bool printHeader);
 
     // destructor
     ~BedWindow(void);
@@ -53,7 +54,8 @@ private:
     bool _matchOnDiffStrand;
     bool _bamInput;
     bool _bamOutput;
-    bool  _isUncompressedBam;
+    bool _isUncompressedBam;
+    bool _printHeader;
 
     // instance of a bed file class.
     BedFile *_bedA, *_bedB;

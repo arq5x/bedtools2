@@ -54,6 +54,8 @@ int main(int argc, char* argv[]) {
     bool outputIsBam        = true;
     bool uncompressedBam    = false;
     bool sortedInput        = false;
+    bool printHeader        = false;
+
     // check to see if we should print out some help
     if(argc <= 1) showHelp = true;
 
@@ -145,7 +147,10 @@ int main(int argc, char* argv[]) {
         }
         else if(PARAMETER_CHECK("-sorted", 7, parameterLength)) {
             sortedInput = true;
-        }        
+        }
+        else if(PARAMETER_CHECK("-header", 7, parameterLength)) {
+            printHeader = true;
+        }
         else {
             cerr << endl << "*****ERROR: Unrecognized parameter: " << argv[i] << " *****" << endl << endl;
             showHelp = true;
@@ -212,7 +217,8 @@ int main(int argc, char* argv[]) {
 
         BedIntersect *bi = new BedIntersect(bedAFile, bedBFile, anyHit, writeA, writeB, writeOverlap,
                                             writeAllOverlap, overlapFraction, noHit, writeCount, sameStrand, diffStrand,
-                                            reciprocalFraction, obeySplits, inputIsBam, outputIsBam, uncompressedBam, sortedInput);
+                                            reciprocalFraction, obeySplits, inputIsBam, outputIsBam, uncompressedBam, 
+                                            sortedInput, printHeader);
         delete bi;
         return 0;
     }
@@ -285,9 +291,11 @@ void ShowHelp(void) {
 
     cerr << "\t-split\t"        << "Treat \"split\" BAM or BED12 entries as distinct BED intervals." << endl << endl;
 
-    cerr << "\t-sorted\t"        << "Use the \"chromsweep\" algorithm for sorted (-k1,1 -k2,2n) input" << endl;
+    cerr << "\t-sorted\t"       << "Use the \"chromsweep\" algorithm for sorted (-k1,1 -k2,2n) input" << endl;
     cerr                        << "\t\tNOTE: this will trust, but not enforce that data is sorted. Caveat emptor." << endl << endl;
-
+    
+    cerr << "\t-header\t"       << "Print the header from the A file prior to results." << endl << endl;
+ 
     // end the program here
     exit(1);
 

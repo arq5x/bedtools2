@@ -30,7 +30,8 @@ class BedSlop {
 public:
 
     // constructor
-    BedSlop(string &bedFile, string &genomeFile, bool forceStrand, float leftSlop, float rightSlop, bool fractional);
+    BedSlop(string &bedFile, string &genomeFile, bool forceStrand, 
+            float leftSlop, float rightSlop, bool fractional, bool printHeader);
 
     // destructor
     ~BedSlop(void);
@@ -46,6 +47,7 @@ private:
     float  _leftSlop;
     float  _rightSlop;
     bool   _fractional;
+    bool   _printHeader;
 
     BedFile *_bed;
     GenomeFile *_genome;
