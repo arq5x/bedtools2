@@ -37,20 +37,21 @@ int main(int argc, char* argv[]) {
     int leftSlop  = 1000;
     int rightSlop = 1000;
 
-    bool haveBedA        = false;
-    bool haveBedB        = false;
-    bool noHit           = false;
-    bool anyHit          = false;
-    bool writeCount      = false;
-    bool haveSlop        = false;
-    bool haveLeft        = false;
-    bool haveRight       = false;
-    bool strandWindows   = false;
+    bool haveBedA            = false;
+    bool haveBedB            = false;
+    bool noHit               = false;
+    bool anyHit              = false;
+    bool writeCount          = false;
+    bool haveSlop            = false;
+    bool haveLeft            = false;
+    bool haveRight           = false;
+    bool strandWindows       = false;
     bool matchOnSameStrand   = false;
     bool matchOnDiffStrand   = false;
-    bool inputIsBam      = false;
-    bool outputIsBam     = true;
-    bool uncompressedBam = false;
+    bool inputIsBam          = false;
+    bool outputIsBam         = true;
+    bool uncompressedBam     = false;
+    bool printHeader         = false;
 
     // check to see if we should print out some help
     if(argc <= 1) showHelp = true;
@@ -139,6 +140,9 @@ int main(int argc, char* argv[]) {
         else if(PARAMETER_CHECK("-ubam", 5, parameterLength)) {
             uncompressedBam = true;
         }
+        else if(PARAMETER_CHECK("-header", 7, parameterLength)) {
+            printHeader = true;
+        }
         else {
             cerr << endl << "*****ERROR: Unrecognized parameter: " << argv[i] << " *****" << endl << endl;
             showHelp = true;
@@ -189,7 +193,7 @@ int main(int argc, char* argv[]) {
     if (!showHelp) {
         BedWindow *bi = new BedWindow(bedAFile, bedBFile, leftSlop, rightSlop, anyHit,
                                       noHit, writeCount, strandWindows, matchOnSameStrand, matchOnDiffStrand,
-                                      inputIsBam, outputIsBam, uncompressedBam);
+                                      inputIsBam, outputIsBam, uncompressedBam, printHeader);
         delete bi;
         return 0;
     }
@@ -257,6 +261,8 @@ void ShowHelp(void) {
 
     cerr << "\t-v\t"            << "Only report those entries in A that have _no overlaps_ with B." << endl;
     cerr                        << "\t\t- Similar to \"grep -v.\"" << endl << endl;
+    
+    cerr << "\t-header\t"       << "Print the header from the A file prior to results." << endl << endl;
 
     // end the program here
     exit(1);

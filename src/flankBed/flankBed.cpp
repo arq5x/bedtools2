@@ -13,14 +13,18 @@
 #include "flankBed.h"
 
 
-BedFlank::BedFlank(string &bedFile, string &genomeFile, bool forceStrand, float leftFlank, float rightFlank, bool fractional) {
+BedFlank::BedFlank(string &bedFile, string &genomeFile, bool forceStrand, 
+                   float leftFlank, float rightFlank, bool fractional,
+                   bool printHeader) 
+{
 
     _bedFile      = bedFile;
     _genomeFile   = genomeFile;
     _forceStrand  = forceStrand;
     _leftFlank    = leftFlank;
     _rightFlank   = rightFlank;
-    _fractional   = fractional; 
+    _fractional   = fractional;
+    _printHeader  = printHeader;
 
     _bed    = new BedFile(bedFile);
     _genome = new GenomeFile(genomeFile);
@@ -42,6 +46,11 @@ void BedFlank::FlankBed() {
     BedLineStatus bedStatus;
 
     _bed->Open();
+    // report A's header first if asked.
+    if (_printHeader == true) {
+        _bed->PrintHeader();
+    }
+        
     bedStatus = _bed->GetNextBed(bedEntry, lineNum);
     while (bedStatus != BED_INVALID) {
         if (bedStatus == BED_VALID) {

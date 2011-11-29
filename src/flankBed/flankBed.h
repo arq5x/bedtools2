@@ -30,7 +30,9 @@ class BedFlank {
 public:
 
     // constructor
-    BedFlank(string &bedFile, string &genomeFile, bool forceStrand, float leftSlop, float rightSlop, bool fractional);
+    BedFlank(string &bedFile, string &genomeFile, bool forceStrand, 
+             float leftSlop, float rightSlop, bool fractional,
+             bool printHeader);
 
     // destructor
     ~BedFlank(void);
@@ -46,6 +48,7 @@ private:
     float  _leftFlank;
     float  _rightFlank;
     bool   _fractional;
+    bool   _printHeader;
 
     BedFile *_bed;
     GenomeFile *_genome;

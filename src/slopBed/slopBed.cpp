@@ -13,14 +13,17 @@
 #include "slopBed.h"
 
 
-BedSlop::BedSlop(string &bedFile, string &genomeFile, bool forceStrand, float leftSlop, float rightSlop, bool fractional) {
+BedSlop::BedSlop(string &bedFile, string &genomeFile, bool forceStrand, 
+                 float leftSlop, float rightSlop, bool fractional,
+                 bool printHeader) {
 
     _bedFile     = bedFile;
     _genomeFile  = genomeFile;
     _forceStrand = forceStrand;
     _leftSlop    = leftSlop;
     _rightSlop   = rightSlop;
-    _fractional  = fractional; 
+    _fractional  = fractional;
+    _printHeader = printHeader;
 
     _bed    = new BedFile(bedFile);
     _genome = new GenomeFile(genomeFile);
@@ -42,6 +45,11 @@ void BedSlop::SlopBed() {
     BedLineStatus bedStatus;
 
     _bed->Open();
+    // report header first if asked.
+    if (_printHeader == true) {
+        _bed->PrintHeader();
+    }
+        
     bedStatus = _bed->GetNextBed(bedEntry, lineNum);
     while (bedStatus != BED_INVALID) {
         if (bedStatus == BED_VALID) {
