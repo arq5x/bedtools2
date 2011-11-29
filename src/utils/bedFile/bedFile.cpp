@@ -188,9 +188,10 @@ void BedFile::GetLine(void) {
 void BedFile::GetHeader(void) {
     while(getline(*_bedStream, _bedLine))
     {
-        if ( (_bedLine.find("#") != string::npos) ||
-             (_bedLine.find("browser") != string::npos) ||
-             (_bedLine.find("track") != string::npos) )
+        if ( (_bedLine.find("#")       == 0) ||
+             (_bedLine.find("browser") == 0) ||
+             (_bedLine.find("track")   == 0) ||
+             (_bedLine.find("chrom")   == 0) )
         {
             _header += _bedLine + '\n';
         }
