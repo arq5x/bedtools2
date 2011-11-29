@@ -186,21 +186,25 @@ void BedFile::GetLine(void) {
 
 // Extract and store the header for the file.
 void BedFile::GetHeader(void) {
-        GetLine();
-        while ((_bedLine.find("#") != string::npos) ||
-               (_bedLine.find("browser") != string::npos) ||
-               (_bedLine.find("track") != string::npos) ) 
+    while(getline(*_bedStream, _bedLine))
+    {
+        if ( (_bedLine.find("#") != string::npos) ||
+             (_bedLine.find("browser") != string::npos) ||
+             (_bedLine.find("track") != string::npos) )
         {
-            _header.push_back(_bedLine);
-            GetLine();
+            _header += _bedLine + '\n';
         }
+        else
+        {
+            _firstLine = true;
+            break;
+        }
+    }
 }
 
 // Dump the header
 void BedFile::PrintHeader(void) {
-    for (size_t i = 0; i < _header.size(); ++i) {
-        cout << _header[i] << endl;
-    }
+    cout << _header;
 }
 
 
@@ -212,7 +216,14 @@ BedLineStatus BedFile::GetNextBed(BED &bed, bool forceSorted) {
     // clear out the previous bed's data
     if (_bedStream->good()) {
         // read the next line in the file and parse into discrete fields
-        GetLine();
+        if (!_firstLine)
+            GetLine();
+        else {
+            // handle the first line as a special case because
+            // of reading the header.
+            Tokenize(_bedLine, _bedFields);
+            _firstLine = false;
+        }
         // load the BED struct as long as it's a valid BED entry.
         BedLineStatus status = parseLine(bed, _bedFields);
         if (!forceSorted) {

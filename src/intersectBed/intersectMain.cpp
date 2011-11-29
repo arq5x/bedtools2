@@ -291,9 +291,11 @@ void ShowHelp(void) {
 
     cerr << "\t-split\t"        << "Treat \"split\" BAM or BED12 entries as distinct BED intervals." << endl << endl;
 
-    cerr << "\t-sorted\t"        << "Use the \"chromsweep\" algorithm for sorted (-k1,1 -k2,2n) input" << endl;
+    cerr << "\t-sorted\t"       << "Use the \"chromsweep\" algorithm for sorted (-k1,1 -k2,2n) input" << endl;
     cerr                        << "\t\tNOTE: this will trust, but not enforce that data is sorted. Caveat emptor." << endl << endl;
-
+    
+    cerr << "\t-header\t"       << "Print the header from the A file prior to results." << endl << endl;
+ 
     // end the program here
     exit(1);
 

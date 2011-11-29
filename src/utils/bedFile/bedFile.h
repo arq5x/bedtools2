@@ -498,7 +498,8 @@ private:
     istream   *_bedStream;
     string _bedLine;
     int _lineNum;
-    vector<string> _header;
+    string _header;
+    bool _firstLine;
     vector<string> _bedFields;
     int _merged_start;
     int _merged_end;
