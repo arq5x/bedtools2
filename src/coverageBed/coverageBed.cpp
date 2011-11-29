@@ -65,7 +65,7 @@ void BedCoverage::CollectCoverageBed() {
             // split the BED into discrete blocksand process each independently.
             else {
                 bedVector bedBlocks;
-                splitBedIntoBlocks(a, lineNum, bedBlocks);
+                splitBedIntoBlocks(a, bedBlocks);
 
                 // use countSplitHits to avoid over-counting each split chunk
                 // as distinct read coverage.

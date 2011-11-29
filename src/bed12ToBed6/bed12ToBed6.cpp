@@ -144,7 +144,7 @@ void ProcessBed(istream &bedInput, BedFile *bed) {
         if (bedStatus == BED_VALID) {
 
             bedVector bedBlocks;  // vec to store the discrete BED "blocks" from a
-            splitBedIntoBlocks(bedEntry, lineNum, bedBlocks);
+            splitBedIntoBlocks(bedEntry, bedBlocks);
 
             for (int i = 0; i < (int) bedBlocks.size(); ++i) {
                 if (addBlockNums == false) {

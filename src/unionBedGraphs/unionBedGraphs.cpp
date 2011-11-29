@@ -180,7 +180,7 @@ void UnionBedGraphs::LoadNextBedgraphItem(int index) {
         if (status != BEDGRAPH_VALID)
             continue;
 
-        current_bedgraph_item[index] = bg ;
+        current_bedgraph_item[index] = bg;
         break;
     }
 }

@@ -155,8 +155,7 @@ void MultiIntersectBed::LoadNextItem(int index) {
 
     BedFile *file = input_files[index];
     BED merged_bed;
-    int lineNum = 0;
-    while (file->GetNextMergedBed(merged_bed, lineNum))
+    while (file->GetNextMergedBed(merged_bed))
     {
         current_item[index] = merged_bed;
         break;

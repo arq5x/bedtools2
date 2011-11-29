@@ -174,7 +174,7 @@ void BedGenomeCoverage::CoverageBed() {
 
             if (_obeySplits == true) {
                 bedVector bedBlocks; // vec to store the discrete BED "blocks"
-                splitBedIntoBlocks(a, lineNum, bedBlocks);
+                splitBedIntoBlocks(a, bedBlocks);
                 AddBlockedCoverage(bedBlocks);
             }
             else if (_only_5p_end) {
