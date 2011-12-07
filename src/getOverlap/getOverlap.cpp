@@ -21,7 +21,7 @@ using namespace std;
 
 
 // define our program name
-#define PROGRAM_NAME "overlap"
+#define PROGRAM_NAME "getOverlap"
 
 // define our parameter checking macro
 #define PARAMETER_CHECK(param, paramLen, actualLen) (strncmp(argv[i], param, min(actualLen, paramLen))== 0) && (actualLen == paramLen)

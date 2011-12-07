@@ -34,7 +34,7 @@ SUBDIRS = $(SRC_DIR)/annotateBed \
 		  $(SRC_DIR)/multiBamCov \
 		  $(SRC_DIR)/multiIntersectBed \
 		  $(SRC_DIR)/nucBed \
-		  $(SRC_DIR)/overlap \
+		  $(SRC_DIR)/getOverlap \
 		  $(SRC_DIR)/pairToBed \
 		  $(SRC_DIR)/pairToPair \
 		  $(SRC_DIR)/shuffleBed \
