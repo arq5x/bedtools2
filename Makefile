@@ -3,6 +3,8 @@
 # (c) 2009 Aaron Quinlan
 # ==========================
 
+SHELL := /bin/bash -e
+
 # define our object and binary directories
 export OBJ_DIR	= obj
 export BIN_DIR	= bin
