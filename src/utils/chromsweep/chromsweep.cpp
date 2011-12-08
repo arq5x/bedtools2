@@ -62,19 +62,17 @@ ChromSweep::~ChromSweep(void) {
 
 
 void ChromSweep::ScanCache() {
-    if (_query->_status != BED_INVALID) {
-        vector<BED>::iterator c = _cache.begin();
-        while (c != _cache.end())
-        {
-            if ((_curr_qy.chrom == c->chrom) && !(after(_curr_qy, *c))) {
-                if (IsValidHit(_curr_qy, *c)) {
-                    _hits.push_back(*c);
-                }
-                ++c;
+    vector<BED>::iterator c = _cache.begin();
+    while (c != _cache.end())
+    {
+        if ((_curr_qy.chrom == c->chrom) && !(after(_curr_qy, *c))) {
+            if (IsValidHit(_curr_qy, *c)) {
+                _hits.push_back(*c);
             }
-            else {
-                c = _cache.erase(c);
-            }
+            ++c;
+        }
+        else {
+            c = _cache.erase(c);
         }
     }
 }
@@ -156,7 +154,6 @@ bool ChromSweep::Next(pair<BED, vector<BED> > &next) {
             _results.push(make_pair(_curr_qy, _hits));
             // reset for the next query
             _hits.clear();
-            _curr_qy = _nullBed;
             _query->GetNextBed(_curr_qy, true);
             _curr_chrom = _curr_qy.chrom;
         }
@@ -167,7 +164,8 @@ bool ChromSweep::Next(pair<BED, vector<BED> > &next) {
         _results.pop();
         return true;
     }
-    // otherwise, the party is over.
-    else {return false;}
+    else {
+        return false;
+    }
 }
 

@@ -481,6 +481,7 @@ private:
     istream   *_bedStream;
     string _bedLine;
 
+    BED _nullBed;
     string _header;
     bool _firstLine;
     vector<string> _bedFields;
@@ -509,14 +510,19 @@ private:
     */
     template <typename T>
     inline BedLineStatus parseLine (T &bed, const vector<string> &lineVector) {
-
+        
+        // clear out the data from the last line.
+        bed = _nullBed;
         unsigned int numFields = lineVector.size();
 
         // bail out if we have a blank line
         if (numFields == 0) {
             return BED_BLANK;
         }
-
+        // bail out if we have a comment line
+        if (lineVector[0].find("#") == 0) {
+            return BED_HEADER;
+        }
 
         if (numFields >= 3) {
             // line parsing for all lines after the first non-header line
@@ -623,7 +629,6 @@ private:
                 bed.name = lineVector[3];
                 bed.score = lineVector[4];
                 bed.strand = lineVector[5];
-                bed.otherFields.clear();
                 for (unsigned int i = 6; i < lineVector.size(); ++i) {
                     bed.otherFields.push_back(lineVector[i]);
                 }
@@ -677,7 +682,6 @@ private:
             }
 
             if (this->bedType > 2) {
-                bed.otherFields.clear();
                 for (unsigned int i = 2; i < numFields; ++i)
                     bed.otherFields.push_back(lineVector[i]);
             }
@@ -717,7 +721,6 @@ private:
     template <typename T>
     inline bool parseGffLine (T &bed, const vector<string> &lineVector, int lineNum, unsigned int numFields) {
         if (numFields == this->bedType) {
-            bed.otherFields.clear();
             if (this->bedType >= 8 && _isGff) {
                 bed.chrom = lineVector[0];
                 if (isInteger(lineVector[3]))
