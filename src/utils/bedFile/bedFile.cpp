@@ -662,14 +662,13 @@ void BedFile::setBedType (int colNums) {
 
 void BedFile::loadBedFileIntoMap() {
 
-    BED bedEntry, nullBed;
+    BED bedEntry;
 
     Open();
     while (GetNextBed(bedEntry)) {
         if (_status == BED_VALID) {
             BIN bin = getBin(bedEntry.start, bedEntry.end);
             bedMap[bedEntry.chrom][bin].push_back(bedEntry);
-            bedEntry = nullBed;
         }
     }
     Close();
@@ -678,8 +677,7 @@ void BedFile::loadBedFileIntoMap() {
 
 void BedFile::loadBedCovFileIntoMap() {
 
-    BED bedEntry, nullBed;
-
+    BED bedEntry;
     Open();
     while (GetNextBed(bedEntry)) {
         if (_status == BED_VALID) {
@@ -698,7 +696,6 @@ void BedFile::loadBedCovFileIntoMap() {
             bedCov.minOverlapStart = INT_MAX;
 
             bedCovMap[bedEntry.chrom][bin].push_back(bedCov);
-            bedEntry = nullBed;
         }
     }
     Close();
@@ -706,8 +703,7 @@ void BedFile::loadBedCovFileIntoMap() {
 
 void BedFile::loadBedCovListFileIntoMap() {
 
-    BED bedEntry, nullBed;
-
+    BED bedEntry;
     Open();
     while (GetNextBed(bedEntry)) {
         if (_status == BED_VALID) {
@@ -724,7 +720,6 @@ void BedFile::loadBedCovListFileIntoMap() {
             bedCovList.zeroLength   = bedEntry.zeroLength;
 
             bedCovListMap[bedEntry.chrom][bin].push_back(bedCovList);
-            bedEntry = nullBed;
         }
     }
     Close();
@@ -733,13 +728,12 @@ void BedFile::loadBedCovListFileIntoMap() {
 
 void BedFile::loadBedFileIntoMapNoBin() {
 
-    BED bedEntry, nullBed;
+    BED bedEntry;
     
     Open();
     while (GetNextBed(bedEntry)) {
         if (_status == BED_VALID) {
             bedMapNoBin[bedEntry.chrom].push_back(bedEntry);
-            bedEntry = nullBed;
         }
     }
     Close();

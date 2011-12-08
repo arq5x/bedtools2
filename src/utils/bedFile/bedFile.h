@@ -91,10 +91,6 @@ struct BED {
 
     // experimental fields for the FJOIN approach.
     bool   zeroLength;
-    bool   added;
-    bool   finished;
-    // list of hits from another file.
-    vector<BED> overlaps;
 
 public:
     // constructors
@@ -108,10 +104,7 @@ public:
       score(""),
       strand(""),
       otherFields(),
-      zeroLength(false),
-      added(false),
-      finished(false),
-      overlaps()
+      zeroLength(false)
     {}
 
     // BED3
@@ -123,10 +116,7 @@ public:
       score(""),
       strand(""),
       otherFields(),
-      zeroLength(false),
-      added(false),
-      finished(false),
-      overlaps()
+      zeroLength(false)
     {}
 
     // BED4
@@ -138,10 +128,7 @@ public:
       score(""),
       strand(strand),
       otherFields(),
-      zeroLength(false),
-      added(false),
-      finished(false),
-      overlaps()
+      zeroLength(false)
     {}
 
     // BED6
@@ -154,10 +141,7 @@ public:
       score(score),
       strand(strand),
       otherFields(),
-      zeroLength(false),
-      added(false),
-      finished(false),
-      overlaps()
+      zeroLength(false)
     {}
 
     // BEDALL
@@ -170,10 +154,7 @@ public:
       score(score),
       strand(strand),
       otherFields(otherFields),
-      zeroLength(false),
-      added(false),
-      finished(false),
-      overlaps()
+      zeroLength(false)
     {}
     
     int size() {
@@ -642,6 +623,7 @@ private:
                 bed.name = lineVector[3];
                 bed.score = lineVector[4];
                 bed.strand = lineVector[5];
+                bed.otherFields.clear();
                 for (unsigned int i = 6; i < lineVector.size(); ++i) {
                     bed.otherFields.push_back(lineVector[i]);
                 }
@@ -695,6 +677,7 @@ private:
             }
 
             if (this->bedType > 2) {
+                bed.otherFields.clear();
                 for (unsigned int i = 2; i < numFields; ++i)
                     bed.otherFields.push_back(lineVector[i]);
             }
@@ -734,6 +717,7 @@ private:
     template <typename T>
     inline bool parseGffLine (T &bed, const vector<string> &lineVector, int lineNum, unsigned int numFields) {
         if (numFields == this->bedType) {
+            bed.otherFields.clear();
             if (this->bedType >= 8 && _isGff) {
                 bed.chrom = lineVector[0];
                 if (isInteger(lineVector[3]))
