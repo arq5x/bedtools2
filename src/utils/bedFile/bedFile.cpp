@@ -253,9 +253,10 @@ bool BedFile::GetNextBed(BED &bed, bool forceSorted) {
             }
             return true;
         }
-        else if (_status == BED_HEADER) {return true;}
-        // i.e, BED_BLANK
-        else {return false;}
+        else if (_status == BED_HEADER || _status == BED_BLANK) 
+        {
+            return true;
+        }
     }
 
     // default if file is closed or EOF
