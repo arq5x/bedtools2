@@ -14,52 +14,43 @@
 #include <queue>
 
 bool after(const BED &a, const BED &b);
-void report_hits(const BED &curr_qy, const vector<BED> &hits);
-vector<BED> scan_cache(const BED &curr_qy, BedLineStatus qy_status, const vector<BED> &db_cache, vector<BED> &hits);
-
 
 /*
     // constructor using existing BedFile pointers
 */
-ChromSweep::ChromSweep(BedFile *bedA, BedFile *bedB, bool sameStrand, bool diffStrand)
-: _bedA(bedA)
-, _bedB(bedB)
+ChromSweep::ChromSweep(BedFile *query, BedFile *db, bool sameStrand, bool diffStrand, bool printHeader)
+: _query(query)
+, _db(db)
 , _sameStrand(sameStrand)
 , _diffStrand(diffStrand)
 {
-    // prime the results pump.
-    _qy_lineNum = 0;
-    _db_lineNum = 0;
+    _hits.reserve(100000);
+    _cache.reserve(100000);
     
-    _hits.reserve(1000);
-    _cache.reserve(1000);
+    _query->Open();
+    if (printHeader) _query->PrintHeader();
+    _db->Open();
     
-    _bedA->Open();
-    _bedB->Open();
-    _qy_status = _bedA->GetNextBed(_curr_qy, _qy_lineNum);
-    _db_status = _bedB->GetNextBed(_curr_db, _db_lineNum);
+    _query->GetNextBed(_curr_qy);
+    _db->GetNextBed(_curr_db);
 }
 
 /*
     Constructor with filenames
 */
-ChromSweep::ChromSweep(string &bedAFile, string &bedBFile) 
+ChromSweep::ChromSweep(string &queryFile, string &dbFile) 
 {
-    // prime the results pump.
-    _qy_lineNum = 0;
-    _db_lineNum = 0;
-    
     _hits.reserve(100000);
     _cache.reserve(100000);
     
-    _bedA = new BedFile(bedAFile);
-    _bedB = new BedFile(bedBFile);
+    _query = new BedFile(queryFile);
+    _db = new BedFile(dbFile);
     
-    _bedA->Open();
-    _bedB->Open();
+    _query->Open();
+    _db->Open();
     
-    _qy_status = _bedA->GetNextBed(_curr_qy, _qy_lineNum);
-    _db_status = _bedB->GetNextBed(_curr_db, _db_lineNum);
+    _query->GetNextBed(_curr_qy);
+    _db->GetNextBed(_curr_db);
 }
 
 
@@ -71,7 +62,7 @@ ChromSweep::~ChromSweep(void) {
 
 
 void ChromSweep::ScanCache() {
-    if (_qy_status != BED_INVALID) {
+    if (_query->_status != BED_INVALID) {
         vector<BED>::iterator c = _cache.begin();
         while (c != _cache.end())
         {
@@ -92,14 +83,13 @@ void ChromSweep::ScanCache() {
 bool ChromSweep::ChromChange()
 {
     // the files are on the same chrom
-    if ((_curr_qy.chrom == _curr_db.chrom) || (_db_status == BED_INVALID) || (_qy_status == BED_INVALID)) {
+    if (_curr_qy.chrom == _curr_db.chrom) {
         return false;
     }
     // the query is ahead of the database. fast-forward the database to catch-up.
     else if (_curr_qy.chrom > _curr_db.chrom) {
-        while (!_bedB->Empty() && _curr_db.chrom < _curr_qy.chrom)
+        while (_db->GetNextBed(_curr_db, true) && _curr_db.chrom < _curr_qy.chrom)
         {
-            _db_status = _bedB->GetNextBed(_curr_db, _db_lineNum);
         }
         _cache.clear();
         return false;
@@ -119,7 +109,7 @@ bool ChromSweep::ChromChange()
             _results.push(make_pair(_curr_qy, _no_hits));
             _cache.clear();
         }
-        _qy_status = _bedA->GetNextBed(_curr_qy, _qy_lineNum);
+        _query->GetNextBed(_curr_qy, true);
         _curr_chrom = _curr_qy.chrom;
         return true;
     }
@@ -146,26 +136,28 @@ bool ChromSweep::IsValidHit(const BED &query, const BED &db) {
 
 
 bool ChromSweep::Next(pair<BED, vector<BED> > &next) {
-    if (!_bedA->Empty()) {
+    if (!_query->Empty()) {
         // have we changed chromosomes?
         if (ChromChange() == false) {
             // scan the database cache for hits
             ScanCache();
             // advance the db until we are ahead of the query. update hits and cache as necessary
-            while (!_bedB->Empty() && _curr_qy.chrom == _curr_db.chrom && !(after(_curr_db, _curr_qy)))
+            while (!_db->Empty() && 
+                   _curr_qy.chrom == _curr_db.chrom && 
+                   !(after(_curr_db, _curr_qy)))
             {
                 if (IsValidHit(_curr_qy, _curr_db)) {
                     _hits.push_back(_curr_db);
                 }
                 _cache.push_back(_curr_db);
-                _db_status = _bedB->GetNextBed(_curr_db, _db_lineNum);
+                _db->GetNextBed(_curr_db, true);
             }
             // add the hits for this query to the pump
             _results.push(make_pair(_curr_qy, _hits));
             // reset for the next query
             _hits.clear();
             _curr_qy = _nullBed;
-            _qy_status = _bedA->GetNextBed(_curr_qy, _qy_lineNum);
+            _query->GetNextBed(_curr_qy, true);
             _curr_chrom = _curr_qy.chrom;
         }
     }

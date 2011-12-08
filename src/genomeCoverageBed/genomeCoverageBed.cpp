@@ -146,21 +146,19 @@ void BedGenomeCoverage::AddBlockedCoverage(const vector<BED> &bedBlocks) {
 void BedGenomeCoverage::CoverageBed() {
 
     BED a, nullBed;
-    int lineNum = 0; // current input line number
-    BedLineStatus bedStatus;
 
     ResetChromCoverage();
 
     _bed->Open();
-    while ( (bedStatus = _bed->GetNextBed(a, lineNum)) != BED_INVALID ) {
-        if (bedStatus == BED_VALID) {
+    while (_bed->GetNextBed(a)) {
+        if (_bed->_status == BED_VALID) {
             if (_filterByStrand == true) {
                 if (a.strand.empty()) {
-                    cerr << "Input error: Interval is missing a strand value on line " << lineNum << "." <<endl;
+                    cerr << "Input error: Interval is missing a strand value on line " << _bed->_lineNum << "." <<endl;
                     exit(1);
                 }
                 if ( ! (a.strand == "-" || a.strand == "+") ) {
-                    cerr << "Input error: Invalid strand value (" << a.strand << ") on line " << lineNum << "." << endl;
+                    cerr << "Input error: Invalid strand value (" << a.strand << ") on line " << _bed->_lineNum << "." << endl;
                     exit(1);
                 }
                 // skip if the strand is not what the user requested.

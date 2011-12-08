@@ -30,10 +30,10 @@ public:
     // A is the query and B is the database
     
     // constructor using existing BedFile pointers
-    ChromSweep(BedFile *bedA, BedFile *bedB, bool sameStrand = false, bool diffStrand = false);
+    ChromSweep(BedFile *query, BedFile *db, bool sameStrand = false, bool diffStrand = false, bool printHeader = false);
     
     // constructor using filenames
-    ChromSweep(string &bedAFile, string &bedBFile);
+    ChromSweep(string &queryFile, string &dbFile);
     
     // destructor
     ~ChromSweep(void);
@@ -57,7 +57,7 @@ public:
 private:
 
     // instances of a bed file class.
-    BedFile *_bedA, *_bedB;
+    BedFile *_query, *_db;
     // do we care about strandedness.
     bool _sameStrand, _diffStrand;
     // a cache of still active features from the database file
@@ -73,10 +73,6 @@ private:
     BED _curr_qy, _curr_db;
     // a cache of the current chrom from the query. used to handle chrom changes.
     string _curr_chrom;
-    // the current line status in the database and query files
-    BedLineStatus _qy_status, _db_status;
-    // the current line numbers in the database and query files
-    int _qy_lineNum, _db_lineNum;
 
 // private methods.
 private:

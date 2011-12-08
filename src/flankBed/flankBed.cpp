@@ -41,9 +41,7 @@ BedFlank::~BedFlank(void) {
 
 void BedFlank::FlankBed() {
 
-    int lineNum = 0;
     BED bedEntry, nullBed;     // used to store the current BED line from the BED file.
-    BedLineStatus bedStatus;
 
     _bed->Open();
     // report A's header first if asked.
@@ -51,10 +49,8 @@ void BedFlank::FlankBed() {
         _bed->PrintHeader();
     }
         
-    bedStatus = _bed->GetNextBed(bedEntry, lineNum);
-    while (bedStatus != BED_INVALID) {
-        if (bedStatus == BED_VALID) {
-
+    while (_bed->GetNextBed(bedEntry)) {
+        if (_bed->_status == BED_VALID) {
             int leftFlank  = _leftFlank;
             int rightFlank = _rightFlank;            
             if (_fractional == true) {
@@ -70,9 +66,8 @@ void BedFlank::FlankBed() {
             {
                 AddStrandedFlank(bedEntry,  leftFlank, rightFlank);                    
             }
-            bedEntry = nullBed;
         }
-        bedStatus = _bed->GetNextBed(bedEntry, lineNum);
+        bedEntry = nullBed;
     }
     _bed->Close();
 }

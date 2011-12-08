@@ -427,7 +427,7 @@ public:
     void GetLine(void);
 
     // Get the next BED entry in an opened BED file.
-    BedLineStatus GetNextBed (BED &bed, bool forceSorted = false);
+    bool GetNextBed (BED &bed, bool forceSorted = false);
     
     // Returns the next MERGED (i.e., non-overlapping) interval in an opened BED file
     // NOTE: assumes input file is sorted by chrom then start
@@ -487,7 +487,9 @@ public:
     masterBedCovListMap  bedCovListMap;
     masterBedMap         bedMap;
     masterBedMapNoBin    bedMapNoBin;
-
+    
+    BedLineStatus _status;
+    int _lineNum;
 private:
 
     // data
@@ -497,7 +499,7 @@ private:
     FileType   _fileType;     // what is the file type? (BED? GFF? VCF?)
     istream   *_bedStream;
     string _bedLine;
-    int _lineNum;
+
     string _header;
     bool _firstLine;
     vector<string> _bedFields;

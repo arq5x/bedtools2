@@ -224,13 +224,10 @@ void ProcessBed(istream &bedInput, BedFile *bed, string path, string sortType, s
 
 
     BED bedEntry, nullBed;
-    int lineNum = 0;
-    BedLineStatus bedStatus;
-
     bed->Open();
     // process each BED entry and convert to an IGV request
-    while ((bedStatus = bed->GetNextBed(bedEntry, lineNum)) != BED_INVALID) {
-        if (bedStatus == BED_VALID) {
+    while (bed->GetNextBed(bedEntry)) {
+        if (bed->_status == BED_VALID) {
 
             string filename = bedEntry.chrom + "_" + ToString(bedEntry.start) + "_" + ToString(bedEntry.end);
             string locus    = bedEntry.chrom + ":" + ToString(bedEntry.start - slop) + "-" + ToString(bedEntry.end + slop);

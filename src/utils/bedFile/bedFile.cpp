@@ -167,7 +167,7 @@ void BedFile::Seek(unsigned long offset) {
 
 // Jump to a specific byte in the file
 bool BedFile::Empty(void) {
-    return _bedStream->eof();
+    return _status == BED_INVALID || _status == BED_BLANK;
 }
 
 // Close the BED file
@@ -216,7 +216,7 @@ void BedFile::PrintHeader(void) {
 }
 
 
-BedLineStatus BedFile::GetNextBed(BED &bed, bool forceSorted) {
+bool BedFile::GetNextBed(BED &bed, bool forceSorted) {
 
     // make sure there are still lines to process.
     // if so, tokenize, validate and return the BED entry.
@@ -233,17 +233,16 @@ BedLineStatus BedFile::GetNextBed(BED &bed, bool forceSorted) {
             _firstLine = false;
         }
         // load the BED struct as long as it's a valid BED entry.
-        BedLineStatus status = parseLine(bed, _bedFields);
-        if (!forceSorted) {
-            return status;
-        }
-        else if (status == BED_VALID) {
+        _status = parseLine(bed, _bedFields);
+        if (_status == BED_INVALID) return false;
+        
+        if (_status == BED_VALID) {
             if (bed.chrom == _prev_chrom) {
                 if ((int) bed.start >= _prev_start) {
                     _prev_chrom = bed.chrom;
                     _prev_start = bed.start;
                 }
-                else {
+                else if (forceSorted) {
                     cerr << "ERROR: input file: (" << bedFile << ") is not sorted by chrom then start" << endl;
                     exit(1);
                 }
@@ -252,15 +251,16 @@ BedLineStatus BedFile::GetNextBed(BED &bed, bool forceSorted) {
                 _prev_chrom = bed.chrom;
                 _prev_start = bed.start;
             }
-            return status;
+            return true;
         }
-        else {
-            return status;
-        }
+        else if (_status == BED_HEADER) {return true;}
+        // i.e, BED_BLANK
+        else {return false;}
     }
 
     // default if file is closed or EOF
-    return BED_INVALID;
+    _status = BED_INVALID;
+    return false;
 }
 
 
@@ -268,10 +268,9 @@ bool BedFile::GetNextMergedBed(BED &merged_bed) {
 
     if (_bedStream->good()) {
         BED bed;
-        BedLineStatus bedStatus;
         // force sorting; hence third param = true
-        while ((bedStatus = GetNextBed(bed, true)) != BED_INVALID) {
-            if (bedStatus == BED_VALID) {
+        while (GetNextBed(bed, true)) {
+            if (_status == BED_VALID) {
                 if (((int) bed.start - _merged_end > 0) || 
                    (_merged_end < 0) || 
                    (bed.chrom != _merged_chrom))
@@ -300,7 +299,7 @@ bool BedFile::GetNextMergedBed(BED &merged_bed) {
             }
         }
         // handle the last merged block in the file.
-        if (bedStatus == BED_INVALID)
+        if (_status == BED_INVALID)
         {
             merged_bed.chrom = _merged_chrom;
             merged_bed.start = _merged_start;
@@ -664,12 +663,10 @@ void BedFile::setBedType (int colNums) {
 void BedFile::loadBedFileIntoMap() {
 
     BED bedEntry, nullBed;
-    int lineNum = 0;
-    BedLineStatus bedStatus;
 
     Open();
-    while ((bedStatus = GetNextBed(bedEntry, lineNum)) != BED_INVALID) {
-        if (bedStatus == BED_VALID) {
+    while (GetNextBed(bedEntry)) {
+        if (_status == BED_VALID) {
             BIN bin = getBin(bedEntry.start, bedEntry.end);
             bedMap[bedEntry.chrom][bin].push_back(bedEntry);
             bedEntry = nullBed;
@@ -682,12 +679,10 @@ void BedFile::loadBedFileIntoMap() {
 void BedFile::loadBedCovFileIntoMap() {
 
     BED bedEntry, nullBed;
-    int lineNum = 0;
-    BedLineStatus bedStatus;
 
     Open();
-    while ((bedStatus = GetNextBed(bedEntry, lineNum)) != BED_INVALID) {
-        if (bedStatus == BED_VALID) {
+    while (GetNextBed(bedEntry)) {
+        if (_status == BED_VALID) {
             BIN bin = getBin(bedEntry.start, bedEntry.end);
 
             BEDCOV bedCov;
@@ -712,12 +707,10 @@ void BedFile::loadBedCovFileIntoMap() {
 void BedFile::loadBedCovListFileIntoMap() {
 
     BED bedEntry, nullBed;
-    int lineNum = 0;
-    BedLineStatus bedStatus;
 
     Open();
-    while ((bedStatus = GetNextBed(bedEntry, lineNum)) != BED_INVALID) {
-        if (bedStatus == BED_VALID) {
+    while (GetNextBed(bedEntry)) {
+        if (_status == BED_VALID) {
             BIN bin = getBin(bedEntry.start, bedEntry.end);
 
             BEDCOVLIST bedCovList;
@@ -741,12 +734,10 @@ void BedFile::loadBedCovListFileIntoMap() {
 void BedFile::loadBedFileIntoMapNoBin() {
 
     BED bedEntry, nullBed;
-    int lineNum = 0;
-    BedLineStatus bedStatus;
-
+    
     Open();
-    while ((bedStatus = this->GetNextBed(bedEntry, lineNum)) != BED_INVALID) {
-        if (bedStatus == BED_VALID) {
+    while (GetNextBed(bedEntry)) {
+        if (_status == BED_VALID) {
             bedMapNoBin[bedEntry.chrom].push_back(bedEntry);
             bedEntry = nullBed;
         }

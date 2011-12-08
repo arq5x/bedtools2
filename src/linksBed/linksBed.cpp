@@ -101,13 +101,11 @@ void BedLinks::CreateLinks() {
     cout << "<table border=\"0\" align=\"justify\"" << endl;
     cout << "<h3>BED Entries from: stdin </h3>" << endl;
 
-    int lineNum = 0;
-    BED bedEntry, nullBed;
-    BedLineStatus bedStatus;
 
+    BED bedEntry, nullBed;
     _bed->Open();
-    while ((bedStatus = _bed->GetNextBed(bedEntry, lineNum)) != BED_INVALID) {
-        if (bedStatus == BED_VALID) {
+    while (_bed->GetNextBed(bedEntry)) {
+        if (_bed->_status == BED_VALID) {
             WriteURL(bedEntry, base);
             bedEntry = nullBed;
         }

@@ -79,14 +79,10 @@ BedShuffle::~BedShuffle(void) {
 
 
 void BedShuffle::Shuffle() {
-
-    int lineNum = 0;
     BED bedEntry, nullBed;     // used to store the current BED line from the BED file.
-    BedLineStatus bedStatus;
-
     _bed->Open();
-    while ((bedStatus = _bed->GetNextBed(bedEntry, lineNum)) != BED_INVALID) {
-        if (bedStatus == BED_VALID) {
+    while (_bed->GetNextBed(bedEntry)) {
+        if (_bed->_status == BED_VALID) {
             ChooseLocus(bedEntry);
             _bed->reportBedNewLine(bedEntry);
             bedEntry = nullBed;
@@ -99,13 +95,11 @@ void BedShuffle::Shuffle() {
 
 void BedShuffle::ShuffleWithExclusions() {
 
-    int lineNum = 0;
     BED bedEntry, nullBed;     // used to store the current BED line from the BED file.
-    BedLineStatus bedStatus;
 
     _bed->Open();
-    while ((bedStatus = _bed->GetNextBed(bedEntry, lineNum)) != BED_INVALID) {
-        if (bedStatus == BED_VALID) {
+    while (_bed->GetNextBed(bedEntry)) {
+        if (_bed->_status == BED_VALID) {
             // keep looking as long as the chosen
             // locus happens to overlap with regions
             // that the user wishes to exclude.
@@ -122,7 +116,7 @@ void BedShuffle::ShuffleWithExclusions() {
             
 
             if (tries > MAX_TRIES) {
-                cerr << "Error, line " << lineNum << ": tried " << MAX_TRIES << " potential loci for entry, but could not avoid excluded regions.  Ignoring entry and moving on." << endl;
+                cerr << "Error, line " << _bed->_lineNum << ": tried " << MAX_TRIES << " potential loci for entry, but could not avoid excluded regions.  Ignoring entry and moving on." << endl;
             }
             else {
                 _bed->reportBedNewLine(bedEntry);
@@ -136,13 +130,11 @@ void BedShuffle::ShuffleWithExclusions() {
 
 void BedShuffle::ShuffleWithInclusions() {
 
-    int lineNum = 0;
     BED bedEntry, nullBed;     // used to store the current BED line from the BED file.
-    BedLineStatus bedStatus;
 
     _bed->Open();
-    while ((bedStatus = _bed->GetNextBed(bedEntry, lineNum)) != BED_INVALID) {
-        if (bedStatus == BED_VALID) {
+    while (_bed->GetNextBed(bedEntry)) {
+        if (_bed->_status == BED_VALID) {
             // choose a new locus
             ChooseLocusFromInclusionFile(bedEntry);
             _bed->reportBedNewLine(bedEntry);

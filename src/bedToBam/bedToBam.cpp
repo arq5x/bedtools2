@@ -185,19 +185,17 @@ void ProcessBed(BedFile *bed, GenomeFile *genome, bool isBED12, int mapQual, boo
 
     // process each BED entry and convert to BAM
     BED bedEntry, nullBed;
-    int lineNum = 0;
-    BedLineStatus bedStatus;
     // open the BED file for reading.
     bed->Open();
-    while ((bedStatus = bed->GetNextBed(bedEntry, lineNum)) != BED_INVALID) {
-        if (bedStatus == BED_VALID) {
+    while (bed->GetNextBed(bedEntry)) {
+        if (bed->_status == BED_VALID) {
             BamAlignment bamEntry;
             if (bed->bedType >= 4) {
-                ConvertBedToBam(bedEntry, bamEntry, chromToId, isBED12, mapQual, lineNum);
+                ConvertBedToBam(bedEntry, bamEntry, chromToId, isBED12, mapQual, bed->_lineNum);
                 writer->SaveAlignment(bamEntry);
             }
             else {
-                cerr << "Error: BED entry without name found at line: " << lineNum << ".  Exiting!" << endl;
+                cerr << "Error: BED entry without name found at line: " << bed->_lineNum << ".  Exiting!" << endl;
                 exit (1);
             }
             bedEntry = nullBed;

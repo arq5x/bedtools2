@@ -156,15 +156,13 @@ void BedSubtract::SubtractBed() {
     _bedB->loadBedFileIntoMap();
 
     BED a, nullBed;
-    BedLineStatus bedStatus;
-    int lineNum = 0;                    // current input line number
-    vector<BED> hits;                   // vector of potential hits
+    vector<BED> hits;
     // reserve some space
     hits.reserve(100);
 
     _bedA->Open();
-    while ((bedStatus = _bedA->GetNextBed(a, lineNum)) != BED_INVALID) {
-        if (bedStatus == BED_VALID) {
+    while (_bedA->GetNextBed(a)) {
+        if (_bedA->_status == BED_VALID) {
             FindAndSubtractOverlaps(a, hits);
             hits.clear();
             a = nullBed;

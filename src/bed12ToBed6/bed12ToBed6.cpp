@@ -136,12 +136,10 @@ void ProcessBed(istream &bedInput, BedFile *bed) {
 
     // process each BED entry and convert to BAM
     BED bedEntry, nullBed;
-    int lineNum = 0;
-    BedLineStatus bedStatus;
     // open the BED file for reading.
     bed->Open();
-    while ((bedStatus = bed->GetNextBed(bedEntry, lineNum)) != BED_INVALID) {
-        if (bedStatus == BED_VALID) {
+    while (bed->GetNextBed(bedEntry)) {
+        if (bed->_status == BED_VALID) {
 
             bedVector bedBlocks;  // vec to store the discrete BED "blocks" from a
             splitBedIntoBlocks(bedEntry, bedBlocks);

@@ -111,13 +111,11 @@ void NucBed::ProfileDNA() {
 
     bool headerReported = false;
     BED bed, nullBed;
-    int lineNum = 0;
-    BedLineStatus bedStatus;
     string sequence;
 
     _bed->Open();
-    while ((bedStatus = _bed->GetNextBed(bed, lineNum)) != BED_INVALID) {
-        if (bedStatus == BED_VALID) {
+    while (_bed->GetNextBed(bed)) {
+        if (_bed->_status == BED_VALID) {
             if (headerReported == false) {
                 PrintHeader();
                 headerReported = true;

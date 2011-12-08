@@ -199,7 +199,6 @@ void BedIntersect::IntersectBed() {
         vector<BED> hits;
         hits.reserve(100);
         BED a, nullBed;
-        BedLineStatus bedStatus;
 
         // open the "A" file, process each BED entry and searh for overlaps.
         _bedA->Open();
@@ -207,8 +206,8 @@ void BedIntersect::IntersectBed() {
         if (_printHeader == true) {
             _bedA->PrintHeader();
         }
-        while ((bedStatus = _bedA->GetNextBed(a)) != BED_INVALID) {
-            if (bedStatus == BED_VALID) {
+        while (_bedA->GetNextBed(a)) {
+            if (_bedA->_status == BED_VALID) {
                 // treat the BED as a single "block"
                 if (_obeySplits == false) {
                     FindOverlaps(a, hits);
@@ -233,7 +232,7 @@ void BedIntersect::IntersectBed() {
     }
     else {
         // use the chromsweep algorithm to detect overlaps on the fly.
-        ChromSweep sweep = ChromSweep(_bedA, _bedB, _sameStrand, _diffStrand);
+        ChromSweep sweep = ChromSweep(_bedA, _bedB, _sameStrand, _diffStrand, _printHeader);
 
         pair<BED, vector<BED> > hit_set;
         hit_set.second.reserve(10000);

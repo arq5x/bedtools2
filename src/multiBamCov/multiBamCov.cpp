@@ -58,15 +58,13 @@ void MultiCovBam::CollectCoverage()
         // if index data available for all BAM files, we can use SetRegion
         if ( reader.HasIndexes() ) {
             BED bed, nullBed;
-            int lineNum = 0;
-            BedLineStatus bedStatus;
 
             _bed->Open();
             // loop through each BED entry, jump to it, 
             // and collect coverage from each BAM
-            while ((bedStatus = _bed->GetNextBed(bed, lineNum)) != BED_INVALID)
+            while (_bed->GetNextBed(bed))
             {
-                if (bedStatus == BED_VALID)
+                if (_bed->_status == BED_VALID)
                 {
                     // initialize counts for each file to 0
                     vector<int> counts(_bam_files.size(), 0);
