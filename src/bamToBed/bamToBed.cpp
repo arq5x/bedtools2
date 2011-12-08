@@ -267,19 +267,17 @@ void ConvertBamToBedpe(const string &bamFile, const bool &useEditDistance) {
     // rip through the BAM file and convert each mapped entry to BEDPE
     BamAlignment bam1, bam2;
     while (reader.GetNextAlignment(bam1)) {
-        // the alignment must be paired
-        if (bam1.IsPaired() == true) {
-            // grab the second alignment for the pair.
-            reader.GetNextAlignment(bam2);
-
-            // require that the alignments are from the same query
-            if (bam1.Name == bam2.Name) {
-                PrintBedPE(bam1, bam2, refs, useEditDistance);
+        
+        reader.GetNextAlignment(bam2);        
+        if (bam1.Name != bam2.Name) {
+            while (bam1.Name != bam2.Name)
+            {
+                bam1 = bam2;
+                reader.GetNextAlignment(bam2);
             }
-            else {
-                cerr << "*****ERROR: -bedpe requires BAM to be sorted/grouped by query name. " << endl;
-                exit(1);
-            }
+        }
+        else if (bam1.IsPaired() == true) {
+            PrintBedPE(bam1, bam2, refs, useEditDistance);
         }
     }
     reader.Close();
