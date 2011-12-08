@@ -78,6 +78,8 @@ all:
 		echo ""; \
 	done
 
+	echo "- Building main bedtools binary."
+	
 
 .PHONY: all
 
