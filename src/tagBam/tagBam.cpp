@@ -123,7 +123,7 @@ void TagBam::Tag() {
                     if (hits.size() > 0) annotations << ";";
                     hits.clear();
                 }
-                // use the name field from the annotation files to populate tag
+                // use the full interval information annotation files to populate tag
                 else if (!_useNames && !_useScores && _useIntervals) {
                     anno->FindOverlapsPerBin(a.chrom, a.start, a.end, a.strand, hits, _sameStrand, _diffStrand);
                     for (size_t j = 0; j < hits.size(); ++j) {
