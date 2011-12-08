@@ -9,6 +9,7 @@ SHELL := /bin/bash -e
 export OBJ_DIR	= obj
 export BIN_DIR	= bin
 export SRC_DIR	= src
+export UTIL_DIR	= src/utils
 export CXX		= g++
 export CXXFLAGS = -Wall -O2 -D_FILE_OFFSET_BITS=64 -fPIC
 export LIBS		= -lz
@@ -59,6 +60,8 @@ UTIL_SUBDIRS =	$(SRC_DIR)/utils/lineFileUtilities \
 				$(SRC_DIR)/utils/Fasta \
 				$(SRC_DIR)/utils/genomeFile
 
+BUILT_OBJECTS = $(OBJ_DIR)/*.o
+
 all:
 	[ -d $(OBJ_DIR) ] || mkdir -p $(OBJ_DIR)
 	[ -d $(BIN_DIR) ] || mkdir -p $(BIN_DIR)
@@ -78,7 +81,8 @@ all:
 		echo ""; \
 	done
 
-	echo "- Building main bedtools binary."
+	@echo "- Building main bedtools binary."
+	@$(CXX) $(LDFLAGS) $(CXXFLAGS) -o $(BIN_DIR)/bedtools $(BUILT_OBJECTS) -L$(UTIL_DIR)/BamTools/lib/ -lbamtools $(LIBS)
 	
 
 .PHONY: all

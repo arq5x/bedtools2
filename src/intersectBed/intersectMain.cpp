@@ -22,9 +22,9 @@ using namespace std;
 #define PARAMETER_CHECK(param, paramLen, actualLen) (strncmp(argv[i], param, min(actualLen, paramLen))== 0) && (actualLen == paramLen)
 
 // function declarations
-void ShowHelp(void);
+void intersect_help(void);
 
-int main(int argc, char* argv[]) {
+int intersect_main(int argc, char* argv[]) {
 
     // our configuration variables
     bool showHelp = false;
@@ -68,7 +68,7 @@ int main(int argc, char* argv[]) {
         }
     }
 
-    if(showHelp) ShowHelp();
+    if(showHelp) intersect_help();
 
     // do some parsing (all of these parameters require 2 strings)
     for(int i = 1; i < argc; i++) {
@@ -223,11 +223,11 @@ int main(int argc, char* argv[]) {
         return 0;
     }
     else {
-        ShowHelp();
+        intersect_help();
     }
 }
 
-void ShowHelp(void) {
+void intersect_help(void) {
 
     cerr << endl << "Program: " << PROGRAM_NAME << " (v" << VERSION << ")" << endl;
 
