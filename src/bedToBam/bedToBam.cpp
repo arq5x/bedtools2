@@ -184,7 +184,7 @@ void ProcessBed(BedFile *bed, GenomeFile *genome, bool isBED12, int mapQual, boo
 
 
     // process each BED entry and convert to BAM
-    BED bedEntry, nullBed;
+    BED bedEntry;
     // open the BED file for reading.
     bed->Open();
     while (bed->GetNextBed(bedEntry)) {
@@ -198,7 +198,6 @@ void ProcessBed(BedFile *bed, GenomeFile *genome, bool isBED12, int mapQual, boo
                 cerr << "Error: BED entry without name found at line: " << bed->_lineNum << ".  Exiting!" << endl;
                 exit (1);
             }
-            bedEntry = nullBed;
         }
     }
     //close up

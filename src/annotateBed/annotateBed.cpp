@@ -114,13 +114,11 @@ void BedAnnotate::AnnotateBed() {
     for (size_t annoIndex = 0; annoIndex < _annoFiles.size(); ++annoIndex) {
         // grab the current annotation file.
         BedFile *anno = _annoFiles[annoIndex];
-        BED a, nullBed;
-
+        BED a;
         // process each entry in the current anno file
         while (anno->GetNextBed(a)) {
             if (anno->_status == BED_VALID) {
                 _bed->countListHits(a, annoIndex, _sameStrand, _diffStrand);
-                a = nullBed;
             }
         }
     }

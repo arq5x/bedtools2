@@ -130,7 +130,7 @@ void BedShuffle::ShuffleWithExclusions() {
 
 void BedShuffle::ShuffleWithInclusions() {
 
-    BED bedEntry, nullBed;     // used to store the current BED line from the BED file.
+    BED bedEntry;     // used to store the current BED line from the BED file.
 
     _bed->Open();
     while (_bed->GetNextBed(bedEntry)) {
@@ -139,7 +139,6 @@ void BedShuffle::ShuffleWithInclusions() {
             ChooseLocusFromInclusionFile(bedEntry);
             _bed->reportBedNewLine(bedEntry);
         }
-        bedEntry = nullBed;
     }
     _bed->Close();
 }

@@ -135,7 +135,7 @@ void DetermineBedInput(BedFile *bed) {
 void ProcessBed(istream &bedInput, BedFile *bed) {
 
     // process each BED entry and convert to BAM
-    BED bedEntry, nullBed;
+    BED bedEntry;
     // open the BED file for reading.
     bed->Open();
     while (bed->GetNextBed(bedEntry)) {
@@ -158,7 +158,6 @@ void ProcessBed(istream &bedInput, BedFile *bed) {
                                                         (int) ((bedBlocks.size()+1)-i), bedBlocks[i].strand.c_str());
                 }
             }
-            bedEntry = nullBed;
         }
     }
     // close up

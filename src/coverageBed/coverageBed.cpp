@@ -51,7 +51,7 @@ void BedCoverage::CollectCoverageBed() {
     // that we can easily compare "A" to it for overlaps
     _bedB->loadBedCovFileIntoMap();
 
-    BED a, nullBed;
+    BED a;
     _bedA->Open();
     // process each entry in A
     while (_bedA->GetNextBed(a)) {
@@ -67,7 +67,6 @@ void BedCoverage::CollectCoverageBed() {
                 // as distinct read coverage.
                 _bedB->countSplitHits(bedBlocks, _sameStrand, _diffStrand, _countsOnly);
             }
-            a = nullBed;
         }
     }
     _bedA->Close();

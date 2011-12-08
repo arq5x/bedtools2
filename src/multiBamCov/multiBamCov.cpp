@@ -57,7 +57,7 @@ void MultiCovBam::CollectCoverage()
 
         // if index data available for all BAM files, we can use SetRegion
         if ( reader.HasIndexes() ) {
-            BED bed, nullBed;
+            BED bed;
 
             _bed->Open();
             // loop through each BED entry, jump to it, 
@@ -97,7 +97,6 @@ void MultiCovBam::CollectCoverage()
                     // report the cov at this interval for each file and reset
                     _bed->reportBedTab(bed);
                     ReportCounts(counts);
-                    bed = nullBed;
                 }
             }
             _bed->Close();

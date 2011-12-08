@@ -223,7 +223,7 @@ void ProcessBed(istream &bedInput, BedFile *bed, string path, string sortType, s
         cout << "load " << session << endl;
 
 
-    BED bedEntry, nullBed;
+    BED bedEntry;
     bed->Open();
     // process each BED entry and convert to an IGV request
     while (bed->GetNextBed(bedEntry)) {
@@ -257,8 +257,6 @@ void ProcessBed(istream &bedInput, BedFile *bed, string path, string sortType, s
             // snapshot
             cout << "snapshot " << filename << "." << imageType << endl;
 
-            // reset
-            bedEntry = nullBed;
         }
     }
     // close up

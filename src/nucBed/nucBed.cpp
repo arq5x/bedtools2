@@ -110,7 +110,7 @@ void NucBed::ProfileDNA() {
     fr.open(_dbFile, memmap);
 
     bool headerReported = false;
-    BED bed, nullBed;
+    BED bed;
     string sequence;
 
     _bed->Open();
@@ -134,7 +134,6 @@ void NucBed::ProfileDNA() {
                     if ((_forceStrand == true) && (bed.strand == "-"))
                         reverseComplement(dna);
                     ReportDnaProfile(bed, dna, length);
-                    bed = nullBed;
                 }
                 else
                 {
@@ -146,7 +145,6 @@ void NucBed::ProfileDNA() {
             else {
                 cerr << "Feature (" << bed.chrom << ":" << bed.start+1 << "-" << bed.end-1 << ") has length = 0, Skipping." << endl;
             }
-            bed = nullBed;
         }
     }
     _bed->Close();

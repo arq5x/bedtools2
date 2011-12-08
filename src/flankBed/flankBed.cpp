@@ -41,7 +41,7 @@ BedFlank::~BedFlank(void) {
 
 void BedFlank::FlankBed() {
 
-    BED bedEntry, nullBed;     // used to store the current BED line from the BED file.
+    BED bedEntry;     // used to store the current BED line from the BED file.
 
     _bed->Open();
     // report A's header first if asked.
@@ -67,7 +67,6 @@ void BedFlank::FlankBed() {
                 AddStrandedFlank(bedEntry,  leftFlank, rightFlank);                    
             }
         }
-        bedEntry = nullBed;
     }
     _bed->Close();
 }

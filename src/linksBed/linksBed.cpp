@@ -102,12 +102,11 @@ void BedLinks::CreateLinks() {
     cout << "<h3>BED Entries from: stdin </h3>" << endl;
 
 
-    BED bedEntry, nullBed;
+    BED bedEntry;
     _bed->Open();
     while (_bed->GetNextBed(bedEntry)) {
         if (_bed->_status == BED_VALID) {
             WriteURL(bedEntry, base);
-            bedEntry = nullBed;
         }
     }
     _bed->Close();

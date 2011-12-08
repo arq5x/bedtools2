@@ -40,7 +40,7 @@ BedSlop::~BedSlop(void) {
 
 void BedSlop::SlopBed() {
 
-    BED bedEntry, nullBed;     // used to store the current BED line from the BED file.
+    BED bedEntry;     // used to store the current BED line from the BED file.
 
     _bed->Open();
     // report header first if asked.
@@ -58,7 +58,6 @@ void BedSlop::SlopBed() {
                 AddSlop(bedEntry, leftSlop, rightSlop);
             }
             _bed->reportBedNewLine(bedEntry);
-            bedEntry = nullBed;
         }
     }
     _bed->Close();

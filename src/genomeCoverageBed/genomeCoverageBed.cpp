@@ -145,7 +145,7 @@ void BedGenomeCoverage::AddBlockedCoverage(const vector<BED> &bedBlocks) {
 
 void BedGenomeCoverage::CoverageBed() {
 
-    BED a, nullBed;
+    BED a;
 
     ResetChromCoverage();
 

@@ -155,7 +155,7 @@ void BedSubtract::SubtractBed() {
     // that we can easily compare "A" to it for overlaps
     _bedB->loadBedFileIntoMap();
 
-    BED a, nullBed;
+    BED a;
     vector<BED> hits;
     // reserve some space
     hits.reserve(100);
@@ -165,7 +165,6 @@ void BedSubtract::SubtractBed() {
         if (_bedA->_status == BED_VALID) {
             FindAndSubtractOverlaps(a, hits);
             hits.clear();
-            a = nullBed;
         }
     }
     _bedA->Close();
