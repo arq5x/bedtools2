@@ -15,9 +15,15 @@
 //
 // Constructor
 //
-BedSort::BedSort(string &bedFile) {
+BedSort::BedSort(string &bedFile, bool printHeader) {
     _bedFile = bedFile;
     _bed = new BedFile(bedFile);
+    
+    _bed->loadBedFileIntoMapNoBin();
+    // report the header first if asked.
+    if (printHeader == true) {
+        _bed->PrintHeader();
+    }
 }
 
 //
@@ -28,10 +34,6 @@ BedSort::~BedSort(void) {
 
 
 void BedSort::SortBed() {
-
-    // load the "B" bed file into a map so
-    // that we can easily compare "A" to it for overlaps
-    _bed->loadBedFileIntoMapNoBin();
 
     // loop through each chromosome and merge their BED entries
     for (masterBedMapNoBin::iterator m = _bed->bedMapNoBin.begin(); m != _bed->bedMapNoBin.end(); ++m) {
@@ -47,10 +49,6 @@ void BedSort::SortBed() {
 
 
 void BedSort::SortBedBySizeAsc() {
-
-    // load the "B" bed file into a map so
-    // that we can easily compare "A" to it for overlaps
-    _bed->loadBedFileIntoMapNoBin();
 
     vector<BED> masterList;
     masterList.reserve(1000000);
@@ -79,10 +77,6 @@ void BedSort::SortBedBySizeAsc() {
 
 void BedSort::SortBedBySizeDesc() {
 
-    // load the "B" bed file into a map so
-    // that we can easily compare "A" to it for overlaps
-    _bed->loadBedFileIntoMapNoBin();
-
     vector<BED> masterList;
     masterList.reserve(1000000);
 
@@ -109,10 +103,6 @@ void BedSort::SortBedBySizeDesc() {
 
 void BedSort::SortBedByChromThenSizeAsc() {
 
-    // load the "B" bed file into a map so
-    // that we can easily compare "A" to it for overlaps
-    _bed->loadBedFileIntoMapNoBin();
-
     // loop through each chromosome and merge their BED entries
     for (masterBedMapNoBin::iterator m = _bed->bedMapNoBin.begin(); m != _bed->bedMapNoBin.end(); ++m) {
 
@@ -128,10 +118,6 @@ void BedSort::SortBedByChromThenSizeAsc() {
 
 
 void BedSort::SortBedByChromThenSizeDesc() {
-
-    // load the "B" bed file into a map so
-    // that we can easily compare "A" to it for overlaps
-    _bed->loadBedFileIntoMapNoBin();
 
     // loop through each chromosome and merge their BED entries
     for (masterBedMapNoBin::iterator m = _bed->bedMapNoBin.begin(); m != _bed->bedMapNoBin.end(); ++m) {
@@ -149,10 +135,6 @@ void BedSort::SortBedByChromThenSizeDesc() {
 
 
 void BedSort::SortBedByChromThenScoreAsc() {
-
-    // load the "B" bed file into a map so
-    // that we can easily compare "A" to it for overlaps
-    _bed->loadBedFileIntoMapNoBin();
 
     if (_bed->bedType >= 5) {
         // loop through each chromosome and merge their BED entries
@@ -175,10 +157,6 @@ void BedSort::SortBedByChromThenScoreAsc() {
 
 
 void BedSort::SortBedByChromThenScoreDesc() {
-
-    // load the "B" bed file into a map so
-    // that we can easily compare "A" to it for overlaps
-    _bed->loadBedFileIntoMapNoBin();
 
     if (_bed->bedType >= 5) {
         // loop through each chromosome and merge their BED entries

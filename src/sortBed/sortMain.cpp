@@ -40,7 +40,7 @@ int main(int argc, char* argv[]) {
     bool sortByChromThenSizeDesc  = false;
     bool sortByChromThenScoreAsc  = false;
     bool sortByChromThenScoreDesc = false;
-
+    bool printHeader        = false;
 
     for(int i = 1; i < argc; i++) {
         int parameterLength = (int)strlen(argv[i]);
@@ -88,6 +88,9 @@ int main(int argc, char* argv[]) {
             sortByChromThenScoreDesc = true;
             sortChoices++;
         }
+        else if(PARAMETER_CHECK("-header", 7, parameterLength)) {
+            printHeader = true;
+        }
         else {
             cerr << endl << "*****ERROR: Unrecognized parameter: " << argv[i] << " *****" << endl << endl;
             showHelp = true;
@@ -106,7 +109,7 @@ int main(int argc, char* argv[]) {
 
 
     if (!showHelp) {
-        BedSort *bm = new BedSort(bedFile);
+        BedSort *bm = new BedSort(bedFile, printHeader);
 
         if (sortBySizeAsc) {
             bm->SortBedBySizeAsc();
@@ -150,7 +153,9 @@ void ShowHelp(void) {
     cerr << "\t" << "-chrThenSizeA\t"   << "Sort by chrom (asc), then feature size (asc)." << endl;
     cerr << "\t" << "-chrThenSizeD\t"   << "Sort by chrom (asc), then feature size (desc)." << endl;
     cerr << "\t" << "-chrThenScoreA\t"  << "Sort by chrom (asc), then score (asc)." << endl;
-    cerr << "\t" << "-chrThenScoreD\t"  << "Sort by chrom (asc), then score (desc)." << endl << endl;
+    cerr << "\t" << "-chrThenScoreD\t"  << "Sort by chrom (asc), then score (desc)." << endl;
+
+    cerr << "\t-header\t"       << "Print the header from the A file prior to results." << endl << endl;
 
     exit(1);
 

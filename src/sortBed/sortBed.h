@@ -26,7 +26,7 @@ class BedSort {
 public:
 
     // constructor
-    BedSort(string &);
+    BedSort(string &bedFile, bool printHeader);
 
     // destructor
     ~BedSort(void);
@@ -44,7 +44,4 @@ private:
 
     // instance of a bed file class.
     BedFile *_bed;
-
-    // methods
-
 };
