@@ -73,7 +73,7 @@ int main(int argc, char *argv[])
 	if (argc < 2) return bedtools_help();
 
     // genome arithmetic tools
-	if (strcmp(argv[1], "intersect") == 0)        return intersect_main(argc-1, argv+1);
+    if (strcmp(argv[1], "intersect") == 0)        return intersect_main(argc-1, argv+1);
     else if (strcmp(argv[1], "window") == 0)      return window_main(argc-1, argv+1);
     else if (strcmp(argv[1], "closest") == 0)     return closest_main(argc-1, argv+1);
     else if (strcmp(argv[1], "coverage") == 0)    return coverage_main(argc-1, argv+1);
