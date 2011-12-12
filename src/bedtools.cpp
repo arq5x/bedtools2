@@ -70,7 +70,7 @@ int bedtools_faq(void);
 int main(int argc, char *argv[])
 {
     // make sure the user at least entered a sub_command
-	if (argc < 2) return bedtools_help();
+    if (argc < 2) return bedtools_help();
 
     // genome arithmetic tools
     if (strcmp(argv[1], "intersect") == 0)        return intersect_main(argc-1, argv+1);
