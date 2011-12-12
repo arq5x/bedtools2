@@ -134,9 +134,9 @@ int bedtools_help(void)
 	cout << "Usage:   bedtools <tool> [options]\n";
 
 	cout << "\nGenome arithmetic:" << endl;
-	cout << RED << "    intersect     " << RESET << "Find exactly overlapping intervals.\n";
+	cout << RED << "    intersect     " << RESET << "Find overlapping intervals in various ways.\n";
     cout << RED << "    window        " << RESET << "Find overlapping intervals within a \"window\".\n";
-	cout << RED << "    closest       " << RESET << "Find overlapping or nearby intervals.\n";	
+	cout << RED << "    closest       " << RESET << "Find the closest, potentially non-overlapping interval.\n";	
 	cout << RED << "    coverage      " << RESET << "Compute the coverage over defined intervals.\n";
 	cout << RED << "    genomecov     " << RESET << "Compute the coverage over an entire genome.\n";
 	cout << RED << "    merge         " << RESET << "Combine overlapping/nearby intervals into a single interval.\n";
