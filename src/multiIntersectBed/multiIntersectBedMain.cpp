@@ -18,7 +18,6 @@
 #include <iostream>
 #include <getopt.h>
 #include <libgen.h> //for basename()
-#include "version.h"
 
 #include "genomeFile.h"
 #include "multiIntersectBed.h"

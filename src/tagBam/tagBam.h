@@ -14,7 +14,6 @@
 
 #include "bedFile.h"
 
-#include "version.h"
 #include "api/BamReader.h"
 #include "api/BamWriter.h"
 #include "api/BamAux.h"

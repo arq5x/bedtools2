@@ -10,7 +10,6 @@
   Licenced under the GNU General Public License 2.0 license.
 ******************************************************************************/
 #include "fastaFromBed.h"
-#include "version.h"
 
 using namespace std;
 

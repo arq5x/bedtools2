@@ -10,12 +10,11 @@
   Licenced under the GNU General Public License 2.0 license.
 ******************************************************************************/
 #include "intersectBed.h"
-#include "version.h"
 
 using namespace std;
 
 // define our program name
-#define PROGRAM_NAME "intersectBed"
+#define PROGRAM_NAME "bedtools intersect"
 
 
 // define our parameter checking macro

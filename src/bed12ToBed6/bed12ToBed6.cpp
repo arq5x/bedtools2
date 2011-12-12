@@ -11,7 +11,6 @@
 ******************************************************************************/
 #include "lineFileUtilities.h"
 #include "bedFile.h"
-#include "version.h"
 
 #include <vector>
 #include <iostream>

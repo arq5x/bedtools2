@@ -10,7 +10,6 @@ aaronquinlan@gmail.com
 Licenced under the GNU General Public License 2.0 license.
 ******************************************************************************/
 #include "genomeCoverageBed.h"
-#include "version.h"
 
 using namespace std;
 

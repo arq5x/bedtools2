@@ -14,7 +14,6 @@
 #include <fstream>
 #include <stdlib.h>
 
-#include "version.h"
 #include "lineFileUtilities.h"
 #include "bedFile.h"
 using namespace std;
@@ -117,8 +116,6 @@ void getoverlap_help(void) {
     cerr << "Summary: Computes the amount of overlap (positive values)" << endl;
     cerr << "\t or distance (negative values) between genome features" << endl;
     cerr << "\t and reports the result at the end of the same line." << endl << endl;
-
-    cerr << "Usage:   " << PROGRAM_NAME << " [OPTIONS] -i <input> -cols s1,e1,s2,e2 " << endl << endl;
 
     cerr << "Options: " << endl;
     cerr << "\t-i\t"        << "Input file. Use \"stdin\" for pipes." << endl << endl;

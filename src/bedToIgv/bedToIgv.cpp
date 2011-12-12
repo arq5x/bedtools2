@@ -12,7 +12,6 @@
 #include "lineFileUtilities.h"
 #include "bedFile.h"
 #include "genomeFile.h"
-#include "version.h"
 
 #include <vector>
 #include <iostream>

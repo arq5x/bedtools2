@@ -7,7 +7,6 @@ BIN_DIR = ../../bin/
 # -------------------
 INCLUDES = -I$(UTILITIES_DIR)/bedFile/ \
            -I$(UTILITIES_DIR)/lineFileUtilities/ \
-           -I$(UTILITIES_DIR)/version/ \
            -I$(UTILITIES_DIR)/gzstream/ \
            -I$(UTILITIES_DIR)/fileType/
 

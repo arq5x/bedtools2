@@ -14,6 +14,7 @@
 #include <iostream>
 #include <fstream>
 #include <stdlib.h>
+#include "version.h"
 
 using namespace std;
 
@@ -59,64 +60,9 @@ int subtract_main(int argc, char* argv[]); //
 int tagbam_main(int argc, char* argv[]);//
 int unionbedgraphs_main(int argc, char* argv[]);//
 int window_main(int argc, char* argv[]); //
+int bedtools_help(void);
+int bedtools_faq(void);
 
-int bedtools_help()
-{
-	cout << "\n";
-	cout << PROGRAM_NAME << ": flexible tools for genome arithmetic and analysis.\n";
-	cout << "Version:  " << "2.15.5" << "\n";
-	cout << "Authors:  " << "Aaron Quinlan and others (see THANKS)" << "\n\n";
-	cout << "Usage:   bedtools <tool> [options]\n";
-
-	cout << "\nGenome arithmetic:" << endl;
-	cout << RED << "    intersect     " << RESET << "Find exactly overlapping intervals.\n";
-    cout << RED << "    window        " << RESET << "Find overlapping intervals within a \"window\".\n";
-	cout << RED << "    closest       " << RESET << "Find overlapping or nearby intervals.\n";	
-	cout << RED << "    coverage      " << RESET << "Compute the coverage over defined intervals.\n";
-	cout << RED << "    genomecov     " << RESET << "Compute the coverage over an entire genome.\n";
-	cout << RED << "    merge         " << RESET << "Combine overlapping/nearby intervals into a single interval.\n";
-	cout << RED << "    complement    " << RESET << "Extract intervals _not_ represented by an interval file.\n";
-	cout << RED << "    subtract      " << RESET << "Remove intervals based on overlaps b/w two files.\n";
-	cout << RED << "    slop          " << RESET << "Adjust the size of intervals.\n";
-	cout << RED << "    flank         " << RESET << "Create new intervals from the flanks of existing intervals.\n";	
-	cout << RED << "    sort          " << RESET << "Order the intervals in a file.\n";
-	cout << RED << "    shuffle       " << RESET << "Randomly redistrubute intervals in a genome.\n";
-	cout << RED << "    annotate      " << RESET << "Annotate coverage of features from multiple files.\n";
-	
-	cout << "\nMulti-way file comparisons:" << endl;
-	cout << RED << "    multiinter    " << RESET << "Identifies common intervals among multiple interval files.\n";
-    cout << RED << "    unionbedg     " << RESET << "Combines coverage intervals from multiple BEDGRAPH files.\n";
-
-	cout << "\nPaired-end manipulation:" << endl;
-	cout << RED << "    pairtobed     " << RESET << "Find pairs that overlap intervals in various ways.\n";
-	cout << RED << "    pairtopair    " << RESET << "Find pairs that overlap other pairs in various ways.\n";
-		                                   
-	cout << "\nFormat conversion:\n";   
-	cout << RED << "    bamtobed      " << RESET << "Convert BAM alignments to BED (& other) formats.\n";
-	cout << RED << "    bedtobam      " << RESET << "Convert intervals to BAM records.\n";
-	cout << RED << "    bedpetobam    " << RESET << "Convert BEDPE intervals to BAM records.\n";	
-	cout << RED << "    bed12tobed6   " << RESET << "Breaks BED12 intervals into discrete BED6 intervals.\n";
-		
-	cout << "\nFasta manipulation:\n";	
-	cout << RED << "    getfasta      " << RESET << "Use intervals to extract sequences from a FASTA file.\n";
-	cout << RED << "    maskfasta     " << RESET << "Use intervals to mask sequences from a FASTA file.\n";
-	cout << RED << "    nuc           " << RESET << "Profile the nucleotide content of intervals in a FASTA file.\n";
-		
-	cout << "\nBAM focused tools:\n";	
-	cout << RED << "    multicov      " << RESET << "Counts coverage from multiple BAMs at specific intervals.\n";
-	cout << RED << "    tag           " << RESET << "Annotate BAM alignments based on overlaps with interval files.\n";
-
-	cout << "\nMiscellaneous tools:\n";	
-	cout << RED << "    overlap       " << RESET << "Computes the amount of overlap from two intervals.\n";	
-	cout << RED << "    igv           " << RESET << "Create an IGV snapshot batch script.\n";
-	cout << RED << "    links         " << RESET << "Create a HTML page of links to UCSC locations.\n";
-		
-	cout << "\nGeneral help:\n";	
-	cout << RED << "    faq           " << RESET << "Frequently asked questions.\n";
-
-	cout << "\n";
-	return 1;
-}
 
 int main(int argc, char *argv[])
 {
@@ -170,10 +116,89 @@ int main(int argc, char *argv[])
     else if (strcmp(argv[1], "-h") == 0)          return bedtools_help();
     else if (strcmp(argv[1], "--help") == 0)      return bedtools_help();
 
+    else if (strcmp(argv[1], "FAQ") == 0)          return bedtools_faq();
     // unknown
 	else {
 		cerr << "error: unrecognized command: " << argv[1] << endl << endl;
 		return 1;
 	}
 	return 0;	
+}
+
+int bedtools_help(void)
+{
+	cout << "\n";
+	cout << RED << PROGRAM_NAME << RESET << ": flexible tools for genome arithmetic and analysis.\n";
+	cout << "Version:  " << VERSION << "\n";
+	cout << "Authors:  " << "Aaron Quinlan and others (see THANKS)" << "\n\n";
+	cout << "Usage:   bedtools <tool> [options]\n";
+
+	cout << "\nGenome arithmetic:" << endl;
+	cout << RED << "    intersect     " << RESET << "Find exactly overlapping intervals.\n";
+    cout << RED << "    window        " << RESET << "Find overlapping intervals within a \"window\".\n";
+	cout << RED << "    closest       " << RESET << "Find overlapping or nearby intervals.\n";	
+	cout << RED << "    coverage      " << RESET << "Compute the coverage over defined intervals.\n";
+	cout << RED << "    genomecov     " << RESET << "Compute the coverage over an entire genome.\n";
+	cout << RED << "    merge         " << RESET << "Combine overlapping/nearby intervals into a single interval.\n";
+	cout << RED << "    complement    " << RESET << "Extract intervals _not_ represented by an interval file.\n";
+	cout << RED << "    subtract      " << RESET << "Remove intervals based on overlaps b/w two files.\n";
+	cout << RED << "    slop          " << RESET << "Adjust the size of intervals.\n";
+	cout << RED << "    flank         " << RESET << "Create new intervals from the flanks of existing intervals.\n";	
+	cout << RED << "    sort          " << RESET << "Order the intervals in a file.\n";
+	cout << RED << "    shuffle       " << RESET << "Randomly redistrubute intervals in a genome.\n";
+	cout << RED << "    annotate      " << RESET << "Annotate coverage of features from multiple files.\n";
+	
+	cout << "\nMulti-way file comparisons:" << endl;
+	cout << RED << "    multiinter    " << RESET << "Identifies common intervals among multiple interval files.\n";
+    cout << RED << "    unionbedg     " << RESET << "Combines coverage intervals from multiple BEDGRAPH files.\n";
+
+	cout << "\nPaired-end manipulation:" << endl;
+	cout << RED << "    pairtobed     " << RESET << "Find pairs that overlap intervals in various ways.\n";
+	cout << RED << "    pairtopair    " << RESET << "Find pairs that overlap other pairs in various ways.\n";
+		                                   
+	cout << "\nFormat conversion:\n";   
+	cout << RED << "    bamtobed      " << RESET << "Convert BAM alignments to BED (& other) formats.\n";
+	cout << RED << "    bedtobam      " << RESET << "Convert intervals to BAM records.\n";
+	cout << RED << "    bedpetobam    " << RESET << "Convert BEDPE intervals to BAM records.\n";	
+	cout << RED << "    bed12tobed6   " << RESET << "Breaks BED12 intervals into discrete BED6 intervals.\n";
+		
+	cout << "\nFasta manipulation:\n";	
+	cout << RED << "    getfasta      " << RESET << "Use intervals to extract sequences from a FASTA file.\n";
+	cout << RED << "    maskfasta     " << RESET << "Use intervals to mask sequences from a FASTA file.\n";
+	cout << RED << "    nuc           " << RESET << "Profile the nucleotide content of intervals in a FASTA file.\n";
+		
+	cout << "\nBAM focused tools:\n";	
+	cout << RED << "    multicov      " << RESET << "Counts coverage from multiple BAMs at specific intervals.\n";
+	cout << RED << "    tag           " << RESET << "Tag BAM alignments based on overlaps with interval files.\n";
+
+	cout << "\nMiscellaneous tools:\n";	
+	cout << RED << "    overlap       " << RESET << "Computes the amount of overlap from two intervals.\n";	
+	cout << RED << "    igv           " << RESET << "Create an IGV snapshot batch script.\n";
+	cout << RED << "    links         " << RESET << "Create a HTML page of links to UCSC locations.\n";
+		
+	cout << "\nGeneral help:\n";	
+	cout << RED << "    FAQ           " << RESET << "Frequently asked questions.\n";
+
+	cout << "\n";
+	return 1;
+}
+
+
+int bedtools_faq(void)
+{
+	cout << "\n";
+    
+    cout << "Q1. How do I see the help for a given command?" << endl;
+    cout << "A1. All BEDTools commands have a \"-h\" option. Additionally, some tools " << endl;
+    cout << "    will provide the help menu if you just type the command line " << endl;
+    cout << "    followed by enter. " << endl;
+    
+    cout << "Q2. How do I see the help for a given command?" << endl;
+    cout << "A1. All BEDTools commands have a \"-h\" option. Additionally, some tools " << endl;
+    cout << "    will provide the help menu if you just type the command line " << endl;
+    cout << "    followed by enter. " << endl;
+    
+    
+	cout << "\n";
+	return 1;
 }

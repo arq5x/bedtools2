@@ -9,7 +9,6 @@
 
   Licenced under the GNU General Public License 2.0 license.
 ******************************************************************************/
-#include "version.h"
 #include "api/BamReader.h"
 #include "api/BamAux.h"
 #include "BamAncillary.h"

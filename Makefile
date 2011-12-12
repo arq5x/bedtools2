@@ -95,14 +95,20 @@ all:
 	done
 
 	@echo "- Building main bedtools binary."
-	gcc $(CXXFLAGS) -c src/bedtools.cpp -o obj/bedtools.o
+	@$(CXX) $(CXXFLAGS) -c src/bedtools.cpp -o obj/bedtools.o -I$(UTIL_DIR)/version/
 	@$(CXX) $(LDFLAGS) $(CXXFLAGS) -o $(BIN_DIR)/bedtools $(BUILT_OBJECTS) -L$(UTIL_DIR)/BamTools/lib/ -lbamtools $(LIBS)
+	@echo "done."
+	
+	@echo "- Creating executables for old CLI."
+	@python scripts/makeBashScripts.py
+	@chmod +x bin/*
+	@echo "done."
 	
 
 .PHONY: all
 
 clean:
-	@echo "Cleaning up."
+	@echo "Cleaning up."	
 	@rm -f $(OBJ_DIR)/* $(BIN_DIR)/*
 	@rm -Rf $(BT_ROOT)/lib
 	@rm -f $(BT_ROOT)/src/api/*.o
