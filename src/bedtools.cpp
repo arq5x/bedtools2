@@ -9,8 +9,6 @@
 
   Licenced under the GNU General Public License 2.0 license.
 ******************************************************************************/
-#include <vector>
-#include <algorithm>    // for swap()
 #include <iostream>
 #include <fstream>
 #include <stdlib.h>
@@ -63,6 +61,11 @@ int window_main(int argc, char* argv[]); //
 int bedtools_help(void);
 int bedtools_faq(void);
 
+/*
+  bedtools command line interface.  
+  
+  Thanks to Heng Li, as this interface is inspired and based upon his samtools interface.
+*/
 
 int main(int argc, char *argv[])
 {
@@ -135,7 +138,7 @@ int bedtools_help(void)
 
 	cout << "\nGenome arithmetic:" << endl;
 	cout << RED << "    intersect     " << RESET << "Find overlapping intervals in various ways.\n";
-    cout << RED << "    window        " << RESET << "Find overlapping intervals within a window around an interval.\n";
+	cout << RED << "    window        " << RESET << "Find overlapping intervals within a window around an interval.\n";
 	cout << RED << "    closest       " << RESET << "Find the closest, potentially non-overlapping interval.\n";	
 	cout << RED << "    coverage      " << RESET << "Compute the coverage over defined intervals.\n";
 	cout << RED << "    genomecov     " << RESET << "Compute the coverage over an entire genome.\n";
@@ -150,23 +153,23 @@ int bedtools_help(void)
 	
 	cout << "\nMulti-way file comparisons:" << endl;
 	cout << RED << "    multiinter    " << RESET << "Identifies common intervals among multiple interval files.\n";
-    cout << RED << "    unionbedg     " << RESET << "Combines coverage intervals from multiple BEDGRAPH files.\n";
+	cout << RED << "    unionbedg     " << RESET << "Combines coverage intervals from multiple BEDGRAPH files.\n";
 
 	cout << "\nPaired-end manipulation:" << endl;
 	cout << RED << "    pairtobed     " << RESET << "Find pairs that overlap intervals in various ways.\n";
 	cout << RED << "    pairtopair    " << RESET << "Find pairs that overlap other pairs in various ways.\n";
-		                                   
+
 	cout << "\nFormat conversion:\n";   
 	cout << RED << "    bamtobed      " << RESET << "Convert BAM alignments to BED (& other) formats.\n";
 	cout << RED << "    bedtobam      " << RESET << "Convert intervals to BAM records.\n";
 	cout << RED << "    bedpetobam    " << RESET << "Convert BEDPE intervals to BAM records.\n";	
 	cout << RED << "    bed12tobed6   " << RESET << "Breaks BED12 intervals into discrete BED6 intervals.\n";
-		
+
 	cout << "\nFasta manipulation:\n";	
 	cout << RED << "    getfasta      " << RESET << "Use intervals to extract sequences from a FASTA file.\n";
 	cout << RED << "    maskfasta     " << RESET << "Use intervals to mask sequences from a FASTA file.\n";
 	cout << RED << "    nuc           " << RESET << "Profile the nucleotide content of intervals in a FASTA file.\n";
-		
+
 	cout << "\nBAM focused tools:\n";	
 	cout << RED << "    multicov      " << RESET << "Counts coverage from multiple BAMs at specific intervals.\n";
 	cout << RED << "    tag           " << RESET << "Tag BAM alignments based on overlaps with interval files.\n";
