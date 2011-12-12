@@ -15,16 +15,16 @@
 using namespace std;
 
 // define our program name
-#define PROGRAM_NAME "sortBed"
+#define PROGRAM_NAME "bedtools sort"
 
 
 // define our parameter checking macro
 #define PARAMETER_CHECK(param, paramLen, actualLen) (strncmp(argv[i], param, min(actualLen, paramLen))== 0) && (actualLen == paramLen)
 
 // function declarations
-void ShowHelp(void);
+void sort_help(void);
 
-int main(int argc, char* argv[]) {
+int sort_main(int argc, char* argv[]) {
 
     // our configuration variables
     bool showHelp = false;
@@ -51,7 +51,7 @@ int main(int argc, char* argv[]) {
         }
     }
 
-    if(showHelp) ShowHelp();
+    if(showHelp) sort_help();
 
     // do some parsing (all of these parameters require 2 strings)
     for(int i = 1; i < argc; i++) {
@@ -135,15 +135,15 @@ int main(int argc, char* argv[]) {
         return 0;
     }
     else {
-        ShowHelp();
+        sort_help();
     }
+    return 0;
 }
 
-void ShowHelp(void) {
+void sort_help(void) {
 
-    cerr << endl << "Program: " << PROGRAM_NAME << " (v" << VERSION << ")" << endl;
-
-    cerr << "Author:  Aaron Quinlan (aaronquinlan@gmail.com)" << endl;
+    cerr << "\nTool:    bedtools sort (aka sortBed)" << endl;
+    
     cerr << "Summary: Sorts a feature file in various and useful ways." << endl << endl;
     cerr << "Usage:   " << PROGRAM_NAME << " [OPTIONS] -i <bed/gff/vcf>" << endl << endl;
 

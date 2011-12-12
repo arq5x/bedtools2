@@ -26,14 +26,14 @@ using namespace std;
 
 
 // define our program name
-#define PROGRAM_NAME "bamToBed"
+#define PROGRAM_NAME "bedtools bamtobed"
 
 // define our parameter checking macro
 #define PARAMETER_CHECK(param, paramLen, actualLen) (strncmp(argv[i], param, min(actualLen, paramLen))== 0) && (actualLen == paramLen)
 
 
 // function declarations
-void ShowHelp(void);
+void bamtobed_help(void);
 
 void ConvertBamToBed(const string &bamFile, bool useEditDistance, const string &bamTag,
                      bool writeBed12, bool obeySplits, const string &color, 
@@ -52,10 +52,10 @@ void ParseCigarBed12(const vector<CigarOp> &cigar, vector<int> &blockStarts,
                      vector<int> &blockEnds, int &alignmentEnd);
 string BuildCigarString(const vector<CigarOp> &cigar);
 
-bool IsCorrectMappingForBEDPE (const BamAlignment &bam);
+bool bamtobed_IsCorrectMappingForBEDPE (const BamAlignment &bam);
 
 
-int main(int argc, char* argv[]) {
+int bamtobed_main(int argc, char* argv[]) {
 
     // our configuration variables
     bool showHelp = false;
@@ -88,7 +88,7 @@ int main(int argc, char* argv[]) {
         }
     }
 
-    if(showHelp) ShowHelp();
+    if(showHelp) bamtobed_help();
 
     // do some parsing (all of these parameters require 2 strings)
     for(int i = 1; i < argc; i++) {
@@ -178,16 +178,15 @@ int main(int argc, char* argv[]) {
             ConvertBamToBedpe(bamFile, useEditDistance);                    // BEDPE
     }
     else {
-        ShowHelp();
+        bamtobed_help();
     }
+    return 0;
 }
 
 
-void ShowHelp(void) {
-
-    cerr << endl << "Program: " << PROGRAM_NAME << " (v" << VERSION << ")" << endl;
-
-    cerr << "Author:  Aaron Quinlan (aaronquinlan@gmail.com)" << endl;
+void bamtobed_help(void) {
+    
+    cerr << "\nTool:    bedtools bamtobed (aka bamToBed)" << endl;
 
     cerr << "Summary: Converts BAM alignments to BED6 or BEDPE format." << endl << endl;
 
@@ -605,7 +604,7 @@ void PrintBedPE(const BamAlignment &bam1, const BamAlignment &bam2, const RefVec
 
 
 // deprecated.
-bool IsCorrectMappingForBEDPE (const BamAlignment &bam) {
+bool bamtobed_IsCorrectMappingForBEDPE (const BamAlignment &bam) {
 
     if ( (bam.RefID == bam.MateRefID) && (bam.InsertSize > 0) ) {
         return true;

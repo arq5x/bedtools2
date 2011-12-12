@@ -22,21 +22,21 @@ using namespace std;
 
 
 // define our program name
-#define PROGRAM_NAME "bed12ToBed6"
+#define PROGRAM_NAME "bedtools bed12tobed6"
 
 // define our parameter checking macro
 #define PARAMETER_CHECK(param, paramLen, actualLen) (strncmp(argv[i], param, min(actualLen, paramLen))== 0) && (actualLen == paramLen)
 
 
 // function declarations
-void ShowHelp(void);
+void bed12tobed6_help(void);
 void DetermineBedInput(BedFile *bed);
 void ProcessBed(istream &bedInput, BedFile *bed);
 
 
 bool addBlockNums = false;
 
-int main(int argc, char* argv[]) {
+int bed12tobed6_main(int argc, char* argv[]) {
 
     // our configuration variables
     bool showHelp = false;
@@ -54,7 +54,7 @@ int main(int argc, char* argv[]) {
         }
     }
 
-    if(showHelp) ShowHelp();
+    if(showHelp) bed12tobed6_help();
 
     // do some parsing (all of these parameters require 2 strings)
     for(int i = 1; i < argc; i++) {
@@ -88,17 +88,16 @@ int main(int argc, char* argv[]) {
         DetermineBedInput(bed);
     }
     else {
-        ShowHelp();
+        bed12tobed6_help();
     }
+    return 0;
 }
 
 
-void ShowHelp(void) {
+void bed12tobed6_help(void) {
 
-    cerr << endl << "Program: " << PROGRAM_NAME << " (v" << VERSION << ")" << endl;
-
-    cerr << "Author:  Aaron Quinlan (aaronquinlan@gmail.com)" << endl;
-
+    cerr << "\nTool:    bedtools bed12tobed6 (aka bed12ToBed6)" << endl;
+    
     cerr << "Summary: Splits BED12 features into discrete BED6 features." << endl << endl;
 
     cerr << "Usage:   " << PROGRAM_NAME << " [OPTIONS] -i <bed12>" << endl << endl;

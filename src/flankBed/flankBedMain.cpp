@@ -15,16 +15,16 @@
 using namespace std;
 
 // define our program name
-#define PROGRAM_NAME "flankBed"
+#define PROGRAM_NAME "bedtools flank"
 
 
 // define our parameter checking macro
 #define PARAMETER_CHECK(param, paramLen, actualLen) (strncmp(argv[i], param, min(actualLen, paramLen))== 0) && (actualLen == paramLen)
 
 // function declarations
-void ShowHelp(void);
+void flank_help(void);
 
-int main(int argc, char* argv[]) {
+int flank_main(int argc, char* argv[]) {
 
     // our configuration variables
     bool showHelp = false;
@@ -54,7 +54,7 @@ int main(int argc, char* argv[]) {
         }
     }
 
-    if(showHelp) ShowHelp();
+    if(showHelp) flank_help();
 
     // do some parsing (all of these parameters require 2 strings)
     for(int i = 1; i < argc; i++) {
@@ -137,15 +137,14 @@ int main(int argc, char* argv[]) {
         return 0;
     }
     else {
-        ShowHelp();
+        flank_help();
     }
+    return 0;
 }
 
-void ShowHelp(void) {
-
-    cerr << endl << "Program: " << PROGRAM_NAME << " (v" << VERSION << ")" << endl;
-
-    cerr << "Author:  Aaron Quinlan (aaronquinlan@gmail.com)" << endl;
+void flank_help(void) {
+    
+    cerr << "\nTool:    bedtools flank (aka flankBed)" << endl;
 
     cerr << "Summary: Creates flanking interval(s) for each BED/GFF/VCF feature." << endl << endl;
 
@@ -155,10 +154,12 @@ void ShowHelp(void) {
     cerr << "\t-b\t"                << "Create flanking intervak using -b base pairs in each direction." << endl;
     cerr                            << "\t\t- (Integer) or (Float, e.g. 0.1) if used with -pct." << endl << endl;
 
-    cerr << "\t-l\t"                << "The number of base pairs that a flank should start from orig. start coordinate." << endl;
+    cerr << "\t-l\t"                << "The number of base pairs that a flank should start from" << endl;
+    cerr                            << "\t\torig. start coordinate." << endl;    
     cerr                            << "\t\t- (Integer) or (Float, e.g. 0.1) if used with -pct." << endl << endl;
         
-    cerr << "\t-r\t"                << "The number of base pairs that a flank should end from orig. end coordinate." << endl;
+    cerr << "\t-r\t"                << "The number of base pairs that a flank should end from" << endl;
+    cerr                            << "\t\torig. end coordinate." << endl;
     cerr                            << "\t\t- (Integer) or (Float, e.g. 0.1) if used with -pct." << endl << endl;
         
     cerr << "\t-s\t"                << "Define -l and -r based on strand." << endl;

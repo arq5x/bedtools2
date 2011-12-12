@@ -15,16 +15,16 @@
 using namespace std;
 
 // define our program name
-#define PROGRAM_NAME "fastaFromBed"
+#define PROGRAM_NAME "bedtools getfasta"
 
 
 // define our parameter checking macro
 #define PARAMETER_CHECK(param, paramLen, actualLen) (strncmp(argv[i], param, min(actualLen, paramLen))== 0) && (actualLen == paramLen)
 
 // function declarations
-void ShowHelp(void);
+void fastafrombed_help(void);
 
-int main(int argc, char* argv[]) {
+int fastafrombed_main(int argc, char* argv[]) {
 
     // our configuration variables
     bool showHelp = false;
@@ -56,7 +56,7 @@ int main(int argc, char* argv[]) {
         }
     }
 
-    if(showHelp) ShowHelp();
+    if(showHelp) fastafrombed_help();
 
     // do some parsing (all of these parameters require 2 strings)
     for(int i = 1; i < argc; i++) {
@@ -107,19 +107,16 @@ int main(int argc, char* argv[]) {
 
         Bed2Fa *b2f = new Bed2Fa(useNameOnly, fastaDbFile, bedFile, fastaOutFile, useFasta, useStrand);
         delete b2f;
-
-        return 0;
     }
     else {
-        ShowHelp();
+        fastafrombed_help();
     }
+    return 0;
 }
 
-void ShowHelp(void) {
-
-    cerr << endl << "Program: " << PROGRAM_NAME << " (v" << VERSION << ")" << endl;
-
-    cerr << "Author:  Aaron Quinlan (aaronquinlan@gmail.com)" << endl;
+void fastafrombed_help(void) {
+    
+    cerr << "\nTool:    bedtools getfasta (aka fastaFromBed)" << endl;
 
     cerr << "Summary: Extract DNA sequences into a fasta file based on feature coordinates." << endl << endl;
 
@@ -134,11 +131,9 @@ void ShowHelp(void) {
     cerr << "\t-tab\tWrite output in TAB delimited format." << endl;
     cerr << "\t\t- Default is FASTA format." << endl << endl;
 
-    cerr << "\t-s\tForce strandedness. If the feature occupies the antisense strand," << endl;
-    cerr << "\t\tthe sequence will be reverse complemented." << endl;
+    cerr << "\t-s\tForce strandedness. If the feature occupies the antisense," << endl;
+    cerr << "\t\tstrand, the sequence will be reverse complemented." << endl;
     cerr << "\t\t- By default, strand information is ignored." << endl << endl;
-
-
 
     // end the program here
     exit(1);

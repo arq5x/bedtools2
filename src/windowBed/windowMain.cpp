@@ -15,16 +15,16 @@
 using namespace std;
 
 // define the version
-#define PROGRAM_NAME "windowBed"
+#define PROGRAM_NAME "bedtools window"
 
 // define our parameter checking macro
 #define PARAMETER_CHECK(param, paramLen, actualLen) (strncmp(argv[i], param, min(actualLen, paramLen))== 0) && (actualLen == paramLen)
 
 // function declarations
-void ShowHelp(void);
+void window_help(void);
 
 
-int main(int argc, char* argv[]) {
+int window_main(int argc, char* argv[]) {
 
     // our configuration variables
     bool showHelp = false;
@@ -65,7 +65,7 @@ int main(int argc, char* argv[]) {
         }
     }
 
-    if(showHelp) ShowHelp();
+    if(showHelp) window_help();
 
     // do some parsing (all of these parameters require 2 strings)
     for(int i = 1; i < argc; i++) {
@@ -198,17 +198,16 @@ int main(int argc, char* argv[]) {
         return 0;
     }
     else {
-        ShowHelp();
+        window_help();
     }
+    return 0;
 }
 
 
-void ShowHelp(void) {
+void window_help(void) {
 
-    cerr << endl << "Program: " << PROGRAM_NAME << " (v" << VERSION << ")" << endl;
-
-    cerr << "Author:  Aaron Quinlan (aaronquinlan@gmail.com)" << endl;
-
+    cerr << "\nTool:    bedtools window (aka windowBed)" << endl;
+    
     cerr << "Summary: Examines a \"window\" around each feature in A and" << endl;
     cerr << "\t reports all features in B that overlap the window. For each" << endl;
     cerr << "\t overlap the entire entry in A and B are reported." << endl << endl;
@@ -219,7 +218,7 @@ void ShowHelp(void) {
 
     cerr << "\t-abam\t"         << "The A input file is in BAM format.  Output will be BAM as well." << endl << endl;
 
-    cerr << "\t-ubam\t"         << "Write uncompressed BAM output. Default is to write compressed BAM." << endl << endl;
+    cerr << "\t-ubam\t"         << "Write uncompressed BAM output. Default writes compressed BAM." << endl << endl;
 
     cerr << "\t-bed\t"          << "When using BAM input (-abam), write output as BED. The default" << endl;
     cerr                        << "\t\tis to write output in BAM when using -abam." << endl << endl;

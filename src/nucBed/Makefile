@@ -24,13 +24,9 @@ BUILT_OBJECTS= $(patsubst %,$(OBJ_DIR)/%,$(OBJECTS))
 PROGRAM= nucBed
 
 
-all: $(PROGRAM)
+all: $(BUILT_OBJECTS)
 
 .PHONY: all
-
-$(PROGRAM): $(BUILT_OBJECTS) $(EXT_OBJECTS)
-	@echo "  * linking $(PROGRAM)"
-	@$(CXX) $(LDFLAGS) $(CXXFLAGS) -o $(BIN_DIR)/$@ $^ $(LIBS)
 
 $(BUILT_OBJECTS): $(SOURCES)
 	@echo "  * compiling" $(*F).cpp

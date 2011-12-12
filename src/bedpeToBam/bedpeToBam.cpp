@@ -29,27 +29,23 @@ using namespace std;
 
 
 // define our program name
-#define PROGRAM_NAME "bedpeToBam"
+#define PROGRAM_NAME "bedpetobam"
 
 // define our parameter checking macro
 #define PARAMETER_CHECK(param, paramLen, actualLen) (strncmp(argv[i], param, min(actualLen, paramLen))== 0) && (actualLen == paramLen)
 
-//ROYDEN
-//NEED TO ADD A IS TYPE12+ check or fail
-//END ROYDEN
-
 
 // function declarations
-void ShowHelp(void);
+void bedpetobam_help(void);
 void ProcessBedPE(BedFilePE *bedpe, GenomeFile *genome,  int mapQual, bool uncompressedBam);
 void ConvertBedPEToBam(const BEDPE &bedpe, BamAlignment &bam1,BamAlignment &bam2, map<string, int> &chromToId, int mapQual, int lineNum);
 
-void MakeBamHeader(const string &genomeFile, RefVector &refs, string &header, map<string, int> &chromToInt);
-int  reg2bin(int beg, int end);
+void bedpetobam_MakeBamHeader(const string &genomeFile, RefVector &refs, string &header, map<string, int> &chromToInt);
+int  bedpetobam_reg2bin(int beg, int end);
 
 
 
-int main(int argc, char* argv[]) {
+int bedpetobam_main(int argc, char* argv[]) {
 
     // our configuration variables
     bool showHelp = false;
@@ -75,7 +71,7 @@ int main(int argc, char* argv[]) {
         }
     }
 
-    if(showHelp) ShowHelp();
+    if(showHelp) bedpetobam_help();
 
     // do some parsing (all of these parameters require 2 strings)
     for(int i = 1; i < argc; i++) {
@@ -133,16 +129,15 @@ int main(int argc, char* argv[]) {
        ProcessBedPE(bedpe, genome,  mapQual, uncompressedBam);
     }
     else {
-        ShowHelp();
+        bedpetobam_help();
     }
+    return 0;
 }
 
 
-void ShowHelp(void) {
-
-    cerr << endl << "Program: " << PROGRAM_NAME << " (v" << VERSION << ")" << endl;
-
-    cerr << "Author:  Aaron Quinlan (aaronquinlan@gmail.com)" << endl;
+void bedpetobam_help(void) {
+    
+    cerr << "\nTool:    bedtools bedpetobam (aka bedpeToBam)" << endl;
 
     cerr << "Summary: Converts feature records to BAM format." << endl << endl;
 
@@ -153,10 +148,10 @@ void ShowHelp(void) {
     cerr << "\t-mapq\t" << "Set the mappinq quality for the BAM records." << endl;
     cerr                    << "\t\t(INT) Default: 255" << endl << endl;
 
-    cerr << "\t-ubam\t"     << "Write uncompressed BAM output. Default is to write compressed BAM." << endl << endl;
+    cerr << "\t-ubam\t"     << "Write uncompressed BAM output. Default writes compressed BAM." << endl << endl;
 
     cerr << "Notes: " << endl;
-    cerr << "\t(1)  BED files must be at least BED4 to be amenable to BAM (needs name field)." << endl << endl;
+    cerr << "\t(1)  BED files must be at least BED4 to create BAM (needs name field)." << endl << endl;
 
 
     // end the program here
@@ -171,7 +166,7 @@ void ProcessBedPE(BedFilePE *bedpe, GenomeFile *genome,  int mapQual, bool uncom
     RefVector refs;
     string    bamHeader;
     map<string, int, std::less<string> > chromToId;
-    MakeBamHeader(genome->getGenomeFileName(), refs, bamHeader, chromToId);
+    bedpetobam_MakeBamHeader(genome->getGenomeFileName(), refs, bamHeader, chromToId);
 
     // set compression mode
     BamWriter::CompressionMode compressionMode = BamWriter::Compressed;
@@ -218,10 +213,10 @@ void ConvertBedPEToBam(const BEDPE &bedpe, BamAlignment &bam1,BamAlignment &bam2
 
     bam1.Name       = bedpe.name;
     bam1.Position   = bedpe.start1;
-    bam1.Bin        = reg2bin(bedpe.start1, bedpe.end1);
+    bam1.Bin        = bedpetobam_reg2bin(bedpe.start1, bedpe.end1);
     bam2.Name       = bedpe.name;
     bam2.Position   = bedpe.start2;
-    bam2.Bin        = reg2bin(bedpe.start2, bedpe.end2);
+    bam2.Bin        = bedpetobam_reg2bin(bedpe.start2, bedpe.end2);
 
     // hard-code the sequence and qualities.
     int bedpeLength1  = bedpe.end1 - bedpe.start1;
@@ -294,7 +289,7 @@ void ConvertBedPEToBam(const BEDPE &bedpe, BamAlignment &bam1,BamAlignment &bam2
 }
 
 
-void MakeBamHeader(const string &genomeFile, RefVector &refs, string &header,
+void bedpetobam_MakeBamHeader(const string &genomeFile, RefVector &refs, string &header,
                    map<string, int, std::less<string> > &chromToId) {
 
     // make a genome map of the genome file.
@@ -333,7 +328,7 @@ void MakeBamHeader(const string &genomeFile, RefVector &refs, string &header,
 
 /* Taken directly from the SAMTools spec
 calculate bin given an alignment in [beg,end) (zero-based, half-close, half-open) */
-int reg2bin(int beg, int end) {
+int bedpetobam_reg2bin(int beg, int end) {
     --end;
     if (beg>>14 == end>>14) return ((1<<15)-1)/7 + (beg>>14);
     if (beg>>17 == end>>17) return ((1<<12)-1)/7 + (beg>>17);

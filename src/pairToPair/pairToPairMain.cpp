@@ -15,15 +15,15 @@
 using namespace std;
 
 // define our program name
-#define PROGRAM_NAME "pairToPair"
+#define PROGRAM_NAME "bedtools pairtopair"
 
 // define our parameter checking macro
 #define PARAMETER_CHECK(param, paramLen, actualLen) (strncmp(argv[i], param, min(actualLen, paramLen))== 0) && (actualLen == paramLen)
 
 // function declarations
-void ShowHelp(void);
+void pairtopair_help(void);
 
-int main(int argc, char* argv[]) {
+int pairtopair_main(int argc, char* argv[]) {
 
     // our configuration variables
     bool showHelp = false;
@@ -58,7 +58,7 @@ int main(int argc, char* argv[]) {
         }
     }
 
-    if(showHelp) ShowHelp();
+    if(showHelp) pairtopair_help();
 
     // do some parsing (all of these parameters require 2 strings)
     for(int i = 1; i < argc; i++) {
@@ -140,16 +140,16 @@ int main(int argc, char* argv[]) {
         return 0;
     }
     else {
-        ShowHelp();
+        pairtopair_help();
     }
+    return 0;
 }
 
 
-void ShowHelp(void) {
-    cerr << endl << "Program: " << PROGRAM_NAME << " (v" << VERSION << ")" << endl;
+void pairtopair_help(void) {
 
-    cerr << "Author:  Aaron Quinlan (aaronquinlan@gmail.com)" << endl;
-
+    cerr << "\nTool:    bedtools pairtopair (aka pairToPair)" << endl;
+    
     cerr << "Summary: Report overlaps between two paired-end BED files (BEDPE)." << endl << endl;
 
     cerr << "Usage:   " << PROGRAM_NAME << " [OPTIONS] -a <BEDPE> -b <BEDPE>" << endl << endl;
@@ -162,13 +162,14 @@ void ShowHelp(void) {
     cerr                                << "\t\tneither\tReport overlaps if neither end of A overlaps B." << endl;
     cerr                                << "\t\teither\tReport overlaps if either ends of A overlap B." << endl;
     cerr                                << "\t\tboth\tReport overlaps if both ends of A overlap B." << endl;
-    cerr                                << "\t\tnotboth\tReport overlaps if one or neither of ends of A overlap B." << endl;
+    cerr                                << "\t\tnotboth\tReport overlaps if one or neither of A's overlap B." << endl;
     
     cerr                                << "\t\t- Default = both." << endl << endl;
 
     cerr << "\t-slop \t"                << "The amount of slop (in b.p.). to be added to each footprint." << endl;
-    cerr                                << "\t\t*Note*: Slop is subtracted from start1 and start2 and added to end1 and end2." << endl << endl;
-
+    cerr                                << "\t\t*Note*: Slop is subtracted from start1 and start2" << endl;
+    cerr                                << "\t\t\tand added to end1 and end2." << endl << endl;
+    
     cerr << "\t-ss\t"                   << "Add slop based to each BEDPE footprint based on strand." << endl;
     cerr                                << "\t\t- If strand is \"+\", slop is only added to the end coordinates." << endl;
     cerr                                << "\t\t- If strand is \"-\", slop is only added to the start coordinates." << endl;

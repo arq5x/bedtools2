@@ -29,22 +29,22 @@ using namespace std;
 
 
 // define our program name
-#define PROGRAM_NAME "bedToBam"
+#define PROGRAM_NAME "bedtools bedtobam"
 
 // define our parameter checking macro
 #define PARAMETER_CHECK(param, paramLen, actualLen) (strncmp(argv[i], param, min(actualLen, paramLen))== 0) && (actualLen == paramLen)
 
 
 // function declarations
-void ShowHelp(void);
+void bedtobam_help(void);
 void ProcessBed(BedFile *bed, GenomeFile *genome, bool isBED12, int mapQual, bool uncompressedBam);
 void ConvertBedToBam(const BED &bed, BamAlignment &bam, map<string, int> &chromToId, bool isBED12, int mapQual, int lineNum);
 void MakeBamHeader(const string &genomeFile, RefVector &refs, string &header, map<string, int> &chromToInt);
-int  reg2bin(int beg, int end);
+int  bedtobam_reg2bin(int beg, int end);
 
 
 
-int main(int argc, char* argv[]) {
+int bedtobam_main(int argc, char* argv[]) {
 
     // our configuration variables
     bool showHelp = false;
@@ -70,7 +70,7 @@ int main(int argc, char* argv[]) {
         }
     }
 
-    if(showHelp) ShowHelp();
+    if(showHelp) bedtobam_help();
 
     // do some parsing (all of these parameters require 2 strings)
     for(int i = 1; i < argc; i++) {
@@ -131,16 +131,15 @@ int main(int argc, char* argv[]) {
         ProcessBed(bed, genome, isBED12, mapQual, uncompressedBam);
     }
     else {
-        ShowHelp();
+        bedtobam_help();
     }
+    return 0;
 }
 
 
-void ShowHelp(void) {
-
-    cerr << endl << "Program: " << PROGRAM_NAME << " (v" << VERSION << ")" << endl;
-
-    cerr << "Author:  Aaron Quinlan (aaronquinlan@gmail.com)" << endl;
+void bedtobam_help(void) {
+    
+    cerr << "\nTool:    bedtools bedtobam (aka bedToBam)" << endl;
 
     cerr << "Summary: Converts feature records to BAM format." << endl << endl;
 
@@ -154,10 +153,10 @@ void ShowHelp(void) {
     cerr << "\t-bed12\t"    << "The BED file is in BED12 format.  The BAM CIGAR" << endl;
     cerr                    << "\t\tstring will reflect BED \"blocks\"." << endl << endl;
 
-    cerr << "\t-ubam\t"     << "Write uncompressed BAM output. Default is to write compressed BAM." << endl << endl;
+    cerr << "\t-ubam\t"     << "Write uncompressed BAM output. Default writes compressed BAM." << endl << endl;
 
     cerr << "Notes: " << endl;
-    cerr << "\t(1)  BED files must be at least BED4 to be amenable to BAM (needs name field)." << endl << endl;
+    cerr << "\t(1)  BED files must be at least BED4 to create BAM (needs name field)." << endl << endl;
 
 
     // end the program here
@@ -211,7 +210,7 @@ void ConvertBedToBam(const BED &bed, BamAlignment &bam, map<string, int, std::le
 
     bam.Name       = bed.name;
     bam.Position   = bed.start;
-    bam.Bin        = reg2bin(bed.start, bed.end);
+    bam.Bin        = bedtobam_reg2bin(bed.start, bed.end);
 
     // hard-code the sequence and qualities.
     int bedLength  = bed.end - bed.start;
@@ -341,7 +340,7 @@ void MakeBamHeader(const string &genomeFile, RefVector &refs, string &header,
 
 /* Taken directly from the SAMTools spec
 calculate bin given an alignment in [beg,end) (zero-based, half-close, half-open) */
-int reg2bin(int beg, int end) {
+int bedtobam_reg2bin(int beg, int end) {
     --end;
     if (beg>>14 == end>>14) return ((1<<15)-1)/7 + (beg>>14);
     if (beg>>17 == end>>17) return ((1<<12)-1)/7 + (beg>>17);

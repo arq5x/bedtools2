@@ -15,16 +15,16 @@
 using namespace std;
 
 // define our program name
-#define PROGRAM_NAME "maskFastaFromBed"
+#define PROGRAM_NAME "bedtools maskfasta"
 
 
 // define our parameter checking macro
 #define PARAMETER_CHECK(param, paramLen, actualLen) (strncmp(argv[i], param, min(actualLen, paramLen))== 0) && (actualLen == paramLen)
 
 // function declarations
-void ShowHelp(void);
+void maskfastafrombed_help(void);
 
-int main(int argc, char* argv[]) {
+int maskfastafrombed_main(int argc, char* argv[]) {
 
     // our configuration variables
     bool showHelp = false;
@@ -55,7 +55,7 @@ int main(int argc, char* argv[]) {
         }
     }
 
-    if(showHelp) ShowHelp();
+    if(showHelp) maskfastafrombed_help();
 
     // do some parsing (all of these parameters require 2 strings)
     for(int i = 1; i < argc; i++) {
@@ -113,24 +113,20 @@ int main(int argc, char* argv[]) {
 
         MaskFastaFromBed *maskFasta = new MaskFastaFromBed(fastaInFile, bedFile, fastaOutFile, softMask, maskChar);
         delete maskFasta;
-        return 0;
     }
     else {
-        ShowHelp();
+        maskfastafrombed_help();
     }
+    return 0;
 }
 
-void ShowHelp(void) {
+void maskfastafrombed_help(void) {
 
-
-
-    cerr << endl << "Program: " << PROGRAM_NAME << " (v" << VERSION << ")" << endl;
-
-    cerr << "Author:  Aaron Quinlan (aaronquinlan@gmail.com)" << endl;
-
+    cerr << "\nTool:    bedtools maskfasta (aka maskFastaFromBed)" << endl;
+    
     cerr << "Summary: Mask a fasta file based on feature coordinates." << endl << endl;
 
-    cerr << "Usage:   " << PROGRAM_NAME << " [OPTIONS] -fi <fasta> -out <fasta> -bed <bed/gff/vcf>" << endl << endl;
+    cerr << "Usage:   " << PROGRAM_NAME << " [OPTIONS] -fi <fasta> -fo <fasta> -bed <bed/gff/vcf>" << endl << endl;
 
     cerr << "Options:" << endl;
     cerr << "\t-fi\tInput FASTA file" << endl;
@@ -138,8 +134,8 @@ void ShowHelp(void) {
     cerr << "\t-fo\tOutput FASTA file" << endl;
     cerr << "\t-soft\tEnforce \"soft\" masking.  That is, instead of masking with Ns," << endl;
     cerr << "\t\tmask with lower-case bases." << endl;
-    cerr << "\t-mc\tReplace masking character.  That is, instead of masking with Ns, use another character." << endl;
-
+    cerr << "\t-mc\tReplace masking character.  That is, instead of masking" << endl;
+    cerr << "\t\twith Ns, use another character." << endl << endl;
     // end the program here
     exit(1);
 

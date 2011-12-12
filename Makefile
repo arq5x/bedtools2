@@ -61,6 +61,19 @@ UTIL_SUBDIRS =	$(SRC_DIR)/utils/lineFileUtilities \
 				$(SRC_DIR)/utils/genomeFile
 
 BUILT_OBJECTS = $(OBJ_DIR)/*.o
+# BUILT_OBJECTS = $(OBJ_DIR)/bedtools.o \
+# 				$(OBJ_DIR)/BamAncillary.o \
+#                 $(OBJ_DIR)/Fasta.o \
+#                 $(OBJ_DIR)/bedFile.o \
+#                 $(OBJ_DIR)/bedFilePE.o \
+#                 $(OBJ_DIR)/bedGraphFile.o \
+#                 $(OBJ_DIR)/chromsweep.o \
+#                 $(OBJ_DIR)/fileType.o \
+#                 $(OBJ_DIR)/gzstream.o \
+#                 $(OBJ_DIR)/sequenceUtils.o \
+#                 $(OBJ_DIR)/split.o \
+#                 $(OBJ_DIR)/intersectBed.o \
+#                 $(OBJ_DIR)/intersectMain.o \
 
 all:
 	[ -d $(OBJ_DIR) ] || mkdir -p $(OBJ_DIR)
@@ -82,6 +95,7 @@ all:
 	done
 
 	@echo "- Building main bedtools binary."
+	gcc $(CXXFLAGS) -c src/bedtools.cpp -o obj/bedtools.o
 	@$(CXX) $(LDFLAGS) $(CXXFLAGS) -o $(BIN_DIR)/bedtools $(BUILT_OBJECTS) -L$(UTIL_DIR)/BamTools/lib/ -lbamtools $(LIBS)
 	
 

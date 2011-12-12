@@ -28,11 +28,11 @@ using namespace std;
 
 
 // function declarations
-void ShowHelp(void);
+void getoverlap_help(void);
 void DetermineInput(string &inFile, short &s1Col, short &e1Col, short &s2Col, short &e2Col);
 void ComputeOverlaps(istream &input, short &s1Col, short &e1Col, short &s2Col, short &e2Col);
 
-int main(int argc, char* argv[]) {
+int getoverlap_main(int argc, char* argv[]) {
 
     // input files
     string inFile = "stdin";
@@ -53,7 +53,7 @@ int main(int argc, char* argv[]) {
         }
     }
 
-    if(showHelp) ShowHelp();
+    if(showHelp) getoverlap_help();
 
     // do some parsing (all of these parameters require 2 strings)
     for(int i = 1; i < argc; i++) {
@@ -92,7 +92,7 @@ int main(int argc, char* argv[]) {
 
         if (posColumns.size() != 4) {
             cerr << endl << "*****" << endl << "*****ERROR: Please specify 4, comma-separated position columns. " << endl << "*****" << endl;
-            ShowHelp();
+            getoverlap_help();
         }
         else {
             short s1, e1, s2, e2;
@@ -105,16 +105,15 @@ int main(int argc, char* argv[]) {
         }
     }
     else {
-        ShowHelp();
+        getoverlap_help();
     }
+    return 0;
 }
 
-void ShowHelp(void) {
+void getoverlap_help(void) {
 
-    cerr << endl << "Program: " << PROGRAM_NAME << " (v" << VERSION << ")" << endl;
-
-    cerr << "Author:  Aaron Quinlan (aaronquinlan@gmail.com)" << endl;
-
+    cerr << "\nTool:    bedtools overlap (aka getOverlap)" << endl;
+    
     cerr << "Summary: Computes the amount of overlap (positive values)" << endl;
     cerr << "\t or distance (negative values) between genome features" << endl;
     cerr << "\t and reports the result at the end of the same line." << endl << endl;

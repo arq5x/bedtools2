@@ -1,0 +1,44 @@
+Public Member Functions	BamAlignment (void)	constructor	BamAlignment (const BamAlignment &other)	copy constructor	~BamAlignment (void)	destructor
+bool 	IsDuplicate (void) const
+bool 	IsFailedQC (void) const
+bool 	IsFirstMate (void) const
+bool 	IsMapped (void) const
+bool 	IsMateMapped (void) const
+bool 	IsMateReverseStrand (void) const
+bool 	IsPaired (void) const
+bool 	IsPrimaryAlignment (void) const
+bool 	IsProperPair (void) const
+bool 	IsReverseStrand (void) const
+bool 	IsSecondMate (void) const
+void 	SetIsDuplicate (bool ok)	Sets value of "PCR duplicate" flag to ok.
+void 	SetIsFailedQC (bool ok)	Sets "failed quality control" flag to ok.
+void 	SetIsFirstMate (bool ok)	Sets "alignment is first mate" flag to ok.
+void 	SetIsMapped (bool ok)	Sets "alignment is mapped" flag to ok.
+void 	SetIsMateMapped (bool ok)	Sets "alignment's mate is mapped" flag to ok.
+void 	SetIsMateReverseStrand (bool ok)	Sets "alignment's mate mapped to reverse strand" flag to ok.
+void 	SetIsPaired (bool ok)	Sets "alignment part of paired-end read" flag to ok.
+void 	SetIsPrimaryAlignment (bool ok)	Sets "position is primary alignment" flag to ok.
+void 	SetIsProperPair (bool ok)	Sets "alignment is part of read that satisfied paired-end resolution" flag to ok.
+void 	SetIsReverseStrand (bool ok)	Sets "alignment mapped to reverse strand" flag to ok.
+void 	SetIsSecondMate (bool ok)	Sets "alignment is second mate on read" flag to ok.
+void 	SetIsMateUnmapped (bool ok)	Complement of using SetIsMateMapped().
+void 	SetIsSecondaryAlignment (bool ok)	Complement of using SetIsPrimaryAlignment().
+void 	SetIsUnmapped (bool ok)	Complement of using SetIsMapped().
+bool 	AddTag (const std::string &tag, const std::string &type, const std::string &value)	Adds a field with string data to the BAM tags.
+bool 	AddTag (const std::string &tag, const std::string &type, const uint32_t &value)	Adds a field with unsigned integer data to the BAM tags.
+bool 	AddTag (const std::string &tag, const std::string &type, const int32_t &value)	Adds a field with signed integer data to the BAM tags.
+bool 	AddTag (const std::string &tag, const std::string &type, const float &value)	Adds a field with floating-point data to the BAM tags.
+bool 	EditTag (const std::string &tag, const std::string &type, const std::string &value)	Edits a BAM tag field containing string data.
+bool 	EditTag (const std::string &tag, const std::string &type, const uint32_t &value)	Edits a BAM tag field containing unsigned integer data.
+bool 	EditTag (const std::string &tag, const std::string &type, const int32_t &value)	Edits a BAM tag field containing signed integer data.
+bool 	EditTag (const std::string &tag, const std::string &type, const float &value)	Edits a BAM tag field containing floating-point data.
+bool 	GetTag (const std::string &tag, std::string &destination) const	Retrieves the string value associated with a BAM tag.
+bool 	GetTag (const std::string &tag, uint32_t &destination) const	Retrieves the unsigned integer value associated with a BAM tag.
+bool 	GetTag (const std::string &tag, int32_t &destination) const	Retrieves the signed integer value associated with a BAM tag.
+bool 	GetTag (const std::string &tag, float &destination) const	Retrieves the floating-point value associated with a BAM tag.
+bool 	GetTagType (const std::string &tag, char &type) const	Retrieves the BAM tag type-code associated with requested tag name.
+bool 	GetEditDistance (uint32_t &editDistance) const 	Retrieves value of edit distance tag ("NM").
+bool 	GetReadGroup (std::string &readGroup) const 	Retrieves value of read group tag ("RG").
+bool 	RemoveTag (const std::string &tag) 	Removes field from BAM tags.
+bool 	BuildCharData (void) 	Populates alignment string fields (read name, bases, qualities, tag data).
+int 	GetEndPosition (bool usePadded=false, bool zeroBased=true) const 	Calculates alignment end position, based on starting position and CIGAR data.

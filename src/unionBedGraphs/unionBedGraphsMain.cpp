@@ -26,7 +26,7 @@
 using namespace std;
 
 // define our program name
-#define PROGRAM_NAME "unionBedGraphs"
+#define PROGRAM_NAME "bedtools unionbedg"
 
 // define our parameter checking macro
 #define PARAMETER_CHECK(param, paramLen, actualLen) (strncmp(argv[i], param, min(actualLen, paramLen))== 0) && (actualLen == paramLen)
@@ -34,14 +34,14 @@ using namespace std;
 //STLized version of basename()
 // (because POSIX basename() modifies the input string pointer)
 // Additionally: removes any extension the basename might have.
-std::string stl_basename(const std::string& path);
+std::string ubg_stl_basename(const std::string& path);
 
 // function declarations
-void ShowHelp(void);
-void ShowExamples(void);
+void unionbedgraphs_help(void);
+void unionbedgraphs_showexamples(void);
 
 
-int main(int argc, char* argv[])
+int unionbedgraphs_main(int argc, char* argv[])
 {
     bool haveFiles         = false;
     bool haveTitles        = false;
@@ -58,7 +58,7 @@ int main(int argc, char* argv[])
 
     //Parse command line options
     if(argc <= 1)
-        ShowHelp();
+        unionbedgraphs_help();
 
     for(int i = 1; i < argc; i++) {
         int parameterLength = (int)strlen(argv[i]);
@@ -70,7 +70,7 @@ int main(int argc, char* argv[])
     }
 
     if(showHelp == true) {
-        ShowHelp();
+        unionbedgraphs_help();
         exit(1);
     }
 
@@ -128,8 +128,8 @@ int main(int argc, char* argv[])
             printEmptyRegions = true;
         }
         else if(PARAMETER_CHECK("-examples", 9, parameterLength)) {
-            ShowHelp();
-            ShowExamples();
+            unionbedgraphs_help();
+            unionbedgraphs_showexamples();
             exit(1);
         }
     }
@@ -156,15 +156,14 @@ int main(int argc, char* argv[])
     if (printHeader)
         ubg.PrintHeader();
     ubg.Union();
+    
+    return 0;
 }
 
-void ShowHelp(void) {
+void unionbedgraphs_help(void) {
 
-    cerr << endl << "Program: " << PROGRAM_NAME << " (v" << VERSION << ")" << endl;
-
-    cerr << "Authors: Assaf Gordon, CSHL" << endl;
-    cerr << "         Aaron Quinlan (aaronquinlan@gmail.com)" << endl << endl;
-
+    cerr << "\nTool:    bedtools unionbedg (aka unionBedGraphs)" << endl;
+    
     cerr << "Summary: Combines multiple BedGraph files into a single file," << endl;
     cerr << "\t allowing coverage comparisons between them." << endl << endl;
 
@@ -177,7 +176,7 @@ void ShowHelp(void) {
     cerr << "\t-header\t\t"     << "Print a header line." << endl;
     cerr                        << "\t\t\t(chrom/start/end + names of each file)." << endl << endl;
 
-    cerr << "\t-names\t\t"      << "A list of names (one / file) to describe each file in -i." << endl;
+    cerr << "\t-names\t\t"      << "A list of names (one/file) to describe each file in -i." << endl;
     cerr                        << "\t\t\tThese names will be printed in the header line." << endl << endl;
 
     cerr << "\t-g\t\t"          << "Use genome file to calculate empty regions." << endl;
@@ -188,14 +187,14 @@ void ShowHelp(void) {
     cerr                        << "\t\t\t- Requires the '-g FILE' parameter.\n" << endl;
 
     cerr << "\t-filler TEXT\t"  << "Use TEXT when representing intervals having no value." << endl;
-    cerr                        << "\t\t\t- Default is '0', but you can use 'N/A' or any other text." << endl << endl;
+    cerr                        << "\t\t\t- Default is '0', but you can use 'N/A' or any text." << endl << endl;
 
     cerr << "\t-examples\t"     << "Show detailed usage examples." << endl << endl;
 }
 
 
 
-void ShowExamples()
+void unionbedgraphs_showexamples()
 {
     cerr << "Example usage:\n\n"  \
 "== Input files: ==\n" \
@@ -276,7 +275,7 @@ void ShowExamples()
 ;
 }
 
-std::string stl_basename(const std::string& path)
+std::string ubg_stl_basename(const std::string& path)
 {
     string result;
 

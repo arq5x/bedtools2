@@ -15,16 +15,16 @@
 using namespace std;
 
 // define our program name
-#define PROGRAM_NAME "subtractBed"
+#define PROGRAM_NAME "bedtools subtract"
 
 
 // define our parameter checking macro
 #define PARAMETER_CHECK(param, paramLen, actualLen) (strncmp(argv[i], param, min(actualLen, paramLen))== 0) && (actualLen == paramLen)
 
 // function declarations
-void ShowHelp(void);
+void subtract_help(void);
 
-int main(int argc, char* argv[]) {
+int subtract_main(int argc, char* argv[]) {
 
     // our configuration variables
     bool showHelp = false;
@@ -54,7 +54,7 @@ int main(int argc, char* argv[]) {
         }
     }
 
-    if(showHelp) ShowHelp();
+    if(showHelp) subtract_help();
 
     // do some parsing (all of these parameters require 2 strings)
     for(int i = 1; i < argc; i++) {
@@ -112,16 +112,15 @@ int main(int argc, char* argv[]) {
         return 0;
     }
     else {
-        ShowHelp();
+        subtract_help();
     }
+    return 0;
 }
 
-void ShowHelp(void) {
+void subtract_help(void) {
 
-    cerr << endl << "Program: " << PROGRAM_NAME << " (v" << VERSION << ")" << endl;
-
-    cerr << "Author:  Aaron Quinlan (aaronquinlan@gmail.com)" << endl;
-
+    cerr << "\nTool:    bedtools subtract (aka subtractBed)" << endl;
+    
     cerr << "Summary: Removes the portion(s) of an interval that is overlapped" << endl;
     cerr << "\t by another feature(s)." << endl << endl;
 
@@ -132,8 +131,8 @@ void ShowHelp(void) {
     cerr                        << "\t\t- Default is 1E-9 (i.e., 1bp)." << endl;
     cerr                        << "\t\t- (FLOAT) (e.g. 0.50)" << endl << endl;
 
-    cerr << "\t-s\t"            << "Require same strandedness.  That is, only subtract hits in B that" << endl;
-    cerr                        << "\t\toverlap A on the _same_ strand." << endl;
+    cerr << "\t-s\t"            << "Require same strandedness.  That is, only subtract hits in B" << endl;
+    cerr                        << "\t\tthat overlap A on the _same_ strand." << endl;
     cerr                        << "\t\t- By default, overlaps are subtracted without respect to strand." << endl << endl;
 
     cerr << "\t-S\t"            << "Force strandedness.  That is, only subtract hits in B that" << endl;

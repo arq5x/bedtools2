@@ -15,16 +15,16 @@
 using namespace std;
 
 // define our program name
-#define PROGRAM_NAME "mergeBed"
+#define PROGRAM_NAME "bedtools merge"
 
 
 // define our parameter checking macro
 #define PARAMETER_CHECK(param, paramLen, actualLen) (strncmp(argv[i], param, min(actualLen, paramLen))== 0) && (actualLen == paramLen)
 
 // function declarations
-void ShowHelp(void);
+void merge_help(void);
 
-int main(int argc, char* argv[]) {
+int merge_main(int argc, char* argv[]) {
 
     // our configuration variables
     bool showHelp = false;
@@ -51,7 +51,7 @@ int main(int argc, char* argv[]) {
         }
     }
 
-    if(showHelp) ShowHelp();
+    if(showHelp) merge_help();
 
     // do some parsing (all of these parameters require 2 strings)
     for(int i = 1; i < argc; i++) {
@@ -112,19 +112,17 @@ int main(int argc, char* argv[]) {
     if (!showHelp) {
         BedMerge *bm = new BedMerge(bedFile, numEntries, maxDistance, forceStrand, reportNames, reportScores, scoreOp);
         delete bm;
-        return 0;
     }
     else {
-        ShowHelp();
+        merge_help();
     }
+    return 0;
 }
 
-void ShowHelp(void) {
-
-    cerr << endl << "Program: " << PROGRAM_NAME << " (v" << VERSION << ")" << endl;
-
-    cerr << "Author:  Aaron Quinlan (aaronquinlan@gmail.com)" << endl;
-
+void merge_help(void) {
+    
+    cerr << "\nTool:    bedtools merge (aka mergeBed)" << endl;
+        
     cerr << "Summary: Merges overlapping BED/GFF/VCF entries into a single interval." << endl << endl;
 
     cerr << "Usage:   " << PROGRAM_NAME << " [OPTIONS] -i <bed/gff/vcf>" << endl << endl;

@@ -15,15 +15,15 @@
 using namespace std;
 
 // define the version
-#define PROGRAM_NAME "coverageBed"
+#define PROGRAM_NAME "bedtools coverage"
 
 // define our parameter checking macro
 #define PARAMETER_CHECK(param, paramLen, actualLen) (strncmp(argv[i], param, min(actualLen, paramLen))== 0) && (actualLen == paramLen)
 
 // function declarations
-void ShowHelp(void);
+void coverage_help(void);
 
-int main(int argc, char* argv[]) {
+int coverage_main(int argc, char* argv[]) {
 
     // our configuration variables
     bool showHelp = false;
@@ -55,7 +55,7 @@ int main(int argc, char* argv[]) {
         }
     }
 
-    if(showHelp) ShowHelp();
+    if(showHelp) coverage_help();
 
     // do some parsing (all of these parameters require 2 strings)
     for(int i = 1; i < argc; i++) {
@@ -123,19 +123,17 @@ int main(int argc, char* argv[]) {
         BedCoverage *bg = new BedCoverage(bedAFile, bedBFile, sameStrand, diffStrand,
                                           writeHistogram, bamInput, obeySplits, eachBase, countsOnly);
         delete bg;
-        return 0;
     }
     else {
-        ShowHelp();
+        coverage_help();
     }
+    return 0;
 }
 
-void ShowHelp(void) {
+void coverage_help(void) {
 
-    cerr << endl << "Program: " << PROGRAM_NAME << " (v" << VERSION << ")" << endl;
-
-    cerr << "Author:  Aaron Quinlan (aaronquinlan@gmail.com)" << endl;
-
+    cerr << "\nTool:    bedtools coverage (aka coverageBed)" << endl;
+    
     cerr << "Summary: Returns the depth and breadth of coverage of features from A" << endl;
     cerr << "\t on the intervals in B." << endl << endl;
 
@@ -149,8 +147,8 @@ void ShowHelp(void) {
     cerr                        << "\t\toverlap B on the _same_ strand." << endl;
     cerr                        << "\t\t- By default, overlaps are counted without respect to strand." << endl << endl;
 
-    cerr << "\t-S\t"            << "Require different strandedness.  That is, only report hits in A that" << endl;
-    cerr                        << "\t\toverlap B on the _opposite_ strand." << endl;
+    cerr << "\t-S\t"            << "Require different strandedness.  That is, only report hits in A" << endl;
+    cerr                        << "\t\tthat overlap B on the _opposite_ strand." << endl;
     cerr                        << "\t\t- By default, overlaps are counted without respect to strand." << endl << endl;
 
     cerr << "\t-hist\t"         << "Report a histogram of coverage for each feature in B" << endl;

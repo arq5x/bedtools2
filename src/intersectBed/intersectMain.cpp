@@ -224,15 +224,14 @@ int intersect_main(int argc, char* argv[]) {
     }
     else {
         intersect_help();
+        return 0;
     }
 }
 
 void intersect_help(void) {
 
-    cerr << endl << "Program: " << PROGRAM_NAME << " (v" << VERSION << ")" << endl;
-
-    cerr << "Author:  Aaron Quinlan (aaronquinlan@gmail.com)" << endl;
-
+    cerr << "\nTool:    bedtools intersect (aka intersectBed)" << endl;
+    
     cerr << "Summary: Report overlaps between two feature files." << endl << endl;
 
     cerr << "Usage:   " << PROGRAM_NAME << " [OPTIONS] -a <bed/gff/vcf> -b <bed/gff/vcf>" << endl << endl;
@@ -241,7 +240,7 @@ void intersect_help(void) {
 
     cerr << "\t-abam\t"         << "The A input file is in BAM format.  Output will be BAM as well." << endl << endl;
 
-    cerr << "\t-ubam\t"         << "Write uncompressed BAM output. Default is to write compressed BAM." << endl << endl;
+    cerr << "\t-ubam\t"         << "Write uncompressed BAM output. Default writes compressed BAM." << endl << endl;
 
     cerr << "\t-bed\t"          << "When using BAM input (-abam), write output as BED. The default" << endl;
     cerr                        << "\t\tis to write output in BAM when using -abam." << endl << endl;
@@ -281,18 +280,17 @@ void intersect_help(void) {
     cerr                        << "\t\t- In other words, if -f is 0.90 and -r is used, this requires" << endl;
     cerr                        << "\t\t  that B overlap 90% of A and A _also_ overlaps 90% of B." << endl << endl;
 
-    cerr << "\t-s\t"            << "Require same strandedness.  That is, only report hits in B that" << endl;
-    cerr                        << "\t\toverlap A on the _same_ strand." << endl;
+    cerr << "\t-s\t"            << "Require same strandedness.  That is, only report hits in B" << endl;
+    cerr                        << "\t\tthat overlap A on the _same_ strand." << endl;
     cerr                        << "\t\t- By default, overlaps are reported without respect to strand." << endl << endl;
 
-    cerr << "\t-S\t"            << "Require different strandedness.  That is, only report hits in B that" << endl;
-    cerr                        << "\t\toverlap A on the _opposite_ strand." << endl;
+    cerr << "\t-S\t"            << "Require different strandedness.  That is, only report hits in B" << endl;
+    cerr                        << "\t\tthat overlap A on the _opposite_ strand." << endl;
     cerr                        << "\t\t- By default, overlaps are reported without respect to strand." << endl << endl;
 
     cerr << "\t-split\t"        << "Treat \"split\" BAM or BED12 entries as distinct BED intervals." << endl << endl;
 
-    cerr << "\t-sorted\t"       << "Use the \"chromsweep\" algorithm for sorted (-k1,1 -k2,2n) input" << endl;
-    cerr                        << "\t\tNOTE: this will trust, but not enforce that data is sorted. Caveat emptor." << endl << endl;
+    cerr << "\t-sorted\t"       << "Use the \"chromsweep\" algorithm for sorted (-k1,1 -k2,2n) input" << endl << endl;
     
     cerr << "\t-header\t"       << "Print the header from the A file prior to results." << endl << endl;
  

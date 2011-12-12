@@ -15,16 +15,16 @@
 using namespace std;
 
 // define our program name
-#define PROGRAM_NAME "multiBamCov"
+#define PROGRAM_NAME "bedtools multicov"
 
 
 // define our parameter checking macro
 #define PARAMETER_CHECK(param, paramLen, actualLen) (strncmp(argv[i], param, min(actualLen, paramLen))== 0) && (actualLen == paramLen)
 
 // function declarations
-void ShowHelp(void);
+void multibamcov_help(void);
 
-int main(int argc, char* argv[]) {
+int multibamcov_main(int argc, char* argv[]) {
 
     // our configuration variables
     bool showHelp = false;
@@ -53,7 +53,7 @@ int main(int argc, char* argv[]) {
         }
     }
 
-    if(showHelp) ShowHelp();
+    if(showHelp) multibamcov_help();
 
     // do some parsing (all of these parameters require 2 strings)
     for(int i = 1; i < argc; i++) {
@@ -107,19 +107,17 @@ int main(int argc, char* argv[]) {
         MultiCovBam *mc = new MultiCovBam(bamFiles, bedFile, minQual, properOnly, keepDuplicates, keepFailedQC);
         mc->CollectCoverage();
         delete mc;
-        return 0;
     }
     else {
-        ShowHelp();
+        multibamcov_help();
     }
+    return 0;
 }
 
-void ShowHelp(void) {
+void multibamcov_help(void) {
 
-    cerr << endl << "Program: " << PROGRAM_NAME << " (v" << VERSION << ")" << endl;
-
-    cerr << "Author:  Aaron Quinlan (aaronquinlan@gmail.com)" << endl;
-
+    cerr << "\nTool:    bedtools multicov (aka multiBamCov)" << endl;
+    
     cerr << "Summary: Counts sequence coverage for multiple bams at specific loci." << endl << endl;
 
     cerr << "Usage:   " << PROGRAM_NAME << " [OPTIONS] -bams aln.1.bam aln.2.bam ... aln.n.bam -bed <bed/gff/vcf>" << endl << endl;
@@ -132,12 +130,12 @@ void ShowHelp(void) {
 
     cerr << "\t-q\t"           << "Minimum mapping quality allowed. Default is 0." << endl << endl;
 
-    cerr << "\t-D\t"           << "Include duplicate-marked reads.  Default is to count non-duplicates only" << endl << endl;
+    cerr << "\t-D\t"           << "Include duplicate reads.  Default counts non-duplicates only" << endl << endl;
 
-    cerr << "\t-F\t"           << "Include failed-QC reads.  Default is to count pass-QC reads only" << endl << endl;
+    cerr << "\t-F\t"           << "Include failed-QC reads.  Default counts pass-QC reads only" << endl << endl;
 
-    cerr << "\t-p\t"           << "Only count proper pairs.  Default is to count all alignments with MAPQ" << endl;
-    cerr << "\t\t"             << "greater than the -q argument, regardless of the BAM FLAG field." << endl << endl;
+    cerr << "\t-p\t"           << "Only count proper pairs.  Default counts all alignments with" << endl;
+    cerr << "\t\t"             << "MAPQ > -q argument, regardless of the BAM FLAG field." << endl << endl;
 
     // end the program here
     exit(1);

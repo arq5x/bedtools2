@@ -15,15 +15,15 @@
 using namespace std;
 
 // define our program name
-#define PROGRAM_NAME "closestBed"
+#define PROGRAM_NAME "bedtools closest"
 
 // define our parameter checking macro
 #define PARAMETER_CHECK(param, paramLen, actualLen) (strncmp(argv[i], param, min(actualLen, paramLen))== 0) && (actualLen == paramLen)
 
 // function declarations
-void ShowHelp(void);
+void closest_help(void);
 
-int main(int argc, char* argv[]) {
+int closest_main(int argc, char* argv[]) {
 
     // our configuration variables
     bool showHelp = false;
@@ -58,7 +58,7 @@ int main(int argc, char* argv[]) {
         }
     }
 
-    if(showHelp) ShowHelp();
+    if(showHelp) closest_help();
 
     // do some parsing (all of these parameters require 2 strings)
     for(int i = 1; i < argc; i++) {
@@ -144,19 +144,16 @@ int main(int argc, char* argv[]) {
                                         diffStrand, tieMode, reportDistance, 
                                         signDistance, strandedDistMode, ignoreOverlaps, printHeader);
         delete bc;
-        return 0;
     }
     else {
-        ShowHelp();
+        closest_help();
     }
+    return 0;
 }
 
-void ShowHelp(void) {
-
-    cerr << endl << "Program: " << PROGRAM_NAME << " (v" << VERSION << ")" << endl;
-
-    cerr << "Authors: Aaron Quinlan (aaronquinlan@gmail.com)" << endl;
-    cerr       << "\t Erik Arner, Riken" << endl << endl;
+void closest_help(void) {
+    
+    cerr << "\nTool:    bedtools closest (aka closestBed)" << endl;
 
     cerr << "Summary: For each feature in A, finds the closest " << endl;
     cerr << "\t feature (upstream or downstream) in B." << endl << endl;
@@ -164,12 +161,12 @@ void ShowHelp(void) {
     cerr << "Usage:   " << PROGRAM_NAME << " [OPTIONS] -a <bed/gff/vcf> -b <bed/gff/vcf>" << endl << endl;
 
     cerr << "Options: " << endl;
-    cerr << "\t-s\t"            << "Require same strandedness.  That is, find the closest feature in B" << endl;
-    cerr                        << "\t\tthat overlaps A on the _same_ strand." << endl;
+    cerr << "\t-s\t"            << "Req. same strandedness.  That is, find the closest feature in" << endl;
+    cerr                        << "\t\tB that overlaps A on the _same_ strand." << endl;
     cerr                        << "\t\t- By default, overlaps are reported without respect to strand." << endl << endl;
 
-    cerr << "\t-S\t"            << "Require opposite strandedness.  That is, find the closest feature in B" << endl;
-    cerr                        << "\t\tthat overlaps A on the _opposite_ strand." << endl;
+    cerr << "\t-S\t"            << "Req. opposite strandedness.  That is, find the closest feature" << endl;
+    cerr                        << "\t\tin B that overlaps A on the _opposite_ strand." << endl;
     cerr                        << "\t\t- By default, overlaps are reported without respect to strand." << endl << endl;
 
     cerr << "\t-d\t"            << "In addition to the closest feature in B, " << endl;
@@ -178,17 +175,19 @@ void ShowHelp(void) {
     
     cerr << "\t-D\t"            << "Like -d, report the closest feature in B, and its distance to A" << endl;
     cerr                        << "\t\tas an extra column. Unlike -d, use negative distances to report" << endl;
-    cerr                        << "\t\tupstream features. You must specify which orientation defines \"upstream\"." << endl;
-    cerr                        << "\t\tThe options are:" << endl;
+    cerr                        << "\t\tupstream features." << endl;
+    cerr                        << "\t\tThe options for defining which orientation is \"upstream\" are:" << endl;
     cerr                        << "\t\t- \"ref\"   Report distance with respect to the reference genome. " << endl;
     cerr                        << "\t\t            B features with a lower (start, stop) are upstream" << endl;
     cerr                        << "\t\t- \"a\"     Report distance with respect to A." << endl;
-    cerr                        << "\t\t            When A is on the - strand, \"upstream\" means B has a higher (start,stop)." << endl;
+    cerr                        << "\t\t            When A is on the - strand, \"upstream\" means B has a" << endl;
+    cerr                        << "\t\t            higher (start,stop)." << endl;    
     cerr                        << "\t\t- \"b\"     Report distance with respect to B." << endl;
-    cerr                        << "\t\t            When B is on the - strand, \"upstream\" means A has a higher (start,stop)." << endl << endl;
+    cerr                        << "\t\t            When B is on the - strand, \"upstream\" means A has a" << endl;
+    cerr                        << "\t\t            higher (start,stop)." << endl << endl;
 
-    cerr << "\t-io\t"           << "Ignore features in B that overlap A.  That is, we want close, but " << endl;
-    cerr                        << "\t\tnot touching features only." << endl << endl;
+    cerr << "\t-io\t"           << "Ignore features in B that overlap A.  That is, we want close," << endl;
+    cerr                        << "\t\tyet not touching features only." << endl << endl;
 
     cerr << "\t-t\t"            << "How ties for closest feature are handled.  This occurs when two" << endl;
     cerr                        << "\t\tfeatures in B have exactly the same \"closeness\" with A." << endl;
