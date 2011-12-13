@@ -1,12 +1,17 @@
 /*****************************************************************************
   bedtools.cpp
 
-  (c) 2009 - Aaron Quinlan
-  Hall Laboratory
-  Department of Biochemistry and Molecular Genetics
+  bedtools command line interface.  
+  Thanks to Heng Li, as this interface is inspired and 
+  based upon his samtools interface.
+
+  (c) 2009-2011 - Aaron Quinlan
+  Quinlan Laboratory
+  Department of Public Health Sciences
+  Center for Public Health genomics
   University of Virginia
   aaronquinlan@gmail.com
-
+  
   Licenced under the GNU General Public License 2.0 license.
 ******************************************************************************/
 #include <iostream>
@@ -61,11 +66,6 @@ int window_main(int argc, char* argv[]); //
 int bedtools_help(void);
 int bedtools_faq(void);
 
-/*
-  bedtools command line interface.  
-  Thanks to Heng Li, as this interface is inspired and 
-  based upon his samtools interface.
-*/
 
 int main(int argc, char *argv[])
 {
