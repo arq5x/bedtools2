@@ -16,7 +16,6 @@
 
 using namespace std;
 
-
 // define our program name
 #define PROGRAM_NAME "bedtools"
 
@@ -63,8 +62,8 @@ int bedtools_faq(void);
 
 /*
   bedtools command line interface.  
-  
-  Thanks to Heng Li, as this interface is inspired and based upon his samtools interface.
+  Thanks to Heng Li, as this interface is inspired and 
+  based upon his samtools interface.
 */
 
 int main(int argc, char *argv[])
@@ -72,56 +71,59 @@ int main(int argc, char *argv[])
     // make sure the user at least entered a sub_command
     if (argc < 2) return bedtools_help();
 
+    std::string sub_cmd = argv[1];
+
     // genome arithmetic tools
-    if (strcmp(argv[1], "intersect") == 0)        return intersect_main(argc-1, argv+1);
-    else if (strcmp(argv[1], "window") == 0)      return window_main(argc-1, argv+1);
-    else if (strcmp(argv[1], "closest") == 0)     return closest_main(argc-1, argv+1);
-    else if (strcmp(argv[1], "coverage") == 0)    return coverage_main(argc-1, argv+1);
-    else if (strcmp(argv[1], "genomecov") == 0)   return genomecoverage_main(argc-1, argv+1);
-    else if (strcmp(argv[1], "merge") == 0)       return merge_main(argc-1, argv+1);
-    else if (strcmp(argv[1], "complement") == 0)  return complement_main(argc-1, argv+1);
-    else if (strcmp(argv[1], "subtract") == 0)    return subtract_main(argc-1, argv+1);
-    else if (strcmp(argv[1], "slop") == 0)        return slop_main(argc-1, argv+1);
-    else if (strcmp(argv[1], "flank") == 0)       return flank_main(argc-1, argv+1);
-    else if (strcmp(argv[1], "sort") == 0)        return sort_main(argc-1, argv+1);
-    else if (strcmp(argv[1], "shuffle") == 0)     return shuffle_main(argc-1, argv+1);
-    else if (strcmp(argv[1], "annotate") == 0)    return annotate_main(argc-1, argv+1);
+    if (sub_cmd == "intersect")        return intersect_main(argc-1, argv+1);
+    else if (sub_cmd == "window")      return window_main(argc-1, argv+1);
+    else if (sub_cmd == "closest")     return closest_main(argc-1, argv+1);
+    else if (sub_cmd == "coverage")    return coverage_main(argc-1, argv+1);
+    else if (sub_cmd == "genomecov")   return genomecoverage_main(argc-1, argv+1);
+    else if (sub_cmd == "merge")       return merge_main(argc-1, argv+1);
+    else if (sub_cmd == "complement")  return complement_main(argc-1, argv+1);
+    else if (sub_cmd == "subtract")    return subtract_main(argc-1, argv+1);
+    else if (sub_cmd == "slop")        return slop_main(argc-1, argv+1);
+    else if (sub_cmd == "flank")       return flank_main(argc-1, argv+1);
+    else if (sub_cmd == "sort")        return sort_main(argc-1, argv+1);
+    else if (sub_cmd == "shuffle")     return shuffle_main(argc-1, argv+1);
+    else if (sub_cmd == "annotate")    return annotate_main(argc-1, argv+1);
 
     // Multi-way file comparisonstools
-    else if (strcmp(argv[1], "multiinter") == 0)  return multiintersect_main(argc-1, argv+1);
-    else if (strcmp(argv[1], "unionbedg") == 0)   return unionbedgraphs_main(argc-1, argv+1);
+    else if (sub_cmd == "multiinter")  return multiintersect_main(argc-1, argv+1);
+    else if (sub_cmd == "unionbedg")   return unionbedgraphs_main(argc-1, argv+1);
 
     // paired-end conversion tools
-    else if (strcmp(argv[1], "pairtobed") == 0)   return pairtobed_main(argc-1, argv+1);
-    else if (strcmp(argv[1], "pairtopair") == 0)  return pairtopair_main(argc-1, argv+1);
+    else if (sub_cmd == "pairtobed")   return pairtobed_main(argc-1, argv+1);
+    else if (sub_cmd == "pairtopair")  return pairtopair_main(argc-1, argv+1);
 
     // format conversion tools
-    else if (strcmp(argv[1], "bamtobed") == 0)    return bamtobed_main(argc-1, argv+1);
-    else if (strcmp(argv[1], "bedtobam") == 0)    return bedtobam_main(argc-1, argv+1);
-    else if (strcmp(argv[1], "bedpetobam") == 0)  return bedpetobam_main(argc-1, argv+1);
-    else if (strcmp(argv[1], "bed12tobed6") == 0) return bed12tobed6_main(argc-1, argv+1);
+    else if (sub_cmd == "bamtobed")    return bamtobed_main(argc-1, argv+1);
+    else if (sub_cmd == "bedtobam")    return bedtobam_main(argc-1, argv+1);
+    else if (sub_cmd == "bedpetobam")  return bedpetobam_main(argc-1, argv+1);
+    else if (sub_cmd == "bed12tobed6") return bed12tobed6_main(argc-1, argv+1);
 
     // BAM-specific tools
-    else if (strcmp(argv[1], "multicov") == 0)    return multibamcov_main(argc-1, argv+1);
-    else if (strcmp(argv[1], "tag") == 0)         return tagbam_main(argc-1, argv+1);    
+    else if (sub_cmd == "multicov")    return multibamcov_main(argc-1, argv+1);
+    else if (sub_cmd == "tag")         return tagbam_main(argc-1, argv+1);
 
     // fasta tools
-    else if (strcmp(argv[1], "getfasta") == 0)       return fastafrombed_main(argc-1, argv+1);
-    else if (strcmp(argv[1], "maskfasta") == 0)      return maskfastafrombed_main(argc-1, argv+1);
-    else if (strcmp(argv[1], "nuc") == 0)         return nuc_main(argc-1, argv+1);
+    else if (sub_cmd == "getfasta")    return fastafrombed_main(argc-1, argv+1);
+    else if (sub_cmd == "maskfasta")   return maskfastafrombed_main(argc-1, argv+1);
+    else if (sub_cmd == "nuc")         return nuc_main(argc-1, argv+1);
 
     // misc. tools
-    else if (strcmp(argv[1], "overlap") == 0)     return getoverlap_main(argc-1, argv+1);
-    else if (strcmp(argv[1], "igv") == 0)         return bedtoigv_main(argc-1, argv+1);
-    else if (strcmp(argv[1], "links") == 0)       return links_main(argc-1, argv+1);    
+    else if (sub_cmd == "overlap")     return getoverlap_main(argc-1, argv+1);
+    else if (sub_cmd == "igv")         return bedtoigv_main(argc-1, argv+1);
+    else if (sub_cmd == "links")       return links_main(argc-1, argv+1);
 
     // help
-    else if (strcmp(argv[1], "-h") == 0)          return bedtools_help();
-    else if (strcmp(argv[1], "--help") == 0)      return bedtools_help();
+    else if (sub_cmd == "-h")          return bedtools_help();
+    else if (sub_cmd == "--help")      return bedtools_help();
 
-    else if (strcmp(argv[1], "FAQ") == 0)          return bedtools_faq();
+    else if (sub_cmd == "FAQ")         return bedtools_faq();
     // unknown
     else {
+        // TODO: Implement a Levenstein-based "did you mean???"
         cerr << "error: unrecognized command: " << argv[1] << endl << endl;
         return 1;
     }
@@ -190,18 +192,12 @@ int bedtools_help(void)
 int bedtools_faq(void)
 {
     cout << "\n";
-    
+
     cout << "Q1. How do I see the help for a given command?" << endl;
     cout << "A1. All BEDTools commands have a \"-h\" option. Additionally, some tools " << endl;
     cout << "    will provide the help menu if you just type the command line " << endl;
     cout << "    followed by enter. " << endl;
-    
-    cout << "Q2. How do I see the help for a given command?" << endl;
-    cout << "A1. All BEDTools commands have a \"-h\" option. Additionally, some tools " << endl;
-    cout << "    will provide the help menu if you just type the command line " << endl;
-    cout << "    followed by enter. " << endl;
-    
-    
+
     cout << "\n";
     return 1;
 }
