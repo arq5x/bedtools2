@@ -68,6 +68,8 @@ void GenomeFile::loadGenomeFileIntoMap() {
                         int size           = atoi(genomeFields[1].c_str());
                         _chromSizes[chrom] = size;
                         _chromList.push_back(chrom);
+                        _startOffsets.push_back(_genomeLength);
+                        _genomeLength += size;
                     }
                 }
                 else {
@@ -81,13 +83,30 @@ void GenomeFile::loadGenomeFileIntoMap() {
     }
 }
 
-
-int GenomeFile::getChromSize(const string &chrom) {
+pair<string, uint32_t> GenomeFile::projectOnGenome(uint32_t genome_pos) {
+    // search for the chrom that the position belongs on.
+    // add 1 to genome position b/c of zero-based, half open.
+    vector<uint32_t>::const_iterator low =
+        lower_bound(_startOffsets.begin(), _startOffsets.end(), genome_pos + 1);
+    
+    // use the iterator to identify the appropriate index 
+    // into the chrom name and start vectors
+    int i = int(low-_startOffsets.begin());
+    string chrom = _chromList[i - 1];
+    uint32_t start = genome_pos - _startOffsets[i - 1];
+    return make_pair(chrom, start);
+}
+    
+uint32_t GenomeFile::getChromSize(const string &chrom) {
     chromToSizes::const_iterator chromIt = _chromSizes.find(chrom);
     if (chromIt != _chromSizes.end())
         return _chromSizes[chrom];
     else
         return -1;  // chrom not found.
+}
+
+uint32_t GenomeFile::getGenomeSize(void) {
+    return _genomeLength;
 }
 
 vector<string> GenomeFile::getChromList() {

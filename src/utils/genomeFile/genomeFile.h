@@ -45,11 +45,15 @@ public:
 
     // load a GENOME file into a map keyed by chrom. value is size of chrom.
     void loadGenomeFileIntoMap();
+    
+    pair<string, uint32_t> projectOnGenome(uint32_t genome_pos);
+    
+    uint32_t getChromSize(const string &chrom);     // return the size of a chromosome
+    uint32_t getGenomeSize(void);              // return the total size of the geonome
+    vector<string> getChromList();             // return a list of chrom names
+    int getNumberOfChroms();                   // return the number of chroms
+    string getGenomeFileName();                // return the name of the genome file
 
-    int getChromSize(const string &chrom);  // return the size of a chromosome
-    vector<string> getChromList();          // return a list of chrom names
-    int getNumberOfChroms();                // return the number of chroms
-    string getGenomeFileName();             // return the name of the genome file
 
 
 
@@ -57,6 +61,11 @@ private:
     string  _genomeFile;
     chromToSizes _chromSizes;
     vector<string> _chromList;
+
+    // projecting chroms into a single coordinate system
+    uint32_t _genomeLength;
+    vector<uint32_t> _startOffsets;
+    
 };
 
 #endif /* GENOMEFILE_H */

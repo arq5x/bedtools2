@@ -42,6 +42,7 @@ int shuffle_main(int argc, char* argv[]) {
     float overlapFraction = 0.0;
     int seed              = -1;
     bool sameChrom        = false;
+    bool chooseChrom      = false;
 
 
     for(int i = 1; i < argc; i++) {
@@ -97,6 +98,9 @@ int shuffle_main(int argc, char* argv[]) {
         else if(PARAMETER_CHECK("-chrom", 6, parameterLength)) {
             sameChrom = true;
         }
+        else if(PARAMETER_CHECK("-chromFirst", 11, parameterLength)) {
+            chooseChrom = true;
+        }
         else if(PARAMETER_CHECK("-f", 2, parameterLength)) {
             if ((i+1) < argc) {
                 overlapFraction = atof(argv[i + 1]);
@@ -119,11 +123,16 @@ int shuffle_main(int argc, char* argv[]) {
       cerr << endl << "*****" << endl << "*****ERROR: Cannot use -incl and -excl together." << endl << "*****" << endl;
       showHelp = true;
     }
+    
+    if (sameChrom && !chooseChrom) {
+        cerr << endl << "*****" << endl << "*****ERROR: Must use -chromThenStart with -chrom" << endl << "*****" << endl;
+        showHelp = true;
+    }
 
     if (!showHelp) {
         BedShuffle *bc = new BedShuffle(bedFile, genomeFile, excludeFile, includeFile, 
                                         haveSeed, haveExclude, haveInclude, sameChrom, 
-                                        overlapFraction, seed);
+                                        overlapFraction, seed, chooseChrom);
         delete bc;
         return 0;
     }
@@ -147,10 +156,12 @@ void shuffle_help(void) {
 
     cerr << "\t-incl\t"             << "Instead of randomly placing features in a genome, the -incl" << endl;
     cerr                            << "\t\toptions defines a BED/GFF/VCF file of coordinates in which " << endl;
-    cerr                            << "\t\tfeatures in -i should be randomly placed (e.g. genes.bed). " << endl << endl;
-
+    cerr                            << "\t\tfeatures in -i should be randomly placed (e.g. genes.bed). " << endl;
+    cerr                            << "\t\t- NOTE: must use with -chromThenStart." << endl << endl;
+    
     cerr << "\t-chrom\t"            << "Keep features in -i on the same chromosome."<< endl;
-    cerr                            << "\t\t- By default, the chrom and position are randomly chosen." << endl << endl;
+    cerr                            << "\t\t- By default, the chrom and position are randomly chosen." << endl;
+    cerr                            << "\t\t- NOTE: must use with -chromThenStart." << endl << endl;
 
     cerr << "\t-seed\t"             << "Supply an integer seed for the shuffling." << endl;
     cerr                            << "\t\t- By default, the seed is chosen automatically." << endl;
@@ -163,6 +174,11 @@ void shuffle_help(void) {
     cerr                            << "\t\tin the -excl file. **Cannot be used with -incl file.**" << endl;
     cerr                            << "\t\t- Default is 1E-9 (i.e., 1bp)." << endl;
     cerr                            << "\t\t- FLOAT (e.g. 0.50)" << endl << endl;
+
+    cerr << "\t-chromFirst\t"       << "\n\t\tInstead of choosing a position randomly among the entire" << endl;
+    cerr                            << "\t\tgenome, first choose a chrom randomly, and then" << endl;
+    cerr                            << "\t\tchoose a random start coordinate on that chrom." << endl << endl;
+
 
     cerr << "Notes: " << endl;
     cerr << "\t(1)  The genome file should tab delimited and structured as follows:" << endl;

@@ -21,6 +21,7 @@
 #include <sys/time.h>
 #include <unistd.h>
 #include <sys/types.h>
+#include <algorithm>  // for binary search
 using namespace std;
 
 const int MAX_TRIES = 1000000;
@@ -35,7 +36,7 @@ public:
     // constructor
     BedShuffle(string &bedFile, string &genomeFile, string &excludeFile, string &includeFile, 
                            bool haveSeed, bool haveExclude, bool haveInclude, bool sameChrom, 
-                           float overlapFraction, int seed);
+                           float overlapFraction, int seed, bool chooseChrom);
 
     // destructor
     ~BedShuffle(void);
@@ -52,6 +53,7 @@ private:
     bool _haveExclude;
     bool _haveInclude;
     bool _haveSeed;
+    bool _chooseChrom;
 
 
     // The BED file from which to compute coverage.
@@ -65,6 +67,7 @@ private:
     int _numChroms;
     vector<string> _includeChroms;
     int _numIncludeChroms;
+    uint32_t _genomeSize;
 
     // methods
     void Shuffle();

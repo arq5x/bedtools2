@@ -15,7 +15,7 @@
 
 BedShuffle::BedShuffle(string &bedFile, string &genomeFile, string &excludeFile, string &includeFile, 
                        bool haveSeed, bool haveExclude, bool haveInclude, bool sameChrom, 
-                       float overlapFraction, int seed) {
+                       float overlapFraction, int seed, bool chooseChrom) {
 
     _bedFile         = bedFile;
     _genomeFile      = genomeFile;
@@ -26,6 +26,7 @@ BedShuffle::BedShuffle(string &bedFile, string &genomeFile, string &excludeFile,
     _haveInclude     = haveInclude;
     _overlapFraction = overlapFraction;
     _haveSeed        = haveSeed;
+    _chooseChrom     = chooseChrom;
 
 
     // use the supplied seed for the random
@@ -45,6 +46,7 @@ BedShuffle::BedShuffle(string &bedFile, string &genomeFile, string &excludeFile,
     _genome      = new GenomeFile(genomeFile);
     _chroms      = _genome->getChromList();
     _numChroms   = _genome->getNumberOfChroms();
+    _genomeSize  = _genome->getGenomeSize();
 
     if (_haveExclude) {
         _exclude = new BedFile(excludeFile);
@@ -146,48 +148,55 @@ void BedShuffle::ShuffleWithInclusions() {
 
 void BedShuffle::ChooseLocus(BED &bedEntry) {
 
-    string chrom = bedEntry.chrom;
+    string randomChrom;
+    CHRPOS randomStart;
+    CHRPOS chromSize;
+    string chrom    = bedEntry.chrom;
     CHRPOS start    = bedEntry.start;
     CHRPOS end      = bedEntry.end;
     CHRPOS length   = end - start;
 
-    string randomChrom;
-    CHRPOS randomStart;
-    CHRPOS chromSize;
-
-    if (_sameChrom == false) {
-        randomChrom    = _chroms[rand() % _numChroms];
-        chromSize      = _genome->getChromSize(randomChrom);
-        randomStart    = rand() % chromSize;
-        bedEntry.chrom = randomChrom;
-        bedEntry.start = randomStart;
-        bedEntry.end   = randomStart + length;
+    // choose a position randomly among the _entire_ genome.
+    if (_chooseChrom == false) 
+    {
+        do 
+        {
+            // we need to combine two consective calls to rand()
+            // because RAND_MAX is 2^31 (2147483648), whereas
+            // mammalian genomes are obviously much larger.
+            uint32_t randStart = ((rand() << 31) | rand()) % _genomeSize;
+            // use the above randomStart (e.g., for human 0..3.1billion) 
+            // to identify the chrom and start on that chrom.
+            pair<string, int> location = _genome->projectOnGenome(randStart);
+            bedEntry.chrom = location.first;
+            bedEntry.start = location.second;
+            bedEntry.end   = bedEntry.start + length;
+            chromSize      = _genome->getChromSize(location.first);
+        } while (bedEntry.end > chromSize);
+        // keep looking if we have exceeded the end of the chrom.
     }
-    else {
-        chromSize      = _genome->getChromSize(chrom);
-        randomStart    = rand() % chromSize;
-        bedEntry.start = randomStart;
-        bedEntry.end   = randomStart + length;
-    }
-
-    // ensure that the chosen location doesn't go past
-    // the length of the chromosome. if so, keep looking
-    // for a new spot.
-    while (bedEntry.end > chromSize) {
-        if (_sameChrom == false) {
-            randomChrom    = _chroms[rand() % _numChroms];
-            chromSize      = _genome->getChromSize(randomChrom);
-            randomStart    = rand() % chromSize;
-            bedEntry.chrom = randomChrom;
-            bedEntry.start = randomStart;
-            bedEntry.end   = randomStart + length;
-        }
-        else {
-            chromSize      = _genome->getChromSize(chrom);
-            randomStart    = rand() % chromSize;
-            bedEntry.start = randomStart;
-            bedEntry.end   = randomStart + length;
-        }
+    // OLD, quite arguably flawed, method.
+    // 1. Choose a chrom randomly (i.e., not weighted by size)
+    // 2. Choose a position on that chrom randomly
+    else 
+    {
+        do 
+        {
+            if (_sameChrom == false) {
+                randomChrom    = _chroms[rand() % _numChroms];
+                chromSize      = _genome->getChromSize(randomChrom);
+                randomStart    = rand() % chromSize;
+                bedEntry.chrom = randomChrom;
+                bedEntry.start = randomStart;
+                bedEntry.end   = randomStart + length;
+            }
+            else {
+                chromSize      = _genome->getChromSize(chrom);
+                randomStart    = rand() % chromSize;
+                bedEntry.start = randomStart;
+                bedEntry.end   = randomStart + length;
+            }
+        } while (bedEntry.end > chromSize);
     }
 }
 
@@ -212,7 +221,7 @@ void BedShuffle::ChooseLocusFromInclusionFile(BED &bedEntry) {
         // retreive a ranom -incl interval on the selected chrom
         includeInterval        = _include->bedMapNoBin[randomChrom][interval];
 
-        bedEntry.chrom = randomChrom;        
+        bedEntry.chrom = randomChrom;
     }
     else {
         // get the number of inclusion intervals for the original chrom
