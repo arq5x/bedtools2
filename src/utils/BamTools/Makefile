@@ -8,10 +8,6 @@ INCLUDES = -Isrc/ -Iinclude/
 # define our source and object files
 # ----------------------------------
 
-# ----------------------------------
-# define our source and object files
-# ----------------------------------
-
 SOURCES= src/api/BamAlignment.cpp \
          src/api/BamMultiReader.cpp \
          src/api/BamReader.cpp \
@@ -50,9 +46,7 @@ SOURCES= src/api/BamAlignment.cpp \
          src/api/internal/sam/SamFormatPrinter_p.cpp \
          src/api/internal/sam/SamHeaderValidator_p.cpp \
          src/api/internal/utils/BamException_p.cpp
-# ----------------------------------
-# define our source and object files
-# ----------------------------------
+
 OBJECTS= $(SOURCES:.cpp=.o)
 LIBRARY=libbamtools.a
 
