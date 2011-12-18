@@ -84,6 +84,7 @@ int shuffle_main(int argc, char* argv[]) {
         else if(PARAMETER_CHECK("-incl", 5, parameterLength)) {
             if ((i+1) < argc) {
                 haveInclude = true;
+                chooseChrom = true;
                 includeFile = argv[i + 1];
                 i++;
             }
@@ -96,6 +97,7 @@ int shuffle_main(int argc, char* argv[]) {
             }
         }
         else if(PARAMETER_CHECK("-chrom", 6, parameterLength)) {
+            chooseChrom = true;
             sameChrom = true;
         }
         else if(PARAMETER_CHECK("-chromFirst", 11, parameterLength)) {
@@ -122,11 +124,6 @@ int shuffle_main(int argc, char* argv[]) {
     if (haveInclude && haveExclude) {
       cerr << endl << "*****" << endl << "*****ERROR: Cannot use -incl and -excl together." << endl << "*****" << endl;
       showHelp = true;
-    }
-    
-    if (sameChrom && !chooseChrom) {
-        cerr << endl << "*****" << endl << "*****ERROR: Must use -chromThenStart with -chrom" << endl << "*****" << endl;
-        showHelp = true;
     }
 
     if (!showHelp) {
@@ -157,11 +154,11 @@ void shuffle_help(void) {
     cerr << "\t-incl\t"             << "Instead of randomly placing features in a genome, the -incl" << endl;
     cerr                            << "\t\toptions defines a BED/GFF/VCF file of coordinates in which " << endl;
     cerr                            << "\t\tfeatures in -i should be randomly placed (e.g. genes.bed). " << endl;
-    cerr                            << "\t\t- NOTE: must use with -chromThenStart." << endl << endl;
+    cerr                            << "\t\t- NOTE: Forces use of -chromFirst (see below)." << endl << endl;
     
     cerr << "\t-chrom\t"            << "Keep features in -i on the same chromosome."<< endl;
     cerr                            << "\t\t- By default, the chrom and position are randomly chosen." << endl;
-    cerr                            << "\t\t- NOTE: must use with -chromThenStart." << endl << endl;
+    cerr                            << "\t\t- NOTE: Forces use of -chromFirst (see below)." << endl << endl;
 
     cerr << "\t-seed\t"             << "Supply an integer seed for the shuffling." << endl;
     cerr                            << "\t\t- By default, the seed is chosen automatically." << endl;
@@ -176,8 +173,10 @@ void shuffle_help(void) {
     cerr                            << "\t\t- FLOAT (e.g. 0.50)" << endl << endl;
 
     cerr << "\t-chromFirst\t"       << "\n\t\tInstead of choosing a position randomly among the entire" << endl;
-    cerr                            << "\t\tgenome, first choose a chrom randomly, and then" << endl;
-    cerr                            << "\t\tchoose a random start coordinate on that chrom." << endl << endl;
+    cerr                            << "\t\tgenome (the default), first choose a chrom randomly, and then" << endl;
+    cerr                            << "\t\tchoose a random start coordinate on that chrom.  This leads" << endl; 
+    cerr                            << "\t\tto features being ~uniformly distributed among the chroms," << endl; 
+    cerr                            << "\t\tas opposed to features being distribute as a function of chrom size." << endl << endl; 
 
 
     cerr << "Notes: " << endl;
