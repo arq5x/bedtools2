@@ -100,7 +100,7 @@ CHRPOS UnionBedGraphs::ConsumeNextCoordinate() {
 
     CHRPOS new_position = queue.top().coord;
     do {
-        IntervalItem item = queue.top();
+        PointWithDepth item = queue.top();
         UpdateInformation(item);
         queue.pop();
     } while (!queue.empty() && queue.top().coord == new_position);
@@ -109,7 +109,7 @@ CHRPOS UnionBedGraphs::ConsumeNextCoordinate() {
 }
 
 
-void UnionBedGraphs::UpdateInformation(const IntervalItem &item) {
+void UnionBedGraphs::UpdateInformation(const PointWithDepth &item) {
     // Update the depth coverage for this file
 
     // Which coordinate is it - start or end?
@@ -179,7 +179,6 @@ void UnionBedGraphs::LoadNextBedgraphItem(int index) {
     while ( (status = file->GetNextBedGraph(bg, lineNum)) != BEDGRAPH_INVALID )  {
         if (status != BEDGRAPH_VALID)
             continue;
-
         current_bedgraph_item[index] = bg;
         break;
     }
@@ -223,8 +222,8 @@ void UnionBedGraphs::AddInterval(int index) {
 
     const BEDGRAPH_STR &bg(current_bedgraph_item[index]);
 
-    IntervalItem start_item(index, START, bg.start, bg.depth);
-    IntervalItem end_item(index, END, bg.end, bg.depth);
+    PointWithDepth start_item(index, START, bg.start, bg.depth);
+    PointWithDepth end_item(index, END, bg.end, bg.depth);
 
     queue.push(start_item);
     queue.push(end_item);

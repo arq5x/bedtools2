@@ -18,7 +18,7 @@
 #include <string>
 #include "bedFile.h"
 #include "genomeFile.h"
-#include "intervalItem.h"
+#include "Point.h"
 
 class MultiIntersectBed
 {
@@ -33,7 +33,7 @@ private:
 
     std::ostream    &output;
 
-    INTERVALS_PRIORITY_QUEUE queue;
+    POINT_PQUEUE queue;
     std::string              current_chrom;
     map<int, bool>           files_with_coverage;
     int                      current_non_zero_inputs;

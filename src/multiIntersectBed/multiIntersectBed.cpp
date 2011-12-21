@@ -71,8 +71,8 @@ void MultiIntersectBed::AddInterval(int index) {
 
     const BED &bed(current_item[index]);
 
-    IntervalItem start_item(index, START, bed.start);
-    IntervalItem end_item(index, END, bed.end);
+    Point start_item(index, START, bed.start);
+    Point end_item(index, END, bed.end);
 
     queue.push(start_item);
     queue.push(end_item);
@@ -216,7 +216,7 @@ void MultiIntersectBed::MultiIntersect() {
         LoadNextItem(i);
 
     // Chromosome loop - once per chromosome
-    IntervalItem curr_point;
+    Point curr_point;
     do {
         // Find the first chromosome to use
         current_chrom = DetermineNextChrom();
@@ -268,7 +268,7 @@ void MultiIntersectBed::Cluster() {
         LoadNextItem(i);
 
     // Chromosome loop - once per chromosome
-    IntervalItem curr_point;
+    Point curr_point;
     short last_direction = 0;
     do {
         // Find the first chromosome to use

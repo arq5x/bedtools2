@@ -17,7 +17,7 @@
 #include <string>
 #include "bedGraphFile.h"
 #include "genomeFile.h"
-#include "intervalItem.h"
+#include "Point.h"
 
 class UnionBedGraphs
 {
@@ -33,7 +33,7 @@ private:
 
     std::ostream    &output;
 
-    INTERVALS_PRIORITY_QUEUE queue;
+    POINTWITHDEPTH_PQUEUE queue;
     std::string              current_chrom;
     int                      current_non_zero_inputs;
     bool                     print_empty_regions;
@@ -104,7 +104,7 @@ private:
        Updates the coverage information based on the given item.
        Item can be a START coordinate or an END coordiante.
      */
-    void UpdateInformation(const IntervalItem &item);
+    void UpdateInformation(const PointWithDepth &item);
 
     /*
        prints chrom/start/end and the current depth coverage values of all the files.

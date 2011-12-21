@@ -10,6 +10,7 @@ INCLUDES = -I$(UTILITIES_DIR)/bedFile/ \
 	   -I$(UTILITIES_DIR)/genomeFile/ \
 	   -I$(UTILITIES_DIR)/gzstream/ \
 	   -I$(UTILITIES_DIR)/fileType/ \
+	   -I$(UTILITIES_DIR)/Point/ \
 	   -I$(UTILITIES_DIR)/BamTools/include
 
 # ----------------------------------
