@@ -520,7 +520,11 @@ private:
             return BED_BLANK;
         }
         // bail out if we have a comment line
-        if (lineVector[0].find("#") == 0) {
+        if ( (lineVector[0].find("#")       == 0) ||
+             (lineVector[0].find("browser") == 0) ||
+             (lineVector[0].find("track")   == 0) 
+           )
+        {
             return BED_HEADER;
         }
 

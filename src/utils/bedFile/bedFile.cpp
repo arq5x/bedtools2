@@ -191,10 +191,9 @@ void BedFile::GetHeader(void) {
         _lineNum++;
         // look for header lines.  ^# headers can span multiple lines, 
         // but ^[browser|track|chrom] headers must occur on the 1st line.
-        if ( (_bedLine.find("#")        == 0) ||
-             ((_bedLine.find("browser") == 0) && (_lineNum == 1)) ||
-             ((_bedLine.find("track")   == 0) && (_lineNum == 1)) ||
-             ((_bedLine.find("chrom")   == 0) && (_lineNum == 1)) 
+        if ( (_bedLine.find("#")       == 0) ||
+             (_bedLine.find("browser") == 0) ||
+             (_bedLine.find("track")   == 0) 
            )
         {
             _header += _bedLine + '\n';
