@@ -215,6 +215,14 @@ FastaIndexEntry FastaIndex::entry(string name) {
     }
 }
 
+bool FastaIndex::chromFound(string name) {
+    FastaIndex::iterator e = this->find(name);
+    if (e == this->end()) {
+        return false;
+    }
+    return true;
+}
+
 string FastaIndex::indexFileExtension() { return ".fai"; }
 
 void FastaReference::open(string reffilename, bool usemmap) {
@@ -319,7 +327,11 @@ string FastaReference::getSubSequence(string seqname, int start, int length) {
 }
 
 long unsigned int FastaReference::sequenceLength(string seqname) {
-    FastaIndexEntry entry = index->entry(seqname);
-    return entry.length;
+    if (index->chromFound(seqname)) {
+        FastaIndexEntry entry = index->entry(seqname);
+        return entry.length;
+    }
+    // 0 length means the chrom wasn't found
+    return 0;
 }
 

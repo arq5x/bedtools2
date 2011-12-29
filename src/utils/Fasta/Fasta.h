@@ -51,6 +51,7 @@ class FastaIndex : public map<string, FastaIndexEntry> {
         void writeIndexFile(string fname);
         ifstream indexFile;
         FastaIndexEntry entry(string key);
+        bool chromFound(string name);
         void flushEntryToIndex(FastaIndexEntry& entry);
         string indexFileExtension(void);
 };
