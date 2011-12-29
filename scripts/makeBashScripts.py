@@ -37,7 +37,8 @@ def main():
                  'subtract': 'subtractBed', 
                  'tag': 'tagBam', 
                  'unionbedg': 'unionBedGraphs', 
-                 'window': 'windowBed'}
+                 'window': 'windowBed',
+                 'makewindows': 'windowMaker'}
 
     # create a BASH script for each old tool, mapping to the new CLI command.
     for tool in tool_map:

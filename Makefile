@@ -44,7 +44,8 @@ SUBDIRS = $(SRC_DIR)/annotateBed \
 		  $(SRC_DIR)/subtractBed \
 		  $(SRC_DIR)/tagBam \
 		  $(SRC_DIR)/unionBedGraphs \
-		  $(SRC_DIR)/windowBed
+		  $(SRC_DIR)/windowBed \
+		  $(SRC_DIR)/windowMaker
 
 UTIL_SUBDIRS =	$(SRC_DIR)/utils/lineFileUtilities \
 				$(SRC_DIR)/utils/bedFile \

@@ -63,6 +63,7 @@ int subtract_main(int argc, char* argv[]); //
 int tagbam_main(int argc, char* argv[]);//
 int unionbedgraphs_main(int argc, char* argv[]);//
 int window_main(int argc, char* argv[]); //
+int windowmaker_main(int argc, char* argv[]); //
 int bedtools_help(void);
 int bedtools_faq(void);
 
@@ -116,6 +117,7 @@ int main(int argc, char *argv[])
     else if (sub_cmd == "overlap")     return getoverlap_main(argc-1, argv+1);
     else if (sub_cmd == "igv")         return bedtoigv_main(argc-1, argv+1);
     else if (sub_cmd == "links")       return links_main(argc-1, argv+1);
+    else if (sub_cmd == "makewindows") return windowmaker_main(argc-1, argv+1);
 
     // help
     else if (sub_cmd == "-h" || sub_cmd == "--help" ||
@@ -134,14 +136,16 @@ int main(int argc, char *argv[])
     // verison information
     else if (sub_cmd == "-contact" || sub_cmd == "--contact")
     {
-        cout << "For further help, please email the bedtools mailing list: " << endl;
-        cout << "bedtools-discuss@googlegroups.com" << endl << endl;
+        cout << endl;
+        cout << "- For further help, or to report a bug, please " << endl;
+        cout << "  email the bedtools mailing list: " << endl;
+        cout << "     bedtools-discuss@googlegroups.com" << endl << endl;
 
-        cout << "Stable releases of bedtools can be found at: " << endl;
-        cout << "http://bedtools.googlecode.com" << endl << endl;
+        cout << "- Stable releases of bedtools can be found at: " << endl;
+        cout << "     http://bedtools.googlecode.com" << endl << endl;
 
-        cout << "The development repository can be found at: " << endl;
-        cout << "https://github.com/arq5x/bedtools" << endl << endl;
+        cout << "- The development repository can be found at: " << endl;
+        cout << "     https://github.com/arq5x/bedtools" << endl << endl;
     }
     // unknown
     else {
@@ -208,11 +212,12 @@ int bedtools_help(void)
     cout  << "    overlap       "  << "Computes the amount of overlap from two intervals.\n"; 
     cout  << "    igv           "  << "Create an IGV snapshot batch script.\n";
     cout  << "    links         "  << "Create a HTML page of links to UCSC locations.\n";
+    cout  << "    makewindows   "  << "Make interval \"windows\" across a genome.\n";
 
     cout  << endl;
     cout  << " -General help:\n";
     cout  << "    --help        "  << "Print this help menu.\n";
-    cout  << "    --faq         "  << "Frequently asked questions.\n";
+    //cout  << "    --faq         "  << "Frequently asked questions.\n";  TODO
     cout  << "    --version     "  << "What version of bedtools are you using?.\n";
     cout  << "    --contact     "  << "Feature requests, bugs, mailing lists, etc.\n";
 
