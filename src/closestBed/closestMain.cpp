@@ -10,6 +10,7 @@
   Licenced under the GNU General Public License 2.0 license.
 ******************************************************************************/
 #include "closestBed.h"
+#include "version.h"
 
 using namespace std;
 
@@ -153,7 +154,7 @@ int closest_main(int argc, char* argv[]) {
 void closest_help(void) {
     
     cerr << "\nTool:    bedtools closest (aka closestBed)" << endl;
-
+    cerr << "Version: " << VERSION << "\n";
     cerr << "Summary: For each feature in A, finds the closest " << endl;
     cerr << "\t feature (upstream or downstream) in B." << endl << endl;
 

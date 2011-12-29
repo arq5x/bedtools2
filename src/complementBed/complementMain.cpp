@@ -10,6 +10,7 @@
   Licenced under the GNU General Public License 2.0 license.
 ******************************************************************************/
 #include "complementBed.h"
+#include "version.h"
 
 using namespace std;
 
@@ -88,7 +89,7 @@ int complement_main(int argc, char* argv[]) {
 void complement_help(void) {
 
     cerr << "\nTool:    bedtools complement (aka complementBed)" << endl;
-    
+    cerr << "Version: " << VERSION << "\n";    
     cerr << "Summary: Returns the base pair complement of a feature file." << endl << endl;
 
     cerr << "Usage:   " << PROGRAM_NAME << " [OPTIONS] -i <bed/gff/vcf> -g <genome>" << endl << endl;

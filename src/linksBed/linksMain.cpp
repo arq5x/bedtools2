@@ -10,6 +10,7 @@
   Licenced under the GNU General Public License 2.0 license.
 ******************************************************************************/
 #include "linksBed.h"
+#include "version.h"
 
 using namespace std;
 
@@ -102,7 +103,7 @@ int links_main(int argc, char* argv[]) {
 void links_help(void) {
 
     cerr << "\nTool:    bedtools links (aka linksBed)" << endl;
-    
+    cerr << "Version: " << VERSION << "\n";    
     cerr << "Summary: Creates HTML links to an UCSC Genome Browser from a feature file." << endl << endl;
     cerr << "Usage:   " << PROGRAM_NAME << " [OPTIONS] -i <bed/gff/vcf> > out.html" << endl << endl;
 

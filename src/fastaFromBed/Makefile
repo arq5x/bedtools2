@@ -12,6 +12,7 @@ INCLUDES = -I$(UTILITIES_DIR)/bedFile/ \
            -I$(UTILITIES_DIR)/sequenceUtilities/ \
            -I$(UTILITIES_DIR)/fileType/ \
            -I$(UTILITIES_DIR)/Fasta/ \
+           -I$(UTILITIES_DIR)/version/
 
 # ----------------------------------
 # define our source and object files

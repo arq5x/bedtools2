@@ -10,6 +10,7 @@
   Licenced under the GNU General Public License 2.0 license.
 ******************************************************************************/
 #include "nucBed.h"
+#include "version.h"
 
 using namespace std;
 
@@ -110,7 +111,7 @@ int nuc_main(int argc, char* argv[]) {
 void nuc_help(void) {
 
     cerr << "\nTool:    bedtools nuc (aka nucBed)" << endl;
-    
+    cerr << "Version: " << VERSION << "\n";    
     cerr << "Summary: Profiles the nucleotide content of intervals in a fasta file." << endl << endl;
 
     cerr << "Usage:   " << PROGRAM_NAME << " [OPTIONS] -fi <fasta> -bed <bed/gff/vcf>" << endl << endl;

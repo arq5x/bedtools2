@@ -10,6 +10,7 @@
   Licenced under the GNU General Public License 2.0 license.
 ******************************************************************************/
 #include "mergeBed.h"
+#include "version.h"
 
 using namespace std;
 
@@ -121,7 +122,7 @@ int merge_main(int argc, char* argv[]) {
 void merge_help(void) {
     
     cerr << "\nTool:    bedtools merge (aka mergeBed)" << endl;
-        
+    cerr << "Version: " << VERSION << "\n";        
     cerr << "Summary: Merges overlapping BED/GFF/VCF entries into a single interval." << endl << endl;
 
     cerr << "Usage:   " << PROGRAM_NAME << " [OPTIONS] -i <bed/gff/vcf>" << endl << endl;

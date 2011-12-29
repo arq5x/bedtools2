@@ -10,6 +10,7 @@
   Licenced under the GNU General Public License 2.0 license.
 ******************************************************************************/
 #include "multiBamCov.h"
+#include "version.h"
 
 using namespace std;
 
@@ -116,7 +117,7 @@ int multibamcov_main(int argc, char* argv[]) {
 void multibamcov_help(void) {
 
     cerr << "\nTool:    bedtools multicov (aka multiBamCov)" << endl;
-    
+    cerr << "Version: " << VERSION << "\n";    
     cerr << "Summary: Counts sequence coverage for multiple bams at specific loci." << endl << endl;
 
     cerr << "Usage:   " << PROGRAM_NAME << " [OPTIONS] -bams aln.1.bam aln.2.bam ... aln.n.bam -bed <bed/gff/vcf>" << endl << endl;

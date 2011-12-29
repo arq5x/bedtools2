@@ -10,6 +10,7 @@
   Licenced under the GNU General Public License 2.0 license.
 ******************************************************************************/
 #include "intersectBed.h"
+#include "version.h"
 
 using namespace std;
 
@@ -230,7 +231,7 @@ int intersect_main(int argc, char* argv[]) {
 void intersect_help(void) {
 
     cerr << "\nTool:    bedtools intersect (aka intersectBed)" << endl;
-    
+    cerr << "Version: " << VERSION << "\n";    
     cerr << "Summary: Report overlaps between two feature files." << endl << endl;
 
     cerr << "Usage:   " << PROGRAM_NAME << " [OPTIONS] -a <bed/gff/vcf> -b <bed/gff/vcf>" << endl << endl;

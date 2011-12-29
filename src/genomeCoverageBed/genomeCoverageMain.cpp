@@ -10,6 +10,7 @@ aaronquinlan@gmail.com
 Licenced under the GNU General Public License 2.0 license.
 ******************************************************************************/
 #include "genomeCoverageBed.h"
+#include "version.h"
 
 using namespace std;
 
@@ -214,7 +215,7 @@ int genomecoverage_main(int argc, char* argv[]) {
 void genomecoverage_help(void) {
 
     cerr << "\nTool:    bedtools genomecov (aka genomeCoverageBed)" << endl;
-    
+    cerr << "Version: " << VERSION << "\n";    
     cerr << "Summary: Compute the coverage of a feature file among a genome." << endl << endl;
 
     cerr << "Usage: " << PROGRAM_NAME << " [OPTIONS] -i <bed/gff/vcf> -g <genome>" << endl << endl;

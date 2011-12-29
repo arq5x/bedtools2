@@ -11,7 +11,8 @@ INCLUDES = -I$(UTILITIES_DIR)/bedGraphFile/ \
 	   -I$(UTILITIES_DIR)/gzstream/ \
 	   -I$(UTILITIES_DIR)/fileType/ \
 	   -I$(UTILITIES_DIR)/Point/ \
-	   -I$(UTILITIES_DIR)/BamTools/include
+	   -I$(UTILITIES_DIR)/BamTools/include \
+	   -I$(UTILITIES_DIR)/version/
 
 # ----------------------------------
 # define our source and object files

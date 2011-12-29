@@ -10,7 +10,8 @@ INCLUDES = -I$(UTILITIES_DIR)/bedFile/ \
            -I$(UTILITIES_DIR)/lineFileUtilities/ \
            -I$(UTILITIES_DIR)/fileType/ \
            -I$(UTILITIES_DIR)/BamTools/include \
-		   -I$(UTILITIES_DIR)/BamTools-Ancillary
+		   -I$(UTILITIES_DIR)/BamTools-Ancillary \
+		   -I$(UTILITIES_DIR)/version/
 
 
 # ----------------------------------

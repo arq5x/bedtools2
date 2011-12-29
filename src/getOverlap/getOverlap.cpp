@@ -16,6 +16,7 @@
 
 #include "lineFileUtilities.h"
 #include "bedFile.h"
+#include "version.h"
 using namespace std;
 
 
@@ -112,7 +113,7 @@ int getoverlap_main(int argc, char* argv[]) {
 void getoverlap_help(void) {
 
     cerr << "\nTool:    bedtools overlap (aka getOverlap)" << endl;
-    
+    cerr << "Version: " << VERSION << "\n";    
     cerr << "Summary: Computes the amount of overlap (positive values)" << endl;
     cerr << "\t or distance (negative values) between genome features" << endl;
     cerr << "\t and reports the result at the end of the same line." << endl << endl;

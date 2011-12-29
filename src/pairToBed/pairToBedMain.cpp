@@ -10,6 +10,7 @@
   Licenced under the GNU General Public License 2.0 license.
 ******************************************************************************/
 #include "pairToBed.h"
+#include "version.h"
 
 using namespace std;
 
@@ -170,7 +171,7 @@ int pairtobed_main(int argc, char* argv[]) {
 void pairtobed_help(void) {
     
     cerr << "\nTool:    bedtools pairtobed (aka pairToBed)" << endl;
-    
+    cerr << "Version: " << VERSION << "\n";    
     cerr << "Summary: Report overlaps between a BEDPE file and a BED/GFF/VCF file." << endl << endl;
 
     cerr << "Usage:   " << PROGRAM_NAME << " [OPTIONS] -a <bedpe> -b <bed/gff/vcf>" << endl << endl;

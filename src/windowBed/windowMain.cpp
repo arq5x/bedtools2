@@ -10,6 +10,7 @@
   Licenced under the GNU General Public License 2.0 license.
 ******************************************************************************/
 #include "windowBed.h"
+#include "version.h"
 
 using namespace std;
 
@@ -206,7 +207,7 @@ int window_main(int argc, char* argv[]) {
 void window_help(void) {
 
     cerr << "\nTool:    bedtools window (aka windowBed)" << endl;
-    
+    cerr << "Version: " << VERSION << "\n";    
     cerr << "Summary: Examines a \"window\" around each feature in A and" << endl;
     cerr << "\t reports all features in B that overlap the window. For each" << endl;
     cerr << "\t overlap the entire entry in A and B are reported." << endl << endl;

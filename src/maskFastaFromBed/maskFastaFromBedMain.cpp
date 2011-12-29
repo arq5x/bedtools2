@@ -10,6 +10,7 @@
   Licenced under the GNU General Public License 2.0 license.
 ******************************************************************************/
 #include "maskFastaFromBed.h"
+#include "version.h"
 
 using namespace std;
 
@@ -122,7 +123,7 @@ int maskfastafrombed_main(int argc, char* argv[]) {
 void maskfastafrombed_help(void) {
 
     cerr << "\nTool:    bedtools maskfasta (aka maskFastaFromBed)" << endl;
-    
+    cerr << "Version: " << VERSION << "\n";    
     cerr << "Summary: Mask a fasta file based on feature coordinates." << endl << endl;
 
     cerr << "Usage:   " << PROGRAM_NAME << " [OPTIONS] -fi <fasta> -fo <fasta> -bed <bed/gff/vcf>" << endl << endl;

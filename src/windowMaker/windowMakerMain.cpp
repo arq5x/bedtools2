@@ -10,6 +10,7 @@
   Licenced under the GNU General Public License 2.0 license.
 ******************************************************************************/
 #include "windowMaker.h"
+#include "version.h"
 
 using namespace std;
 
@@ -99,7 +100,7 @@ int windowmaker_main(int argc, char* argv[]) {
 void windowmaker_help(void) {
 
     cerr << "\nTool:    bedtools makewindows" << endl;
-    
+    cerr << "Version: " << VERSION << "\n";    
     cerr << "Summary: Makes adjacent and/or sliding windows across a genome." << endl << endl;
 
     cerr << "Usage:   " << PROGRAM_NAME << " [OPTIONS] -g <genome> -w <window_size>" << endl << endl;

@@ -11,7 +11,8 @@ INCLUDES = -I$(UTILITIES_DIR)/bedFilePE/ \
             -I$(UTILITIES_DIR)/gzstream/ \
             -I$(UTILITIES_DIR)/fileType/ \
             -I$(UTILITIES_DIR)/BamTools/include \
-            -I$(UTILITIES_DIR)/BamTools-Ancillary
+            -I$(UTILITIES_DIR)/BamTools-Ancillary \
+            -I$(UTILITIES_DIR)/version/
 
 # ----------------------------------
 # define our source and object files

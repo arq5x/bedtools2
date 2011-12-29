@@ -149,7 +149,7 @@ int pairtopair_main(int argc, char* argv[]) {
 void pairtopair_help(void) {
 
     cerr << "\nTool:    bedtools pairtopair (aka pairToPair)" << endl;
-    
+    cerr << "Version: " << VERSION << "\n";    
     cerr << "Summary: Report overlaps between two paired-end BED files (BEDPE)." << endl << endl;
 
     cerr << "Usage:   " << PROGRAM_NAME << " [OPTIONS] -a <BEDPE> -b <BEDPE>" << endl << endl;

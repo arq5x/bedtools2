@@ -10,6 +10,7 @@
   Licenced under the GNU General Public License 2.0 license.
 ******************************************************************************/
 #include "flankBed.h"
+#include "version.h"
 
 using namespace std;
 
@@ -144,7 +145,7 @@ int flank_main(int argc, char* argv[]) {
 void flank_help(void) {
     
     cerr << "\nTool:    bedtools flank (aka flankBed)" << endl;
-
+    cerr << "Version: " << VERSION << "\n";
     cerr << "Summary: Creates flanking interval(s) for each BED/GFF/VCF feature." << endl << endl;
 
     cerr << "Usage:   " << PROGRAM_NAME << " [OPTIONS] -i <bed/gff/vcf> -g <genome> [-b <int> or (-l and -r)]" << endl << endl;

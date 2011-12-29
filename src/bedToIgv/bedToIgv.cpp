@@ -12,6 +12,7 @@
 #include "lineFileUtilities.h"
 #include "bedFile.h"
 #include "genomeFile.h"
+#include "version.h"
 
 #include <vector>
 #include <iostream>
@@ -147,7 +148,7 @@ int bedtoigv_main(int argc, char* argv[]) {
 void bedtoigv_help(void) {
 
     cerr << "\nTool:    bedtools igv (aka bedToIgv)" << endl;
-
+    cerr << "Version: " << VERSION << "\n";
     cerr << "Summary: Creates a batch script to create IGV images " << endl;
     cerr << "         at each interval defined in a BED/GFF/VCF file." << endl << endl;
 

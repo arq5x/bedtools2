@@ -11,7 +11,7 @@
 ******************************************************************************/
 #include "lineFileUtilities.h"
 #include "bedFile.h"
-
+#include "version.h"
 #include <vector>
 #include <iostream>
 #include <fstream>
@@ -96,7 +96,7 @@ int bed12tobed6_main(int argc, char* argv[]) {
 void bed12tobed6_help(void) {
 
     cerr << "\nTool:    bedtools bed12tobed6 (aka bed12ToBed6)" << endl;
-    
+    cerr << "Version: " << VERSION << "\n";
     cerr << "Summary: Splits BED12 features into discrete BED6 features." << endl << endl;
 
     cerr << "Usage:   " << PROGRAM_NAME << " [OPTIONS] -i <bed12>" << endl << endl;

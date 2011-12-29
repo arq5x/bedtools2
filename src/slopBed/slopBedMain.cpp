@@ -10,6 +10,7 @@
   Licenced under the GNU General Public License 2.0 license.
 ******************************************************************************/
 #include "slopBed.h"
+#include "version.h"
 
 using namespace std;
 
@@ -143,7 +144,7 @@ int slop_main(int argc, char* argv[]) {
 void slop_help(void) {
 
     cerr << "\nTool:    bedtools slop (aka slopBed)" << endl;
-    
+    cerr << "Version: " << VERSION << "\n";    
     cerr << "Summary: Add requested base pairs of \"slop\" to each feature." << endl << endl;
 
     cerr << "Usage:   " << PROGRAM_NAME << " [OPTIONS] -i <bed/gff/vcf> -g <genome> [-b <int> or (-l and -r)]" << endl << endl;

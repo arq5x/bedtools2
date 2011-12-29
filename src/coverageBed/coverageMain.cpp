@@ -10,6 +10,7 @@
   Licenced under the GNU General Public License 2.0 license.
 ******************************************************************************/
 #include "coverageBed.h"
+#include "version.h"
 
 using namespace std;
 
@@ -132,7 +133,7 @@ int coverage_main(int argc, char* argv[]) {
 void coverage_help(void) {
 
     cerr << "\nTool:    bedtools coverage (aka coverageBed)" << endl;
-    
+    cerr << "Version: " << VERSION << "\n";    
     cerr << "Summary: Returns the depth and breadth of coverage of features from A" << endl;
     cerr << "\t on the intervals in B." << endl << endl;
 

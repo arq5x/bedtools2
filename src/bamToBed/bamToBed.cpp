@@ -13,6 +13,7 @@
 #include "api/BamAux.h"
 #include "BamAncillary.h"
 #include "bedFile.h"
+#include "version.h"
 using namespace BamTools;
 
 #include <vector>
@@ -186,7 +187,7 @@ int bamtobed_main(int argc, char* argv[]) {
 void bamtobed_help(void) {
     
     cerr << "\nTool:    bedtools bamtobed (aka bamToBed)" << endl;
-
+    cerr << "Version: " << VERSION << "\n";
     cerr << "Summary: Converts BAM alignments to BED6 or BEDPE format." << endl << endl;
 
     cerr << "Usage:   " << PROGRAM_NAME << " [OPTIONS] -i <bam> " << endl << endl;

@@ -21,6 +21,7 @@
 
 #include "genomeFile.h"
 #include "multiIntersectBed.h"
+#include "version.h"
 
 using namespace std;
 
@@ -168,7 +169,7 @@ int multiintersect_main(int argc, char* argv[])
 void multiintersect_help(void) {
 
     cerr << "\nTool:    bedtools multiinter (aka multiIntersectBed)" << endl;
-    
+    cerr << "Version: " << VERSION << "\n";    
     cerr << "Summary: Identifies common intervals among multiple" << endl;
     cerr << "\t BED/GFF/VCF files." << endl << endl;
 

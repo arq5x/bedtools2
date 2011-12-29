@@ -10,6 +10,7 @@
   Licenced under the GNU General Public License 2.0 license.
 ******************************************************************************/
 #include "annotateBed.h"
+#include "version.h"
 
 using namespace std;
 
@@ -140,6 +141,7 @@ int annotate_main(int argc, char* argv[]) {
 void annotate_help(void) {
 
     cerr << "\nTool:    bedtools annotate (aka annotateBed)" << endl;
+    cerr << "Version: " << VERSION << "\n";
     cerr << "Summary: Annotates the depth & breadth of coverage of features from mult. files" << endl;
     cerr << "\t on the intervals in -i." << endl << endl;
 

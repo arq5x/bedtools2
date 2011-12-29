@@ -10,6 +10,7 @@
   Licenced under the GNU General Public License 2.0 license.
 ******************************************************************************/
 #include "shuffleBed.h"
+#include "version.h"
 
 using namespace std;
 
@@ -142,7 +143,7 @@ int shuffle_main(int argc, char* argv[]) {
 void shuffle_help(void) {
 
     cerr << "\nTool:    bedtools shuffle (aka shuffleBed)" << endl;
-    
+    cerr << "Version: " << VERSION << "\n";    
     cerr << "Summary: Randomly permute the locations of a feature file among a genome." << endl << endl;
 
     cerr << "Usage:   " << PROGRAM_NAME << " [OPTIONS] -i <bed/gff/vcf> -g <genome>" << endl << endl;

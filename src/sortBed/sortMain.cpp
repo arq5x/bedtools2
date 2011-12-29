@@ -10,6 +10,7 @@
   Licenced under the GNU General Public License 2.0 license.
 ******************************************************************************/
 #include "sortBed.h"
+#include "version.h"
 
 using namespace std;
 
@@ -142,7 +143,7 @@ int sort_main(int argc, char* argv[]) {
 void sort_help(void) {
 
     cerr << "\nTool:    bedtools sort (aka sortBed)" << endl;
-    
+    cerr << "Version: " << VERSION << "\n";    
     cerr << "Summary: Sorts a feature file in various and useful ways." << endl << endl;
     cerr << "Usage:   " << PROGRAM_NAME << " [OPTIONS] -i <bed/gff/vcf>" << endl << endl;
 

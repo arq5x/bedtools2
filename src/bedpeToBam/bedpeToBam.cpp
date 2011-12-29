@@ -138,7 +138,7 @@ int bedpetobam_main(int argc, char* argv[]) {
 void bedpetobam_help(void) {
     
     cerr << "\nTool:    bedtools bedpetobam (aka bedpeToBam)" << endl;
-
+    cerr << "Version: " << VERSION << "\n";
     cerr << "Summary: Converts feature records to BAM format." << endl << endl;
 
     cerr << "Usage:   " << PROGRAM_NAME << " [OPTIONS] -i <bed/gff/vcf> -g <genome>" << endl << endl;

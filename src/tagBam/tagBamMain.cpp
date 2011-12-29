@@ -10,6 +10,7 @@
   Licenced under the GNU General Public License 2.0 license.
 ******************************************************************************/
 #include "tagBam.h"
+#include "version.h"
 
 using namespace std;
 
@@ -195,7 +196,7 @@ int tagbam_main(int argc, char* argv[]) {
 void tagbam_help(void) {
 
     cerr << "\nTool:    bedtools tag (aka tagBam)" << endl;
-    
+    cerr << "Version: " << VERSION << "\n";    
     cerr << "Summary: Annotates a BAM file based on overlaps with multiple BED/GFF/VCF files" << endl;
     cerr << "\t on the intervals in -i." << endl << endl;
 

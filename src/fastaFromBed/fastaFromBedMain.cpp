@@ -10,6 +10,7 @@
   Licenced under the GNU General Public License 2.0 license.
 ******************************************************************************/
 #include "fastaFromBed.h"
+#include "version.h"
 
 using namespace std;
 
@@ -116,7 +117,7 @@ int fastafrombed_main(int argc, char* argv[]) {
 void fastafrombed_help(void) {
     
     cerr << "\nTool:    bedtools getfasta (aka fastaFromBed)" << endl;
-
+    cerr << "Version: " << VERSION << "\n";
     cerr << "Summary: Extract DNA sequences into a fasta file based on feature coordinates." << endl << endl;
 
     cerr << "Usage:   " << PROGRAM_NAME << " [OPTIONS] -fi <fasta> -bed <bed/gff/vcf> -fo <fasta> " << endl << endl;

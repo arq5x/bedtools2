@@ -21,6 +21,7 @@
 
 #include "genomeFile.h"
 #include "unionBedGraphs.h"
+#include "version.h"
 
 using namespace std;
 
@@ -162,7 +163,7 @@ int unionbedgraphs_main(int argc, char* argv[])
 void unionbedgraphs_help(void) {
 
     cerr << "\nTool:    bedtools unionbedg (aka unionBedGraphs)" << endl;
-    
+    cerr << "Version: " << VERSION << "\n";    
     cerr << "Summary: Combines multiple BedGraph files into a single file," << endl;
     cerr << "\t allowing coverage comparisons between them." << endl << endl;
 

@@ -10,6 +10,7 @@
   Licenced under the GNU General Public License 2.0 license.
 ******************************************************************************/
 #include "subtractBed.h"
+#include "version.h"
 
 using namespace std;
 
@@ -119,7 +120,7 @@ int subtract_main(int argc, char* argv[]) {
 void subtract_help(void) {
 
     cerr << "\nTool:    bedtools subtract (aka subtractBed)" << endl;
-    
+    cerr << "Version: " << VERSION << "\n";    
     cerr << "Summary: Removes the portion(s) of an interval that is overlapped" << endl;
     cerr << "\t by another feature(s)." << endl << endl;
 
