@@ -41,6 +41,7 @@ int bedtobam_main(int argc, char* argv[]);//
 int bedtoigv_main(int argc, char* argv[]);//
 int bedpetobam_main(int argc, char* argv[]);//
 int closest_main(int argc, char* argv[]); //
+int cluster_main(int argc, char* argv[]); //
 int complement_main(int argc, char* argv[]);//
 int coverage_main(int argc, char* argv[]); //
 int fastafrombed_main(int argc, char* argv[]);//
@@ -82,6 +83,7 @@ int main(int argc, char *argv[])
     else if (sub_cmd == "coverage")    return coverage_main(argc-1, argv+1);
     else if (sub_cmd == "genomecov")   return genomecoverage_main(argc-1, argv+1);
     else if (sub_cmd == "merge")       return merge_main(argc-1, argv+1);
+    else if (sub_cmd == "cluster")     return cluster_main(argc-1, argv+1);    
     else if (sub_cmd == "complement")  return complement_main(argc-1, argv+1);
     else if (sub_cmd == "subtract")    return subtract_main(argc-1, argv+1);
     else if (sub_cmd == "slop")        return slop_main(argc-1, argv+1);
@@ -171,6 +173,7 @@ int bedtools_help(void)
     cout  << "    coverage      "  << "Compute the coverage over defined intervals.\n";
     cout  << "    genomecov     "  << "Compute the coverage over an entire genome.\n";
     cout  << "    merge         "  << "Combine overlapping/nearby intervals into a single interval.\n";
+    cout  << "    cluster       "  << "Cluster (but don't merge) overlapping/nearby intervals.\n";
     cout  << "    complement    "  << "Extract intervals _not_ represented by an interval file.\n";
     cout  << "    subtract      "  << "Remove intervals based on overlaps b/w two files.\n";
     cout  << "    slop          "  << "Adjust the size of intervals.\n";

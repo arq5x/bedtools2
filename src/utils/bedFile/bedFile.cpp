@@ -242,7 +242,11 @@ bool BedFile::GetNextBed(BED &bed, bool forceSorted) {
                     _prev_start = bed.start;
                 }
                 else if (forceSorted) {
-                    cerr << "ERROR: input file: (" << bedFile << ") is not sorted by chrom then start" << endl;
+                    cerr << "ERROR: input file: (" << bedFile 
+                         << ") is not sorted by chrom then start." << endl
+                         << "       The start coordinate at line " << _lineNum 
+                         << " is less than the start at line " << _lineNum-1 
+                         << endl;
                     exit(1);
                 }
             }

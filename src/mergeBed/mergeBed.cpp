@@ -241,54 +241,47 @@ void BedMerge::ReportStranded(string chrom, int start, int end,
 // = Merge overlapping BED entries into a single entry =
 // =====================================================
 void BedMerge::MergeBed() {
-
-    // load the "B" bed file into a map so
-    // that we can easily compare "A" to it for overlaps
-    _bed->loadBedFileIntoMapNoBin();
-
-    // loop through each chromosome and merge their BED entries
-    masterBedMapNoBin::const_iterator m    = _bed->bedMapNoBin.begin();
-    masterBedMapNoBin::const_iterator mEnd = _bed->bedMapNoBin.end();
-    for (; m != mEnd; ++m) {
-
-        // bedList is already sorted by start position.
-        string chrom        = m->first;
-        vector<BED> bedList = m->second;
-        int mergeCount = 1;
-        vector<string> names;
-        vector<string> scores;
-        
-        // merge overlapping features for this chromosome.
-        int start = -1;
-        int end   = -1;
-        vector<BED>::const_iterator bedItr = bedList.begin();
-        vector<BED>::const_iterator bedEnd = bedList.end();
-        for (; bedItr != bedEnd; ++bedItr) {
-            // new block, no overlap
-            if ( (((int) bedItr->start - end) > _maxDistance) || (end < 0)) {
-                if (start >= 0) {
-                    Report(chrom, start, end, names, scores, mergeCount);
-                    // reset
-                    mergeCount = 1;
-                    names.clear();
-                    scores.clear();
-                }
-                start = bedItr->start;
-                end   = bedItr->end;
-                if (!bedItr->name.empty())  names.push_back(bedItr->name);
-                if (!bedItr->score.empty()) scores.push_back(bedItr->score);
+    int mergeCount = 1;
+    vector<string> names;
+    vector<string> scores;
+    int start = -1;
+    int end   = -1;
+    BED prev, curr;
+    
+    _bed->Open();
+    while (_bed->GetNextBed(curr, true)) { // true = force sorted intervals
+        if (_bed->_status != BED_VALID)
+            continue;            
+        // new block, no overlap
+        if ( (((int) curr.start - end) > _maxDistance) || (curr.chrom != prev.chrom)) {
+            if (start >= 0) {
+                Report(prev.chrom, start, end, names, scores, mergeCount);
+                // reset
+                mergeCount = 1;
+                names.clear();
+                scores.clear();
             }
-            // same block, overlaps
-            else {
-                if ((int) bedItr-> end > end) end = bedItr->end;
-                mergeCount++;
-                if (!bedItr->name.empty())  names.push_back(bedItr->name);
-                if (!bedItr->score.empty()) scores.push_back(bedItr->score);
-            }
+            start = curr.start;
+            end   = curr.end;
+            if (!curr.name.empty())
+                names.push_back(curr.name);
+            if (!curr.score.empty())
+            scores.push_back(curr.score);
         }
-        if (start >= 0) {
-            Report(chrom, start, end, names, scores, mergeCount);
+        // same block, overlaps
+        else {
+            if ((int) curr.end > end) 
+                end = curr.end;
+            if (!curr.name.empty())
+                names.push_back(curr.name);
+            if (!curr.score.empty())
+                scores.push_back(curr.score);
+            mergeCount++;
         }
+        prev = curr;
+    }
+    if (start >= 0) {
+        Report(prev.chrom, start, end, names, scores, mergeCount);
     }
 }
 
