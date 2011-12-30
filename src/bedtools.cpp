@@ -161,13 +161,13 @@ int main(int argc, char *argv[])
 
 int bedtools_help(void)
 {
-    cout  << PROGRAM_NAME  << ": flexible tools for genome arithmetic and analysis.\n";
-    cout << "usage:   bedtools <subcommand> [options]" << endl << endl;
+    cout  << PROGRAM_NAME  << ": flexible tools for genome arithmetic and DNA sequence analysis.\n";
+    cout << "usage:    bedtools <subcommand> [options]" << endl << endl;
 
     cout  << "The bedtools sub-commands include:" << endl;
     
     cout  << endl;
-    cout  << " -Genome arithmetic:" << endl;
+    cout  << "//Genome arithmetic:" << endl;
     cout  << "    intersect     "  << "Find overlapping intervals in various ways.\n";
     cout  << "    window        "  << "Find overlapping intervals within a window around an interval.\n";
     cout  << "    closest       "  << "Find the closest, potentially non-overlapping interval.\n";    
@@ -184,35 +184,35 @@ int bedtools_help(void)
     cout  << "    annotate      "  << "Annotate coverage of features from multiple files.\n";
     
     cout  << endl;
-    cout  << " -Multi-way file comparisons:" << endl;
+    cout  << "//Multi-way file comparisons:" << endl;
     cout  << "    multiinter    "  << "Identifies common intervals among multiple interval files.\n";
     cout  << "    unionbedg     "  << "Combines coverage intervals from multiple BEDGRAPH files.\n";
 
     cout  << endl;
-    cout  << " -Paired-end manipulation:" << endl;
+    cout  << "//Paired-end manipulation:" << endl;
     cout  << "    pairtobed     "  << "Find pairs that overlap intervals in various ways.\n";
     cout  << "    pairtopair    "  << "Find pairs that overlap other pairs in various ways.\n";
 
     cout  << endl;
-    cout  << " -Format conversion:\n";   
+    cout  << "//Format conversion:\n";   
     cout  << "    bamtobed      "  << "Convert BAM alignments to BED (& other) formats.\n";
     cout  << "    bedtobam      "  << "Convert intervals to BAM records.\n";
     cout  << "    bedpetobam    "  << "Convert BEDPE intervals to BAM records.\n";    
     cout  << "    bed12tobed6   "  << "Breaks BED12 intervals into discrete BED6 intervals.\n";
 
     cout  << endl;
-    cout  << " -Fasta manipulation:\n";  
+    cout  << "//Fasta manipulation:\n";  
     cout  << "    getfasta      "  << "Use intervals to extract sequences from a FASTA file.\n";
     cout  << "    maskfasta     "  << "Use intervals to mask sequences from a FASTA file.\n";
     cout  << "    nuc           "  << "Profile the nucleotide content of intervals in a FASTA file.\n";
 
     cout  << endl;
-    cout  << " -BAM focused tools:\n";   
+    cout  << "//BAM focused tools:\n";   
     cout  << "    multicov      "  << "Counts coverage from multiple BAMs at specific intervals.\n";
     cout  << "    tag           "  << "Tag BAM alignments based on overlaps with interval files.\n";
 
     cout  << endl;
-    cout  << " -Miscellaneous tools:\n"; 
+    cout  << "//Miscellaneous tools:\n"; 
     cout  << "    overlap       "  << "Computes the amount of overlap from two intervals.\n"; 
     cout  << "    igv           "  << "Create an IGV snapshot batch script.\n";
     cout  << "    links         "  << "Create a HTML page of links to UCSC locations.\n";
@@ -220,7 +220,7 @@ int bedtools_help(void)
     cout  << "    groupby       "  << "Group by common cols. & summarize oth. cols. (~ SQL \"groupBy\")\n";
 
     cout  << endl;
-    cout  << " -General help:\n";
+    cout  << "//General help:\n";
     cout  << "    --help        "  << "Print this help menu.\n";
     //cout  << "    --faq         "  << "Frequently asked questions.\n";  TODO
     cout  << "    --version     "  << "What version of bedtools are you using?.\n";
