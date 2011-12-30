@@ -29,6 +29,8 @@ SUBDIRS = $(SRC_DIR)/annotateBed \
 		  $(SRC_DIR)/fastaFromBed \
 		  $(SRC_DIR)/flankBed \
 		  $(SRC_DIR)/genomeCoverageBed \
+		  $(SRC_DIR)/getOverlap \
+		  $(SRC_DIR)/groupBy \
 		  $(SRC_DIR)/intersectBed \
 		  $(SRC_DIR)/linksBed \
 		  $(SRC_DIR)/maskFastaFromBed \
@@ -36,7 +38,6 @@ SUBDIRS = $(SRC_DIR)/annotateBed \
 		  $(SRC_DIR)/multiBamCov \
 		  $(SRC_DIR)/multiIntersectBed \
 		  $(SRC_DIR)/nucBed \
-		  $(SRC_DIR)/getOverlap \
 		  $(SRC_DIR)/pairToBed \
 		  $(SRC_DIR)/pairToPair \
 		  $(SRC_DIR)/shuffleBed \
