@@ -110,11 +110,6 @@ void cluster_help(void) {
     cerr                                 << "\t\t- Def. 0. That is, overlapping & book-ended features are merged." << endl;
     cerr                                 << "\t\t- (INTEGER)" << endl << endl;
     
-    cerr << "Notes: " << endl;
-    cerr << "\t(1) All output, regardless of input type (e.g., GFF or VCF)" << endl;
-    cerr << "\t    will in BED format with zero-based starts" << endl << endl;
-
-
     // end the program here
     exit(1);
 
