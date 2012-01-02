@@ -227,7 +227,7 @@ int bedtools_help(void)
     cout  << "    --contact     "  << "Feature requests, bugs, mailing lists, etc.\n";
 
     cout << "\n";
-    return 1;
+    return 0;
 }
 
 
@@ -241,5 +241,5 @@ int bedtools_faq(void)
     cout << "    followed by enter. " << endl;
 
     cout << "\n";
-    return 1;
+    return 0;
 }
