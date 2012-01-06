@@ -122,6 +122,7 @@ int main(int argc, char *argv[])
     else if (sub_cmd == "links")       return links_main(argc-1, argv+1);
     else if (sub_cmd == "makewindows") return windowmaker_main(argc-1, argv+1);
     else if (sub_cmd == "groupby")     return groupby_main(argc-1, argv+1);
+
     // help
     else if (sub_cmd == "-h" || sub_cmd == "--help" ||
              sub_cmd == "-help")
@@ -156,7 +157,7 @@ int main(int argc, char *argv[])
         cerr << "error: unrecognized command: " << argv[1] << endl << endl;
         return 1;
     }
-    return 0;   
+    return 0;
 }
 
 int bedtools_help(void)

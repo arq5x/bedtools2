@@ -2,7 +2,7 @@
 // TcpSocket_p.cpp (c) 2011 Derek Barnett
 // Marth Lab, Department of Biology, Boston College
 // ---------------------------------------------------------------------------
-// Last modified: 8 December 2011 (DB)
+// Last modified: 5 January 2012 (DB)
 // ---------------------------------------------------------------------------
 // Provides basic TCP I/O interface
 // ***************************************************************************
@@ -14,6 +14,7 @@ using namespace BamTools;
 using namespace BamTools::Internal;
 
 #include <algorithm>
+#include <climits>
 #include <sstream>
 #include <vector>
 using namespace std;
@@ -37,7 +38,7 @@ static const size_t DEFAULT_BUFFER_SIZE = 0x4000;
 
 TcpSocket::TcpSocket(void)
     : m_mode(IBamIODevice::NotOpen)
-//    , m_localPort(0)
+// , m_localPort(0)
     , m_remotePort(0)
     , m_engine(0)
     , m_cachedSocketDescriptor(-1)
@@ -75,13 +76,13 @@ bool TcpSocket::ConnectImpl(const HostInfo& hostInfo,
     }
 
     // reset socket state
-    m_hostName   = hostInfo.HostName();
-    m_mode       = mode;
-    m_state      = TcpSocket::UnconnectedState;
-    m_error      = TcpSocket::UnknownSocketError;
-//    m_localPort  = 0;
+    m_hostName = hostInfo.HostName();
+    m_mode = mode;
+    m_state = TcpSocket::UnconnectedState;
+    m_error = TcpSocket::UnknownSocketError;
+// m_localPort = 0;
     m_remotePort = 0;
-//    m_localAddress.Clear();
+// m_localAddress.Clear();
     m_remoteAddress.Clear();
     m_readBuffer.Clear();
 
@@ -100,7 +101,7 @@ bool TcpSocket::ConnectImpl(const HostInfo& hostInfo,
 
     // iterate through adddresses
     vector<HostAddress>::const_iterator addrIter = addresses.begin();
-    vector<HostAddress>::const_iterator addrEnd  = addresses.end();
+    vector<HostAddress>::const_iterator addrEnd = addresses.end();
     for ( ; addrIter != addrEnd; ++addrIter) {
         const HostAddress& addr = (*addrIter);
 
@@ -116,10 +117,10 @@ bool TcpSocket::ConnectImpl(const HostInfo& hostInfo,
 
             // if connection successful, update our state & return true
             m_mode = mode;
-//            m_localAddress  = m_engine->GetLocalAddress();
-//            m_localPort     = m_engine->GetLocalPort();
+// m_localAddress = m_engine->GetLocalAddress();
+// m_localPort = m_engine->GetLocalPort();
             m_remoteAddress = m_engine->GetRemoteAddress();
-            m_remotePort    = m_engine->GetRemotePort();
+            m_remotePort = m_engine->GetRemotePort();
             m_cachedSocketDescriptor = m_engine->GetSocketDescriptor();
             m_state = TcpSocket::ConnectedState;
             return true;
@@ -170,9 +171,9 @@ void TcpSocket::DisconnectFromHost(void) {
         ResetSocketEngine();
 
     // reset connection state
-//    m_localPort = 0;
+// m_localPort = 0;
     m_remotePort = 0;
-//    m_localAddress.Clear();
+// m_localAddress.Clear();
     m_remoteAddress.Clear();
     m_hostName.clear();
     m_cachedSocketDescriptor = -1;
@@ -194,11 +195,11 @@ std::string TcpSocket::GetHostName(void) const {
 }
 
 //HostAddress TcpSocket::GetLocalAddress(void) const {
-//    return m_localAddress;
+// return m_localAddress;
 //}
 
 //uint16_t TcpSocket::GetLocalPort(void) const {
-//    return m_localPort;
+// return m_localPort;
 //}
 
 HostAddress TcpSocket::GetRemoteAddress(void) const {
@@ -313,8 +314,8 @@ string TcpSocket::ReadLine(int64_t max) {
 
     // prep result byte buffer
     ByteArray result;
-
-    size_t bufferMax = ((max > static_cast<int64_t>(string::npos)) ? string::npos : static_cast<size_t>(max));
+    size_t bufferMax = ((max > static_cast<int64_t>(UINT_MAX))
+                        ? UINT_MAX : static_cast<size_t>(max));
     result.Resize(bufferMax);
 
     // read data
@@ -322,7 +323,7 @@ string TcpSocket::ReadLine(int64_t max) {
     if ( result.Size() == 0 ) {
 
         if ( bufferMax == 0 )
-            bufferMax = string::npos;
+            bufferMax = UINT_MAX;
 
         result.Resize(1);
 
@@ -427,3 +428,4 @@ int64_t TcpSocket::Write(const char* data, const unsigned int numBytes) {
     }
     return -1;
 }
+
