@@ -41,7 +41,8 @@ BedSubtract::~BedSubtract(void) {
 void BedSubtract::FindAndSubtractOverlaps(BED &a, vector<BED> &hits) {
 
     // find all of the overlaps between a and B.
-    _bedB->FindOverlapsPerBin(a.chrom, a.start, a.end, a.strand, hits, _sameStrand, _diffStrand);
+    _bedB->allHits(a.chrom, a.start, a.end, a.strand, 
+                   hits, _sameStrand, _diffStrand, 0.0, false);
 
     //  is A completely spanned by an entry in B?
     //  if so, A should not be reported.

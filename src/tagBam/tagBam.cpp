@@ -98,14 +98,16 @@ void TagBam::Tag() {
                 
                 if (!_useNames && !_useScores && !_useIntervals) {
                     // add the label for this annotation file to tag if there is overlap
-                    if (anno->FindOneOrMoreOverlapsPerBin(a.chrom, a.start, a.end, a.strand, _sameStrand, _diffStrand, _overlapFraction))
+                    if (anno->anyHits(a.chrom, a.start, a.end, a.strand, 
+                                      _sameStrand, _diffStrand, _overlapFraction, false))
                     {
                         annotations << _annoLabels[i] << ";";
                     }
                 }
                 // use the score field
                 else if (!_useNames && _useScores && !_useIntervals) {
-                    anno->FindOverlapsPerBin(a.chrom, a.start, a.end, a.strand, hits, _sameStrand, _diffStrand);
+                    anno->allHits(a.chrom, a.start, a.end, a.strand, 
+                                  hits, _sameStrand, _diffStrand, 0.0, false);
                     for (size_t i = 0; i < hits.size(); ++i) {
                         annotations << hits[i].score;
                         if (i < hits.size() - 1) annotations << ",";
@@ -115,7 +117,8 @@ void TagBam::Tag() {
                 }
                 // use the name field from the annotation files to populate tag
                 else if (_useNames && !_useScores && !_useIntervals) {
-                    anno->FindOverlapsPerBin(a.chrom, a.start, a.end, a.strand, hits, _sameStrand, _diffStrand);
+                    anno->allHits(a.chrom, a.start, a.end, a.strand, 
+                                  hits, _sameStrand, _diffStrand, 0.0, false);
                     for (size_t j = 0; j < hits.size(); ++i) {
                         annotations << hits[j].name;
                         if (j < hits.size() - 1) annotations << ",";
@@ -125,7 +128,8 @@ void TagBam::Tag() {
                 }
                 // use the full interval information annotation files to populate tag
                 else if (!_useNames && !_useScores && _useIntervals) {
-                    anno->FindOverlapsPerBin(a.chrom, a.start, a.end, a.strand, hits, _sameStrand, _diffStrand);
+                    anno->allHits(a.chrom, a.start, a.end, a.strand, 
+                                  hits, _sameStrand, _diffStrand,  0.0, false);
                     for (size_t j = 0; j < hits.size(); ++j) {
                         annotations << _annoLabels[i]  << ":" << 
                                         hits[j].chrom  << ":" <<

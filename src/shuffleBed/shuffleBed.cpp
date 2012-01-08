@@ -111,8 +111,8 @@ void BedShuffle::ShuffleWithExclusions() {
             {
                 // choose a new locus
                 ChooseLocus(bedEntry);
-                haveOverlap = _exclude->FindOneOrMoreOverlapsPerBin(bedEntry.chrom, bedEntry.start, bedEntry.end,
-                                                                    bedEntry.strand, false, _overlapFraction);
+                haveOverlap = _exclude->anyHits(bedEntry.chrom, bedEntry.start, bedEntry.end,
+                                                bedEntry.strand, false, false, _overlapFraction, false);
                 tries++;
             } while ((haveOverlap == true) && (tries <= MAX_TRIES));
             

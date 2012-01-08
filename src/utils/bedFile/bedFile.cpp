@@ -315,147 +315,102 @@ bool BedFile::GetNextMergedBed(BED &merged_bed) {
 }
 
 
-void BedFile::FindOverlapsPerBin(string chrom, CHRPOS start, CHRPOS end,
-                                 string strand, vector<BED> &hits, bool sameStrand, bool diffStrand) {
+void BedFile::allHits(string chrom, CHRPOS start, CHRPOS end, string strand, 
+                                 vector<BED> &hits, bool sameStrand, bool diffStrand,
+                                 float overlapFraction, bool reciprocal) {
 
     BIN startBin, endBin;
     startBin = (start >> _binFirstShift);
     endBin = ((end-1) >> _binFirstShift);
-
-    // loop through each bin "level" in the binning hierarchy
-    for (BINLEVEL i = 0; i < _binLevels; ++i) {
-
-        // loop through each bin at this level of the hierarchy
-        BIN offset = _binOffsetsExtended[i];
-        for (BIN j = (startBin+offset); j <= (endBin+offset); ++j)  {
-
-            // loop through each feature in this chrom/bin and see if it overlaps
-            // with the feature that was passed in.  if so, add the feature to
-            // the list of hits.
-            vector<BED>::const_iterator bedItr = bedMap[chrom][j].begin();
-            vector<BED>::const_iterator bedEnd = bedMap[chrom][j].end();
-
-            for (; bedItr != bedEnd; ++bedItr) {
-                // do we have sufficient overlap?
-                if (overlaps(bedItr->start, bedItr->end, start, end) > 0) {
-                    
-                    bool strands_are_same = (strand == bedItr->strand);
-                    
-                    // test for necessary strandedness
-                    if ( (sameStrand == false && diffStrand == false)
-                         ||
-                         (sameStrand == true && strands_are_same == true)
-                         ||
-                         (diffStrand == true && strands_are_same == false)
-                       )
-                    {
-                        hits.push_back(*bedItr);
-                    }
-                }
-            }
-        }
-        startBin >>= _binNextShift;
-        endBin >>= _binNextShift;
-    }
-}
-
-
-bool BedFile::FindOneOrMoreOverlapsPerBin(string chrom, CHRPOS start, CHRPOS end, string strand,
-                                          bool sameStrand, bool diffStrand, float overlapFraction) {
-
-    BIN startBin, endBin;
-    startBin = (start   >> _binFirstShift);
-    endBin   = ((end-1) >> _binFirstShift);
-
     CHRPOS aLength = (end - start);
 
-    // loop through each bin "level" in the binning hierarchy
+    /* SYNOPSIS:
+         1. We loop through each UCSC BIN level for feature A's chrom.
+         2. For each BIN, we loop through each B feature and add it to
+            hits if it meets all of the user's requests, which include:
+               (a) overlap fractio, (b) strandedness, (c) reciprocal overlap
+    */
     for (BINLEVEL i = 0; i < _binLevels; ++i) {
-
-        // loop through each bin at this level of the hierarchy
         BIN offset = _binOffsetsExtended[i];
         for (BIN j = (startBin+offset); j <= (endBin+offset); ++j)  {
-
-            // loop through each feature in this chrom/bin and see if it overlaps
-            // with the feature that was passed in.  if so, add the feature to
-            // the list of hits.
-            vector<BED>::const_iterator bedItr = bedMap[chrom][j].begin();
-            vector<BED>::const_iterator bedEnd = bedMap[chrom][j].end();
-            for (; bedItr != bedEnd; ++bedItr) {
-
-                CHRPOS s = max(start, bedItr->start);
-                CHRPOS e = min(end, bedItr->end);
-                // the number of overlapping bases b/w a and b
-                int overlapBases = (e - s);
-
-                // do we have sufficient overlap?
-                if ( (float) overlapBases / (float) aLength  >= overlapFraction) {
-                    
-                    bool strands_are_same = (strand == bedItr->strand);
-                    // test for necessary strandedness
-                    if ( (sameStrand == false && diffStrand == false)
-                         ||
-                         (sameStrand == true && strands_are_same == true)
-                         ||
-                         (diffStrand == true && strands_are_same == false)
-                       )
-                    {
-                        return true;
-                    }
-                }
-            }
-        }
-        startBin >>= _binNextShift;
-        endBin >>= _binNextShift;
-    }
-    return false;
-}
-
-
-bool BedFile::FindOneOrMoreReciprocalOverlapsPerBin(string chrom, CHRPOS start, CHRPOS end, string strand,
-                                                    bool sameStrand, bool diffStrand, float overlapFraction) {
-
-    BIN startBin, endBin;
-    startBin = (start >> _binFirstShift);
-    endBin = ((end-1) >> _binFirstShift);
-
-    CHRPOS aLength = (end - start);
-
-    // loop through each bin "level" in the binning hierarchy
-    for (BINLEVEL i = 0; i < _binLevels; ++i) {
-
-        // loop through each bin at this level of the hierarchy
-        BIN offset = _binOffsetsExtended[i];
-        for (BIN j = (startBin+offset); j <= (endBin+offset); ++j)  {
-
-            // loop through each feature in this chrom/bin and see if it overlaps
-            // with the feature that was passed in.  if so, add the feature to
-            // the list of hits.
             vector<BED>::const_iterator bedItr = bedMap[chrom][j].begin();
             vector<BED>::const_iterator bedEnd = bedMap[chrom][j].end();
             for (; bedItr != bedEnd; ++bedItr) {
                 CHRPOS s = max(start, bedItr->start);
                 CHRPOS e = min(end, bedItr->end);
-
-                // the number of overlapping bases b/w a and b
-                int overlapBases = (e - s);
-
-                // do we have sufficient overlap?
+                int overlapBases = (e - s); 
+                // 1. is there sufficient overlap w.r.t A?
                 if ( (float) overlapBases / (float) aLength  >= overlapFraction) {
                     CHRPOS bLength = (bedItr->end - bedItr->start);
                     float bOverlap = ( (float) overlapBases / (float) bLength );
                     bool strands_are_same = (strand == bedItr->strand);
-                    
-                    // test for sufficient reciprocal overlap and strandedness
-                    if ( (bOverlap >= overlapFraction) && 
-                         ((sameStrand == false && diffStrand == false)
-                             ||
+                    // 2. does the overlap meet the user's strand repuirements?
+                    if ( (sameStrand == false && diffStrand == false)
+                         ||
                          (sameStrand == true && strands_are_same == true)
-                             ||
-                         (diffStrand == true && strands_are_same == false))
-                    )
+                         ||
+                         (diffStrand == true && strands_are_same == false)
+                       )
                     {
-                        return true;
+                        // 3. did the user request reciprocal overlap
+                        // (i.e. sufficient overlap w.r.t. both A and B?)
+                        if (!reciprocal)
+                            hits.push_back(*bedItr);
+                        else if (bOverlap >= overlapFraction)
+                            hits.push_back(*bedItr);
+                    }
+                }
+            }
+        }
+        startBin >>= _binNextShift;
+        endBin >>= _binNextShift;
+    }
+}
+
+
+bool BedFile::anyHits(string chrom, CHRPOS start, CHRPOS end, string strand,
+                     bool sameStrand, bool diffStrand, float overlapFraction, bool reciprocal) {
+
+    BIN startBin, endBin;
+    startBin = (start >> _binFirstShift);
+    endBin = ((end-1) >> _binFirstShift);
+    CHRPOS aLength = (end - start);
+
+    /* SYNOPSIS:
+    1. We loop through each UCSC BIN level for feature A's chrom.
+    2. For each BIN, we loop through each B feature and return true
+       if it meets all of the user's requests, which include:
+       (a) overlap fractio, (b) strandedness, (c) reciprocal overlap.
+       Otherwise, return false.
+    */
+    for (BINLEVEL i = 0; i < _binLevels; ++i) {
+        BIN offset = _binOffsetsExtended[i];
+        for (BIN j = (startBin+offset); j <= (endBin+offset); ++j)  {
+            vector<BED>::const_iterator bedItr = bedMap[chrom][j].begin();
+            vector<BED>::const_iterator bedEnd = bedMap[chrom][j].end();
+            for (; bedItr != bedEnd; ++bedItr) {
+                CHRPOS s = max(start, bedItr->start);
+                CHRPOS e = min(end, bedItr->end);
+                int overlapBases = (e - s); 
+                // 1. is there sufficient overlap w.r.t A?
+                if ( (float) overlapBases / (float) aLength  >= overlapFraction) {
+                    CHRPOS bLength = (bedItr->end - bedItr->start);
+                    float bOverlap = ( (float) overlapBases / (float) bLength );
+                    bool strands_are_same = (strand == bedItr->strand);
+                    // 2. does the overlap meet the user's strand repuirements?
+                    if ( (sameStrand == false && diffStrand == false)
+                        ||
+                        (sameStrand == true && strands_are_same == true)
+                        ||
+                        (diffStrand == true && strands_are_same == false)
+                        )
+                    {
+                        // 3. did the user request reciprocal overlap
+                        // (i.e. sufficient overlap w.r.t. both A and B?)
+                        if (!reciprocal)
+                            return true;
+                        else if (bOverlap >= overlapFraction)
+                            return true;
                     }
                 }
             }
@@ -667,11 +622,13 @@ void BedFile::setBedType (int colNums) {
 void BedFile::loadBedFileIntoMap() {
 
     BED bedEntry;
-
+    
     Open();
     while (GetNextBed(bedEntry)) {
         if (_status == BED_VALID) {
             BIN bin = getBin(bedEntry.start, bedEntry.end);
+            // ostringstream key;
+            // key <<bedEntry.chrom << bin;
             bedMap[bedEntry.chrom][bin].push_back(bedEntry);
         }
     }

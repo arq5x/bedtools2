@@ -83,7 +83,8 @@ void BedClosest::FindWindowOverlaps(BED &a, vector<BED> &hits) {
 
             // THE HEAVY LIFTING
             // search for hits with the current slop added
-            _bedB->FindOverlapsPerBin(a.chrom, aFudgeStart, aFudgeEnd, a.strand, hits, _sameStrand, _diffStrand);
+            _bedB->allHits(a.chrom, aFudgeStart, aFudgeEnd, a.strand, 
+                           hits, _sameStrand, _diffStrand, 0.0, false);
 
             vector<BED>::const_iterator h = hits.begin();
             vector<BED>::const_iterator hitsEnd = hits.end();

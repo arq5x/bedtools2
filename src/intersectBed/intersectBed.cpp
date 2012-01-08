@@ -17,46 +17,62 @@ Helper functions
 ************************************/
 bool BedIntersect::processHits(const BED &a, const vector<BED> &hits) {
 
-    // how many overlaps are there b/w the bed and the set of hits?
-    CHRPOS s, e;
-    int overlapBases;
-    int  numOverlaps = 0;
+    // // how many overlaps are there b/w the bed and the set of hits?
+    // CHRPOS s, e;
+    // int overlapBases;
+    // int  numOverlaps = 0;
+    // bool hitsFound   = false;
+    // int aLength      = (a.end - a.start);   // the length of a in b.p.
+    // 
+    // // loop through the hits and report those that meet the user's criteria
+    // vector<BED>::const_iterator h       = hits.begin();
+    // vector<BED>::const_iterator hitsEnd = hits.end();
+    // for (; h != hitsEnd; ++h) {
+    //     s            = max(a.start, h->start);
+    //     e            = min(a.end, h->end);
+    //     overlapBases = (e - s);             // the number of overlapping bases b/w a and b
+    // 
+    //     // is there enough overlap relative to the user's request? (default ~ 1bp)
+    //     if ( ( (float) overlapBases / (float) aLength ) >= _overlapFraction ) {
+    //         // Report the hit if the user doesn't care about reciprocal overlap between A and B.
+    //         if (_reciprocal == false) {
+    //             hitsFound = true;
+    //             numOverlaps++;
+    //             if (_printable == true)
+    //                 ReportOverlapDetail(overlapBases, a, *h, s, e);
+    //         }
+    //         // we require there to be sufficient __reciprocal__ overlap
+    //         else {
+    //             int bLength    = (h->end - h->start);
+    //             float bOverlap = ( (float) overlapBases / (float) bLength );
+    //             if (bOverlap >= _overlapFraction) {
+    //                 hitsFound = true;
+    //                 numOverlaps++;
+    //                 if (_printable == true)
+    //                     ReportOverlapDetail(overlapBases, a, *h, s, e);
+    //             }
+    //         }
+    //     }
+    // }
+    // // report the summary of the overlaps if requested.
+    // ReportOverlapSummary(a, numOverlaps);
+    // // were hits found for this BED feature?
+    // return hitsFound;
     bool hitsFound   = false;
-    int aLength      = (a.end - a.start);   // the length of a in b.p.
-
-    // loop through the hits and report those that meet the user's criteria
-    vector<BED>::const_iterator h       = hits.begin();
-    vector<BED>::const_iterator hitsEnd = hits.end();
-    for (; h != hitsEnd; ++h) {
-        s            = max(a.start, h->start);
-        e            = min(a.end, h->end);
-        overlapBases = (e - s);             // the number of overlapping bases b/w a and b
-
-        // is there enough overlap relative to the user's request? (default ~ 1bp)
-        if ( ( (float) overlapBases / (float) aLength ) >= _overlapFraction ) {
-            // Report the hit if the user doesn't care about reciprocal overlap between A and B.
-            if (_reciprocal == false) {
-                hitsFound = true;
-                numOverlaps++;
-                if (_printable == true)
-                    ReportOverlapDetail(overlapBases, a, *h, s, e);
-            }
-            // we require there to be sufficient __reciprocal__ overlap
-            else {
-                int bLength    = (h->end - h->start);
-                float bOverlap = ( (float) overlapBases / (float) bLength );
-                if (bOverlap >= _overlapFraction) {
-                    hitsFound = true;
-                    numOverlaps++;
-                    if (_printable == true)
-                        ReportOverlapDetail(overlapBases, a, *h, s, e);
-                }
-            }
+    if (_printable == true) {
+        vector<BED>::const_iterator h       = hits.begin();
+        vector<BED>::const_iterator hitsEnd = hits.end();
+        for (; h != hitsEnd; ++h) {
+            CHRPOS s = max(a.start, h->start);
+            CHRPOS e = min(a.end, h->end);
+            int overlapBases = (e - s);
+            ReportOverlapDetail(overlapBases, a, *h, s, e);
+            hitsFound = true;
         }
     }
-    // report the summary of the overlaps if requested.
-    ReportOverlapSummary(a, numOverlaps);
-    // were hits found for this BED feature?
+    else {
+        ReportOverlapSummary(a, hits.size());
+    }
     return hitsFound;
 }
 
@@ -113,7 +129,9 @@ bool BedIntersect::FindOverlaps(const BED &a, vector<BED> &hits) {
     bool hitsFound = false;
     
     // collect and report the sufficient hits
-    _bedB->FindOverlapsPerBin(a.chrom, a.start, a.end, a.strand, hits, _sameStrand, _diffStrand);
+    _bedB->allHits(a.chrom, a.start, a.end, a.strand,
+                   hits, _sameStrand, _diffStrand,
+                   _overlapFraction, _reciprocal);
     hitsFound = processHits(a, hits);
     return hitsFound;
 }
@@ -168,20 +186,6 @@ void BedIntersect::ReportOverlapSummary(const BED &a, const int &numOverlapsFoun
         _bedB->reportNullBedTab();
         printf("0\n");
     }
-}
-
-
-bool BedIntersect::FindOneOrMoreOverlap(const BED &a) {
-    bool overlapsFound = false;
-    if (_reciprocal == false) {
-        overlapsFound = _bedB->FindOneOrMoreOverlapsPerBin(a.chrom, a.start, a.end, a.strand,
-                                                          _sameStrand, _diffStrand, _overlapFraction);
-    }
-    else {
-        overlapsFound = _bedB->FindOneOrMoreReciprocalOverlapsPerBin(a.chrom, a.start, a.end, a.strand,
-                                                                    _sameStrand, _diffStrand, _overlapFraction);
-    }
-    return overlapsFound;
 }
 
 
@@ -305,7 +309,9 @@ void BedIntersect::IntersectBam(string bamFile) {
                 bool overlapsFound = false;
                 // treat the BAM alignment as a single "block"
                 if (_obeySplits == false) {
-                    overlapsFound = FindOneOrMoreOverlap(a);
+                    overlapsFound = _bedB->anyHits(a.chrom, a.start, a.end, 
+                                                   a.strand, _sameStrand, _diffStrand,
+                                                   _overlapFraction, _reciprocal);
                 }
                 // split the BAM alignment into discrete blocks and
                 // look for overlaps only within each block.
@@ -318,7 +324,9 @@ void BedIntersect::IntersectBam(string bamFile) {
                     vector<BED>::const_iterator bedItr  = bedBlocks.begin();
                     vector<BED>::const_iterator bedEnd  = bedBlocks.end();
                     for (; bedItr != bedEnd; ++bedItr) {
-                        overlapFoundForBlock = FindOneOrMoreOverlap(*bedItr);
+                        overlapFoundForBlock = _bedB->anyHits(bedItr->chrom, bedItr->start, bedItr->end, 
+                                                              bedItr->strand, _sameStrand, _diffStrand,
+                                                              _overlapFraction, _reciprocal);
                         if (overlapFoundForBlock == true)
                             overlapsFound = true;
                     }

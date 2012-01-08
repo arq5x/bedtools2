@@ -88,8 +88,6 @@ private:
 
     bool FindOverlaps(const BED &a, vector<BED> &hits);
 
-    bool FindOneOrMoreOverlap(const BED &a);
-
     void ReportOverlapDetail(int overlapBases, const BED &a, const BED &b, CHRPOS s, CHRPOS e);
     
     void ReportOverlapSummary(const BED &a, const int &numOverlapsFound);

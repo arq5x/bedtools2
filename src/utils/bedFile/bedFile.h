@@ -30,7 +30,7 @@
 #include <limits.h>
 #include <stdint.h>
 #include <cstdio>
-//#include <tr1/unordered_map>  // Experimental.
+#include <tr1/unordered_map>  // Experimental.
 using namespace std;
 
 
@@ -290,16 +290,16 @@ typedef vector<BEDCOV> bedCovVector;
 typedef vector<MATE> mateVector;
 typedef vector<BEDCOVLIST> bedCovListVector;
 
-typedef map<BIN, bedVector,    std::less<BIN> > binsToBeds;
-typedef map<BIN, bedCovVector, std::less<BIN> > binsToBedCovs;
-typedef map<BIN, mateVector, std::less<BIN> > binsToMates;
-typedef map<BIN, bedCovListVector, std::less<BIN> > binsToBedCovLists;
+typedef tr1::unordered_map<BIN, bedVector> binsToBeds;
+typedef tr1::unordered_map<BIN, bedCovVector> binsToBedCovs;
+typedef tr1::unordered_map<BIN, mateVector> binsToMates;
+typedef tr1::unordered_map<BIN, bedCovListVector> binsToBedCovLists;
 
-typedef map<string, binsToBeds, std::less<string> >    masterBedMap;
-typedef map<string, binsToBedCovs, std::less<string> > masterBedCovMap;
-typedef map<string, binsToMates, std::less<string> > masterMateMap;
-typedef map<string, binsToBedCovLists, std::less<string> > masterBedCovListMap;
-typedef map<string, bedVector, std::less<string> >     masterBedMapNoBin;
+typedef tr1::unordered_map<string, binsToBeds>    masterBedMap;
+typedef tr1::unordered_map<string, binsToBedCovs> masterBedCovMap;
+typedef tr1::unordered_map<string, binsToMates> masterMateMap;
+typedef tr1::unordered_map<string, binsToBedCovLists> masterBedCovListMap;
+typedef tr1::unordered_map<string, bedVector>     masterBedMapNoBin;
 
 
 // EXPERIMENTAL - wait for TR1
@@ -430,15 +430,14 @@ public:
     // search for all overlapping features in another BED file.
     // Searches through each relevant genome bin on the same chromosome
     // as the single feature. Note: Adapted from kent source "binKeeperFind"
-    void FindOverlapsPerBin(string chrom, CHRPOS start, CHRPOS end, string strand, vector<BED> &hits, bool sameStrand, bool diffStrand);
+    void allHits(string chrom, CHRPOS start, CHRPOS end, string strand, 
+                 vector<BED> &hits, bool sameStrand, bool diffStrand, 
+                 float overlapFraction, bool reciprocal);
 
     // return true if at least one overlap was found.  otherwise, return false.
-    bool FindOneOrMoreOverlapsPerBin(string chrom, CHRPOS start, CHRPOS end, string strand,
-                                        bool sameStrand, bool diffStrand, float overlapFraction = 0.0);
+    bool anyHits(string chrom, CHRPOS start, CHRPOS end, string strand,
+                bool sameStrand, bool diffStrand, float overlapFraction, bool reciprocal);
 
-    // return true if at least one __reciprocal__ overlap was found.  otherwise, return false.
-    bool FindOneOrMoreReciprocalOverlapsPerBin(string chrom, CHRPOS start, CHRPOS end, string strand,
-                                                    bool sameStrand, bool diffStrand, float overlapFraction = 0.0);
 
     // Given a chrom, start, end and strand for a single feature,
     // increment a the number of hits for each feature in B file
