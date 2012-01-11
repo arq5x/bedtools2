@@ -247,15 +247,15 @@ void ConvertBedToBam(const BED &bed, BamAlignment &bam, map<string, int, std::le
     else{
 
         // does it smell like BED12?  if so, process it.
-        if (bed.otherFields.size() == 6) {
+        if (bed.fields.size() == 6) {
 
             // extract the relevant BED fields to convert BED12 to BAM
             // namely: blockCount, blockStarts, blockEnds
-            unsigned int blockCount = atoi(bed.otherFields[3].c_str());
+            unsigned int blockCount = atoi(bed.fields[9].c_str());
 
             vector<int> blockSizes, blockStarts;
-            Tokenize(bed.otherFields[4], blockSizes, ",");
-            Tokenize(bed.otherFields[5], blockStarts, ",");
+            Tokenize(bed.fields[10], blockSizes, ",");
+            Tokenize(bed.fields[11], blockStarts, ",");
 
             // make sure this is a well-formed BED12 entry.
             if (blockSizes.size() != blockCount) {

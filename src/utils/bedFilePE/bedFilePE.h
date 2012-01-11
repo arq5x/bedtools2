@@ -35,7 +35,10 @@ struct BEDPE {
     string strand1;
     string strand2;
 
-    vector<string> otherFields;
+    // all of the original fields in the record
+    vector<string> fields;
+    // indices of the "other" fields
+    vector<uint16_t> other_idxs;
 };
 
 

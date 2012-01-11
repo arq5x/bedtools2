@@ -17,12 +17,12 @@ Helper functions
 *************************************************/
 void splitBedIntoBlocks(const BED &bed, bedVector &bedBlocks) {
 
-    if (bed.otherFields.size() < 6) {
+    if (bed.fields.size() < 6) {
         cerr << "Input error: Cannot split into blocks. Found interval with fewer than 12 columns." << endl;
         exit(1);
     }
 
-    int blockCount = atoi(bed.otherFields[3].c_str());
+    int blockCount = atoi(bed.fields[9].c_str());
     if ( blockCount <= 0 ) {
         cerr << "Input error: found interval having <= 0 blocks." << endl;
         exit(1);
@@ -33,8 +33,8 @@ void splitBedIntoBlocks(const BED &bed, bedVector &bedBlocks) {
     }
     else {
         // get the comma-delimited strings for the BED12 block starts and block ends.
-        string blockSizes(bed.otherFields[4]);
-        string blockStarts(bed.otherFields[5]);
+        string blockSizes(bed.fields[10]);
+        string blockStarts(bed.fields[11]);
 
         vector<int> sizes;
         vector<int> starts;
@@ -50,7 +50,8 @@ void splitBedIntoBlocks(const BED &bed, bedVector &bedBlocks) {
         for (UINT i = 0; i < (UINT) blockCount; ++i) {
             CHRPOS blockStart = bed.start + starts[i];
             CHRPOS blockEnd   = bed.start + starts[i] + sizes[i];
-            BED currBedBlock(bed.chrom, blockStart, blockEnd, bed.name, bed.score, bed.strand, bed.otherFields);
+            BED currBedBlock(bed.chrom, blockStart, blockEnd, 
+                             bed.name, bed.score, bed.strand, bed.fields, bed.other_idxs);
             bedBlocks.push_back(currBedBlock);
         }
     }
@@ -651,7 +652,8 @@ void BedFile::loadBedCovFileIntoMap() {
             bedCov.name         = bedEntry.name;
             bedCov.score        = bedEntry.score;
             bedCov.strand       = bedEntry.strand;
-            bedCov.otherFields  = bedEntry.otherFields;
+            bedCov.fields       = bedEntry.fields;
+            bedCov.other_idxs   = bedEntry.other_idxs;
             bedCov.zeroLength   = bedEntry.zeroLength;
             bedCov.count = 0;
             bedCov.minOverlapStart = INT_MAX;
@@ -677,7 +679,8 @@ void BedFile::loadBedCovListFileIntoMap() {
             bedCovList.name         = bedEntry.name;
             bedCovList.score        = bedEntry.score;
             bedCovList.strand       = bedEntry.strand;
-            bedCovList.otherFields  = bedEntry.otherFields;
+            bedCovList.fields       = bedEntry.fields;
+            bedCovList.other_idxs   = bedEntry.other_idxs;
             bedCovList.zeroLength   = bedEntry.zeroLength;
 
             bedCovListMap[bedEntry.chrom][bin].push_back(bedCovList);

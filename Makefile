@@ -34,6 +34,7 @@ SUBDIRS = $(SRC_DIR)/annotateBed \
 		  $(SRC_DIR)/intersectBed \
 		  $(SRC_DIR)/linksBed \
 		  $(SRC_DIR)/maskFastaFromBed \
+		  $(SRC_DIR)/mapBed \
 		  $(SRC_DIR)/mergeBed \
 		  $(SRC_DIR)/multiBamCov \
 		  $(SRC_DIR)/multiIntersectBed \

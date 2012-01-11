@@ -161,8 +161,8 @@ bool PairToPair::FindHitsOnBothEnds(const BEDPE &a, const vector<MATE> &qualityH
                                                                    b2.bed.chrom.c_str(), b2.bed.start, b2.bed.end,
                                                                    b1.bed.name.c_str(), b1.bed.score.c_str(),
                                                                    b1.bed.strand.c_str(), b2.bed.strand.c_str());
-                for (size_t i = 0; i < b1.bed.otherFields.size(); ++i)
-                    printf("\t%s", b1.bed.otherFields[i].c_str());
+                for (size_t i = 0; i < b1.bed.other_idxs.size(); ++i)
+                    printf("\t%s", b1.bed.fields[b1.bed.other_idxs[i]].c_str());
                 printf("\n");
             }
         }
@@ -195,8 +195,8 @@ void PairToPair::FindHitsOnEitherEnd(const BEDPE &a, const vector<MATE> &quality
                                                                    b2.bed.chrom.c_str(), b2.bed.start, b2.bed.end,
                                                                    b1.bed.name.c_str(), b1.bed.score.c_str(),
                                                                    b1.bed.strand.c_str(), b2.bed.strand.c_str());
-                for (size_t i = 0; i < b1.bed.otherFields.size(); ++i)
-                    printf("\t%s", b1.bed.otherFields[i].c_str());
+                for (size_t i = 0; i < b1.bed.other_idxs.size(); ++i)
+                    printf("\t%s", b1.bed.fields[b1.bed.other_idxs[i]].c_str());
                 printf("\n");
             }
             else {
@@ -207,8 +207,8 @@ void PairToPair::FindHitsOnEitherEnd(const BEDPE &a, const vector<MATE> &quality
                                                                    b1.mate->bed.chrom.c_str(), b1.mate->bed.start, b1.mate->bed.end,
                                                                    b1.bed.name.c_str(), b1.bed.score.c_str(),
                                                                    b1.bed.strand.c_str(), b1.mate->bed.strand.c_str());
-                for (size_t i = 0; i < b1.bed.otherFields.size(); ++i)
-                    printf("\t%s", b1.bed.otherFields[i].c_str());
+                for (size_t i = 0; i < b1.bed.other_idxs.size(); ++i)
+                    printf("\t%s", b1.bed.fields[b1.bed.other_idxs[i]].c_str());
                 printf("\n");
             }
         }

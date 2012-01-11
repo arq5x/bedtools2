@@ -106,11 +106,10 @@ void BedFilePE::reportBedPETab(const BEDPE &a) {
         printf("%s\t%d\t%d\t%s\t%d\t%d\t%s\t%s\t%s\t%s", a.chrom1.c_str(), a.start1, a.end1,
                                             a.chrom2.c_str(), a.start2, a.end2,
                                             a.name.c_str(), a.score.c_str(), a.strand1.c_str(), a.strand2.c_str());
-
-        vector<string>::const_iterator othIt = a.otherFields.begin();
-        vector<string>::const_iterator othEnd = a.otherFields.end();
+        vector<uint16_t>::const_iterator othIt  = a.other_idxs.begin();
+        vector<uint16_t>::const_iterator othEnd = a.other_idxs.end();
         for ( ; othIt != othEnd; ++othIt) {
-            printf("\t%s", othIt->c_str());
+            printf("\t%s", a.fields[*othIt].c_str());
         }
         printf("\t");
     }
@@ -149,11 +148,10 @@ void BedFilePE::reportBedPENewLine(const BEDPE &a) {
         printf("%s\t%d\t%d\t%s\t%d\t%d\t%s\t%s\t%s\t%s", a.chrom1.c_str(), a.start1, a.end1,
                                             a.chrom2.c_str(), a.start2, a.end2,
                                             a.name.c_str(), a.score.c_str(), a.strand1.c_str(), a.strand2.c_str());
-
-        vector<string>::const_iterator othIt  = a.otherFields.begin();
-        vector<string>::const_iterator othEnd = a.otherFields.end();
+        vector<uint16_t>::const_iterator othIt  = a.other_idxs.begin();
+        vector<uint16_t>::const_iterator othEnd = a.other_idxs.end();
         for ( ; othIt != othEnd; ++othIt) {
-            printf("\t%s", othIt->c_str());
+            printf("\t%s", a.fields[*othIt].c_str());
         }
         printf("\n");
     }
@@ -193,7 +191,7 @@ bool BedFilePE::parseBedPELine (BEDPE &bed, const vector<string> &lineVector, co
     if ((lineNum == 1) && (lineVector.size() >= 6)) {
 
         this->bedType = lineVector.size();
-
+        bed.fields = lineVector;
         if (this->bedType == 6) {
             bed.chrom1 = lineVector[0];
             bed.start1 = atoi(lineVector[1].c_str());
@@ -263,7 +261,7 @@ bool BedFilePE::parseBedPELine (BEDPE &bed, const vector<string> &lineVector, co
             bed.strand2 = lineVector[9];
 
             for (unsigned int i = 10; i < lineVector.size(); ++i) {
-                bed.otherFields.push_back(lineVector[i]);
+                bed.other_idxs.push_back(i);
             }
             return true;
         }
@@ -287,6 +285,8 @@ bool BedFilePE::parseBedPELine (BEDPE &bed, const vector<string> &lineVector, co
     }
     else if ( (lineNum > 1) && (lineVector.size() == this->bedType)) {
 
+        bed.fields = lineVector;
+        
         if (this->bedType == 6) {
             bed.chrom1 = lineVector[0];
             bed.start1 = atoi(lineVector[1].c_str());
@@ -354,9 +354,8 @@ bool BedFilePE::parseBedPELine (BEDPE &bed, const vector<string> &lineVector, co
 
             bed.strand1 = lineVector[8];
             bed.strand2 = lineVector[9];
-
             for (unsigned int i = 10; i < lineVector.size(); ++i) {
-                bed.otherFields.push_back(lineVector[i]);
+                bed.other_idxs.push_back(i);
             }
             return true;
         }
@@ -513,7 +512,8 @@ void BedFilePE::splitBedPEIntoBeds(const BEDPE &bedpeEntry, const int &lineNum, 
     bedEntry1->bed.name            = bedpeEntry.name;
     bedEntry1->bed.score           = bedpeEntry.score;        // only store the score in end1 to save memory
     bedEntry1->bed.strand          = bedpeEntry.strand1;
-    bedEntry1->bed.otherFields     = bedpeEntry.otherFields;  // only store the otherFields in end1 to save memory
+    bedEntry1->bed.fields          = bedpeEntry.fields;       // only store the fields in end1 to save memory
+    bedEntry1->bed.other_idxs      = bedpeEntry.other_idxs;   // only store the other_idxs in end1 to save memory
     bedEntry1->lineNum             = lineNum;
     bedEntry1->mate                = bedEntry2;               // keep a pointer to end2
 
