@@ -23,7 +23,10 @@ using namespace BamTools;
 
 #include <vector>
 #include <iostream>
+#include <algorithm>
+#include <numeric>
 #include <fstream>
+#include <iomanip>
 #include <stdlib.h>
 using namespace std;
 
@@ -65,9 +68,7 @@ private:
     // private methods
     //------------------------------------------------
     void Map();
-    
-    void ApplyHits(const BED &a, const vector<BED> &hits);
-
+    string MapHits(const BED &a, const vector<BED> &hits);
 };
 
 #endif /* MAPBED_H */

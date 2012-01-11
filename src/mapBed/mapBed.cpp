@@ -12,6 +12,8 @@
 #include "lineFileUtilities.h"
 #include "mapBed.h"
 
+const int PRECISION = 21;
+double GetUserColumn(const string s);
 
 // Constructor
 BedMap::BedMap(string bedAFile, string bedBFile, int column, string operation,
@@ -48,25 +50,50 @@ void BedMap::Map() {
     pair<BED, vector<BED> > hit_set;
     hit_set.second.reserve(100000);
     while (sweep.Next(hit_set)) {
-        ApplyHits(hit_set.first, hit_set.second);
+        string result = ApplyHits(hit_set.first, hit_set.second);
+        _bedB->reportBedTab(hit_set.first);
+        printf("%s\n", result.c_str());
     }
 }
 
+string BedMap::MapHits(const BED &a, const vector<BED> &hits) {
 
-// ***************************************
-// **************   TO DO   **************
-// move all of this logic into bedFile.cpp
-// so that hits aren't looped through twice.
-// ***************************************
-
-void BedMap::ApplyHits(const BED &a, const vector<BED> &hits) {
-    // loop through the hits and report those that meet the user's criteria
-    vector<BED>::const_iterator h       = hits.begin();
-    vector<BED>::const_iterator hitsEnd = hits.end();
-    for (; h != hitsEnd; ++h) {
-        cout << h->fields[_column] << " " << h->fields.size() << endl;
+    vector<string> data;
+    vector<double> dataF;
+    data.reserve(hits.size());
+    dataF.reserve(hits.size());
+    for (size_t i = 0; i < hits.size(); ++i) {
+        try {
+            data.push_back(hits[i].fields.at(_column));
+        }
+        catch(std::out_of_range& e) {
+            cerr << endl << "*****" << endl 
+                 << "*****ERROR: requested column ("
+                 << _column + 1
+                 << ") exceeds the number of columns in file at line "
+                 << _bedA->_lineNum << ". Exiting." 
+                 << endl << "*****" << endl;
+            exit(1);
+        }
     }
+    transform(data.begin(), data.end(), back_inserter(dataF), GetUserColumn);
+
+    // sum
+    double total = accumulate(dataF.begin(), dataF.end(), 0.0);
+    ostringstream output;
+    output << setprecision (PRECISION) << total;
+    return output.str();
 }
 
+
+double GetUserColumn(const string s) {
+    std::istringstream i(s);
+    double x;
+    if (!(i >> x)) {
+        cerr << "Error: Could not properly convert string to numeric (\"" + i.str() + "\")" << endl;
+        exit(1);
+    }
+    return x;
+}
 
 

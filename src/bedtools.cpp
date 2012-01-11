@@ -52,6 +52,7 @@ int groupby_main(int argc, char* argv[]);//
 int intersect_main(int argc, char* argv[]); //
 int links_main(int argc, char* argv[]);//
 int maskfastafrombed_main(int argc, char* argv[]);//
+int map_main(int argc, char* argv[]); //
 int merge_main(int argc, char* argv[]); //
 int multibamcov_main(int argc, char* argv[]);//
 int multiintersect_main(int argc, char* argv[]);//
@@ -82,6 +83,7 @@ int main(int argc, char *argv[])
     else if (sub_cmd == "window")      return window_main(argc-1, argv+1);
     else if (sub_cmd == "closest")     return closest_main(argc-1, argv+1);
     else if (sub_cmd == "coverage")    return coverage_main(argc-1, argv+1);
+    else if (sub_cmd == "map")         return map_main(argc-1, argv+1);
     else if (sub_cmd == "genomecov")   return genomecoverage_main(argc-1, argv+1);
     else if (sub_cmd == "merge")       return merge_main(argc-1, argv+1);
     else if (sub_cmd == "cluster")     return cluster_main(argc-1, argv+1);    
@@ -173,6 +175,7 @@ int bedtools_help(void)
     cout  << "    window        "  << "Find overlapping intervals within a window around an interval.\n";
     cout  << "    closest       "  << "Find the closest, potentially non-overlapping interval.\n";    
     cout  << "    coverage      "  << "Compute the coverage over defined intervals.\n";
+    cout  << "    map           "  << "Summarize intervals from one file overlapping intervals in another.\n";
     cout  << "    genomecov     "  << "Compute the coverage over an entire genome.\n";
     cout  << "    merge         "  << "Combine overlapping/nearby intervals into a single interval.\n";
     cout  << "    cluster       "  << "Cluster (but don't merge) overlapping/nearby intervals.\n";
