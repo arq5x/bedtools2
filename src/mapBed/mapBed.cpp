@@ -73,6 +73,10 @@ string BedMap::MapHits(const BED &a, const vector<BED> &hits) {
         output << setprecision (PRECISION) << vo.GetMin();
     else if (_operation == "max")
         output << setprecision (PRECISION) << vo.GetMax();
+    else if (_operation == "mode")
+        output << vo.GetMode();
+    else if (_operation == "antimode")
+        output << vo.GetAntiMode();
     else if (_operation == "count")
         output << setprecision (PRECISION) << vo.GetCount();
     else if (_operation == "count_distinct")
@@ -82,7 +86,7 @@ string BedMap::MapHits(const BED &a, const vector<BED> &hits) {
     else if (_operation == "distinct")
         output << vo.GetDistinct();
     else {
-        cerr << "ERROR: " << _operation << " is an unrecoginzed operation";
+        cerr << "ERROR: " << _operation << " is an unrecoginzed operation\n";
         exit(1);
     }
     _column_vec.clear();

@@ -39,6 +39,8 @@ public:
     double GetSum(void);              // return the total of the values in the vector
     double GetMean(void);             // return the average value in the vector
     double GetMedian(void);           // return the median value in the vector
+    string GetMode(void);             // return the most common value in the vector
+    string GetAntiMode(void);         // return the least common value in the vector
     double GetMin(void);              // return the minimum element of the vector
     double GetMax(void);              // return the maximum element of the vector
     uint32_t GetCount(void);          // return the count of element in the vector

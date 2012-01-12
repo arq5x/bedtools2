@@ -88,6 +88,64 @@ double VectorOps::GetMax(void)
     return *max_element( _vecd.begin(), _vecd.end() );
 }
 
+
+string VectorOps::GetMode(void)
+{
+    string mode;
+    int max_count = 0;
+    int curr_count = 0;
+    
+    sort(_vecs.begin(), _vecs.end());
+
+    string prev = "";
+    vector<string>::const_iterator it = _vecs.begin();
+    while (it != _vecs.end())
+    {
+        if (*it != prev && prev != "")
+        {
+            if (curr_count > max_count)
+            {
+                max_count = curr_count;
+                mode = *it;
+            }
+            curr_count = 0;
+        }
+        else { curr_count++; }
+        prev = *it;
+        ++it;
+    }
+    return mode;
+}
+
+
+string VectorOps::GetAntiMode(void)
+{
+    string antimode;
+    int min_count = 0;
+    int curr_count = 0;
+    
+    sort(_vecs.begin(), _vecs.end());
+
+    string prev = "";
+    vector<string>::const_iterator it = _vecs.begin();
+    while (it != _vecs.end())
+    {
+        if (*it != prev && prev != "")
+        {
+            if (curr_count < min_count)
+            {
+                min_count = curr_count;
+                antimode = *it;
+            }
+            curr_count = 0;
+        }
+        else { curr_count++; }
+        prev = *it;
+        ++it;
+    }
+    return antimode;
+}
+
 uint32_t VectorOps::GetCount(void)
 {
     return _vecs.size();
