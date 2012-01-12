@@ -628,8 +628,6 @@ void BedFile::loadBedFileIntoMap() {
     while (GetNextBed(bedEntry)) {
         if (_status == BED_VALID) {
             BIN bin = getBin(bedEntry.start, bedEntry.end);
-            // ostringstream key;
-            // key <<bedEntry.chrom << bin;
             bedMap[bedEntry.chrom][bin].push_back(bedEntry);
         }
     }

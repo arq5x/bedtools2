@@ -155,33 +155,42 @@ void map_help(void) {
 
     cerr << "\nTool:    bedtools map (aka mapBed)" << endl;
     cerr << "Version: " << VERSION << "\n";    
-    cerr << "Summary: Summarize interval overlaps between two feature files." << endl << endl;
+    cerr << "Summary: Summarize a column from intervals in B that overlap A." << endl << endl;
 
     cerr << "Usage:   " << PROGRAM_NAME << " [OPTIONS] -a <bed/gff/vcf> -b <bed/gff/vcf>" << endl << endl;
 
     cerr << "Options: " << endl;
 
-    cerr << "\t-c\t"            << "Which column?." << endl << endl;
+    cerr << "\t-c\t"             << "Specify the column from the B file to map onto A." << endl;
+    cerr                         << "\t\t - Default = 4." << endl << endl;
 
-    cerr << "\t-o\t"            << "Which operation?." << endl << endl;
+    cerr << "\t-o\t"             << "Specify the operation that should be applied to -c." << endl;
+    cerr                         << "\t\t Valid operations:" << endl;
+    cerr                         << "\t\t    sum, min, max," << endl;
+    cerr                         << "\t\t    mean, median," << endl;
+    cerr                         << "\t\t    collapse (i.e., print a comma separated list (duplicates allowed)), " << endl;
+    cerr                         << "\t\t    distinct (i.e., print a comma separated list (NO duplicates allowed)), " << endl;
+    cerr                         << "\t\t    count" << endl;
+    cerr                         << "\t\t    count_distinct (i.e., a count of the unique values in the column), " << endl;
+    cerr                         << "\t\t- Default: sum" << endl << endl;
 
-    cerr << "\t-f\t"            << "Minimum overlap required as a fraction of A." << endl;
-    cerr                        << "\t\t- Default is 1E-9 (i.e., 1bp)." << endl;
-    cerr                        << "\t\t- FLOAT (e.g. 0.50)" << endl << endl;
-
-    cerr << "\t-r\t"            << "Require that the fraction overlap be reciprocal for A and B." << endl;
-    cerr                        << "\t\t- In other words, if -f is 0.90 and -r is used, this requires" << endl;
-    cerr                        << "\t\t  that B overlap 90% of A and A _also_ overlaps 90% of B." << endl << endl;
-
-    cerr << "\t-s\t"            << "Require same strandedness.  That is, only report hits in B" << endl;
-    cerr                        << "\t\tthat overlap A on the _same_ strand." << endl;
-    cerr                        << "\t\t- By default, overlaps are reported without respect to strand." << endl << endl;
-
-    cerr << "\t-S\t"            << "Require different strandedness.  That is, only report hits in B" << endl;
-    cerr                        << "\t\tthat overlap A on the _opposite_ strand." << endl;
-    cerr                        << "\t\t- By default, overlaps are reported without respect to strand." << endl << endl;
-    
-    cerr << "\t-header\t"       << "Print the header from the A file prior to results." << endl << endl;
+    cerr << "\t-f\t"             << "Minimum overlap required as a fraction of A." << endl;
+    cerr                         << "\t\t- Default is 1E-9 (i.e., 1bp)." << endl;
+    cerr                         << "\t\t- FLOAT (e.g. 0.50)" << endl << endl;
+                                 
+    cerr << "\t-r\t"             << "Require that the fraction overlap be reciprocal for A and B." << endl;
+    cerr                         << "\t\t- In other words, if -f is 0.90 and -r is used, this requires" << endl;
+    cerr                         << "\t\t  that B overlap 90% of A and A _also_ overlaps 90% of B." << endl << endl;
+                                 
+    cerr << "\t-s\t"             << "Require same strandedness.  That is, only report hits in B" << endl;
+    cerr                         << "\t\tthat overlap A on the _same_ strand." << endl;
+    cerr                         << "\t\t- By default, overlaps are reported without respect to strand." << endl << endl;
+                                 
+    cerr << "\t-S\t"             << "Require different strandedness.  That is, only report hits in B" << endl;
+    cerr                         << "\t\tthat overlap A on the _opposite_ strand." << endl;
+    cerr                         << "\t\t- By default, overlaps are reported without respect to strand." << endl << endl;
+                                 
+    cerr << "\t-header\t"        << "Print the header from the A file prior to results." << endl << endl;
  
     // end the program here
     exit(1);

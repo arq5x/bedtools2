@@ -14,6 +14,7 @@
 
 #include "bedFile.h"
 #include "chromsweep.h"
+#include "VectorOps.h"
 #include "api/BamReader.h"
 #include "api/BamWriter.h"
 #include "api/BamAux.h"
@@ -63,12 +64,15 @@ private:
     
     // instance of a bed file class.
     BedFile *_bedA, *_bedB;
+    
+    vector<string> _column_vec; // vector to hold current column's worth of data
 
     //------------------------------------------------
     // private methods
     //------------------------------------------------
     void Map();
     string MapHits(const BED &a, const vector<BED> &hits);
+    void ExtractColumnFromHits(const vector<BED> &hits);
 };
 
 #endif /* MAPBED_H */
