@@ -30,7 +30,10 @@ public:
     // A is the query and B is the database
     
     // constructor using existing BedFile pointers
-    ChromSweep(BedFile *query, BedFile *db, bool sameStrand = false, bool diffStrand = false, bool printHeader = false);
+    ChromSweep(BedFile *query, BedFile *db, 
+               bool sameStrand = false, bool diffStrand = false, 
+               float overlapFraction = 0.0, bool reciprocal = false,
+               bool printHeader = false);
     
     // constructor using filenames
     ChromSweep(string &queryFile, string &dbFile);
@@ -58,8 +61,9 @@ private:
 
     // instances of a bed file class.
     BedFile *_query, *_db;
+    float _overlapFraction;
     // do we care about strandedness.
-    bool _sameStrand, _diffStrand;
+    bool _sameStrand, _diffStrand, _reciprocal;
     // a cache of still active features from the database file
     vector<BED> _cache;
     // the set of hits in the database for the current query

@@ -18,11 +18,18 @@ bool after(const BED &a, const BED &b);
 /*
     // constructor using existing BedFile pointers
 */
-ChromSweep::ChromSweep(BedFile *query, BedFile *db, bool sameStrand, bool diffStrand, bool printHeader)
+ChromSweep::ChromSweep(BedFile *query, BedFile *db, 
+                       bool sameStrand, bool diffStrand, 
+                       float overlapFraction, bool reciprocal,
+                       bool printHeader)
+
+
 : _query(query)
 , _db(db)
+, _overlapFraction(overlapFraction)
 , _sameStrand(sameStrand)
 , _diffStrand(diffStrand)
+, _reciprocal(reciprocal)
 {
     _hits.reserve(100000);
     _cache.reserve(100000);
@@ -115,8 +122,15 @@ bool ChromSweep::ChromChange()
 
 
 bool ChromSweep::IsValidHit(const BED &query, const BED &db) {
-    // do we have an overlap in the DB?
-    if (overlaps(query.start, query.end, db.start, db.end) > 0) {
+    CHRPOS aLength = query.end - query.start;
+    CHRPOS s = max(query.start, db.start);
+    CHRPOS e = min(query.end, db.end);
+    int overlapBases = (e - s); 
+    // 1. is there sufficient overlap w.r.t A?
+    if ( (float) overlapBases / (float) aLength  >= _overlapFraction) {
+        CHRPOS bLength = (db.end - query.start);
+        float bOverlap = ( (float) overlapBases / (float) bLength );
+    
         // Now test for necessary strandedness.
         bool strands_are_same = (query.strand == db.strand);
         if ( (_sameStrand == false && _diffStrand == false)
@@ -126,7 +140,12 @@ bool ChromSweep::IsValidHit(const BED &query, const BED &db) {
              (_diffStrand == true && strands_are_same == false)
            )
         {
-            return true;
+            // 3. did the user request reciprocal overlap
+            // (i.e. sufficient overlap w.r.t. both A and B?)
+            if (!_reciprocal)
+                return true;
+            else if (bOverlap >= _overlapFraction)
+                return true;
         }
     }
     return false;
