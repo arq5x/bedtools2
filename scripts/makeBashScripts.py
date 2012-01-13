@@ -25,6 +25,7 @@ def main():
                  'igv': 'bedToIgv', 
                  'intersect': 'intersectBed', 
                  'links': 'linksBed', 
+                 'map': 'mapBed', 
                  'maskfasta': 'maskFastaFromBed', 
                  'merge': 'mergeBed', 
                  'multicov': 'multiBamCov', 
