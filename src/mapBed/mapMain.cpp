@@ -34,6 +34,7 @@ int map_main(int argc, char* argv[]) {
     string bedBFile;
     int column = 5;
     string operation = "sum";
+    string nullValue = ".";
 
     // input arguments
     float overlapFraction = 1E-9;
@@ -111,6 +112,10 @@ int map_main(int argc, char* argv[]) {
         else if (PARAMETER_CHECK("-S", 2, parameterLength)) {
             diffStrand = true;
         }
+        else if (PARAMETER_CHECK("-null", 5, parameterLength)) {
+            nullValue = argv[i + 1];
+            i++;
+        }
         else if(PARAMETER_CHECK("-header", 7, parameterLength)) {
             printHeader = true;
         }
@@ -141,7 +146,7 @@ int map_main(int argc, char* argv[]) {
         BedMap *bm = new BedMap(bedAFile, bedBFile, column, operation,
                                        overlapFraction, sameStrand,
                                        diffStrand, reciprocalFraction,
-                                       printHeader);
+                                       nullValue, printHeader);
         delete bm;
         return 0;
     }
@@ -161,7 +166,7 @@ void map_help(void) {
 
     cerr << "Options: " << endl;
 
-    cerr << "\t-c\t"             << "Specify the column from the B file to map onto A." << endl;
+    cerr << "\t-c\t"             << "Specify the column from the B file to map onto intervaks in A." << endl;
     cerr                         << "\t\t - Default = 4." << endl << endl;
 
     cerr << "\t-o\t"             << "Specify the operation that should be applied to -c." << endl;
@@ -189,7 +194,10 @@ void map_help(void) {
     cerr << "\t-S\t"             << "Require different strandedness.  That is, only report hits in B" << endl;
     cerr                         << "\t\tthat overlap A on the _opposite_ strand." << endl;
     cerr                         << "\t\t- By default, overlaps are reported without respect to strand." << endl << endl;
-                                 
+
+    cerr << "\t-null\t"          << "The value to print if no overlaps are found for an A interval." << endl;
+    cerr                         << "\t\t- Default - \".\"" << endl << endl;
+
     cerr << "\t-header\t"        << "Print the header from the A file prior to results." << endl << endl;
  
     // end the program here

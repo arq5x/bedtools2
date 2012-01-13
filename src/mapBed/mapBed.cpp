@@ -18,8 +18,8 @@ double GetUserColumn(const string s);
 // Constructor
 BedMap::BedMap(string bedAFile, string bedBFile, int column, string operation,
                float overlapFraction, bool sameStrand, 
-               bool diffStrand, bool reciprocal, 
-               bool printHeader) 
+               bool diffStrand, bool reciprocal,
+               string nullValue, bool printHeader) 
 {
 
     _bedAFile            = bedAFile;
@@ -30,6 +30,7 @@ BedMap::BedMap(string bedAFile, string bedBFile, int column, string operation,
     _sameStrand          = sameStrand;
     _diffStrand          = diffStrand;
     _reciprocal          = reciprocal;
+    _nullValue           = nullValue;
     _printHeader         = printHeader;
     
     Map();
@@ -46,7 +47,10 @@ void BedMap::Map() {
     _bedB = new BedFile(_bedBFile);
 
     // use the chromsweep algorithm to detect overlaps on the fly.
-    ChromSweep sweep = ChromSweep(_bedA, _bedB, _sameStrand, _diffStrand, _printHeader);
+    ChromSweep sweep = ChromSweep(_bedA, _bedB, 
+                                  _sameStrand, _diffStrand, 
+                                  _overlapFraction, _reciprocal,
+                                  _printHeader);
 
     pair<BED, vector<BED> > hit_set;
     hit_set.second.reserve(100000);
@@ -59,10 +63,13 @@ void BedMap::Map() {
 
 
 string BedMap::MapHits(const BED &a, const vector<BED> &hits) {
+    
+    ostringstream output;
+    if (hits.size() == 0)
+        return _nullValue;
+
     ExtractColumnFromHits(hits);
     VectorOps vo(_column_vec);
-    ostringstream output;
-    
     if (_operation == "sum") 
         output << setprecision (PRECISION) << vo.GetSum();
     else if (_operation == "mean")
