@@ -10,6 +10,7 @@ INCLUDES = -I$(UTILITIES_DIR)/tabFile/ \
            -I$(UTILITIES_DIR)/lineFileUtilities/ \
            -I$(UTILITIES_DIR)/gzstream/ \
            -I$(UTILITIES_DIR)/fileType/ \
+           -I$(UTILITIES_DIR)/VectorOps/ \
            -I$(UTILITIES_DIR)/version/
 
 # ----------------------------------
@@ -17,7 +18,7 @@ INCLUDES = -I$(UTILITIES_DIR)/tabFile/ \
 # ----------------------------------
 SOURCES= groupBy.cpp
 OBJECTS= $(SOURCES:.cpp=.o)
-_EXT_OBJECTS=tabFile.o gzstream.o fileType.o
+_EXT_OBJECTS=tabFile.o gzstream.o fileType.o VectorOps.o
 EXT_OBJECTS=$(patsubst %,$(OBJ_DIR)/%,$(_EXT_OBJECTS))
 BUILT_OBJECTS= $(patsubst %,$(OBJ_DIR)/%,$(OBJECTS))
 

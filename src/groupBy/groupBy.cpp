@@ -27,6 +27,7 @@ Licenced under the MIT license.
 #include "version.h"
 #include "lineFileUtilities.h"
 #include "tabFile.h"
+#include "VectorOps.h"
 using namespace std;
 
 
@@ -39,33 +40,12 @@ const int PRECISION = 21;
 #define PARAMETER_CHECK(param, paramLen, actualLen) ((strncmp(argv[i], param, min(actualLen, paramLen))== 0) && (actualLen == paramLen))
 #define LOOKS_LIKE_A_PARAM(string) (strlen(string)>0 && string[0]=='-')
 
-
-struct ValueGreaterThan
-{
-    bool operator()( const vector< pair<int, string> >::value_type& lhs,
-        const vector< pair<int, string> >::value_type& rhs ) const
-    {
-        return lhs.first > rhs.first;
-    }
-};
-
-struct ValueLessThan
-{
-    bool operator()( const vector< pair<int, string> >::value_type& lhs,
-        const vector< pair<int, string> >::value_type& rhs ) const
-    {
-        return lhs.first < rhs.first;
-    }
-};
-
 // function declarations
 void groupby_help(void);
 void GroupBy(const string &inFile, const vector<int> &groupColumns, const vector<int> &opColumns, const vector<string> &ops, const bool printOriginalLine, const bool printHeaderLine, const bool InputHaveHeaderLine, const bool ignoreCase);
 void PrintHeaderLine(const vector<string> &InputFields, const vector<int> &groupColumns, const vector<int> &opColumns, const vector<string> &ops, const bool PrintFullInputLine, const bool InputHaveHeaderLine);
 void ReportSummary(const vector<string> &group, const vector<vector<string> > &data, const vector<string> &ops);
 void addValue (const vector<string> &fromList, vector<string> &toList, int index, int lineNum, const bool ignoreCase);
-float ToFloat (string element);
-double ToDouble(const string &element);
 void TabPrintPost (string element);
 void TabPrintPre (string element);
 void CommaPrint (string element);
@@ -407,170 +387,59 @@ void ReportSummary(const vector<string> &group, const vector<vector<string> > &d
 
         string op = ops[i];
         std::stringstream buffer;
-        vector<double> dataF;
-        // are we doing a numeric conversion?  if so, convert the strings to doubles.
-        if ((op == "sum") || (op == "max") || (op == "min") || (op == "mean") ||
-            (op == "median") || (op == "stdev") || (op == "sstdev"))
-        {
-            transform(data[i].begin(), data[i].end(), back_inserter(dataF), ToDouble);
-        }
+        VectorOps vo(data[i]);
 
         if (op == "sum") {
-            // sum them up
-            double total = accumulate(dataF.begin(), dataF.end(), 0.0);
-            buffer << setprecision (PRECISION) << total;
+            buffer << setprecision (PRECISION) << vo.GetSum();
             result.push_back(buffer.str());
         }
         else if (op == "collapse") {
-            string collapse;
-            for( size_t j = 0; j < data[i].size(); j++ ) {//Ugly, but cannot use back_inserter
-                if (j>0)
-                    collapse.append(",");
-                collapse.append(data[i][j]);
-            }
-            result.push_back(collapse);
+            result.push_back(vo.GetCollapse());
         }
         else if (op == "distinct") {
-            string distinct;
-            // get the current column's data
-            vector<string> col_data = data[i];
-            // remove duplicate entries from the vector
-            // http://stackoverflow.com/questions/1041620/most-efficient-way-to-erase-duplicates-and-sort-a-c-vector
-            sort( col_data.begin(), col_data.end() );
-            col_data.erase( unique( col_data.begin(), col_data.end() ), col_data.end() );
-            
-            for( size_t j = 0; j < col_data.size(); j++ ) {//Ugly, but cannot use back_inserter
-                if (j>0)
-                    distinct.append(",");
-                distinct.append(col_data[j]);
-            }
-            result.push_back(distinct);
+            result.push_back(vo.GetDistinct());
         }
         else if (op == "concat") {
-            string concat;
-            for( size_t j = 0; j < data[i].size(); j++ ) {//Ugly, but cannot use back_inserter
-                concat.append(data[i][j]);
-            }
-            result.push_back(concat);
+            result.push_back(vo.GetConcat());
         }
         else if (op == "min") {
-            buffer << setprecision (PRECISION) << *min_element( dataF.begin(), dataF.end() );
+            buffer << setprecision (PRECISION) << vo.GetMin();
             result.push_back(buffer.str());
         }
         else if (op == "max") {
-            buffer << setprecision (PRECISION) << *max_element( dataF.begin(), dataF.end() );
+            buffer << setprecision (PRECISION) << vo.GetMax();
             result.push_back(buffer.str());
         }
         else if (op == "mean") {
-            double total = accumulate(dataF.begin(), dataF.end(), 0.0);
-            double mean = total / dataF.size();
-            buffer << setprecision (PRECISION) << mean;
+            buffer << setprecision (PRECISION) << vo.GetMean();
             result.push_back(buffer.str());
         }
         else if (op == "median") {
-            double median = 0.0;
-            sort(dataF.begin(), dataF.end());
-            int totalLines = dataF.size();
-            if ((totalLines % 2) > 0) {
-                long mid;
-                mid = totalLines / 2;
-                median = dataF[mid];
-            }
-            else {
-                long midLow, midHigh;
-                midLow = (totalLines / 2) - 1;
-                midHigh = (totalLines / 2);
-                median = (dataF[midLow] + dataF[midHigh]) / 2.0;
-            }
-            buffer << setprecision (PRECISION) << median;
+            buffer << setprecision (PRECISION) << vo.GetMedian();
             result.push_back(buffer.str());
         }
         else if (op == "count") {
             buffer << setprecision (PRECISION) << data[i].size();
             result.push_back(buffer.str());
         }
-        else if ((op == "mode") || (op == "antimode") ||
-        (op == "freqdesc") || (op == "freqasc")) {
-            // compute the frequency of each unique value
-            map<string, int> freqs;
-            vector<string>::const_iterator dIt  = data[i].begin();
-            vector<string>::const_iterator dEnd = data[i].end();
-            for (; dIt != dEnd; ++dIt) {
-                freqs[*dIt]++;
-            }
-
-            // grab the mode and the anti mode
-            string mode, antiMode;
-            int    count = 0;
-            int minCount = INT_MAX;
-            for(map<string,int>::const_iterator iter = freqs.begin(); iter != freqs.end(); ++iter) {
-                if (iter->second > count) {
-                    mode = iter->first;
-                    count = iter->second;
-                }
-                if (iter->second < minCount) {
-                    antiMode = iter->first;
-                    minCount = iter->second;
-                }
-            }
-            // report
-            if (op == "mode") {
-                buffer << setprecision (PRECISION) << mode;
-                result.push_back(buffer.str());
-            }
-            else if (op == "antimode") {
-                buffer << setprecision (PRECISION) << antiMode;
-                result.push_back(buffer.str());
-            }
-            else if (op == "freqdesc" || op == "freqasc") {
-                // pair for the num times a values was
-                // observed (1) and the value itself (2)
-                pair<int, string> freqPair;
-                vector< pair<int, string> > freqList;
-
-                // create a list of pairs of all the observed values (second)
-                // and their occurences (first)
-                map<string,int>::const_iterator mapIter = freqs.begin();
-                map<string,int>::const_iterator mapEnd  = freqs.end();
-                for(; mapIter != mapEnd; ++mapIter)
-                    freqList.push_back( make_pair(mapIter->second, mapIter->first) );
-
-                // sort the list of pairs in the requested order by the frequency
-                // this will make the value that was observed least/most bubble to the top
-                if (op == "freqdesc")
-                    sort(freqList.begin(), freqList.end(), ValueGreaterThan());
-                else if (op == "freqasc")
-                    sort(freqList.begin(), freqList.end(), ValueLessThan());
-
-                // record all of the values and their frequencies.
-                vector< pair<int, string> >::const_iterator iter    = freqList.begin();
-                vector< pair<int, string> >::const_iterator iterEnd = freqList.end();
-                for (; iter != iterEnd; ++iter)
-                    buffer << iter->second << ":" << iter->first << ",";
-                result.push_back(buffer.str());
-            }
+        else if (op == "mode") {
+            result.push_back(vo.GetMode());
         }
-        else if (op == "stdev" || op == "sstdev") {
-            // get the mean
-            double total = accumulate(dataF.begin(), dataF.end(), 0.0);
-            double mean = total / dataF.size();
-            // get the variance
-            double totalVariance = 0.0;
-            vector<double>::const_iterator dIt  = dataF.begin();
-            vector<double>::const_iterator dEnd = dataF.end();
-            for (; dIt != dEnd; ++dIt) {
-                totalVariance += pow((*dIt - mean),2);
-            }
-            double variance = 0.0;
-            if (op == "stdev") {
-                variance = totalVariance / dataF.size();
-            }
-            else if (op == "sstdev" && dataF.size() > 1) {
-                variance = totalVariance / (dataF.size() - 1);
-            }
-            double stddev = sqrt(variance);
-            // report
-            buffer << setprecision (PRECISION) << stddev;
+        else if (op == "antimode") {
+            result.push_back(vo.GetAntiMode());
+        }
+        else if (op == "freqdesc") {
+            result.push_back(vo.GetFreqDesc());
+        }
+        else if (op == "freqasc") {
+            result.push_back(vo.GetFreqAsc());
+        }
+        else if (op == "stdev") {
+            buffer << setprecision (PRECISION) << vo.GetStddev();
+            result.push_back(buffer.str());
+        }
+        else if (op == "sstdev") {
+            buffer << setprecision (PRECISION) << vo.GetSstddev();
             result.push_back(buffer.str());
         }
     }
@@ -596,10 +465,6 @@ void addValue (const vector<string> &fromList, vector<string> &toList, int index
 }
 
 
-float ToFloat (string element) {
-    return atof(element.c_str());
-}
-
 void TabPrintPost (string element) {
     cout << element << "\t";
 }
@@ -610,16 +475,6 @@ void TabPrintPre (string element) {
 
 void CommaPrint (string element) {
     cout << element << ",";
-}
-
-double ToDouble(const string &element) {
-    std::istringstream i(element);
-    double x;
-    if (!(i >> x)) {
-        cerr << "Error: Could not properly convert string to numeric (\"" + element + "\")" << endl;
-        exit(1);
-    }
-    return x;
 }
 
 inline string ColumnHeaderName(const vector<string> &inFields, const size_t FieldIndex,

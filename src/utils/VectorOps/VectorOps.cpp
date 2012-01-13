@@ -25,6 +25,24 @@ double MakeDouble(const string &element) {
     return x;
 }
 
+struct ValueGreaterThan
+{
+    bool operator()( const vector< pair<int, string> >::value_type& lhs,
+        const vector< pair<int, string> >::value_type& rhs ) const
+    {
+        return lhs.first > rhs.first;
+    }
+};
+
+struct ValueLessThan
+{
+    bool operator()( const vector< pair<int, string> >::value_type& lhs,
+        const vector< pair<int, string> >::value_type& rhs ) const
+    {
+        return lhs.first < rhs.first;
+    }
+};
+
 // Constructor
 VectorOps::VectorOps(const vector<string> &vec)
 : _vecs(vec)
@@ -50,6 +68,34 @@ double VectorOps::GetMean(void)
     // convert the vec of strings to a vec of doubles
     transform(_vecs.begin(), _vecs.end(), back_inserter(_vecd), MakeDouble);
     return accumulate(_vecd.begin(), _vecd.end(), 0.0) / _size;
+}
+
+double VectorOps::GetStddev(void) 
+{
+    double mean = GetMean();
+    // get the variance
+    double totalVariance = 0.0;
+    vector<double>::const_iterator dIt  = _vecd.begin();
+    vector<double>::const_iterator dEnd = _vecd.end();
+    for (; dIt != dEnd; ++dIt) {
+        totalVariance += pow((*dIt - mean),2);
+    }
+    double variance = totalVariance / _vecd.size();
+    return sqrt(variance);
+}
+
+double VectorOps::GetSstddev(void) 
+{
+    double mean = GetMean();
+    // get the variance
+    double totalVariance = 0.0;
+    vector<double>::const_iterator dIt  = _vecd.begin();
+    vector<double>::const_iterator dEnd = _vecd.end();
+    for (; dIt != dEnd; ++dIt) {
+        totalVariance += pow((*dIt - mean),2);
+    }
+    double variance = totalVariance / (_vecd.size() - 1);
+    return sqrt(variance);
 }
 
 double VectorOps::GetMedian(void) 
@@ -169,6 +215,14 @@ string VectorOps::GetCollapse(void)
     return collapse.str();
 }
 
+string VectorOps::GetConcat(void)
+{
+    ostringstream collapse;
+    for( size_t i = 0; i < _vecs.size(); i++ )
+        collapse << _vecs[i];
+    return collapse.str();
+}
+
 string VectorOps::GetDistinct(void)
 {
     ostringstream distinct;
@@ -183,4 +237,75 @@ string VectorOps::GetDistinct(void)
         distinct << _vecs[i];
     }
     return distinct.str();
+}
+
+string VectorOps::GetFreqDesc(void)
+{
+    // compute the frequency of each unique value
+    map<string, int> freqs;
+    vector<string>::const_iterator dIt  = _vecs.begin();
+    vector<string>::const_iterator dEnd = _vecs.end();
+    for (; dIt != dEnd; ++dIt) {
+        freqs[*dIt]++;
+    }
+    // pair for the num times a values was
+    // observed (1) and the value itself (2)
+    pair<int, string> freqPair;
+    vector< pair<int, string> > freqList;
+
+    // create a list of pairs of all the observed values (second)
+    // and their occurences (first)
+    map<string,int>::const_iterator mapIter = freqs.begin();
+    map<string,int>::const_iterator mapEnd  = freqs.end();
+    for(; mapIter != mapEnd; ++mapIter)
+        freqList.push_back( make_pair(mapIter->second, mapIter->first) );
+
+    // sort the list of pairs in the requested order by the frequency
+    // this will make the value that was observed least/most bubble to the top
+    sort(freqList.begin(), freqList.end(), ValueGreaterThan());
+
+    // record all of the values and their frequencies.
+    ostringstream buffer;
+    vector< pair<int, string> >::const_iterator iter    = freqList.begin();
+    vector< pair<int, string> >::const_iterator iterEnd = freqList.end();
+    for (; iter != iterEnd; ++iter)
+        buffer << iter->second << ":" << iter->first << ",";
+    
+    return buffer.str();
+}
+
+
+string VectorOps::GetFreqAsc(void)
+{
+    // compute the frequency of each unique value
+    map<string, int> freqs;
+    vector<string>::const_iterator dIt  = _vecs.begin();
+    vector<string>::const_iterator dEnd = _vecs.end();
+    for (; dIt != dEnd; ++dIt) {
+        freqs[*dIt]++;
+    }
+    // pair for the num times a values was
+    // observed (1) and the value itself (2)
+    pair<int, string> freqPair;
+    vector< pair<int, string> > freqList;
+
+    // create a list of pairs of all the observed values (second)
+    // and their occurences (first)
+    map<string,int>::const_iterator mapIter = freqs.begin();
+    map<string,int>::const_iterator mapEnd  = freqs.end();
+    for(; mapIter != mapEnd; ++mapIter)
+        freqList.push_back( make_pair(mapIter->second, mapIter->first) );
+
+    // sort the list of pairs in the requested order by the frequency
+    // this will make the value that was observed least/most bubble to the top
+    sort(freqList.begin(), freqList.end(), ValueLessThan());
+
+    // record all of the values and their frequencies.
+    ostringstream buffer;
+    vector< pair<int, string> >::const_iterator iter    = freqList.begin();
+    vector< pair<int, string> >::const_iterator iterEnd = freqList.end();
+    for (; iter != iterEnd; ++iter)
+        buffer << iter->second << ":" << iter->first << ",";
+    
+    return buffer.str();
 }

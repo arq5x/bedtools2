@@ -21,7 +21,7 @@ INCLUDES = -I$(UTILITIES_DIR)/bedFile/ \
 # ----------------------------------
 SOURCES= mapMain.cpp mapBed.cpp
 OBJECTS= $(SOURCES:.cpp=.o)
-_EXT_OBJECTS=bedFile.o lineFileUtilities.o BamAncillary.o gzstream.o fileType.o chromsweep.o
+_EXT_OBJECTS=bedFile.o lineFileUtilities.o BamAncillary.o gzstream.o fileType.o VectorOps.o chromsweep.o
 EXT_OBJECTS=$(patsubst %,$(OBJ_DIR)/%,$(_EXT_OBJECTS))
 BUILT_OBJECTS= $(patsubst %,$(OBJ_DIR)/%,$(OBJECTS))
 PROGRAM= mapBed
@@ -41,6 +41,7 @@ $(EXT_OBJECTS):
 	@$(MAKE) --no-print-directory -C $(UTILITIES_DIR)/BamTools-Ancillary/
 	@$(MAKE) --no-print-directory -C $(UTILITIES_DIR)/gzstream/
 	@$(MAKE) --no-print-directory -C $(UTILITIES_DIR)/fileType/
+	@$(MAKE) --no-print-directory -C $(UTILITIES_DIR)/VectorOps/
 	@$(MAKE) --no-print-directory -C $(UTILITIES_DIR)/chromsweep/
 		
 clean:
