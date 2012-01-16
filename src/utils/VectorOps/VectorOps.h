@@ -15,6 +15,7 @@
 #include <vector>
 #include <map>
 #include <math.h>
+#include <stdint.h>
 #include <string>
 #include <sstream>
 #include <algorithm>
