@@ -160,7 +160,7 @@ void map_help(void) {
 
     cerr << "\nTool:    bedtools map (aka mapBed)" << endl;
     cerr << "Version: " << VERSION << "\n";    
-    cerr << "Summary: Summarize a column from intervals in B that overlap A." << endl << endl;
+    cerr << "Summary: Apply a function to a column from B intervals that overlap A." << endl << endl;
 
     cerr << "Usage:   " << PROGRAM_NAME << " [OPTIONS] -a <bed/gff/vcf> -b <bed/gff/vcf>" << endl << endl;
 
