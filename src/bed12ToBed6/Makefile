@@ -9,6 +9,8 @@ INCLUDES = -I$(UTILITIES_DIR)/bedFile/ \
            -I$(UTILITIES_DIR)/lineFileUtilities/ \
            -I$(UTILITIES_DIR)/gzstream/ \
            -I$(UTILITIES_DIR)/fileType/ \
+           -I$(UTILITIES_DIR)/BamTools/include \
+		   -I$(UTILITIES_DIR)/BlockedIntervals \
            -I$(UTILITIES_DIR)/version/
 
 # ----------------------------------
@@ -16,7 +18,7 @@ INCLUDES = -I$(UTILITIES_DIR)/bedFile/ \
 # ----------------------------------
 SOURCES= bed12ToBed6.cpp
 OBJECTS= $(SOURCES:.cpp=.o)
-_EXT_OBJECTS=bedFile.o  lineFileUtilities.o gzstream.o fileType.o
+_EXT_OBJECTS=bedFile.o  BlockedIntervals.o lineFileUtilities.o gzstream.o fileType.o
 EXT_OBJECTS=$(patsubst %,$(OBJ_DIR)/%,$(_EXT_OBJECTS))
 BUILT_OBJECTS= $(patsubst %,$(OBJ_DIR)/%,$(OBJECTS))
 PROGRAM= bed12ToBed6
@@ -35,6 +37,7 @@ $(EXT_OBJECTS):
 	@$(MAKE) --no-print-directory -C $(UTILITIES_DIR)/bedFile/
 	@$(MAKE) --no-print-directory -C $(UTILITIES_DIR)/gzstream/
 	@$(MAKE) --no-print-directory -C $(UTILITIES_DIR)/fileType/
+	@$(MAKE) --no-print-directory -C $(UTILITIES_DIR)/BlockedIntervals/
 			
 clean:
 	@echo "Cleaning up."

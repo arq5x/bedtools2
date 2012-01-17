@@ -61,6 +61,7 @@ UTIL_SUBDIRS =	$(SRC_DIR)/utils/lineFileUtilities \
 				$(SRC_DIR)/utils/tabFile \
 				$(SRC_DIR)/utils/BamTools \
 				$(SRC_DIR)/utils/BamTools-Ancillary \
+				$(SRC_DIR)/utils/BlockedIntervals \
 				$(SRC_DIR)/utils/Fasta \
 				$(SRC_DIR)/utils/VectorOps \
 				$(SRC_DIR)/utils/genomeFile

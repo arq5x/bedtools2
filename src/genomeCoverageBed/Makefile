@@ -11,7 +11,7 @@ INCLUDES = -I$(UTILITIES_DIR)/bedFile/ \
            -I$(UTILITIES_DIR)/lineFileUtilities/ \
            -I$(UTILITIES_DIR)/fileType/ \
            -I$(UTILITIES_DIR)/BamTools/include \
-		   -I$(UTILITIES_DIR)/BamTools-Ancillary \
+		   -I$(UTILITIES_DIR)/BlockedIntervals \
 		   -I$(UTILITIES_DIR)/version/
 # ----------------------------------
 # define our source and object files
@@ -37,7 +37,7 @@ $(EXT_OBJECTS):
 	@$(MAKE) --no-print-directory -C $(UTILITIES_DIR)/bedFile/
 	@$(MAKE) --no-print-directory -C $(UTILITIES_DIR)/genomeFile
 	@$(MAKE) --no-print-directory -C $(UTILITIES_DIR)/BamTools/
-	@$(MAKE) --no-print-directory -C $(UTILITIES_DIR)/BamTools-Ancillary/
+	@$(MAKE) --no-print-directory -C $(UTILITIES_DIR)/BlockedIntervals/
 	@$(MAKE) --no-print-directory -C $(UTILITIES_DIR)/gzstream/
 	@$(MAKE) --no-print-directory -C $(UTILITIES_DIR)/fileType/	
 		

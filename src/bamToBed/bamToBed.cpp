@@ -11,7 +11,7 @@
 ******************************************************************************/
 #include "api/BamReader.h"
 #include "api/BamAux.h"
-#include "BamAncillary.h"
+#include "BlockedIntervals.h"
 #include "bedFile.h"
 #include "version.h"
 using namespace BamTools;
@@ -289,50 +289,10 @@ void ConvertBamToBedpe(const string &bamFile, const bool &useEditDistance) {
 }
 
 
-void ParseCigarBed12(const vector<CigarOp> &cigar, vector<int> &blockStarts, vector<int> &blockLengths, unsigned int &alignmentEnd) {
-
-    int currPosition = 0;
-    int blockLength  = 0;
-
-    //  Rip through the CIGAR ops and figure out if there is more
-    //  than one block for this alignment
-    vector<CigarOp>::const_iterator cigItr = cigar.begin();
-    vector<CigarOp>::const_iterator cigEnd = cigar.end();
-    for (; cigItr != cigEnd; ++cigItr) {
-        switch (cigItr->Type) {
-            case ('M') :
-                blockLength  += cigItr->Length;
-                currPosition += cigItr->Length;
-            case ('I') : break;
-            case ('S') : break;
-            case ('D') : break;
-                blockLength  += cigItr->Length;
-                currPosition += cigItr->Length;
-            case ('P') : break;
-            case ('N') :
-                blockStarts.push_back(currPosition + cigItr->Length);
-                blockLengths.push_back(blockLength);
-                currPosition += cigItr->Length;
-                blockLength = 0;
-            case ('H') : break;                             // for 'H' - do nothing, move to next op
-            default    :
-                printf("ERROR: Invalid Cigar op type\n");   // shouldn't get here
-                exit(1);
-        }
-    }
-    // add the kast block and set the
-    // alignment end (i.e., relative to the start)
-    blockLengths.push_back(blockLength);
-    alignmentEnd = currPosition;
-}
-
-
 string BuildCigarString(const vector<CigarOp> &cigar) {
 
     stringstream cigarString;
-
     for (size_t i = 0; i < cigar.size(); ++i) {
-        //cerr << cigar[i].Type << " " << cigar[i].Length << endl;
         switch (cigar[i].Type) {
             case ('M') :
             case ('I') :
@@ -449,16 +409,18 @@ void PrintBed(const BamAlignment &bam,  const RefVector &refs, bool useEditDista
     // Report each chunk of the BAM alignment as a discrete BED entry
     // For example 10M100N10M would be reported as two seprate BED entries of length 10
     else {
+        // parse the CIGAR string and figure out the alignment blocks
         vector<BED> bedBlocks;
-        // Load the alignment blocks in bam into the bedBlocks vector.
-        // Don't trigger a new block when a "D" (deletion) CIGAR op is found.
-        getBamBlocks(bam, refs, bedBlocks, false);
+        string chrom = refs.at(bam.RefID).RefName;
+        // extract the block starts and lengths from the CIGAR string
+        GetBamBlocks(bam, chrom, bedBlocks);
 
-        vector<BED>::const_iterator bedItr = bedBlocks.begin();
-        vector<BED>::const_iterator bedEnd = bedBlocks.end();
-        for (; bedItr != bedEnd; ++bedItr) {
-            printf("%s\t%d\t%d\t\%s\t%d\t%s\n", refs.at(bam.RefID).RefName.c_str(), bedItr->start,
-                                          bedItr->end, name.c_str(), bam.MapQuality, strand.c_str());
+        unsigned int i;
+        for (i = 0; i < bedBlocks.size(); ++i) {
+            BED curr = bedBlocks[i];
+            printf("%s\t%d\t%d\t\%s\t%d\t%s\n", 
+                   chrom.c_str(), curr.start, curr.end,
+                   name.c_str(), bam.MapQuality, strand.c_str());
         }
     }
 }
@@ -476,14 +438,11 @@ void PrintBed12(const BamAlignment &bam, const RefVector &refs, bool useEditDist
     if (bam.IsSecondMate()) name += "/2";
 
     // parse the CIGAR string and figure out the alignment blocks
-    unsigned int alignmentEnd;
-    vector<int> blockLengths;
-    vector<int> blockStarts;
-    blockStarts.push_back(0);
-
+    vector<BED> bedBlocks;
+    string chrom = refs.at(bam.RefID).RefName;
+    CHRPOS alignmentEnd = bam.GetEndPosition();
     // extract the block starts and lengths from the CIGAR string
-    ParseCigarBed12(bam.CigarData, blockStarts, blockLengths, alignmentEnd);
-    alignmentEnd += bam.Position;
+    GetBamBlocks(bam, chrom, bedBlocks);
 
     // write BED6 portion
     if (useEditDistance == false && bamTag == "") {
@@ -514,20 +473,20 @@ void PrintBed12(const BamAlignment &bam, const RefVector &refs, bool useEditDist
     }
 
     // write the colors, etc.
-    printf("%d\t%d\t%s\t%d\t", bam.Position, alignmentEnd, color.c_str(), (int) blockStarts.size());
+    printf("%d\t%d\t%s\t%d\t", bam.Position, alignmentEnd, color.c_str(), (int) bedBlocks.size());
 
     // now write the lengths portion
     unsigned int b;
-    for (b = 0; b < blockLengths.size() - 1; ++b) {
-        printf("%d,", blockLengths[b]);
+    for (b = 0; b < bedBlocks.size() - 1; ++b) {
+        printf("%d,", bedBlocks[b].end - bedBlocks[b].start);
     }
-    printf("%d\t", blockLengths[b]);
+    printf("%d\t", bedBlocks[b].end - bedBlocks[b].start);
 
     // now write the starts portion
-    for (b = 0; b < blockStarts.size() - 1; ++b) {
-        printf("%d,", blockStarts[b]);
+    for (b = 0; b < bedBlocks.size() - 1; ++b) {
+        printf("%d,", bedBlocks[b].start - bam.Position);
     }
-    printf("%d\n", blockStarts[b]);
+    printf("%d\n", bedBlocks[b].start - bam.Position);
 }
 
 

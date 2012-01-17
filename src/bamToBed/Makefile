@@ -10,7 +10,7 @@ INCLUDES = -I$(UTILITIES_DIR)/bedFile/ \
            -I$(UTILITIES_DIR)/lineFileUtilities/ \
            -I$(UTILITIES_DIR)/fileType/ \
            -I$(UTILITIES_DIR)/BamTools/include \
-		   -I$(UTILITIES_DIR)/BamTools-Ancillary \
+		   -I$(UTILITIES_DIR)/BlockedIntervals \
 		   -I$(UTILITIES_DIR)/version/
 
 
@@ -19,7 +19,7 @@ INCLUDES = -I$(UTILITIES_DIR)/bedFile/ \
 # ----------------------------------
 SOURCES= bamToBed.cpp
 OBJECTS= $(SOURCES:.cpp=.o)
-_EXT_OBJECTS=BamAncillary.o
+_EXT_OBJECTS=BamAncillary.o BlockedIntervals.o
 EXT_OBJECTS=$(patsubst %,$(OBJ_DIR)/%,$(_EXT_OBJECTS))
 BUILT_OBJECTS= $(patsubst %,$(OBJ_DIR)/%,$(OBJECTS))
 PROGRAM= bamToBed
@@ -35,6 +35,7 @@ $(BUILT_OBJECTS): $(SOURCES)
 
 $(EXT_OBJECTS):
 	@$(MAKE) --no-print-directory -C $(UTILITIES_DIR)/BamAncillary/
+	@$(MAKE) --no-print-directory -C $(UTILITIES_DIR)/BlockedIntervals/
 	
 clean:
 	@echo "Cleaning up."
