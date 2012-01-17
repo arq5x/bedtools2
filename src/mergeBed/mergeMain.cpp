@@ -154,6 +154,7 @@ void merge_help(void) {
     cerr << "\t(1) All output, regardless of input type (e.g., GFF or VCF)" << endl;
     cerr << "\t    will in BED format with zero-based starts" << endl << endl;
 
+    cerr << "\t(2) The input file (-i) file must be sorted by chrom, then start." << endl << endl;
 
     // end the program here
     exit(1);
