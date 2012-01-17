@@ -167,7 +167,7 @@ void map_help(void) {
     cerr << "Options: " << endl;
 
     cerr << "\t-c\t"             << "Specify the column from the B file to map onto intervals in A." << endl;
-    cerr                         << "\t\t - Default = 4." << endl << endl;
+    cerr                         << "\t\t - Default = 5." << endl << endl;
 
     cerr << "\t-o\t"             << "Specify the operation that should be applied to -c." << endl;
     cerr                         << "\t\t Valid operations:" << endl;
@@ -199,7 +199,10 @@ void map_help(void) {
     cerr                         << "\t\t- Default - \".\"" << endl << endl;
 
     cerr << "\t-header\t"        << "Print the header from the A file prior to results." << endl << endl;
- 
+
+    cerr << "Notes: " << endl;
+    cerr << "\t(1) Both input files must be sorted by chrom, then start." << endl << endl;
+    
     // end the program here
     exit(1);
 
