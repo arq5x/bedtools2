@@ -166,7 +166,7 @@ void map_help(void) {
 
     cerr << "Options: " << endl;
 
-    cerr << "\t-c\t"             << "Specify the column from the B file to map onto intervaks in A." << endl;
+    cerr << "\t-c\t"             << "Specify the column from the B file to map onto intervals in A." << endl;
     cerr                         << "\t\t - Default = 4." << endl << endl;
 
     cerr << "\t-o\t"             << "Specify the operation that should be applied to -c." << endl;
