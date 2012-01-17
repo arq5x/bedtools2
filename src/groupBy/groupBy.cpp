@@ -217,7 +217,7 @@ int groupby_main(int argc, char* argv[]) {
 
 void groupby_help(void) {
 
-    cerr << "\nTool:    bedtools intersect (aka intersectBed)" << endl;
+    cerr << "\nTool:    bedtools groupby " << endl;
     cerr << "Version: " << VERSION << "\n";    
     cerr << "Summary: Summarizes a dataset column based upon" << endl;
     cerr << "\t common column groupings. Akin to the SQL \"group by\" command." << endl << endl;
