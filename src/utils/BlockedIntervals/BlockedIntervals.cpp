@@ -64,9 +64,10 @@ void GetBamBlocks(const BamAlignment &bam,
 
 void GetBedBlocks(const BED &bed, bedVector &bedBlocks) {
 
-    if (bed.fields.size() < 6) {
-        cerr << "Input error: Cannot split into blocks. Found interval with fewer than 12 columns." << endl;
-        exit(1);
+    // nothing to do if it is not a BED12 intervals
+    if (bed.fields.size() != 12) {
+        bedBlocks.push_back(bed);
+        return;
     }
 
     int blockCount = atoi(bed.fields[9].c_str());
@@ -102,4 +103,15 @@ void GetBedBlocks(const BED &bed, bedVector &bedBlocks) {
             bedBlocks.push_back(currBedBlock);
         }
     }
+}
+
+
+int GetTotalBlockLength(const bedVector &bedBlocks) {
+    int total_size = 0;
+    bedVector::const_iterator blockItr = bedBlocks.begin();
+    bedVector::const_iterator blockEnd = bedBlocks.end();
+    for (; blockItr != blockEnd; ++blockItr) {
+        total_size += blockItr->end - blockItr->start;
+    }
+    return total_size;
 }

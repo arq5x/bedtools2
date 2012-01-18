@@ -469,6 +469,7 @@ public:
     string bedFile;
     unsigned int bedType;  // 3-6, 12 for BED
                            // 9 for GFF
+    bool isBed12;          // is it file of true blocked BED12 records?
     bool isZeroBased;
 
     // Main data structires used by BEDTools
@@ -504,6 +505,7 @@ private:
     void setVcf (bool isVcf);
     void setFileType (FileType type);
     void setBedType (int colNums);
+    void setBed12 (bool isBed12);
 
     /************ Private utilities ***********************/
     void GetHeader(void);
@@ -559,6 +561,21 @@ private:
                     setZeroBased(true);
                     setFileType(BED_FILETYPE);
                     setBedType(numFields);       // we now expect numFields columns in each line
+                    
+                    // test to see if the file has true blocked BED12 records
+                    if (numFields == 12) {
+                        int cdsStart = atoi(lineVector[6].c_str());
+                        int cdsEnd   = atoi(lineVector[7].c_str());
+                        int numExons = atoi(lineVector[9].c_str());
+
+                        if (cdsStart > 0 && cdsEnd > 0&& numExons > 0 &&
+                            lineVector[10].find(",") == 0 &&
+                            lineVector[11].find(",") == 0)
+                        {
+                            setBed12(true);
+                        }
+                        else setBed12(false);
+                    }
                     if (parseBedLine(bed, lineVector, _lineNum, numFields) == true) return BED_VALID;
                 }
                 // it's VCF, assuming the second column is numeric and there are at least 8 fields.

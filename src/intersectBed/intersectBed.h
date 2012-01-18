@@ -87,6 +87,8 @@ private:
     bool processHits(const BED &a, const vector<BED> &hits);
 
     bool FindOverlaps(const BED &a, vector<BED> &hits);
+    
+    bool FindBlockedOverlaps(const BED &a, vector<BED> &hits);
 
     void ReportOverlapDetail(int overlapBases, const BED &a, const BED &b, CHRPOS s, CHRPOS e);
     

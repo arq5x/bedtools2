@@ -27,3 +27,6 @@ void GetBamBlocks(const BamAlignment &bam,
 
 /* break a BED12 record into discrete BED6 blocks. */
 void GetBedBlocks(const BED &bed, bedVector &bedBlocks);
+
+/* compute the total forprint of a set of BED blocks */
+int GetTotalBlockLength(const bedVector &bedBlocks);

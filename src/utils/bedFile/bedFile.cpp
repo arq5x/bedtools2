@@ -559,7 +559,6 @@ void BedFile::setZeroBased(bool zeroBased) { this->isZeroBased = zeroBased; }
 
 void BedFile::setGff (bool gff) { this->_isGff = gff; }
 
-
 void BedFile::setVcf (bool vcf) { this->_isVcf = vcf; }
 
 
@@ -569,10 +568,8 @@ void BedFile::setFileType (FileType type) {
 }
 
 
-void BedFile::setBedType (int colNums) {
-    bedType = colNums;
-}
-
+void BedFile::setBedType (int colNums) { bedType = colNums; }
+void BedFile::setBed12 (bool isBed12) { this->isBed12 = isBed12; }
 
 void BedFile::loadBedFileIntoMap() {
 
