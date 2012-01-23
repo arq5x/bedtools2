@@ -30,7 +30,7 @@
 #include <limits.h>
 #include <stdint.h>
 #include <cstdio>
-#include <tr1/unordered_map>  // Experimental.
+//#include <tr1/unordered_map>  // Experimental.
 using namespace std;
 
 
@@ -299,29 +299,16 @@ typedef vector<BEDCOV> bedCovVector;
 typedef vector<MATE> mateVector;
 typedef vector<BEDCOVLIST> bedCovListVector;
 
-typedef tr1::unordered_map<BIN, bedVector> binsToBeds;
-typedef tr1::unordered_map<BIN, bedCovVector> binsToBedCovs;
-typedef tr1::unordered_map<BIN, mateVector> binsToMates;
-typedef tr1::unordered_map<BIN, bedCovListVector> binsToBedCovLists;
+typedef map<BIN, bedVector> binsToBeds;
+typedef map<BIN, bedCovVector> binsToBedCovs;
+typedef map<BIN, mateVector> binsToMates;
+typedef map<BIN, bedCovListVector> binsToBedCovLists;
 
-typedef tr1::unordered_map<string, binsToBeds>    masterBedMap;
-typedef tr1::unordered_map<string, binsToBedCovs> masterBedCovMap;
-typedef tr1::unordered_map<string, binsToMates> masterMateMap;
-typedef tr1::unordered_map<string, binsToBedCovLists> masterBedCovListMap;
-typedef tr1::unordered_map<string, bedVector>     masterBedMapNoBin;
-
-
-// EXPERIMENTAL - wait for TR1
-// typedef vector<BED>    bedVector;
-// typedef vector<BEDCOV> bedCovVector;
-//
-// typedef tr1::unordered_map<BIN, bedVector> binsToBeds;
-// typedef tr1::unordered_map<BIN, bedCovVector> binsToBedCovs;
-//
-// typedef tr1::unordered_map<string, binsToBeds>    masterBedMap;
-// typedef tr1::unordered_map<string, binsToBedCovs> masterBedCovMap;
-// typedef tr1::unordered_map<string, bedVector>     masterBedMapNoBin;
-
+typedef map<string, binsToBeds>    masterBedMap;
+typedef map<string, binsToBedCovs> masterBedCovMap;
+typedef map<string, binsToMates> masterMateMap;
+typedef map<string, binsToBedCovLists> masterBedCovListMap;
+typedef map<string, bedVector>     masterBedMapNoBin;
 
 
 // return the genome "bin" for a feature with this start and end

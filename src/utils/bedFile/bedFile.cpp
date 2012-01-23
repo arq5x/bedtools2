@@ -288,6 +288,8 @@ void BedFile::allHits(string chrom, CHRPOS start, CHRPOS end, string strand,
     for (BINLEVEL i = 0; i < _binLevels; ++i) {
         BIN offset = _binOffsetsExtended[i];
         for (BIN j = (startBin+offset); j <= (endBin+offset); ++j)  {
+            // move to the next bin if this one is empty
+            if (bedMap[chrom][j].empty()) continue;
             vector<BED>::const_iterator bedItr = bedMap[chrom][j].begin();
             vector<BED>::const_iterator bedEnd = bedMap[chrom][j].end();
             for (; bedItr != bedEnd; ++bedItr) {

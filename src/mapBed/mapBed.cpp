@@ -24,7 +24,7 @@ BedMap::BedMap(string bedAFile, string bedBFile, int column, string operation,
 
     _bedAFile            = bedAFile;
     _bedBFile            = bedBFile;
-    _column              = column - 1;
+    _column              = column - 1;  // user's request is 1-based
     _operation           = operation;
     _overlapFraction     = overlapFraction;
     _sameStrand          = sameStrand;
@@ -53,7 +53,7 @@ void BedMap::Map() {
                                   _printHeader);
 
     pair<BED, vector<BED> > hit_set;
-    hit_set.second.reserve(100000);
+    hit_set.second.reserve(10000);
     while (sweep.Next(hit_set)) {
         string result = MapHits(hit_set.first, hit_set.second);
         _bedA->reportBedTab(hit_set.first);

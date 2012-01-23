@@ -24,7 +24,7 @@ bool BedIntersect::processHits(const BED &a, const vector<BED> &hits) {
         for (; h != hitsEnd; ++h) {
             CHRPOS s = max(a.start, h->start);
             CHRPOS e = min(a.end, h->end);
-            int overlapBases = (e - s);
+            int overlapBases = e-s;
             ReportOverlapDetail(overlapBases, a, *h, s, e);
             hitsFound = true;
         }
@@ -93,6 +93,73 @@ bool BedIntersect::FindOverlaps(const BED &a, vector<BED> &hits) {
                    _overlapFraction, _reciprocal);
     hitsFound = processHits(a, hits);
     return hitsFound;
+}
+
+
+bool BedIntersect::FindBlockedOverlaps(const BED &a, vector<BED> &hits) {
+    
+    // find the hits that overlap with the full span of the blocked BED
+    _bedB->allHits(a.chrom, a.start, a.end, a.strand,
+                   hits, _sameStrand, _diffStrand,
+                   _overlapFraction, _reciprocal);
+    
+    // break a into discrete blocks, as we need to 
+    // measure overlap with the individual blocks, not the full span.
+    bedVector a_blocks; 
+    GetBedBlocks(a, a_blocks);
+    int a_footprint = GetTotalBlockLength(a_blocks);
+    // container to store the set of raw hits 
+    // that actually overlap the A blocks
+    bedVector valid_hits;
+    valid_hits.reserve(hits.size());
+    
+    // 1. Loop through each raw hit (outer loop)
+    // 2. Break the raw hit into it;s blocks
+    //    and see of one of the hit blocks (inner loop)
+    //    overlaps one of a's blocks (inner, inner loop)
+    // 3. If so, mark the hit as valid and add it to the valid_set.
+    //    Otherwise, the hit only overlapped the span of a and not
+    //    the individual blocks.  Thus, it doesn't count.
+    bedVector::const_iterator hItr = hits.begin();
+    bedVector::const_iterator hEnd = hits.end();
+    for (; hItr != hEnd; ++hItr) {
+        // break the hit into blocks
+        bedVector hitBlocks;
+        GetBedBlocks(*hItr, hitBlocks);
+        int b_footprint = GetTotalBlockLength(hitBlocks);
+        // test to see if there is a valid hit with one of the blocks
+        bool valid_hit    = false;
+        int total_overlap = 0;
+        bedVector::const_iterator hbItr = hitBlocks.begin();
+        bedVector::const_iterator hbEnd = hitBlocks.end();
+        for (; hbItr != hbEnd; ++hbItr) {
+            // look for overlaps between this hit/block and each block in a
+            bedVector::const_iterator a_blockItr = a_blocks.begin();
+            bedVector::const_iterator a_blockEnd = a_blocks.end();
+            for (; a_blockItr != a_blockEnd; ++a_blockItr) {
+                int hs = max(a_blockItr->start, hbItr->start);
+                int he = min(a_blockItr->end, hbItr->end);
+                int overlap = he - hs;
+                if (overlap > 0) {
+                    valid_hit = true;
+                    total_overlap += overlap;
+                }
+            }
+        }
+        if (valid_hit) {
+            // require sufficint overlap fraction (reciprocal or otherwise)
+            // w.r.t to the "footprint" (i.e., the total length of each block)
+            if ( ((float) total_overlap / (float) a_footprint) > _overlapFraction) {
+                if (_reciprocal && ((float) total_overlap / (float) b_footprint) > _overlapFraction) {
+                    valid_hits.push_back(*hItr);
+                }
+                else if (!_reciprocal) {
+                    valid_hits.push_back(*hItr);
+                }
+            }
+        }
+    }
+    return processHits(a, valid_hits);
 }
 
 
@@ -172,22 +239,12 @@ void BedIntersect::IntersectBed() {
         while (_bedA->GetNextBed(a)) {
             if (_bedA->_status == BED_VALID) {
                 // treat the BED as a single "block"
-                if (_obeySplits == false) {
+                if (_obeySplits == false)
                     FindOverlaps(a, hits);
-                    hits.clear();
-                }
                 // split the BED12 into blocks and look for overlaps in each discrete block
-                else {
-                    bedVector bedBlocks;  // vec to store the discrete BED "blocks"
-                    GetBedBlocks(a,bedBlocks);
-
-                    vector<BED>::const_iterator bedItr  = bedBlocks.begin();
-                    vector<BED>::const_iterator bedEnd  = bedBlocks.end();
-                    for (; bedItr != bedEnd; ++bedItr) {
-                        FindOverlaps(*bedItr, hits);
-                        hits.clear();
-                    }
-                }
+                else
+                    FindBlockedOverlaps(a, hits);
+                hits.clear();
             }
         }
         _bedA->Close();
@@ -202,7 +259,10 @@ void BedIntersect::IntersectBed() {
         pair<BED, vector<BED> > hit_set;
         hit_set.second.reserve(10000);
         while (sweep.Next(hit_set)) {
-            processHits(hit_set.first, hit_set.second);
+            if (_obeySplits == false)
+                processHits(hit_set.first, hit_set.second);
+            else
+                FindBlockedOverlaps(hit_set.first, hit_set.second);
         }
     }
 }
