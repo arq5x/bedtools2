@@ -339,7 +339,7 @@ inline bool isInteger(const std::string& s) {
 }
 
 
-// return the amount of overlap between two features.  Negative if none and the the
+// return the amount of overlap between two features.  Negative if none and the
 // number of negative bases is the distance between the two.
 inline
 int overlaps(CHRPOS aS, CHRPOS aE, CHRPOS bS, CHRPOS bE) {
