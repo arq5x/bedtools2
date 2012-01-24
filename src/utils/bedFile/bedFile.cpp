@@ -343,6 +343,8 @@ bool BedFile::anyHits(string chrom, CHRPOS start, CHRPOS end, string strand,
     for (BINLEVEL i = 0; i < _binLevels; ++i) {
         BIN offset = _binOffsetsExtended[i];
         for (BIN j = (startBin+offset); j <= (endBin+offset); ++j)  {
+            // move to the next bin if this one is empty
+            if (bedMap[chrom][j].empty()) continue;
             vector<BED>::const_iterator bedItr = bedMap[chrom][j].begin();
             vector<BED>::const_iterator bedEnd = bedMap[chrom][j].end();
             for (; bedItr != bedEnd; ++bedItr) {
@@ -391,7 +393,6 @@ void BedFile::countHits(const BED &a, bool sameStrand, bool diffStrand, bool cou
         // loop through each bin at this level of the hierarchy
         BIN offset = _binOffsetsExtended[i];
         for (BIN j = (startBin+offset); j <= (endBin+offset); ++j) {
-
             // loop through each feature in this chrom/bin and see if it overlaps
             // with the feature that was passed in.  if so, add the feature to
             // the list of hits.
