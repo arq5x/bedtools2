@@ -30,7 +30,8 @@ public:
     BedClosest(string &bedAFile, string &bedBFile, 
                bool sameStrand, bool diffStrand, string &tieMode, 
                bool reportDistance, bool signDistance, string &strandedDistMode,
-               bool ignoreOverlaps, bool printHeader);
+               bool ignoreOverlaps, bool ignoreUpstream, bool ignoreDownstream,
+               bool printHeader);
 
     // destructor
     ~BedClosest(void);
@@ -50,6 +51,8 @@ private:
     bool   _signDistance;
     string _strandedDistMode;
     bool   _ignoreOverlaps;
+    bool   _ignoreUpstream;
+    bool   _ignoreDownstream;
     bool   _printHeader;
 
     BedFile *_bedA, *_bedB;

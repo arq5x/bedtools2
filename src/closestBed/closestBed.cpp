@@ -23,7 +23,7 @@ const int SLOPGROWTH = 2048000;
 */
 BedClosest::BedClosest(string &bedAFile, string &bedBFile, bool sameStrand, bool diffStrand,
                        string &tieMode, bool reportDistance, bool signDistance, string &_strandedDistMode,
-                       bool ignoreOverlaps, bool printHeader) 
+                       bool ignoreOverlaps, bool ignoreUpstream, bool ignoreDownstream, bool printHeader) 
     : _bedAFile(bedAFile)
     , _bedBFile(bedBFile)
     , _tieMode(tieMode)
@@ -33,6 +33,8 @@ BedClosest::BedClosest(string &bedAFile, string &bedBFile, bool sameStrand, bool
     , _signDistance(signDistance)
     , _strandedDistMode(_strandedDistMode)
     , _ignoreOverlaps(ignoreOverlaps)
+    , _ignoreUpstream(ignoreUpstream)
+    , _ignoreDownstream(ignoreDownstream)
     , _printHeader(printHeader)
 {
     _bedA           = new BedFile(_bedAFile);
@@ -113,8 +115,14 @@ void BedClosest::FindWindowOverlaps(BED &a, vector<BED> &hits) {
                         if ((_strandedDistMode == "ref")
                                 || (_strandedDistMode == "a" && a.strand != "-")
                                 || (_strandedDistMode == "b" && h->strand == "-")) {
-                            curDistance = -curDistance;
+                            // hit is "upstream" of A
+                            if (_ignoreUpstream)
+                                continue;
+                            else
+                                curDistance = -curDistance;
                         }
+                        else if (_ignoreDownstream)
+                            continue;
                     }
                     
                     if (abs(curDistance) < minDistance) {
@@ -137,8 +145,14 @@ void BedClosest::FindWindowOverlaps(BED &a, vector<BED> &hits) {
                     if (_signDistance) {
                         if ((_strandedDistMode == "a" && a.strand == "-")
                                 || (_strandedDistMode == "b" && h->strand != "-")) {
-                            curDistance = -curDistance;
+                            // hit is "upstream" of A
+                            if (_ignoreUpstream)
+                                continue;
+                            else
+                                curDistance = -curDistance;
                         }
+                        else if (_ignoreDownstream)
+                            continue;
                     }
                     if (abs(curDistance) < minDistance) {
                         minDistance = abs(curDistance);
