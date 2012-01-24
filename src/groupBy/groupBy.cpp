@@ -165,7 +165,7 @@ int groupby_main(int argc, char* argv[]) {
     for( size_t i = 0; i < ops.size(); i++ ) {
         if ((ops[i] != "sum")  && (ops[i] != "max")    && (ops[i] != "min") && (ops[i] != "mean") &&
             (ops[i] != "mode") && (ops[i] != "median") && (ops[i] != "antimode") && (ops[i] != "stdev") &&
-            (ops[i] != "sstdev") && (ops[i] != "count") && (ops[i] != "collapse") && (ops[i] != "distinct") &&
+            (ops[i] != "sstdev") && (ops[i] != "count") && (ops[i] != "count_distinct") && (ops[i] != "collapse") && (ops[i] != "distinct") &&
             (ops[i] != "concat") && (ops[i] != "freqdesc") && (ops[i] != "freqasc")) 
         {
             cerr << endl << "*****" << endl << "*****ERROR: Invalid operation selection \"" << ops[i] << endl << "\"  *****" << endl;
@@ -237,7 +237,7 @@ void groupby_help(void) {
 
     cerr << "\t-o -ops\t\t"      << "Specify the operation that should be applied to opCol." << endl;
     cerr                         << "\t\t\tValid operations:" << endl;
-    cerr                         << "\t\t\t    sum, count, min, max," << endl;
+    cerr                         << "\t\t\t    sum, count, count_distinct, min, max," << endl;
     cerr                         << "\t\t\t    mean, median, mode, antimode," << endl;
     cerr                         << "\t\t\t    stdev, sstdev (sample standard dev.)," << endl;
     cerr                         << "\t\t\t    collapse (i.e., print a comma separated list (duplicates allowed)), " << endl;
@@ -420,6 +420,10 @@ void ReportSummary(const vector<string> &group, const vector<vector<string> > &d
         }
         else if (op == "count") {
             buffer << setprecision (PRECISION) << data[i].size();
+            result.push_back(buffer.str());
+        }
+        else if (op == "count_distinct") {
+            buffer << setprecision (PRECISION) << vo.GetCountDistinct();
             result.push_back(buffer.str());
         }
         else if (op == "mode") {
