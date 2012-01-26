@@ -137,7 +137,7 @@ void windowmaker_help(void) {
 
     cerr << "\nTool: bedtools makewindows" << endl;
     cerr << "Version: " << VERSION << "\n";
-    cerr << "Summary: Makes adjacent and/or sliding windows across a genome." << endl << endl;
+    cerr << "Summary: Makes adjacent or sliding windows across a genome or BED file." << endl << endl;
 
     cerr << "Usage: " << PROGRAM_NAME << " [OPTIONS] [-g <genome> OR -b <bed>]" << endl;
     cerr << " [ -w <window_size> OR -n <number of windows> ]" << endl << endl;
