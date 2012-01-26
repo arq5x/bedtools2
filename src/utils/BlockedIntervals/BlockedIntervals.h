@@ -22,7 +22,7 @@ using namespace BamTools;
 */
 void GetBamBlocks(const BamAlignment &bam,
                   const string &chrom,
-                  vector<BED> &bedBlocks,
+                  bedVector &bedBlocks,
                   bool breakOnDeletionOps = false);
 
 /* break a BED12 record into discrete BED6 blocks. */

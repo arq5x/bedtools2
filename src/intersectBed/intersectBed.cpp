@@ -16,7 +16,6 @@
 Helper functions
 ************************************/
 bool BedIntersect::processHits(const BED &a, const vector<BED> &hits) {
-
     bool hitsFound   = false;
     if (_printable == true) {
         vector<BED>::const_iterator h       = hits.begin();
@@ -96,17 +95,8 @@ bool BedIntersect::FindOverlaps(const BED &a, vector<BED> &hits) {
 }
 
 
-bool BedIntersect::FindBlockedOverlaps(const BED &a, vector<BED> &hits) {
-    
-    // find the hits that overlap with the full span of the blocked BED
-    _bedB->allHits(a.chrom, a.start, a.end, a.strand,
-                   hits, _sameStrand, _diffStrand,
-                   _overlapFraction, _reciprocal);
-    
-    // break a into discrete blocks, as we need to 
-    // measure overlap with the individual blocks, not the full span.
-    bedVector a_blocks; 
-    GetBedBlocks(a, a_blocks);
+bool BedIntersect::FindBlockedOverlaps(const BED &a, const vector<BED> &a_blocks, 
+                                       const vector<BED> &hits, bool a_is_bam) {
     int a_footprint = GetTotalBlockLength(a_blocks);
     // container to store the set of raw hits 
     // that actually overlap the A blocks
@@ -159,7 +149,11 @@ bool BedIntersect::FindBlockedOverlaps(const BED &a, vector<BED> &hits) {
             }
         }
     }
-    return processHits(a, valid_hits);
+    if (!a_is_bam) {
+        return processHits(a, valid_hits);
+    }
+    else
+        return !valid_hits.empty();
 }
 
 
@@ -242,8 +236,19 @@ void BedIntersect::IntersectBed() {
                 if (_obeySplits == false)
                     FindOverlaps(a, hits);
                 // split the BED12 into blocks and look for overlaps in each discrete block
-                else
-                    FindBlockedOverlaps(a, hits);
+                else {
+                    // find the hits that overlap with the full span of the blocked BED
+                    _bedB->allHits(a.chrom, a.start, a.end, a.strand,
+                                   hits, _sameStrand, _diffStrand,
+                                   _overlapFraction, _reciprocal);
+                    // break a into discrete blocks, as we need to 
+                    // measure overlap with the individual blocks, not the full span.
+                    bedVector a_blocks; 
+                    GetBedBlocks(a, a_blocks);
+                    // find the overlaps between the block in A and B 
+                    // last parm is false as a is not a BAM entry
+                    FindBlockedOverlaps(a, a_blocks, hits, false);
+                }
                 hits.clear();
             }
         }
@@ -261,8 +266,11 @@ void BedIntersect::IntersectBed() {
         while (sweep.Next(hit_set)) {
             if (_obeySplits == false)
                 processHits(hit_set.first, hit_set.second);
-            else
-                FindBlockedOverlaps(hit_set.first, hit_set.second);
+            else {
+                bedVector a_blocks; 
+                GetBedBlocks(hit_set.first, a_blocks);
+                FindBlockedOverlaps(hit_set.first, a_blocks, hit_set.second, false);
+            }
         }
     }
 }
@@ -279,19 +287,15 @@ void BedIntersect::IntersectBam(string bamFile) {
     // using BAM output.
     if (_bamOutput == false) {
         _bedA = new BedFile(_bedAFile);
-        _bedA->bedType = 6;
+        _bedA->bedType = 12;
     }
-
     // open the BAM file
     BamReader reader;
     BamWriter writer;
-    
     reader.Open(bamFile);
-
     // get header & reference information
     string bamHeader  = reader.GetHeaderText();
     RefVector refs    = reader.GetReferenceData();
-
     // open a BAM output to stdout if we are writing BAM
     if (_bamOutput == true) {
         // set compression mode
@@ -301,93 +305,55 @@ void BedIntersect::IntersectBam(string bamFile) {
         // open our BAM writer
         writer.Open("stdout", bamHeader, refs);
     }
-
     vector<BED> hits;
     // reserve some space
     hits.reserve(100);
-
-    
     BamAlignment bam;    
     // get each set of alignments for each pair.
     while (reader.GetNextAlignment(bam)) {
 
-        if (bam.IsMapped()) {
-            BED a;
-            a.chrom = refs.at(bam.RefID).RefName;
-            a.start = bam.Position;
-            a.end   = bam.GetEndPosition(false, false);
-
-            // build the name field from the BAM alignment.
-            a.name = bam.Name;
-            if (bam.IsFirstMate()) a.name += "/1";
-            if (bam.IsSecondMate()) a.name += "/2";
-
-            a.score  = ToString(bam.MapQuality);
-
-            a.strand = "+";
-            if (bam.IsReverseStrand()) a.strand = "-";
-
-            if (_bamOutput == true) {
-                bool overlapsFound = false;
-                // treat the BAM alignment as a single "block"
-                if (_obeySplits == false) {
-                    overlapsFound = _bedB->anyHits(a.chrom, a.start, a.end, 
-                                                   a.strand, _sameStrand, _diffStrand,
-                                                   _overlapFraction, _reciprocal);
-                }
-                // split the BAM alignment into discrete blocks and
-                // look for overlaps only within each block.
-                else {
-                    bool overlapFoundForBlock;
-                    bedVector bedBlocks;  // vec to store the discrete BED "blocks" from a
-                    // we don't want to split on "D" ops, hence the "false"
-                    GetBamBlocks(bam, refs.at(bam.RefID).RefName, bedBlocks);
-
-                    vector<BED>::const_iterator bedItr  = bedBlocks.begin();
-                    vector<BED>::const_iterator bedEnd  = bedBlocks.end();
-                    for (; bedItr != bedEnd; ++bedItr) {
-                        overlapFoundForBlock = _bedB->anyHits(bedItr->chrom, bedItr->start, bedItr->end, 
-                                                              bedItr->strand, _sameStrand, _diffStrand,
-                                                              _overlapFraction, _reciprocal);
-                        if (overlapFoundForBlock == true)
-                            overlapsFound = true;
-                    }
-                }
-                if (overlapsFound == true) {
-                    if (_noHit == false)
-                        writer.SaveAlignment(bam);
-                }
-                else {
-                    if (_noHit == true) {
-                        writer.SaveAlignment(bam);
-                    }
-                }
-            }
-            else {
-                // treat the BAM alignment as a single BED "block"
-                if (_obeySplits == false) {
-                    FindOverlaps(a, hits);
-                    hits.clear();
-                }
-                // split the BAM alignment into discrete BED blocks and
-                // look for overlaps only within each block.
-                else {
-                    bedVector bedBlocks;  // vec to store the discrete BED "blocks" from a
-                    GetBamBlocks(bam, refs.at(bam.RefID).RefName, bedBlocks);
-
-                    vector<BED>::const_iterator bedItr  = bedBlocks.begin();
-                    vector<BED>::const_iterator bedEnd  = bedBlocks.end();
-                    for (; bedItr != bedEnd; ++bedItr) {
-                        FindOverlaps(*bedItr, hits);
-                        hits.clear();
-                    }
-                }
-            }
-        }
         // BAM IsMapped() is false
-        else if (_noHit == true) {
+        if ((!bam.IsMapped()) && (_noHit == true))
             writer.SaveAlignment(bam);
+        else if (!bam.IsMapped())
+            continue;
+
+        // break alignment into discrete blocks,
+        bedVector bed_blocks;
+        string chrom = refs.at(bam.RefID).RefName;
+        GetBamBlocks(bam, chrom, bed_blocks);
+        // create a basic BED entry from the BAM alignment
+        BED bed;
+        MakeBedFromBam(bam, chrom, bed_blocks, bed);
+        bool overlapsFound = false;
+        if ((_bamOutput == true) && (_obeySplits == false)) 
+        {
+            overlapsFound = _bedB->anyHits(bed.chrom, bed.start, bed.end, 
+                                           bed.strand, _sameStrand, _diffStrand,
+                                           _overlapFraction, _reciprocal);
         }
+        else if ( ((_bamOutput == true)  && (_obeySplits == true)) ||
+                  ((_bamOutput == false) && (_obeySplits == true)) )
+        {
+            // find the hits that overlap with the full span of the blocked BED
+            _bedB->allHits(bed.chrom, bed.start, bed.end, bed.strand,
+                           hits, _sameStrand, _diffStrand,
+                           _overlapFraction, _reciprocal);
+            // find the overlaps between the block in A and B
+            overlapsFound = FindBlockedOverlaps(bed, bed_blocks, hits, _bamOutput);
+        }
+        else if ((_bamOutput == false) && (_obeySplits == false))
+        {
+            FindOverlaps(bed, hits);
+        }
+        // save the BAM alignment if overlap reqs. were met
+        if (_bamOutput == true) {
+            if ((overlapsFound == true) && (_noHit == false))
+                writer.SaveAlignment(bam);
+            else if ((overlapsFound == false) && (_noHit == true))
+                writer.SaveAlignment(bam);
+        }
+        hits.clear();
     }
 
     // close the relevant BAM files.

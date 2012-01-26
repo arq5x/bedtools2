@@ -798,7 +798,6 @@ public:
     */
     template <typename T>
     inline void reportBedTab(const T &bed) {
-        
         // if it is azeroLength feature, we need to
         // correct the start and end coords to what they were
         // in the original file
@@ -888,7 +887,6 @@ public:
                 start++;
             end--;
         }
-        
         //BED
         if (_isGff == false && _isVcf == false) {
             if (this->bedType == 3) {
@@ -960,7 +958,6 @@ public:
     */
     template <typename T>
     inline void reportBedRangeTab(const T &bed, CHRPOS start, CHRPOS end) {
-        
         // if it is azeroLength feature, we need to
         // correct the start and end coords to what they were
         // in the original file

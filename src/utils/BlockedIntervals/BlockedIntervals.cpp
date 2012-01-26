@@ -14,7 +14,7 @@
 
 void GetBamBlocks(const BamAlignment &bam,
                   const string &chrom,
-                  vector<BED> &bedBlocks,
+                  bedVector &bedBlocks,
                   bool breakOnDeletionOps)
 {
     vector<int> starts;

@@ -18,6 +18,7 @@
 #include "api/BamWriter.h"
 #include "api/BamAux.h"
 #include "BlockedIntervals.h"
+#include "BamAncillary.h"
 using namespace BamTools;
 
 
@@ -87,11 +88,12 @@ private:
     bool processHits(const BED &a, const vector<BED> &hits);
 
     bool FindOverlaps(const BED &a, vector<BED> &hits);
-    
-    bool FindBlockedOverlaps(const BED &a, vector<BED> &hits);
+
+    bool FindBlockedOverlaps(const BED &a, const vector<BED> &a_blocks, 
+        const vector<BED> &hits, bool a_is_bam);
 
     void ReportOverlapDetail(int overlapBases, const BED &a, const BED &b, CHRPOS s, CHRPOS e);
-    
+
     void ReportOverlapSummary(const BED &a, const int &numOverlapsFound);
 
 };
