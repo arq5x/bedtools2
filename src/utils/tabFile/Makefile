@@ -9,7 +9,7 @@ INCLUDES = -I$(UTILITIES_DIR)/lineFileUtilities/ -I$(UTILITIES_DIR)/gzstream/ -I
 # ----------------------------------
 # define our source and object files
 # ----------------------------------
-SOURCES= tabFile.cpp
+SOURCES= tabFile.cpp tabFile.h
 OBJECTS= $(SOURCES:.cpp=.o)
 _EXT_OBJECTS=lineFileUtilities.o gzstream.o fileType.o
 EXT_OBJECTS=$(patsubst %,$(OBJ_DIR)/%,$(_EXT_OBJECTS))

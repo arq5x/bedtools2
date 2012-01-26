@@ -9,7 +9,7 @@ INCLUDES =
 # ----------------------------------
 # define our source and object files
 # ----------------------------------
-SOURCES= lineFileUtilities.cpp
+SOURCES= lineFileUtilities.cpp lineFileUtilities.h
 OBJECTS= $(SOURCES:.cpp=.o)
 _EXT_OBJECTS=	
 EXT_OBJECTS=$(patsubst %,$(OBJ_DIR)/%,$(_EXT_OBJECTS))
