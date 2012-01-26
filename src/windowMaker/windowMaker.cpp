@@ -33,14 +33,14 @@ void WindowMaker::MakeWindows() {
         string chrom = chromList[c];
         uint32_t chrom_size = _genome->getChromSize(chrom);
         
-    	for (uint32_t start = 0; start <= chrom_size; start += _step) {
-    		if ((start + _size) <= chrom_size) {
-    			cout << chrom << "\t" << start << "\t" << start + _size << endl;
-    		}
-    		else if (start < chrom_size) {
-    			cout << chrom << "\t" << start << "\t" << chrom_size << endl;
-    		}
-    	}
+        for (uint32_t start = 0; start <= chrom_size; start += _step) {
+            if ((start + _size) <= chrom_size) {
+                cout << chrom << "\t" << start << "\t" << start + _size << endl;
+            }
+            else if (start < chrom_size) {
+                cout << chrom << "\t" << start << "\t" << chrom_size << endl;
+            }
+        }
     }
 }
 

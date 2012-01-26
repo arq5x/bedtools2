@@ -18,11 +18,8 @@ INCLUDES = -I$(UTILITIES_DIR)/bedFile/ \
 # define our source and object files
 # ----------------------------------
 SOURCES= bamToBed.cpp
-OBJECTS= $(SOURCES:.cpp=.o)
-_EXT_OBJECTS=BamAncillary.o BlockedIntervals.o
-EXT_OBJECTS=$(patsubst %,$(OBJ_DIR)/%,$(_EXT_OBJECTS))
+OBJECTS= bamToBed.o
 BUILT_OBJECTS= $(patsubst %,$(OBJ_DIR)/%,$(OBJECTS))
-PROGRAM= bamToBed
 
 
 all: $(BUILT_OBJECTS)
@@ -33,12 +30,8 @@ $(BUILT_OBJECTS): $(SOURCES)
 	@echo "  * compiling" $(*F).cpp
 	@$(CXX) -c -o $@ $(*F).cpp $(LDFLAGS) $(CXXFLAGS) $(INCLUDES) 
 
-$(EXT_OBJECTS):
-	@$(MAKE) --no-print-directory -C $(UTILITIES_DIR)/BamAncillary/
-	@$(MAKE) --no-print-directory -C $(UTILITIES_DIR)/BlockedIntervals/
-	
 clean:
 	@echo "Cleaning up."
-	@rm -f $(OBJ_DIR)/* $(BIN_DIR)/*
+	@rm -f $(OBJ_DIR)/bamToBed.o
 
 .PHONY: clean

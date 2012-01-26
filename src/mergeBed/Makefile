@@ -14,12 +14,9 @@ INCLUDES = -I$(UTILITIES_DIR)/bedFile/ \
 # ----------------------------------
 # define our source and object files
 # ----------------------------------
-SOURCES= mergeMain.cpp mergeBed.cpp
-OBJECTS= $(SOURCES:.cpp=.o)
-_EXT_OBJECTS=bedFile.o lineFileUtilities.o gzstream.o fileType.o
-EXT_OBJECTS=$(patsubst %,$(OBJ_DIR)/%,$(_EXT_OBJECTS))
+SOURCES= mergeMain.cpp mergeBed.cpp mergeBed.h
+OBJECTS= mergeMain.o mergeBed.o
 BUILT_OBJECTS= $(patsubst %,$(OBJ_DIR)/%,$(OBJECTS))
-PROGRAM= mergeBed
 
 
 all: $(BUILT_OBJECTS)
@@ -30,15 +27,8 @@ $(BUILT_OBJECTS): $(SOURCES)
 	@echo "  * compiling" $(*F).cpp
 	@$(CXX) -c -o $@ $(*F).cpp $(LDFLAGS) $(CXXFLAGS) $(INCLUDES)
 
-$(EXT_OBJECTS):
-	@$(MAKE) --no-print-directory -C $(UTILITIES_DIR)/bedFile/
-	@$(MAKE) --no-print-directory -C $(UTILITIES_DIR)/lineFileUtilities/
-	@$(MAKE) --no-print-directory -C $(UTILITIES_DIR)/gzstream/
-	@$(MAKE) --no-print-directory -C $(UTILITIES_DIR)/fileType/
-	@$(MAKE) --no-print-directory -C $(UTILITIES_DIR)/fileType/
-			
 clean:
 	@echo "Cleaning up."
-	@rm -f $(OBJ_DIR)/* $(BIN_DIR)/*
+	@rm -f $(OBJ_DIR)/mergeMain.o $(OBJ_DIR)/mergeBed.o
 
 .PHONY: clean

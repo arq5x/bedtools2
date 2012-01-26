@@ -16,12 +16,9 @@ INCLUDES = -I$(UTILITIES_DIR)/bedFile/ \
 # ----------------------------------
 # define our source and object files
 # ----------------------------------
-SOURCES= windowMain.cpp windowBed.cpp
-OBJECTS= $(SOURCES:.cpp=.o)
-_EXT_OBJECTS=bedFile.o lineFileUtilities.o gzstream.o fileType.o
-EXT_OBJECTS=$(patsubst %,$(OBJ_DIR)/%,$(_EXT_OBJECTS))
+SOURCES= windowMain.cpp windowBed.cpp windowBed.h
+OBJECTS= windowMain.o windowBed.o
 BUILT_OBJECTS= $(patsubst %,$(OBJ_DIR)/%,$(OBJECTS))
-PROGRAM= windowBed
 
 
 all: $(BUILT_OBJECTS)
@@ -32,16 +29,8 @@ $(BUILT_OBJECTS): $(SOURCES)
 	@echo "  * compiling" $(*F).cpp
 	@$(CXX) -c -o $@ $(*F).cpp $(LDFLAGS) $(CXXFLAGS) $(INCLUDES)
 
-$(EXT_OBJECTS):
-	@$(MAKE) --no-print-directory -C $(UTILITIES_DIR)/bedFile/
-	@$(MAKE) --no-print-directory -C $(UTILITIES_DIR)/lineFileUtilities/
-	@$(MAKE) --no-print-directory -C $(UTILITIES_DIR)/BamTools/
-	@$(MAKE) --no-print-directory -C $(UTILITIES_DIR)/BamTools-Ancillary/
-	@$(MAKE) --no-print-directory -C $(UTILITIES_DIR)/gzstream/
-	@$(MAKE) --no-print-directory -C $(UTILITIES_DIR)/fileType/
-		
 clean:
 	@echo "Cleaning up."
-	@rm -f $(OBJ_DIR)/* $(BIN_DIR)/*
+	@rm -f $(OBJ_DIR)/windowMain.o $(OBJ_DIR)/windowBed.o
 
 .PHONY: clean

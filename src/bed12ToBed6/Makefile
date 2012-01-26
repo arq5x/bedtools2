@@ -17,11 +17,8 @@ INCLUDES = -I$(UTILITIES_DIR)/bedFile/ \
 # define our source and object files
 # ----------------------------------
 SOURCES= bed12ToBed6.cpp
-OBJECTS= $(SOURCES:.cpp=.o)
-_EXT_OBJECTS=bedFile.o  BlockedIntervals.o lineFileUtilities.o gzstream.o fileType.o
-EXT_OBJECTS=$(patsubst %,$(OBJ_DIR)/%,$(_EXT_OBJECTS))
+OBJECTS= bed12ToBed6.o
 BUILT_OBJECTS= $(patsubst %,$(OBJ_DIR)/%,$(OBJECTS))
-PROGRAM= bed12ToBed6
 
 
 all: $(BUILT_OBJECTS)
@@ -32,15 +29,8 @@ $(BUILT_OBJECTS): $(SOURCES)
 	@echo "  * compiling" $(*F).cpp
 	@$(CXX) -c -o $@ $(*F).cpp $(LDFLAGS) $(CXXFLAGS) $(INCLUDES)
 
-$(EXT_OBJECTS):	
-	@$(MAKE) --no-print-directory -C $(UTILITIES_DIR)/lineFileUtilities/
-	@$(MAKE) --no-print-directory -C $(UTILITIES_DIR)/bedFile/
-	@$(MAKE) --no-print-directory -C $(UTILITIES_DIR)/gzstream/
-	@$(MAKE) --no-print-directory -C $(UTILITIES_DIR)/fileType/
-	@$(MAKE) --no-print-directory -C $(UTILITIES_DIR)/BlockedIntervals/
-			
 clean:
 	@echo "Cleaning up."
-	@rm -f $(OBJ_DIR)/* $(BIN_DIR)/*
+	@rm -f $(OBJ_DIR)/bed12ToBed6.o
 
 .PHONY: clean
