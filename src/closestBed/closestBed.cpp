@@ -23,7 +23,7 @@ const int SLOPGROWTH = 2048000;
 */
 BedClosest::BedClosest(string &bedAFile, string &bedBFile, bool sameStrand, bool diffStrand,
                        string &tieMode, bool reportDistance, bool signDistance, string &_strandedDistMode,
-                       bool ignoreOverlaps, bool printHeader) 
+                       bool ignoreOverlaps, bool ignoreUpstream, bool ignoreDownstream, bool printHeader) 
     : _bedAFile(bedAFile)
     , _bedBFile(bedBFile)
     , _tieMode(tieMode)
@@ -33,6 +33,8 @@ BedClosest::BedClosest(string &bedAFile, string &bedBFile, bool sameStrand, bool
     , _signDistance(signDistance)
     , _strandedDistMode(_strandedDistMode)
     , _ignoreOverlaps(ignoreOverlaps)
+    , _ignoreUpstream(ignoreUpstream)
+    , _ignoreDownstream(ignoreDownstream)
     , _printHeader(printHeader)
 {
     _bedA           = new BedFile(_bedAFile);
@@ -113,7 +115,18 @@ void BedClosest::FindWindowOverlaps(BED &a, vector<BED> &hits) {
                         if ((_strandedDistMode == "ref")
                                 || (_strandedDistMode == "a" && a.strand != "-")
                                 || (_strandedDistMode == "b" && h->strand == "-")) {
-                            curDistance = -curDistance;
+                            // hit is "upstream" of A
+                            if (_ignoreUpstream) {
+                                numOverlaps--;
+                                continue;
+                            }
+                            else {
+                                curDistance = -curDistance;
+                            }
+                        }
+                        else if (_ignoreDownstream) {
+                            numOverlaps--;
+                            continue;
                         }
                     }
                     
@@ -137,7 +150,18 @@ void BedClosest::FindWindowOverlaps(BED &a, vector<BED> &hits) {
                     if (_signDistance) {
                         if ((_strandedDistMode == "a" && a.strand == "-")
                                 || (_strandedDistMode == "b" && h->strand != "-")) {
-                            curDistance = -curDistance;
+                            // hit is "upstream" of A
+                            if (_ignoreUpstream) {
+                                numOverlaps--;
+                                continue;
+                            }
+                            else{
+                                curDistance = -curDistance;
+                            }
+                        }
+                        else if (_ignoreDownstream){
+                            numOverlaps--;
+                            continue;
                         }
                     }
                     if (abs(curDistance) < minDistance) {
@@ -173,7 +197,7 @@ void BedClosest::FindWindowOverlaps(BED &a, vector<BED> &hits) {
     // report the closest feature(s) in B to the current A feature.
     // obey the user's reporting request (_tieMode)
     if (numOverlaps > 0) {
-        if (closestB.size() == 1 || _tieMode == "first") {
+        if (closestB.size() == 1 || (_tieMode == "first" && closestB.size() > 0)) {
             _bedA->reportBedTab(a);
             if (_reportDistance == true) {
                 _bedB->reportBedTab(closestB[0]);
@@ -195,7 +219,7 @@ void BedClosest::FindWindowOverlaps(BED &a, vector<BED> &hits) {
                         _bedB->reportBedNewLine(*b);
                 }
             }
-            else if (_tieMode == "last") {
+            else if (_tieMode == "last" && closestB.size() > 0) {
                 _bedA->reportBedTab(a);
                 if (_reportDistance == true) {
                     _bedB->reportBedTab(closestB[closestB.size()-1]);

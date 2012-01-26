@@ -40,6 +40,8 @@ int closest_main(int argc, char* argv[]) {
     bool sameStrand     = false;
     bool diffStrand     = false;
     bool ignoreOverlaps = false;
+    bool ignoreUpstream = false;
+    bool ignoreDownstream = false;
     bool reportDistance = false;
     bool signDistance   = false;
     bool haveStrandedDistMode = false;
@@ -100,6 +102,12 @@ int closest_main(int argc, char* argv[]) {
         else if (PARAMETER_CHECK("-io", 3, parameterLength)) {
             ignoreOverlaps = true;
         }
+        else if (PARAMETER_CHECK("-iu", 3, parameterLength)) {
+            ignoreUpstream = true;
+        }
+        else if (PARAMETER_CHECK("-id", 3, parameterLength)) {
+            ignoreDownstream = true;
+        }
         else if (PARAMETER_CHECK("-t", 2, parameterLength)) {
             if ((i+1) < argc) {
                 haveTieMode = true;
@@ -139,10 +147,22 @@ int closest_main(int argc, char* argv[]) {
         showHelp = true;
     }
     
+    if (ignoreUpstream && ignoreDownstream) {
+        cerr << endl << "*****" << endl << "*****ERROR: Request either -iu OR -id, not both." << endl << "*****" << endl;
+        showHelp = true;
+    }
+    
+    if ((ignoreUpstream || ignoreDownstream) && ! haveStrandedDistMode) {
+        cerr << endl << "*****" << endl << "*****ERROR: When requesting -iu or -id, you also need to specify -D." << endl << "*****" << endl;
+        showHelp = true;
+    }
+    
+    
     if (!showHelp) {
         BedClosest *bc = new BedClosest(bedAFile, bedBFile, sameStrand, 
                                         diffStrand, tieMode, reportDistance, 
-                                        signDistance, strandedDistMode, ignoreOverlaps, printHeader);
+                                        signDistance, strandedDistMode, ignoreOverlaps,
+                                        ignoreUpstream, ignoreDownstream, printHeader);
         delete bc;
     }
     else {
@@ -188,6 +208,13 @@ void closest_help(void) {
 
     cerr << "\t-io\t"           << "Ignore features in B that overlap A.  That is, we want close," << endl;
     cerr                        << "\t\tyet not touching features only." << endl << endl;
+    
+    cerr << "\t-iu\t"           << "Ignore features in B that are upstream of features in A." << endl;
+    cerr                        << "\t\tThis option requires -D and follows its orientation" << endl;
+    cerr                        << "\t\trules for determining what is \"upstream\"." << endl;
+    cerr << "\t-id\t"           << "Ignore features in B that are upstream of features in A." << endl;
+    cerr                        << "\t\tThis option requires -D and follows its orientation" << endl;
+    cerr                        << "\t\trules for determining what is \"downstream\"." << endl;
 
     cerr << "\t-t\t"            << "How ties for closest feature are handled.  This occurs when two" << endl;
     cerr                        << "\t\tfeatures in B have exactly the same \"closeness\" with A." << endl;
