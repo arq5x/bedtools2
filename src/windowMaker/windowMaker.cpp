@@ -96,7 +96,7 @@ void WindowMaker::MakeFixedCountWindow(const BED& interval) {
         return;
 
     uint32_t i=1;
-    for (uint32_t start = interval.start; start <= interval.end; start += window_size, ++i) {
+    for (uint32_t start = interval.start; start < interval.end; start += window_size, ++i) {
         string name = GenerateID(interval,i);
         uint32_t end = min(start + window_size,interval.end);
         cout << interval.chrom << "\t" << start << "\t" << end << name << endl;
