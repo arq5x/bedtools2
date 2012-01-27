@@ -32,6 +32,7 @@ int windowmaker_main(int argc, char* argv[]) {
     // input files
     string inputFile;
     WindowMaker::INPUT_FILE_TYPE inputFileType = WindowMaker::GENOME_FILE;
+    WindowMaker::ID_METHOD idMethod = WindowMaker::ID_NONE;
 
     // parms
     uint32_t size = 0;
@@ -96,6 +97,21 @@ int windowmaker_main(int argc, char* argv[]) {
                 i++;
             }
         }
+        else if(PARAMETER_CHECK("-i", 2, parameterLength)) {
+            if ((i+1) < argc) {
+                if (strcmp(argv[i+1],"winnum")==0)
+                    idMethod = WindowMaker::ID_WINDOW_NUMBER;
+                else if (strcmp(argv[i+1],"srcwinnum")==0)
+                    idMethod = WindowMaker::ID_SOURCE_ID_WINDOW_NUMBER;
+                else if (strcmp(argv[i+1],"src")==0)
+                    idMethod = WindowMaker::ID_SOURCE_ID;
+                else {
+                    cerr << endl << "*****ERROR: Invalid ID method (" << argv[i+1] << "). Possible values are: winnum, srcwinnum" << endl << endl ;
+                    showHelp = true;
+                }
+                i++;
+            }
+        }
         else {
             cerr << endl << "*****ERROR: Unrecognized parameter: " << argv[i] << " *****" << endl << endl;
             showHelp = true;
@@ -122,9 +138,9 @@ int windowmaker_main(int argc, char* argv[]) {
     if (!showHelp) {
         WindowMaker *wm = NULL;
         if (haveCount)
-            wm = new WindowMaker(inputFile, inputFileType, count);
+            wm = new WindowMaker(inputFile, idMethod, inputFileType, count);
         if (haveSize)
-            wm = new WindowMaker(inputFile, inputFileType, size, step);
+            wm = new WindowMaker(inputFile, idMethod, inputFileType, size, step);
         delete wm;
     }
     else {
@@ -168,6 +184,15 @@ void windowmaker_help(void) {
     cerr << "\t\tDivide each input interval (either a chromosome or a BED interval)" << endl;
     cerr << "\t\tto fixed number of windows (i.e. same number of windows, with" << endl;
     cerr << "\t\tvarying window sizes)." << endl << endl;
+
+    cerr << "ID Naming Options: " << endl;
+    cerr << "\t-i src|winnum|srcwinnum" << endl;
+    cerr << "\t\tThe default output is 3 columns: chrom, start, end ." << endl;
+    cerr << "\t\tWith this option, a name column will be added." << endl;
+    cerr << "\t\t \"-i src\" - use the source interval's name." << endl;
+    cerr << "\t\t \"-i winnum\" - use the window number as the ID (e.g. 1,2,3,4...)." << endl;
+    cerr << "\t\t \"-i srcwinnum\" - use the source interval's name with the window number." << endl;
+    cerr << "\t\tSee below for usage examples." << endl << endl;
 
     cerr << "Notes: " << endl;
     cerr << "\t(1) The genome file should tab delimited and structured as follows:" << endl;
@@ -229,6 +254,41 @@ void windowmaker_help(void) {
     cerr << " ..." << endl;
     cerr << endl;
 
+    cerr << " # Add a name column, based on the window number: "<< endl;
+    cerr << " $ cat input.bed" << endl;
+    cerr << " chr5  60000  70000 AAA" << endl;
+    cerr << " chr5  73000  90000 BBB" << endl;
+    cerr << " chr5 100000 101000 CCC" << endl;
+    cerr << " $ " << PROGRAM_NAME << " -b input.bed -n 3 -i winnum" << endl;
+    cerr << " chr5        60000   63334   1" << endl;
+    cerr << " chr5        63334   66668   2" << endl;
+    cerr << " chr5        66668   70000   3" << endl;
+    cerr << " chr5        73000   78667   1" << endl;
+    cerr << " chr5        78667   84334   2" << endl;
+    cerr << " chr5        84334   90000   3" << endl;
+    cerr << " chr5        100000  100334  1" << endl;
+    cerr << " chr5        100334  100668  2" << endl;
+    cerr << " chr5        100668  101000  3" << endl;
+    cerr << " ..." << endl;
+    cerr << endl;
+
+    cerr << " # Add a name column, based on the source ID + window number: "<< endl;
+    cerr << " $ cat input.bed" << endl;
+    cerr << " chr5  60000  70000 AAA" << endl;
+    cerr << " chr5  73000  90000 BBB" << endl;
+    cerr << " chr5 100000 101000 CCC" << endl;
+    cerr << " $ " << PROGRAM_NAME << " -b input.bed -n 3 -i srcwinnum" << endl;
+    cerr << " chr5        60000   63334   AAA_1" << endl;
+    cerr << " chr5        63334   66668   AAA_2" << endl;
+    cerr << " chr5        66668   70000   AAA_3" << endl;
+    cerr << " chr5        73000   78667   BBB_1" << endl;
+    cerr << " chr5        78667   84334   BBB_2" << endl;
+    cerr << " chr5        84334   90000   BBB_3" << endl;
+    cerr << " chr5        100000  100334  CCC_1" << endl;
+    cerr << " chr5        100334  100668  CCC_2" << endl;
+    cerr << " chr5        100668  101000  CCC_3" << endl;
+    cerr << " ..." << endl;
+    cerr << endl;
 
 
 
@@ -238,3 +298,4 @@ void windowmaker_help(void) {
     exit(1);
 
 }
+
