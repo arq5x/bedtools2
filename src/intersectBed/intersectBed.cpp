@@ -60,14 +60,22 @@ bool BedIntersect::processHits(const BED &a, const vector<BED> &hits) {
     // return hitsFound;
     bool hitsFound   = false;
     if (_printable == true) {
-        vector<BED>::const_iterator h       = hits.begin();
-        vector<BED>::const_iterator hitsEnd = hits.end();
-        for (; h != hitsEnd; ++h) {
-            CHRPOS s = max(a.start, h->start);
-            CHRPOS e = min(a.end, h->end);
-            int overlapBases = (e - s);
-            ReportOverlapDetail(overlapBases, a, *h, s, e);
-            hitsFound = true;
+        // -wao the user wants to force the reporting of 0 overlap
+        if (hits.size() == 0 && _writeAllOverlap) {
+            _bedA->reportBedTab(a);
+            _bedB->reportNullBedTab();
+            printf("0\n");
+        }
+        else {
+            vector<BED>::const_iterator h       = hits.begin();
+            vector<BED>::const_iterator hitsEnd = hits.end();
+            for (; h != hitsEnd; ++h) {
+                CHRPOS s = max(a.start, h->start);
+                CHRPOS e = min(a.end, h->end);
+                int overlapBases = (e - s);
+                ReportOverlapDetail(overlapBases, a, *h, s, e);
+                hitsFound = true;
+            }
         }
     }
     else {
@@ -179,12 +187,6 @@ void BedIntersect::ReportOverlapSummary(const BED &a, const int &numOverlapsFoun
     // -v  report iff there were no overlaps
     else if (_noHit && (numOverlapsFound == 0)) {
         _bedA->reportBedNewLine(a);
-    }
-    // -wao the user wants to force the reporting of 0 overlap
-    else if (_writeAllOverlap && (numOverlapsFound == 0)) {
-        _bedA->reportBedTab(a);
-        _bedB->reportNullBedTab();
-        printf("0\n");
     }
 }
 
