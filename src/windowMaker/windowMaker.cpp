@@ -11,11 +11,12 @@ Licenced under the GNU General Public License 2.0 license.
 ******************************************************************************/
 #include "windowMaker.h"
 
-WindowMaker::WindowMaker(string &fileName, INPUT_FILE_TYPE input_file_type, uint32_t size, uint32_t step)
+WindowMaker::WindowMaker(string &fileName, ID_METHOD id_method, INPUT_FILE_TYPE input_file_type, uint32_t size, uint32_t step)
 : _size(size)
 , _step(step)
 , _count(0)
 , _window_method(FIXED_WINDOW_SIZE)
+, _id_method(id_method)
 {
     if (input_file_type==GENOME_FILE)
         MakeWindowsFromGenome(fileName);
@@ -23,11 +24,12 @@ WindowMaker::WindowMaker(string &fileName, INPUT_FILE_TYPE input_file_type, uint
         MakeWindowsFromBED(fileName);
 }
 
-WindowMaker::WindowMaker(string &fileName, INPUT_FILE_TYPE input_file_type, uint32_t count)
+WindowMaker::WindowMaker(string &fileName, ID_METHOD id_method, INPUT_FILE_TYPE input_file_type, uint32_t count)
     : _size(0)
     , _step(0)
     , _count(count)
     , _window_method(FIXED_WINDOW_COUNT)
+    , _id_method(id_method)
 {
     if (input_file_type==GENOME_FILE)
         MakeWindowsFromGenome(fileName);
@@ -75,12 +77,14 @@ void WindowMaker::MakeBEDWindow(const BED& interval)
 }
 
 void WindowMaker::MakeFixedSizeWindow(const BED& interval) {
-    for (uint32_t start = interval.start; start <= interval.end; start += _step) {
+    uint32_t i=1;
+    for (uint32_t start = interval.start; start <= interval.end; start += _step, ++i) {
+        string name = GenerateID(interval,i);
         if ((start + _size) <= interval.end) {
-            cout << interval.chrom << "\t" << start << "\t" << start + _size << endl;
+            cout << interval.chrom << "\t" << start << "\t" << start + _size << name << endl;
         }
         else if (start < interval.end) {
-            cout << interval.chrom << "\t" << start << "\t" << interval.end << endl;
+            cout << interval.chrom << "\t" << start << "\t" << interval.end << name << endl;
         }
     }
 }
@@ -91,8 +95,28 @@ void WindowMaker::MakeFixedCountWindow(const BED& interval) {
     if (window_size==0 || interval_size==0)
         return;
 
-    for (uint32_t start = interval.start; start <= interval.end; start += window_size) {
+    uint32_t i=1;
+    for (uint32_t start = interval.start; start < interval.end; start += window_size, ++i) {
+        string name = GenerateID(interval,i);
         uint32_t end = min(start + window_size,interval.end);
-        cout << interval.chrom << "\t" << start << "\t" << end << endl;
+        cout << interval.chrom << "\t" << start << "\t" << end << name << endl;
     }
+}
+
+string WindowMaker::GenerateID(const BED& interval, uint32_t window_index) const {
+    stringstream s;
+    switch(_id_method) {
+    case ID_SOURCE_ID:
+         s << "\t" << interval.name;
+         break;
+    case ID_WINDOW_NUMBER:
+         s << "\t" << window_index;
+         break;
+    case ID_SOURCE_ID_WINDOW_NUMBER:
+         s << "\t" << interval.name << "_" << window_index;
+    default:
+    case ID_NONE:
+         break;
+    }
+    return s.str();
 }

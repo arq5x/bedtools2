@@ -29,10 +29,16 @@ public:
         FIXED_WINDOW_SIZE,
         FIXED_WINDOW_COUNT
     };
+    enum ID_METHOD {
+        ID_NONE,
+        ID_WINDOW_NUMBER,
+        ID_SOURCE_ID,
+        ID_SOURCE_ID_WINDOW_NUMBER
+    };
 
     // constructor
-    WindowMaker(string &fileName, INPUT_FILE_TYPE input_file_type, uint32_t count);
-    WindowMaker(string &fileName, INPUT_FILE_TYPE input_file_type, uint32_t size, uint32_t step);
+    WindowMaker(string &fileName, ID_METHOD id_method, INPUT_FILE_TYPE input_file_type, uint32_t count);
+    WindowMaker(string &fileName, ID_METHOD id_method, INPUT_FILE_TYPE input_file_type, uint32_t size, uint32_t step);
 
     // destructor
     ~WindowMaker(void);
@@ -45,9 +51,12 @@ private:
     uint32_t _step;
     uint32_t _count;
     WINDOW_METHOD _window_method;
+    ID_METHOD _id_method;
 
     void MakeBEDWindow(const BED& interval);
 
     void MakeFixedSizeWindow(const BED& interval);
     void MakeFixedCountWindow(const BED& interval);
+
+    string GenerateID(const BED& interval, uint32_t window_index) const;
 };
