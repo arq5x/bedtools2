@@ -109,3 +109,8 @@ clean:
 	@rm -Rf $(BT_ROOT)/include
 
 .PHONY: clean
+
+test:
+	@cd test; sh test.sh
+
+.PHONY: test
