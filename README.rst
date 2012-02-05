@@ -40,7 +40,7 @@ Download tarball - that big gray button on the upper right.
 #. Type "make" and hit enter.
 #. If you encountered no errors, then bedtools should now be in bin/
   If not, try to troubleshoot then email me: aaronquinlan at gmail dot com
-# Run the test suite with: "make test"
+#. Run the test suite with: "make test"
 #. Copy the files in bin/ to ~/bin or if you have the privileges, to /usr/local/bin.  Make sure that the directory to which you copy the tools is in your $PATH
 #. Use the tools.
 
