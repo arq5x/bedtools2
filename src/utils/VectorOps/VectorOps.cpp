@@ -152,7 +152,7 @@ string VectorOps::GetMode(void)
             if (curr_count > max_count)
             {
                 max_count = curr_count;
-                mode = *it;
+                mode = prev;
             }
             curr_count = 1;
         }
@@ -169,7 +169,7 @@ string VectorOps::GetMode(void)
 string VectorOps::GetAntiMode(void)
 {
     string antimode;
-    int min_count = 0;
+    int min_count = INT_MAX;
     int curr_count = 0;
     
     sort(_vecs.begin(), _vecs.end());
@@ -183,7 +183,7 @@ string VectorOps::GetAntiMode(void)
             if (curr_count < min_count)
             {
                 min_count = curr_count;
-                antimode = *it;
+                antimode = prev;
             }
             curr_count = 1;
         }
