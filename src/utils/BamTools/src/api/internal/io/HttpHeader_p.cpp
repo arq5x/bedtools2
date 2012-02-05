@@ -2,7 +2,7 @@
 // HttpHeader_p.cpp (c) 2011 Derek Barnett
 // Marth Lab, Department of Biology, Boston College
 // ---------------------------------------------------------------------------
-// Last modified: 10 November 2011 (DB)
+// Last modified: 13 January 2012 (DB)
 // ---------------------------------------------------------------------------
 // Provides a generic interface for parsing/generating HTTP headers, along
 // with specialized request & response header types
@@ -125,9 +125,9 @@ int HttpHeader::GetMinorVersion(void) const {
     return m_minorVersion;
 }
 
-string HttpHeader::GetValue(const string& key) const {
+string HttpHeader::GetValue(const string& key) {
     if ( ContainsKey(key) )
-        return m_fields.at(key);
+        return m_fields[key];
     else return string();
 }
 
