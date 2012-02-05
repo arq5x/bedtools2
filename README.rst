@@ -35,13 +35,13 @@ git clone git://github.com/arq5x/bedtools.git
 
 Download tarball - that big gray button on the upper right.
 ...........................................................
-#. Unpack the source downloaded tarball.
-#. cd into the expanded folder.
-#. Type "make" and hit enter.
-#. If you encountered no errors, then bedtools should now be in bin/
+1. Unpack the source downloaded tarball.
+2. cd into the expanded folder.
+3. Type "make" and hit enter.
+4. If you encountered no errors, then bedtools should now be in bin/
   If not, try to troubleshoot then email me: aaronquinlan at gmail dot com
-#. Run the test suite with: "make test"
-#. Copy the files in bin/ to ~/bin or if you have the privileges, to /usr/local/bin.  Make sure that the directory to which you copy the tools is in your $PATH
-#. Use the tools.
+5. Run the test suite with: "make test"
+6. Copy the files in bin/ to ~/bin or if you have the privileges, to /usr/local/bin.  Make sure that the directory to which you copy the tools is in your $PATH
+7. Use the tools.
 
 
