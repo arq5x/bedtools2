@@ -243,11 +243,16 @@ void BedGenomeCoverage::CoverageBam(string bamFile) {
             StartNewChrom(chrom);
 
         // add coverage accordingly.
-        if (_obeySplits) {
+        if (!_only_5p_end && !_only_3p_end) {
             bedVector bedBlocks;
-            // since we are counting coverage, we do want to split blocks when a
-            // deletion (D) CIGAR op is encountered (hence the true for the last parm)
-            GetBamBlocks(bam, refs.at(bam.RefID).RefName, bedBlocks, true);
+            // we always want to split blocks when a D CIGAR op is found.
+            // if the user invokes -split, we want to also split on N ops.
+            if (_obeySplits) { // "D" true, "N" true
+                GetBamBlocks(bam, refs.at(bam.RefID).RefName, bedBlocks, true, true);
+            }
+            else { // "D" true, "N" false
+                GetBamBlocks(bam, refs.at(bam.RefID).RefName, bedBlocks, true, false);
+            }
             AddBlockedCoverage(bedBlocks);
         }
         else if (_only_5p_end) {
@@ -258,8 +263,6 @@ void BedGenomeCoverage::CoverageBam(string bamFile) {
             int pos = ( bam.IsReverseStrand() ) ? start : end;
             AddCoverage(pos,pos);
         }
-        else
-            AddCoverage(start, end);
     }
     // close the BAM
     reader.Close();

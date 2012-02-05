@@ -117,7 +117,7 @@ void BedCoverage::CollectCoverageBam(string bamFile) {
                 bedVector bedBlocks;
                 // since we are counting coverage, we do want to split blocks when a
                 // deletion (D) CIGAR op is encountered (hence the true for the last parm)
-                GetBamBlocks(bam, refs.at(bam.RefID).RefName, bedBlocks, true);
+                GetBamBlocks(bam, refs.at(bam.RefID).RefName, bedBlocks, false, true);
                 // use countSplitHits to avoid over-counting each split chunk
                 // as distinct read coverage.
                 _bedB->countSplitHits(bedBlocks, _sameStrand, _diffStrand, _countsOnly);

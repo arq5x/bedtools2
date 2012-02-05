@@ -15,7 +15,8 @@
 void GetBamBlocks(const BamAlignment &bam,
                   const string &chrom,
                   bedVector &bedBlocks,
-                  bool breakOnDeletionOps)
+                  bool breakOnDeletionOps,
+                  bool breakOnSkipOps)
 {
     vector<int> starts;
     vector<int> lengths;
@@ -47,10 +48,14 @@ void GetBamBlocks(const BamAlignment &bam,
                 }
             case ('P') : break;
             case ('N') :
-                bedBlocks.push_back( BED(chrom, currPosition, currPosition + blockLength,
-                                      bam.Name, ToString(bam.MapQuality), strand) );
-                currPosition += cigItr->Length + blockLength;
-                blockLength = 0;
+                if (!breakOnSkipOps)
+                    blockLength += cigItr->Length;
+                else {
+                    bedBlocks.push_back( BED(chrom, currPosition, currPosition + blockLength,
+                                          bam.Name, ToString(bam.MapQuality), strand) );
+                    currPosition += cigItr->Length + blockLength;
+                    blockLength = 0;
+                }
             case ('H') : break;                             // for 'H' - do nothing, move to next op
             default    :
                 printf("ERROR: Invalid Cigar op type\n");   // shouldn't get here

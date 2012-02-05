@@ -323,7 +323,7 @@ void BedIntersect::IntersectBam(string bamFile) {
         // break alignment into discrete blocks,
         bedVector bed_blocks;
         string chrom = refs.at(bam.RefID).RefName;
-        GetBamBlocks(bam, chrom, bed_blocks);
+        GetBamBlocks(bam, chrom, bed_blocks, false, true);
         // create a basic BED entry from the BAM alignment
         BED bed;
         MakeBedFromBam(bam, chrom, bed_blocks, bed);

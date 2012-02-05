@@ -413,7 +413,7 @@ void PrintBed(const BamAlignment &bam,  const RefVector &refs, bool useEditDista
         vector<BED> bedBlocks;
         string chrom = refs.at(bam.RefID).RefName;
         // extract the block starts and lengths from the CIGAR string
-        GetBamBlocks(bam, chrom, bedBlocks);
+        GetBamBlocks(bam, chrom, bedBlocks, false, true);
 
         unsigned int i;
         for (i = 0; i < bedBlocks.size(); ++i) {
@@ -442,7 +442,7 @@ void PrintBed12(const BamAlignment &bam, const RefVector &refs, bool useEditDist
     string chrom = refs.at(bam.RefID).RefName;
     CHRPOS alignmentEnd = bam.GetEndPosition();
     // extract the block starts and lengths from the CIGAR string
-    GetBamBlocks(bam, chrom, bedBlocks);
+    GetBamBlocks(bam, chrom, bedBlocks, false, true);
 
     // write BED6 portion
     if (useEditDistance == false && bamTag == "") {

@@ -21,9 +21,10 @@ using namespace BamTools;
     into discrete alignment blocks.
 */
 void GetBamBlocks(const BamAlignment &bam,
-                  const string &chrom,
-                  bedVector &bedBlocks,
-                  bool breakOnDeletionOps = false);
+                      const string &chrom,
+                      bedVector &bedBlocks,
+                      bool breakOnDeletionOps,
+                      bool breakOnSkipOps);
 
 /* break a BED12 record into discrete BED6 blocks. */
 void GetBedBlocks(const BED &bed, bedVector &bedBlocks);
