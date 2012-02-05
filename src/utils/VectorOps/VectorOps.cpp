@@ -154,12 +154,14 @@ string VectorOps::GetMode(void)
                 max_count = curr_count;
                 mode = *it;
             }
-            curr_count = 0;
+            curr_count = 1;
         }
         else { curr_count++; }
         prev = *it;
         ++it;
     }
+    if (curr_count > max_count)
+        mode = prev;
     return mode;
 }
 
@@ -183,12 +185,14 @@ string VectorOps::GetAntiMode(void)
                 min_count = curr_count;
                 antimode = *it;
             }
-            curr_count = 0;
+            curr_count = 1;
         }
         else { curr_count++; }
         prev = *it;
         ++it;
     }
+    if (curr_count < min_count)
+        antimode = prev;
     return antimode;
 }
 
