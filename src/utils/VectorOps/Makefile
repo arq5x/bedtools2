@@ -5,7 +5,7 @@ UTILITIES_DIR = ../../utils/
 # ----------------------------------
 # define our source and object files
 # ----------------------------------
-SOURCES= VectorOps.cpp
+SOURCES= VectorOps.cpp VectorOps.h
 OBJECTS= $(SOURCES:.cpp=.o)
 BUILT_OBJECTS= $(patsubst %,$(OBJ_DIR)/%,$(OBJECTS))
 

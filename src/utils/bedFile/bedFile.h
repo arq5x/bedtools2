@@ -30,7 +30,7 @@
 #include <limits.h>
 #include <stdint.h>
 #include <cstdio>
-#include <tr1/unordered_map>  // Experimental.
+//#include <tr1/unordered_map>  // Experimental.
 using namespace std;
 
 
@@ -299,29 +299,16 @@ typedef vector<BEDCOV> bedCovVector;
 typedef vector<MATE> mateVector;
 typedef vector<BEDCOVLIST> bedCovListVector;
 
-typedef tr1::unordered_map<BIN, bedVector> binsToBeds;
-typedef tr1::unordered_map<BIN, bedCovVector> binsToBedCovs;
-typedef tr1::unordered_map<BIN, mateVector> binsToMates;
-typedef tr1::unordered_map<BIN, bedCovListVector> binsToBedCovLists;
+typedef map<BIN, bedVector> binsToBeds;
+typedef map<BIN, bedCovVector> binsToBedCovs;
+typedef map<BIN, mateVector> binsToMates;
+typedef map<BIN, bedCovListVector> binsToBedCovLists;
 
-typedef tr1::unordered_map<string, binsToBeds>    masterBedMap;
-typedef tr1::unordered_map<string, binsToBedCovs> masterBedCovMap;
-typedef tr1::unordered_map<string, binsToMates> masterMateMap;
-typedef tr1::unordered_map<string, binsToBedCovLists> masterBedCovListMap;
-typedef tr1::unordered_map<string, bedVector>     masterBedMapNoBin;
-
-
-// EXPERIMENTAL - wait for TR1
-// typedef vector<BED>    bedVector;
-// typedef vector<BEDCOV> bedCovVector;
-//
-// typedef tr1::unordered_map<BIN, bedVector> binsToBeds;
-// typedef tr1::unordered_map<BIN, bedCovVector> binsToBedCovs;
-//
-// typedef tr1::unordered_map<string, binsToBeds>    masterBedMap;
-// typedef tr1::unordered_map<string, binsToBedCovs> masterBedCovMap;
-// typedef tr1::unordered_map<string, bedVector>     masterBedMapNoBin;
-
+typedef map<string, binsToBeds>    masterBedMap;
+typedef map<string, binsToBedCovs> masterBedCovMap;
+typedef map<string, binsToMates> masterMateMap;
+typedef map<string, binsToBedCovLists> masterBedCovListMap;
+typedef map<string, bedVector>     masterBedMapNoBin;
 
 
 // return the genome "bin" for a feature with this start and end
@@ -352,7 +339,7 @@ inline bool isInteger(const std::string& s) {
 }
 
 
-// return the amount of overlap between two features.  Negative if none and the the
+// return the amount of overlap between two features.  Negative if none and the
 // number of negative bases is the distance between the two.
 inline
 int overlaps(CHRPOS aS, CHRPOS aE, CHRPOS bS, CHRPOS bE) {
@@ -469,6 +456,7 @@ public:
     string bedFile;
     unsigned int bedType;  // 3-6, 12 for BED
                            // 9 for GFF
+    bool isBed12;          // is it file of true blocked BED12 records?
     bool isZeroBased;
 
     // Main data structires used by BEDTools
@@ -504,6 +492,7 @@ private:
     void setVcf (bool isVcf);
     void setFileType (FileType type);
     void setBedType (int colNums);
+    void setBed12 (bool isBed12);
 
     /************ Private utilities ***********************/
     void GetHeader(void);
@@ -559,6 +548,21 @@ private:
                     setZeroBased(true);
                     setFileType(BED_FILETYPE);
                     setBedType(numFields);       // we now expect numFields columns in each line
+                    
+                    // test to see if the file has true blocked BED12 records
+                    if (numFields == 12) {
+                        int cdsStart = atoi(lineVector[6].c_str());
+                        int cdsEnd   = atoi(lineVector[7].c_str());
+                        int numExons = atoi(lineVector[9].c_str());
+
+                        if (cdsStart > 0 && cdsEnd > 0&& numExons > 0 &&
+                            lineVector[10].find(",") == 0 &&
+                            lineVector[11].find(",") == 0)
+                        {
+                            setBed12(true);
+                        }
+                        else setBed12(false);
+                    }
                     if (parseBedLine(bed, lineVector, _lineNum, numFields) == true) return BED_VALID;
                 }
                 // it's VCF, assuming the second column is numeric and there are at least 8 fields.
@@ -794,7 +798,6 @@ public:
     */
     template <typename T>
     inline void reportBedTab(const T &bed) {
-        
         // if it is azeroLength feature, we need to
         // correct the start and end coords to what they were
         // in the original file
@@ -884,7 +887,6 @@ public:
                 start++;
             end--;
         }
-        
         //BED
         if (_isGff == false && _isVcf == false) {
             if (this->bedType == 3) {
@@ -956,7 +958,6 @@ public:
     */
     template <typename T>
     inline void reportBedRangeTab(const T &bed, CHRPOS start, CHRPOS end) {
-        
         // if it is azeroLength feature, we need to
         // correct the start and end coords to what they were
         // in the original file

@@ -19,12 +19,9 @@ INCLUDES = -I$(UTILITIES_DIR)/bedFile/ \
 # ----------------------------------
 # define our source and object files
 # ----------------------------------
-SOURCES= mapMain.cpp mapBed.cpp
-OBJECTS= $(SOURCES:.cpp=.o)
-_EXT_OBJECTS=bedFile.o lineFileUtilities.o BamAncillary.o gzstream.o fileType.o VectorOps.o chromsweep.o
-EXT_OBJECTS=$(patsubst %,$(OBJ_DIR)/%,$(_EXT_OBJECTS))
+SOURCES= mapMain.cpp mapBed.cpp mapBed.h
+OBJECTS= mapMain.o mapBed.o
 BUILT_OBJECTS= $(patsubst %,$(OBJ_DIR)/%,$(OBJECTS))
-PROGRAM= mapBed
 
 all: $(BUILT_OBJECTS)
 
@@ -34,18 +31,8 @@ $(BUILT_OBJECTS): $(SOURCES)
 	@echo "  * compiling" $(*F).cpp
 	@$(CXX) -c -o $@ $(*F).cpp $(LDFLAGS) $(CXXFLAGS) $(DFLAGS) $(INCLUDES)
 
-$(EXT_OBJECTS):
-	@$(MAKE) --no-print-directory -C $(UTILITIES_DIR)/bedFile/
-	@$(MAKE) --no-print-directory -C $(UTILITIES_DIR)/lineFileUtilities/
-	@$(MAKE) --no-print-directory -C $(UTILITIES_DIR)/BamTools/
-	@$(MAKE) --no-print-directory -C $(UTILITIES_DIR)/BamTools-Ancillary/
-	@$(MAKE) --no-print-directory -C $(UTILITIES_DIR)/gzstream/
-	@$(MAKE) --no-print-directory -C $(UTILITIES_DIR)/fileType/
-	@$(MAKE) --no-print-directory -C $(UTILITIES_DIR)/VectorOps/
-	@$(MAKE) --no-print-directory -C $(UTILITIES_DIR)/chromsweep/
-		
 clean:
 	@echo "Cleaning up."
-	@rm -f $(OBJ_DIR)/* $(BIN_DIR)/*
+	@rm -f $(OBJ_DIR)/mapMain.o $(OBJ_DIR)/mapBed.o
 
 .PHONY: clean

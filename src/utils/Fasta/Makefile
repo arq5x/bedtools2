@@ -9,7 +9,7 @@ INCLUDES =
 # ----------------------------------
 # define our source and object files
 # ----------------------------------
-SOURCES= Fasta.cpp split.cpp
+SOURCES= Fasta.cpp Fasta.h split.cpp split.h
 OBJECTS= $(SOURCES:.cpp=.o)
 BUILT_OBJECTS= $(patsubst %,$(OBJ_DIR)/%,$(OBJECTS))
 

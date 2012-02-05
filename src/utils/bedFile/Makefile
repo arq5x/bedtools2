@@ -4,12 +4,15 @@ UTILITIES_DIR = ../../utils/
 # -------------------
 # define our includes
 # -------------------
-INCLUDES = -I$(UTILITIES_DIR)/lineFileUtilities/ -I$(UTILITIES_DIR)/gzstream/ -I$(UTILITIES_DIR)/fileType/ -I$(UTILITIES_DIR)/stringUtilities/
+INCLUDES = -I$(UTILITIES_DIR)/lineFileUtilities/ \
+           -I$(UTILITIES_DIR)/gzstream/ \
+           -I$(UTILITIES_DIR)/fileType/ \
+           -I$(UTILITIES_DIR)/stringUtilities/
 
 # ----------------------------------
 # define our source and object files
 # ----------------------------------
-SOURCES= bedFile.cpp
+SOURCES= bedFile.cpp bedFile.h
 OBJECTS= $(SOURCES:.cpp=.o)
 _EXT_OBJECTS=lineFileUtilities.o gzstream.o fileType.o
 EXT_OBJECTS=$(patsubst %,$(OBJ_DIR)/%,$(_EXT_OBJECTS))

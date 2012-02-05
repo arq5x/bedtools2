@@ -11,7 +11,7 @@ INCLUDES = -I$(UTILITIES_DIR)/lineFileUtilities/ \
 # ----------------------------------
 # define our source and object files
 # ----------------------------------
-SOURCES= genomeFile.cpp
+SOURCES= genomeFile.cpp genomeFile.h
 OBJECTS= $(SOURCES:.cpp=.o)
 _EXT_OBJECTS=lineFileUtilities.o fileType.o
 EXT_OBJECTS=$(patsubst %,$(OBJ_DIR)/%,$(_EXT_OBJECTS))

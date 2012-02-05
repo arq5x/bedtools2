@@ -48,7 +48,7 @@ SOURCES= src/api/BamAlignment.cpp \
          src/api/internal/utils/BamException_p.cpp
 
 OBJECTS= $(SOURCES:.cpp=.o)
-LIBRARY=libbamtools.a
+LIBRARY=lib/libbamtools.a
 
 all: $(LIBRARY)
     
@@ -65,7 +65,8 @@ $(LIBRARY): $(OBJECTS)
 
 
 	@echo " * linking $(LIBRARY)"
-	ar cr lib/$@ $^
+	ar cr $@ $^
+	-ranlib $@
 
 $(OBJECTS): $(SOURCES)
 	@echo " * compiling" $(*F).cpp

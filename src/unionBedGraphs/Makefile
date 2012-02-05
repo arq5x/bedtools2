@@ -17,12 +17,9 @@ INCLUDES = -I$(UTILITIES_DIR)/bedGraphFile/ \
 # ----------------------------------
 # define our source and object files
 # ----------------------------------
-SOURCES= unionBedGraphs.cpp unionBedGraphsMain.cpp
-OBJECTS= $(SOURCES:.cpp=.o)
-_EXT_OBJECTS=bedGraphFile.o genomeFile.o lineFileUtilities.o gzstream.o fileType.o
-EXT_OBJECTS=$(patsubst %,$(OBJ_DIR)/%,$(_EXT_OBJECTS))
+SOURCES= unionBedGraphsMain.cpp unionBedGraphs.cpp unionBedGraphs.h
+OBJECTS= unionBedGraphsMain.o unionBedGraphs.o
 BUILT_OBJECTS= $(patsubst %,$(OBJ_DIR)/%,$(OBJECTS))
-PROGRAM= unionBedGraphs
 
 all: $(BUILT_OBJECTS)
 
@@ -32,15 +29,8 @@ $(BUILT_OBJECTS): $(SOURCES)
 	@echo "  * compiling" $(*F).cpp
 	@$(CXX) -c -o $@ $(*F).cpp $(LDFLAGS) $(CXXFLAGS) $(INCLUDES)
 
-$(EXT_OBJECTS):
-	@$(MAKE) --no-print-directory -C $(UTILITIES_DIR)/lineFileUtilities/
-	@$(MAKE) --no-print-directory -C $(UTILITIES_DIR)/bedGraphFile/
-	@$(MAKE) --no-print-directory -C $(UTILITIES_DIR)/genomeFile/
-	@$(MAKE) --no-print-directory -C $(UTILITIES_DIR)/gzstream/
-	@$(MAKE) --no-print-directory -C $(UTILITIES_DIR)/fileType/	
-
 clean:
 	@echo "Cleaning up."
-	@rm -f $(OBJ_DIR)/* $(BIN_DIR)/*
+	@rm -f $(OBJ_DIR)/unionBedGraphsMain.o $(OBJ_DIR)/unionBedGraphs.o
 
 .PHONY: clean

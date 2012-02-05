@@ -9,7 +9,7 @@ INCLUDES = -I$(UTILITIES_DIR)/lineFileUtilities/ -I$(UTILITIES_DIR)/bedFile/ -I$
 # ----------------------------------
 # define our source and object files
 # ----------------------------------
-SOURCES= bedFilePE.cpp
+SOURCES= bedFilePE.cpp bedFilePE.h
 OBJECTS= $(SOURCES:.cpp=.o)
 _EXT_OBJECTS=lineFileUtilities.o fileType.o
 EXT_OBJECTS=$(patsubst %,$(OBJ_DIR)/%,$(_EXT_OBJECTS))

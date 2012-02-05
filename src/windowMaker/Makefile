@@ -16,13 +16,9 @@ INCLUDES = -I$(UTILITIES_DIR)/genomeFile/ \
 # ----------------------------------
 # define our source and object files
 # ----------------------------------
-SOURCES= windowMakerMain.cpp windowMaker.cpp
-OBJECTS= $(SOURCES:.cpp=.o)
-_EXT_OBJECTS=genomeFile.o
-EXT_OBJECTS=$(patsubst %,$(OBJ_DIR)/%,$(_EXT_OBJECTS))
+SOURCES= windowMakerMain.cpp windowMaker.cpp windowMaker.h
+OBJECTS= windowMakerMain.o windowMaker.o
 BUILT_OBJECTS= $(patsubst %,$(OBJ_DIR)/%,$(OBJECTS))
-PROGRAM= windowMaker
-
 
 all: $(BUILT_OBJECTS)
 
@@ -37,6 +33,6 @@ $(EXT_OBJECTS):
 	
 clean:
 	@echo "Cleaning up."
-	@rm -f $(OBJ_DIR)/* $(BIN_DIR)/*
+	@rm -f $(OBJ_DIR)/windowMakerMain.o $(OBJ_DIR)/windowMaker.o
 
 .PHONY: clean

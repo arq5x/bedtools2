@@ -16,7 +16,7 @@
 
 #include "api/BamReader.h"
 #include "api/BamAux.h"
-#include "BamAncillary.h"
+#include "BlockedIntervals.h"
 using namespace BamTools;
 
 #include <vector>

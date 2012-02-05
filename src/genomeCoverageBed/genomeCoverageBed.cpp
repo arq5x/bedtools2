@@ -172,7 +172,7 @@ void BedGenomeCoverage::CoverageBed() {
 
             if (_obeySplits == true) {
                 bedVector bedBlocks; // vec to store the discrete BED "blocks"
-                splitBedIntoBlocks(a, bedBlocks);
+                GetBedBlocks(a, bedBlocks);
                 AddBlockedCoverage(bedBlocks);
             }
             else if (_only_5p_end) {
@@ -247,7 +247,7 @@ void BedGenomeCoverage::CoverageBam(string bamFile) {
             bedVector bedBlocks;
             // since we are counting coverage, we do want to split blocks when a
             // deletion (D) CIGAR op is encountered (hence the true for the last parm)
-            getBamBlocks(bam, refs, bedBlocks, true);
+            GetBamBlocks(bam, refs.at(bam.RefID).RefName, bedBlocks, true);
             AddBlockedCoverage(bedBlocks);
         }
         else if (_only_5p_end) {

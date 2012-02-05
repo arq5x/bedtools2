@@ -12,52 +12,6 @@
 #include "bedFile.h"
 
 
-/************************************************
-Helper functions
-*************************************************/
-void splitBedIntoBlocks(const BED &bed, bedVector &bedBlocks) {
-
-    if (bed.fields.size() < 6) {
-        cerr << "Input error: Cannot split into blocks. Found interval with fewer than 12 columns." << endl;
-        exit(1);
-    }
-
-    int blockCount = atoi(bed.fields[9].c_str());
-    if ( blockCount <= 0 ) {
-        cerr << "Input error: found interval having <= 0 blocks." << endl;
-        exit(1);
-    }
-    else if ( blockCount == 1 ) {
-        //take a short-cut for single blocks
-        bedBlocks.push_back(bed);
-    }
-    else {
-        // get the comma-delimited strings for the BED12 block starts and block ends.
-        string blockSizes(bed.fields[10]);
-        string blockStarts(bed.fields[11]);
-
-        vector<int> sizes;
-        vector<int> starts;
-        Tokenize(blockSizes, sizes, ",");
-        Tokenize(blockStarts, starts, ",");
-
-        if ( sizes.size() != (size_t) blockCount || starts.size() != (size_t) blockCount ) {
-            cerr << "Input error: found interval with block-counts not matching starts/sizes on line." << endl;
-            exit(1);
-        }
-
-        // add each BED block to the bedBlocks vector
-        for (UINT i = 0; i < (UINT) blockCount; ++i) {
-            CHRPOS blockStart = bed.start + starts[i];
-            CHRPOS blockEnd   = bed.start + starts[i] + sizes[i];
-            BED currBedBlock(bed.chrom, blockStart, blockEnd, 
-                             bed.name, bed.score, bed.strand, bed.fields, bed.other_idxs);
-            bedBlocks.push_back(currBedBlock);
-        }
-    }
-}
-
-
 /***********************************************
 Sorting comparison functions
 ************************************************/
@@ -334,6 +288,8 @@ void BedFile::allHits(string chrom, CHRPOS start, CHRPOS end, string strand,
     for (BINLEVEL i = 0; i < _binLevels; ++i) {
         BIN offset = _binOffsetsExtended[i];
         for (BIN j = (startBin+offset); j <= (endBin+offset); ++j)  {
+            // move to the next bin if this one is empty
+            if (bedMap[chrom][j].empty()) continue;
             vector<BED>::const_iterator bedItr = bedMap[chrom][j].begin();
             vector<BED>::const_iterator bedEnd = bedMap[chrom][j].end();
             for (; bedItr != bedEnd; ++bedItr) {
@@ -387,6 +343,8 @@ bool BedFile::anyHits(string chrom, CHRPOS start, CHRPOS end, string strand,
     for (BINLEVEL i = 0; i < _binLevels; ++i) {
         BIN offset = _binOffsetsExtended[i];
         for (BIN j = (startBin+offset); j <= (endBin+offset); ++j)  {
+            // move to the next bin if this one is empty
+            if (bedMap[chrom][j].empty()) continue;
             vector<BED>::const_iterator bedItr = bedMap[chrom][j].begin();
             vector<BED>::const_iterator bedEnd = bedMap[chrom][j].end();
             for (; bedItr != bedEnd; ++bedItr) {
@@ -435,7 +393,6 @@ void BedFile::countHits(const BED &a, bool sameStrand, bool diffStrand, bool cou
         // loop through each bin at this level of the hierarchy
         BIN offset = _binOffsetsExtended[i];
         for (BIN j = (startBin+offset); j <= (endBin+offset); ++j) {
-
             // loop through each feature in this chrom/bin and see if it overlaps
             // with the feature that was passed in.  if so, add the feature to
             // the list of hits.
@@ -605,7 +562,6 @@ void BedFile::setZeroBased(bool zeroBased) { this->isZeroBased = zeroBased; }
 
 void BedFile::setGff (bool gff) { this->_isGff = gff; }
 
-
 void BedFile::setVcf (bool vcf) { this->_isVcf = vcf; }
 
 
@@ -615,10 +571,8 @@ void BedFile::setFileType (FileType type) {
 }
 
 
-void BedFile::setBedType (int colNums) {
-    bedType = colNums;
-}
-
+void BedFile::setBedType (int colNums) { bedType = colNums; }
+void BedFile::setBed12 (bool isBed12) { this->isBed12 = isBed12; }
 
 void BedFile::loadBedFileIntoMap() {
 

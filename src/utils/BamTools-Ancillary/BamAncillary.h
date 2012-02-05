@@ -16,4 +16,7 @@
 namespace BamTools {
     void getBamBlocks(const BamAlignment &bam, const RefVector &refs,
                         vector<BED> &blocks, bool includeDeletions = true);
+
+    void MakeBedFromBam(const BamAlignment &bam, const string &chrom,
+        const bedVector &blocks, BED &bed);
 }
