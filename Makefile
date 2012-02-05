@@ -110,7 +110,7 @@ clean:
 
 .PHONY: clean
 
-test:
+test: all
 	@cd test; sh test.sh
 
 .PHONY: test
