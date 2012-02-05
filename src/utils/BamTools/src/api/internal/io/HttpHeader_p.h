@@ -2,7 +2,7 @@
 // HttpHeader_p.h (c) 2011 Derek Barnett
 // Marth Lab, Department of Biology, Boston College
 // ---------------------------------------------------------------------------
-// Last modified: 10 November 2011 (DB)
+// Last modified: 13 January 2012 (DB)
 // ---------------------------------------------------------------------------
 // Provides a generic interface for parsing/generating HTTP headers, along
 // with specialized request & response header types
@@ -41,7 +41,7 @@ class HttpHeader {
 
         // header field=>value access
         bool ContainsKey(const std::string& key) const;
-        std::string GetValue(const std::string& key) const;
+        std::string GetValue(const std::string& key);
         void RemoveField(const std::string& key);
         void SetField(const std::string& key, const std::string& value);
 
