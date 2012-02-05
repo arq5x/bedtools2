@@ -105,7 +105,7 @@ clean:
 	@rm -f $(OBJ_DIR)/* $(BIN_DIR)/*
 	@rm -Rf $(BT_ROOT)/lib
 	@rm -f $(BT_ROOT)/src/api/*.o
-	@rm -f $(BT_ROOT)/src/api/internal/*.o
+	@rm -f $(BT_ROOT)/src/api/internal/*/*.o
 	@rm -Rf $(BT_ROOT)/include
 
 .PHONY: clean
