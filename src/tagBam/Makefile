@@ -17,7 +17,7 @@ INCLUDES = -I$(UTILITIES_DIR)/bedFile/ \
 # ----------------------------------
 # define our source and object files
 # ----------------------------------
-SOURCES= tagBamMain.cpp tagBam.cpp tagBam.H
+SOURCES= tagBamMain.cpp tagBam.cpp tagBam.h
 OBJECTS= tagBamMain.o tagBam.o
 BUILT_OBJECTS= $(patsubst %,$(OBJ_DIR)/%,$(OBJECTS))
 
