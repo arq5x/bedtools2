@@ -190,6 +190,68 @@ rm obs exp
 #                       -split                            #
 ###########################################################
 ###########################################################
+samtools view -Sb one_block.sam > one_block.bam 2>/dev/null
+samtools view -Sb two_blocks.sam > two_blocks.bam 2>/dev/null
+samtools view -Sb three_blocks.sam > three_blocks.bam 2>/dev/null
 
 
+##################################################################
+#  Test three blocks matches BED without -split
+##################################################################
+echo "    intersect.t17...\c"
+echo \
+"three_blocks	16	chr1	1	40	10M10N10M10N10M	*	0	0	GAAGGCCACCGCCGCGGTTATTTTCCTTCA	CCCDDB?=FJIIJIGFJIJHIJJJJJJJJI	MD:Z:50" > exp
+$BT intersect -abam three_blocks.bam -b three_blocks_nomatch.bed | samtools view - > obs
+check obs exp
+rm obs exp
 
+##################################################################
+#  Test three blocks does not match BED with -split
+##################################################################
+echo "    intersect.t18...\c"
+touch exp
+$BT intersect -abam three_blocks.bam -b three_blocks_nomatch.bed -split | samtools view - > obs
+check obs exp
+rm obs exp
+
+##################################################################
+#  Test three blocks matches BED with -split
+##################################################################
+echo "    intersect.t19...\c"
+echo \
+"three_blocks	16	chr1	1	40	10M10N10M10N10M	*	0	0	GAAGGCCACCGCCGCGGTTATTTTCCTTCA	CCCDDB?=FJIIJIGFJIJHIJJJJJJJJI	MD:Z:50" > exp
+$BT intersect -abam three_blocks.bam -b three_blocks_match.bed -split | samtools view - > obs
+check obs exp
+rm obs exp
+
+##################################################################
+#  Test three blocks does not match BED with -split and -s
+#  BAM os -, BED is +
+##################################################################
+echo "    intersect.t20...\c"
+touch exp
+$BT intersect -abam three_blocks.bam -b three_blocks_match.bed -split -s | samtools view - > obs
+check obs exp
+rm obs exp
+
+##################################################################
+#  Test three blocks  match BED that overlap 1bp with -split
+##################################################################
+echo "    intersect.t21...\c"
+echo \
+"three_blocks	16	chr1	1	40	10M10N10M10N10M	*	0	0	GAAGGCCACCGCCGCGGTTATTTTCCTTCA	CCCDDB?=FJIIJIGFJIJHIJJJJJJJJI	MD:Z:50" > exp
+$BT intersect -abam three_blocks.bam -b three_blocks_match_1bp.bed -split | samtools view - > obs
+check obs exp
+rm obs exp
+
+################################################################################
+#  Test three blocks does not match BED that overlap 1bp with -split and -f 0.1
+################################################################################
+echo "    intersect.t22...\c"
+touch exp
+$BT intersect -abam three_blocks.bam -b three_blocks_match_1bp.bed -split -f 0.1 | samtools view - > obs
+check obs exp
+rm obs exp
+
+
+rm *.bam

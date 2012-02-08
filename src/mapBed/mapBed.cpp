@@ -19,7 +19,8 @@ double GetUserColumn(const string s);
 BedMap::BedMap(string bedAFile, string bedBFile, int column, string operation,
                float overlapFraction, bool sameStrand, 
                bool diffStrand, bool reciprocal,
-               string nullValue, bool printHeader) 
+               bool choseNullValue, string nullValue, 
+               bool printHeader) 
 {
 
     _bedAFile            = bedAFile;
@@ -33,6 +34,8 @@ BedMap::BedMap(string bedAFile, string bedBFile, int column, string operation,
     _nullValue           = nullValue;
     _printHeader         = printHeader;
     
+    if (!choseNullValue && operation == "count")
+        _nullValue = "0";
     Map();
 }
 
@@ -84,7 +87,7 @@ string BedMap::MapHits(const BED &a, const vector<BED> &hits) {
         output << vo.GetMode();
     else if (_operation == "antimode")
         output << vo.GetAntiMode();
-    else if (_operation == "count")
+    else if (_operation == "count") 
         output << setprecision (PRECISION) << vo.GetCount();
     else if (_operation == "count_distinct")
         output << setprecision (PRECISION) << vo.GetCountDistinct();

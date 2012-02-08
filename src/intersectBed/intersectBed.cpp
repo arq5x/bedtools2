@@ -328,7 +328,7 @@ void BedIntersect::IntersectBam(string bamFile) {
         BED bed;
         MakeBedFromBam(bam, chrom, bed_blocks, bed);
         bool overlapsFound = false;
-        if ((_bamOutput == true) && (_obeySplits == false)) 
+        if ((_bamOutput == true) && (_obeySplits == false))
         {
             overlapsFound = _bedB->anyHits(bed.chrom, bed.start, bed.end, 
                                            bed.strand, _sameStrand, _diffStrand,

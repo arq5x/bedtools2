@@ -41,7 +41,8 @@ public:
     BedMap(string bedAFile, string bedBFile, int column, string operation,
                    float overlapFraction, bool sameStrand, 
                    bool diffStrand, bool reciprocal, 
-                   string nullValue, bool printHeader);
+                   bool choseNullValue, string nullValue, 
+                   bool printHeader);
 
     // destructor
     ~BedMap(void);

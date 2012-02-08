@@ -48,6 +48,7 @@ int map_main(int argc, char* argv[]) {
     bool sameStrand         = false;
     bool diffStrand         = false;
     bool printHeader        = false;
+    bool choseNullValue     = false;
 
     // check to see if we should print out some help
     if(argc <= 1) showHelp = true;
@@ -114,6 +115,7 @@ int map_main(int argc, char* argv[]) {
         }
         else if (PARAMETER_CHECK("-null", 5, parameterLength)) {
             nullValue = argv[i + 1];
+            choseNullValue = true;
             i++;
         }
         else if(PARAMETER_CHECK("-header", 7, parameterLength)) {
@@ -146,7 +148,8 @@ int map_main(int argc, char* argv[]) {
         BedMap *bm = new BedMap(bedAFile, bedBFile, column, operation,
                                        overlapFraction, sameStrand,
                                        diffStrand, reciprocalFraction,
-                                       nullValue, printHeader);
+                                       choseNullValue, nullValue, 
+                                       printHeader);
         delete bm;
         return 0;
     }
