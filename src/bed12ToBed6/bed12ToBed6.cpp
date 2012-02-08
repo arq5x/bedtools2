@@ -154,7 +154,7 @@ void ProcessBed(istream &bedInput, BedFile *bed) {
                                                         i+1, bedBlocks[i].strand.c_str());
                     else 
                         printf ("%s\t%d\t%d\t%s\t%d\t%s\n", bedBlocks[i].chrom.c_str(), bedBlocks[i].start, bedBlocks[i].end, bedBlocks[i].name.c_str(),
-                                                        (int) ((bedBlocks.size()+1)-i), bedBlocks[i].strand.c_str());
+                                                        (int) ((bedBlocks.size())-i), bedBlocks[i].strand.c_str());
                 }
             }
         }
