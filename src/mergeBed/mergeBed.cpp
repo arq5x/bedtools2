@@ -302,16 +302,13 @@ void BedMerge::MergeBedStranded() {
         
         // bedList is already sorted by start position.
         string chrom        = m->first;
-        vector<BED> bedList = m->second;
 
         // make a list of the two strands to merge separately.
         vector<string> strands(2);
         strands[0] = "+";
         strands[1] = "-";
-
         // do two passes, one for each strand.
         for (unsigned int s = 0; s < strands.size(); s++) {
-
             int mergeCount = 1;
             int numOnStrand = 0;
             vector<string> names;
@@ -320,15 +317,13 @@ void BedMerge::MergeBedStranded() {
             // merge overlapping features for this chromosome.
             int start = -1;
             int end   = -1;
-            vector<BED>::const_iterator bedItr = bedList.begin();
-            vector<BED>::const_iterator bedEnd = bedList.end();
+            vector<BED>::const_iterator bedItr = m->second.begin();
+            vector<BED>::const_iterator bedEnd = m->second.end();
             for (; bedItr != bedEnd; ++bedItr) {
-
                 // if forcing strandedness, move on if the hit
                 // is not on the current strand.
                 if (bedItr->strand != strands[s]) { continue; }
                 else { numOnStrand++; }
-                
                 if ( (((int) bedItr->start - end) > _maxDistance) || (end < 0)) {
                     if (start >= 0) {
                         ReportStranded(chrom, start, end, names, scores, mergeCount, strands[s]);
