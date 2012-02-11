@@ -88,7 +88,7 @@ int getoverlap_main(int argc, char* argv[]) {
         // Split the column string sent by the user into discrete column numbers
         // A comma separated string is expected.
         vector<string> posColumns;
-        Tokenize(columns, posColumns, ",");
+        Tokenize(columns, posColumns, ',');
 
         if (posColumns.size() != 4) {
             cerr << endl << "*****" << endl << "*****ERROR: Please specify 4, comma-separated position columns. " << endl << "*****" << endl;

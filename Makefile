@@ -50,8 +50,7 @@ SUBDIRS = $(SRC_DIR)/annotateBed \
 		  $(SRC_DIR)/windowBed \
 		  $(SRC_DIR)/windowMaker
 
-UTIL_SUBDIRS =	$(SRC_DIR)/utils/lineFileUtilities \
-				$(SRC_DIR)/utils/bedFile \
+UTIL_SUBDIRS =	$(SRC_DIR)/utils/bedFile \
 				$(SRC_DIR)/utils/bedGraphFile \
 				$(SRC_DIR)/utils/chromsweep \
 				$(SRC_DIR)/utils/gzstream \

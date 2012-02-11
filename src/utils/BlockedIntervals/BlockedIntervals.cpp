@@ -91,8 +91,8 @@ void GetBedBlocks(const BED &bed, bedVector &bedBlocks) {
 
         vector<int> sizes;
         vector<int> starts;
-        Tokenize(blockSizes, sizes, ",");
-        Tokenize(blockStarts, starts, ",");
+        Tokenize(blockSizes, sizes, ',');
+        Tokenize(blockStarts, starts, ',');
 
         if ( sizes.size() != (size_t) blockCount || starts.size() != (size_t) blockCount ) {
             cerr << "Input error: found interval with block-counts not matching starts/sizes on line." << endl;

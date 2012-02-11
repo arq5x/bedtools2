@@ -161,7 +161,7 @@ int groupby_main(int argc, char* argv[]) {
     // split the opsString into discrete operations and make sure they are all valid.
     vector<string> ops;
     opsString.erase(remove_if(opsString.begin(),opsString.end(),::isspace),opsString.end());
-    Tokenize(opsString, ops, ",");
+    Tokenize(opsString, ops, ',');
     for( size_t i = 0; i < ops.size(); i++ ) {
         if ((ops[i] != "sum")  && (ops[i] != "max")    && (ops[i] != "min") && (ops[i] != "mean") &&
             (ops[i] != "mode") && (ops[i] != "median") && (ops[i] != "antimode") && (ops[i] != "stdev") &&
@@ -177,10 +177,10 @@ int groupby_main(int argc, char* argv[]) {
         // Split the column string sent by the user into discrete column numbers
         // A comma separated string is expected.
         vector<int> groupColumnsInt;
-        Tokenize(groupColumnsString, groupColumnsInt, ",");
+        Tokenize(groupColumnsString, groupColumnsInt, ',');
 
         vector<int> opColumnsInt;
-        Tokenize(opsColumnString, opColumnsInt, ",");
+        Tokenize(opsColumnString, opColumnsInt, ',');
 
         // sanity check the group columns
         for(size_t i = 0; i < groupColumnsInt.size(); ++i) {

@@ -254,8 +254,8 @@ void ConvertBedToBam(const BED &bed, BamAlignment &bam, map<string, int, std::le
             unsigned int blockCount = atoi(bed.fields[9].c_str());
 
             vector<int> blockSizes, blockStarts;
-            Tokenize(bed.fields[10], blockSizes, ",");
-            Tokenize(bed.fields[11], blockStarts, ",");
+            Tokenize(bed.fields[10], blockSizes, ',');
+            Tokenize(bed.fields[11], blockStarts, ',');
 
             // make sure this is a well-formed BED12 entry.
             if (blockSizes.size() != blockCount) {
