@@ -109,7 +109,7 @@ namespace BamTools {
         
         // identify which indices relate to the "other" 
         // (i,e. non-BED6) fields
-        for (size_t i = 5; i <= 11; ++i)
+        for (size_t i = 6; i <= 11; ++i)
             bed.other_idxs.push_back(i);
     }
 }
