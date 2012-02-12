@@ -98,10 +98,6 @@ int merge_main(int argc, char* argv[]) {
         cerr << endl << "*****" << endl << "*****ERROR: Need -i BED file. " << endl << "*****" << endl;
         showHelp = true;
     }
-    if (reportNames && numEntries) {
-        cerr << endl << "*****" << endl << "*****ERROR: Request either -n OR -nms, not both." << endl << "*****" << endl;
-        showHelp = true;
-    }
     if ((reportScores == true) && (scoreOp != "sum")  && (scoreOp != "max")    && (scoreOp != "min") && (scoreOp != "mean") &&
         (scoreOp != "mode") && (scoreOp != "median") && (scoreOp != "antimode") && (scoreOp != "collapse")) 
     {

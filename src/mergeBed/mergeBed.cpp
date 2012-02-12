@@ -37,87 +37,29 @@ void BedMerge::ReportMergedNames(const vector<string> &names) {
 
 
 void BedMerge::ReportMergedScores(const vector<string> &scores) {
+    
+    // setup a VectorOps instances for the list of scores.
+    // VectorOps methods used for each possible operation.
+    VectorOps vo(scores);
+    std::stringstream buffer;
     if (scores.size() > 0) {
-        printf("\t");
-
-        // convert the scores to floats
-        vector<float> data;
-        for (size_t i = 0 ; i < scores.size() ; i++) {
-            data.push_back(atof(scores[i].c_str()));
-        }    
-
-        if (_scoreOp == "sum") {
-            printf("%.3f", accumulate(data.begin(), data.end(), 0.0));
-        }
-        else if (_scoreOp == "min") {
-            printf("%.3f", *min_element( data.begin(), data.end() ));
-        }
-        else if (_scoreOp == "max") {
-            printf("%.3f", *max_element( data.begin(), data.end() ));
-        }
-        else if (_scoreOp == "mean") {
-            double total = accumulate(data.begin(), data.end(), 0.0);
-            double mean = total / data.size();
-            printf("%.3f", mean);
-        }
-        else if (_scoreOp == "median") {
-            double median = 0.0;
-            sort(data.begin(), data.end());
-            int totalLines = data.size();
-            if ((totalLines % 2) > 0) {
-                long mid;
-                mid = totalLines / 2;
-                median = data[mid];
-            }
-            else {
-                long midLow, midHigh;
-                midLow = (totalLines / 2) - 1;
-                midHigh = (totalLines / 2);
-                median = (data[midLow] + data[midHigh]) / 2.0;
-            }
-            printf("%.3f", median);
-        }
-        else if ((_scoreOp == "mode") || (_scoreOp == "antimode")) {
-             // compute the frequency of each unique value
-             map<string, int> freqs;
-             vector<string>::const_iterator dIt  = scores.begin();
-             vector<string>::const_iterator dEnd = scores.end();
-             for (; dIt != dEnd; ++dIt) {
-                 freqs[*dIt]++;
-             }
-
-             // grab the mode and the anti mode
-             string mode, antiMode;
-             int    count = 0;
-             int minCount = INT_MAX;
-             for(map<string,int>::const_iterator iter = freqs.begin(); iter != freqs.end(); ++iter) {
-                 if (iter->second > count) {
-                     mode = iter->first;
-                     count = iter->second;
-                 }
-                 if (iter->second < minCount) {
-                     antiMode = iter->first;
-                     minCount = iter->second;
-                 }
-             }
-             // report
-             if (_scoreOp == "mode") {
-                 printf("%s", mode.c_str());
-             }
-             else if (_scoreOp == "antimode") {
-                 printf("%s", antiMode.c_str());
-             }
-         }
-         else if (_scoreOp == "collapse") {    
-            vector<string>::const_iterator scoreItr = scores.begin();
-            vector<string>::const_iterator scoreEnd = scores.end();
-            for (; scoreItr != scoreEnd; ++scoreItr) {
-                if (scoreItr < (scoreEnd - 1))
-                    cout << *scoreItr << ";";
-                else
-                    cout << *scoreItr;
-            }
-        }
+        if (_scoreOp == "sum")
+            buffer << setprecision (PRECISION) << vo.GetSum();
+        else if (_scoreOp == "min")
+            buffer << setprecision (PRECISION) << vo.GetMin();
+        else if (_scoreOp == "max")
+            buffer << setprecision (PRECISION) << vo.GetMax();
+        else if (_scoreOp == "mean")
+            buffer << setprecision (PRECISION) << vo.GetMean();
+        else if (_scoreOp == "median")
+            buffer << setprecision (PRECISION) << vo.GetMedian();
+        else if (_scoreOp == "mode")
+            buffer << setprecision (PRECISION) << vo.GetMode();
+        else if (_scoreOp == "antimode")
+            buffer << setprecision (PRECISION) << vo.GetAntiMode();
+        else if (_scoreOp == "collapse")
+            buffer << setprecision (PRECISION) << vo.GetCollapse();
+        cout << "\t" << buffer.str();
     }
     else {        
         cerr << endl 
@@ -180,6 +122,23 @@ void BedMerge::Report(string chrom, int start, int end,
     else if (_numEntries == true && _reportNames == false && _reportScores == false) {
         printf("\t%d\n", mergeCount);
     }
+    // merged intervals, counts, and scores
+    else if (_numEntries == true && _reportNames == false && _reportScores == true) {
+        printf("\t%d", mergeCount);
+        ReportMergedScores(scores);
+        printf("\n");
+    }
+    // merged intervals, counts, and names
+    else if (_numEntries == true && _reportNames == true && _reportScores == false) {
+        ReportMergedNames(names);
+        printf("\t%d\n", mergeCount);
+    }
+    // merged intervals, counts, names, and scores
+    else if (_numEntries == true && _reportNames == true && _reportScores == true) {
+        ReportMergedNames(names);
+        ReportMergedScores(scores);
+        printf("\t%d\n", mergeCount);
+    }
     // merged intervals and names        
     else if (_numEntries == false && _reportNames == true && _reportScores == false) {
         ReportMergedNames(names);
@@ -217,6 +176,25 @@ void BedMerge::ReportStranded(string chrom, int start, int end,
     // merged intervals and counts    
     else if (_numEntries == true && _reportNames == false && _reportScores == false) {
         printf("\t%d\t%s\n", mergeCount, strand.c_str());
+    }
+    // merged intervals, counts, and scores
+    else if (_numEntries == true && _reportNames == false && _reportScores == true) {
+        printf("\t%d", mergeCount);
+        ReportMergedScores(scores);
+        printf("\t%s\n", strand.c_str());
+    }
+    // merged intervals, counts, and names
+    else if (_numEntries == true && _reportNames == true && _reportScores == false) {
+        ReportMergedNames(names);
+        printf("\t%d\t%s", mergeCount, strand.c_str());
+        printf("\n");
+    }
+    // merged intervals, counts, names, and scores
+    else if (_numEntries == true && _reportNames == true && _reportScores == true) {
+        ReportMergedNames(names);
+        ReportMergedScores(scores);
+        printf("\t%s\t%d", strand.c_str(), mergeCount);
+        printf("\n");
     }
     // merged intervals and names        
     else if (_numEntries == false && _reportNames == true && _reportScores == false) {

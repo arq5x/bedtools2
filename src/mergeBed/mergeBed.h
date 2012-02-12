@@ -14,12 +14,15 @@
 #include <algorithm>
 #include <numeric>
 #include <iostream>
+#include <iomanip>
 #include <fstream>
 #include <limits.h>
 #include <stdlib.h>
+#include "VectorOps.h"
 
 using namespace std;
 
+const int PRECISION = 21;
 
 //************************************************
 // Class methods and elements
