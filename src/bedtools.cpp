@@ -59,6 +59,7 @@ int multiintersect_main(int argc, char* argv[]);//
 int nuc_main(int argc, char* argv[]);//
 int pairtobed_main(int argc, char* argv[]);//
 int pairtopair_main(int argc, char* argv[]);//
+int random_main(int argc, char* argv[]); //
 int shuffle_main(int argc, char* argv[]); //
 int slop_main(int argc, char* argv[]); //
 int sort_main(int argc, char* argv[]); //
@@ -92,6 +93,7 @@ int main(int argc, char *argv[])
     else if (sub_cmd == "slop")        return slop_main(argc-1, argv+1);
     else if (sub_cmd == "flank")       return flank_main(argc-1, argv+1);
     else if (sub_cmd == "sort")        return sort_main(argc-1, argv+1);
+    else if (sub_cmd == "random")      return random_main(argc-1, argv+1);
     else if (sub_cmd == "shuffle")     return shuffle_main(argc-1, argv+1);
     else if (sub_cmd == "annotate")    return annotate_main(argc-1, argv+1);
 
@@ -184,6 +186,7 @@ int bedtools_help(void)
     cout  << "    slop          "  << "Adjust the size of intervals.\n";
     cout  << "    flank         "  << "Create new intervals from the flanks of existing intervals.\n";
     cout  << "    sort          "  << "Order the intervals in a file.\n";
+    cout  << "    random        "  << "Generate random intervals in a genome.\n";
     cout  << "    shuffle       "  << "Randomly redistrubute intervals in a genome.\n";
     cout  << "    annotate      "  << "Annotate coverage of features from multiple files.\n";
     

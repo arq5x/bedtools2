@@ -41,6 +41,7 @@ SUBDIRS = $(SRC_DIR)/annotateBed \
 		  $(SRC_DIR)/nucBed \
 		  $(SRC_DIR)/pairToBed \
 		  $(SRC_DIR)/pairToPair \
+		  $(SRC_DIR)/randomBed \
 		  $(SRC_DIR)/shuffleBed \
 		  $(SRC_DIR)/slopBed \
 		  $(SRC_DIR)/sortBed \

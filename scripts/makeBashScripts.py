@@ -34,6 +34,7 @@ def main():
                  'overlap': 'getOverlap', 
                  'pairtobed': 'pairToBed', 
                  'pairtopair': 'pairToPair', 
+                 'random': 'randomBed', 
                  'shuffle': 'shuffleBed', 
                  'slop': 'slopBed', 
                  'sort': 'sortBed', 
