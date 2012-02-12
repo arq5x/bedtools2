@@ -122,10 +122,6 @@ void random_help(void) {
     cerr                            << "\t\t- Default = 1,000,000." << endl;
     cerr                            << "\t\t- (INTEGER)" << endl << endl;
 
-    cerr << "\t-n\t"                << "Supply an integer seed for the shuffling." << endl;
-    cerr                            << "\t\t- By default, the seed is chosen automatically." << endl;
-    cerr                            << "\t\t- (INTEGER)" << endl << endl;
-
     cerr << "\t-seed\t"             << "Supply an integer seed for the shuffling." << endl;
     cerr                            << "\t\t- By default, the seed is chosen automatically." << endl;
     cerr                            << "\t\t- (INTEGER)" << endl << endl;
