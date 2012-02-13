@@ -90,3 +90,62 @@ chr1	30	100	a2;a3;a4" > exp
 $BT merge -i a.names.bed -nms > obs
 check obs exp
 rm obs exp
+
+###########################################################
+# -nms and -scores sum
+###########################################################
+echo "    merge.t6...\c"
+echo \
+"chr1	10	20	a1	1
+chr1	30	100	a2;a3;a4	9
+chr2	10	20	a1	5
+chr2	30	40	a2	6
+chr2	42	100	a3;a4	15" > exp
+$BT merge -i a.full.bed -nms -scores sum> obs
+check obs exp
+rm obs exp
+
+###########################################################
+# -n and -scores sum
+###########################################################
+echo "    merge.t7...\c"
+echo \
+"chr1	10	20	1	1
+chr1	30	100	3	9
+chr2	10	20	1	5
+chr2	30	40	1	6
+chr2	42	100	2	15" > exp
+$BT merge -i a.full.bed -n -scores sum> obs
+check obs exp
+rm obs exp
+
+###########################################################
+# -n, -nms, and -scores sum
+###########################################################
+echo "    merge.t8...\c"
+echo \
+"chr1	10	20	a1	1	1
+chr1	30	100	a2;a3;a4	9	3
+chr2	10	20	a1	5	1
+chr2	30	40	a2	6	1
+chr2	42	100	a3;a4	15	2" > exp
+$BT merge -i a.full.bed -nms -n -scores sum> obs
+check obs exp
+rm obs exp
+
+###########################################################
+# -s, -n, -nms, and -scores sum
+###########################################################
+echo "    merge.t9...\c"
+echo \
+"chr1	10	20	a1	1	+	1
+chr1	30	40	a2	2	+	1
+chr1	45	100	a4	4	+	1
+chr1	40	50	a3	3	-	1
+chr2	10	20	a1	5	+	1
+chr2	30	40	a2	6	+	1
+chr2	42	50	a3	7	+	1
+chr2	45	100	a4	8	-	1" > exp
+$BT merge -i a.full.bed -s -nms -n -scores sum> obs
+check obs exp
+rm obs exp
