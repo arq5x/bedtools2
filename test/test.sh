@@ -13,6 +13,16 @@ cd bamtobed
 sh test-bamtobed.sh
 cd ..
 
+echo " Testing bedtools coverage:"
+cd coverage
+sh test-coverage.sh
+cd ..
+
+echo " Testing bedtools flank:"
+cd flank
+sh test-flank.sh
+cd ..
+
 echo " Testing bedtools genomecov:"
 cd genomecov
 sh test-genomecov.sh
@@ -31,4 +41,9 @@ cd ..
 echo " Testing bedtools merge:"
 cd merge
 sh test-merge.sh
+cd ..
+
+echo " Testing bedtools slop:"
+cd slop
+sh test-slop.sh
 cd ..

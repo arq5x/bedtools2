@@ -124,8 +124,8 @@ int flank_main(int argc, char* argv[]) {
       cerr << endl << "*****" << endl << "*****ERROR: Need both -l and -r. " << endl << "*****" << endl;
       showHelp = true;
     }
-    if (forceStrand && (!(haveLeft) || !(haveRight))) {
-      cerr << endl << "*****" << endl << "*****ERROR: Must supply -l and -r with -s. " << endl << "*****" << endl;
+    if (forceStrand && ((!(haveLeft) || !(haveRight)) && (!haveBoth))) {
+      cerr << endl << "*****" << endl << "*****ERROR: Must supply -l and -r or just -b with -s. " << endl << "*****" << endl;
       showHelp = true;
     }
 

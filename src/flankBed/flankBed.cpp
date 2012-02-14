@@ -103,14 +103,15 @@ void BedFlank::AddFlank(BED &bed, int leftFlank, int rightFlank) {
     
     // make the left flank (if necessary)
     if (rightFlank > 0) {
-        if ( (static_cast<int>(right.end) + (rightFlank+1)) <= static_cast<int>(chromSize)) 
+        if ( (static_cast<int>(right.end) + static_cast<int>(rightFlank+1))
+             <= static_cast<int>(chromSize)) 
         {
             right.start    = right.end;
             right.end     += (rightFlank);
         }
         else {
             right.start    = right.end;
-            right.end     += chromSize;
+            right.end      = chromSize;
         }
         // report the right flank
         _bed->reportBedNewLine(right);
