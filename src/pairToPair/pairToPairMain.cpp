@@ -163,12 +163,12 @@ void pairtopair_help(void) {
     cerr                                << "\t\teither\tReport overlaps if either ends of A overlap B." << endl;
     cerr                                << "\t\tboth\tReport overlaps if both ends of A overlap B." << endl;
     cerr                                << "\t\tnotboth\tReport overlaps if one or neither of A's overlap B." << endl;
-    
     cerr                                << "\t\t- Default = both." << endl << endl;
 
-    cerr << "\t-slop \t"                << "The amount of slop (in b.p.). to be added to each footprint." << endl;
+    cerr << "\t-slop \t"                << "The amount of slop (in b.p.). to be added to each footprint of A." << endl;
     cerr                                << "\t\t*Note*: Slop is subtracted from start1 and start2" << endl;
     cerr                                << "\t\t\tand added to end1 and end2." << endl << endl;
+    cerr                                << "\t\t- Default = 0." << endl << endl;
     
     cerr << "\t-ss\t"                   << "Add slop based to each BEDPE footprint based on strand." << endl;
     cerr                                << "\t\t- If strand is \"+\", slop is only added to the end coordinates." << endl;

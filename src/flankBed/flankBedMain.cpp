@@ -151,7 +151,7 @@ void flank_help(void) {
     cerr << "Usage:   " << PROGRAM_NAME << " [OPTIONS] -i <bed/gff/vcf> -g <genome> [-b <int> or (-l and -r)]" << endl << endl;
 
     cerr << "Options: " << endl;
-    cerr << "\t-b\t"                << "Create flanking intervak using -b base pairs in each direction." << endl;
+    cerr << "\t-b\t"                << "Create flanking interval(s) using -b base pairs in each direction." << endl;
     cerr                            << "\t\t- (Integer) or (Float, e.g. 0.1) if used with -pct." << endl << endl;
 
     cerr << "\t-l\t"                << "The number of base pairs that a flank should start from" << endl;
@@ -176,8 +176,11 @@ void flank_help(void) {
     cerr << "\t(1)  Starts will be set to 0 if options would force it below 0." << endl;
     cerr << "\t(2)  Ends will be set to the chromosome length if requested flank would" << endl;
     cerr <<        "\tforce it above the max chrom length." << endl;
+    cerr << "\t(3)  In contrast to slop, which _extends_ intervals, bedtools flank" << endl;
+    cerr <<        "\tcreates new intervals from the regions just up- and down-stream" << endl;
+    cerr <<        "\tof your existing intervals." << endl;
 
-    cerr << "\t(3)  The genome file should tab delimited and structured as follows:" << endl;
+    cerr << "\t(4)  The genome file should tab delimited and structured as follows:" << endl;
     cerr << "\n\t<chromName><TAB><chromSize>" << endl << endl;
     cerr << "\tFor example, Human (hg19):" << endl;
     cerr << "\tchr1\t249250621" << endl;
