@@ -22,7 +22,6 @@ BedCluster::BedCluster(string &bedFile,
     _maxDistance(maxDistance)
 {
     _bed = new BedFile(bedFile);
-
     if (_forceStrand == false)
         ClusterBed();
     else
@@ -46,6 +45,7 @@ void BedCluster::ClusterBed() {
     while (_bed->GetNextBed(curr, true)) { // true = force sorted intervals
         if (_bed->_status != BED_VALID)
             continue;            
+
         // new cluster, no overlap
         if ( (((int) curr.start - end) > _maxDistance) || 
              (curr.chrom != prev.chrom)
@@ -53,6 +53,10 @@ void BedCluster::ClusterBed() {
         {
             cluster_id++;
             end   = curr.end;
+        }
+        else {
+            if ((int) curr.end > end)
+                end   = curr.end;
         }
         prev = curr;
         _bed->reportBedTab(curr);
