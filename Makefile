@@ -130,5 +130,5 @@ gitversion:
 		mkdir -p ./src/utils/version ; \
 		echo "Updating version file." ; \
 		printf "#ifndef VERSION_H\n#define VERSION_H\n\n#define VERSION \"$${GIT_VERSION}\"\n\n#endif /* VERSION_H */\n" > $(VERSION_FILE) ; \
-		$(MAKE); \
+		$(MAKE) clean; \
 	fi )
