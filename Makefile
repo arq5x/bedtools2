@@ -5,7 +5,7 @@
 
 SHELL := /bin/bash -e
 
-VERSION_FILE=./src/utils/version/version.h
+VERSION_FILE=./src/utils/version/version_git.h
 
 
 # define our object and binary directories
@@ -55,6 +55,7 @@ SUBDIRS = $(SRC_DIR)/annotateBed \
 		  $(SRC_DIR)/windowMaker
 
 UTIL_SUBDIRS =	$(SRC_DIR)/utils/bedFile \
+				$(SRC_DIR)/utils/version \
 				$(SRC_DIR)/utils/bedGraphFile \
 				$(SRC_DIR)/utils/chromsweep \
 				$(SRC_DIR)/utils/gzstream \
@@ -122,13 +123,12 @@ test: all
 .PHONY: gitversion
 gitversion:
 	@( BEDTOOLS_VERSION="" ; \
-	[ -e "$(VERSION_FILE)" ] && BEDTOOLS_VERSION=$$(grep "define VERSION " "$(VERSION_FILE)" | cut -f3 -d" " | sed 's/"//g') ; \
+	[ -e "$(VERSION_FILE)" ] && BEDTOOLS_VERSION=$$(grep "define VERSION_GIT " "$(VERSION_FILE)" | cut -f3 -d" " | sed 's/"//g') ; \
 	GIT_VERSION=$$(git describe --always --tags --dirty) ; \
 	echo "BEDTOOLS_VERSION = $$BEDTOOLS_VERSION" ; \
 	echo "GIT_VERSION = $$GIT_VERSION" ; \
 	if [ "$${GIT_VERSION}" != "$${BEDTOOLS_VERSION}" ] ; then \
 		mkdir -p ./src/utils/version ; \
 		echo "Updating version file." ; \
-		printf "#ifndef VERSION_H\n#define VERSION_H\n\n#define VERSION \"$${GIT_VERSION}\"\n\n#endif /* VERSION_H */\n" > $(VERSION_FILE) ; \
-		$(MAKE) clean; \
+		printf "#ifndef VERSION_GIT_H\n#define VERSION_GIT_H\n\n#define VERSION_GIT \"$${GIT_VERSION}\"\n\n#endif /* VERSION_GIT_H */\n" > $(VERSION_FILE) ; \
 	fi )
