@@ -5,6 +5,9 @@
 
 SHELL := /bin/bash -e
 
+VERSION_FILE=./src/utils/version/version.h
+
+
 # define our object and binary directories
 export OBJ_DIR	= obj
 export BIN_DIR	= bin
@@ -69,7 +72,7 @@ UTIL_SUBDIRS =	$(SRC_DIR)/utils/bedFile \
 BUILT_OBJECTS = $(OBJ_DIR)/*.o
 
 
-all:
+all: gitversion
 	[ -d $(OBJ_DIR) ] || mkdir -p $(OBJ_DIR)
 	[ -d $(BIN_DIR) ] || mkdir -p $(BIN_DIR)
 	
@@ -115,3 +118,17 @@ test: all
 	@cd test; sh test.sh
 
 .PHONY: test
+
+.PHONY: gitversion
+gitversion:
+	@( BEDTOOLS_VERSION="" ; \
+	[ -e "$(VERSION_FILE)" ] && BEDTOOLS_VERSION=$$(grep "define VERSION " "$(VERSION_FILE)" | cut -f3 -d" " | sed 's/"//g') ; \
+	GIT_VERSION=$$(git describe --always --tags --dirty) ; \
+	echo "BEDTOOLS_VERSION = $$BEDTOOLS_VERSION" ; \
+	echo "GIT_VERSION = $$GIT_VERSION" ; \
+	if [ "$${GIT_VERSION}" != "$${BEDTOOLS_VERSION}" ] ; then \
+		mkdir -p ./src/utils/version ; \
+		echo "Updating version file." ; \
+		printf "#ifndef VERSION_H\n#define VERSION_H\n\n#define VERSION \"$${GIT_VERSION}\"\n\n#endif /* VERSION_H */\n" > $(VERSION_FILE) ; \
+		$(MAKE) clean ; \
+	fi )
