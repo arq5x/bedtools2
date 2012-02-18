@@ -48,7 +48,7 @@ rm obs exp
 ###########################################################
 #  expand multiple columns while switching order
 ###########################################################
-echo "    expand.t2...\c"
+echo "    expand.t3...\c"
 echo \
 "chr1	10	20	10	1
 chr1	10	20	20	2
