@@ -13,6 +13,9 @@ cd cluster; sh test-cluster.sh; cd ..
 echo " Testing bedtools coverage:"
 cd coverage; sh test-coverage.sh; cd ..
 
+echo " Testing bedtools expand:"
+cd expand; sh test-expand.sh; cd ..
+
 echo " Testing bedtools flank:"
 cd flank; sh test-flank.sh; cd ..
 
