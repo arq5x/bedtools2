@@ -218,8 +218,10 @@ void Expand (const string &inFile,
                     << "*****" << endl;
                     exit(1);
                 }
+               
                 // expand the requested column into a vector
                 Tokenize(inFields[expColumns[c]-1], expansion, ',');
+               
                 if ((int) expansion.size() != prev_size && prev_size >= 0) {
                     cerr << endl
                     << "*****" << endl
@@ -248,6 +250,8 @@ void Expand (const string &inFile,
                     }
                     // expanded column, grab relevant value from expanded vector.
                     else {
+                        // expandedCols[i][j]
+                        // i == column, j = row
                         printf("%s", expandedCols[numExpColsSeen][n].c_str());
                         numExpColsSeen++;
                     }
