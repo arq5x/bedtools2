@@ -18,6 +18,7 @@ def main():
                  'cluster': 'clusterBed',
                  'complement': 'complementBed',
                  'coverage': 'coverageBed', 
+                 'expand': 'expandCols',
                  'flank': 'flankBed', 
                  'genomecov': 'genomeCoverageBed', 
                  'getfasta': 'fastaFromBed',
