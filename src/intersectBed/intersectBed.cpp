@@ -19,10 +19,16 @@ bool BedIntersect::processHits(const BED &a, const vector<BED> &hits) {
     bool hitsFound   = false;
     if (_printable == true) {
         // -wao the user wants to force the reporting of 0 overlap
-        if (hits.size() == 0 && _writeAllOverlap) {
-            _bedA->reportBedTab(a);
-            _bedB->reportNullBedTab();
-            printf("0\n");
+        if (hits.size() == 0) {
+            if (_writeAllOverlap) { 
+                _bedA->reportBedTab(a);
+                _bedB->reportNullBedTab();
+                printf("0\n");
+            }
+            else if (_leftJoin) {
+                _bedA->reportBedTab(a);
+                _bedB->reportNullBedNewLine();
+            }
         }
         else {
             vector<BED>::const_iterator h       = hits.begin();
@@ -48,7 +54,7 @@ bool BedIntersect::processHits(const BED &a, const vector<BED> &hits) {
 */
 BedIntersect::BedIntersect(string bedAFile, string bedBFile, bool anyHit,
                            bool writeA, bool writeB, bool writeOverlap, bool writeAllOverlap,
-                           float overlapFraction, bool noHit, bool writeCount, bool sameStrand, bool diffStrand,
+                           float overlapFraction, bool noHit, bool leftJoin, bool writeCount, bool sameStrand, bool diffStrand,
                            bool reciprocal, bool obeySplits, bool bamInput, bool bamOutput, bool isUncompressedBam,
                            bool sortedInput, bool printHeader) {
 
@@ -56,6 +62,7 @@ BedIntersect::BedIntersect(string bedAFile, string bedBFile, bool anyHit,
     _bedBFile            = bedBFile;
     _anyHit              = anyHit;
     _noHit               = noHit;
+    _leftJoin            = leftJoin;
     _writeA              = writeA;
     _writeB              = writeB;
     _writeOverlap        = writeOverlap;
@@ -167,11 +174,13 @@ bool BedIntersect::FindBlockedOverlaps(const BED &a, const vector<BED> &a_blocks
 
 void BedIntersect::ReportOverlapDetail(int overlapBases, const BED &a, const BED &b, CHRPOS s, CHRPOS e) {
     // default. simple intersection only
-    if (_writeA == false && _writeB == false && _writeOverlap == false) {
+    if (_writeA == false && _writeB == false && 
+        _writeOverlap == false && _leftJoin == false) 
+    {
         _bedA->reportBedRangeNewLine(a,s,e);
     }
     //  -wa -wb write the original A and B
-    else if (_writeA == true && _writeB == true) {
+    else if ((_writeA == true && _writeB == true) || _leftJoin == true) {
         _bedA->reportBedTab(a);
         _bedB->reportBedNewLine(b);
     }

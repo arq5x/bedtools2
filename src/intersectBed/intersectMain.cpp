@@ -39,6 +39,7 @@ int intersect_main(int argc, char* argv[]) {
     bool haveBedA           = false;
     bool haveBedB           = false;
     bool noHit              = false;
+    bool leftJoin           = false;
     bool anyHit             = false;
     bool writeA             = false;
     bool writeB             = false;
@@ -142,6 +143,9 @@ int intersect_main(int argc, char* argv[]) {
         else if (PARAMETER_CHECK("-split", 6, parameterLength)) {
             obeySplits = true;
         }
+        else if (PARAMETER_CHECK("-leftjoin", 9, parameterLength)) {
+            leftJoin = true;
+        }
         else if(PARAMETER_CHECK("-ubam", 5, parameterLength)) {
             uncompressedBam = true;
         }
@@ -216,7 +220,7 @@ int intersect_main(int argc, char* argv[]) {
     if (!showHelp) {
 
         BedIntersect *bi = new BedIntersect(bedAFile, bedBFile, anyHit, writeA, writeB, writeOverlap,
-                                            writeAllOverlap, overlapFraction, noHit, writeCount, sameStrand, diffStrand,
+                                            writeAllOverlap, overlapFraction, noHit, leftJoin, writeCount, sameStrand, diffStrand,
                                             reciprocalFraction, obeySplits, inputIsBam, outputIsBam, uncompressedBam, 
                                             sortedInput, printHeader);
         delete bi;
@@ -248,6 +252,9 @@ void intersect_help(void) {
     cerr << "\t-wa\t"           << "Write the original entry in A for each overlap." << endl << endl;
 
     cerr << "\t-wb\t"           << "Write the original entry in B for each overlap." << endl;
+    cerr                        << "\t\t- Useful for knowing _what_ A overlaps. Restricted by -f and -r." << endl << endl;
+    
+    cerr << "\t-leftjoin\t"     << "Write the original entry in B for each overlap." << endl;
     cerr                        << "\t\t- Useful for knowing _what_ A overlaps. Restricted by -f and -r." << endl << endl;
 
     cerr << "\t-wo\t"           << "Write the original A and B entries plus the number of base" << endl;
