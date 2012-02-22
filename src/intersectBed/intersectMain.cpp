@@ -143,7 +143,7 @@ int intersect_main(int argc, char* argv[]) {
         else if (PARAMETER_CHECK("-split", 6, parameterLength)) {
             obeySplits = true;
         }
-        else if (PARAMETER_CHECK("-leftjoin", 9, parameterLength)) {
+        else if (PARAMETER_CHECK("-loj", 4, parameterLength)) {
             leftJoin = true;
         }
         else if(PARAMETER_CHECK("-ubam", 5, parameterLength)) {
@@ -216,6 +216,26 @@ int intersect_main(int argc, char* argv[]) {
         cerr << endl << "*****" << endl << "*****ERROR: Request either -s OR -S, not both." << endl << "*****" << endl;
         showHelp = true;
     }
+    
+    if (inputIsBam && writeB) {
+        cerr << endl << "*****" << endl << "*****WARNING: -wb is ignored with -abam" << endl << "*****" << endl;
+    }
+
+    if (inputIsBam && leftJoin) {
+        cerr << endl << "*****" << endl << "*****WARNING: -loj is ignored with -abam" << endl << "*****" << endl;
+    }
+    
+    if (inputIsBam && writeCount) {
+        cerr << endl << "*****" << endl << "*****WARNING: -c is ignored with -abam" << endl << "*****" << endl;
+    }
+    
+    if (inputIsBam && writeOverlap) {
+        cerr << endl << "*****" << endl << "*****WARNING: -wo is ignored with -abam" << endl << "*****" << endl;
+    }
+    
+    if (inputIsBam && writeAllOverlap) {
+        cerr << endl << "*****" << endl << "*****WARNING: -wao is ignored with -abam" << endl << "*****" << endl;
+    }
 
     if (!showHelp) {
 
@@ -254,8 +274,9 @@ void intersect_help(void) {
     cerr << "\t-wb\t"           << "Write the original entry in B for each overlap." << endl;
     cerr                        << "\t\t- Useful for knowing _what_ A overlaps. Restricted by -f and -r." << endl << endl;
     
-    cerr << "\t-leftjoin\t"     << "Write the original entry in B for each overlap." << endl;
-    cerr                        << "\t\t- Useful for knowing _what_ A overlaps. Restricted by -f and -r." << endl << endl;
+    cerr << "\t-loj\t"          << "Perform a \"left outer join\". That is, for each feature in A" << endl;
+    cerr                        << "\t\treport each overlap with B.  If no overlaps are found, " << endl;
+    cerr                        << "\t\treport a NULL feature for B." << endl << endl;
 
     cerr << "\t-wo\t"           << "Write the original A and B entries plus the number of base" << endl;
     cerr                        << "\t\tpairs of overlap between the two features." << endl;
@@ -301,6 +322,11 @@ void intersect_help(void) {
     
     cerr << "\t-header\t"       << "Print the header from the A file prior to results." << endl << endl;
  
+    cerr << "Notes: " << endl;
+    cerr << "\t(1) When a BAM file is used for the A file, the alignment is retained if overlaps exist," << endl;
+    cerr << "\tand exlcuded if an overlap cannot be found.  If multiple overlaps exist, they are not" << endl;
+    cerr << "\treported, as we are only testing for one or more overlaps." << endl << endl;
+
     // end the program here
     exit(1);
 
