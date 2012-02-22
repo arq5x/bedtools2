@@ -27,7 +27,7 @@ TabFile::~TabFile(void) {
 
 
 void TabFile::Open(void) {
-    if (_tabFile == "stdin") {
+    if (_tabFile == "stdin" || _tabFile == "-") {
         _tabStream = &cin;
     }
     else {
@@ -71,7 +71,7 @@ void TabFile::Open(void) {
 
 // Close the TAB file
 void TabFile::Close(void) {
-    if (_tabFile != "stdin") delete _tabStream;
+    if (_tabFile != "stdin" && _tabFile != "-") delete _tabStream;
 }
 
 

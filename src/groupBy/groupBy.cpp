@@ -87,12 +87,7 @@ int groupby_main(int argc, char* argv[]) {
         int parameterLength = (int)strlen(argv[i]);
 
         if(PARAMETER_CHECK("-i", 2, parameterLength)) {
-            if ((i+1) >= argc || LOOKS_LIKE_A_PARAM(argv[i+1])) {
-                cerr << endl << "*****ERROR: -i parameter requires a value." << endl << endl;
-                groupby_help();
-                break;
-            }
-            else {
+            if ((i+1) < argc) {
                 inFile     = argv[i + 1];
                 i++;
             }
