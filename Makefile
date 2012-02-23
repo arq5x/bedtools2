@@ -78,25 +78,7 @@ UTIL_SUBDIRS =	$(SRC_DIR)/utils/bedFile \
 BUILT_OBJECTS = $(OBJ_DIR)/*.o
 
 
-all: gitversion
-	[ -d $(OBJ_DIR) ] || mkdir -p $(OBJ_DIR)
-	[ -d $(BIN_DIR) ] || mkdir -p $(BIN_DIR)
-	
-	@echo "Building BEDTools:"
-	@echo "========================================================="
-	
-	@for dir in $(UTIL_SUBDIRS); do \
-		echo "- Building in $$dir"; \
-		$(MAKE) --no-print-directory -C $$dir; \
-		echo ""; \
-	done
-
-	@for dir in $(SUBDIRS); do \
-		echo "- Building in $$dir"; \
-		$(MAKE) --no-print-directory -C $$dir; \
-		echo ""; \
-	done
-
+all: print_banner $(OBJ_DIR) $(BIN_DIR) gitversion $(UTIL_SUBDIRS) $(SUBDIRS)
 	@echo "- Building main bedtools binary."
 	@$(CXX) $(CXXFLAGS) -c src/bedtools.cpp -o obj/bedtools.o -I$(UTIL_DIR)/version/
 	@$(CXX) $(LDFLAGS) $(CXXFLAGS) -o $(BIN_DIR)/bedtools $(BUILT_OBJECTS) -L$(UTIL_DIR)/BamTools/lib/ -lbamtools $(LIBS)
@@ -109,6 +91,22 @@ all: gitversion
 	
 
 .PHONY: all
+
+print_banner:
+	@echo "Building BEDTools:"
+	@echo "========================================================="
+.PHONY: print_banner
+
+# make the "obj/" and "bin/" directories, if they don't exist
+$(OBJ_DIR) $(BIN_DIR):
+	@mkdir -p $@
+
+# even though these are real directories, treat them as phony targets, forcing to always go in them are re-make.
+# a future improvement would be the check for the compiled object, and rebuild only if the source code is newer.
+.PHONY: $(UTIL_SUBDIRS) $(SUBDIRS)
+$(UTIL_SUBDIRS) $(SUBDIRS): $(OBJ_DIR) $(BIN_DIR)
+	@echo "- Building in $@"
+	@$(MAKE) --no-print-directory --directory=$@
 
 clean:
 	@echo "Cleaning up."	
