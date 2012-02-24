@@ -101,6 +101,14 @@ print_banner:
 $(OBJ_DIR) $(BIN_DIR):
 	@mkdir -p $@
 
+
+# One special case: All (or almost all) programs requires the BamTools API files to be created first.
+.PHONY: bamtools_api
+bamtools_api:
+	@$(MAKE) --no-print-directory --directory=$(BT_ROOT) api
+$(UTIL_SUBDIRS) $(SUBDIRS): bamtools_api
+
+
 # even though these are real directories, treat them as phony targets, forcing to always go in them are re-make.
 # a future improvement would be the check for the compiled object, and rebuild only if the source code is newer.
 .PHONY: $(UTIL_SUBDIRS) $(SUBDIRS)
@@ -109,13 +117,9 @@ $(UTIL_SUBDIRS) $(SUBDIRS): $(OBJ_DIR) $(BIN_DIR)
 	@$(MAKE) --no-print-directory --directory=$@
 
 clean:
-	@echo "Cleaning up."	
+	@$(MAKE) --no-print-directory --directory=$(BT_ROOT) clean_api
+	@echo " * Cleaning up."
 	@rm -f $(OBJ_DIR)/* $(BIN_DIR)/*
-	@rm -Rf $(BT_ROOT)/lib
-	@rm -f $(BT_ROOT)/src/api/*.o
-	@rm -f $(BT_ROOT)/src/api/internal/*/*.o
-	@rm -Rf $(BT_ROOT)/include
-
 .PHONY: clean
 
 test: all
