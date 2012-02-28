@@ -217,7 +217,7 @@ int intersect_main(int argc, char* argv[]) {
         showHelp = true;
     }
     
-    if (inputIsBam && writeB) {
+    if (inputIsBam && writeB && outputIsBam) {
         cerr << endl << "*****" << endl << "*****WARNING: -wb is ignored with -abam" << endl << "*****" << endl;
     }
 
