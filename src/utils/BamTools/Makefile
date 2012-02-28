@@ -55,15 +55,6 @@ all: $(LIBRARY)
 .PHONY: all
 
 $(LIBRARY): $(OBJECTS)
-	[ -d lib ] || mkdir -p lib
-	[ -d include ] || mkdir -p include
-	[ -d include/api ] || mkdir -p include/api
-	[ -d include/shared ] || mkdir -p include/shared
-
-	@cp src/api/*.h include/api
-	@cp src/shared/*.h include/shared
-
-
 	@echo " * linking $(LIBRARY)"
 	ar cr $@ $^
 	-ranlib $@
@@ -71,3 +62,18 @@ $(LIBRARY): $(OBJECTS)
 $(OBJECTS): $(SOURCES)
 	@echo " * compiling" $(*F).cpp
 	@$(CXX) -c $(*D)/$(*F).cpp $(LDFLAGS) $(CXXFLAGS) $(INCLUDES) -o $(*D)/$(*F).o
+
+.PHONY: api
+api:
+	@echo " * Creating BamTools API"
+	@mkdir -p lib
+	@mkdir -p include
+	@mkdir -p include/api
+	@mkdir -p include/shared
+	@cp src/api/*.h include/api
+	@cp src/shared/*.h include/shared
+
+.PHONY: clean_api
+clean_api:
+	@echo " * Cleaning-up BamTools API"
+	@rm -rf ./lib ./src/api/*.o ./src/api/internal/*/*.o ./include
