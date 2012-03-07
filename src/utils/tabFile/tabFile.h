@@ -13,6 +13,7 @@
 #define TABFILE_H
 
 #include "gzstream.h"
+#include "fileType.h"
 #include <vector>
 #include <string>
 #include <iostream>

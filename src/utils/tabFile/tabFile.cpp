@@ -25,45 +25,20 @@ TabFile::TabFile(const string &tabFile)
 TabFile::~TabFile(void) {
 }
 
-
 void TabFile::Open(void) {
     if (_tabFile == "stdin" || _tabFile == "-") {
         _tabStream = &cin;
     }
     else {
-        size_t foundPos;
-        foundPos = _tabFile.find_last_of(".gz");
-        // is this a GZIPPED TAB file?
-        if (foundPos == _tabFile.size() - 1) {
-            igzstream tabs(_tabFile.c_str(), ios::in);
-            if ( !tabs ) {
-                cerr << "Error: The requested file (" << _tabFile << ") could not be opened. Exiting!" << endl;
-                exit (1);
-            }
-            else {
-                // if so, close it (this was just a test)
-                tabs.close();
-                // now set a pointer to the stream so that we
-                // can read the file later on.
-                _tabStream = new igzstream(_tabFile.c_str(), ios::in);
-            }
+        _tabStream = new ifstream(_tabFile.c_str(), ios::in);
+        
+        if( isGzipFile(_tabStream) ) {
+            delete _tabStream;
+            _tabStream = new igzstream(_tabFile.c_str(), ios::in);
         }
-        // not GZIPPED.
-        else {
-
-            ifstream tabs(_tabFile.c_str(), ios::in);
-            // can we open the file?
-            if ( !tabs ) {
-                cerr << "Error: The requested file (" << _tabFile << ") could not be opened. Exiting!" << endl;
-                exit (1);
-            }
-            else {
-                // if so, close it (this was just a test)
-                tabs.close();
-                // now set a pointer to the stream so that we
-                // can read the file later on.
-                _tabStream = new ifstream(_tabFile.c_str(), ios::in);
-            }
+        if ( !(_tabStream->good()) ) {
+            cerr << "Error: The requested file (" << _tabFile << ") could not be opened. Exiting!" << endl;
+            exit (1);
         }
     }
 }
