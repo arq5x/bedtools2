@@ -79,7 +79,7 @@ UTIL_SUBDIRS =	$(SRC_DIR)/utils/bedFile \
 BUILT_OBJECTS = $(OBJ_DIR)/*.o
 
 
-all: print_banner $(OBJ_DIR) $(BIN_DIR) $(UTIL_SUBDIRS) $(SUBDIRS)
+all: print_banner $(OBJ_DIR) $(BIN_DIR) version $(UTIL_SUBDIRS) $(SUBDIRS)
 	@echo "- Building main bedtools binary."
 	@$(CXX) $(CXXFLAGS) -c src/bedtools.cpp -o obj/bedtools.o -I$(UTIL_DIR)/version/
 	@$(CXX) $(LDFLAGS) $(CXXFLAGS) -o $(BIN_DIR)/bedtools $(BUILT_OBJECTS) -L$(UTIL_DIR)/BamTools/lib/ -lbamtools $(LIBS)
@@ -128,7 +128,7 @@ test: all
 
 .PHONY: test
 
-#.PHONY: gitversion
+.PHONY: version
 version:
 	@( BEDTOOLS_VERSION="" ; \
 	[ -e "$(VERSION_FILE)" ] && BEDTOOLS_VERSION=$$(grep "define VERSION_GIT " "$(VERSION_FILE)" | cut -f3 -d" " | sed 's/"//g') ; \
