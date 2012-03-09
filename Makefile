@@ -128,7 +128,7 @@ test: all
 .PHONY: test
 
 #.PHONY: gitversion
-gitversion:
+version:
 	@( BEDTOOLS_VERSION="" ; \
 	[ -e "$(VERSION_FILE)" ] && BEDTOOLS_VERSION=$$(grep "define VERSION_GIT " "$(VERSION_FILE)" | cut -f3 -d" " | sed 's/"//g') ; \
 	GIT_VERSION=$$(git describe --always --tags --dirty) ; \
