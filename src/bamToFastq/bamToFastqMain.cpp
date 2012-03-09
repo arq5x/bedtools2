@@ -19,7 +19,7 @@
 #include <fstream>
 #include <vector>
 #include <string>
-#include "BamToFastq.h"
+#include "bamToFastq.h"
 #include "version.h"
 using namespace std;
 

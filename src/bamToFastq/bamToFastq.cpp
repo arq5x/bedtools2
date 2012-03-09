@@ -12,7 +12,7 @@
  ***************************************************************************
 */
 
-#include "BamToFastq.h"
+#include "bamToFastq.h"
 
 // constructor
 BamToFastq::BamToFastq(string bamFile, string fastq1, string fastq2, bool useMateTags, bool pairedEnd)
