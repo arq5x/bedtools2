@@ -20,7 +20,7 @@
 #include <vector>
 #include <string>
 #include "BamToFastq.h"
-#include "Version.h"
+#include "version.h"
 using namespace std;
 
 
