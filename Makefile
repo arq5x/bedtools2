@@ -179,7 +179,7 @@ setversion:
 .PHONY: autoversion
 autoversion:
 	@( \
-	if [ -d ".git" ] && $$(which git) ; then \
+	if [ -d ".git" ] && which git > /dev/null ; then \
 		DETECTED_VERSION=$$(git describe --always --tags --dirty) ; \
 	else \
 		DETECTED_VERSION=$$(grep -v "^#" "$(RELEASED_VERSION_FILE)") ; \
