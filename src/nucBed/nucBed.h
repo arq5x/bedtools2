@@ -31,7 +31,7 @@ public:
     // constructor
     NucBed(string &dbFile, string &bedFile, bool printSeq, 
            bool hasPattern, const string &pattern,
-           bool forceStrand);
+           bool forceStrand, bool ignoreCase);
     // destructor
     ~NucBed(void);
 
@@ -45,6 +45,7 @@ private:
     bool   _hasPattern;
     string _pattern;
     bool _forceStrand;
+    bool _ignoreCase;
 
     // instance of a bed file class.
     BedFile  *_bed;

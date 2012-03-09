@@ -110,17 +110,24 @@ void getDnaContent(const string &seq, int &a, int &c, int &g, int &t, int &n, in
 }
 
 
-int countPattern(const string &seq, const string &pattern)
+int countPattern(const string &seq, const string &pattern, bool ignoreCase)
 {
-    // swap the bases
-    int patternLength = pattern.size();
+    string s = seq;
+    string p = pattern;
+    // standardize the seq and the pattern 
+    // if case should be ignored
+    if (ignoreCase) {
+        toUpperCase(s);
+        toUpperCase(p);
+    }
+    int patternLength = p.size();
     int patternCount = 0;
-    for(unsigned int i = 0; i < seq.length(); i++) {
-        if (seq.substr(i,patternLength) == pattern) {
+    for(unsigned int i = 0; i < s.length(); i++) {
+        if (s.substr(i,patternLength) == p) {
             patternCount++;
         }
     }
     return patternCount;
 }
-        
+
 

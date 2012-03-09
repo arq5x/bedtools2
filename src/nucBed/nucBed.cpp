@@ -14,7 +14,9 @@
 
 
 NucBed::NucBed(string &dbFile, string &bedFile, bool printSeq, 
-               bool hasPattern, const string &pattern, bool forceStrand) {
+               bool hasPattern, const string &pattern, 
+               bool forceStrand, bool ignoreCase) 
+{
 
     _dbFile       = dbFile;
     _bedFile      = bedFile;
@@ -22,7 +24,7 @@ NucBed::NucBed(string &dbFile, string &bedFile, bool printSeq,
     _hasPattern   = hasPattern;
     _pattern      = pattern;
     _forceStrand  = forceStrand;
-    
+    _ignoreCase   = ignoreCase;
     _bed = new BedFile(_bedFile);
 
     // Compute the DNA content in each BED/GFF/VCF interval
@@ -42,7 +44,7 @@ void NucBed::ReportDnaProfile(const BED& bed, const string &sequence, int seqLen
     getDnaContent(sequence,a,c,g,t,n,other);
     
     if (_hasPattern)
-        userPatternCount = countPattern(sequence, _pattern);
+        userPatternCount = countPattern(sequence, _pattern, _ignoreCase);
     
     
     // report the original interval

@@ -40,6 +40,7 @@ int nuc_main(int argc, char* argv[]) {
     bool printSeq    = false;
     bool hasPattern  = false;
     bool forceStrand = false;
+    bool ignoreCase  = false;
 
     // check to see if we should print out some help
     if(argc <= 1) showHelp = true;
@@ -80,6 +81,9 @@ int nuc_main(int argc, char* argv[]) {
         else if(PARAMETER_CHECK("-s", 2, parameterLength)) {
             forceStrand = true;
         }
+        else if(PARAMETER_CHECK("-C", 2, parameterLength)) {
+            ignoreCase = true;
+        }
         else if(PARAMETER_CHECK("-pattern", 8, parameterLength)) {
             if ((i+1) < argc) {
                 hasPattern = true;
@@ -99,7 +103,8 @@ int nuc_main(int argc, char* argv[]) {
 
     if (!showHelp) {
 
-        NucBed *nuc = new NucBed(fastaDbFile, bedFile, printSeq, hasPattern, pattern, forceStrand);
+        NucBed *nuc = new NucBed(fastaDbFile, bedFile, printSeq, 
+                                 hasPattern, pattern, forceStrand, ignoreCase);
         delete nuc;
     }
     else {
@@ -117,13 +122,19 @@ void nuc_help(void) {
     cerr << "Usage:   " << PROGRAM_NAME << " [OPTIONS] -fi <fasta> -bed <bed/gff/vcf>" << endl << endl;
 
     cerr << "Options: " << endl;
+
     cerr << "\t-fi\tInput FASTA file" << endl << endl;
+
     cerr << "\t-bed\tBED/GFF/VCF file of ranges to extract from -fi" << endl << endl;
+
     cerr << "\t-s\tProfile the sequence according to strand." << endl << endl;
+
     cerr << "\t-seq\tPrint the extracted sequence" << endl << endl;
+
     cerr << "\t-pattern\tReport the number of times a user-defined sequence" << endl;
-    cerr << "\t\t\tis observed (case-insensitive)." << endl << endl;    
-    
+    cerr << "\t\t\tis observed (case-sensitive)." << endl << endl;    
+
+    cerr << "\t-C\tIgore case when matching -pattern. By defaulty, case matters." << endl << endl;
     
     cerr << "Output format: " << endl;
     cerr << "\tThe following information will be reported after each BED entry:" << endl;
