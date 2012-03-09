@@ -25,6 +25,7 @@ export BT_ROOT  = src/utils/BamTools/
 
 SUBDIRS = $(SRC_DIR)/annotateBed \
 		  $(SRC_DIR)/bamToBed \
+		  $(SRC_DIR)/bamToFastq \
 		  $(SRC_DIR)/bedToBam \
 		  $(SRC_DIR)/bedpeToBam \
 		  $(SRC_DIR)/bedToIgv \

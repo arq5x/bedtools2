@@ -36,6 +36,7 @@ using namespace std;
 
 int annotate_main(int argc, char* argv[]);//
 int bamtobed_main(int argc, char* argv[]);//
+int bamtofastq_main(int argc, char* argv[]);//
 int bed12tobed6_main(int argc, char* argv[]); //
 int bedtobam_main(int argc, char* argv[]);//
 int bedtoigv_main(int argc, char* argv[]);//
@@ -109,6 +110,7 @@ int main(int argc, char *argv[])
     // format conversion tools
     else if (sub_cmd == "bamtobed")    return bamtobed_main(argc-1, argv+1);
     else if (sub_cmd == "bedtobam")    return bedtobam_main(argc-1, argv+1);
+    else if (sub_cmd == "bamtofastq")  return bamtofastq_main(argc-1, argv+1);
     else if (sub_cmd == "bedpetobam")  return bedpetobam_main(argc-1, argv+1);
     else if (sub_cmd == "bed12tobed6") return bed12tobed6_main(argc-1, argv+1);
 
@@ -206,6 +208,7 @@ int bedtools_help(void)
     cout  << "[ Format conversion ]" << endl;
     cout  << "    bamtobed      "  << "Convert BAM alignments to BED (& other) formats.\n";
     cout  << "    bedtobam      "  << "Convert intervals to BAM records.\n";
+    cout  << "    bedtofastq    "  << "Convert BAM records to FASTQ records.\n";
     cout  << "    bedpetobam    "  << "Convert BEDPE intervals to BAM records.\n";    
     cout  << "    bed12tobed6   "  << "Breaks BED12 intervals into discrete BED6 intervals.\n";
 

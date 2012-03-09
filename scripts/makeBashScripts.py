@@ -10,7 +10,8 @@ import os
 
 def main():
     tool_map =  {'annotate': 'annotateBed', 
-                 'bamtobed': 'bamToBed', 
+                 'bamtobed': 'bamToBed',
+                 'bamtofastq': 'bamToFastq', 
                  'bed12tobed6': 'bed12ToBed6', 
                  'bedpetobam': 'bedpeToBam', 
                  'bedtobam': 'bedToBam', 
