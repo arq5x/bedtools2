@@ -242,7 +242,7 @@ void groupby_help(void) {
     cerr                         << "\t\t\t    freqasc (i.e., print asc. list of values:freq)" << endl;
     cerr                         << "\t\t\t- Default: sum" << endl << endl;
 
-    cerr << "\t-full\t\t"   << "Print all columns from input file." << endl;
+    cerr << "\t-full\t\t"   << "Print all columns from input file.  The first line in the group is used." << endl;
     cerr            << "\t\t\tDefault: print only grouped columns." << endl << endl;
 
     cerr << "\t-inheader\t" << "Input file has a header line - the first line will be ignored." << endl << endl ;
