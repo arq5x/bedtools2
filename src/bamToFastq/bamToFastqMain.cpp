@@ -127,7 +127,8 @@ void bamtofastq_help(void) {
     cerr << "Usage:   " << PROGRAM_NAME << " [OPTIONS] -i <BAM> -fq <FQ> " << endl << endl;
 
     cerr << "Options:" << endl;
-    cerr << "\t-fq2\tFASTQ for second end.  Use if BAM contains paired-end data." << endl << endl;
+    cerr << "\t-fq2\tFASTQ for second end.  Used if BAM contains paired-end data." << endl;
+    cerr << "\t\tBAM should be sorted by query name is creating paired FASTQ." << endl << endl;
     
     cerr << "\t-tags\tCreate FASTQ based on the mate info" << endl;
     cerr << "\t\tin the BAM R2 and Q2 tags." << endl << endl;

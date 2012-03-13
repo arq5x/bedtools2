@@ -30,26 +30,26 @@ class BamToFastq {
 
 public:
 
-	// constructor 
-	BamToFastq(string bamFile, string fastq1, string fastq2, bool useMateTags, bool pairedEnd);
+    // constructor 
+    BamToFastq(string bamFile, string fastq1, string fastq2, bool useMateTags, bool pairedEnd);
 
-	// destructor
-	~BamToFastq(void);
+    // destructor
+    ~BamToFastq(void);
 
-		
+        
 private:
-		
-	void SingleFastq();
-	void PairedFastq();
-	void PairedFastqUseTags();
+        
+    void SingleFastq();
+    void PairedFastq();
+    void PairedFastqUseTags();
 
-	string _bamFile;
+    string _bamFile;
 
-	BamAlignment _end1;
-	BamAlignment _end2;
+    BamAlignment _end1;
+    BamAlignment _end2;
 
-	string _fastq1, _fastq2;	// the names of the fastq output files
-	bool _useMateTags;			// whether or not the mate sequence should be 
-								// extracted from the R2 BAM tag.
+    string _fastq1, _fastq2;    // the names of the fastq output files
+    bool _useMateTags;          // whether or not the mate sequence should be 
+                                // extracted from the R2 BAM tag.
     bool _pairedEnd;
 };

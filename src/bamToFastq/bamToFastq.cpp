@@ -176,6 +176,8 @@ void BamToFastq::PairedFastqUseTags() {
             // since the info for both ends are contained in each BAM record,
             // we only need to process one of the two records (bam1) in order
             // to produce FASTQ entries for both ends.
+            // NOTE: Assumes that R2 and Q2 have already been rev 
+            //      and revcomped if necessary
             if (bam1.IsFirstMate() == true) {
                 // end1
                 fq1 << "@" << bam1.Name << "/1" << endl;
