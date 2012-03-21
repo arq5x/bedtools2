@@ -2,6 +2,7 @@
 # BEDTools Makefile
 # (c) 2009 Aaron Quinlan
 # ==========================
+
 SHELL := /bin/bash -e
 
 VERSION_FILE=./src/utils/version/version_git.h
