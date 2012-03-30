@@ -53,7 +53,7 @@ def main():
         
         script = open('bin/'  + old, 'w')
         script.write("#!/bin/sh\n")
-        script.write("bedtools " + new + " \"$@\"\n")
+        script.write("${0%/*}/bedtools " + new + " \"$@\"\n")
         script.close()
 
 if __name__ == "__main__":
