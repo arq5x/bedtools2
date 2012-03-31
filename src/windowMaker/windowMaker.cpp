@@ -51,7 +51,7 @@ void WindowMaker::MakeWindowsFromGenome(const string& genomeFileName) {
     for (size_t c = 0; c < chromList.size(); ++c) {
         string chrom = chromList[c];
 
-        BED bed(chrom,0,_genome->getChromSize(chrom));
+        BED bed(chrom,0,_genome->getChromSize(chrom),chrom,"","");
         MakeBEDWindow(bed);
     }
 }
