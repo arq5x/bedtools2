@@ -247,7 +247,7 @@ void ConvertBedToBam(const BED &bed, BamAlignment &bam, map<string, int, std::le
     else{
 
         // does it smell like BED12?  if so, process it.
-        if (bed.fields.size() == 6) {
+        if (bed.fields.size() == 12) {
 
             // extract the relevant BED fields to convert BED12 to BAM
             // namely: blockCount, blockStarts, blockEnds
@@ -344,9 +344,9 @@ int bedtobam_reg2bin(int beg, int end) {
     --end;
     if (beg>>14 == end>>14) return ((1<<15)-1)/7 + (beg>>14);
     if (beg>>17 == end>>17) return ((1<<12)-1)/7 + (beg>>17);
-    if (beg>>20 == end>>20) return ((1<<9)-1)/7 + (beg>>20);
-    if (beg>>23 == end>>23) return ((1<<6)-1)/7 + (beg>>23);
-    if (beg>>26 == end>>26) return ((1<<3)-1)/7 + (beg>>26);
+    if (beg>>20 == end>>20) return ((1<<9)-1)/7  + (beg>>20);
+    if (beg>>23 == end>>23) return ((1<<6)-1)/7  + (beg>>23);
+    if (beg>>26 == end>>26) return ((1<<3)-1)/7  + (beg>>26);
     return 0;
 }
 
