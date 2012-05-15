@@ -380,7 +380,7 @@ void ReportSummary(const vector<string> &group, const vector<vector<string> > &d
     vector<string> result;
     for( size_t i = 0; i < data.size(); i++ ) {
 
-        if (data[i].size() == 0)
+        if (data[i].empty())
             continue;
             
         string op = ops[i];
@@ -445,7 +445,7 @@ void ReportSummary(const vector<string> &group, const vector<vector<string> > &d
             result.push_back(buffer.str());
         }
     }
-    if (result.size() > 0) {
+    if (!result.empty()) {
         for_each(group.begin(), group.end(), TabPrintPost);
         cout << *result.begin();
         for_each(++result.begin(), result.end(), TabPrintPre);
