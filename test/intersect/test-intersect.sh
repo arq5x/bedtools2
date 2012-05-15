@@ -254,4 +254,25 @@ check obs exp
 rm obs exp
 
 
+
+##################################################################
+#  Test that only the mapped read is is found as an intersection
+##################################################################
+echo "    intersect.t23...\c"
+echo \
+"mapped	16	chr1	1	40	30M	*	0	0	GAAGGCCACCGCCGCGGTTATTTTCCTTCA	CCCDDB?=FJIIJIGFJIJHIJJJJJJJJI	MD:Z:50" > exp
+samtools view -Sb mapped_and_unmapped.sam 2>/dev/null | $BT intersect -abam - -b a.bed | samtools view - > obs 
+check obs exp
+rm obs exp
+
+##################################################################
+#  Test that an unmapped read is handled properly with -v
+##################################################################
+echo "    intersect.t24...\c"
+echo \
+"umapped	4	*	1	40	30M	*	0	0	GAAGGCCACCGCCGCGGTTATTTTCCTTCA	CCCDDB?=FJIIJIGFJIJHIJJJJJJJJI	MD:Z:50" > exp
+samtools view -Sb mapped_and_unmapped.sam 2>/dev/null | $BT intersect -abam - -b a.bed -v | samtools view - > obs 
+check obs exp
+rm obs exp
+
 rm *.bam

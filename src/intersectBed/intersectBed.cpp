@@ -323,12 +323,12 @@ void BedIntersect::IntersectBam(string bamFile) {
     // get each set of alignments for each pair.
     while (reader.GetNextAlignment(bam)) {
 
-        // BAM IsMapped() is false
-        if ((!bam.IsMapped()) && (_noHit == true))
-            writer.SaveAlignment(bam);
-        else if (!bam.IsMapped())
+        // save an unaligned read if -v
+        if (!bam.IsMapped()) {
+            if (_noHit == true)
+                writer.SaveAlignment(bam);
             continue;
-
+        }   
         // break alignment into discrete blocks,
         bedVector bed_blocks;
         string chrom = refs.at(bam.RefID).RefName;
