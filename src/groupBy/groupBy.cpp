@@ -380,6 +380,9 @@ void ReportSummary(const vector<string> &group, const vector<vector<string> > &d
     vector<string> result;
     for( size_t i = 0; i < data.size(); i++ ) {
 
+        if (data[i].size() == 0)
+            continue;
+            
         string op = ops[i];
         std::stringstream buffer;
         VectorOps vo(data[i]);
@@ -442,10 +445,12 @@ void ReportSummary(const vector<string> &group, const vector<vector<string> > &d
             result.push_back(buffer.str());
         }
     }
-    for_each(group.begin(), group.end(), TabPrintPost);
-    cout << *result.begin();
-    for_each(++result.begin(), result.end(), TabPrintPre);
-    cout << endl; //Gets rid of extraneous tab
+    if (result.size() > 0) {
+        for_each(group.begin(), group.end(), TabPrintPost);
+        cout << *result.begin();
+        for_each(++result.begin(), result.end(), TabPrintPre);
+        cout << endl; //Gets rid of extraneous tab
+    }
 }
 
 
