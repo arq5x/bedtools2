@@ -7,6 +7,9 @@ cd bed12tobed6; sh test-bed12tobed6.sh; cd ..
 echo " Testing bedtools bamtobed:"
 cd bamtobed; sh test-bamtobed.sh; cd ..
 
+echo " Testing bedtools closest:"
+cd closest; sh test-closest.sh; cd ..
+
 echo " Testing bedtools cluster:"
 cd cluster; sh test-cluster.sh; cd ..
 

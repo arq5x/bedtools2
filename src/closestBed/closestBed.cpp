@@ -110,7 +110,7 @@ void BedClosest::FindWindowOverlaps(BED &a, vector<BED> &hits) {
                 }
                 // the hit is to the "left" of A
                 else if (h->end <= a.start) {
-                    curDistance = a.start - h->end;
+                    curDistance = (a.start - h->end) + 1;
                     if (_signDistance) {
                         if ((_strandedDistMode == "ref")
                                 || (_strandedDistMode == "a" && a.strand != "-")
@@ -146,7 +146,7 @@ void BedClosest::FindWindowOverlaps(BED &a, vector<BED> &hits) {
                 }
                 // the hit is to the "right" of A
                 else if (h->start >= a.end) {
-                    curDistance = h->start - a.end;
+                    curDistance = (h->start - a.end) + 1;
                     if (_signDistance) {
                         if ((_strandedDistMode == "a" && a.strand == "-")
                                 || (_strandedDistMode == "b" && h->strand != "-")) {
