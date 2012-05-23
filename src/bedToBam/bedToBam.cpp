@@ -173,7 +173,7 @@ void ProcessBed(BedFile *bed, GenomeFile *genome, bool isBED12, int mapQual, boo
     string    bamHeader;
     map<string, int, std::less<string> > chromToId;
     MakeBamHeader(genome->getGenomeFileName(), refs, bamHeader, chromToId);
-
+        
     // set compression mode
     BamWriter::CompressionMode compressionMode = BamWriter::Compressed;
     if ( uncompressedBam ) compressionMode = BamWriter::Uncompressed;
@@ -314,7 +314,9 @@ void MakeBamHeader(const string &genomeFile, RefVector &refs, string &header,
 
     int chromId = 0;
     vector<string> chromList = genome.getChromList();
-    sort(chromList.begin(), chromList.end());
+    // ARQ: 23-May-2012.  No need to sort. Allow genome file to
+    // drive the order of the chromosomes in the BAM header.
+    // sort(chromList.begin(), chromList.end());
 
     // create a BAM header (@SQ) entry for each chrom in the BEDTools genome file.
     vector<string>::const_iterator genomeItr  = chromList.begin();
