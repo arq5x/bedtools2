@@ -275,4 +275,36 @@ samtools view -Sb mapped_and_unmapped.sam 2>/dev/null | $BT intersect -abam - -b
 check obs exp
 rm obs exp
 
+##################################################################
+#  Test -c with BAM input
+##################################################################
+echo "    intersect.t25...\c"
+echo \
+"chr1	0	30	one_blocks	40	-	0	30	0,0,0	1	30,	0,	1" > exp
+$BT intersect -abam one_block.bam -b c.bed -c > obs
+check obs exp
+rm obs exp
+
+##################################################################
+#  Test -wo with BAM input
+##################################################################
+echo "    intersect.t26...\c"
+echo \
+"chr1	0	30	one_blocks	40	-	0	30	0,0,0	1	30,	0,	chr1	0	100	c1	1	+	30" > exp
+$BT intersect -abam one_block.bam -b c.bed -wo > obs
+check obs exp
+rm obs exp
+
+##################################################################
+#  Test -wao with BAM input
+##################################################################
+echo "    intersect.t27...\c"
+echo \
+"chr1	0	30	one_blocks	40	-	0	30	0,0,0	1	30,	0,	chr1	0	100	c1	1	+	30" > exp
+$BT intersect -abam one_block.bam -b c.bed -wo > obs
+check obs exp
+
+
+rm obs exp
+
 rm *.bam
