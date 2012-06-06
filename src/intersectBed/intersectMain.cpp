@@ -225,16 +225,9 @@ int intersect_main(int argc, char* argv[]) {
         cerr << endl << "*****" << endl << "*****WARNING: -loj is ignored with -abam" << endl << "*****" << endl;
     }
     
-    if (inputIsBam && writeCount) {
-        cerr << endl << "*****" << endl << "*****WARNING: -c is ignored with -abam" << endl << "*****" << endl;
-    }
-    
-    if (inputIsBam && writeOverlap) {
-        cerr << endl << "*****" << endl << "*****WARNING: -wo is ignored with -abam" << endl << "*****" << endl;
-    }
-    
-    if (inputIsBam && writeAllOverlap) {
-        cerr << endl << "*****" << endl << "*****WARNING: -wao is ignored with -abam" << endl << "*****" << endl;
+    if (outputIsBam && (writeCount || writeOverlap || writeAllOverlap)) 
+    {
+        outputIsBam = false;
     }
 
     if (!showHelp) {
