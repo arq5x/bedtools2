@@ -229,7 +229,10 @@ void ConvertBamToBed(const string &bamFile, bool useEditDistance, const string &
                      bool useCigar,   bool useNovoalign, bool useBWA) {
     // open the BAM file
     BamReader reader;
-    reader.Open(bamFile);
+    if (!reader.Open(bamFile)) {
+        cerr << "Failed to open BAM file " << bamFile << endl;
+        exit(1);
+    }
 
     // get header & reference information
     string header = reader.GetHeaderText();
@@ -257,7 +260,10 @@ void ConvertBamToBed(const string &bamFile, bool useEditDistance, const string &
 void ConvertBamToBedpe(const string &bamFile, const bool &useEditDistance) {
     // open the BAM file
     BamReader reader;
-    reader.Open(bamFile);
+    if (!reader.Open(bamFile)) {
+        cerr << "Failed to open BAM file " << bamFile << endl;
+        exit(1);
+    }
 
     // get header & reference information
     string header = reader.GetHeaderText();
