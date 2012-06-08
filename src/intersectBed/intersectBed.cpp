@@ -325,7 +325,7 @@ void BedIntersect::IntersectBam(string bamFile) {
 
         // save an unaligned read if -v
         if (!bam.IsMapped()) {
-            if (_noHit == true)
+            if ((_noHit == true) && (_bamOutput == true))
                 writer.SaveAlignment(bam);
             continue;
         }   
