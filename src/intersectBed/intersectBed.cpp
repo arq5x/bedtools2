@@ -152,7 +152,7 @@ bool BedIntersect::FindBlockedOverlaps(const BED &a, const vector<BED> &a_blocks
             }
         }
         if (valid_hit) {
-            // require sufficint overlap fraction (reciprocal or otherwise)
+            // require sufficient overlap fraction (reciprocal or otherwise)
             // w.r.t to the "footprint" (i.e., the total length of each block)
             if ( ((float) total_overlap / (float) a_footprint) > _overlapFraction) {
                 if (_reciprocal && ((float) total_overlap / (float) b_footprint) > _overlapFraction) {
@@ -251,7 +251,7 @@ void BedIntersect::IntersectBed() {
                     // find the hits that overlap with the full span of the blocked BED
                     _bedB->allHits(a.chrom, a.start, a.end, a.strand,
                                    hits, _sameStrand, _diffStrand,
-                                   _overlapFraction, _reciprocal);
+                                   0.0, false);
                     // break a into discrete blocks, as we need to 
                     // measure overlap with the individual blocks, not the full span.
                     bedVector a_blocks; 
