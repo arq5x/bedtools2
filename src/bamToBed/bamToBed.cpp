@@ -350,10 +350,15 @@ void PrintBed(const BamAlignment &bam,  const RefVector &refs, bool useEditDista
                 }
             }
             else if (useEditDistance == false && bamTag != "") {
-                int32_t tagValue;
-                if (bam.GetTag(bamTag, tagValue)) {
+                uint32_t uTagValue;
+                int32_t sTagValue;
+                if (bam.GetTag(bamTag, uTagValue)) {
                     printf("%s\t%d\t%d\t\%s\t%d\t%s", refs.at(bam.RefID).RefName.c_str(), bam.Position,
-                                                  alignmentEnd, name.c_str(), tagValue, strand.c_str());
+                                                  alignmentEnd, name.c_str(), uTagValue, strand.c_str());
+                }
+                else if (bam.GetTag(bamTag, sTagValue)) {
+                    printf("%s\t%d\t%d\t\%s\t%d\t%s", refs.at(bam.RefID).RefName.c_str(), bam.Position,
+                                                  alignmentEnd, name.c_str(), sTagValue, strand.c_str());
                 }
                 else {
                     cerr << "The requested tag (" << bamTag << ") was not found in the BAM file.  Exiting\n";
