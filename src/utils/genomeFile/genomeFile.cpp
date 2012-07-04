@@ -53,8 +53,7 @@ void GenomeFile::loadGenomeFileIntoMap() {
 
         // ignore a blank line
         if (genomeFields.size() > 0) {
-            if (genomeFields[0].find("#") == string::npos) {
-
+            if (genomeFields[0].find("#") != 0) {
                 // we need at least 2 columns
                 if (genomeFields.size() >= 2) {
                     char *p2End;
