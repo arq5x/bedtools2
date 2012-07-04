@@ -286,6 +286,7 @@ void ConvertBamToBedpe(const string &bamFile, const bool &useEditDistance) {
                 bam1 = bam2;
                 reader.GetNextAlignment(bam2);
             }
+            PrintBedPE(bam1, bam2, refs, useEditDistance);
         }
         else if (bam1.IsPaired() && bam2.IsPaired()) {
             PrintBedPE(bam1, bam2, refs, useEditDistance);
