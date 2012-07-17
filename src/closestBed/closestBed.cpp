@@ -21,9 +21,12 @@ const int SLOPGROWTH = 2048000;
 /*
     Constructor
 */
-BedClosest::BedClosest(string &bedAFile, string &bedBFile, bool sameStrand, bool diffStrand,
-                       string &tieMode, bool reportDistance, bool signDistance, string &_strandedDistMode,
-                       bool ignoreOverlaps, bool ignoreUpstream, bool ignoreDownstream, bool printHeader) 
+BedClosest::BedClosest(string &bedAFile, string &bedBFile, bool sameStrand,
+                       bool diffStrand, string &tieMode, bool reportDistance,
+                       bool signDistance, string &_strandedDistMode, 
+                       bool ignoreOverlaps, bool ignoreUpstream, 
+                       bool ignoreDownstream, bool printHeader,
+                       bool diffNames) 
     : _bedAFile(bedAFile)
     , _bedBFile(bedBFile)
     , _tieMode(tieMode)
@@ -36,6 +39,7 @@ BedClosest::BedClosest(string &bedAFile, string &bedBFile, bool sameStrand, bool
     , _ignoreUpstream(ignoreUpstream)
     , _ignoreDownstream(ignoreDownstream)
     , _printHeader(printHeader)
+    , _diffNames(diffNames)
 {
     _bedA           = new BedFile(_bedAFile);
     _bedB           = new BedFile(_bedBFile);
@@ -91,6 +95,10 @@ void BedClosest::FindWindowOverlaps(BED &a, vector<BED> &hits) {
             vector<BED>::const_iterator h = hits.begin();
             vector<BED>::const_iterator hitsEnd = hits.end();
             for (; h != hitsEnd; ++h) {
+                
+                // skip the hit if the user doesn't want to allow same names.
+                if ((_diffNames == true) && (a.name == h->name))
+                    continue;
 
                 // do the actual features overlap?
                 int s = max(a.start, h->start);

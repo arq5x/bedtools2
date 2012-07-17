@@ -59,3 +59,25 @@ echo \
 $BT closest -a b-one-bp-closer.bed -b a.bed -d > obs
 check obs exp
 rm obs exp
+
+###########################################################
+# test closest without forcing different names ( -N )
+###########################################################
+echo "    closest.t5...\c"
+echo \
+"chr1	10	20	break1	chr1	40	50	break1	21
+chr1	55	58	break2	chr1	60	70	break2	3" > exp
+$BT closest -a a.names.bed -b b.names.bed -d > obs
+check obs exp
+rm obs exp
+
+###########################################################
+# test closest with forcing different names ( -N )
+###########################################################
+echo "    closest.t6...\c"
+echo \
+"chr1	10	20	break1	chr1	60	70	break2	41
+chr1	55	58	break2	chr1	40	50	break1	6" > exp
+$BT closest -a a.names.bed -b b.names.bed -d -N > obs
+check obs exp
+rm obs exp

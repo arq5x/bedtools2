@@ -45,7 +45,8 @@ int closest_main(int argc, char* argv[]) {
     bool reportDistance = false;
     bool signDistance   = false;
     bool haveStrandedDistMode = false;
-    bool printHeader        = false;
+    bool printHeader    = false;
+    bool diffNames      = false;
 
 
     // check to see if we should print out some help
@@ -108,6 +109,9 @@ int closest_main(int argc, char* argv[]) {
         else if (PARAMETER_CHECK("-id", 3, parameterLength)) {
             ignoreDownstream = true;
         }
+        else if (PARAMETER_CHECK("-N", 2, parameterLength)) {
+            diffNames = true;
+        }
         else if (PARAMETER_CHECK("-t", 2, parameterLength)) {
             if ((i+1) < argc) {
                 haveTieMode = true;
@@ -161,8 +165,10 @@ int closest_main(int argc, char* argv[]) {
     if (!showHelp) {
         BedClosest *bc = new BedClosest(bedAFile, bedBFile, sameStrand, 
                                         diffStrand, tieMode, reportDistance, 
-                                        signDistance, strandedDistMode, ignoreOverlaps,
-                                        ignoreUpstream, ignoreDownstream, printHeader);
+                                        signDistance, strandedDistMode,
+                                        ignoreOverlaps, ignoreUpstream,
+                                        ignoreDownstream, printHeader,
+                                        diffNames);
         delete bc;
     }
     else {
@@ -223,6 +229,9 @@ void closest_help(void) {
     cerr                        << "\t\t- \"all\"    Report all ties (default)." << endl;
     cerr                        << "\t\t- \"first\"  Report the first tie that occurred in the B file." << endl;
     cerr                        << "\t\t- \"last\"   Report the last tie that occurred in the B file." << endl << endl;
+    
+    cerr << "\t-N\t"            << "Require that the query and the closest hit have different names." << endl;
+    cerr                        << "\t\tFor BED, the 4th column is compared." << endl << endl;
     
     cerr << "\t-header\t"       << "Print the header from the A file prior to results." << endl << endl;
 

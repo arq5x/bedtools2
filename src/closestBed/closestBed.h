@@ -31,7 +31,7 @@ public:
                bool sameStrand, bool diffStrand, string &tieMode, 
                bool reportDistance, bool signDistance, string &strandedDistMode,
                bool ignoreOverlaps, bool ignoreUpstream, bool ignoreDownstream,
-               bool printHeader);
+               bool printHeader, bool diffNames);
 
     // destructor
     ~BedClosest(void);
@@ -54,6 +54,7 @@ private:
     bool   _ignoreUpstream;
     bool   _ignoreDownstream;
     bool   _printHeader;
+    bool   _diffNames;
 
     BedFile *_bedA, *_bedB;
 
