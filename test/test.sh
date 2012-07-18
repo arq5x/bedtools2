@@ -36,3 +36,6 @@ cd merge; sh test-merge.sh; cd ..
 
 echo " Testing bedtools slop:"
 cd slop; sh test-slop.sh; cd ..
+
+echo " Testing bedtools subtract:"
+cd subtract; sh test-subtract.sh; cd ..

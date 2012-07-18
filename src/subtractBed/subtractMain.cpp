@@ -19,7 +19,9 @@ using namespace std;
 
 
 // define our parameter checking macro
-#define PARAMETER_CHECK(param, paramLen, actualLen) (strncmp(argv[i], param, min(actualLen, paramLen))== 0) && (actualLen == paramLen)
+#define PARAMETER_CHECK(param, paramLen, actualLen) \
+        (strncmp(argv[i], param, min(actualLen, paramLen))== 0) && \
+        (actualLen == paramLen)
 
 // function declarations
 void subtract_help(void);
@@ -41,6 +43,7 @@ int subtract_main(int argc, char* argv[]) {
     bool haveFraction = false;
     bool sameStrand = false;
     bool diffStrand = false;
+    bool removeAll = false;
 
     // check to see if we should print out some help
     if(argc <= 1) showHelp = true;
@@ -88,26 +91,37 @@ int subtract_main(int argc, char* argv[]) {
         else if (PARAMETER_CHECK("-S", 2, parameterLength)) {
             diffStrand = true;
         }
+        else if (PARAMETER_CHECK("-A", 2, parameterLength)) {
+            removeAll = true;
+        }
         else {
-            cerr << endl << "*****ERROR: Unrecognized parameter: " << argv[i] << " *****" << endl << endl;
+            cerr << endl 
+                    << "*****ERROR: Unrecognized parameter: " 
+                    << argv[i] << " *****" << endl << endl;
             showHelp = true;
         }
     }
 
     // make sure we have both input files
     if (!haveBedA || !haveBedB) {
-        cerr << endl << "*****" << endl << "*****ERROR: Need -a and -b files. " << endl << "*****" << endl;
+        cerr << endl << "*****" << endl 
+                << "*****ERROR: Need -a and -b files. " 
+                << endl << "*****" << endl;
         showHelp = true;
     }
     
     if (sameStrand && diffStrand) {
-        cerr << endl << "*****" << endl << "*****ERROR: Request either -s OR -S, not both." << endl << "*****" << endl;
+        cerr << endl << "*****" << endl 
+                << "*****ERROR: Request either -s OR -S, not both." 
+                << endl << "*****" << endl;
         showHelp = true;
     }
 
     if (!showHelp) {
 
-        BedSubtract *bs = new BedSubtract(bedAFile, bedBFile, overlapFraction, sameStrand, diffStrand);
+        BedSubtract *bs = new BedSubtract(bedAFile, bedBFile, 
+                                          overlapFraction, sameStrand,
+                                          diffStrand, removeAll);
         delete bs;
         return 0;
     }
@@ -138,6 +152,10 @@ void subtract_help(void) {
     cerr << "\t-S\t"            << "Force strandedness.  That is, only subtract hits in B that" << endl;
     cerr                        << "\t\toverlap A on the _opposite_ strand." << endl;
     cerr                        << "\t\t- By default, overlaps are subtracted without respect to strand." << endl << endl;
+    
+    cerr << "\t-A\t"            << "Remove entire feature if any overlap.  That is, by default," << endl;
+    cerr                        << "\t\tonly subtract the portion of A that overlaps B. Here, if" << endl;
+    cerr                        << "\t\tany overlap is found (or -f amount), the entire feature is removed." << endl << endl;
 
     // end the program here
     exit(1);

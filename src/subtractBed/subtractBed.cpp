@@ -16,17 +16,18 @@
 /*
     Constructor
 */
-BedSubtract::BedSubtract(string &bedAFile, string &bedBFile, float overlapFraction, bool sameStrand, bool diffStrand) {
-
-    _bedAFile = bedAFile;
-    _bedBFile = bedBFile;
-    _overlapFraction = overlapFraction;
-    _sameStrand = sameStrand;
-    _diffStrand = diffStrand;
-
+BedSubtract::BedSubtract(string &bedAFile, string &bedBFile, 
+                         float overlapFraction, bool sameStrand, 
+                         bool diffStrand, bool removeAll)
+    : _bedAFile(bedAFile)
+    , _bedBFile(bedBFile)
+    , _overlapFraction(overlapFraction)
+    , _sameStrand(sameStrand)
+    , _diffStrand(diffStrand)
+    , _removeAll(removeAll)
+{
     _bedA = new BedFile(bedAFile);
     _bedB = new BedFile(bedBFile);
-
     SubtractBed();
 }
 
@@ -48,7 +49,7 @@ void BedSubtract::FindAndSubtractOverlaps(BED &a, vector<BED> &hits) {
     //  if so, A should not be reported.
     int numConsumedByB = 0;
     int numOverlaps = 0;
-    vector<BED> bOverlaps;  // list of hits in B.  Special processing if there are multiple.
+    vector<BED> bOverlaps;  // list of hits in B.  Special proc. if multiple.
 
     vector<BED>::const_iterator h = hits.begin();
     vector<BED>::const_iterator hitsEnd = hits.end();
@@ -56,8 +57,8 @@ void BedSubtract::FindAndSubtractOverlaps(BED &a, vector<BED> &hits) {
 
         int s = max(a.start, h->start);
         int e = min(a.end, h->end);
-        int overlapBases = (e - s);             // the number of overlapping bases b/w a and b
-        int aLength = (a.end - a.start);        // the length of a in b.p.
+        int overlapBases = (e - s);
+        int aLength = (a.end - a.start);
 
         if (s < e) {
 
@@ -84,7 +85,7 @@ void BedSubtract::FindAndSubtractOverlaps(BED &a, vector<BED> &hits) {
         // entry in bOverlaps.
 
         // if A was not "consumed" by any entry in B
-        if (numConsumedByB == 0) {
+        if ((numConsumedByB == 0) && (_removeAll == false)) {
 
             BED theHit = bOverlaps[0];
 
@@ -122,9 +123,12 @@ void BedSubtract::FindAndSubtractOverlaps(BED &a, vector<BED> &hits) {
 
         vector<bool> aKeep(a.end - a.start, true);
 
-        if (numConsumedByB == 0) {
+        if ((numConsumedByB == 0) && (_removeAll == false)) {
             // track the number of hit starts and ends at each position in A
-            for (vector<BED>::iterator h = bOverlaps.begin(); h != bOverlaps.end(); ++h) {
+            for (vector<BED>::iterator h = bOverlaps.begin(); 
+                 h != bOverlaps.end();
+                 ++h)
+            {
                 int s = max(a.start, h->start);
                 int e = min(a.end, h->end);
 
