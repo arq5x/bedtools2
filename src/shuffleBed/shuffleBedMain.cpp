@@ -44,6 +44,7 @@ int shuffle_main(int argc, char* argv[]) {
     int seed              = -1;
     bool sameChrom        = false;
     bool chooseChrom      = false;
+    bool isBedpe          = false;
 
 
     for(int i = 1; i < argc; i++) {
@@ -110,6 +111,9 @@ int shuffle_main(int argc, char* argv[]) {
                 i++;
             }
         }
+        else if(PARAMETER_CHECK("-bedpe", 6, parameterLength)) {
+            isBedpe = true;
+        }
         else {
           cerr << endl << "*****ERROR: Unrecognized parameter: " << argv[i] << " *****" << endl << endl;
             showHelp = true;
@@ -128,9 +132,10 @@ int shuffle_main(int argc, char* argv[]) {
     }
 
     if (!showHelp) {
-        BedShuffle *bc = new BedShuffle(bedFile, genomeFile, excludeFile, includeFile, 
-                                        haveSeed, haveExclude, haveInclude, sameChrom, 
-                                        overlapFraction, seed, chooseChrom);
+        BedShuffle *bc = new BedShuffle(bedFile, genomeFile, excludeFile,
+                                        includeFile, haveSeed, haveExclude,
+                                        haveInclude, sameChrom, overlapFraction, 
+                                        seed, chooseChrom, isBedpe);
         delete bc;
         return 0;
     }
@@ -177,7 +182,9 @@ void shuffle_help(void) {
     cerr                            << "\t\tgenome (the default), first choose a chrom randomly, and then" << endl;
     cerr                            << "\t\tchoose a random start coordinate on that chrom.  This leads" << endl; 
     cerr                            << "\t\tto features being ~uniformly distributed among the chroms," << endl; 
-    cerr                            << "\t\tas opposed to features being distribute as a function of chrom size." << endl << endl; 
+    cerr                            << "\t\tas opposed to features being distribute as a function of chrom size." << endl << endl;
+    
+    cerr << "\t-bedpe\t"            << "Indicate that the A file is in BEDPE format." << endl << endl;
 
 
     cerr << "Notes: " << endl;

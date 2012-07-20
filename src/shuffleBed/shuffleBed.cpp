@@ -13,9 +13,12 @@
 #include "shuffleBed.h"
 
 
-BedShuffle::BedShuffle(string &bedFile, string &genomeFile, string &excludeFile, string &includeFile, 
-                       bool haveSeed, bool haveExclude, bool haveInclude, bool sameChrom, 
-                       float overlapFraction, int seed, bool chooseChrom) {
+BedShuffle::BedShuffle(string &bedFile, string &genomeFile, 
+                       string &excludeFile, string &includeFile, 
+                       bool haveSeed, bool haveExclude,
+                       bool haveInclude, bool sameChrom, 
+                       float overlapFraction, int seed,
+                       bool chooseChrom, bool isBedpe) {
 
     _bedFile         = bedFile;
     _genomeFile      = genomeFile;
@@ -27,6 +30,7 @@ BedShuffle::BedShuffle(string &bedFile, string &genomeFile, string &excludeFile,
     _overlapFraction = overlapFraction;
     _haveSeed        = haveSeed;
     _chooseChrom     = chooseChrom;
+    _isBedpe         = isBedpe;
 
 
     // use the supplied seed for the random
@@ -41,8 +45,12 @@ BedShuffle::BedShuffle(string &bedFile, string &genomeFile, string &excludeFile,
         _seed = (unsigned)time(0)+(unsigned)getpid();
         srand(_seed);
     }
+    
+    if (_isBedpe == false)
+        _bed         = new BedFile(bedFile);
+    else
+        _bedpe       = new BedFilePE(bedFile);
 
-    _bed         = new BedFile(bedFile);
     _genome      = new GenomeFile(genomeFile);
     _chroms      = _genome->getChromList();
     _numChroms   = _genome->getNumberOfChroms();
@@ -81,49 +89,129 @@ BedShuffle::~BedShuffle(void) {
 
 
 void BedShuffle::Shuffle() {
-    BED bedEntry;
-    _bed->Open();
-    while (_bed->GetNextBed(bedEntry)) {
-        if (_bed->_status == BED_VALID) {
-            ChooseLocus(bedEntry);
-            _bed->reportBedNewLine(bedEntry);
+    
+    if (_isBedpe == false) {
+        BED bedEntry;
+        _bed->Open();
+        while (_bed->GetNextBed(bedEntry)) {
+            if (_bed->_status == BED_VALID) {
+                ChooseLocus(bedEntry);
+                _bed->reportBedNewLine(bedEntry);
+            }
         }
+        _bed->Close();
     }
-    _bed->Close();
+    // BEDPE input
+    else {
+        int lineNum = 0;     // current input line number
+        BedLineStatus status;
+
+        BEDPE bedEntry;
+        _bedpe->Open();
+        while ((status = _bedpe->GetNextBedPE(bedEntry, lineNum)) != BED_INVALID) 
+        {
+            if (status == BED_VALID) {
+                ChoosePairedLocus(bedEntry);
+                _bedpe->reportBedPENewLine(bedEntry);
+            }
+        }
+        _bedpe->Close();
+    }
 }
 
 
 
 void BedShuffle::ShuffleWithExclusions() {
 
-    BED bedEntry;
-    _bed->Open();
-    while (_bed->GetNextBed(bedEntry)) {
-        if (_bed->_status == BED_VALID) {
-            // keep looking as long as the chosen
-            // locus happens to overlap with regions
-            // that the user wishes to exclude.
-            int  tries = 0;
-            bool haveOverlap = false;
-            do 
-            {
-                // choose a new locus
-                ChooseLocus(bedEntry);
-                haveOverlap = _exclude->anyHits(bedEntry.chrom, bedEntry.start, bedEntry.end,
-                                                bedEntry.strand, false, false, _overlapFraction, false);
-                tries++;
-            } while ((haveOverlap == true) && (tries <= MAX_TRIES));
+    if (_isBedpe == false) {
+        BED bedEntry;
+        _bed->Open();
+        while (_bed->GetNextBed(bedEntry)) {
+            if (_bed->_status == BED_VALID) {
+                // keep looking as long as the chosen
+                // locus happens to overlap with regions
+                // that the user wishes to exclude.
+                int  tries = 0;
+                bool haveOverlap = false;
+                do 
+                {
+                    // choose a new locus
+                    ChooseLocus(bedEntry);
+                    haveOverlap = _exclude->anyHits(bedEntry.chrom, 
+                                                    bedEntry.start, 
+                                                    bedEntry.end,
+                                                    bedEntry.strand, 
+                                                    false, false, 
+                                                    _overlapFraction, false);
+                    tries++;
+                } while ((haveOverlap == true) && (tries <= MAX_TRIES));
             
 
-            if (tries > MAX_TRIES) {
-                cerr << "Error, line " << _bed->_lineNum << ": tried " << MAX_TRIES << " potential loci for entry, but could not avoid excluded regions.  Ignoring entry and moving on." << endl;
-            }
-            else {
-                _bed->reportBedNewLine(bedEntry);
+                if (tries > MAX_TRIES) {
+                    cerr << "Error, line " << _bed->_lineNum 
+                         << ": tried " << MAX_TRIES 
+                         << " potential loci for entry, but could not avoid "
+                         << "excluded regions.  Ignoring entry and moving on." 
+                         << endl;                }
+                else {
+                    _bed->reportBedNewLine(bedEntry);
+                }
             }
         }
+        _bed->Close();
     }
-    _bed->Close();
+    // BEDPE input
+    else {
+        int lineNum = 0;     // current input line number
+        BedLineStatus status;
+
+        BEDPE bedEntry;
+        _bedpe->Open();
+        while ((status = _bedpe->GetNextBedPE(bedEntry, lineNum)) != BED_INVALID) 
+        {
+            if (status == BED_VALID) {
+                // keep looking as long as the chosen
+                // locus happens to overlap with regions
+                // that the user wishes to exclude.
+                int  tries = 0;
+                bool haveOverlap1 = false;
+                bool haveOverlap2 = false;
+                do 
+                {
+                    // choose a new locus
+                    ChoosePairedLocus(bedEntry);
+                    haveOverlap1 = _exclude->anyHits(bedEntry.chrom1, 
+                                                     bedEntry.start1, 
+                                                     bedEntry.end1,
+                                                     bedEntry.strand1, 
+                                                     false, false, 
+                                                     _overlapFraction, false);
+
+                    haveOverlap2 = _exclude->anyHits(bedEntry.chrom2, 
+                                                     bedEntry.start2, 
+                                                     bedEntry.end2,
+                                                     bedEntry.strand2, 
+                                                     false, false, 
+                                                     _overlapFraction, false);
+                    tries++;
+                } while (((haveOverlap1 == true) || (haveOverlap2 == true))
+                        && (tries <= MAX_TRIES));
+                
+                if (tries > MAX_TRIES) {
+                    cerr << "Error, line " << _bed->_lineNum 
+                         << ": tried " << MAX_TRIES 
+                         << " potential loci for entry, but could not avoid "
+                         << "excluded regions.  Ignoring entry and moving on." 
+                         << endl;
+                }
+                else {
+                    _bedpe->reportBedPENewLine(bedEntry);
+                }
+                
+            }
+        }
+        _bedpe->Close();
+    }
 }
 
 
@@ -198,6 +286,58 @@ void BedShuffle::ChooseLocus(BED &bedEntry) {
 }
 
 
+void BedShuffle::ChoosePairedLocus(BEDPE &b) {
+    
+    CHRPOS foot1_len = b.end1 - b.start1;
+    CHRPOS foot2_len = b.end2 - b.start2;
+    CHRPOS length    = b.end2 - b.start1;
+
+    if (b.chrom1 == b.chrom2)
+    {
+        CHRPOS chromSize;
+        do 
+        {
+            uint32_t randStart = ((rand() << 31) | rand()) % _genomeSize;
+            pair<string, int> location = _genome->projectOnGenome(randStart);
+            b.chrom1  = location.first;
+            b.chrom2  = location.first;
+            b.start1  = location.second;
+            b.end1    = b.start1 + foot1_len;
+            b.end2    = b.start1 + length;
+            b.start2  = b.end2 - foot2_len;
+            chromSize      = _genome->getChromSize(location.first);
+        } while ((b.end1 > chromSize) || 
+                (b.start2 > chromSize) ||
+                (b.end2 > chromSize));
+        // keep looking if we have exceeded the end of the chrom.
+    }
+    else
+    {
+        CHRPOS chromSize1, chromSize2;
+        do 
+        {
+            uint32_t rand1Start = ((rand() << 31) | rand()) % _genomeSize;
+            uint32_t rand2Start = ((rand() << 31) | rand()) % _genomeSize;
+            pair<string, int> location1 = _genome->projectOnGenome(rand1Start);
+            pair<string, int> location2 = _genome->projectOnGenome(rand2Start);
+            
+            b.chrom1  = location1.first;
+            b.chrom2  = location2.first;
+            b.start1  = location1.second;
+            b.start2  = location2.second;
+            
+            b.end1    = b.start1 + foot1_len;
+            b.end2    = b.start2 + foot2_len;
+            chromSize1      = _genome->getChromSize(location1.first);
+            chromSize2      = _genome->getChromSize(location2.first);
+            
+        } while ((b.end1 > chromSize1) || 
+                (b.end2 > chromSize2));
+        // keep looking if we have exceeded the end of the chrom.
+    }
+}
+
+
 void BedShuffle::ChooseLocusFromInclusionFile(BED &bedEntry) {
 
     string chrom    = bedEntry.chrom;
@@ -238,4 +378,3 @@ void BedShuffle::ChooseLocusFromInclusionFile(BED &bedEntry) {
         ChooseLocusFromInclusionFile(bedEntry);
     }
 }
-

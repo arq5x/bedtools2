@@ -10,6 +10,7 @@
   Licenced under the GNU General Public License 2.0 license.
 ******************************************************************************/
 #include "bedFile.h"
+#include "bedFilePE.h"
 #include "genomeFile.h"
 
 #include <vector>
@@ -34,9 +35,12 @@ class BedShuffle {
 public:
 
     // constructor
-    BedShuffle(string &bedFile, string &genomeFile, string &excludeFile, string &includeFile, 
-                           bool haveSeed, bool haveExclude, bool haveInclude, bool sameChrom, 
-                           float overlapFraction, int seed, bool chooseChrom);
+    BedShuffle(string &bedFile, string &genomeFile, 
+               string &excludeFile, string &includeFile, 
+               bool haveSeed, bool haveExclude, 
+               bool haveInclude, bool sameChrom, 
+               float overlapFraction, int seed, 
+               bool chooseChrom, bool isBedpe);
 
     // destructor
     ~BedShuffle(void);
@@ -54,10 +58,12 @@ private:
     bool _haveInclude;
     bool _haveSeed;
     bool _chooseChrom;
+    bool _isBedpe;
 
 
     // The BED file from which to compute coverage.
     BedFile *_bed;
+    BedFilePE *_bedpe;
     BedFile *_exclude;
     BedFile *_include;
 
@@ -76,4 +82,6 @@ private:
 
     void ChooseLocus(BED &);
     void ChooseLocusFromInclusionFile(BED &);
+    
+    void ChoosePairedLocus(BEDPE &b);
 };
