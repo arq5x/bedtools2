@@ -106,7 +106,7 @@ void BedShuffle::Shuffle() {
         int lineNum = 0;     // current input line number
         BedLineStatus status;
 
-        BEDPE bedEntry;
+        BEDPE bedEntry, nullBedPE;
         _bedpe->Open();
         while ((status = _bedpe->GetNextBedPE(bedEntry, lineNum)) != BED_INVALID) 
         {
@@ -114,6 +114,7 @@ void BedShuffle::Shuffle() {
                 ChoosePairedLocus(bedEntry);
                 _bedpe->reportBedPENewLine(bedEntry);
             }
+            bedEntry = nullBedPE;
         }
         _bedpe->Close();
     }
@@ -201,7 +202,7 @@ void BedShuffle::ShuffleWithExclusions() {
                     cerr << "Error, line " << _bed->_lineNum 
                          << ": tried " << MAX_TRIES 
                          << " potential loci for entry, but could not avoid "
-                         << "excluded regions.  Ignoring entry and moving on." 
+                         << "excluded regions.  Ignoring entry and moving on."
                          << endl;
                 }
                 else {
