@@ -58,7 +58,7 @@ void BedRandom::Generate()
             // we need to combine two consective calls to rand()
             // because RAND_MAX is 2^31 (2147483648), whereas
             // mammalian genomes are obviously much larger.
-            uint32_t randStart = ((rand() << 31) | rand()) % genomeSize;
+            uint32_t randStart = ((((long) rand()) << 31) | rand()) % genomeSize;
             // use the above randomStart (e.g., for human 0..3.1billion) 
             // to identify the chrom and start on that chrom.
             pair<string, int> location = _genome->projectOnGenome(randStart);

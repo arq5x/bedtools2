@@ -250,7 +250,7 @@ void BedShuffle::ChooseLocus(BED &bedEntry) {
             // we need to combine two consective calls to rand()
             // because RAND_MAX is 2^31 (2147483648), whereas
             // mammalian genomes are obviously much larger.
-            uint32_t randStart = ((rand() << 31) | rand()) % _genomeSize;
+            uint32_t randStart = ((((long) rand()) << 31) | rand()) % _genomeSize;
             // use the above randomStart (e.g., for human 0..3.1billion) 
             // to identify the chrom and start on that chrom.
             pair<string, int> location = _genome->projectOnGenome(randStart);
@@ -298,7 +298,7 @@ void BedShuffle::ChoosePairedLocus(BEDPE &b) {
         CHRPOS chromSize;
         do 
         {
-            uint32_t randStart = ((rand() << 31) | rand()) % _genomeSize;
+            uint32_t randStart = ((((long) rand()) << 31) | rand()) % _genomeSize;
             pair<string, int> location = _genome->projectOnGenome(randStart);
             b.chrom1  = location.first;
             b.chrom2  = location.first;
@@ -317,8 +317,8 @@ void BedShuffle::ChoosePairedLocus(BEDPE &b) {
         CHRPOS chromSize1, chromSize2;
         do 
         {
-            uint32_t rand1Start = ((rand() << 31) | rand()) % _genomeSize;
-            uint32_t rand2Start = ((rand() << 31) | rand()) % _genomeSize;
+            uint32_t rand1Start = ((((long) rand()) << 31) | rand()) % _genomeSize;
+            uint32_t rand2Start = ((((long) rand()) << 31) | rand()) % _genomeSize;
             pair<string, int> location1 = _genome->projectOnGenome(rand1Start);
             pair<string, int> location2 = _genome->projectOnGenome(rand2Start);
             
