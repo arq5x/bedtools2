@@ -1,0 +1,203 @@
+\select@language {english}
+\contentsline {chapter}{\numberline {1}Overview}{1}{chapter.1}
+\contentsline {chapter}{\numberline {2}Table of contents}{3}{chapter.2}
+\contentsline {section}{\numberline {2.1}Overview}{3}{section.2.1}
+\contentsline {subsection}{\numberline {2.1.1}1.1 Background}{3}{subsection.2.1.1}
+\contentsline {subsection}{\numberline {2.1.2}1.2 Summary of available tools.}{3}{subsection.2.1.2}
+\contentsline {subsection}{\numberline {2.1.3}1.3 Fundamental concepts.}{4}{subsection.2.1.3}
+\contentsline {subsubsection}{1.3.1 What are genome features and how are they represented?}{4}{subsubsection*.3}
+\contentsline {subsubsection}{1.3.2 Overlapping / intersecting features.}{5}{subsubsection*.4}
+\contentsline {subsubsection}{1.3.3 Comparing features in file \IeC {\textquotedblleft }A\IeC {\textquotedblright } and file \IeC {\textquotedblleft }B\IeC {\textquotedblright }.}{5}{subsubsection*.5}
+\contentsline {subsubsection}{1.3.4 BED starts are zero-based and BED ends are one-based.}{5}{subsubsection*.6}
+\contentsline {subsubsection}{1.3.5 GFF starts and ends are one-based.}{5}{subsubsection*.7}
+\contentsline {subsubsection}{1.3.6 VCF coordinates are one-based.}{6}{subsubsection*.8}
+\contentsline {subsubsection}{1.3.7 File B is loaded into memory (most of the time).}{6}{subsubsection*.9}
+\contentsline {subsubsection}{1.3.8 Feature files \emph {must} be tab-delimited.}{6}{subsubsection*.10}
+\contentsline {subsubsection}{1.3.9 All BEDTools allow features to be \IeC {\textquotedblleft }piped\IeC {\textquotedblright } via standard input.}{6}{subsubsection*.11}
+\contentsline {subsubsection}{1.3.10 Most BEDTools write their results to standard output.}{6}{subsubsection*.12}
+\contentsline {subsubsection}{1.3.11 What is a \IeC {\textquotedblleft }genome\IeC {\textquotedblright } file?}{7}{subsubsection*.13}
+\contentsline {subsubsection}{1.3.12 Paired-end BED files (BEDPE files).}{7}{subsubsection*.14}
+\contentsline {subsubsection}{1.3.13 Use \IeC {\textquotedblleft }-h\IeC {\textquotedblright } for help with any BEDTool.}{7}{subsubsection*.15}
+\contentsline {subsubsection}{1.3.14 BED features must not contain negative positions.}{7}{subsubsection*.16}
+\contentsline {subsubsection}{1.3.15 The start position must be \textless {}= to the end position.}{7}{subsubsection*.17}
+\contentsline {subsubsection}{1.3.16 Headers are allowed in GFF and BED files}{7}{subsubsection*.18}
+\contentsline {subsubsection}{1.3.17 GZIP support: BED, GFF, VCF, and BEDPE file can be \IeC {\textquotedblleft }gzipped\IeC {\textquotedblright }}{8}{subsubsection*.19}
+\contentsline {subsubsection}{1.3.18 Support for \IeC {\textquotedblleft }split\IeC {\textquotedblright } or \IeC {\textquotedblleft }spliced\IeC {\textquotedblright } BAM alignments and \IeC {\textquotedblleft }blocked\IeC {\textquotedblright } BED features}{8}{subsubsection*.20}
+\contentsline {subsubsection}{1.3.19 Writing uncompressed BAM output.}{8}{subsubsection*.21}
+\contentsline {subsection}{\numberline {2.1.4}1.4 Implementation and algorithmic notes.}{8}{subsection.2.1.4}
+\contentsline {subsection}{\numberline {2.1.5}1.5 License and availability.}{9}{subsection.2.1.5}
+\contentsline {subsection}{\numberline {2.1.6}1.6 Mailing list.}{9}{subsection.2.1.6}
+\contentsline {subsection}{\numberline {2.1.7}1.7 Contributors.}{9}{subsection.2.1.7}
+\contentsline {section}{\numberline {2.2}Installation}{9}{section.2.2}
+\contentsline {section}{\numberline {2.3}Quick start}{9}{section.2.3}
+\contentsline {subsection}{\numberline {2.3.1}Install BEDTools}{9}{subsection.2.3.1}
+\contentsline {subsection}{\numberline {2.3.2}Use BEDTools}{10}{subsection.2.3.2}
+\contentsline {section}{\numberline {2.4}General usage}{10}{section.2.4}
+\contentsline {subsection}{\numberline {2.4.1}4.1 Supported file formats}{10}{subsection.2.4.1}
+\contentsline {subsubsection}{4.1.1 BED format}{10}{subsubsection*.22}
+\contentsline {subsubsection}{4.1.2 BEDPE format}{12}{subsubsection*.23}
+\contentsline {subsubsection}{4.1.3 GFF format}{13}{subsubsection*.24}
+\contentsline {subsubsection}{4.1.3 GFF format}{14}{subsubsection*.25}
+\contentsline {subsubsection}{4.1.5 SAM/BAM format}{15}{subsubsection*.26}
+\contentsline {subsubsection}{4.1.6 VCF format}{15}{subsubsection*.27}
+\contentsline {section}{\numberline {2.5}The BEDTools suite}{15}{section.2.5}
+\contentsline {subsection}{\numberline {2.5.1}Table of contents}{15}{subsection.2.5.1}
+\contentsline {subsubsection}{5.1 intersectBed}{15}{subsubsection*.28}
+\contentsline {paragraph}{5.1.1 Usage and option summary}{15}{paragraph*.29}
+\contentsline {paragraph}{5.1.2 Default behavior}{16}{paragraph*.30}
+\contentsline {paragraph}{5.1.3 (-wa)Reporting the original A feature}{17}{paragraph*.31}
+\contentsline {paragraph}{5.1.4 (-wb)Reporting the original B feature}{17}{paragraph*.32}
+\contentsline {paragraph}{5.1.5 (-u)Reporting the presence of \emph {at least one} overlapping feature}{18}{paragraph*.33}
+\contentsline {paragraph}{5.1.6 (-c)Reporting the number of overlapping features}{18}{paragraph*.34}
+\contentsline {paragraph}{5.1.6 (-c)Reporting the number of overlapping features}{18}{paragraph*.35}
+\contentsline {paragraph}{5.1.7 (-v)Reporting the absence of any overlapping features}{19}{paragraph*.36}
+\contentsline {paragraph}{5.1.8 (-f)Requiring a minimal overlap fraction}{19}{paragraph*.37}
+\contentsline {paragraph}{5.1.9 (-r, combined with -f)Requiring reciprocal minimal overlap fraction}{19}{paragraph*.38}
+\contentsline {paragraph}{5.1.10 (-s)Enforcing ``strandedness''}{20}{paragraph*.39}
+\contentsline {paragraph}{5.1.11 (-abam)Default behavior when using BAM input}{20}{paragraph*.40}
+\contentsline {paragraph}{5.1.12 (-bed)Output BED format when using BAM input}{20}{paragraph*.41}
+\contentsline {paragraph}{5.1.13 (-split)Reporting overlaps with spliced alignments or blocked BED features}{21}{paragraph*.42}
+\contentsline {subsubsection}{5.2 pairToBed}{22}{subsubsection*.43}
+\contentsline {paragraph}{5.2.1 Usage and option summary}{22}{paragraph*.44}
+\contentsline {paragraph}{5.2.2 Default behavior}{24}{paragraph*.45}
+\contentsline {paragraph}{5.2.3 (-type)Optional overlap requirements}{24}{paragraph*.46}
+\contentsline {paragraph}{5.2.4 (-f)Requiring a minimum overlap fraction}{27}{paragraph*.47}
+\contentsline {paragraph}{5.2.5 (-s)Enforcing ``strandedness''}{27}{paragraph*.48}
+\contentsline {paragraph}{5.2.6 (-abam)Default is to write BAM output when using BAM input}{28}{paragraph*.49}
+\contentsline {paragraph}{5.2.7 (-bedpe)Output BEDPE format when using BAM input}{28}{paragraph*.50}
+\contentsline {subsubsection}{5.3 pairToPair}{29}{subsubsection*.51}
+\contentsline {paragraph}{5.3.1 Usage and option summary}{29}{paragraph*.52}
+\contentsline {paragraph}{5.3.2 Default behavior}{29}{paragraph*.53}
+\contentsline {paragraph}{5.3.3 (-type neither)Optional overlap requirements}{30}{paragraph*.54}
+\contentsline {subsubsection}{5.4 bamToBed}{30}{subsubsection*.55}
+\contentsline {paragraph}{5.4.1 Usage and option summary}{30}{paragraph*.56}
+\contentsline {paragraph}{5.4.2 (-split)Creating BED12 features from ``spliced'' BAM entries.}{32}{paragraph*.57}
+\contentsline {subsubsection}{5.5 windowBed}{32}{subsubsection*.58}
+\contentsline {paragraph}{5.5.1 Usage and option summary}{32}{paragraph*.59}
+\contentsline {paragraph}{5.5.2 Default behavior}{33}{paragraph*.60}
+\contentsline {paragraph}{5.5.3 (-w)Defining a custom window size}{33}{paragraph*.61}
+\contentsline {paragraph}{5.5.4 (-l and -r)Defining assymteric windows}{34}{paragraph*.62}
+\contentsline {paragraph}{5.5.5 (-sw)Defining assymteric windows based on strand}{34}{paragraph*.63}
+\contentsline {paragraph}{5.5.6 (-sm)Enforcing ``strandedness''}{35}{paragraph*.64}
+\contentsline {paragraph}{5.5.7 (-u)Reporting the presence of at least one overlapping feature}{35}{paragraph*.65}
+\contentsline {paragraph}{5.5.8 (-c)Reporting the number of overlapping features}{35}{paragraph*.66}
+\contentsline {paragraph}{5.5.9 (-v)Reporting the absence of any overlapping features}{35}{paragraph*.67}
+\contentsline {subsubsection}{5.6 closestBed}{35}{subsubsection*.68}
+\contentsline {paragraph}{5.6.1 Usage and option summary}{35}{paragraph*.69}
+\contentsline {paragraph}{5.6.2 Default behavior}{36}{paragraph*.70}
+\contentsline {paragraph}{5.6.3 (-s)Enforcing ``strandedness''}{36}{paragraph*.71}
+\contentsline {paragraph}{5.6.4 (-t)Controlling how ties for ``closest'' are broken}{37}{paragraph*.72}
+\contentsline {paragraph}{5.6.5 (-d)Reporting the distance to the closest feature in base pairs}{37}{paragraph*.73}
+\contentsline {subsubsection}{5.7 subtractBed}{37}{subsubsection*.74}
+\contentsline {paragraph}{5.7.1 Usage and option summary}{38}{paragraph*.75}
+\contentsline {paragraph}{5.7.2 Default behavior}{38}{paragraph*.76}
+\contentsline {paragraph}{5.7.3 (-f)Requiring a minimal overlap fraction before subtracting}{38}{paragraph*.77}
+\contentsline {paragraph}{5.7.4 (-s)Enforcing ``strandedness''}{39}{paragraph*.78}
+\contentsline {subsubsection}{5.8 mergeBed}{39}{subsubsection*.79}
+\contentsline {paragraph}{5.8.1 Usage and option summary}{39}{paragraph*.80}
+\contentsline {paragraph}{5.8.2 Default behavior}{39}{paragraph*.81}
+\contentsline {paragraph}{5.8.3 (-s)Enforcing ``strandedness''}{39}{paragraph*.82}
+\contentsline {paragraph}{5.8.4 (-n)Reporting the number of features that were merged}{40}{paragraph*.83}
+\contentsline {paragraph}{5.8.5 (-d)Controlling how close two features must be in order to merge}{40}{paragraph*.84}
+\contentsline {paragraph}{5.8.6 (-nms)Reporting the names of the features that were merged}{40}{paragraph*.85}
+\contentsline {subsubsection}{5.9 coverageBed}{41}{subsubsection*.86}
+\contentsline {paragraph}{5.9.1 Usage and option summary}{41}{paragraph*.87}
+\contentsline {paragraph}{5.9.2 Default behavior}{41}{paragraph*.88}
+\contentsline {paragraph}{5.9.4 (-s)Calculating coverage by strand}{42}{paragraph*.89}
+\contentsline {paragraph}{5.9.5 (-hist)Creating a histogram of coverage for each feature in the B file}{43}{paragraph*.90}
+\contentsline {paragraph}{5.9.6 (-hist)Reporting the per-base of coverage for each feature in the B file}{43}{paragraph*.91}
+\contentsline {paragraph}{5.9.7 (-split)Reporting coverage with spliced alignments or blocked BED features}{44}{paragraph*.92}
+\contentsline {subsubsection}{5.10 genomeCoverageBed}{44}{subsubsection*.93}
+\contentsline {paragraph}{5.10.1 Usage and option summary}{44}{paragraph*.94}
+\contentsline {paragraph}{5.10.2 Default behavior}{45}{paragraph*.95}
+\contentsline {paragraph}{5.10.3 (-max)Controlling the histogram's maximum depth}{46}{paragraph*.96}
+\contentsline {paragraph}{5.10.4 (-d)Reporting ``per-base'' genome coverage}{46}{paragraph*.97}
+\contentsline {paragraph}{5.1.13 (-split)Reporting coverage with spliced alignments or blocked BED features}{46}{paragraph*.98}
+\contentsline {subsubsection}{5.11 fastaFromBed}{46}{subsubsection*.99}
+\contentsline {paragraph}{5.11.1 Usage and option summary}{47}{paragraph*.100}
+\contentsline {paragraph}{5.11.2 Default behavior}{47}{paragraph*.101}
+\contentsline {paragraph}{5.11.3 Using the BED ``name'' column as a FASTA header.}{47}{paragraph*.102}
+\contentsline {paragraph}{5.11.4 Creating a tab-delimited output file in lieu of FASTA output.}{48}{paragraph*.103}
+\contentsline {paragraph}{5.11.5 (-s)Forcing the extracted sequence to reflect the requested strand}{48}{paragraph*.104}
+\contentsline {subsubsection}{5.12 maskFastaFromBed}{48}{subsubsection*.105}
+\contentsline {paragraph}{5.12.1 Usage and option summary}{48}{paragraph*.106}
+\contentsline {paragraph}{5.12.2 Default behavior}{49}{paragraph*.107}
+\contentsline {paragraph}{5.12.3 Soft-masking the FASTA file.}{49}{paragraph*.108}
+\contentsline {subsubsection}{5.13 shuffleBed}{49}{subsubsection*.109}
+\contentsline {paragraph}{5.13.1 Usage and option summary}{49}{paragraph*.110}
+\contentsline {paragraph}{5.13.2 Default behavior}{50}{paragraph*.111}
+\contentsline {paragraph}{5.13.3 (-chrom)Requiring that features be shuffled on the same chromosome}{50}{paragraph*.112}
+\contentsline {paragraph}{5.13.4 Excluding certain genome regions from shuffleBed}{51}{paragraph*.113}
+\contentsline {paragraph}{5.13.5 Defining a ``seed'' for the random replacement.}{51}{paragraph*.114}
+\contentsline {subsubsection}{5.14 slopBed}{52}{subsubsection*.115}
+\contentsline {paragraph}{5.14.1 Usage and option summary}{52}{paragraph*.116}
+\contentsline {paragraph}{5.14.2 Default behavior}{52}{paragraph*.117}
+\contentsline {paragraph}{5.14.3 Resizing features according to strand}{53}{paragraph*.118}
+\contentsline {subsubsection}{5.15 sortBed}{53}{subsubsection*.119}
+\contentsline {paragraph}{5.15.1 Usage and option summary}{53}{paragraph*.120}
+\contentsline {paragraph}{5.15.2 Default behavior}{54}{paragraph*.121}
+\contentsline {paragraph}{5.15.3 Optional sorting behavior}{54}{paragraph*.122}
+\contentsline {subsubsection}{5.16 linksBed}{54}{subsubsection*.123}
+\contentsline {paragraph}{5.16.1 Usage and option summary}{54}{paragraph*.124}
+\contentsline {paragraph}{5.16.2 Default behavior}{55}{paragraph*.125}
+\contentsline {paragraph}{5.16.3 Creating HTML links to a local UCSC Browser installation}{55}{paragraph*.126}
+\contentsline {subsubsection}{5.17 complementBed}{55}{subsubsection*.127}
+\contentsline {paragraph}{5.17.1 Usage and option summary}{56}{paragraph*.128}
+\contentsline {paragraph}{5.17.2 Default behavior}{56}{paragraph*.129}
+\contentsline {subsubsection}{5.18 bedToBam}{56}{subsubsection*.130}
+\contentsline {paragraph}{5.18.1 Usage and option summary}{56}{paragraph*.131}
+\contentsline {paragraph}{5.18.2 Default behavior}{57}{paragraph*.132}
+\contentsline {paragraph}{5.18.3 Creating ``spliced'' BAM entries from ``blocked'' BED features}{57}{paragraph*.133}
+\contentsline {subsubsection}{5.19 overlap}{57}{subsubsection*.134}
+\contentsline {paragraph}{5.19.1 Usage and option summary}{57}{paragraph*.135}
+\contentsline {paragraph}{5.19.2 Default behavior}{58}{paragraph*.136}
+\contentsline {subsubsection}{5.20 bedToIgv}{58}{subsubsection*.137}
+\contentsline {paragraph}{5.20.1 Usage and option summary}{58}{paragraph*.138}
+\contentsline {paragraph}{5.20.2 Default behavior}{59}{paragraph*.139}
+\contentsline {paragraph}{5.20.3 Using a bedToIgv batch script within IGV.}{59}{paragraph*.140}
+\contentsline {subsubsection}{5.21 bed12ToBed6}{59}{subsubsection*.141}
+\contentsline {paragraph}{5.21.1 Usage and option summary}{59}{paragraph*.142}
+\contentsline {paragraph}{5.21.2 Default behavior}{59}{paragraph*.143}
+\contentsline {subsubsection}{5.22 groupBy}{60}{subsubsection*.144}
+\contentsline {paragraph}{5.22.1 Usage and option summary}{60}{paragraph*.145}
+\contentsline {paragraph}{5.22.2 Default behavior.}{61}{paragraph*.146}
+\contentsline {paragraph}{5.22.3 Computing the min and max.}{62}{paragraph*.147}
+\contentsline {paragraph}{5.22.4 Computing the mean and median.}{62}{paragraph*.148}
+\contentsline {paragraph}{5.22.5 Computing the mode and ``antimode''.}{63}{paragraph*.149}
+\contentsline {paragraph}{5.22.6 Computing the count of lines for a given group.}{63}{paragraph*.150}
+\contentsline {paragraph}{5.22.7 Collapsing: listing all of the values in the opCol for a given group.}{63}{paragraph*.151}
+\contentsline {paragraph}{5.22.8 Computing frequencies: freqasc and freqdesc.}{63}{paragraph*.152}
+\contentsline {subsubsection}{5.23 unionBedGraphs}{64}{subsubsection*.153}
+\contentsline {paragraph}{5.23.1 Usage and option summary}{64}{paragraph*.154}
+\contentsline {paragraph}{5.23.2 Default behavior}{64}{paragraph*.155}
+\contentsline {paragraph}{5.23.3 Add a header line to the output}{65}{paragraph*.156}
+\contentsline {paragraph}{5.23.4 Add a header line with custom file names to the output}{65}{paragraph*.157}
+\contentsline {paragraph}{5.23.5 Include regions that have zero coverage in all BEDGRAPH files.}{65}{paragraph*.158}
+\contentsline {paragraph}{5.23.6 Use a custom value for missing values.}{65}{paragraph*.159}
+\contentsline {paragraph}{5.23.7 Use BEDGRAPH files with non-numeric values.}{66}{paragraph*.160}
+\contentsline {subsubsection}{5.24 annotateBed}{66}{subsubsection*.161}
+\contentsline {paragraph}{5.24.1 Usage and option summary}{66}{paragraph*.162}
+\contentsline {paragraph}{5.24.2 Default behavior - annotate one file with coverage from others.}{67}{paragraph*.163}
+\contentsline {paragraph}{5.24.3 Report the count of hits from the annotation files}{67}{paragraph*.164}
+\contentsline {paragraph}{5.24.4 Report both the count of hits and the fraction covered from the annotation files}{67}{paragraph*.165}
+\contentsline {paragraph}{5.24.5 Restrict the reporting to overlaps on the same strand.}{68}{paragraph*.166}
+\contentsline {section}{\numberline {2.6}Example usage}{68}{section.2.6}
+\contentsline {subsection}{\numberline {2.6.1}6.1 intersectBed}{68}{subsection.2.6.1}
+\contentsline {subsection}{\numberline {2.6.2}6.2 pairToBed}{69}{subsection.2.6.2}
+\contentsline {subsection}{\numberline {2.6.3}6.3 pairToPair}{69}{subsection.2.6.3}
+\contentsline {subsection}{\numberline {2.6.4}6.4 bamToBed}{69}{subsection.2.6.4}
+\contentsline {subsection}{\numberline {2.6.5}6.5 windowBed}{70}{subsection.2.6.5}
+\contentsline {subsection}{\numberline {2.6.6}6.6 closestBed}{70}{subsection.2.6.6}
+\contentsline {subsection}{\numberline {2.6.7}6.7 subtractBed}{70}{subsection.2.6.7}
+\contentsline {subsection}{\numberline {2.6.8}6.8 mergeBed}{70}{subsection.2.6.8}
+\contentsline {subsection}{\numberline {2.6.9}6.9 coverageBed}{71}{subsection.2.6.9}
+\contentsline {subsection}{\numberline {2.6.10}6.10 complementBed}{71}{subsection.2.6.10}
+\contentsline {subsection}{\numberline {2.6.11}6.11 shuffleBed}{71}{subsection.2.6.11}
+\contentsline {section}{\numberline {2.7}Advanced usage}{71}{section.2.7}
+\contentsline {subsection}{\numberline {2.7.1}7.1 Mask all regions in a genome except for targeted capture regions.}{71}{subsection.2.7.1}
+\contentsline {subsection}{\numberline {2.7.2}7.2 Screening for novel SNPs.}{72}{subsection.2.7.2}
+\contentsline {subsection}{\numberline {2.7.3}7.4 Computing the coverage of BAM alignments on exons.}{72}{subsection.2.7.3}
+\contentsline {subsection}{\numberline {2.7.4}7.5 Computing coverage separately for each strand.}{72}{subsection.2.7.4}
+\contentsline {subsection}{\numberline {2.7.5}7.6 Find structural variant calls that are private to one sample.}{72}{subsection.2.7.5}
+\contentsline {subsection}{\numberline {2.7.6}7.7 Exclude SV deletions that appear to be ALU insertions in the reference genome.}{73}{subsection.2.7.6}
+\contentsline {chapter}{\numberline {3}Mailing list}{75}{chapter.3}
