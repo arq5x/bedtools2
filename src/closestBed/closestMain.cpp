@@ -218,7 +218,7 @@ void closest_help(void) {
     cerr << "\t-iu\t"           << "Ignore features in B that are upstream of features in A." << endl;
     cerr                        << "\t\tThis option requires -D and follows its orientation" << endl;
     cerr                        << "\t\trules for determining what is \"upstream\"." << endl;
-    cerr << "\t-id\t"           << "Ignore features in B that are upstream of features in A." << endl;
+    cerr << "\t-id\t"           << "Ignore features in B that are downstream of features in A." << endl;
     cerr                        << "\t\tThis option requires -D and follows its orientation" << endl;
     cerr                        << "\t\trules for determining what is \"downstream\"." << endl;
 
