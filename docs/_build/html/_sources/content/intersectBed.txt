@@ -1,11 +1,11 @@
-################
-5.1 intersectBed
-################
+#########################################
+5.1 intersect
+#########################################
 
 By far, the most common question asked of two sets of genomic features is whether or not any of the
-features in the two sets "overlap" with one another. This is known as feature intersection. **intersectBed**
+features in the two sets "overlap" with one another. This is known as feature intersection. **bedtools intersect**
 allows one to screen for overlaps between two sets of genomic features. Moreover, it allows one to have
-fine control as to how the intersections are reported. **intersectBed** works with both BED/GFF/VCF
+fine control as to how the intersections are reported. **bedtools intersect** works with both BED/GFF/VCF
 and BAM files as input.
 
 ===============================
@@ -14,6 +14,8 @@ and BAM files as input.
 **Usage**:
 ::
 
+  bedtools intersect [OPTIONS] [-a <BED/GFF/VCF> || -abam <BAM>] -b <BED/GFF/VCF>
+  
   intersectBed [OPTIONS] [-a <BED/GFF/VCF> || -abam <BAM>] -b <BED/GFF/VCF>
   
   
@@ -23,9 +25,9 @@ Option                           Description
 ===========================      =========================================================================================================================================================
 **-a**				             BED/GFF/VCF file A. Each feature in A is compared to B in search of overlaps. Use "stdin" if passing A with a UNIX pipe.
 **-b**					         BED/GFF/VCF file B. Use "stdin" if passing B with a UNIX pipe.
-**-abam**					     BAM file A. Each BAM alignment in A is compared to B in search of overlaps. Use "stdin" if passing A with a UNIX pipe: For example: samtools view -b <BAM> | intersectBed -abam stdin -b genes.bed                                                   
+**-abam**					     BAM file A. Each BAM alignment in A is compared to B in search of overlaps. Use "stdin" if passing A with a UNIX pipe: For example: samtools view -b <BAM> | bedtools intersect -abam stdin -b genes.bed                                                   
 **-ubam**					     Write uncompressed BAM output. The default is write compressed BAM output.
-**-bed**					     When using BAM input (-abam), write output as BED. The default is to write output in BAM when using -abam. For example:   intersectBed -abam reads.bam -b genes.bed -bed                              
+**-bed**					     When using BAM input (-abam), write output as BED. The default is to write output in BAM when using -abam. For example:   bedtools intersect -abam reads.bam -b genes.bed -bed                              
 **-wa**					         Write the original entry in A for each overlap.
 **-wb** 				         Write the original entry in B for each overlap. Useful for knowing what A overlaps. Restricted by -f and -r.
 **-wo** 				         Write the original A and B entries plus the number of base pairs of overlap between the two features. Only A features with overlap are reported. Restricted by -f and -r.
@@ -43,153 +45,155 @@ Option                           Description
 ===============================
 5.1.2 Default behavior
 ===============================
-By default, if an overlap is found, **intersectBed** reports the shared interval between the two
+By default, if an overlap is found, **bedtools intersect** reports the shared interval between the two
 overlapping features.
-::
-  Chromosome  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-  BED/BAM A      *******************            *************  
-
-  BED File B                ^^^^^^^^    
-
-  Result                    ========
-  
 For example:
 ::
   cat A.bed
-  chr1 100 200
-  chr1 1000 2000
+  chr1  10  20
+  chr1  30  40
 
   cat B.bed
-  chr1 150 250
+  chr1  15   20
 
-  intersectBed -a A.bed -b B.bed
-  chr1 150 200
-
+  bedtools intersect -a A.bed -b B.bed
+  chr1  15   20
   
+.. plot::
+
+    a = """chr1	10	20\nchr1	30	40"""
+    b = """chr1	15	20"""
+
+    title = "bedtools intersect -a A.bed -b B.bed"
+    from matplotlib.pyplot import show
+    from pyplots.plotter import plot_a_b_tool
+    plot_a_b_tool(a, b, 'intersect', title, 'A.bed', 'B.bed')
+    show()
+
 =============================================
-5.1.3 (-wa)Reporting the original A feature 
+5.1.3 (-wa) Reporting the original A feature 
 =============================================
-Instead, one can force **intersectBed** to report the *original* **"A"** feature when an overlap is found. As
+Instead, one can force **bedtools intersect** to report the *original* **"A"** feature when an overlap is found. As
 shown below, the entire "A" feature is reported, not just the portion that overlaps with the "B" feature.
-::
-  Chromosome  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-  BED/BAM A      *******************            *************  
-
-  BED File B                ^^^^^^^^    
-
-  Result         ===================
-
-For example (compare with example from default behavior):
+For example:
 ::
   cat A.bed
-  chr1 100 200
-  chr1 1000 2000
-  
+  chr1  10  20
+  chr1  30   40
+
   cat B.bed
-  chr1 150 250
-  
-  intersectBed -a A.bed -b B.bed -wa
-  chr1 100 200
+  chr1  15  20
+
+  bedtools intersect -a A.bed -b B.bed -wa
+  chr1  10   20
+
+.. plot::
+
+    a = """chr1	10	20\nchr1	30	40"""
+    b = """chr1	15	20"""
+
+    title = "bedtools intersect -a A.bed -b B.bed -wa"
+    from matplotlib.pyplot import show
+    from pyplots.plotter import plot_a_b_tool
+    plot_a_b_tool(a, b, 'intersect', title, 'A.bed', 'B.bed', wa=True)
+    show()
+
 
 =============================================
-5.1.4 (-wb)Reporting the original B feature 
+5.1.4 (-wb) Reporting the original B feature 
 =============================================
-Similarly, one can force **intersectBed** to report the *original* **"B"** feature when an overlap is found. If
+Similarly, one can force **bedtools intersect** to report the *original* **"B"** feature when an overlap is found. If
 just -wb is used, the overlapping portion of A will be reported followed by the *original* **"B"**. If both -wa
 and -wb are used, the *originals* of both **"A"** and **"B"** will be reported.
 
 For example (-wb alone):
 ::
+For example:
+::
   cat A.bed
-  chr1 100 200
-  chr1 1000 2000
-  
+  chr1  10  20
+  chr1  30  40
+
   cat B.bed
-  chr1 150 250
+  chr1  15   20
+
+  bedtools intersect -a A.bed -b B.bed -wb
+  chr1  15  20  chr 15  20
   
-  intersectBed -a A.bed -b B.bed -wb
-  chr1 150 200 chr1 150 250
 
 Now -wa and -wb:
 ::
   cat A.bed
-  chr1 100 200
-  chr1 1000 2000
-  
+  chr1  10  20
+  chr1  30  40
+
   cat B.bed
-  chr1 150 250
-  
-  intersectBed -a A.bed -b B.bed -wa -wb
-  chr1 100 200 chr1 150 250
+  chr1  15   20
+
+  bedtools intersect -a A.bed -b B.bed -wa -wb
+  chr1  10  20  chr 15  20
 
 =======================================================================
-5.1.5 (-u)Reporting the presence of *at least one* overlapping feature 
+5.1.5 (-u) Reporting the presence of *at least one* overlapping feature 
 =======================================================================
-Frequently a feature in "A" will overlap with multiple features in "B". By default, **intersectBed** will
+Frequently a feature in "A" will overlap with multiple features in "B". By default, **bedtools intersect** will
 report each overlap as a separate output line. However, one may want to simply know that there is at
 least one overlap (or none). When one uses the -u option, "A" features that overlap with one or more
 "B" features are reported once. Those that overlap with no "B" features are not reported at all.
 
 
-For example:
+For example (*without* -u):
 ::
   cat A.bed
-  chr1 100 200
-  chr1 1000 2000
-  
+  chr1  10  20
+  chr1  30  40
+
   cat B.bed
-  chr1 101 201
-  chr1 120 220
+  chr1  15   20
+  chr1  18   25
   
-  intersectBed -a A.bed -b B.bed -u
-  chr1 100 200
+  bedtools intersect -a A.bed -b B.bed -wb
+  chr1  10  20  chr 15  20
+  chr1  10  20  chr 18  25
+  
+For example (*with* -u):
+::
+    cat A.bed
+    chr1  10  20
+    chr1  30  40
+
+    cat B.bed
+    chr1  15   20
+    chr1  18   25
+
+    bedtools intersect -a A.bed -b B.bed -u
+    chr1  10  20
 
 =======================================================================
-5.1.6 (-c)Reporting the number of overlapping features 
+5.1.6 (-c) Reporting the number of overlapping features 
 =======================================================================
 The -c option reports a column after each "A" feature indicating the *number* (0 or more) of overlapping
 features found in "B". Therefore, *each feature in A is reported once*.
 
 For example:
 ::
-  cat A.bed
-  chr1 100 200
-  chr1 1000 2000
-  
-  cat B.bed
-  chr1 101 201
-  chr1 120 220
-  
-  intersectBed -a A.bed -b B.bed -c
-  chr1 100 200 2
-  chr1 1000 2000 0
+    cat A.bed
+    chr1    10    20
+    chr1    30    40
 
-  
-=======================================================================
-5.1.6 (-c)Reporting the number of overlapping features 
-=======================================================================
-The -c option reports a column after each "A" feature indicating the *number* (0 or more) of overlapping
-features found in "B". Therefore, *each feature in A is reported once*.
+    cat B.bed
+    chr1    15  20
+    chr1    18  25
 
-For example:
-::
-  cat A.bed
-  chr1 100 200
-  chr1 1000 2000
-  
-  cat B.bed
-  chr1 101 201
-  chr1 120 220
-  
-  intersectBed -a A.bed -b B.bed -c
-  chr1 100 200 2
-  chr1 1000 2000 0
+    bedtools intersect -a A.bed -b B.bed -u
+    chr1    10    20    2
+    chr1    30    40    0
 
 
 =======================================================================
-5.1.7 (-v)Reporting the absence of any overlapping features 
+5.1.7 (-v) Reporting the absence of any overlapping features 
 =======================================================================
 There will likely be cases where you'd like to know which "A" features do not overlap with any of the
 "B" features. Perhaps you'd like to know which SNPs don't overlap with any gene annotations. The -v
@@ -197,22 +201,32 @@ There will likely be cases where you'd like to know which "A" features do not ov
 
 For example:
 ::
-  cat A.bed
-  chr1 100 200
-  chr1 1000 2000
-  
-  cat B.bed
-  chr1 101 201
-  chr1 120 220
-  
-  intersectBed -a A.bed -b B.bed -v
-  chr1 1000 2000
+    cat A.bed
+    chr1  10  20
+    chr1  30  40
+
+    cat B.bed
+    chr1  15  20
+
+    bedtools intersect -a A.bed -b B.bed -v
+    chr1  30   40
+
+.. plot::
+
+    a = """chr1	10	20\nchr1	30	40"""
+    b = """chr1	15	20"""
+
+    title = "bedtools intersect -a A -b B -v"
+    from matplotlib.pyplot import show
+    from pyplots.plotter import plot_a_b_tool
+    plot_a_b_tool(a, b, 'intersect', title, 'A.bed', 'B.bed', v=True)
+    show()
 
 
 =======================================================================
-5.1.8 (-f)Requiring a minimal overlap fraction 
+5.1.8 (-f) Requiring a minimal overlap fraction 
 =======================================================================
-By default, **intersectBed** will report an overlap between A and B so long as there is at least one base
+By default, **bedtools intersect** will report an overlap between A and B so long as there is at least one base
 pair is overlapping. Yet sometimes you may want to restrict reported overlaps between A and B to cases
 where the feature in B overlaps at least X% (e.g. 50%) of the A feature. The -f option does exactly
 this.
@@ -226,7 +240,7 @@ For example (note that the second B entry is not reported):
   chr1 130 201
   chr1 180 220
   
-  intersectBed -a A.bed -b B.bed -f 0.50 -wa -wb
+  bedtools intersect -a A.bed -b B.bed -f 0.50 -wa -wb
   chr1 100 200 chr1 130 201
 
 ==========================================================================
@@ -246,13 +260,13 @@ For example (note that the second B entry is not reported):
   chr1 130 201
   chr1 130 200000
   
-  intersectBed -a A.bed -b B.bed -f 0.50 -r -wa -wb
+  bedtools intersect -a A.bed -b B.bed -f 0.50 -r -wa -wb
   chr1 100 200 chr1 130 201
 
 ==========================================================================
 5.1.10 (-s)Enforcing "strandedness" 
 ==========================================================================
-By default, **intersectBed** will report overlaps between features even if the features are on opposite
+By default, **bedtools intersect** will report overlaps between features even if the features are on opposite
 strands. However, if strand information is present in both BED files and the "-s" option is used, overlaps
 will only be reported when features are on the same strand.
 
@@ -265,14 +279,14 @@ For example (note that the second B entry is not reported):
   chr1 130 201 b1 100 -
   chr1 130 201 b2 100 +
   
-  intersectBed -a A.bed -b B.bed -wa -wb -s
+  bedtools intersect -a A.bed -b B.bed -wa -wb -s
   chr1 100 200 a1 100 + chr1 130 201 b2 100 +
   
   
 ==========================================================================
 5.1.11 (-abam)Default behavior when using BAM input 
 ==========================================================================
-When comparing alignments in BAM format (**-abam**) to features in BED format (**-b**), **intersectBed**
+When comparing alignments in BAM format (**-abam**) to features in BED format (**-b**), **bedtools intersect**
 will, **by default**, write the output in BAM format. That is, each alignment in the BAM file that meets
 the user's criteria will be written (to standard output) in BAM format. This serves as a mechanism to
 create subsets of BAM alignments are of biological interest, etc. Note that only the mate in the BAM
@@ -283,7 +297,7 @@ for a pair to be written to BAM output.
 
 For example:
 ::
-  intersectBed -abam reads.unsorted.bam -b simreps.bed | samtools view - | head -3
+  bedtools intersect -abam reads.unsorted.bam -b simreps.bed | samtools view - | head -3
   
   BERTHA_0001:3:1:15:1362#0 99 chr4 9236904 0 50M = 9242033 5 1 7 9
   AGACGTTAACTTTACACACCTCTGCCAAGGTCCTCATCCTTGTATTGAAG W c T U ] b \ g c e g X g f c b f c c b d d g g V Y P W W _
@@ -301,7 +315,7 @@ For example:
 ==========================================================================
 5.1.12 (-bed)Output BED format when using BAM input 
 ==========================================================================
-When comparing alignments in BAM format (**-abam**) to features in BED format (**-b**), **intersectBed**
+When comparing alignments in BAM format (**-abam**) to features in BED format (**-b**), **bedtools intersect**
 will **optionally** write the output in BED format. That is, each alignment in the BAM file is converted
 to a 6 column BED feature and if overlaps are found (or not) based on the user's criteria, the BAM
 alignment will be reported in BED format. The BED "name" field is comprised of the RNAME field in
@@ -310,7 +324,7 @@ appended to the name. The "score" field is the mapping quality score from the BA
 
 For example:
 ::
-  intersectBed -abam reads.unsorted.bam -b simreps.bed -bed | head -20
+  bedtools intersect -abam reads.unsorted.bam -b simreps.bed -bed | head -20
   
   chr4  9236903   9236953   BERTHA_0001:3:1:15:1362#0/1  0   +
   chr6  114221671 114221721 BERTHA_0001:3:1:16:994#0/1   37  -
@@ -336,7 +350,7 @@ For example:
 ==================================================================================
 5.1.13 (-split)Reporting overlaps with spliced alignments or blocked BED features 
 ==================================================================================
-As described in section 1.3.19, intersectBed will, by default, screen for overlaps against the entire span
+As described in section 1.3.19, bedtools intersect will, by default, screen for overlaps against the entire span
 of a spliced/split BAM alignment or blocked BED12 feature. When dealing with RNA-seq reads, for
 example, one typically wants to only screen for overlaps for the portions of the reads that come from
 exons (and ignore the interstitial intron sequence). The **-split** command allows for such overlaps to be
