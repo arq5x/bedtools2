@@ -1,2 +1,2 @@
 make clean html
-open _build/html/index.html -a Safari
+open _build/html/index.html -a Chrome
