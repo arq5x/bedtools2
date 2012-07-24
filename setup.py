@@ -2,5 +2,5 @@ from setuptools import setup
 
 setup(
     name='bedtools',
-    install_requires=['numpy>=1.6.0', 'matplotlib'],
+    install_requires=['numpy', 'matplotlib'],
     )
