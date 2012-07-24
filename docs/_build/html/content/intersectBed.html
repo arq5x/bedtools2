@@ -1,0 +1,500 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>5.1 intersect</title>
+    
+    <link rel="stylesheet" href="../_static/rtd.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.16.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="shortcut icon" href="../_static/bedtools.png"/>
+    <link rel="top" title="None" href="../index.html" />
+    <link rel="up" title="The BEDTools suite" href="bedtools-suite.html" />
+    <link rel="next" title="5.2 pairToBed" href="pairToBed.html" />
+    <link rel="prev" title="The BEDTools suite" href="bedtools-suite.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="pairToBed.html" title="5.2 pairToBed"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="bedtools-suite.html" title="The BEDTools suite"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">bedtools v2.16.2</a> &raquo;</li>
+          <li><a href="bedtools-suite.html" accesskey="U">The BEDTools suite</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="intersect">
+<h1>5.1 intersect<a class="headerlink" href="#intersect" title="Permalink to this headline">¶</a></h1>
+<p>By far, the most common question asked of two sets of genomic features is whether or not any of the
+features in the two sets &#8220;overlap&#8221; with one another. This is known as feature intersection. <strong>bedtools intersect</strong>
+allows one to screen for overlaps between two sets of genomic features. Moreover, it allows one to have
+fine control as to how the intersections are reported. <strong>bedtools intersect</strong> works with both BED/GFF/VCF
+and BAM files as input.</p>
+<div class="section" id="usage-and-option-summary">
+<h2>5.1.1 Usage and option summary<a class="headerlink" href="#usage-and-option-summary" title="Permalink to this headline">¶</a></h2>
+<p><strong>Usage</strong>:</p>
+<div class="highlight-python"><pre>bedtools intersect [OPTIONS] [-a &lt;BED/GFF/VCF&gt; || -abam &lt;BAM&gt;] -b &lt;BED/GFF/VCF&gt;
+
+intersectBed [OPTIONS] [-a &lt;BED/GFF/VCF&gt; || -abam &lt;BAM&gt;] -b &lt;BED/GFF/VCF&gt;</pre>
+</div>
+<table border="1" class="docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Option</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><strong>-a</strong></td>
+<td>BED/GFF/VCF file A. Each feature in A is compared to B in search of overlaps. Use &#8220;stdin&#8221; if passing A with a UNIX pipe.</td>
+</tr>
+<tr class="row-odd"><td><strong>-b</strong></td>
+<td>BED/GFF/VCF file B. Use &#8220;stdin&#8221; if passing B with a UNIX pipe.</td>
+</tr>
+<tr class="row-even"><td><strong>-abam</strong></td>
+<td>BAM file A. Each BAM alignment in A is compared to B in search of overlaps. Use &#8220;stdin&#8221; if passing A with a UNIX pipe: For example: samtools view -b &lt;BAM&gt; | bedtools intersect -abam stdin -b genes.bed</td>
+</tr>
+<tr class="row-odd"><td><strong>-ubam</strong></td>
+<td>Write uncompressed BAM output. The default is write compressed BAM output.</td>
+</tr>
+<tr class="row-even"><td><strong>-bed</strong></td>
+<td>When using BAM input (-abam), write output as BED. The default is to write output in BAM when using -abam. For example:   bedtools intersect -abam reads.bam -b genes.bed -bed</td>
+</tr>
+<tr class="row-odd"><td><strong>-wa</strong></td>
+<td>Write the original entry in A for each overlap.</td>
+</tr>
+<tr class="row-even"><td><strong>-wb</strong></td>
+<td>Write the original entry in B for each overlap. Useful for knowing what A overlaps. Restricted by -f and -r.</td>
+</tr>
+<tr class="row-odd"><td><strong>-wo</strong></td>
+<td>Write the original A and B entries plus the number of base pairs of overlap between the two features. Only A features with overlap are reported. Restricted by -f and -r.</td>
+</tr>
+<tr class="row-even"><td><strong>-wao</strong></td>
+<td>Write the original A and B entries plus the number of base pairs of overlap between the two features. However, A features w/o overlap are also reported with a NULL B feature and overlap = 0. Restricted by -f and -r.</td>
+</tr>
+<tr class="row-odd"><td><strong>-u</strong></td>
+<td>Write original A entry once if any overlaps found in B. In other words, just report the fact at least one overlap was found in B. Restricted by -f and -r.</td>
+</tr>
+<tr class="row-even"><td><strong>-c</strong></td>
+<td>For each entry in A, report the number of hits in B while restricting to -f. Reports 0 for A entries that have no overlap with B. Restricted by -f and -r.</td>
+</tr>
+<tr class="row-odd"><td><strong>-v</strong></td>
+<td>Only report those entries in A that have no overlap in B. Restricted by -f and -r.</td>
+</tr>
+<tr class="row-even"><td><strong>-f</strong></td>
+<td>Minimum overlap required as a fraction of A. Default is 1E-9 (i.e. 1bp).</td>
+</tr>
+<tr class="row-odd"><td><strong>-r</strong></td>
+<td>Require that the fraction of overlap be reciprocal for A and B. In other words, if -f is 0.90 and -r is used, this requires that B overlap at least 90% of A and that A also overlaps at least 90% of B.</td>
+</tr>
+<tr class="row-even"><td><strong>-s</strong></td>
+<td>Force &#8220;strandedness&#8221;. That is, only report hits in B that overlap A on the same strand. By default, overlaps are reported without respect to strand.</td>
+</tr>
+<tr class="row-odd"><td><strong>-split</strong></td>
+<td>Treat &#8220;split&#8221; BAM (i.e., having an &#8220;N&#8221; CIGAR operation) or BED12 entries as distinct BED intervals.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="default-behavior">
+<h2>5.1.2 Default behavior<a class="headerlink" href="#default-behavior" title="Permalink to this headline">¶</a></h2>
+<p>By default, if an overlap is found, <strong>bedtools intersect</strong> reports the shared interval between the two
+overlapping features.</p>
+<p>For example:</p>
+<div class="highlight-python"><pre>cat A.bed
+chr1  10  20
+chr1  30  40
+
+cat B.bed
+chr1  15   20
+
+bedtools intersect -a A.bed -b B.bed
+chr1  15   20</pre>
+</div>
+<p>(<a class="reference external" href="../content/intersectBed-1.py">Source code</a>, <a class="reference external" href="../content/intersectBed-1.png">png</a>, <a class="reference external" href="../content/intersectBed-1.hires.png">hires.png</a>, <a class="reference external" href="../content/intersectBed-1.pdf">pdf</a>)</p>
+<div class="figure">
+<img alt="../_images/intersectBed-1.png" src="../_images/intersectBed-1.png" />
+</div>
+</div>
+<div class="section" id="wa-reporting-the-original-a-feature">
+<h2>5.1.3 (-wa) Reporting the original A feature<a class="headerlink" href="#wa-reporting-the-original-a-feature" title="Permalink to this headline">¶</a></h2>
+<p>Instead, one can force <strong>bedtools intersect</strong> to report the <em>original</em> <strong>&#8220;A&#8221;</strong> feature when an overlap is found. As
+shown below, the entire &#8220;A&#8221; feature is reported, not just the portion that overlaps with the &#8220;B&#8221; feature.</p>
+<p>For example:</p>
+<div class="highlight-python"><pre>cat A.bed
+chr1  10  20
+chr1  30   40
+
+cat B.bed
+chr1  15  20
+
+bedtools intersect -a A.bed -b B.bed -wa
+chr1  10   20</pre>
+</div>
+<p>(<a class="reference external" href="../content/intersectBed-2.py">Source code</a>, <a class="reference external" href="../content/intersectBed-2.png">png</a>, <a class="reference external" href="../content/intersectBed-2.hires.png">hires.png</a>, <a class="reference external" href="../content/intersectBed-2.pdf">pdf</a>)</p>
+<div class="figure">
+<img alt="../_images/intersectBed-2.png" src="../_images/intersectBed-2.png" />
+</div>
+</div>
+<div class="section" id="wb-reporting-the-original-b-feature">
+<h2>5.1.4 (-wb) Reporting the original B feature<a class="headerlink" href="#wb-reporting-the-original-b-feature" title="Permalink to this headline">¶</a></h2>
+<p>Similarly, one can force <strong>bedtools intersect</strong> to report the <em>original</em> <strong>&#8220;B&#8221;</strong> feature when an overlap is found. If
+just -wb is used, the overlapping portion of A will be reported followed by the <em>original</em> <strong>&#8220;B&#8221;</strong>. If both -wa
+and -wb are used, the <em>originals</em> of both <strong>&#8220;A&#8221;</strong> and <strong>&#8220;B&#8221;</strong> will be reported.</p>
+<p>For example (-wb alone):
+::
+For example:</p>
+<div class="highlight-python"><pre>cat A.bed
+chr1  10  20
+chr1  30  40
+
+cat B.bed
+chr1  15   20
+
+bedtools intersect -a A.bed -b B.bed -wb
+chr1  15  20  chr 15  20</pre>
+</div>
+<p>Now -wa and -wb:</p>
+<div class="highlight-python"><pre>cat A.bed
+chr1  10  20
+chr1  30  40
+
+cat B.bed
+chr1  15   20
+
+bedtools intersect -a A.bed -b B.bed -wa -wb
+chr1  10  20  chr 15  20</pre>
+</div>
+</div>
+<div class="section" id="u-reporting-the-presence-of-at-least-one-overlapping-feature">
+<h2>5.1.5 (-u) Reporting the presence of <em>at least one</em> overlapping feature<a class="headerlink" href="#u-reporting-the-presence-of-at-least-one-overlapping-feature" title="Permalink to this headline">¶</a></h2>
+<p>Frequently a feature in &#8220;A&#8221; will overlap with multiple features in &#8220;B&#8221;. By default, <strong>bedtools intersect</strong> will
+report each overlap as a separate output line. However, one may want to simply know that there is at
+least one overlap (or none). When one uses the -u option, &#8220;A&#8221; features that overlap with one or more
+&#8220;B&#8221; features are reported once. Those that overlap with no &#8220;B&#8221; features are not reported at all.</p>
+<p>For example (<em>without</em> -u):</p>
+<div class="highlight-python"><pre>cat A.bed
+chr1  10  20
+chr1  30  40
+
+cat B.bed
+chr1  15   20
+chr1  18   25
+
+bedtools intersect -a A.bed -b B.bed -wb
+chr1  10  20  chr 15  20
+chr1  10  20  chr 18  25</pre>
+</div>
+<p>For example (<em>with</em> -u):</p>
+<div class="highlight-python"><pre>cat A.bed
+chr1  10  20
+chr1  30  40
+
+cat B.bed
+chr1  15   20
+chr1  18   25
+
+bedtools intersect -a A.bed -b B.bed -u
+chr1  10  20</pre>
+</div>
+</div>
+<div class="section" id="c-reporting-the-number-of-overlapping-features">
+<h2>5.1.6 (-c) Reporting the number of overlapping features<a class="headerlink" href="#c-reporting-the-number-of-overlapping-features" title="Permalink to this headline">¶</a></h2>
+<p>The -c option reports a column after each &#8220;A&#8221; feature indicating the <em>number</em> (0 or more) of overlapping
+features found in &#8220;B&#8221;. Therefore, <em>each feature in A is reported once</em>.</p>
+<p>For example:</p>
+<div class="highlight-python"><pre>cat A.bed
+chr1    10    20
+chr1    30    40
+
+cat B.bed
+chr1    15  20
+chr1    18  25
+
+bedtools intersect -a A.bed -b B.bed -u
+chr1    10    20    2
+chr1    30    40    0</pre>
+</div>
+</div>
+<div class="section" id="v-reporting-the-absence-of-any-overlapping-features">
+<h2>5.1.7 (-v) Reporting the absence of any overlapping features<a class="headerlink" href="#v-reporting-the-absence-of-any-overlapping-features" title="Permalink to this headline">¶</a></h2>
+<p>There will likely be cases where you&#8217;d like to know which &#8220;A&#8221; features do not overlap with any of the
+&#8220;B&#8221; features. Perhaps you&#8217;d like to know which SNPs don&#8217;t overlap with any gene annotations. The -v
+(an homage to &#8220;grep -v&#8221;) option will only report those &#8220;A&#8221; features that have no overlaps in &#8220;B&#8221;.</p>
+<p>For example:</p>
+<div class="highlight-python"><pre>cat A.bed
+chr1  10  20
+chr1  30  40
+
+cat B.bed
+chr1  15  20
+
+bedtools intersect -a A.bed -b B.bed -v
+chr1  30   40</pre>
+</div>
+<p>(<a class="reference external" href="../content/intersectBed-3.py">Source code</a>, <a class="reference external" href="../content/intersectBed-3.png">png</a>, <a class="reference external" href="../content/intersectBed-3.hires.png">hires.png</a>, <a class="reference external" href="../content/intersectBed-3.pdf">pdf</a>)</p>
+<div class="figure">
+<img alt="../_images/intersectBed-3.png" src="../_images/intersectBed-3.png" />
+</div>
+</div>
+<div class="section" id="f-requiring-a-minimal-overlap-fraction">
+<h2>5.1.8 (-f) Requiring a minimal overlap fraction<a class="headerlink" href="#f-requiring-a-minimal-overlap-fraction" title="Permalink to this headline">¶</a></h2>
+<p>By default, <strong>bedtools intersect</strong> will report an overlap between A and B so long as there is at least one base
+pair is overlapping. Yet sometimes you may want to restrict reported overlaps between A and B to cases
+where the feature in B overlaps at least X% (e.g. 50%) of the A feature. The -f option does exactly
+this.</p>
+<p>For example (note that the second B entry is not reported):</p>
+<div class="highlight-python"><pre>cat A.bed
+chr1 100 200
+
+cat B.bed
+chr1 130 201
+chr1 180 220
+
+bedtools intersect -a A.bed -b B.bed -f 0.50 -wa -wb
+chr1 100 200 chr1 130 201</pre>
+</div>
+</div>
+<div class="section" id="r-combined-with-f-requiring-reciprocal-minimal-overlap-fraction">
+<h2>5.1.9 (-r, combined with -f)Requiring reciprocal minimal overlap fraction<a class="headerlink" href="#r-combined-with-f-requiring-reciprocal-minimal-overlap-fraction" title="Permalink to this headline">¶</a></h2>
+<p>Similarly, you may want to require that a minimal fraction of both the A and the B features is
+overlapped. For example, if feature A is 1kb and feature B is 1Mb, you might not want to report the
+overlap as feature A can overlap at most 1% of feature B. If one set -f to say, 0.02, and one also
+enable the -r (reciprocal overlap fraction required), this overlap would not be reported.</p>
+<p>For example (note that the second B entry is not reported):</p>
+<div class="highlight-python"><pre>cat A.bed
+chr1 100 200
+
+cat B.bed
+chr1 130 201
+chr1 130 200000
+
+bedtools intersect -a A.bed -b B.bed -f 0.50 -r -wa -wb
+chr1 100 200 chr1 130 201</pre>
+</div>
+</div>
+<div class="section" id="s-enforcing-strandedness">
+<h2>5.1.10 (-s)Enforcing &#8220;strandedness&#8221;<a class="headerlink" href="#s-enforcing-strandedness" title="Permalink to this headline">¶</a></h2>
+<p>By default, <strong>bedtools intersect</strong> will report overlaps between features even if the features are on opposite
+strands. However, if strand information is present in both BED files and the &#8220;-s&#8221; option is used, overlaps
+will only be reported when features are on the same strand.</p>
+<p>For example (note that the second B entry is not reported):</p>
+<div class="highlight-python"><pre>cat A.bed
+chr1 100 200 a1 100 +
+
+cat B.bed
+chr1 130 201 b1 100 -
+chr1 130 201 b2 100 +
+
+bedtools intersect -a A.bed -b B.bed -wa -wb -s
+chr1 100 200 a1 100 + chr1 130 201 b2 100 +</pre>
+</div>
+</div>
+<div class="section" id="abam-default-behavior-when-using-bam-input">
+<h2>5.1.11 (-abam)Default behavior when using BAM input<a class="headerlink" href="#abam-default-behavior-when-using-bam-input" title="Permalink to this headline">¶</a></h2>
+<p>When comparing alignments in BAM format (<strong>-abam</strong>) to features in BED format (<strong>-b</strong>), <strong>bedtools intersect</strong>
+will, <strong>by default</strong>, write the output in BAM format. That is, each alignment in the BAM file that meets
+the user&#8217;s criteria will be written (to standard output) in BAM format. This serves as a mechanism to
+create subsets of BAM alignments are of biological interest, etc. Note that only the mate in the BAM
+alignment is compared to the BED file. Thus, if only one end of a paired-end sequence overlaps with a
+feature in B, then that end will be written to the BAM output. By contrast, the other mate for the
+pair will not be written. One should use <strong>pairToBed(Section 5.2)</strong> if one wants each BAM alignment
+for a pair to be written to BAM output.</p>
+<p>For example:</p>
+<div class="highlight-python"><pre>bedtools intersect -abam reads.unsorted.bam -b simreps.bed | samtools view - | head -3
+
+BERTHA_0001:3:1:15:1362#0 99 chr4 9236904 0 50M = 9242033 5 1 7 9
+AGACGTTAACTTTACACACCTCTGCCAAGGTCCTCATCCTTGTATTGAAG W c T U ] b \ g c e g X g f c b f c c b d d g g V Y P W W _
+\c`dcdabdfW^a^gggfgd XT:A:R NM:i:0 SM:i:0 AM:i:0 X0:i:19 X1:i:2 XM:i:0 XO:i:0 XG:i:0 MD:Z:50
+BERTHA _0001:3:1:16:994#0 83 chr6 114221672 37 25S6M1I11M7S =
+114216196 -5493 G A A A G G C C A G A G T A T A G A A T A A A C A C A A C A A T G T C C A A G G T A C A C T G T T A
+gffeaaddddggggggedgcgeggdegggggffcgggggggegdfggfgf XT:A:M NM:i:3 SM:i:37 AM:i:37 XM:i:2 X O : i :
+1 XG:i:1 MD:Z:6A6T3
+BERTHA _0001:3:1:16:594#0 147 chr8 43835330 0 50M =
+43830893 -4487 CTTTGGGAGGGCTTTGTAGCCTATCTGGAAAAAGGAAATATCTTCCCATG U
+\e^bgeTdg_Kgcg`ggeggg_gggggggggddgdggVg\gWdfgfgff XT:A:R NM:i:2 SM:i:0 AM:i:0 X0:i:10 X1:i:7 X M : i :
+2 XO:i:0 XG:i:0 MD:Z:1A2T45</pre>
+</div>
+</div>
+<div class="section" id="bed-output-bed-format-when-using-bam-input">
+<h2>5.1.12 (-bed)Output BED format when using BAM input<a class="headerlink" href="#bed-output-bed-format-when-using-bam-input" title="Permalink to this headline">¶</a></h2>
+<p>When comparing alignments in BAM format (<strong>-abam</strong>) to features in BED format (<strong>-b</strong>), <strong>bedtools intersect</strong>
+will <strong>optionally</strong> write the output in BED format. That is, each alignment in the BAM file is converted
+to a 6 column BED feature and if overlaps are found (or not) based on the user&#8217;s criteria, the BAM
+alignment will be reported in BED format. The BED &#8220;name&#8221; field is comprised of the RNAME field in
+the BAM alignment. If mate information is available, the mate (e.g., &#8220;/1&#8221; or &#8220;/2&#8221;) field will be
+appended to the name. The &#8220;score&#8221; field is the mapping quality score from the BAM alignment.</p>
+<p>For example:</p>
+<div class="highlight-python"><pre>bedtools intersect -abam reads.unsorted.bam -b simreps.bed -bed | head -20
+
+chr4  9236903   9236953   BERTHA_0001:3:1:15:1362#0/1  0   +
+chr6  114221671 114221721 BERTHA_0001:3:1:16:994#0/1   37  -
+chr8  43835329  43835379  BERTHA_0001:3:1:16:594#0/2   0   -
+chr4  49110668  49110718  BERTHA_0001:3:1:31:487#0/1   23  +
+chr19 27732052  27732102  BERTHA_0001:3:1:32:890#0/2   46  +
+chr19 27732012  27732062  BERTHA_0001:3:1:45:1135#0/1  37  +
+chr10 117494252 117494302 BERTHA_0001:3:1:68:627#0/1   37  -
+chr19 27731966  27732016  BERTHA_0001:3:1:83:931#0/2   9   +
+chr8  48660075  48660125  BERTHA_0001:3:1:86:608#0/2   37  -
+chr9  34986400  34986450  BERTHA_0001:3:1:113:183#0/2  37  -
+chr10 42372771  42372821  BERTHA_0001:3:1:128:1932#0/1 3   -
+chr19 27731954  27732004  BERTHA_0001:3:1:130:1402#0/2 0   +
+chr10 42357337  42357387  BERTHA_0001:3:1:137:868#0/2  9   +
+chr1  159720631 159720681 BERTHA_0001:3:1:147:380#0/2  37  -
+chrX  58230155  58230205  BERTHA_0001:3:1:151:656#0/2  37  -
+chr5  142612746 142612796 BERTHA_0001:3:1:152:1893#0/1 37  -
+chr9  71795659  71795709  BERTHA_0001:3:1:177:387#0/1  37  +
+chr1  106240854 106240904 BERTHA_0001:3:1:194:928#0/1  37  -
+chr4  74128456  74128506  BERTHA_0001:3:1:221:724#0/1  37  -
+chr8  42606164  42606214  BERTHA_0001:3:1:244:962#0/1  37  +</pre>
+</div>
+</div>
+<div class="section" id="split-reporting-overlaps-with-spliced-alignments-or-blocked-bed-features">
+<h2>5.1.13 (-split)Reporting overlaps with spliced alignments or blocked BED features<a class="headerlink" href="#split-reporting-overlaps-with-spliced-alignments-or-blocked-bed-features" title="Permalink to this headline">¶</a></h2>
+<p>As described in section 1.3.19, bedtools intersect will, by default, screen for overlaps against the entire span
+of a spliced/split BAM alignment or blocked BED12 feature. When dealing with RNA-seq reads, for
+example, one typically wants to only screen for overlaps for the portions of the reads that come from
+exons (and ignore the interstitial intron sequence). The <strong>-split</strong> command allows for such overlaps to be
+performed.</p>
+<p>For example, the diagram below illustrates the <em>default</em> behavior. The blue dots represent the &#8220;split/
+spliced&#8221; portion of the alignment (i.e., CIGAR &#8220;N&#8221; operation). In this case, the two exon annotations
+are reported as overlapping with the &#8220;split&#8221; BAM alignment, but in addition, a third feature that
+overlaps the &#8220;split&#8221; portion of the alignment is also reported.</p>
+<div class="highlight-python"><pre>Chromosome  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Exons       ---------------                                       ----------
+
+BED/BAM  A     ************.......................................****
+
+BED File B  ^^^^^^^^^^^^^^^                     ^^^^^^^^          ^^^^^^^^^^
+
+Result      ===============                     ========          ==========</pre>
+</div>
+<p>In contrast, when using the <strong>-split</strong> option, only the exon overlaps are reported.</p>
+<div class="highlight-python"><pre>Chromosome  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Exons       ---------------                                       ----------
+
+BED/BAM  A     ************.......................................****
+
+BED File B  ^^^^^^^^^^^^^^^                     ^^^^^^^^          ^^^^^^^^^^
+
+Result      ===============                                       ==========</pre>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/bedtools.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">5.1 intersect</a><ul>
+<li><a class="reference internal" href="#usage-and-option-summary">5.1.1 Usage and option summary</a></li>
+<li><a class="reference internal" href="#default-behavior">5.1.2 Default behavior</a></li>
+<li><a class="reference internal" href="#wa-reporting-the-original-a-feature">5.1.3 (-wa) Reporting the original A feature</a></li>
+<li><a class="reference internal" href="#wb-reporting-the-original-b-feature">5.1.4 (-wb) Reporting the original B feature</a></li>
+<li><a class="reference internal" href="#u-reporting-the-presence-of-at-least-one-overlapping-feature">5.1.5 (-u) Reporting the presence of <em>at least one</em> overlapping feature</a></li>
+<li><a class="reference internal" href="#c-reporting-the-number-of-overlapping-features">5.1.6 (-c) Reporting the number of overlapping features</a></li>
+<li><a class="reference internal" href="#v-reporting-the-absence-of-any-overlapping-features">5.1.7 (-v) Reporting the absence of any overlapping features</a></li>
+<li><a class="reference internal" href="#f-requiring-a-minimal-overlap-fraction">5.1.8 (-f) Requiring a minimal overlap fraction</a></li>
+<li><a class="reference internal" href="#r-combined-with-f-requiring-reciprocal-minimal-overlap-fraction">5.1.9 (-r, combined with -f)Requiring reciprocal minimal overlap fraction</a></li>
+<li><a class="reference internal" href="#s-enforcing-strandedness">5.1.10 (-s)Enforcing &#8220;strandedness&#8221;</a></li>
+<li><a class="reference internal" href="#abam-default-behavior-when-using-bam-input">5.1.11 (-abam)Default behavior when using BAM input</a></li>
+<li><a class="reference internal" href="#bed-output-bed-format-when-using-bam-input">5.1.12 (-bed)Output BED format when using BAM input</a></li>
+<li><a class="reference internal" href="#split-reporting-overlaps-with-spliced-alignments-or-blocked-bed-features">5.1.13 (-split)Reporting overlaps with spliced alignments or blocked BED features</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="bedtools-suite.html"
+                        title="previous chapter">The BEDTools suite</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="pairToBed.html"
+                        title="next chapter">5.2 pairToBed</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/content/intersectBed.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="pairToBed.html" title="5.2 pairToBed"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="bedtools-suite.html" title="The BEDTools suite"
+             >previous</a> |</li>
+        <li><a href="../index.html">bedtools v2.16.2</a> &raquo;</li>
+          <li><a href="bedtools-suite.html" >The BEDTools suite</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2012.
+      Last updated on Jul 23, 2012.
+    <a href="http://www.gnu.org/licenses/gpl-3.0.txt"><p>GPL3 licensed</p></a>
+    </div>
+  </body>
+</html>

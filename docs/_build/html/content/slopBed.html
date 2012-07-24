@@ -1,0 +1,216 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>5.14 slopBed</title>
+    
+    <link rel="stylesheet" href="../_static/rtd.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.16.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="shortcut icon" href="../_static/bedtools.png"/>
+    <link rel="top" title="None" href="../index.html" />
+    <link rel="up" title="The BEDTools suite" href="bedtools-suite.html" />
+    <link rel="next" title="5.15 sortBed" href="sortBed.html" />
+    <link rel="prev" title="5.13 shuffleBed" href="shuffleBed.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="sortBed.html" title="5.15 sortBed"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="shuffleBed.html" title="5.13 shuffleBed"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">bedtools v2.16.2</a> &raquo;</li>
+          <li><a href="bedtools-suite.html" accesskey="U">The BEDTools suite</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="slopbed">
+<h1>5.14 slopBed<a class="headerlink" href="#slopbed" title="Permalink to this headline">¶</a></h1>
+<p><strong>slopBed</strong> will increase the size of each feature in a feature file be a user-defined number of bases. While
+something like this could be done with an &#8220;<strong>awk &#8216;{OFS=&#8221;t&#8221; print $1,$2-&lt;slop&gt;,$3+&lt;slop&gt;}&#8217;</strong>&#8221;,
+<strong>slopBed</strong> will restrict the resizing to the size of the chromosome (i.e. no start &lt; 0 and no end &gt;
+chromosome size).</p>
+<div class="section" id="usage-and-option-summary">
+<h2>5.14.1 Usage and option summary<a class="headerlink" href="#usage-and-option-summary" title="Permalink to this headline">¶</a></h2>
+<p>Usage:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">slopBed</span> <span class="p">[</span><span class="n">OPTIONS</span><span class="p">]</span> <span class="o">-</span><span class="n">i</span> <span class="o">&lt;</span><span class="n">BED</span><span class="o">/</span><span class="n">GFF</span><span class="o">/</span><span class="n">VCF</span><span class="o">&gt;</span> <span class="o">-</span><span class="n">g</span> <span class="o">&lt;</span><span class="n">GENOME</span><span class="o">&gt;</span> <span class="p">[</span><span class="o">-</span><span class="n">b</span> <span class="ow">or</span> <span class="p">(</span><span class="o">-</span><span class="n">l</span> <span class="ow">and</span> <span class="o">-</span><span class="n">r</span><span class="p">)]</span>
+</pre></div>
+</div>
+<table border="1" class="docutils">
+<colgroup>
+<col width="12%" />
+<col width="88%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Option</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><strong>-b</strong></td>
+<td>Increase the BED/GFF/VCF entry by the same number base pairs in each direction. <em>Integer</em>.</td>
+</tr>
+<tr class="row-odd"><td><strong>-l</strong></td>
+<td>The number of base pairs to subtract from the start coordinate. <em>Integer</em>.</td>
+</tr>
+<tr class="row-even"><td><strong>-r</strong></td>
+<td>The number of base pairs to add to the end coordinate. <em>Integer</em>.</td>
+</tr>
+<tr class="row-odd"><td><strong>-s</strong></td>
+<td>Define -l and -r based on strand. For example. if used, -l 500 for a negative-stranded feature, it will add 500 bp to the <em>end</em> coordinate.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="default-behavior">
+<h2>5.14.2 Default behavior<a class="headerlink" href="#default-behavior" title="Permalink to this headline">¶</a></h2>
+<p>By default, <strong>slopBed</strong> will either add a fixed number of bases in each direction (<strong>-b</strong>) or an asymmetric
+number of bases in each direction (<strong>-l</strong> and <strong>-r</strong>).</p>
+<p>For example:</p>
+<div class="highlight-python"><pre>cat A.bed
+chr1 5 100
+chr1 800 980
+
+cat my.genome
+chr1 1000
+
+slopBed -i A.bed -g my.genome -b 5
+chr1 0 105
+chr1 795 985
+
+slopBed -i A.bed -g my.genome -l 2 -r 3
+chr1 3 103
+chr1 798 983</pre>
+</div>
+<p>However, if the requested number of bases exceeds the boundaries of the chromosome, <strong>slopBed</strong> will
+&#8220;clip&#8221; the feature accordingly.</p>
+<div class="highlight-python"><pre>cat A.bed
+chr1  5   100
+chr1  800 980
+
+cat my.genome
+chr1  1000
+
+slopBed -i A.bed -g my.genome -b 5000
+chr1  0   1000
+chr1  0   1000</pre>
+</div>
+</div>
+<div class="section" id="resizing-features-according-to-strand">
+<h2>5.14.3 Resizing features according to strand<a class="headerlink" href="#resizing-features-according-to-strand" title="Permalink to this headline">¶</a></h2>
+<p><strong>slopBed</strong> will optionally increase the size of a feature based on strand.</p>
+<p>For example:</p>
+<div class="highlight-python"><pre>cat A.bed
+chr1 100 200 a1 1 +
+chr1 100 200 a2 2 -
+
+cat my.genome
+chr1 1000
+
+slopBed  -i A.bed -g my.genome -l 50 -r 80 -s
+chr1 50  280 a1 1 +
+chr1 20  250 a2 2 -</pre>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/bedtools.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">5.14 slopBed</a><ul>
+<li><a class="reference internal" href="#usage-and-option-summary">5.14.1 Usage and option summary</a></li>
+<li><a class="reference internal" href="#default-behavior">5.14.2 Default behavior</a></li>
+<li><a class="reference internal" href="#resizing-features-according-to-strand">5.14.3 Resizing features according to strand</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="shuffleBed.html"
+                        title="previous chapter">5.13 shuffleBed</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="sortBed.html"
+                        title="next chapter">5.15 sortBed</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/content/slopBed.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="sortBed.html" title="5.15 sortBed"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="shuffleBed.html" title="5.13 shuffleBed"
+             >previous</a> |</li>
+        <li><a href="../index.html">bedtools v2.16.2</a> &raquo;</li>
+          <li><a href="bedtools-suite.html" >The BEDTools suite</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2012.
+      Last updated on Jul 23, 2012.
+    <a href="http://www.gnu.org/licenses/gpl-3.0.txt"><p>GPL3 licensed</p></a>
+    </div>
+  </body>
+</html>

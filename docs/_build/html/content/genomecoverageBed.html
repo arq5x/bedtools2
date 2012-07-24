@@ -1,0 +1,257 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>5.10 genomeCoverageBed</title>
+    
+    <link rel="stylesheet" href="../_static/rtd.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.16.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="shortcut icon" href="../_static/bedtools.png"/>
+    <link rel="top" title="None" href="../index.html" />
+    <link rel="up" title="The BEDTools suite" href="bedtools-suite.html" />
+    <link rel="next" title="5.11 fastaFromBed" href="fastafromBed.html" />
+    <link rel="prev" title="5.9 coverageBed" href="coverageBed.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="fastafromBed.html" title="5.11 fastaFromBed"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="coverageBed.html" title="5.9 coverageBed"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">bedtools v2.16.2</a> &raquo;</li>
+          <li><a href="bedtools-suite.html" accesskey="U">The BEDTools suite</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="genomecoveragebed">
+<h1>5.10 genomeCoverageBed<a class="headerlink" href="#genomecoveragebed" title="Permalink to this headline">¶</a></h1>
+<p><strong>genomeCoverageBed</strong> computes a histogram of feature coverage (e.g., aligned sequences) for a given
+genome. Optionally, by using the <strong>-d</strong> option, it will report the depth of coverage at <em>each base</em> on each
+chromosome in the genome file (<strong>-g</strong>).</p>
+<div class="section" id="usage-and-option-summary">
+<h2>5.10.1 Usage and option summary<a class="headerlink" href="#usage-and-option-summary" title="Permalink to this headline">¶</a></h2>
+<p>Usage:</p>
+<div class="highlight-python"><pre>genomeCoverageBed [OPTIONS] -i &lt;BED&gt; -g &lt;GENOME&gt;</pre>
+</div>
+<p>NOTE: genomeCoverageBed requires that the input BED file be sorted by
+chromosome. A simple sort -k1,1 will suffice.</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="9%" />
+<col width="91%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Option</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><strong>-ibam</strong></td>
+<td><blockquote class="first">
+<div>BAM file as input for coverage. Each BAM alignment in A added to the total coverage for the genome. Use &#8220;stdin&#8221; if passing it with a UNIX pipe: For example:</div></blockquote>
+<div class="last line-block">
+<div class="line">samtools view -b &lt;BAM&gt; | genomeCoverageBed -ibam stdin -g hg18.genome</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><strong>-d</strong></td>
+<td>Report the depth at each genome position. <em>Default behavior is to report a histogram</em>.</td>
+</tr>
+<tr class="row-even"><td><strong>-max</strong></td>
+<td>Combine all positions with a depth &gt;= max into a single bin in the histogram.</td>
+</tr>
+<tr class="row-odd"><td><strong>-bg</strong></td>
+<td>Report depth in BedGraph format. For details, see: <a class="reference external" href="http://genome.ucsc.edu/goldenPath/help/bedgraph.html">http://genome.ucsc.edu/goldenPath/help/bedgraph.html</a></td>
+</tr>
+<tr class="row-even"><td><strong>-bga</strong></td>
+<td>Report depth in BedGraph format, as above (i.e., -bg). However with this option, regions with zero coverage are also reported. This allows one to quickly extract all regions of a genome with 0 coverage by applying: &#8220;grep -w 0$&#8221; to the output.</td>
+</tr>
+<tr class="row-odd"><td><strong>-split</strong></td>
+<td>Treat &#8220;split&#8221; BAM or BED12 entries as distinct BED intervals when computing coverage. For BAM files, this uses the CIGAR &#8220;N&#8221; and &#8220;D&#8221; operations to infer the blocks for computing coverage. For BED12 files, this uses the BlockCount, BlockStarts, and BlockEnds fields (i.e., columns 10,11,12).</td>
+</tr>
+<tr class="row-even"><td><strong>-strand</strong></td>
+<td>Calculate coverage of intervals from a specific strand. With BED files, requires at least 6 columns (strand is column 6).</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="default-behavior">
+<h2>5.10.2 Default behavior<a class="headerlink" href="#default-behavior" title="Permalink to this headline">¶</a></h2>
+<p>By default, <strong>genomeCoverageBed</strong> will compute a histogram of coverage for the genome file provided.
+The default output format is as follows:
+1. chromosome (or entire genome)
+2. depth of coverage from features in input file
+3. number of bases on chromosome (or genome) with depth equal to column 2.
+4. size of chromosome (or entire genome) in base pairs
+5. fraction of bases on chromosome (or entire genome) with depth equal to column 2.</p>
+<p>For example:</p>
+<div class="highlight-python"><pre>cat A.bed
+chr1  10  20
+chr1  20  30
+chr2  0   500
+
+cat my.genome
+chr1  1000
+chr2  500
+
+genomeCoverageBed -i A.bed -g my.genome
+chr1   0  980  1000  0.98
+chr1   1  20   1000  0.02
+chr2   1  500  500   1
+genome 0  980  1500  0.653333
+genome 1  520  1500  0.346667</pre>
+</div>
+</div>
+<div class="section" id="max-controlling-the-histogram-s-maximum-depth">
+<h2>5.10.3 (-max)Controlling the histogram&#8217;s maximum depth<a class="headerlink" href="#max-controlling-the-histogram-s-maximum-depth" title="Permalink to this headline">¶</a></h2>
+<p>Using the <strong>-max</strong> option, <strong>genomeCoverageBed</strong> will &#8220;lump&#8221; all positions in the genome having feature
+coverage greather than or equal to <strong>max</strong> into the <strong>max</strong> histogram bin. For example, if one sets <strong>-max</strong>
+equal to 50, the max depth reported in the output will be 50 and all positions with a depth &gt;= 50 will
+be represented in bin 50.</p>
+</div>
+<div class="section" id="d-reporting-per-base-genome-coverage">
+<h2>5.10.4 (-d)Reporting &#8220;per-base&#8221; genome coverage<a class="headerlink" href="#d-reporting-per-base-genome-coverage" title="Permalink to this headline">¶</a></h2>
+<p>Using the <strong>-d</strong> option, <strong>genomeCoverageBed</strong> will compute the depth of feature coverage for each base
+on each chromosome in genome file provided.</p>
+<p>The &#8220;per-base&#8221; output format is as follows:
+1. chromosome
+2. chromosome position
+3. depth (number) of features overlapping this chromosome position.</p>
+<p>For example:</p>
+<div class="highlight-python"><pre>cat A.bed
+chr1  10  20
+chr1  20  30
+chr2  0   500
+
+cat my.genome
+chr1  1000
+chr2  500
+
+genomeCoverageBed -i A.bed -g my.genome -d | head -15 | tail -n 10
+chr1  6  0
+chr1  7  0
+chr1  8  0
+chr1  9  0
+chr1  10 0
+chr1  11 1
+chr1  12 1
+chr1  13 1
+chr1  14 1
+chr1  15 1</pre>
+</div>
+</div>
+<div class="section" id="split-reporting-coverage-with-spliced-alignments-or-blocked-bed-features">
+<h2>5.1.13 (-split)Reporting coverage with spliced alignments or blocked BED features<a class="headerlink" href="#split-reporting-coverage-with-spliced-alignments-or-blocked-bed-features" title="Permalink to this headline">¶</a></h2>
+<p>As described in section 1.3.19, genomeCoverageBed will, by default, screen for overlaps against the
+entire span of a spliced/split BAM alignment or blocked BED12 feature. When dealing with RNA-seq
+reads, for example, one typically wants to only screen for overlaps for the portions of the reads that
+come from exons (and ignore the interstitial intron sequence). The <strong>-split</strong> command allows for such
+overlaps to be performed.</p>
+<p>For additional details, please visit the Usage From The Wild site and have a look at example 5,
+contributed by Assaf Gordon.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/bedtools.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">5.10 genomeCoverageBed</a><ul>
+<li><a class="reference internal" href="#usage-and-option-summary">5.10.1 Usage and option summary</a></li>
+<li><a class="reference internal" href="#default-behavior">5.10.2 Default behavior</a></li>
+<li><a class="reference internal" href="#max-controlling-the-histogram-s-maximum-depth">5.10.3 (-max)Controlling the histogram&#8217;s maximum depth</a></li>
+<li><a class="reference internal" href="#d-reporting-per-base-genome-coverage">5.10.4 (-d)Reporting &#8220;per-base&#8221; genome coverage</a></li>
+<li><a class="reference internal" href="#split-reporting-coverage-with-spliced-alignments-or-blocked-bed-features">5.1.13 (-split)Reporting coverage with spliced alignments or blocked BED features</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="coverageBed.html"
+                        title="previous chapter">5.9 coverageBed</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="fastafromBed.html"
+                        title="next chapter">5.11 fastaFromBed</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/content/genomecoverageBed.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="fastafromBed.html" title="5.11 fastaFromBed"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="coverageBed.html" title="5.9 coverageBed"
+             >previous</a> |</li>
+        <li><a href="../index.html">bedtools v2.16.2</a> &raquo;</li>
+          <li><a href="bedtools-suite.html" >The BEDTools suite</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2012.
+      Last updated on Jul 23, 2012.
+    <a href="http://www.gnu.org/licenses/gpl-3.0.txt"><p>GPL3 licensed</p></a>
+    </div>
+  </body>
+</html>

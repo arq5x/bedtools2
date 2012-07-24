@@ -1,0 +1,202 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>5.18 bedToBam</title>
+    
+    <link rel="stylesheet" href="../_static/rtd.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.16.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="shortcut icon" href="../_static/bedtools.png"/>
+    <link rel="top" title="None" href="../index.html" />
+    <link rel="up" title="The BEDTools suite" href="bedtools-suite.html" />
+    <link rel="next" title="5.19 overlap" href="overlap.html" />
+    <link rel="prev" title="5.17 complementBed" href="complementBed.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="overlap.html" title="5.19 overlap"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="complementBed.html" title="5.17 complementBed"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">bedtools v2.16.2</a> &raquo;</li>
+          <li><a href="bedtools-suite.html" accesskey="U">The BEDTools suite</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="bedtobam">
+<h1>5.18 bedToBam<a class="headerlink" href="#bedtobam" title="Permalink to this headline">¶</a></h1>
+<p><strong>bedToBam</strong> converts features in a feature file to BAM format. This is useful as an efficient means of
+storing large genome annotations in a compact, indexed format for visualization purposes.</p>
+<div class="section" id="usage-and-option-summary">
+<h2>5.18.1 Usage and option summary<a class="headerlink" href="#usage-and-option-summary" title="Permalink to this headline">¶</a></h2>
+<p>Usage:</p>
+<div class="highlight-python"><pre>bedToBam [OPTIONS] -i &lt;BED/GFF/VCF&gt; -g &lt;GENOME&gt; &gt; &lt;BAM&gt;</pre>
+</div>
+<table border="1" class="docutils">
+<colgroup>
+<col width="11%" />
+<col width="89%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Option</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><strong>-mapq</strong></td>
+<td>Set a mapping quality (SAM MAPQ field) value for all BED entries. <em>Default: 255</em></td>
+</tr>
+<tr class="row-odd"><td><strong>-ubam</strong></td>
+<td>Write uncompressed BAM output. The default is write compressed BAM output.</td>
+</tr>
+<tr class="row-even"><td><strong>-bed12</strong></td>
+<td>Indicate that the input BED file is in BED12 (a.k.a &#8220;blocked&#8221; BED) format. In this case, bedToBam will convert blocked BED features (e.g., gene annotaions) into &#8220;spliced&#8221; BAM alignments by creating an appropriate CIGAR string.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="default-behavior">
+<h2>5.18.2 Default behavior<a class="headerlink" href="#default-behavior" title="Permalink to this headline">¶</a></h2>
+<p>The default behavior is to assume that the input file is in unblocked format. For example:</p>
+<div class="highlight-python"><pre>head -5 rmsk.hg18.chr21.bed
+chr21 9719768  9721892  ALR/Alpha  1004  +
+chr21 9721905  9725582  ALR/Alpha  1010  +
+chr21 9725582  9725977  L1PA3 3288 +
+chr21 9726021  9729309  ALR/Alpha  1051  +
+chr21 9729320  9729809  L1PA3 3897 -
+
+bedToBam -i rmsk.hg18.chr21.bed -g human.hg18.genome &gt; rmsk.hg18.chr21.bam
+
+samtools view rmsk.hg18.chr21.bam | head -5
+ALR/Alpha  0   chr21 9719769  255  2124M *  0  0  *  *
+ALR/Alpha  0   chr21 9721906  255  3677M *  0  0  *  *
+L1PA3      0   chr21 9725583  255  395M  *  0  0  *  *
+ALR/Alpha  0   chr21 9726022  255  3288M *  0  0  *  *
+L1PA3      16  chr21 9729321  255  489M  *  0  0  *  *</pre>
+</div>
+</div>
+<div class="section" id="creating-spliced-bam-entries-from-blocked-bed-features">
+<h2>5.18.3 Creating &#8220;spliced&#8221; BAM entries from &#8220;blocked&#8221; BED features<a class="headerlink" href="#creating-spliced-bam-entries-from-blocked-bed-features" title="Permalink to this headline">¶</a></h2>
+<p>Optionally, <strong>bedToBam</strong> will create spliced BAM entries from &#8220;blocked&#8221; BED features by using the
+-bed12 option. This will create CIGAR strings in the BAM output that will be displayed as &#8220;spliced&#8221;
+alignments. The image illustrates this behavior, as the top track is a BAM representation (using
+bedToBam) of a BED file of UCSC genes.</p>
+<p>For example:</p>
+<div class="highlight-python"><pre>bedToBam -i knownGene.hg18.chr21.bed -g human.hg18.genome -bed12 &gt; knownGene.bam
+
+samtools view knownGene.bam | head -2
+uc002yip.1  16   chr21 9928614   2                       5                        5
+
+298M1784N71M1411N93M3963N80M1927N106M3608N81M1769N62M11856N89M98N82M816N61M6910N65M
+738N64M146N100M1647N120M6478N162M1485N51M6777N60M9274N54M880N54M1229N54M2377N54M112
+68N58M2666N109M2885N158M     *   0  0  *  *
+uc002yiq.1  16   chr21 9928614   2                       5                        5
+
+298M1784N71M1411N93M3963N80M1927N106M3608N81M1769N62M11856N89M98N82M816N61M6910N65M
+738N64M146N100M1647N120M6478N162M1485N51M6777N60M10208N54M1229N54M2377N54M11268N58M
+2666N109M2885N158M       *   0   0  *  *</pre>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/bedtools.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">5.18 bedToBam</a><ul>
+<li><a class="reference internal" href="#usage-and-option-summary">5.18.1 Usage and option summary</a></li>
+<li><a class="reference internal" href="#default-behavior">5.18.2 Default behavior</a></li>
+<li><a class="reference internal" href="#creating-spliced-bam-entries-from-blocked-bed-features">5.18.3 Creating &#8220;spliced&#8221; BAM entries from &#8220;blocked&#8221; BED features</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="complementBed.html"
+                        title="previous chapter">5.17 complementBed</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="overlap.html"
+                        title="next chapter">5.19 overlap</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/content/bedToBam.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="overlap.html" title="5.19 overlap"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="complementBed.html" title="5.17 complementBed"
+             >previous</a> |</li>
+        <li><a href="../index.html">bedtools v2.16.2</a> &raquo;</li>
+          <li><a href="bedtools-suite.html" >The BEDTools suite</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2012.
+      Last updated on Jul 23, 2012.
+    <a href="http://www.gnu.org/licenses/gpl-3.0.txt"><p>GPL3 licensed</p></a>
+    </div>
+  </body>
+</html>

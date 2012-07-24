@@ -1,0 +1,324 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>5.22 groupBy</title>
+    
+    <link rel="stylesheet" href="../_static/rtd.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.16.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="shortcut icon" href="../_static/bedtools.png"/>
+    <link rel="top" title="None" href="../index.html" />
+    <link rel="up" title="The BEDTools suite" href="bedtools-suite.html" />
+    <link rel="next" title="5.23 unionBedGraphs" href="unionBedGraphs.html" />
+    <link rel="prev" title="5.21 bed12ToBed6" href="bed12ToBed6.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="unionBedGraphs.html" title="5.23 unionBedGraphs"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="bed12ToBed6.html" title="5.21 bed12ToBed6"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">bedtools v2.16.2</a> &raquo;</li>
+          <li><a href="bedtools-suite.html" accesskey="U">The BEDTools suite</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="groupby">
+<h1>5.22 groupBy<a class="headerlink" href="#groupby" title="Permalink to this headline">¶</a></h1>
+<p><strong>groupBy</strong> is a useful tool that mimics the &#8220;groupBy&#8221; clause in database systems. Given a file or stream
+that is sorted by the appropriate &#8220;grouping columns&#8221;, groupBy will compute summary statistics on
+another column in the file or stream. This will work with output from all BEDTools as well as any other
+tab-delimited file or stream.</p>
+<p><strong>NOTE: When using groupBy, the input data must be ordered by the same
+columns as specified with the -grp argument. For example, if -grp is 1,2,3, the the
+data should be pre-grouped accordingly. When groupBy detects changes in the
+group columns it then summarizes all lines with that group</strong>.</p>
+<div class="section" id="usage-and-option-summary">
+<h2>5.22.1 Usage and option summary<a class="headerlink" href="#usage-and-option-summary" title="Permalink to this headline">¶</a></h2>
+<p>Usage:</p>
+<div class="highlight-python"><pre>groupBy [OPTIONS] -i &lt;input&gt; -opCol &lt;input column&gt;</pre>
+</div>
+<table border="1" class="docutils">
+<colgroup>
+<col width="11%" />
+<col width="89%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Option</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><strong>-i</strong></td>
+<td><blockquote class="first">
+<div>The input file that should be grouped and summarized. <em>Use &#8220;stdin&#8221; when using piped input</em>.</div></blockquote>
+<p class="last"><strong>Note: if -i is omitted, input is assumed to come from standard input (stdin)</strong></p>
+</td>
+</tr>
+<tr class="row-odd"><td><strong>-g OR -grp</strong></td>
+<td>Specifies which column(s) (1-based) should be used to group the input. The columns must be comma-separated and each column must be explicitly listed. No ranges (e.g. 1-4) yet allowed. <em>Default: 1,2,3</em></td>
+</tr>
+<tr class="row-even"><td><strong>-c OR -opCol</strong></td>
+<td>Specify the column (1-based) that should be summarized. <em>Required</em>.</td>
+</tr>
+<tr class="row-odd"><td><strong>-o OR -op</strong></td>
+<td><p class="first">Specify the operation that should be applied to <strong>opCol</strong>.</p>
+<div class="line-block">
+<div class="line">Valid operations:</div>
+</div>
+<blockquote>
+<div><div class="line-block">
+<div class="line"><strong>sum</strong> - <em>numeric only</em></div>
+<div class="line"><strong>count</strong> - <em>numeric or text</em></div>
+<div class="line"><strong>min</strong> - <em>numeric only</em></div>
+<div class="line"><strong>max</strong> - <em>numeric only</em></div>
+<div class="line"><strong>mean</strong> - <em>numeric only</em></div>
+<div class="line"><strong>stdev</strong> - <em>numeric only</em></div>
+<div class="line"><strong>median</strong> - <em>numeric only</em></div>
+<div class="line"><strong>mode</strong> - <em>numeric or text</em></div>
+<div class="line"><strong>antimode</strong> - <em>numeric or text</em></div>
+<div class="line"><strong>collapse</strong> (i.e., print a comma separated list) - <em>numeric or text</em></div>
+<div class="line"><strong>freqasc</strong> - <em>print a comma separated list of values observed and the number of times they were observed. Reported in ascending order of frequency</em></div>
+</div>
+</div></blockquote>
+<div class="line-block">
+<div class="line"><strong>freqdesc</strong> - <em>print a comma separated list of values observed and the number of times they were observed. Reported in descending order of frequency</em></div>
+</div>
+<blockquote class="last">
+<div><div class="line-block">
+<div class="line"><em>Default: sum</em></div>
+</div>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="default-behavior">
+<h2>5.22.2 Default behavior.<a class="headerlink" href="#default-behavior" title="Permalink to this headline">¶</a></h2>
+<p>Let&#8217;s imagine we have three incredibly interesting genetic variants that we are studying and we are
+interested in what annotated repeats these variants overlap.</p>
+<div class="highlight-python"><pre>cat variants.bed
+chr21  9719758 9729320 variant1
+chr21  9729310 9757478 variant2
+chr21  9795588 9796685 variant3
+
+intersectBed -a variants.bed -b repeats.bed -wa -wb &gt; variantsToRepeats.bed
+cat variantsToRepeats.bed
+chr21  9719758 9729320 variant1   chr21  9719768 9721892 ALR/Alpha   1004  +
+chr21  9719758 9729320 variant1   chr21  9721905 9725582 ALR/Alpha   1010  +
+chr21  9719758 9729320 variant1   chr21  9725582 9725977 L1PA3       3288  +
+chr21  9719758 9729320 variant1   chr21  9726021 9729309 ALR/Alpha   1051  +
+chr21  9729310 9757478 variant2   chr21  9729320 9729809 L1PA3       3897  -
+chr21  9729310 9757478 variant2   chr21  9729809 9730866 L1P1        8367  +
+chr21  9729310 9757478 variant2   chr21  9730866 9734026 ALR/Alpha   1036  -
+chr21  9729310 9757478 variant2   chr21  9734037 9757471 ALR/Alpha   1182  -
+chr21  9795588 9796685 variant3   chr21  9795589 9795713 (GAATG)n    308   +
+chr21  9795588 9796685 variant3   chr21  9795736 9795894 (GAATG)n    683   +
+chr21  9795588 9796685 variant3   chr21  9795911 9796007 (GAATG)n    345   +
+chr21  9795588 9796685 variant3   chr21  9796028 9796187 (GAATG)n    756   +
+chr21  9795588 9796685 variant3   chr21  9796202 9796615 (GAATG)n    891   +
+chr21  9795588 9796685 variant3   chr21  9796637 9796824 (GAATG)n    621   +</pre>
+</div>
+<p>We can see that variant1 overlaps with 3 repeats, variant2 with 4 and variant3 with 6. We can use
+groupBy to summarize the hits for each variant in several useful ways. The default behavior is to
+compute the <em>sum</em> of the opCol.</p>
+<div class="highlight-python"><pre>groupBy -i variantsToRepeats.bed -grp 1,2,3 -opCol 9
+chr21 9719758 9729320 6353
+chr21 9729310 9757478 14482
+chr21 9795588 9796685 3604</pre>
+</div>
+</div>
+<div class="section" id="computing-the-min-and-max">
+<h2>5.22.3 Computing the min and max.<a class="headerlink" href="#computing-the-min-and-max" title="Permalink to this headline">¶</a></h2>
+<p>Now let&#8217;s find the <em>min</em> and <em>max</em> repeat score for each variant. We do this by &#8220;grouping&#8221; on the variant
+coordinate columns (i.e. cols. 1,2 and 3) and ask for the min and max of the repeat score column (i.e.
+col. 9).</p>
+<div class="highlight-python"><pre>groupBy -i variantsToRepeats.bed -g 1,2,3 -c 9 -o min
+chr21 9719758 9729320 1004
+chr21 9729310 9757478 1036
+chr21 9795588 9796685 308</pre>
+</div>
+<p>We can also group on just the <em>name</em> column with similar effect.</p>
+<div class="highlight-python"><pre>groupBy -i variantsToRepeats.bed -grp 4 -opCol 9 -op min
+variant1 1004
+variant2 1036
+variant3 308</pre>
+</div>
+<p>What about the <em>max</em> score? Let&#8217;s keep the coordinates and the name of the variants so that we
+stay in BED format.</p>
+<div class="highlight-python"><pre>groupBy -i variantsToRepeats.bed -grp 1,2,3,4 -opCol 9 -op max
+chr21 9719758 9729320 variant1 3288
+chr21 9729310 9757478 variant2 8367
+chr21 9795588 9796685 variant3 891</pre>
+</div>
+</div>
+<div class="section" id="computing-the-mean-and-median">
+<h2>5.22.4 Computing the mean and median.<a class="headerlink" href="#computing-the-mean-and-median" title="Permalink to this headline">¶</a></h2>
+<p>Now let&#8217;s find the <em>mean</em> and <em>median</em> repeat score for each variant.</p>
+<div class="highlight-python"><pre>cat variantsToRepeats.bed | groupBy -g 1,2,3,4 -c 9 -o mean
+chr21 9719758 9729320 variant1 1588.25
+chr21 9729310 9757478 variant2 3620.5
+chr21 9795588 9796685 variant3 600.6667
+
+groupBy -i variantsToRepeats.bed -grp 1,2,3,4 -opCol 9 -op median
+chr21 9719758 9729320 variant1 1030.5
+chr21 9729310 9757478 variant2 2539.5
+chr21 9795588 9796685 variant3 652</pre>
+</div>
+</div>
+<div class="section" id="computing-the-mode-and-antimode">
+<h2>5.22.5 Computing the mode and &#8220;antimode&#8221;.<a class="headerlink" href="#computing-the-mode-and-antimode" title="Permalink to this headline">¶</a></h2>
+<p>Now let&#8217;s find the <em>mode</em> and <em>antimode</em> (i.e., the least frequent) repeat score for each variant (in this case
+they are identical).</p>
+<div class="highlight-python"><pre>groupBy -i variantsToRepeats.bed -grp 1,2,3,4 -opCol 9 -op mode
+chr21 9719758 9729320 variant1 1004
+chr21 9729310 9757478 variant2 1036
+chr21 9795588 9796685 variant3 308
+
+groupBy -i variantsToRepeats.bed -grp 1,2,3,4 -opCol 9 -op antimode
+chr21 9719758 9729320 variant1 1004
+chr21 9729310 9757478 variant2 1036
+chr21 9795588 9796685 variant3 308</pre>
+</div>
+</div>
+<div class="section" id="computing-the-count-of-lines-for-a-given-group">
+<h2>5.22.6 Computing the count of lines for a given group.<a class="headerlink" href="#computing-the-count-of-lines-for-a-given-group" title="Permalink to this headline">¶</a></h2>
+<p>Figure:</p>
+<div class="highlight-python"><pre>groupBy -i variantsToRepeats.bed -g 1,2,3,4 -c 9 -c count
+chr21 9719758 9729320 variant1 4
+chr21 9729310 9757478 variant2 4
+chr21 9795588 9796685 variant3 6</pre>
+</div>
+</div>
+<div class="section" id="collapsing-listing-all-of-the-values-in-the-opcol-for-a-given-group">
+<h2>5.22.7 Collapsing: listing all of the values in the opCol for a given group.<a class="headerlink" href="#collapsing-listing-all-of-the-values-in-the-opcol-for-a-given-group" title="Permalink to this headline">¶</a></h2>
+<p>Now for something different. What if we wanted all of the names of the repeats listed on the same line
+as the variants? Use the collapse option. This &#8220;denormalizes&#8221; things. Now you have a list of all the
+repeats on a single line.</p>
+<div class="highlight-python"><pre>groupBy -i variantsToRepeats.bed -grp 1,2,3,4 -opCol 9 -op collapse
+chr21 9719758 9729320 variant1 ALR/Alpha,ALR/Alpha,L1PA3,ALR/Alpha,
+chr21 9729310 9757478 variant2 L1PA3,L1P1,ALR/Alpha,ALR/Alpha,
+chr21 9795588 9796685 variant3 (GAATG)n,(GAATG)n,(GAATG)n,(GAATG)n,(GAATG)n,(GAATG)n,</pre>
+</div>
+</div>
+<div class="section" id="computing-frequencies-freqasc-and-freqdesc">
+<h2>5.22.8 Computing frequencies: freqasc and freqdesc.<a class="headerlink" href="#computing-frequencies-freqasc-and-freqdesc" title="Permalink to this headline">¶</a></h2>
+<p>Now for something different. What if we wanted all of the names of the repeats listed on the same line
+as the variants? Use the collapse option. This &#8220;denormalizes&#8221; things. Now you have a list of all the
+repeats on a single line.</p>
+<div class="highlight-python"><pre>cat variantsToRepeats.bed | groupBy -g 1 -c 8 -o freqdesc
+chr21 (GAATG)n:6,ALR/Alpha:5,L1PA3:2,L1P1:1,
+
+cat variantsToRepeats.bed | groupBy -g 1 -c 8 -o freqasc
+chr21 L1P1:1,L1PA3:2,ALR/Alpha:5,(GAATG)n:6,</pre>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/bedtools.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">5.22 groupBy</a><ul>
+<li><a class="reference internal" href="#usage-and-option-summary">5.22.1 Usage and option summary</a></li>
+<li><a class="reference internal" href="#default-behavior">5.22.2 Default behavior.</a></li>
+<li><a class="reference internal" href="#computing-the-min-and-max">5.22.3 Computing the min and max.</a></li>
+<li><a class="reference internal" href="#computing-the-mean-and-median">5.22.4 Computing the mean and median.</a></li>
+<li><a class="reference internal" href="#computing-the-mode-and-antimode">5.22.5 Computing the mode and &#8220;antimode&#8221;.</a></li>
+<li><a class="reference internal" href="#computing-the-count-of-lines-for-a-given-group">5.22.6 Computing the count of lines for a given group.</a></li>
+<li><a class="reference internal" href="#collapsing-listing-all-of-the-values-in-the-opcol-for-a-given-group">5.22.7 Collapsing: listing all of the values in the opCol for a given group.</a></li>
+<li><a class="reference internal" href="#computing-frequencies-freqasc-and-freqdesc">5.22.8 Computing frequencies: freqasc and freqdesc.</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="bed12ToBed6.html"
+                        title="previous chapter">5.21 bed12ToBed6</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="unionBedGraphs.html"
+                        title="next chapter">5.23 unionBedGraphs</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/content/groupBy.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="unionBedGraphs.html" title="5.23 unionBedGraphs"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="bed12ToBed6.html" title="5.21 bed12ToBed6"
+             >previous</a> |</li>
+        <li><a href="../index.html">bedtools v2.16.2</a> &raquo;</li>
+          <li><a href="bedtools-suite.html" >The BEDTools suite</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2012.
+      Last updated on Jul 23, 2012.
+    <a href="http://www.gnu.org/licenses/gpl-3.0.txt"><p>GPL3 licensed</p></a>
+    </div>
+  </body>
+</html>

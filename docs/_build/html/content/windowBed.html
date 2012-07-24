@@ -1,0 +1,297 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>5.5 windowBed</title>
+    
+    <link rel="stylesheet" href="../_static/rtd.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.16.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="shortcut icon" href="../_static/bedtools.png"/>
+    <link rel="top" title="None" href="../index.html" />
+    <link rel="up" title="The BEDTools suite" href="bedtools-suite.html" />
+    <link rel="next" title="5.6 closestBed" href="closestBed.html" />
+    <link rel="prev" title="5.4 bamToBed" href="bamToBed.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="closestBed.html" title="5.6 closestBed"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="bamToBed.html" title="5.4 bamToBed"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">bedtools v2.16.2</a> &raquo;</li>
+          <li><a href="bedtools-suite.html" accesskey="U">The BEDTools suite</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="windowbed">
+<h1>5.5 windowBed<a class="headerlink" href="#windowbed" title="Permalink to this headline">¶</a></h1>
+<p>Similar to <strong>intersectBed</strong>, <strong>windowBed</strong> searches for overlapping features in A and B. However,
+<strong>windowBed</strong> adds a specified number (1000, by default) of base pairs upstream and downstream of
+each feature in A. In effect, this allows features in B that are &#8220;near&#8221; features in A to be detected.</p>
+<div class="section" id="usage-and-option-summary">
+<h2>5.5.1 Usage and option summary<a class="headerlink" href="#usage-and-option-summary" title="Permalink to this headline">¶</a></h2>
+<p><strong>Usage:</strong></p>
+<div class="highlight-python"><pre>windowBed [OPTIONS] -a &lt;BED/GFF/VCF&gt; -b &lt;BED/GFF/VCF&gt;</pre>
+</div>
+<table border="1" class="docutils">
+<colgroup>
+<col width="11%" />
+<col width="89%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Option</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><strong>-abam</strong></td>
+<td>BAM file A. Each BAM alignment in A is compared to B in search of overlaps. Use &#8220;stdin&#8221; if passing A with a UNIX pipe: For example:  samtools view -b &lt;BAM&gt; | windowBed -abam stdin -b genes.bed</td>
+</tr>
+<tr class="row-odd"><td><strong>-ubam</strong></td>
+<td>Write uncompressed BAM output. The default is write compressed BAM output.</td>
+</tr>
+<tr class="row-even"><td><strong>-bed</strong></td>
+<td>When using BAM input (-abam), write output as BED. The default is to write output in BAM when using -abam. For example:  windowBed -abam reads.bam -b genes.bed -bed</td>
+</tr>
+<tr class="row-odd"><td><strong>-w</strong></td>
+<td>Base pairs added upstream and downstream of each entry in A when searching for overlaps in B. <em>Default is 1000 bp</em>.</td>
+</tr>
+<tr class="row-even"><td><strong>-l</strong></td>
+<td>Base pairs added upstream (left of) of each entry in A when searching for overlaps in B. <em>Allows one to create assymetrical &#8220;windows&#8221;. Default is 1000bp</em>.</td>
+</tr>
+<tr class="row-odd"><td><strong>-r</strong></td>
+<td>Base pairs added downstream (right of) of each entry in A when searching for overlaps in B. <em>Allows one to create assymetrical &#8220;windows&#8221;. Default is 1000bp</em>.</td>
+</tr>
+<tr class="row-even"><td><strong>-sw</strong></td>
+<td>Define -l and -r based on strand. For example if used, -l 500 for a negative-stranded feature will add 500 bp downstream. <em>By default, this is disabled</em>.</td>
+</tr>
+<tr class="row-odd"><td><strong>-sm</strong></td>
+<td>Only report hits in B that overlap A on the same strand. <em>By default, overlaps are reported without respect to strand</em>.</td>
+</tr>
+<tr class="row-even"><td><strong>-u</strong></td>
+<td>Write original A entry once if any overlaps found in B. In other words, just report the fact at least one overlap was found in B.</td>
+</tr>
+<tr class="row-odd"><td><strong>-c</strong></td>
+<td>For each entry in A, report the number of hits in B while restricting to -f. Reports 0 for A entries that have no overlap with B.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="default-behavior">
+<h2>5.5.2 Default behavior<a class="headerlink" href="#default-behavior" title="Permalink to this headline">¶</a></h2>
+<p>By default, <strong>windowBed</strong> adds 1000 bp upstream and downstream of each A feature and searches for
+features in B that overlap this &#8220;window&#8221;. If an overlap is found in B, both the <em>original</em> A feature and the
+<em>original</em> B feature are reported. For example, in the figure below, feature B1 would be found, but B2
+would not.</p>
+<div class="highlight-python"><pre>Chromosome  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                                      "window" = 10
+BED File A                 &lt;----------*************----------&gt;
+
+BED File B            ^^^^^^^^                                          ^^^^^^
+
+Result                ========</pre>
+</div>
+<p>For example:</p>
+<div class="highlight-python"><pre>cat A.bed
+chr1  100  200
+
+cat B.bed
+chr1  500  1000
+chr1  1300 2000
+
+windowBed -a A.bed -b B.bed
+chr1  100  200  chr1  500  1000</pre>
+</div>
+</div>
+<div class="section" id="w-defining-a-custom-window-size">
+<h2>5.5.3 (-w)Defining a custom window size<a class="headerlink" href="#w-defining-a-custom-window-size" title="Permalink to this headline">¶</a></h2>
+<p>Instead of using the default window size of 1000bp, one can define a custom, <em>symmetric</em> window around
+each feature in A using the <strong>-w</strong> option. One should specify the window size in base pairs. For example,
+a window of 5kb should be defined as <strong>-w 5000</strong>.</p>
+<p>For example (note that in contrast to the default behavior, the second B entry is reported):</p>
+<div class="highlight-python"><pre>cat A.bed
+chr1  100  200
+
+cat B.bed
+chr1  500  1000
+chr1  1300 2000
+
+windowBed -a A.bed -b B.bed -w 5000
+chr1  100  200  chr1  500   1000
+chr1  100  200  chr1  1300  2000</pre>
+</div>
+</div>
+<div class="section" id="l-and-r-defining-assymteric-windows">
+<h2>5.5.4 (-l and -r)Defining assymteric windows<a class="headerlink" href="#l-and-r-defining-assymteric-windows" title="Permalink to this headline">¶</a></h2>
+<p>One can also define asymmetric windows where a differing number of bases are added upstream and
+downstream of each feature using the <strong>-l (upstream)</strong> and <strong>-r (downstream)</strong> options.</p>
+<p>For example (note the difference between -l 200 and -l 300):</p>
+<div class="highlight-python"><pre>cat A.bed
+chr1  1000  2000
+
+cat B.bed
+chr1  500   800
+chr1  10000 20000
+
+windowBed -a A.bed -b B.bed -l 200 -r 20000
+chr1  100   200  chr1  10000  20000
+
+windowBed -a A.bed -b B.bed -l 300 -r 20000
+chr1  100   200  chr1  500    800
+chr1  100   200  chr1  10000  20000</pre>
+</div>
+</div>
+<div class="section" id="sw-defining-assymteric-windows-based-on-strand">
+<h2>5.5.5 (-sw)Defining assymteric windows based on strand<a class="headerlink" href="#sw-defining-assymteric-windows-based-on-strand" title="Permalink to this headline">¶</a></h2>
+<p>Especially when dealing with gene annotations or RNA-seq experiments, you may want to define
+asymmetric windows based on &#8220;strand&#8221;. For example, you may want to screen for overlaps that occur
+within 5000 bp upstream of a gene (e.g. a promoter region) while screening only 1000 bp downstream of
+the gene. By enabling the <strong>-sw</strong> (&#8220;stranded&#8221; windows) option, the windows are added upstream or
+downstream according to strand. For example, imagine one specifies <strong>-l 5000 -r 1000</strong> as well as the <strong>-
+sw</strong> option. In this case, forward stranded (&#8220;+&#8221;) features will screen 5000 bp to the <em>left</em> (that is, <em>lower</em>
+genomic coordinates) and 1000 bp to the <em>right</em> (that is, <em>higher</em> genomic coordinates). By contrast,
+reverse stranded (&#8220;-&#8221;) features will screen 5000 bp to the <em>right</em> (that is, <em>higher</em> genomic coordinates) and
+1000 bp to the <em>left</em> (that is, <em>lower</em> genomic coordinates).</p>
+<p>For example (note the difference between -l 200 and -l 300):</p>
+<div class="highlight-python"><pre>cat A.bed
+chr1  10000  20000  A.forward  1  +
+chr1  10000  20000  A.reverse  1  -
+
+cat B.bed
+chr1  1000   8000   B1
+chr1  24000  32000  B2
+
+windowBed -a A.bed -b B.bed -l 5000 -r 1000 -sw
+chr1  10000  20000  A.forward  1  +  chr1  1000   8000   B1
+chr1  10000  20000  A.reverse  1  -  chr1  24000  32000  B2</pre>
+</div>
+</div>
+<div class="section" id="sm-enforcing-strandedness">
+<h2>5.5.6 (-sm)Enforcing &#8220;strandedness&#8221;<a class="headerlink" href="#sm-enforcing-strandedness" title="Permalink to this headline">¶</a></h2>
+<p>This option behaves the same as the -s option for intersectBed while scanning for overlaps within the
+&#8220;window&#8221; surrounding A. See the discussion in the intersectBed section for details.</p>
+</div>
+<div class="section" id="u-reporting-the-presence-of-at-least-one-overlapping-feature">
+<h2>5.5.7 (-u)Reporting the presence of at least one overlapping feature<a class="headerlink" href="#u-reporting-the-presence-of-at-least-one-overlapping-feature" title="Permalink to this headline">¶</a></h2>
+<p>This option behaves the same as for intersectBed while scanning for overlaps within the &#8220;window&#8221;
+surrounding A. See the discussion in the intersectBed section for details.</p>
+</div>
+<div class="section" id="c-reporting-the-number-of-overlapping-features">
+<h2>5.5.8 (-c)Reporting the number of overlapping features<a class="headerlink" href="#c-reporting-the-number-of-overlapping-features" title="Permalink to this headline">¶</a></h2>
+<p>This option behaves the same as for intersectBed while scanning for overlaps within the &#8220;window&#8221;
+surrounding A. See the discussion in the intersectBed section for details.</p>
+</div>
+<div class="section" id="v-reporting-the-absence-of-any-overlapping-features">
+<h2>5.5.9 (-v)Reporting the absence of any overlapping features<a class="headerlink" href="#v-reporting-the-absence-of-any-overlapping-features" title="Permalink to this headline">¶</a></h2>
+<p>This option behaves the same as for intersectBed while scanning for overlaps within the &#8220;window&#8221;
+surrounding A. See the discussion in the intersectBed section for details.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/bedtools.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">5.5 windowBed</a><ul>
+<li><a class="reference internal" href="#usage-and-option-summary">5.5.1 Usage and option summary</a></li>
+<li><a class="reference internal" href="#default-behavior">5.5.2 Default behavior</a></li>
+<li><a class="reference internal" href="#w-defining-a-custom-window-size">5.5.3 (-w)Defining a custom window size</a></li>
+<li><a class="reference internal" href="#l-and-r-defining-assymteric-windows">5.5.4 (-l and -r)Defining assymteric windows</a></li>
+<li><a class="reference internal" href="#sw-defining-assymteric-windows-based-on-strand">5.5.5 (-sw)Defining assymteric windows based on strand</a></li>
+<li><a class="reference internal" href="#sm-enforcing-strandedness">5.5.6 (-sm)Enforcing &#8220;strandedness&#8221;</a></li>
+<li><a class="reference internal" href="#u-reporting-the-presence-of-at-least-one-overlapping-feature">5.5.7 (-u)Reporting the presence of at least one overlapping feature</a></li>
+<li><a class="reference internal" href="#c-reporting-the-number-of-overlapping-features">5.5.8 (-c)Reporting the number of overlapping features</a></li>
+<li><a class="reference internal" href="#v-reporting-the-absence-of-any-overlapping-features">5.5.9 (-v)Reporting the absence of any overlapping features</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="bamToBed.html"
+                        title="previous chapter">5.4 bamToBed</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="closestBed.html"
+                        title="next chapter">5.6 closestBed</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/content/windowBed.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="closestBed.html" title="5.6 closestBed"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="bamToBed.html" title="5.4 bamToBed"
+             >previous</a> |</li>
+        <li><a href="../index.html">bedtools v2.16.2</a> &raquo;</li>
+          <li><a href="bedtools-suite.html" >The BEDTools suite</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2012.
+      Last updated on Jul 23, 2012.
+    <a href="http://www.gnu.org/licenses/gpl-3.0.txt"><p>GPL3 licensed</p></a>
+    </div>
+  </body>
+</html>

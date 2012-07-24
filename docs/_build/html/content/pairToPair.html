@@ -1,0 +1,237 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>5.3 pairToPair</title>
+    
+    <link rel="stylesheet" href="../_static/rtd.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.16.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="shortcut icon" href="../_static/bedtools.png"/>
+    <link rel="top" title="None" href="../index.html" />
+    <link rel="up" title="The BEDTools suite" href="bedtools-suite.html" />
+    <link rel="next" title="5.4 bamToBed" href="bamToBed.html" />
+    <link rel="prev" title="5.2 pairToBed" href="pairToBed.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="bamToBed.html" title="5.4 bamToBed"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="pairToBed.html" title="5.2 pairToBed"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">bedtools v2.16.2</a> &raquo;</li>
+          <li><a href="bedtools-suite.html" accesskey="U">The BEDTools suite</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="pairtopair">
+<h1>5.3 pairToPair<a class="headerlink" href="#pairtopair" title="Permalink to this headline">¶</a></h1>
+<p><strong>pairToPair</strong> compares two BEDPE files in search of overlaps where each end of a BEDPE feature in A
+overlaps with the ends of a feature in B. For example, using pairToPair, one could screen for the exact
+same discordant paired-end alignment in two files. This could suggest (among other things) that the
+discordant pair suggests the same structural variation in each file/sample.</p>
+<div class="section" id="usage-and-option-summary">
+<h2>5.3.1 Usage and option summary<a class="headerlink" href="#usage-and-option-summary" title="Permalink to this headline">¶</a></h2>
+<p><strong>Usage:</strong></p>
+<div class="highlight-python"><pre>pairToPair [OPTIONS] -a &lt;BEDPE&gt; -b &lt;BEDPE&gt;</pre>
+</div>
+<table border="1" class="docutils">
+<colgroup>
+<col width="14%" />
+<col width="86%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Option</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><strong>-a</strong></td>
+<td>BEDPE file A. Each feature in A is compared to B in search of overlaps. Use &#8220;stdin&#8221; if passing A with a UNIX pipe.</td>
+</tr>
+<tr class="row-odd"><td><strong>-b</strong></td>
+<td>BEDPE file B. Use &#8220;stdin&#8221; if passing B with a UNIX pipe.</td>
+</tr>
+<tr class="row-even"><td><strong>-f</strong></td>
+<td>Minimum overlap required as a fraction of A. Default is 1E-9 (i.e. 1bp).</td>
+</tr>
+<tr class="row-odd"><td><strong>-is</strong></td>
+<td>Force &#8220;strandedness&#8221;. That is, only report hits in B that overlap A on the same strand. By default, overlaps are reported without respect to strand.</td>
+</tr>
+<tr class="row-even"><td><strong>-type</strong></td>
+<td><blockquote class="first">
+<div>Approach to reporting overlaps between BEDPE and BED.</div></blockquote>
+<div class="line-block">
+<div class="line"><strong>either</strong> Report overlaps if either ends of A overlap B.</div>
+</div>
+<blockquote class="last">
+<div><div class="line-block">
+<div class="line"><strong>neither</strong> Report A if neither end of A overlaps B.</div>
+</div>
+<div class="line-block">
+<div class="line"><strong>both</strong> Report overlaps if both ends of A overlap B.   -<em>Default behavior.</em></div>
+</div>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="default-behavior">
+<h2>5.3.2 Default behavior<a class="headerlink" href="#default-behavior" title="Permalink to this headline">¶</a></h2>
+<p>By default, a BEDPE feature from A will be reported if <em>both</em> ends overlap a feature in the BEDPE B
+file. If strand information is present for the two BEDPE files, it will be further required that the
+overlaps on each end be on the same strand. This way, an otherwise overlapping (in terms of genomic
+locations) F/R alignment will not be matched with a R/R alignment.</p>
+<p>Default: Report A if <em>both</em> ends overlaps B.</p>
+<div class="highlight-python"><pre>Chromosome  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+BEDPE/BAM A         *****.................................*****
+
+BED File B         ^^^^^^^^                                          ^^^^^^
+
+Result              =====.................................=====</pre>
+</div>
+<p>Default when strand information is present in both BEDPE files: Report A if <em>both</em> ends overlaps B <em>on
+the same strands</em>.</p>
+<div class="highlight-python"><pre>Chromosome  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+BEDPE A         &gt;&gt;&gt;&gt;&gt;.................................&gt;&gt;&gt;&gt;&gt;
+
+BEDPE B            &lt;&lt;&lt;&lt;&lt;.............................&gt;&gt;&gt;&gt;&gt;
+
+Result
+
+
+
+BEDPE A         &gt;&gt;&gt;&gt;&gt;.................................&gt;&gt;&gt;&gt;&gt;
+
+BEDPE B            &gt;&gt;&gt;&gt;&gt;.............................&gt;&gt;&gt;&gt;&gt;
+
+Result          &gt;&gt;&gt;&gt;&gt;.................................&gt;&gt;&gt;&gt;&gt;</pre>
+</div>
+</div>
+<div class="section" id="type-neither-optional-overlap-requirements">
+<h2>5.3.3 (-type neither)Optional overlap requirements<a class="headerlink" href="#type-neither-optional-overlap-requirements" title="Permalink to this headline">¶</a></h2>
+<p>Using then <strong>-type neither, pairToPair</strong> will only report A if <em>neither</em> end overlaps with a BEDPE
+feature in B.</p>
+<p><strong>-type neither</strong>: Report A only if <em>neither</em> end overlaps B.</p>
+<div class="highlight-python"><pre>Chromosome  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+BEDPE/BAM A         *****.................................*****
+
+BED File B         ^^^^^^^^......................................^^^^^^
+
+Result
+
+
+
+BEDPE/BAM A         *****.................................*****
+
+BED File B    ^^^^................................................^^^^^^
+
+Result              =====.................................=====</pre>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/bedtools.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">5.3 pairToPair</a><ul>
+<li><a class="reference internal" href="#usage-and-option-summary">5.3.1 Usage and option summary</a></li>
+<li><a class="reference internal" href="#default-behavior">5.3.2 Default behavior</a></li>
+<li><a class="reference internal" href="#type-neither-optional-overlap-requirements">5.3.3 (-type neither)Optional overlap requirements</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="pairToBed.html"
+                        title="previous chapter">5.2 pairToBed</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="bamToBed.html"
+                        title="next chapter">5.4 bamToBed</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/content/pairToPair.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="bamToBed.html" title="5.4 bamToBed"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="pairToBed.html" title="5.2 pairToBed"
+             >previous</a> |</li>
+        <li><a href="../index.html">bedtools v2.16.2</a> &raquo;</li>
+          <li><a href="bedtools-suite.html" >The BEDTools suite</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2012.
+      Last updated on Jul 23, 2012.
+    <a href="http://www.gnu.org/licenses/gpl-3.0.txt"><p>GPL3 licensed</p></a>
+    </div>
+  </body>
+</html>

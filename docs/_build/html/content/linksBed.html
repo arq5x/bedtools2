@@ -1,0 +1,200 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>5.16 linksBed</title>
+    
+    <link rel="stylesheet" href="../_static/rtd.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.16.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="shortcut icon" href="../_static/bedtools.png"/>
+    <link rel="top" title="None" href="../index.html" />
+    <link rel="up" title="The BEDTools suite" href="bedtools-suite.html" />
+    <link rel="next" title="5.17 complementBed" href="complementBed.html" />
+    <link rel="prev" title="5.15 sortBed" href="sortBed.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="complementBed.html" title="5.17 complementBed"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="sortBed.html" title="5.15 sortBed"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">bedtools v2.16.2</a> &raquo;</li>
+          <li><a href="bedtools-suite.html" accesskey="U">The BEDTools suite</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="linksbed">
+<h1>5.16 linksBed<a class="headerlink" href="#linksbed" title="Permalink to this headline">¶</a></h1>
+<p>Creates an HTML file with links to an instance of the UCSC Genome Browser for all features /
+intervals in a file. This is useful for cases when one wants to manually inspect through a large set of
+annotations or features.</p>
+<div class="section" id="usage-and-option-summary">
+<h2>5.16.1 Usage and option summary<a class="headerlink" href="#usage-and-option-summary" title="Permalink to this headline">¶</a></h2>
+<p>Usage:</p>
+<div class="highlight-python"><pre>linksBed [OPTIONS] -i &lt;BED/GFF/VCF&gt; &gt; &lt;HTML file&gt;</pre>
+</div>
+<table border="1" class="docutils">
+<colgroup>
+<col width="12%" />
+<col width="88%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Option</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><strong>-base</strong></td>
+<td>The &#8220;basename&#8221; for the UCSC browser. <em>Default: http://genome.ucsc.edu</em></td>
+</tr>
+<tr class="row-odd"><td><strong>-org</strong></td>
+<td>The organism (e.g. mouse, human). <em>Default: human</em></td>
+</tr>
+<tr class="row-even"><td><strong>-db</strong></td>
+<td>The genome build. <em>Default: hg18</em></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="default-behavior">
+<h2>5.16.2 Default behavior<a class="headerlink" href="#default-behavior" title="Permalink to this headline">¶</a></h2>
+<p>By default, <strong>linksBed</strong> creates links to the public UCSC Genome Browser.</p>
+<p>For example:</p>
+<div class="highlight-python"><pre>head genes.bed
+chr21 9928613  10012791  uc002yip.1 0  -
+chr21 9928613  10012791  uc002yiq.1 0  -
+chr21 9928613  10012791  uc002yir.1 0  -
+chr21 9928613  10012791  uc010gkv.1 0  -
+chr21 9928613  10061300  uc002yis.1 0  -
+chr21 10042683 10120796  uc002yit.1 0  -
+chr21 10042683 10120808  uc002yiu.1 0  -
+chr21 10079666 10120808  uc002yiv.1 0  -
+chr21 10080031 10081687  uc002yiw.1 0  -
+chr21 10081660 10120796  uc002yix.2 0  -
+
+linksBed -i genes.bed &gt; genes.html</pre>
+</div>
+<p>When genes.html is opened in a web browser, one should see something like the following, where each
+link on the page is built from the features in genes.bed:</p>
+</div>
+<div class="section" id="creating-html-links-to-a-local-ucsc-browser-installation">
+<h2>5.16.3 Creating HTML links to a local UCSC Browser installation<a class="headerlink" href="#creating-html-links-to-a-local-ucsc-browser-installation" title="Permalink to this headline">¶</a></h2>
+<p>Optionally, <strong>linksBed</strong> will create links to a local copy of the UCSC Genome Browser.</p>
+<p>For example:</p>
+<div class="highlight-python"><pre>head -3 genes.bed
+chr21 9928613 10012791 uc002yip.1 0 -
+chr21 9928613 10012791 uc002yiq.1 0 -
+
+linksBed -i genes.bed -base http://mirror.uni.edu &gt; genes.html</pre>
+</div>
+<p>One can point the links to the appropriate organism and genome build as well:</p>
+<div class="highlight-python"><pre>head -3 genes.bed
+chr21 9928613 10012791 uc002yip.1 0 -
+chr21 9928613 10012791 uc002yiq.1 0 -
+
+linksBed -i genes.bed -base http://mirror.uni.edu -org mouse -db mm9 &gt; genes.html</pre>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/bedtools.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">5.16 linksBed</a><ul>
+<li><a class="reference internal" href="#usage-and-option-summary">5.16.1 Usage and option summary</a></li>
+<li><a class="reference internal" href="#default-behavior">5.16.2 Default behavior</a></li>
+<li><a class="reference internal" href="#creating-html-links-to-a-local-ucsc-browser-installation">5.16.3 Creating HTML links to a local UCSC Browser installation</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="sortBed.html"
+                        title="previous chapter">5.15 sortBed</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="complementBed.html"
+                        title="next chapter">5.17 complementBed</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/content/linksBed.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="complementBed.html" title="5.17 complementBed"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="sortBed.html" title="5.15 sortBed"
+             >previous</a> |</li>
+        <li><a href="../index.html">bedtools v2.16.2</a> &raquo;</li>
+          <li><a href="bedtools-suite.html" >The BEDTools suite</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2012.
+      Last updated on Jul 23, 2012.
+    <a href="http://www.gnu.org/licenses/gpl-3.0.txt"><p>GPL3 licensed</p></a>
+    </div>
+  </body>
+</html>

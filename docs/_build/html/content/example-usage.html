@@ -1,0 +1,314 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Example usage</title>
+    
+    <link rel="stylesheet" href="../_static/rtd.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.16.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="shortcut icon" href="../_static/bedtools.png"/>
+    <link rel="top" title="None" href="../index.html" />
+    <link rel="next" title="Advanced usage" href="advanced-usage.html" />
+    <link rel="prev" title="5.24 annotateBed" href="annotateBed.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="advanced-usage.html" title="Advanced usage"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="annotateBed.html" title="5.24 annotateBed"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">bedtools v2.16.2</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="example-usage">
+<h1>Example usage<a class="headerlink" href="#example-usage" title="Permalink to this headline">¶</a></h1>
+<p>Below are several examples of basic BEDTools usage. Example BED files are provided in the
+/data directory of the BEDTools distribution.</p>
+<div class="section" id="intersectbed">
+<h2>6.1 intersectBed<a class="headerlink" href="#intersectbed" title="Permalink to this headline">¶</a></h2>
+<p>6.1.1 Report the base-pair overlap between sequence alignments and genes.</p>
+<div class="highlight-python"><pre>intersectBed -a reads.bed -b genes.bed</pre>
+</div>
+<p>6.1.2 Report whether each alignment overlaps one or more genes. If not, the alignment is not reported.</p>
+<div class="highlight-python"><pre>intersectBed -a reads.bed -b genes.bed -u</pre>
+</div>
+<p>6.1.3 Report those alignments that overlap NO genes. Like &#8220;grep -v&#8221;</p>
+<div class="highlight-python"><pre>intersectBed -a reads.bed -b genes.bed -v</pre>
+</div>
+<p>6.1.4 Report the number of genes that each alignment overlaps.</p>
+<div class="highlight-python"><pre>intersectBed -a reads.bed -b genes.bed -c</pre>
+</div>
+<p>6.1.5 Report the entire, original alignment entry for each overlap with a gene.</p>
+<div class="highlight-python"><pre>intersectBed -a reads.bed -b genes.bed -wa</pre>
+</div>
+<p>6.1.6 Report the entire, original gene entry for each overlap with a gene.</p>
+<div class="highlight-python"><pre>intersectBed -a reads.bed -b genes.bed -wb</pre>
+</div>
+<p>6.1.7 Report the entire, original alignment and gene entries for each overlap.</p>
+<div class="highlight-python"><pre>intersectBed -a reads.bed -b genes.bed -wa -wb</pre>
+</div>
+<p>6.1.8 Only report an overlap with a repeat if it spans at least 50% of the exon.</p>
+<div class="highlight-python"><pre>intersectBed -a exons.bed -b repeatMasker.bed -f 0.50</pre>
+</div>
+<p>6.1.9 Only report an overlap if comprises 50% of the structural variant and 50% of the segmental duplication. Thus, it is reciprocally at least a 50% overlap.</p>
+<div class="highlight-python"><pre>intersectBed -a SV.bed -b segmentalDups.bed -f 0.50 -r</pre>
+</div>
+<p>6.1.10 Read BED A from stdin. For example, find genes that overlap LINEs but not SINEs.</p>
+<div class="highlight-python"><pre>intersectBed -a genes.bed -b LINES.bed | intersectBed -a stdin -b SINEs.bed -v</pre>
+</div>
+<p>6.1.11 Retain only single-end BAM alignments that overlap exons.</p>
+<div class="highlight-python"><pre>intersectBed -abam reads.bam -b exons.bed &gt; reads.touchingExons.bam</pre>
+</div>
+<p>6.1.12 Retain only single-end BAM alignments that do not overlap simple sequence
+repeats.</p>
+<div class="highlight-python"><pre>intersectBed -abam reads.bam -b SSRs.bed -v &gt; reads.noSSRs.bam</pre>
+</div>
+</div>
+<div class="section" id="pairtobed">
+<h2>6.2 pairToBed<a class="headerlink" href="#pairtobed" title="Permalink to this headline">¶</a></h2>
+<p>6.2.1 Return all structural variants (in BEDPE format) that overlap with genes on either
+end.</p>
+<div class="highlight-python"><pre>pairToBed -a sv.bedpe -b genes &gt; sv.genes</pre>
+</div>
+<p>6.2.2 Return all structural variants (in BEDPE format) that overlap with genes on both
+end.</p>
+<div class="highlight-python"><pre>pairToBed -a sv.bedpe -b genes -type both &gt; sv.genes</pre>
+</div>
+<p>6.2.3 Retain only paired-end BAM alignments where neither end overlaps simple
+sequence repeats.</p>
+<div class="highlight-python"><pre>pairToBed -abam reads.bam -b SSRs.bed -type neither &gt; reads.noSSRs.bam</pre>
+</div>
+<p>6.2.4 Retain only paired-end BAM alignments where both ends overlap segmental
+duplications.</p>
+<div class="highlight-python"><pre>pairToBed -abam reads.bam -b segdups.bed -type both &gt; reads.SSRs.bam</pre>
+</div>
+<p>6.2.5 Retain only paired-end BAM alignments where neither or one and only one end
+overlaps segmental duplications.</p>
+<div class="highlight-python"><pre>pairToBed -abam reads.bam -b segdups.bed -type notboth &gt; reads.notbothSSRs.bam</pre>
+</div>
+</div>
+<div class="section" id="pairtopair">
+<h2>6.3 pairToPair<a class="headerlink" href="#pairtopair" title="Permalink to this headline">¶</a></h2>
+<p>6.3.1 Find all SVs (in BEDPE format) in sample 1 that are also in sample 2.</p>
+<div class="highlight-python"><pre>pairToPair -a 1.sv.bedpe -b 2.sv.bedpe | cut -f 1-10 &gt; 1.sv.in2.bedpe</pre>
+</div>
+<p>6.3.2 Find all SVs (in BEDPE format) in sample 1 that are not in sample 2.</p>
+<div class="highlight-python"><pre>pairToPair -a 1.sv.bedpe -b 2.sv.bedpe -type neither | cut -f 1-10 &gt;</pre>
+</div>
+<p>1.sv.notin2.bedpe</p>
+</div>
+<div class="section" id="bamtobed">
+<h2>6.4 bamToBed<a class="headerlink" href="#bamtobed" title="Permalink to this headline">¶</a></h2>
+<p>6.4.1 Convert BAM alignments to BED format.</p>
+<div class="highlight-python"><pre>bamToBed -i reads.bam &gt; reads.bed</pre>
+</div>
+<p>6.4.2 Convert BAM alignments to BED format using the BAM edit distance (NM) as the
+BED &#8220;score&#8221;.</p>
+<div class="highlight-python"><pre>bamToBed -i reads.bam -ed &gt; reads.bed</pre>
+</div>
+<p>6.4.3 Convert BAM alignments to BEDPE format.</p>
+<div class="highlight-python"><pre>bamToBed -i reads.bam -bedpe &gt; reads.bedpe</pre>
+</div>
+</div>
+<div class="section" id="windowbed">
+<h2>6.5 windowBed<a class="headerlink" href="#windowbed" title="Permalink to this headline">¶</a></h2>
+<p>6.5.1 Report all genes that are within 10000 bp upstream or downstream of CNVs.</p>
+<div class="highlight-python"><pre>windowBed -a CNVs.bed -b genes.bed -w 10000</pre>
+</div>
+<p>6.5.2 Report all genes that are within 10000 bp upstream or 5000 bp downstream of
+CNVs.</p>
+<div class="highlight-python"><pre>windowBed -a CNVs.bed -b genes.bed -l 10000 -r 5000</pre>
+</div>
+<p>6.5.3 Report all SNPs that are within 5000 bp upstream or 1000 bp downstream of genes.
+Define upstream and downstream based on strand.</p>
+<div class="highlight-python"><pre>windowBed -a genes.bed -b snps.bed -l 5000 -r 1000 -sw</pre>
+</div>
+</div>
+<div class="section" id="closestbed">
+<h2>6.6 closestBed<a class="headerlink" href="#closestbed" title="Permalink to this headline">¶</a></h2>
+<p>Note: By default, if there is a tie for closest, all ties will be reported. <strong>closestBed</strong> allows overlapping
+features to be the closest.</p>
+<p>6.6.1 Find the closest ALU to each gene.</p>
+<div class="highlight-python"><pre>closestBed -a genes.bed -b ALUs.bed</pre>
+</div>
+<p>6.6.2 Find the closest ALU to each gene, choosing the first ALU in the file if there is a
+tie.</p>
+<div class="highlight-python"><pre>closestBed -a genes.bed -b ALUs.bed -t first</pre>
+</div>
+<p>6.6.3 Find the closest ALU to each gene, choosing the last ALU in the file if there is a
+tie.</p>
+<div class="highlight-python"><pre>closestBed -a genes.bed -b ALUs.bed -t last</pre>
+</div>
+</div>
+<div class="section" id="subtractbed">
+<h2>6.7 subtractBed<a class="headerlink" href="#subtractbed" title="Permalink to this headline">¶</a></h2>
+<p>Note: If a feature in A is entirely &#8220;spanned&#8221; by any feature in B, it will not be reported.</p>
+<p>6.7.1 Remove introns from gene features. Exons will (should) be reported.</p>
+<div class="highlight-python"><pre>subtractBed -a genes.bed -b introns.bed</pre>
+</div>
+</div>
+<div class="section" id="mergebed">
+<h2>6.8 mergeBed<a class="headerlink" href="#mergebed" title="Permalink to this headline">¶</a></h2>
+<p>6.8.1 Merge overlapping repetitive elements into a single entry.</p>
+<div class="highlight-python"><pre>mergeBed -i repeatMasker.bed</pre>
+</div>
+<p>6.8.2 Merge overlapping repetitive elements into a single entry, returning the number of
+entries merged.</p>
+<div class="highlight-python"><pre>mergeBed -i repeatMasker.bed -n</pre>
+</div>
+<p>6.8.3 Merge nearby (within 1000 bp) repetitive elements into a single entry.</p>
+<div class="highlight-python"><pre>mergeBed -i repeatMasker.bed -d 1000</pre>
+</div>
+</div>
+<div class="section" id="coveragebed">
+<h2>6.9 coverageBed<a class="headerlink" href="#coveragebed" title="Permalink to this headline">¶</a></h2>
+<p>6.9.1 Compute the coverage of aligned sequences on 10 kilobase &#8220;windows&#8221; spanning the
+genome.</p>
+<div class="highlight-python"><pre>coverageBed -a reads.bed -b windows10kb.bed | head
+chr1 0     10000 0  10000 0.00
+chr1 10001 20000 33 10000 0.21
+chr1 20001 30000 42 10000 0.29
+chr1 30001 40000 71 10000 0.36</pre>
+</div>
+<p>6.9.2 Compute the coverage of aligned sequences on 10 kilobase &#8220;windows&#8221; spanning the
+genome and created a BEDGRAPH of the number of aligned reads in each window for
+display on the UCSC browser.</p>
+<div class="highlight-python"><pre>coverageBed -a reads.bed -b windows10kb.bed | cut -f 1-4 &gt; windows10kb.cov.bedg</pre>
+</div>
+<p>6.9.3 Compute the coverage of aligned sequences on 10 kilobase &#8220;windows&#8221; spanning the
+genome and created a BEDGRAPH of the fraction of each window covered by at least
+one aligned read for display on the UCSC browser.</p>
+<div class="highlight-python"><pre>coverageBed -a reads.bed -b windows10kb.bed | awk ??{OFS="\t"; print $1,$2,$3,$6}??
+&gt; windows10kb.pctcov.bedg</pre>
+</div>
+</div>
+<div class="section" id="complementbed">
+<h2>6.10 complementBed<a class="headerlink" href="#complementbed" title="Permalink to this headline">¶</a></h2>
+<p>6.10.1 Report all intervals in the human genome that are not covered by repetitive
+elements.</p>
+<div class="highlight-python"><pre>complementBed -i repeatMasker.bed -g hg18.genome</pre>
+</div>
+</div>
+<div class="section" id="shufflebed">
+<h2>6.11 shuffleBed<a class="headerlink" href="#shufflebed" title="Permalink to this headline">¶</a></h2>
+<p>6.11.1 Randomly place all discovered variants in the genome. However, prevent them
+from being placed in know genome gaps.</p>
+<div class="highlight-python"><pre>shuffleBed -i variants.bed -g hg18.genome -excl genome_gaps.bed</pre>
+</div>
+<p>6.11.2 Randomly place all discovered variants in the genome. However, prevent them
+from being placed in know genome gaps and require that the variants be randomly
+placed on the same chromosome.</p>
+<div class="highlight-python"><pre>shuffleBed -i variants.bed -g hg18.genome -excl genome_gaps.bed -chrom</pre>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/bedtools.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Example usage</a><ul>
+<li><a class="reference internal" href="#intersectbed">6.1 intersectBed</a></li>
+<li><a class="reference internal" href="#pairtobed">6.2 pairToBed</a></li>
+<li><a class="reference internal" href="#pairtopair">6.3 pairToPair</a></li>
+<li><a class="reference internal" href="#bamtobed">6.4 bamToBed</a></li>
+<li><a class="reference internal" href="#windowbed">6.5 windowBed</a></li>
+<li><a class="reference internal" href="#closestbed">6.6 closestBed</a></li>
+<li><a class="reference internal" href="#subtractbed">6.7 subtractBed</a></li>
+<li><a class="reference internal" href="#mergebed">6.8 mergeBed</a></li>
+<li><a class="reference internal" href="#coveragebed">6.9 coverageBed</a></li>
+<li><a class="reference internal" href="#complementbed">6.10 complementBed</a></li>
+<li><a class="reference internal" href="#shufflebed">6.11 shuffleBed</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="annotateBed.html"
+                        title="previous chapter">5.24 annotateBed</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="advanced-usage.html"
+                        title="next chapter">Advanced usage</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/content/example-usage.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="advanced-usage.html" title="Advanced usage"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="annotateBed.html" title="5.24 annotateBed"
+             >previous</a> |</li>
+        <li><a href="../index.html">bedtools v2.16.2</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2012.
+      Last updated on Jul 23, 2012.
+    <a href="http://www.gnu.org/licenses/gpl-3.0.txt"><p>GPL3 licensed</p></a>
+    </div>
+  </body>
+</html>

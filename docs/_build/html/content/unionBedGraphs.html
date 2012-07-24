@@ -1,0 +1,296 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>5.23 unionBedGraphs</title>
+    
+    <link rel="stylesheet" href="../_static/rtd.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.16.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="shortcut icon" href="../_static/bedtools.png"/>
+    <link rel="top" title="None" href="../index.html" />
+    <link rel="up" title="The BEDTools suite" href="bedtools-suite.html" />
+    <link rel="next" title="5.24 annotateBed" href="annotateBed.html" />
+    <link rel="prev" title="5.22 groupBy" href="groupBy.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="annotateBed.html" title="5.24 annotateBed"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="groupBy.html" title="5.22 groupBy"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">bedtools v2.16.2</a> &raquo;</li>
+          <li><a href="bedtools-suite.html" accesskey="U">The BEDTools suite</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="unionbedgraphs">
+<h1>5.23 unionBedGraphs<a class="headerlink" href="#unionbedgraphs" title="Permalink to this headline">¶</a></h1>
+<p><strong>unionBedGraphs</strong> combines multiple BEDGRAPH files into a single file such that one can directly
+compare coverage (and other text-values such as genotypes) across multiple sample</p>
+<div class="section" id="usage-and-option-summary">
+<h2>5.23.1 Usage and option summary<a class="headerlink" href="#usage-and-option-summary" title="Permalink to this headline">¶</a></h2>
+<p>Usage:</p>
+<div class="highlight-python"><pre>unionBedGraphs [OPTIONS] -i FILE1 FILE2 FILE3 ... FILEn</pre>
+</div>
+<table border="1" class="docutils">
+<colgroup>
+<col width="12%" />
+<col width="88%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Option</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><strong>-header</strong></td>
+<td>Print a header line, consisting of chrom, start, end followed by the names of each input BEDGRAPH file.</td>
+</tr>
+<tr class="row-odd"><td><strong>-names</strong></td>
+<td>A list of names (one per file) to describe each file in -i. These names will be printed in the header line.</td>
+</tr>
+<tr class="row-even"><td><strong>-empty</strong></td>
+<td>Report empty regions (i.e., start/end intervals w/o values in all files). <em>Requires the &#8216;-g FILE&#8217; parameter (see below)</em>.</td>
+</tr>
+<tr class="row-odd"><td><strong>-g</strong></td>
+<td>The genome file to be used to calculate empty regions.</td>
+</tr>
+<tr class="row-even"><td><strong>-filler TEXT</strong></td>
+<td>Use TEXT when representing intervals having no value. Default is &#8216;0&#8217;, but you can use &#8216;N/A&#8217; or any other text.</td>
+</tr>
+<tr class="row-odd"><td><strong>-examples</strong></td>
+<td>Show detailed usage examples.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="default-behavior">
+<h2>5.23.2 Default behavior<a class="headerlink" href="#default-behavior" title="Permalink to this headline">¶</a></h2>
+<p>Figure:</p>
+<div class="highlight-python"><pre>cat 1.bg
+chr1 1000 1500 10
+chr1 2000 2100 20
+
+cat 2.bg
+chr1 900 1600 60
+chr1 1700 2050 50
+
+cat 3.bg
+chr1 1980 2070 80
+chr1 2090 2100 20
+
+cat sizes.txt
+chr1 5000
+
+unionBedGraphs -i 1.bg 2.bg 3.bg
+chr1 900  1000 0  60 0
+chr1 1000 1500 10 60 0
+chr1 1500 1600 0  60 0
+chr1 1700 1980 0  50 0
+chr1 1980 2000 0  50 80
+chr1 2000 2050 20 50 80
+chr1 2050 2070 20 0  80
+chr1 2070 2090 20 0  0
+chr1 2090 2100 20 0  20</pre>
+</div>
+</div>
+<div class="section" id="add-a-header-line-to-the-output">
+<h2>5.23.3 Add a header line to the output<a class="headerlink" href="#add-a-header-line-to-the-output" title="Permalink to this headline">¶</a></h2>
+<p>Figure:</p>
+<div class="highlight-python"><pre>unionBedGraphs -i 1.bg 2.bg 3.bg -header
+chrom  start  end  1  2  3
+chr1   900    1000 0  60 0
+chr1   1000   1500 10 60 0
+chr1   1500   1600 0  60 0
+chr1   1700   1980 0  50 0
+chr1   1980   2000 0  50 80
+chr1   2000   2050 20 50 80
+chr1   2050   2070 20 0  80
+chr1   2070   2090 20 0  0
+chr1   2090   2100 20 0  20</pre>
+</div>
+</div>
+<div class="section" id="add-a-header-line-with-custom-file-names-to-the-output">
+<h2>5.23.4 Add a header line with custom file names to the output<a class="headerlink" href="#add-a-header-line-with-custom-file-names-to-the-output" title="Permalink to this headline">¶</a></h2>
+<p>Figure:</p>
+<div class="highlight-python"><pre>unionBedGraphs -i 1.bg 2.bg 3.bg -header -names WT-1 WT-2 KO-1
+chrom  start  end   WT-1  WT-2  KO-1
+chr1   900    1000  0     60    0
+chr1   1000   1500  10    60    0
+chr1   1500   1600  0     60    0
+chr1   1700   1980  0     50    0
+chr1   1980   2000  0     50    80
+chr1   2000   2050  20    50    80
+chr1   2050   2070  20    0     80
+chr1   2070   2090  20    0     0
+chr1   2090   2100  20    0     20</pre>
+</div>
+</div>
+<div class="section" id="include-regions-that-have-zero-coverage-in-all-bedgraph-files">
+<h2>5.23.5 Include regions that have zero coverage in all BEDGRAPH files.<a class="headerlink" href="#include-regions-that-have-zero-coverage-in-all-bedgraph-files" title="Permalink to this headline">¶</a></h2>
+<p>Figure:</p>
+<div class="highlight-python"><pre>unionBedGraphs -i 1.bg 2.bg 3.bg -empty -g sizes.txt -header
+chrom  start  end  WT-1  WT-2  KO-1
+chrom  start  end  1     2     3
+chr1   0      900  0     0     0
+chr1   900    1000 0     60    0
+chr1   1000   1500 10    60    0
+chr1   1500   1600 0     60    0
+chr1   1600   1700 0     0     0
+chr1   1700   1980 0     50    0
+chr1   1980   2000 0     50    80
+chr1   2000   2050 20    50    80
+chr1   2050   2070 20    0     80
+chr1   2070   2090 20    0     0
+chr1   2090   2100 20    0     20
+chr1   2100   5000 0     0     0</pre>
+</div>
+</div>
+<div class="section" id="use-a-custom-value-for-missing-values">
+<h2>5.23.6 Use a custom value for missing values.<a class="headerlink" href="#use-a-custom-value-for-missing-values" title="Permalink to this headline">¶</a></h2>
+<p>Figure:</p>
+<div class="highlight-python"><pre>unionBedGraphs -i 1.bg 2.bg 3.bg -empty -g sizes.txt -header -filler N/A
+chrom start end  WT-1  WT-2  KO-1
+chrom start end  1     2     3
+chr1  0     900  N/A   N/A   N/A
+chr1  900   1000 N/A   60    N/A
+chr1  1000  1500 10    60    N/A
+chr1  1500  1600 N/A   60    N/A
+chr1  1600  1700 N/A   N/A   N/A
+chr1  1700  1980 N/A   50    N/A
+chr1  1980  2000 N/A   50    80
+chr1  2000  2050 20    50    80
+chr1  2050  2070 20    N/A   80
+chr1  2070  2090 20    N/A   N/A
+chr1  2090  2100 20    N/A   20
+chr1  2100  5000 N/A   N/A   N/A</pre>
+</div>
+</div>
+<div class="section" id="use-bedgraph-files-with-non-numeric-values">
+<h2>5.23.7 Use BEDGRAPH files with non-numeric values.<a class="headerlink" href="#use-bedgraph-files-with-non-numeric-values" title="Permalink to this headline">¶</a></h2>
+<p>Figure:</p>
+<div class="highlight-python"><pre>cat 1.snp.bg
+chr1 0 1 A/G
+chr1 5 6 C/T
+
+cat 2.snp.bg
+chr1 0 1 C/C
+chr1 7 8 T/T
+
+cat 3.snp.bg
+chr1 0 1 A/G
+chr1 5 6 C/T
+
+unionBedGraphs -i 1.snp.bg 2.snp.bg 3.snp.bg -filler -/-
+chr1 0 1 A/G C/C A/G
+chr1 5 6 C/T -/- C/T
+chr1 7 8 -/- T/T -/-</pre>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/bedtools.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">5.23 unionBedGraphs</a><ul>
+<li><a class="reference internal" href="#usage-and-option-summary">5.23.1 Usage and option summary</a></li>
+<li><a class="reference internal" href="#default-behavior">5.23.2 Default behavior</a></li>
+<li><a class="reference internal" href="#add-a-header-line-to-the-output">5.23.3 Add a header line to the output</a></li>
+<li><a class="reference internal" href="#add-a-header-line-with-custom-file-names-to-the-output">5.23.4 Add a header line with custom file names to the output</a></li>
+<li><a class="reference internal" href="#include-regions-that-have-zero-coverage-in-all-bedgraph-files">5.23.5 Include regions that have zero coverage in all BEDGRAPH files.</a></li>
+<li><a class="reference internal" href="#use-a-custom-value-for-missing-values">5.23.6 Use a custom value for missing values.</a></li>
+<li><a class="reference internal" href="#use-bedgraph-files-with-non-numeric-values">5.23.7 Use BEDGRAPH files with non-numeric values.</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="groupBy.html"
+                        title="previous chapter">5.22 groupBy</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="annotateBed.html"
+                        title="next chapter">5.24 annotateBed</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/content/unionBedGraphs.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="annotateBed.html" title="5.24 annotateBed"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="groupBy.html" title="5.22 groupBy"
+             >previous</a> |</li>
+        <li><a href="../index.html">bedtools v2.16.2</a> &raquo;</li>
+          <li><a href="bedtools-suite.html" >The BEDTools suite</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2012.
+      Last updated on Jul 23, 2012.
+    <a href="http://www.gnu.org/licenses/gpl-3.0.txt"><p>GPL3 licensed</p></a>
+    </div>
+  </body>
+</html>

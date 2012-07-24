@@ -1,0 +1,317 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>5.9 coverageBed</title>
+    
+    <link rel="stylesheet" href="../_static/rtd.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.16.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="shortcut icon" href="../_static/bedtools.png"/>
+    <link rel="top" title="None" href="../index.html" />
+    <link rel="up" title="The BEDTools suite" href="bedtools-suite.html" />
+    <link rel="next" title="5.10 genomeCoverageBed" href="genomecoverageBed.html" />
+    <link rel="prev" title="5.8 mergeBed" href="mergeBed.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="genomecoverageBed.html" title="5.10 genomeCoverageBed"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="mergeBed.html" title="5.8 mergeBed"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">bedtools v2.16.2</a> &raquo;</li>
+          <li><a href="bedtools-suite.html" accesskey="U">The BEDTools suite</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="coveragebed">
+<h1>5.9 coverageBed<a class="headerlink" href="#coveragebed" title="Permalink to this headline">¶</a></h1>
+<p><strong>coverageBed</strong> computes both the <em>depth</em> and <em>breadth</em> of coverage of features in file A across the features
+in file B. For example, <strong>coverageBed</strong> can compute the coverage of sequence alignments (file A) across 1
+kilobase (arbitrary) windows (file B) tiling a genome of interest. One advantage that <strong>coverageBed</strong>
+offers is that it not only <em>counts</em> the number of features that overlap an interval in file B, it also
+computes the fraction of bases in B interval that were overlapped by one or more features. Thus,
+<strong>coverageBed</strong> also computes the <em>breadth</em> of coverage for each interval in B.</p>
+<div class="section" id="usage-and-option-summary">
+<h2>5.9.1 Usage and option summary<a class="headerlink" href="#usage-and-option-summary" title="Permalink to this headline">¶</a></h2>
+<p>Usage:</p>
+<div class="highlight-python"><pre>coverageBed [OPTIONS] -a &lt;BED/GFF/VCF&gt; -b &lt;BED/GFF/VCF&gt;</pre>
+</div>
+<table border="1" class="docutils">
+<colgroup>
+<col width="9%" />
+<col width="91%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Option</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><strong>-abam</strong></td>
+<td><blockquote class="first">
+<div>BAM file A. Each BAM alignment in A is compared to B in search of overlaps. Use &#8220;stdin&#8221; if passing A with a UNIX pipe: For example:</div></blockquote>
+<div class="last line-block">
+<div class="line">samtools view -b &lt;BAM&gt; | intersectBed -abam stdin -b genes.bed</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><strong>-s</strong></td>
+<td>Force strandedness. That is, only features in A are only counted towards coverage in B if they are the same strand. <em>By default, this is disabled and coverage is counted without respect to strand</em>.</td>
+</tr>
+<tr class="row-even"><td><strong>-hist</strong></td>
+<td><p class="first">Report a histogram of coverage for each feature in B as well as a summary histogram for _all_ features in B.</p>
+<div class="line-block">
+<div class="line">Output (tab delimited) after each feature in B:</div>
+</div>
+<blockquote class="last">
+<div><div class="line-block">
+<div class="line">1) depth</div>
+<div class="line">2) # bases at depth</div>
+<div class="line">3) size of B</div>
+<div class="line">4) % of B at depth</div>
+</div>
+</div></blockquote>
+</td>
+</tr>
+<tr class="row-odd"><td><strong>-d</strong></td>
+<td>Report the depth at each position in each B feature. Positions reported are one based. Each position and depth follow the complete B feature.</td>
+</tr>
+<tr class="row-even"><td><strong>-split</strong></td>
+<td>Treat &#8220;split&#8221; BAM or BED12 entries as distinct BED intervals when computing coverage. For BAM files, this uses the CIGAR &#8220;N&#8221; and &#8220;D&#8221; operations to infer the blocks for computing coverage. For BED12 files, this uses the BlockCount, BlockStarts, and BlockEnds fields (i.e., columns 10,11,12).</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="default-behavior">
+<h2>5.9.2 Default behavior<a class="headerlink" href="#default-behavior" title="Permalink to this headline">¶</a></h2>
+<p>After each interval in B, <strong>coverageBed</strong> will report:</p>
+<ol class="arabic simple">
+<li>The number of features in A that overlapped (by at least one base pair) the B interval.</li>
+<li>The number of bases in B that had non-zero coverage from features in A.</li>
+<li>The length of the entry in B.</li>
+<li>The fraction of bases in B that had non-zero coverage from features in A.</li>
+</ol>
+<p>Below are the number of features in A (N=...) overlapping B and fraction of bases in B with coverage.</p>
+<div class="highlight-python"><pre>Chromosome  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+BED FILE B  ***************     ***************     ******    **************
+
+BED File A  ^^^^ ^^^^              ^^             ^^^^^^^^^    ^^^ ^^ ^^^^
+              ^^^^^^^^                                      ^^^^^ ^^^^^ ^^
+
+Result      [  N=3, 10/15 ]     [  N=1, 2/16 ]     [N=1,6/6]   [N=5, 11/12 ]</pre>
+</div>
+<p>For example:</p>
+<div class="highlight-python"><pre>cat A.bed
+chr1  10  20
+chr1  20  30
+chr1  30  40
+chr1  100 200
+
+cat B.bed
+chr1  0   100
+chr1  100 200
+chr2  0   100
+
+coverageBed -a A.bed -b B.bed
+chr1  0   100  3  30  100 0.3000000
+chr1  100 200  1  100 100 1.0000000
+chr2  0   100  0  0   100 0.0000000</pre>
+</div>
+</div>
+<div class="section" id="s-calculating-coverage-by-strand">
+<h2>5.9.4 (-s)Calculating coverage by strand<a class="headerlink" href="#s-calculating-coverage-by-strand" title="Permalink to this headline">¶</a></h2>
+<p>Use the &#8220;<strong>-s</strong>&#8221; option if one wants to only count coverage if features in A are on the same strand as the
+feature / window in B. This is especially useful for RNA-seq experiments.</p>
+<p>For example (note the difference in coverage with and without <strong>-s</strong>:</p>
+<div class="highlight-python"><pre>cat A.bed
+chr1  10  20  a1  1  -
+chr1  20  30  a2  1  -
+chr1  30  40  a3  1  -
+chr1  100 200 a4  1  +
+
+cat B.bed
+chr1  0   100 b1  1  +
+chr1  100 200 b2  1  -
+chr2  0   100 b3  1  +
+
+coverageBed -a A.bed -b B.bed
+chr1  0   100 b1  1  +  3  30  100  0.3000000
+chr1  100 200 b2  1  -  1  100 100  1.0000000
+chr2  0   100 b3  1  +  0  0   100  0.0000000
+
+coverageBed -a A.bed -b B.bed -s
+chr1  0   100 b1  1  +  0  0   100  0.0000000
+chr1  100 200 b2  1  -  0  0   100  0.0000000
+chr2  0   100 b3  1  +  0  0   100  0.0000000</pre>
+</div>
+</div>
+<div class="section" id="hist-creating-a-histogram-of-coverage-for-each-feature-in-the-b-file">
+<h2>5.9.5 (-hist)Creating a histogram of coverage for each feature in the B file<a class="headerlink" href="#hist-creating-a-histogram-of-coverage-for-each-feature-in-the-b-file" title="Permalink to this headline">¶</a></h2>
+<p>One should use the &#8220;<strong>-hist</strong>&#8221; option to create, for each interval in B, a histogram of coverage of the
+features in A across B.</p>
+<p>In this case, each entire feature in B will be reported, followed by the depth of coverage, the number of
+bases at that depth, the size of the feature, and the fraction covered. After all of the features in B have
+been reported, a histogram summarizing the coverage among all features in B will be reported.</p>
+<div class="highlight-python"><pre>cat A.bed
+chr1  10  20  a1  1  -
+chr1  20  30  a2  1  -
+chr1  30  40  a3  1  -
+chr1  100 200 a4  1  +
+
+cat B.bed
+chr1  0   100 b1  1  +
+chr1  100 200 b2  1  -
+chr2  0   100 b3  1  +
+
+coverageBed -a A.bed -b B.bed -hist
+chr1  0   100 b1  1  +  0  70  100  0.7000000
+chr1  0   100 b1  1  +  1  30  100  0.3000000
+chr1  100 200 b2  1  -  1  100 100  1.0000000
+chr2  0   100 b3  1  +  0  100 100  1.0000000
+all   0   170 300 0.5666667
+all   1   130 300 0.4333333</pre>
+</div>
+</div>
+<div class="section" id="hist-reporting-the-per-base-of-coverage-for-each-feature-in-the-b-file">
+<h2>5.9.6 (-hist)Reporting the per-base of coverage for each feature in the B file<a class="headerlink" href="#hist-reporting-the-per-base-of-coverage-for-each-feature-in-the-b-file" title="Permalink to this headline">¶</a></h2>
+<p>One should use the &#8220;<strong>-d</strong>&#8221; option to create, for each interval in B, a detailed list of coverage at each of the
+positions across each B interval.</p>
+<p>The output will consist of a line for each one-based position in each B feature, followed by the coverage
+detected at that position.</p>
+<div class="highlight-python"><pre>cat A.bed
+chr1  0  5
+chr1  3  8
+chr1  4  8
+chr1  5  9
+
+cat B.bed
+chr1  0  10
+
+coverageBed -a A.bed -b B.bed -d
+chr1  0  10  B  1  1
+chr1  0  10  B  2  1
+chr1  0  10  B  3  1
+chr1  0  10  B  4  2
+chr1  0  10  B  5  3
+chr1  0  10  B  6  3
+chr1  0  10  B  7  3
+chr1  0  10  B  8  3
+chr1  0  10  B  9  1
+chr1  0  10  B  10 0</pre>
+</div>
+</div>
+<div class="section" id="split-reporting-coverage-with-spliced-alignments-or-blocked-bed-features">
+<h2>5.9.7 (-split)Reporting coverage with spliced alignments or blocked BED features<a class="headerlink" href="#split-reporting-coverage-with-spliced-alignments-or-blocked-bed-features" title="Permalink to this headline">¶</a></h2>
+<p>As described in section 1.3.19, coverageBed will, by default, screen for overlaps against the entire span
+of a spliced/split BAM alignment or blocked BED12 feature. When dealing with RNA-seq reads, for
+example, one typically wants to only tabulate coverage for the portions of the reads that come from
+exons (and ignore the interstitial intron sequence). The <strong>-split</strong> command allows for such coverage to be
+performed.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/bedtools.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">5.9 coverageBed</a><ul>
+<li><a class="reference internal" href="#usage-and-option-summary">5.9.1 Usage and option summary</a></li>
+<li><a class="reference internal" href="#default-behavior">5.9.2 Default behavior</a></li>
+<li><a class="reference internal" href="#s-calculating-coverage-by-strand">5.9.4 (-s)Calculating coverage by strand</a></li>
+<li><a class="reference internal" href="#hist-creating-a-histogram-of-coverage-for-each-feature-in-the-b-file">5.9.5 (-hist)Creating a histogram of coverage for each feature in the B file</a></li>
+<li><a class="reference internal" href="#hist-reporting-the-per-base-of-coverage-for-each-feature-in-the-b-file">5.9.6 (-hist)Reporting the per-base of coverage for each feature in the B file</a></li>
+<li><a class="reference internal" href="#split-reporting-coverage-with-spliced-alignments-or-blocked-bed-features">5.9.7 (-split)Reporting coverage with spliced alignments or blocked BED features</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="mergeBed.html"
+                        title="previous chapter">5.8 mergeBed</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="genomecoverageBed.html"
+                        title="next chapter">5.10 genomeCoverageBed</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/content/coverageBed.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="genomecoverageBed.html" title="5.10 genomeCoverageBed"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="mergeBed.html" title="5.8 mergeBed"
+             >previous</a> |</li>
+        <li><a href="../index.html">bedtools v2.16.2</a> &raquo;</li>
+          <li><a href="bedtools-suite.html" >The BEDTools suite</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2012.
+      Last updated on Jul 23, 2012.
+    <a href="http://www.gnu.org/licenses/gpl-3.0.txt"><p>GPL3 licensed</p></a>
+    </div>
+  </body>
+</html>

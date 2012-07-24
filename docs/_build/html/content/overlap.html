@@ -1,0 +1,173 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>5.19 overlap</title>
+    
+    <link rel="stylesheet" href="../_static/rtd.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.16.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="shortcut icon" href="../_static/bedtools.png"/>
+    <link rel="top" title="None" href="../index.html" />
+    <link rel="up" title="The BEDTools suite" href="bedtools-suite.html" />
+    <link rel="next" title="5.20 bedToIgv" href="bedToIgv.html" />
+    <link rel="prev" title="5.18 bedToBam" href="bedToBam.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="bedToIgv.html" title="5.20 bedToIgv"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="bedToBam.html" title="5.18 bedToBam"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">bedtools v2.16.2</a> &raquo;</li>
+          <li><a href="bedtools-suite.html" accesskey="U">The BEDTools suite</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="overlap">
+<h1>5.19 overlap<a class="headerlink" href="#overlap" title="Permalink to this headline">¶</a></h1>
+<p><strong>overlap</strong> computes the amount of overlap (in the case of positive values) or distance (in the case of
+negative values) between feature coordinates occurring on the same input line and reports the result at
+the end of the same line. In this way, it is a useful method for computing custom overlap scores from
+the output of other BEDTools.</p>
+<div class="section" id="usage-and-option-summary">
+<h2>5.19.1 Usage and option summary<a class="headerlink" href="#usage-and-option-summary" title="Permalink to this headline">¶</a></h2>
+<p>Usage:</p>
+<div class="highlight-python"><pre>overlap [OPTIONS] -i &lt;input&gt; -cols s1,e1,s2,e2</pre>
+</div>
+<table border="1" class="docutils">
+<colgroup>
+<col width="11%" />
+<col width="89%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Option</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><strong>-i</strong></td>
+<td>Input file. Use &#8220;stdin&#8221; for pipes.</td>
+</tr>
+<tr class="row-odd"><td><strong>-cols</strong></td>
+<td>Specify the columns (1-based) for the starts and ends of the features for which you&#8217;d like to compute the overlap/distance. The columns must be listed in the following order: <em>start1,end1,start2,end2</em></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="default-behavior">
+<h2>5.19.2 Default behavior<a class="headerlink" href="#default-behavior" title="Permalink to this headline">¶</a></h2>
+<p>The default behavior is to compute the amount of overlap between the features you specify based on the
+start and end coordinates. For example:</p>
+<div class="highlight-python"><pre>windowBed -a A.bed -b B.bed -w 10
+chr1  10  20  A  chr1  15  25  B
+chr1  10  20  C  chr1  25  35  D</pre>
+</div>
+<p># Now let&#8217;s say we want to compute the number of base pairs of overlap
+# between the overlapping features from the output of windowBed.</p>
+<div class="highlight-python"><pre>windowBed -a A.bed -b B.bed -w 10 | overlap -i stdin -cols 2,3,6,7
+chr1  10  20  A  chr1  15  25  B  5
+chr1  10  20  C  chr1  25  35  D  -5</pre>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/bedtools.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">5.19 overlap</a><ul>
+<li><a class="reference internal" href="#usage-and-option-summary">5.19.1 Usage and option summary</a></li>
+<li><a class="reference internal" href="#default-behavior">5.19.2 Default behavior</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="bedToBam.html"
+                        title="previous chapter">5.18 bedToBam</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="bedToIgv.html"
+                        title="next chapter">5.20 bedToIgv</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/content/overlap.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="bedToIgv.html" title="5.20 bedToIgv"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="bedToBam.html" title="5.18 bedToBam"
+             >previous</a> |</li>
+        <li><a href="../index.html">bedtools v2.16.2</a> &raquo;</li>
+          <li><a href="bedtools-suite.html" >The BEDTools suite</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2012.
+      Last updated on Jul 23, 2012.
+    <a href="http://www.gnu.org/licenses/gpl-3.0.txt"><p>GPL3 licensed</p></a>
+    </div>
+  </body>
+</html>

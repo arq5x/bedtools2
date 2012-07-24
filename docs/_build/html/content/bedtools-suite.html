@@ -1,0 +1,162 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>The BEDTools suite</title>
+    
+    <link rel="stylesheet" href="../_static/rtd.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.16.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="shortcut icon" href="../_static/bedtools.png"/>
+    <link rel="top" title="None" href="../index.html" />
+    <link rel="next" title="5.1 intersect" href="intersectBed.html" />
+    <link rel="prev" title="General usage" href="general-usage.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="intersectBed.html" title="5.1 intersect"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="general-usage.html" title="General usage"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">bedtools v2.16.2</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="the-bedtools-suite">
+<h1>The BEDTools suite<a class="headerlink" href="#the-bedtools-suite" title="Permalink to this headline">¶</a></h1>
+<p>This section covers the functionality and default / optional usage for each of the available BEDTools.
+Example &#8220;figures&#8221; are provided in some cases in an effort to convey the purpose of the tool. The
+behavior of each available parameter is discussed for each tool in abstract terms. More concrete usage
+examples are provided in <strong>Section 6</strong>.</p>
+<div class="section" id="table-of-contents">
+<h2>Table of contents<a class="headerlink" href="#table-of-contents" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="intersectBed.html">5.1 intersect</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pairToBed.html">5.2 pairToBed</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pairToPair.html">5.3 pairToPair</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bamToBed.html">5.4 bamToBed</a></li>
+<li class="toctree-l1"><a class="reference internal" href="windowBed.html">5.5 windowBed</a></li>
+<li class="toctree-l1"><a class="reference internal" href="closestBed.html">5.6 closestBed</a></li>
+<li class="toctree-l1"><a class="reference internal" href="subtractBed.html">5.7 subtractBed</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mergeBed.html">5.8 mergeBed</a></li>
+<li class="toctree-l1"><a class="reference internal" href="coverageBed.html">5.9 coverageBed</a></li>
+<li class="toctree-l1"><a class="reference internal" href="genomecoverageBed.html">5.10 genomeCoverageBed</a></li>
+<li class="toctree-l1"><a class="reference internal" href="fastafromBed.html">5.11 fastaFromBed</a></li>
+<li class="toctree-l1"><a class="reference internal" href="maskfastafromBed.html">5.12 maskFastaFromBed</a></li>
+<li class="toctree-l1"><a class="reference internal" href="shuffleBed.html">5.13 shuffleBed</a></li>
+<li class="toctree-l1"><a class="reference internal" href="slopBed.html">5.14 slopBed</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sortBed.html">5.15 sortBed</a></li>
+<li class="toctree-l1"><a class="reference internal" href="linksBed.html">5.16 linksBed</a></li>
+<li class="toctree-l1"><a class="reference internal" href="complementBed.html">5.17 complementBed</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bedToBam.html">5.18 bedToBam</a></li>
+<li class="toctree-l1"><a class="reference internal" href="overlap.html">5.19 overlap</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bedToIgv.html">5.20 bedToIgv</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bed12ToBed6.html">5.21 bed12ToBed6</a></li>
+<li class="toctree-l1"><a class="reference internal" href="groupBy.html">5.22 groupBy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="unionBedGraphs.html">5.23 unionBedGraphs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="annotateBed.html">5.24 annotateBed</a></li>
+</ul>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/bedtools.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">The BEDTools suite</a><ul>
+<li><a class="reference internal" href="#table-of-contents">Table of contents</a><ul>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="general-usage.html"
+                        title="previous chapter">General usage</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="intersectBed.html"
+                        title="next chapter">5.1 intersect</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/content/bedtools-suite.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="intersectBed.html" title="5.1 intersect"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="general-usage.html" title="General usage"
+             >previous</a> |</li>
+        <li><a href="../index.html">bedtools v2.16.2</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2012.
+      Last updated on Jul 23, 2012.
+    <a href="http://www.gnu.org/licenses/gpl-3.0.txt"><p>GPL3 licensed</p></a>
+    </div>
+  </body>
+</html>

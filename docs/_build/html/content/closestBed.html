@@ -1,0 +1,251 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>5.6 closestBed</title>
+    
+    <link rel="stylesheet" href="../_static/rtd.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.16.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="shortcut icon" href="../_static/bedtools.png"/>
+    <link rel="top" title="None" href="../index.html" />
+    <link rel="up" title="The BEDTools suite" href="bedtools-suite.html" />
+    <link rel="next" title="5.7 subtractBed" href="subtractBed.html" />
+    <link rel="prev" title="5.5 windowBed" href="windowBed.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="subtractBed.html" title="5.7 subtractBed"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="windowBed.html" title="5.5 windowBed"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">bedtools v2.16.2</a> &raquo;</li>
+          <li><a href="bedtools-suite.html" accesskey="U">The BEDTools suite</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="closestbed">
+<h1>5.6 closestBed<a class="headerlink" href="#closestbed" title="Permalink to this headline">¶</a></h1>
+<p>Similar to <strong>intersectBed, closestBed</strong> searches for overlapping features in A and B. In the event that
+no feature in B overlaps the current feature in A, <strong>closestBed</strong> will report the <em>closest</em> (that is, least
+genomic distance from the start or end of A) feature in B. For example, one might want to find which
+is the closest gene to a significant GWAS polymorphism. Note that <strong>closestBed</strong> will report an
+overlapping feature as the closest&#8212;that is, it does not restrict to closest <em>non-overlapping</em> feature.</p>
+<div class="section" id="usage-and-option-summary">
+<h2>5.6.1 Usage and option summary<a class="headerlink" href="#usage-and-option-summary" title="Permalink to this headline">¶</a></h2>
+<p><strong>Usage:</strong></p>
+<div class="highlight-python"><pre>closestBed [OPTIONS] -a &lt;BED/GFF/VCF&gt; -b &lt;BED/GFF/VCF&gt;</pre>
+</div>
+<table border="1" class="docutils">
+<colgroup>
+<col width="12%" />
+<col width="88%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Option</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><strong>-s</strong></td>
+<td>Force strandedness. That is, find the closest feature in B overlaps A on the same strand. <em>By default, this is disabled</em>.</td>
+</tr>
+<tr class="row-odd"><td><strong>-d</strong></td>
+<td>In addition to the closest feature in B, report its distance to A as an extra column. The reported distance for overlapping features will be 0.</td>
+</tr>
+<tr class="row-even"><td><strong>-t</strong></td>
+<td><p class="first">How ties for closest feature should be handled. This occurs when two features in B have exactly the same overlap with a feature in A. <em>By default, all such features in B are reported</em>.</p>
+<blockquote class="last">
+<div><p>Here are the other choices controlling how ties are handled:</p>
+<p><em>all-</em>   Report all ties (default).</p>
+<p><em>first-</em>   Report the first tie that occurred in the B file.</p>
+<p><em>last-</em>   Report the last tie that occurred in the B file.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="default-behavior">
+<h2>5.6.2 Default behavior<a class="headerlink" href="#default-behavior" title="Permalink to this headline">¶</a></h2>
+<p><strong>closestBed</strong> first searches for features in B that overlap a feature in A. If overlaps are found, the feature
+in B that overlaps the highest fraction of A is reported. If no overlaps are found, <strong>closestBed</strong> looks for
+the feature in B that is <em>closest</em> (that is, least genomic distance to the start or end of A) to A. For
+example, in the figure below, feature B1 would be reported as the closest feature to A1.</p>
+<div class="highlight-python"><pre>Chromosome  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+BED FILE A                             *************
+
+BED File B         ^^^^^^^^                            ^^^^^^
+
+Result                                                 ======</pre>
+</div>
+<p>For example:</p>
+<div class="highlight-python"><pre>cat A.bed
+chr1  100  200
+
+cat B.bed
+chr1  500  1000
+chr1  1300 2000
+
+closestBed -a A.bed -b B.bed
+chr1  100  200  chr1  500  1000</pre>
+</div>
+</div>
+<div class="section" id="s-enforcing-strandedness">
+<h2>5.6.3 (-s)Enforcing &#8220;strandedness&#8221;<a class="headerlink" href="#s-enforcing-strandedness" title="Permalink to this headline">¶</a></h2>
+<p>This option behaves the same as the -s option for intersectBed while scanning for the closest
+(overlapping or not) feature in B. See the discussion in the intersectBed section for details.</p>
+</div>
+<div class="section" id="t-controlling-how-ties-for-closest-are-broken">
+<h2>5.6.4 (-t)Controlling how ties for &#8220;closest&#8221; are broken<a class="headerlink" href="#t-controlling-how-ties-for-closest-are-broken" title="Permalink to this headline">¶</a></h2>
+<p>When there are two or more features in B that overlap the <em>same fraction</em> of A, <strong>closestBed</strong> will, by
+default, report both features in B. Imagine feature A is a SNP and file B contains genes. It can often
+occur that two gene annotations (e.g. opposite strands) in B will overlap the SNP. As mentioned, the
+default behavior is to report both such genes in B. However, the -t option allows one to optionally
+choose the just first or last feature (in terms of where it occurred in the input file, not chromosome
+position) that occurred in B.</p>
+<p>For example (note the difference between -l 200 and -l 300):</p>
+<div class="highlight-python"><pre>cat A.bed
+chr1  100  101  rs1234
+
+cat B.bed
+chr1  0  1000  geneA  100  +
+chr1  0  1000  geneB  100  -
+
+closestBed -a A.bed -b B.bed
+chr1  100  101  rs1234  chr1  0  1000  geneA  100  +
+chr1  100  101  rs1234  chr1  0  1000  geneB  100  -
+
+closestBed -a A.bed -b B.bed -t all
+chr1  100  101  rs1234  chr1  0  1000  geneA  100  +
+chr1  100  101  rs1234  chr1  0  1000  geneB  100  -
+
+closestBed -a A.bed -b B.bed -t first
+chr1  100  101  rs1234  chr1  0  1000  geneA  100  +
+
+closestBed -a A.bed -b B.bed -t last
+chr1  100  101  rs1234  chr1  0  1000  geneB  100  -</pre>
+</div>
+</div>
+<div class="section" id="d-reporting-the-distance-to-the-closest-feature-in-base-pairs">
+<h2>5.6.5 (-d)Reporting the distance to the closest feature in base pairs<a class="headerlink" href="#d-reporting-the-distance-to-the-closest-feature-in-base-pairs" title="Permalink to this headline">¶</a></h2>
+<p>ClosestBed will optionally report the distance to the closest feature in the B file using the <strong>-d</strong> option.
+When a feature in B overlaps a feature in A, a distance of 0 is reported.</p>
+<div class="highlight-python"><pre>cat A.bed
+chr1  100  200
+chr1  500  600
+
+cat B.bed
+chr1  500  1000
+chr1  1300 2000
+
+closestBed -a A.bed -b B.bed -d
+chr1  100  200  chr1  500  1000  300
+chr1  500  600  chr1  500  1000  0</pre>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/bedtools.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">5.6 closestBed</a><ul>
+<li><a class="reference internal" href="#usage-and-option-summary">5.6.1 Usage and option summary</a></li>
+<li><a class="reference internal" href="#default-behavior">5.6.2 Default behavior</a></li>
+<li><a class="reference internal" href="#s-enforcing-strandedness">5.6.3 (-s)Enforcing &#8220;strandedness&#8221;</a></li>
+<li><a class="reference internal" href="#t-controlling-how-ties-for-closest-are-broken">5.6.4 (-t)Controlling how ties for &#8220;closest&#8221; are broken</a></li>
+<li><a class="reference internal" href="#d-reporting-the-distance-to-the-closest-feature-in-base-pairs">5.6.5 (-d)Reporting the distance to the closest feature in base pairs</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="windowBed.html"
+                        title="previous chapter">5.5 windowBed</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="subtractBed.html"
+                        title="next chapter">5.7 subtractBed</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/content/closestBed.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="subtractBed.html" title="5.7 subtractBed"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="windowBed.html" title="5.5 windowBed"
+             >previous</a> |</li>
+        <li><a href="../index.html">bedtools v2.16.2</a> &raquo;</li>
+          <li><a href="bedtools-suite.html" >The BEDTools suite</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2012.
+      Last updated on Jul 23, 2012.
+    <a href="http://www.gnu.org/licenses/gpl-3.0.txt"><p>GPL3 licensed</p></a>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,274 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>5.13 shuffleBed</title>
+    
+    <link rel="stylesheet" href="../_static/rtd.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.16.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="shortcut icon" href="../_static/bedtools.png"/>
+    <link rel="top" title="None" href="../index.html" />
+    <link rel="up" title="The BEDTools suite" href="bedtools-suite.html" />
+    <link rel="next" title="5.14 slopBed" href="slopBed.html" />
+    <link rel="prev" title="5.12 maskFastaFromBed" href="maskfastafromBed.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="slopBed.html" title="5.14 slopBed"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="maskfastafromBed.html" title="5.12 maskFastaFromBed"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">bedtools v2.16.2</a> &raquo;</li>
+          <li><a href="bedtools-suite.html" accesskey="U">The BEDTools suite</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="shufflebed">
+<h1>5.13 shuffleBed<a class="headerlink" href="#shufflebed" title="Permalink to this headline">¶</a></h1>
+<p><strong>shuffleBed</strong> will randomly permute the genomic locations of a fearure file among a genome defined in a
+genome file. One can also provide an &#8220;exclusions&#8221; BED/GFF/VCF file that lists regions where you do
+not want the permuted features to be placed. For example, one might want to prevent features from
+being placed in known genome gaps. <strong>shuffleBed</strong> is useful as a <em>null</em> basis against which to test the
+significance of associations of one feature with another.</p>
+<div class="section" id="usage-and-option-summary">
+<h2>5.13.1 Usage and option summary<a class="headerlink" href="#usage-and-option-summary" title="Permalink to this headline">¶</a></h2>
+<p>Usage:</p>
+<div class="highlight-python"><pre>shuffleBed [OPTIONS] -i &lt;BED/GFF/VCF&gt; -g &lt;GENOME&gt;</pre>
+</div>
+<table border="1" class="docutils">
+<colgroup>
+<col width="11%" />
+<col width="89%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Option</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><strong>-excl</strong></td>
+<td>A BED file of coordinates in which features from -i should <em>not</em> be placed (e.g., genome gaps).</td>
+</tr>
+<tr class="row-odd"><td><strong>-chrom</strong></td>
+<td>Keep features in -i on the same chromosome. Solely permute their location on the chromosome. <em>By default, both the chromosome and position are randomly chosen</em>.</td>
+</tr>
+<tr class="row-even"><td><strong>-seed</strong></td>
+<td>Supply an integer seed for the shuffling. This will allow feature shuffling experiments to be recreated exactly as the seed for the pseudo-random number generation will be constant. <em>By default, the seed is chosen automatically</em>.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="default-behavior">
+<h2>5.13.2 Default behavior<a class="headerlink" href="#default-behavior" title="Permalink to this headline">¶</a></h2>
+<p>By default, <strong>shuffleBed</strong> will reposition each feature in the input BED file on a random chromosome at a
+random position. The size and strand of each feature are preserved.</p>
+<p>For example:</p>
+<div class="highlight-python"><pre>cat A.bed
+chr1  0  100  a1  1  +
+chr1  0  1000 a2  2  -
+
+cat my.genome
+chr1  10000
+chr2  8000
+chr3  5000
+chr4  2000
+
+shuffleBed -i A.bed -g my.genome
+chr4  1498  1598  a1  1  +
+chr3  2156  3156  a2  2  -</pre>
+</div>
+</div>
+<div class="section" id="chrom-requiring-that-features-be-shuffled-on-the-same-chromosome">
+<h2>5.13.3 (-chrom)Requiring that features be shuffled on the same chromosome<a class="headerlink" href="#chrom-requiring-that-features-be-shuffled-on-the-same-chromosome" title="Permalink to this headline">¶</a></h2>
+<p>The &#8220;<strong>-chrom</strong>&#8221; option behaves the same as the default behavior except that features are randomly
+placed on the same chromosome as defined in the BED file.</p>
+<p>For example:</p>
+<div class="highlight-python"><pre>cat A.bed
+chr1  0  100  a1  1  +
+chr1  0  1000 a2  2  -
+
+cat my.genome
+chr1  10000
+chr2  8000
+chr3  5000
+chr4  2000
+
+shuffleBed -i A.bed -g my.genome -chrom
+chr1  9560  9660  a1  1  +
+chr1  7258  8258  a2  2  -</pre>
+</div>
+</div>
+<div class="section" id="excluding-certain-genome-regions-from-shufflebed">
+<h2>5.13.4 Excluding certain genome regions from shuffleBed<a class="headerlink" href="#excluding-certain-genome-regions-from-shufflebed" title="Permalink to this headline">¶</a></h2>
+<p>One may want to prevent BED features from being placed in certain regions of the genome. For
+example, one may want to exclude genome gaps from permutation experiment. The &#8220;<strong>-excl</strong>&#8221; option
+defines a BED file of regions that should be excluded. <strong>shuffleBed</strong> will attempt to permute the
+locations of all features while adhering to the exclusion rules. However it will stop looking for an
+appropriate location if it cannot find a valid spot for a feature after 1,000,000 tries.</p>
+<p>For example (<em>note that the exclude file excludes all but 100 base pairs of the chromosome</em>):</p>
+<div class="highlight-python"><pre>cat A.bed
+chr1  0  100   a1  1  +
+chr1  0  1000  a2  2  -
+
+cat my.genome
+chr1  10000
+
+cat exclude.bed
+chr1  100  10000
+
+shuffleBed -i A.bed -g my.genome -excl exclude.bed
+chr1  0  100  a1  1  +
+Error, line 2: tried 1000000 potential loci for entry, but could not avoid excluded
+regions. Ignoring entry and moving on.</pre>
+</div>
+<p>For example (<em>now the exclusion file only excludes the first 100 bases of the chromosome</em>):</p>
+<div class="highlight-python"><pre>cat A.bed
+chr1  0  100  a1  1  +
+chr1  0  1000 a2  2  -
+
+cat my.genome
+chr1  10000
+
+cat exclude.bed
+chr1  0  100
+
+shuffleBed -i A.bed -g my.genome -excl exclude.bed
+chr1  147  247  a1  1  +
+chr1  2441 3441 a2  2  -</pre>
+</div>
+</div>
+<div class="section" id="defining-a-seed-for-the-random-replacement">
+<h2>5.13.5 Defining a &#8220;seed&#8221; for the random replacement.<a class="headerlink" href="#defining-a-seed-for-the-random-replacement" title="Permalink to this headline">¶</a></h2>
+<p><strong>shuffleBed</strong> uses a pseudo-random number generator to permute the locations of BED features.
+Therefore, each run should produce a different result. This can be problematic if one wants to exactly
+recreate an experiment. By using the &#8220;<strong>-seed</strong>&#8221; option, one can supply a custom integer seed for
+<strong>shuffleBed</strong>. In turn, each execution of <strong>shuffleBed</strong> with the same seed and input files should produce
+identical results.</p>
+<p>For example (<em>note that the exclude file below excludes all but 100 base pairs of the chromosome</em>):</p>
+<div class="highlight-python"><pre>cat A.bed
+chr1 0 100 a1 1 +
+chr1 0 1000 a2 2 -
+
+cat my.genome
+chr1 10000
+
+shuffleBed -i A.bed -g my.genome -seed 927442958
+chr1 6177 6277 a1 1 +
+chr1 8119 9119 a2 2 -
+
+shuffleBed -i A.bed -g my.genome -seed 927442958
+chr1 6177 6277 a1 1 +
+chr1 8119 9119 a2 2 -
+
+. . .
+
+shuffleBed -i A.bed -g my.genome -seed 927442958
+chr1 6177 6277 a1 1 +
+chr1 8119 9119 a2 2 -</pre>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/bedtools.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">5.13 shuffleBed</a><ul>
+<li><a class="reference internal" href="#usage-and-option-summary">5.13.1 Usage and option summary</a></li>
+<li><a class="reference internal" href="#default-behavior">5.13.2 Default behavior</a></li>
+<li><a class="reference internal" href="#chrom-requiring-that-features-be-shuffled-on-the-same-chromosome">5.13.3 (-chrom)Requiring that features be shuffled on the same chromosome</a></li>
+<li><a class="reference internal" href="#excluding-certain-genome-regions-from-shufflebed">5.13.4 Excluding certain genome regions from shuffleBed</a></li>
+<li><a class="reference internal" href="#defining-a-seed-for-the-random-replacement">5.13.5 Defining a &#8220;seed&#8221; for the random replacement.</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="maskfastafromBed.html"
+                        title="previous chapter">5.12 maskFastaFromBed</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="slopBed.html"
+                        title="next chapter">5.14 slopBed</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/content/shuffleBed.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="slopBed.html" title="5.14 slopBed"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="maskfastafromBed.html" title="5.12 maskFastaFromBed"
+             >previous</a> |</li>
+        <li><a href="../index.html">bedtools v2.16.2</a> &raquo;</li>
+          <li><a href="bedtools-suite.html" >The BEDTools suite</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2012.
+      Last updated on Jul 23, 2012.
+    <a href="http://www.gnu.org/licenses/gpl-3.0.txt"><p>GPL3 licensed</p></a>
+    </div>
+  </body>
+</html>

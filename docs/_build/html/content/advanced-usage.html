@@ -1,0 +1,181 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Advanced usage</title>
+    
+    <link rel="stylesheet" href="../_static/rtd.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.16.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="shortcut icon" href="../_static/bedtools.png"/>
+    <link rel="top" title="None" href="../index.html" />
+    <link rel="prev" title="Example usage" href="example-usage.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="example-usage.html" title="Example usage"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">bedtools v2.16.2</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="advanced-usage">
+<h1>Advanced usage<a class="headerlink" href="#advanced-usage" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="mask-all-regions-in-a-genome-except-for-targeted-capture-regions">
+<h2>7.1 Mask all regions in a genome except for targeted capture regions.<a class="headerlink" href="#mask-all-regions-in-a-genome-except-for-targeted-capture-regions" title="Permalink to this headline">¶</a></h2>
+<p># Add 500 bp up and downstream of each probe</p>
+<div class="highlight-python"><pre>slopBed -i probes.bed -b 500 &gt; probes.500bp.bed</pre>
+</div>
+<p># Get a BED file of all regions not covered by the probes (+500 bp up/down)</p>
+<div class="highlight-python"><pre>complementBed -i probes.500bp.bed -g hg18.genome &gt; probes.500bp.complement.bed</pre>
+</div>
+<p># Create a masked genome where all bases are masked except for the probes +500bp</p>
+<div class="highlight-python"><pre>maskFastaFromBed -in hg18.fa -bed probes.500bp.complement.bed -fo hg18.probecomplement.
+masked.fa</pre>
+</div>
+</div>
+<div class="section" id="screening-for-novel-snps">
+<h2>7.2 Screening for novel SNPs.<a class="headerlink" href="#screening-for-novel-snps" title="Permalink to this headline">¶</a></h2>
+<p># Find all SNPs that are not in dbSnp and not in the latest 1000 genomes calls</p>
+<div class="highlight-python"><pre>intersectBed -a snp.calls.bed -b dbSnp.bed -v | intersectBed -a stdin -b 1KG.bed
+-v &gt; snp.calls.novel.bed</pre>
+</div>
+<p>you can first use intersectBed with the &#8220;-f 1.0&#8221; option.</p>
+<div class="highlight-python"><pre>intersectBed -a features.bed -b windows.bed -f 1.0 | coverageBed -a stdin -b
+windows.bed &gt; windows.bed.coverage</pre>
+</div>
+</div>
+<div class="section" id="computing-the-coverage-of-bam-alignments-on-exons">
+<h2>7.4 Computing the coverage of BAM alignments on exons.<a class="headerlink" href="#computing-the-coverage-of-bam-alignments-on-exons" title="Permalink to this headline">¶</a></h2>
+<p># One can combine SAMtools with BEDtools to compute coverage directly from the BAM
+data by using bamToBed.</p>
+<div class="highlight-python"><pre>bamToBed -i reads.bam | coverageBed -a stdin -b exons.bed &gt; exons.bed.coverage</pre>
+</div>
+<p># Take it a step further and require that coverage be from properly-paired reads.</p>
+<div class="highlight-python"><pre>samtools view -bf 0x2 reads.bam | bamToBed -i stdin | coverageBed -a stdin -b
+exons.bed &gt; exons.bed.proper.coverage</pre>
+</div>
+</div>
+<div class="section" id="computing-coverage-separately-for-each-strand">
+<h2>7.5 Computing coverage separately for each strand.<a class="headerlink" href="#computing-coverage-separately-for-each-strand" title="Permalink to this headline">¶</a></h2>
+<p># Use grep to only look at forward strand features (i.e. those that end in &#8220;+&#8221;).</p>
+<div class="highlight-python"><pre>bamToBed -i reads.bam | grep \+$ | coverageBed -a stdin -b genes.bed &gt;
+genes.bed.forward.coverage</pre>
+</div>
+<p># Use grep to only look at reverse strand features (i.e. those that end in &#8220;-&#8221;).</p>
+<div class="highlight-python"><pre>bamToBed -i reads.bam | grep \-$ | coverageBed -a stdin -b genes.bed &gt;
+genes.bed.forward.coverage</pre>
+</div>
+</div>
+<div class="section" id="find-structural-variant-calls-that-are-private-to-one-sample">
+<h2>7.6 Find structural variant calls that are private to one sample.<a class="headerlink" href="#find-structural-variant-calls-that-are-private-to-one-sample" title="Permalink to this headline">¶</a></h2>
+<p># :</p>
+<div class="highlight-python"><pre>pairToPair -a sample1.sv.bedpe -b othersamples.sv.bedpe -type neither &gt;
+sample1.sv.private.bedpe</pre>
+</div>
+</div>
+<div class="section" id="exclude-sv-deletions-that-appear-to-be-alu-insertions-in-the-reference-genome">
+<h2>7.7 Exclude SV deletions that appear to be ALU insertions in the reference genome.<a class="headerlink" href="#exclude-sv-deletions-that-appear-to-be-alu-insertions-in-the-reference-genome" title="Permalink to this headline">¶</a></h2>
+<p># We&#8217;ll require that 90% of the inner span of the deletion be overlapped by a
+recent ALU.</p>
+<div class="highlight-python"><pre>pairToBed -a deletions.sv.bedpe -b ALUs.recent.bed -type notispan -f 0.80 &gt;
+deletions.notALUsinRef.bedpe</pre>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/bedtools.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Advanced usage</a><ul>
+<li><a class="reference internal" href="#mask-all-regions-in-a-genome-except-for-targeted-capture-regions">7.1 Mask all regions in a genome except for targeted capture regions.</a></li>
+<li><a class="reference internal" href="#screening-for-novel-snps">7.2 Screening for novel SNPs.</a></li>
+<li><a class="reference internal" href="#computing-the-coverage-of-bam-alignments-on-exons">7.4 Computing the coverage of BAM alignments on exons.</a></li>
+<li><a class="reference internal" href="#computing-coverage-separately-for-each-strand">7.5 Computing coverage separately for each strand.</a></li>
+<li><a class="reference internal" href="#find-structural-variant-calls-that-are-private-to-one-sample">7.6 Find structural variant calls that are private to one sample.</a></li>
+<li><a class="reference internal" href="#exclude-sv-deletions-that-appear-to-be-alu-insertions-in-the-reference-genome">7.7 Exclude SV deletions that appear to be ALU insertions in the reference genome.</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="example-usage.html"
+                        title="previous chapter">Example usage</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/content/advanced-usage.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="example-usage.html" title="Example usage"
+             >previous</a> |</li>
+        <li><a href="../index.html">bedtools v2.16.2</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2012.
+      Last updated on Jul 23, 2012.
+    <a href="http://www.gnu.org/licenses/gpl-3.0.txt"><p>GPL3 licensed</p></a>
+    </div>
+  </body>
+</html>

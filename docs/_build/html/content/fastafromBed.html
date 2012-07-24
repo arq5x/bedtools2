@@ -1,0 +1,240 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>5.11 fastaFromBed</title>
+    
+    <link rel="stylesheet" href="../_static/rtd.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.16.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="shortcut icon" href="../_static/bedtools.png"/>
+    <link rel="top" title="None" href="../index.html" />
+    <link rel="up" title="The BEDTools suite" href="bedtools-suite.html" />
+    <link rel="next" title="5.12 maskFastaFromBed" href="maskfastafromBed.html" />
+    <link rel="prev" title="5.10 genomeCoverageBed" href="genomecoverageBed.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="maskfastafromBed.html" title="5.12 maskFastaFromBed"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="genomecoverageBed.html" title="5.10 genomeCoverageBed"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">bedtools v2.16.2</a> &raquo;</li>
+          <li><a href="bedtools-suite.html" accesskey="U">The BEDTools suite</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="fastafrombed">
+<h1>5.11 fastaFromBed<a class="headerlink" href="#fastafrombed" title="Permalink to this headline">¶</a></h1>
+<p><strong>fastaFromBed</strong> extracts sequences from a FASTA file for each of the intervals defined in a BED file.
+The headers in the input FASTA file must exactly match the chromosome column in the BED file.</p>
+<div class="section" id="usage-and-option-summary">
+<h2>5.11.1 Usage and option summary<a class="headerlink" href="#usage-and-option-summary" title="Permalink to this headline">¶</a></h2>
+<p>Usage:</p>
+<div class="highlight-python"><pre>fastaFromBed [OPTIONS] -fi &lt;input FASTA&gt; -bed &lt;BED/GFF/VCF&gt; -fo &lt;output FASTA&gt;</pre>
+</div>
+<table border="1" class="docutils">
+<colgroup>
+<col width="12%" />
+<col width="88%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Option</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><strong>-name</strong></td>
+<td>Use the &#8220;name&#8221; column in the BED file for the FASTA headers in the output FASTA file.</td>
+</tr>
+<tr class="row-odd"><td><strong>-tab</strong></td>
+<td>Report extract sequences in a tab-delimited format instead of in FASTA format.</td>
+</tr>
+<tr class="row-even"><td><strong>-s</strong></td>
+<td>Force strandedness. If the feature occupies the antisense strand, the sequence will be reverse complemented. <em>Default: strand information is ignored</em>.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="default-behavior">
+<h2>5.11.2 Default behavior<a class="headerlink" href="#default-behavior" title="Permalink to this headline">¶</a></h2>
+<p><strong>fastaFromBed</strong> will extract the sequence defined by the coordinates in a BED interval and create a
+new FASTA entry in the output file for each extracted sequence. By default, the FASTA header for each
+extracted sequence will be formatted as follows: &#8220;&lt;chrom&gt;:&lt;start&gt;-&lt;end&gt;&#8221;.</p>
+<p>For example:</p>
+<div class="highlight-python"><pre>$ cat test.fa
+&gt;chr1
+AAAAAAAACCCCCCCCCCCCCGCTACTGGGGGGGGGGGGGGGGGG
+
+cat test.bed
+chr1 5 10
+
+fastaFromBed -fi test.fa -bed test.bed -fo test.fa.out
+
+cat test.fa.out
+&gt;chr1:5-10
+AAACC</pre>
+</div>
+</div>
+<div class="section" id="using-the-bed-name-column-as-a-fasta-header">
+<h2>5.11.3 Using the BED &#8220;name&#8221; column as a FASTA header.<a class="headerlink" href="#using-the-bed-name-column-as-a-fasta-header" title="Permalink to this headline">¶</a></h2>
+<p>Using the <strong>-name</strong> option, one can set the FASTA header for each extracted sequence to be the &#8220;name&#8221;
+columns from the BED feature.</p>
+<p>For example:</p>
+<div class="highlight-python"><pre>cat test.fa
+&gt;chr1
+AAAAAAAACCCCCCCCCCCCCGCTACTGGGGGGGGGGGGGGGGGG
+
+cat test.bed
+chr1 5 10 myseq
+
+fastaFromBed -fi test.fa -bed test.bed -fo test.fa.out -name
+
+cat test.fa.out
+&gt;myseq
+AAACC</pre>
+</div>
+</div>
+<div class="section" id="creating-a-tab-delimited-output-file-in-lieu-of-fasta-output">
+<h2>5.11.4 Creating a tab-delimited output file in lieu of FASTA output.<a class="headerlink" href="#creating-a-tab-delimited-output-file-in-lieu-of-fasta-output" title="Permalink to this headline">¶</a></h2>
+<p>Using the <strong>-tab</strong> option, the <strong>-fo</strong> output file will be tab-delimited instead of in FASTA format.</p>
+<p>For example:</p>
+<div class="highlight-python"><pre>cat test.fa
+&gt;chr1
+AAAAAAAACCCCCCCCCCCCCGCTACTGGGGGGGGGGGGGGGGGG
+
+cat test.bed
+chr1 5 10 myseq
+
+fastaFromBed -fi test.fa -bed test.bed -fo test.fa.out.tab -name -tab
+
+cat test.fa.out
+myseq AAACC</pre>
+</div>
+</div>
+<div class="section" id="s-forcing-the-extracted-sequence-to-reflect-the-requested-strand">
+<h2>5.11.5 (-s)Forcing the extracted sequence to reflect the requested strand<a class="headerlink" href="#s-forcing-the-extracted-sequence-to-reflect-the-requested-strand" title="Permalink to this headline">¶</a></h2>
+<p><strong>fastaFromBed</strong> will extract the sequence in the orientation defined in the strand column when the &#8220;-s&#8221;
+option is used.</p>
+<p>For example:</p>
+<div class="highlight-python"><pre>cat test.fa
+&gt;chr1
+AAAAAAAACCCCCCCCCCCCCGCTACTGGGGGGGGGGGGGGGGGG
+
+cat test.bed
+chr1 20 25 forward 1 +
+chr1 20 25 reverse 1 -
+
+fastaFromBed -fi test.fa -bed test.bed -s -name -fo test.fa.out
+
+cat test.fa.out
+&gt;forward
+CGCTA
+&gt;reverse
+TAGCG</pre>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/bedtools.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">5.11 fastaFromBed</a><ul>
+<li><a class="reference internal" href="#usage-and-option-summary">5.11.1 Usage and option summary</a></li>
+<li><a class="reference internal" href="#default-behavior">5.11.2 Default behavior</a></li>
+<li><a class="reference internal" href="#using-the-bed-name-column-as-a-fasta-header">5.11.3 Using the BED &#8220;name&#8221; column as a FASTA header.</a></li>
+<li><a class="reference internal" href="#creating-a-tab-delimited-output-file-in-lieu-of-fasta-output">5.11.4 Creating a tab-delimited output file in lieu of FASTA output.</a></li>
+<li><a class="reference internal" href="#s-forcing-the-extracted-sequence-to-reflect-the-requested-strand">5.11.5 (-s)Forcing the extracted sequence to reflect the requested strand</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="genomecoverageBed.html"
+                        title="previous chapter">5.10 genomeCoverageBed</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="maskfastafromBed.html"
+                        title="next chapter">5.12 maskFastaFromBed</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/content/fastafromBed.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="maskfastafromBed.html" title="5.12 maskFastaFromBed"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="genomecoverageBed.html" title="5.10 genomeCoverageBed"
+             >previous</a> |</li>
+        <li><a href="../index.html">bedtools v2.16.2</a> &raquo;</li>
+          <li><a href="bedtools-suite.html" >The BEDTools suite</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2012.
+      Last updated on Jul 23, 2012.
+    <a href="http://www.gnu.org/licenses/gpl-3.0.txt"><p>GPL3 licensed</p></a>
+    </div>
+  </body>
+</html>

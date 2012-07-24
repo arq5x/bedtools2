@@ -1,0 +1,161 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Quick start</title>
+    
+    <link rel="stylesheet" href="../_static/rtd.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.16.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="shortcut icon" href="../_static/bedtools.png"/>
+    <link rel="top" title="None" href="../index.html" />
+    <link rel="next" title="General usage" href="general-usage.html" />
+    <link rel="prev" title="Installation" href="installation.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="general-usage.html" title="General usage"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="installation.html" title="Installation"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">bedtools v2.16.2</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="quick-start">
+<h1>Quick start<a class="headerlink" href="#quick-start" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="install-bedtools">
+<h2>Install BEDTools<a class="headerlink" href="#install-bedtools" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-python"><pre>curl http://bedtools.googlecode.com/files/BEDTools.&lt;version&gt;.tar.gz &gt; BEDTools.tar.gz
+tar -zxvf BEDTools.tar.gz
+cd BEDTools
+make clean
+make all
+sudo cp bin/* /usr/local/bin/</pre>
+</div>
+</div>
+<div class="section" id="use-bedtools">
+<h2>Use BEDTools<a class="headerlink" href="#use-bedtools" title="Permalink to this headline">¶</a></h2>
+<p>Below are examples of typical BEDTools usage. <strong>Additional usage examples are described in
+section 6 of this manual.</strong> Using the &#8220;-h&#8221; option with any BEDTools will report a list of all command
+line options.</p>
+<p>A. Report the base-pair overlap between the features in two BED files.</p>
+<div class="highlight-python"><pre>intersectBed -a reads.bed -b genes.bed</pre>
+</div>
+<p>B. Report those entries in A that overlap NO entries in B. Like &#8220;grep -v&#8221;</p>
+<div class="highlight-python"><pre>intersectBed -a reads.bed -b genes.bed ?Cv</pre>
+</div>
+<p>C. Read BED A from stdin. Useful for stringing together commands. For example, find genes that overlap LINEs
+but not SINEs.</p>
+<div class="highlight-python"><pre>intersectBed -a genes.bed -b LINES.bed | intersectBed -a stdin -b SINEs.bed ?Cv</pre>
+</div>
+<p>D. Find the closest ALU to each gene.</p>
+<div class="highlight-python"><pre>closestBed -a genes.bed -b ALUs.bed</pre>
+</div>
+<p>E. Merge overlapping repetitive elements into a single entry, returning the number of entries merged.</p>
+<div class="highlight-python"><pre>mergeBed -i repeatMasker.bed -n</pre>
+</div>
+<p>F. Merge nearby repetitive elements into a single entry, so long as they are within 1000 bp of one another.</p>
+<div class="highlight-python"><pre>mergeBed -i repeatMasker.bed -d 1000</pre>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/bedtools.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Quick start</a><ul>
+<li><a class="reference internal" href="#install-bedtools">Install BEDTools</a></li>
+<li><a class="reference internal" href="#use-bedtools">Use BEDTools</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="installation.html"
+                        title="previous chapter">Installation</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="general-usage.html"
+                        title="next chapter">General usage</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/content/quick-start.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="general-usage.html" title="General usage"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="installation.html" title="Installation"
+             >previous</a> |</li>
+        <li><a href="../index.html">bedtools v2.16.2</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2012.
+      Last updated on Jul 23, 2012.
+    <a href="http://www.gnu.org/licenses/gpl-3.0.txt"><p>GPL3 licensed</p></a>
+    </div>
+  </body>
+</html>
