@@ -34,6 +34,9 @@ cd map; sh test-map.sh; cd ..
 echo " Testing bedtools merge:"
 cd merge; sh test-merge.sh; cd ..
 
+echo " Testing bedtools multicov:"
+cd multicov; sh test-multicov.sh; cd ..
+
 echo " Testing bedtools slop:"
 cd slop; sh test-slop.sh; cd ..
 

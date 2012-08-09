@@ -40,7 +40,13 @@ int multibamcov_main(int argc, char* argv[]) {
     bool properOnly        = false;
     bool keepDuplicates    = false;
     bool keepFailedQC      = false;
-    
+    bool obeySplits        = false;
+    bool sameStrand        = false;
+    bool diffStrand        = false;
+    float overlapFraction = 1E-9;
+    bool haveFraction       = false;
+    bool reciprocalFraction = false;
+     
     // check to see if we should print out some help
     if(argc <= 1) showHelp = true;
 
@@ -81,6 +87,19 @@ int multibamcov_main(int argc, char* argv[]) {
                 i--;
             }
         }
+        else if(PARAMETER_CHECK("-split", 6, parameterLength)) {
+            obeySplits = true;
+        }
+        else if(PARAMETER_CHECK("-f", 2, parameterLength)) {
+            if ((i+1) < argc) {
+                haveFraction = true;
+                overlapFraction = atof(argv[i + 1]);
+                i++;
+            }
+        }
+        else if(PARAMETER_CHECK("-r", 2, parameterLength)) {
+            reciprocalFraction = true;
+        }
         else if(PARAMETER_CHECK("-q", 2, parameterLength)) {
             if ((i+1) < argc) {
                 minQual = atoi(argv[i + 1]);
@@ -92,19 +111,30 @@ int multibamcov_main(int argc, char* argv[]) {
         }
         else if(PARAMETER_CHECK("-D", 2, parameterLength)) {
             keepDuplicates = true;
-        }
-        
+        }        
         else if(PARAMETER_CHECK("-F", 2, parameterLength)) {
             keepFailedQC = true;
         }
+        else if (PARAMETER_CHECK("-s", 2, parameterLength)) {
+            sameStrand = true;
+        }
+        else if (PARAMETER_CHECK("-S", 2, parameterLength)) {
+            diffStrand = true;
+        }
         else {
-            cerr << endl << "*****ERROR: Unrecognized parameter: " << argv[i] << " *****" << endl << endl;
+            cerr << endl << "*****ERROR: Unrecognized parameter: " << 
+                argv[i] << " *****" << endl << endl;
             showHelp = true;
         }
     }
 
     if (!showHelp) {
-        MultiCovBam *mc = new MultiCovBam(bamFiles, bedFile, minQual, properOnly, keepDuplicates, keepFailedQC);
+        MultiCovBam *mc = new MultiCovBam(bamFiles, bedFile, 
+                                          minQual, properOnly, 
+                                          keepDuplicates, keepFailedQC,
+                                          obeySplits, sameStrand,
+                                          diffStrand, overlapFraction,
+                                          reciprocalFraction);
         mc->CollectCoverage();
         delete mc;
     }
@@ -127,6 +157,24 @@ void multibamcov_help(void) {
     cerr << "\t-bams\t"        << "The bam files." << endl << endl;
 
     cerr << "\t-bed\t"         << "The bed file." << endl << endl;
+    
+    cerr << "\t-split\t"       << "Treat \"split\" BAM or BED12 entries as distinct BED intervals." << endl << endl;
+                               
+    cerr << "\t-s\t"           << "Require same strandedness.  That is, only report hits in B" << endl;
+    cerr                       << "\t\tthat overlap A on the _same_ strand." << endl;
+    cerr                       << "\t\t- By default, overlaps are reported without respect to strand." << endl << endl;
+                               
+    cerr << "\t-S\t"           << "Require different strandedness.  That is, only report hits in B" << endl;
+    cerr                       << "\t\tthat overlap A on the _opposite_ strand." << endl;
+    cerr                       << "\t\t- By default, overlaps are reported without respect to strand." << endl << endl;
+
+    cerr << "\t-f\t"            << "Minimum overlap required as a fraction of each A." << endl;
+    cerr                        << "\t\t- Default is 1E-9 (i.e., 1bp)." << endl;
+    cerr                        << "\t\t- FLOAT (e.g. 0.50)" << endl << endl;
+
+    cerr << "\t-r\t"            << "Require that the fraction overlap be reciprocal for each A and B." << endl;
+    cerr                        << "\t\t- In other words, if -f is 0.90 and -r is used, this requires" << endl;
+    cerr                        << "\t\t  that B overlap 90% of A and A _also_ overlaps 90% of B." << endl << endl;
 
     cerr << "\t-q\t"           << "Minimum mapping quality allowed. Default is 0." << endl << endl;
 
