@@ -208,7 +208,7 @@ int bedtools_help(void)
     cout  << "[ Format conversion ]" << endl;
     cout  << "    bamtobed      "  << "Convert BAM alignments to BED (& other) formats.\n";
     cout  << "    bedtobam      "  << "Convert intervals to BAM records.\n";
-    cout  << "    bedtofastq    "  << "Convert BAM records to FASTQ records.\n";
+    cout  << "    bamtofastq    "  << "Convert BAM records to FASTQ records.\n";
     cout  << "    bedpetobam    "  << "Convert BEDPE intervals to BAM records.\n";    
     cout  << "    bed12tobed6   "  << "Breaks BED12 intervals into discrete BED6 intervals.\n";
 
