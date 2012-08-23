@@ -102,7 +102,7 @@ void BedWindow::FindWindowOverlaps(const BED &a, vector<BED> &hits) {
     if (_anyHit == true && (numOverlaps >= 1)) {
         _bedA->reportBedNewLine(a); }
     else if (_writeCount == true) {
-        _bedA->reportBedTab(a); printf("\t%d\n", numOverlaps);
+        _bedA->reportBedTab(a); printf("%d\n", numOverlaps);
     }
     else if (_noHit == true && (numOverlaps == 0)) {
         _bedA->reportBedNewLine(a);
