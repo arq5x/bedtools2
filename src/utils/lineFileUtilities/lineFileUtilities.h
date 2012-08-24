@@ -50,9 +50,6 @@ void Tokenize(const string &str, vector<int> &elems, char delimiter = '\t')
 inline
 void TokenizeColumns(const string &str, vector<int> &elems) 
 {
-
-    // http://stackoverflow.com/questions/236129/how-to-split-a-string-in-c/236803#236803
-    // NOTE: this approach intentionally allows consecutive delimiters
     vector<string> col_sets;
     Tokenize(str, col_sets, ',');
 
