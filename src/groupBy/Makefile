@@ -16,7 +16,7 @@ INCLUDES = -I$(UTILITIES_DIR)/tabFile/ \
 # ----------------------------------
 # define our source and object files
 # ----------------------------------
-SOURCES= groupBy.cpp
+SOURCES= groupBy.cpp $(UTILITIES_DIR)/lineFileUtilities/lineFileUtilities.h
 OBJECTS= groupBy.o
 BUILT_OBJECTS= $(patsubst %,$(OBJ_DIR)/%,$(OBJECTS))
 
