@@ -52,7 +52,8 @@ void BedComplement::ComplementBed() {
         bedVector::const_iterator bEnd = _bed->bedMapNoBin[currChrom].end();
         for (; bItr != bEnd; ++bItr) {
             if (bItr->end > currChromSize) {
-                cout << "Warninge: end of BED entry exceeds chromosome length. Please correct." << endl;
+                cerr << "Warning: end of BED entry exceeds chromosome length. "
+				cerr << "Please correct." << endl;
                 _bed->reportBedNewLine(*bItr);
                 exit(1);
             }
