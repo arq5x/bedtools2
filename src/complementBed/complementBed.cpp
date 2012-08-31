@@ -53,7 +53,7 @@ void BedComplement::ComplementBed() {
         for (; bItr != bEnd; ++bItr) {
             if (bItr->end > currChromSize) {
                 cerr << "Warning: end of BED entry exceeds chromosome length. "
-				cerr << "Please correct." << endl;
+				     << "Please correct." << endl;
                 _bed->reportBedNewLine(*bItr);
                 exit(1);
             }
