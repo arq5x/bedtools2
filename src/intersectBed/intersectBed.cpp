@@ -246,14 +246,17 @@ void BedIntersect::IntersectBed() {
                 // treat the BED as a single "block"
                 if (_obeySplits == false)
                     FindOverlaps(a, hits);
-                // split the BED12 into blocks and look for overlaps in each discrete block
+                // split the BED12 into blocks and look for 
+				// overlaps in each discrete block
                 else {
-                    // find the hits that overlap with the full span of the blocked BED
+                    // find the hits that overlap with the 
+					// full span of the blocked BED
                     _bedB->allHits(a.chrom, a.start, a.end, a.strand,
                                    hits, _sameStrand, _diffStrand,
                                    0.0, false);
                     // break a into discrete blocks, as we need to 
-                    // measure overlap with the individual blocks, not the full span.
+                    // measure overlap with the individual blocks, 
+					// not the full span.
                     bedVector a_blocks; 
                     GetBedBlocks(a, a_blocks);
                     // find the overlaps between the block in A and B 
@@ -275,12 +278,14 @@ void BedIntersect::IntersectBed() {
         pair<BED, vector<BED> > hit_set;
         hit_set.second.reserve(10000);
         while (sweep.Next(hit_set)) {
-            if (_obeySplits == false)
-                processHits(hit_set.first, hit_set.second);
+            if (_obeySplits == false) {
+				processHits(hit_set.first, hit_set.second);
+			}
             else {
                 bedVector a_blocks; 
                 GetBedBlocks(hit_set.first, a_blocks);
-                FindBlockedOverlaps(hit_set.first, a_blocks, hit_set.second, false);
+                FindBlockedOverlaps(hit_set.first, a_blocks, 
+									hit_set.second, false);
             }
         }
     }
@@ -351,7 +356,8 @@ void BedIntersect::IntersectBam(string bamFile) {
                            hits, _sameStrand, _diffStrand,
                            _overlapFraction, _reciprocal);
             // find the overlaps between the block in A and B
-            overlapsFound = FindBlockedOverlaps(bed, bed_blocks, hits, _bamOutput);
+            overlapsFound = 
+				FindBlockedOverlaps(bed, bed_blocks, hits, _bamOutput);
         }
         else if ((_bamOutput == false) && (_obeySplits == false))
         {
