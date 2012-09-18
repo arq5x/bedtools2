@@ -323,7 +323,7 @@ void GroupBy (const string &inFile,
     TabFile *_tab = new TabFile(inFile);
     _tab->Open();
     while ((tabLineStatus = _tab->GetNextTabLine(inFields, lineNum)) != TAB_INVALID) {
-        if (tabLineStatus == TAB_VALID) {
+        if ((tabLineStatus == TAB_VALID) || (tabLineStatus == TAB_HEADER)) {
 
             if (first_line) {
                 first_line = false;
