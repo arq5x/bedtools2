@@ -1,0 +1,13 @@
+#chrom	start	end	A	B	C
+chr1	0	10	a1	10	+
+chr1	10	20	a2	5	+
+chr1	11	21	a3	5	+
+chr1	20	30	a4	15	+
+chr1	20	30	a5	15	+
+chr1	20	30	a6	15	+
+chr1	120	130	a7	1	+
+chr3	0	10	a8	1	+
+chr3	10	20	a9	2	+
+chr3	20	30	a10	3	+
+chr3	120	130	a11	4	+
+chr3	120	130	a12	4	+
