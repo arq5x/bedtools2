@@ -85,10 +85,12 @@ void BedCoverage::CollectCoverageBam(string bamFile) {
     // that we can easily compare "A" to it for overlaps
     _bedB->loadBedCovFileIntoMap();
 
-    // open the BAM file
+    // open the BAM file		
     BamReader reader;
-    reader.Open(bamFile);
-
+    if (!reader.Open(bamFile)) {
+        cerr << "Failed to open BAM file " << bamFile << endl;
+        exit(1);
+    }
     // get header & reference information
     string header = reader.GetHeaderText();
     RefVector refs = reader.GetReferenceData();

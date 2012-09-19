@@ -211,7 +211,10 @@ void BedGenomeCoverage::CoverageBam(string bamFile) {
 
     // open the BAM file
     BamReader reader;
-    reader.Open(bamFile);
+    if (!reader.Open(bamFile)) {
+        cerr << "Failed to open BAM file " << bamFile << endl;
+        exit(1);
+    }
 
     // get header & reference information
     string header = reader.GetHeaderText();

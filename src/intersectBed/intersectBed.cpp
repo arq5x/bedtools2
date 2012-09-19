@@ -308,7 +308,11 @@ void BedIntersect::IntersectBam(string bamFile) {
     // open the BAM file
     BamReader reader;
     BamWriter writer;
-    reader.Open(bamFile);
+    if (!reader.Open(bamFile)) {
+        cerr << "Failed to open BAM file " << bamFile << endl;
+        exit(1);
+    }
+    
     // get header & reference information
     string bamHeader  = reader.GetHeaderText();
     RefVector refs    = reader.GetReferenceData();

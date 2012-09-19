@@ -169,9 +169,9 @@ bool ChromSweep::Next(pair<BED, vector<BED> > &next) {
             {
                 if (IsValidHit(_curr_qy, _curr_db)) {
                     _hits.push_back(_curr_db);
-                }
-                _cache.push_back(_curr_db);
-                _db->GetNextBed(_curr_db, true);
+				}
+				_cache.push_back(_curr_db);
+				_db->GetNextBed(_curr_db, true);
             }
             // add the hits for this query to the pump
             _results.push(make_pair(_curr_qy, _hits));

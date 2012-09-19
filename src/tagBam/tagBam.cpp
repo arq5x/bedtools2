@@ -64,7 +64,11 @@ void TagBam::Tag() {
     // open the BAM file
     BamReader reader;
     BamWriter writer;
-    reader.Open(_bamFile);
+	if (!reader.Open(_bamFile)) {
+        cerr << "Failed to open BAM file " << _bamFile << endl;
+        exit(1);
+    }
+    
     // get header & reference information
     string bamHeader  = reader.GetHeaderText();
     RefVector refs = reader.GetReferenceData();
