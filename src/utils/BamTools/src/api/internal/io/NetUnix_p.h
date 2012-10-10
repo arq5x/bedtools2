@@ -23,6 +23,7 @@
 #ifndef _WIN32 // <-- source files only include the proper Net*_p.h, but this is a double-check
 
 #include <arpa/inet.h>
+#include <netinet/in.h>
 #include <sys/ioctl.h>
 #include <sys/socket.h>
 #include <sys/stat.h>
