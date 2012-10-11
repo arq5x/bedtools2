@@ -36,6 +36,7 @@ rm obs exp
 #  Enforce coordinate sorted input.
 ###########################################################
 echo "    merge.t2...\c"
+command -v tac 2>/dev/null || alias tac="sed '1!G;h;\$!d'"
 tac a.bed | $BT merge -i - 2> obs
 echo "ERROR: input file: (-) is not sorted by chrom then start.
        The start coordinate at line 3 is less than the start at line 2" > exp
@@ -67,7 +68,7 @@ echo \
 *****
 *****ERROR: No names found to report for the -names option. Exiting.
 *****" > exp
-$BT merge -i a.bed -nms &> obs
+$BT merge -i a.bed -nms > obs 2>&1
 check obs exp
 rm obs exp
 
