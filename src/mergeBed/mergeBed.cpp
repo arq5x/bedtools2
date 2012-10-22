@@ -107,50 +107,59 @@ BedMerge::~BedMerge(void) {
 // ===============================================
 // Convenience method for reporting merged blocks
 // ================================================
-void BedMerge::Report(string chrom, int start, int end, 
-                      const vector<string> &names, const vector<string> &scores, int mergeCount) 
+void BedMerge::Report(string chrom, int start, 
+                      int end, const vector<string> &names, 
+                      const vector<string> &scores, int mergeCount) 
 {
     // ARQ: removed to force all output to be zero-based, BED format, reagrdless of input type
     //if (_bed->isZeroBased == false) {start++;}
     
     printf("%s\t%d\t%d", chrom.c_str(), start, end);
     // just the merged intervals
-    if (_numEntries == false && _reportNames == false && _reportScores == false) {
+    if (_numEntries == false && _reportNames == false && 
+        _reportScores == false) {
         printf("\n");
     }
     // merged intervals and counts    
-    else if (_numEntries == true && _reportNames == false && _reportScores == false) {
+    else if (_numEntries == true && _reportNames == false && 
+        _reportScores == false) {
         printf("\t%d\n", mergeCount);
     }
     // merged intervals, counts, and scores
-    else if (_numEntries == true && _reportNames == false && _reportScores == true) {
+    else if (_numEntries == true && _reportNames == false && 
+        _reportScores == true) {
         printf("\t%d", mergeCount);
         ReportMergedScores(scores);
         printf("\n");
     }
     // merged intervals, counts, and names
-    else if (_numEntries == true && _reportNames == true && _reportScores == false) {
+    else if (_numEntries == true && _reportNames == true && 
+        _reportScores == false) {
         ReportMergedNames(names);
         printf("\t%d\n", mergeCount);
     }
     // merged intervals, counts, names, and scores
-    else if (_numEntries == true && _reportNames == true && _reportScores == true) {
+    else if (_numEntries == true && _reportNames == true && 
+        _reportScores == true) {
         ReportMergedNames(names);
         ReportMergedScores(scores);
         printf("\t%d\n", mergeCount);
     }
     // merged intervals and names        
-    else if (_numEntries == false && _reportNames == true && _reportScores == false) {
+    else if (_numEntries == false && _reportNames == true && 
+        _reportScores == false) {
         ReportMergedNames(names);
         printf("\n");
     }
     // merged intervals and scores        
-    else if (_numEntries == false && _reportNames == false && _reportScores == true) {
+    else if (_numEntries == false && _reportNames == false && 
+        _reportScores == true) {
         ReportMergedScores(scores);
         printf("\n");
     }
     // merged intervals, names, and scores        
-    else if (_numEntries == false && _reportNames == true && _reportScores == true) {
+    else if (_numEntries == false && _reportNames == true && 
+        _reportScores == true) {
         ReportMergedNames(names);
         ReportMergedScores(scores);
         printf("\n");
@@ -161,53 +170,62 @@ void BedMerge::Report(string chrom, int start, int end,
 // =========================================================
 // Convenience method for reporting merged blocks by strand
 // =========================================================
-void BedMerge::ReportStranded(string chrom, int start, int end, 
-                              const vector<string> &names, const vector<string> &scores,
-                              int mergeCount, string strand) 
+void BedMerge::ReportStranded(string chrom, int start, 
+                              int end, const vector<string> &names, 
+                              const vector<string> &scores, int mergeCount,
+                              string strand) 
 {
     // ARQ: removed to force all output to be zero-based, BED format, reagrdless of input type
     //if (_bed->isZeroBased == false) {start++;}
     
     printf("%s\t%d\t%d", chrom.c_str(), start, end);
     // just the merged intervals
-    if (_numEntries == false && _reportNames == false && _reportScores == false) {
+    if (_numEntries == false && _reportNames == false && 
+        _reportScores == false) {
         printf("\t%s\n", strand.c_str());
     }
     // merged intervals and counts    
-    else if (_numEntries == true && _reportNames == false && _reportScores == false) {
+    else if (_numEntries == true && _reportNames == false &&
+        _reportScores == false) {
         printf("\t%d\t%s\n", mergeCount, strand.c_str());
     }
     // merged intervals, counts, and scores
-    else if (_numEntries == true && _reportNames == false && _reportScores == true) {
+    else if (_numEntries == true && _reportNames == false &&
+        _reportScores == true) {
         printf("\t%d", mergeCount);
         ReportMergedScores(scores);
         printf("\t%s\n", strand.c_str());
     }
     // merged intervals, counts, and names
-    else if (_numEntries == true && _reportNames == true && _reportScores == false) {
+    else if (_numEntries == true && _reportNames == true &&
+        _reportScores == false) {
         ReportMergedNames(names);
         printf("\t%d\t%s", mergeCount, strand.c_str());
         printf("\n");
     }
     // merged intervals, counts, names, and scores
-    else if (_numEntries == true && _reportNames == true && _reportScores == true) {
+    else if (_numEntries == true && _reportNames == true &&
+        _reportScores == true) {
         ReportMergedNames(names);
         ReportMergedScores(scores);
         printf("\t%s\t%d", strand.c_str(), mergeCount);
         printf("\n");
     }
     // merged intervals and names        
-    else if (_numEntries == false && _reportNames == true && _reportScores == false) {
+    else if (_numEntries == false && _reportNames == true &&
+        _reportScores == false) {
         ReportMergedNames(names);
         printf("\t%s\n", strand.c_str());
     }
     // merged intervals and scores        
-    else if (_numEntries == false && _reportNames == false && _reportScores == true) {
+    else if (_numEntries == false && _reportNames == false && 
+        _reportScores == true) {
         ReportMergedScores(scores);
         printf("\t%s\n", strand.c_str());
     }
     // merged intervals, names, and scores        
-    else if (_numEntries == false && _reportNames == true && _reportScores == true) {
+    else if (_numEntries == false && _reportNames == true && 
+        _reportScores == true) {
         ReportMergedNames(names);
         ReportMergedScores(scores);
         printf("\t%s\n", strand.c_str());
@@ -231,7 +249,9 @@ void BedMerge::MergeBed() {
         if (_bed->_status != BED_VALID)
             continue;            
         // new block, no overlap
-        if ( (((int) curr.start - end) > _maxDistance) || (curr.chrom != prev.chrom)) {
+        if ( (((int) curr.start - end) > _maxDistance) || 
+            (curr.chrom != prev.chrom)) 
+        {
             if (start >= 0) {
                 Report(prev.chrom, start, end, names, scores, mergeCount);
                 // reset
@@ -264,9 +284,9 @@ void BedMerge::MergeBed() {
 }
 
 
-// ==================================================================================
+// ===============================================================================
 // = Merge overlapping BED entries into a single entry, accounting for strandedness =
-// ==================================================================================
+// ================================================================================
 void BedMerge::MergeBedStranded() {
 
     // load the "B" bed file into a map so
@@ -302,9 +322,12 @@ void BedMerge::MergeBedStranded() {
                 // is not on the current strand.
                 if (bedItr->strand != strands[s]) { continue; }
                 else { numOnStrand++; }
-                if ( (((int) bedItr->start - end) > _maxDistance) || (end < 0)) {
+                if ( (((int) bedItr->start - end) > _maxDistance) || 
+                    (end < 0)) 
+                {
                     if (start >= 0) {
-                        ReportStranded(chrom, start, end, names, scores, mergeCount, strands[s]);
+                        ReportStranded(chrom, start, end, names, 
+                                       scores, mergeCount, strands[s]);
                         // reset
                         mergeCount = 1;
                         names.clear();
@@ -323,7 +346,8 @@ void BedMerge::MergeBedStranded() {
                 }
             }
             if (start >= 0) {
-                ReportStranded(chrom, start, end, names, scores, mergeCount, strands[s]);
+                ReportStranded(chrom, start, end, names, 
+                               scores, mergeCount, strands[s]);
             }
         }
     }
