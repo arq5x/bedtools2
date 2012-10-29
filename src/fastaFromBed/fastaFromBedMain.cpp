@@ -139,8 +139,8 @@ void fastafrombed_help(void) {
     cerr << "\t-bed\tBED/GFF/VCF file of ranges to extract from -fi" << endl;
     cerr << "\t-fo\tOutput file (can be FASTA or TAB-delimited)" << endl;
     cerr << "\t-name\tUse the name field for the FASTA header" << endl;
-    cerr << "\t-split\tgiven a bed12, concat the sequence from exons" << endl;
-
+    cerr << "\t-split\tgiven BED12 fmt., extract and concatenate the sequences"
+         << "from the BED \"blocks\" (e.g., exons)" << endl;
     cerr << "\t-tab\tWrite output in TAB delimited format." << endl;
     cerr << "\t\t- Default is FASTA format." << endl << endl;
 
