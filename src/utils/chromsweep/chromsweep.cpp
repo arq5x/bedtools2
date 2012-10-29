@@ -32,8 +32,7 @@ ChromSweep::ChromSweep(BedFile *query, BedFile *db,
 , _reciprocal(reciprocal)
 {
     _hits.reserve(100000);
-    _cache.reserve(100000);
-    
+
     _query->Open();
     if (printHeader) _query->PrintHeader();
     _db->Open();
@@ -48,8 +47,7 @@ ChromSweep::ChromSweep(BedFile *query, BedFile *db,
 ChromSweep::ChromSweep(string &queryFile, string &dbFile) 
 {
     _hits.reserve(100000);
-    _cache.reserve(100000);
-    
+
     _query = new BedFile(queryFile);
     _db = new BedFile(dbFile);
     
@@ -69,7 +67,7 @@ ChromSweep::~ChromSweep(void) {
 
 
 void ChromSweep::ScanCache() {
-    vector<BED>::iterator c = _cache.begin();
+    list<BED>::iterator c = _cache.begin();
     while (c != _cache.end())
     {
 

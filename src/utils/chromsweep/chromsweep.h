@@ -64,8 +64,12 @@ private:
     float _overlapFraction;
     // do we care about strandedness.
     bool _sameStrand, _diffStrand, _reciprocal;
-    // a cache of still active features from the database file
-    vector<BED> _cache;
+    // a cache of still active features from the database file\
+    // 2012-Oct-29: prefer LIST over VECTOR as, when _cache is large,
+    // the overhead of deleting from a vector is huge.  Deleting from
+    // the front of a LIST is cheap. Thanks to Neil Kindlon (Quinlan lab)
+    // for the very important fix.
+    list<BED> _cache;
     // the set of hits in the database for the current query
     vector<BED> _hits;
     // a queue from which we retrieve overlap results.  used by Next()
