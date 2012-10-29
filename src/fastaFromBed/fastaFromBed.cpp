@@ -11,10 +11,11 @@
 ******************************************************************************/
 #include "lineFileUtilities.h"
 #include "fastaFromBed.h"
+#include "bedFile.h"
 
 
 Bed2Fa::Bed2Fa(bool useName, const string &dbFile, const string &bedFile,
-    const string &fastaOutFile, bool useFasta, bool useStrand) {
+    const string &fastaOutFile, bool useFasta, bool useStrand, bool useExons) {
 
     _useName      = useName;
     _dbFile       = dbFile;
@@ -22,6 +23,7 @@ Bed2Fa::Bed2Fa(bool useName, const string &dbFile, const string &bedFile,
     _fastaOutFile = fastaOutFile;
     _useFasta     = useFasta;
     _useStrand    = useStrand;
+    _useExons     = useExons;
 
     _bed = new BedFile(_bedFile);
 
@@ -120,7 +122,20 @@ void Bed2Fa::ExtractDNA() {
                     if ( (bed.start <= seqLength) && (bed.end <= seqLength) ) 
                     {
                         int length = bed.end - bed.start;
-                        sequence = fr->getSubSequence(bed.chrom, bed.start, length);
+                        if(_useExons){
+                            bedVector bedBlocks;  // vec to store the discrete BED "blocks"
+                            GetBedBlocks(bed, bedBlocks);
+                            sequence.clear();
+                            for (int i = 0; i < (int) bedBlocks.size(); ++i) {
+                                #cerr << bedBlocks[i].start << " " << bedBlocks[i].end << endl;
+                                sequence += fr->getSubSequence(bed.chrom,
+                                        bedBlocks[i].start,
+                                        bedBlocks[i].end - bedBlocks[i].start);
+
+                            }
+                        } else {
+                            sequence = fr->getSubSequence(bed.chrom, bed.start, length);
+                        }
                         ReportDNA(bed, sequence);
                     }
                     else
