@@ -13,6 +13,7 @@
 #define FASTAFROMBED_H
 
 #include "bedFile.h"
+#include "BlockedIntervals.h"
 #include "sequenceUtils.h"
 #include "Fasta.h"
 #include <vector>
@@ -30,7 +31,7 @@ public:
 
     // constructor
     Bed2Fa(bool useName, const string &dbFile, const string &bedFile, const string &fastaOutFile,
-        bool useFasta, bool useStrand);
+        bool useFasta, bool useStrand, bool useExons);
 
     // destructor
     ~Bed2Fa(void);
@@ -47,6 +48,7 @@ private:
     string _fastaOutFile;
     bool _useFasta;
     bool _useStrand;
+    bool _useExons;
 
     // instance of a bed file class.
     BedFile  *_bed;
