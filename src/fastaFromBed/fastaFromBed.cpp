@@ -28,7 +28,7 @@ Bed2Fa::Bed2Fa(bool useName, const string &dbFile, const string &bedFile,
     _bed = new BedFile(_bedFile);
 
     // Figure out what the output file should be.
-    if (fastaOutFile == "stdout") {
+    if (fastaOutFile == "stdout" || fastaOutFile == "-") {
         _faOut = &cout;
     }
     else {
