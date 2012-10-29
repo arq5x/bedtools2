@@ -127,7 +127,6 @@ void Bed2Fa::ExtractDNA() {
                             GetBedBlocks(bed, bedBlocks);
                             sequence.clear();
                             for (int i = 0; i < (int) bedBlocks.size(); ++i) {
-                                #cerr << bedBlocks[i].start << " " << bedBlocks[i].end << endl;
                                 sequence += fr->getSubSequence(bed.chrom,
                                         bedBlocks[i].start,
                                         bedBlocks[i].end - bedBlocks[i].start);
