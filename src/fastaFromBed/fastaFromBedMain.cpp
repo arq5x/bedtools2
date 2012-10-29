@@ -88,7 +88,7 @@ int fastafrombed_main(int argc, char* argv[]) {
         else if(PARAMETER_CHECK("-name", 5, parameterLength)) {
             useNameOnly = true;
         }
-        else if(PARAMETER_CHECK("-exons", 6, parameterLength)) {
+        else if(PARAMETER_CHECK("-split", 6, parameterLength)) {
             useExons = true;
         }
         else if(PARAMETER_CHECK("-tab", 4, parameterLength)) {
@@ -131,7 +131,7 @@ void fastafrombed_help(void) {
     cerr << "\t-bed\tBED/GFF/VCF file of ranges to extract from -fi" << endl;
     cerr << "\t-fo\tOutput file (can be FASTA or TAB-delimited)" << endl;
     cerr << "\t-name\tUse the name field for the FASTA header" << endl;
-    cerr << "\t-exons\tgiven a bed12, concat the sequence from exons" << endl;
+    cerr << "\t-split\tgiven a bed12, concat the sequence from exons" << endl;
 
     cerr << "\t-tab\tWrite output in TAB delimited format." << endl;
     cerr << "\t\t- Default is FASTA format." << endl << endl;
