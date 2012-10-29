@@ -25,6 +25,9 @@ cd flank; sh test-flank.sh; cd ..
 echo " Testing bedtools genomecov:"
 cd genomecov; sh test-genomecov.sh; cd ..
 
+echo " Testing bedtools getfasta:"
+cd getfasta; sh test-getfasta.sh; cd ..
+
 echo " Testing bedtools intersect:"
 cd intersect; sh test-intersect.sh; cd ..
 

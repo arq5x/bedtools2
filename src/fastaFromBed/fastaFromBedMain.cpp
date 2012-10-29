@@ -43,7 +43,7 @@ int fastafrombed_main(int argc, char* argv[]) {
     bool useNameOnly = false;
     bool useFasta = true;
     bool useStrand = false;
-    bool useExons = false;
+    bool useBlocks = false;
 
     // check to see if we should print out some help
     if(argc <= 1) showHelp = true;
@@ -89,7 +89,7 @@ int fastafrombed_main(int argc, char* argv[]) {
             useNameOnly = true;
         }
         else if(PARAMETER_CHECK("-split", 6, parameterLength)) {
-            useExons = true;
+            useBlocks = true;
         }
         else if(PARAMETER_CHECK("-tab", 4, parameterLength)) {
             useFasta = false;
@@ -98,7 +98,10 @@ int fastafrombed_main(int argc, char* argv[]) {
             useStrand = true;
         }
         else {
-            cerr << "*****ERROR: Unrecognized parameter: " << argv[i] << " *****" << endl << endl;
+            cerr << "*****ERROR: Unrecognized parameter: " 
+                 << argv[i] 
+                 << " *****" 
+                 << endl << endl;
             showHelp = true;
         }
     }
@@ -109,7 +112,10 @@ int fastafrombed_main(int argc, char* argv[]) {
 
     if (!showHelp) {
 
-        Bed2Fa *b2f = new Bed2Fa(useNameOnly, fastaDbFile, bedFile, fastaOutFile, useFasta, useStrand, useExons);
+        Bed2Fa *b2f = new Bed2Fa(useNameOnly, fastaDbFile, 
+                                 bedFile, fastaOutFile, 
+                                 useFasta, useStrand, 
+                                 useBlocks);
         delete b2f;
     }
     else {
@@ -124,7 +130,9 @@ void fastafrombed_help(void) {
     cerr << "Version: " << VERSION << "\n";
     cerr << "Summary: Extract DNA sequences into a fasta file based on feature coordinates." << endl << endl;
 
-    cerr << "Usage:   " << PROGRAM_NAME << " [OPTIONS] -fi <fasta> -bed <bed/gff/vcf> -fo <fasta> " << endl << endl;
+    cerr << "Usage:   " << PROGRAM_NAME 
+         << " [OPTIONS] -fi <fasta> -bed <bed/gff/vcf> -fo <fasta> " 
+         << endl << endl;
 
     cerr << "Options: " << endl;
     cerr << "\t-fi\tInput FASTA file" << endl;
@@ -136,7 +144,8 @@ void fastafrombed_help(void) {
     cerr << "\t-tab\tWrite output in TAB delimited format." << endl;
     cerr << "\t\t- Default is FASTA format." << endl << endl;
 
-    cerr << "\t-s\tForce strandedness. If the feature occupies the antisense," << endl;
+    cerr << "\t-s\tForce strandedness. If the feature occupies the antisense," 
+         << endl;
     cerr << "\t\tstrand, the sequence will be reverse complemented." << endl;
     cerr << "\t\t- By default, strand information is ignored." << endl << endl;
 
