@@ -14,6 +14,7 @@
 
 #include "bedFile.h"
 #include <vector>
+#include <list>
 #include <queue>
 #include <iostream>
 #include <fstream>
