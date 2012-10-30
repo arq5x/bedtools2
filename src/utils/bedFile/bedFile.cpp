@@ -102,7 +102,9 @@ void BedFile::Open(void) {
             _bedStream = new igzstream(bedFile.c_str(), ios::in);
         }
         if ( !(_bedStream->good()) ) {
-            cerr << "Error: The requested bed file (" << bedFile << ") could not be opened. Exiting!" << endl;
+            cerr << "Error: The requested bed file (" 
+                 << bedFile 
+                 << ") could not be opened. Exiting!" << endl;
             exit (1);
         }
     }
@@ -270,9 +272,12 @@ bool BedFile::GetNextMergedBed(BED &merged_bed) {
 }
 
 
-void BedFile::allHits(string chrom, CHRPOS start, CHRPOS end, string strand, 
-                                 vector<BED> &hits, bool sameStrand, bool diffStrand,
-                                 float overlapFraction, bool reciprocal) {
+void BedFile::allHits(string chrom, CHRPOS start, 
+                      CHRPOS end, string strand, 
+                      vector<BED> &hits, bool sameStrand, 
+                      bool diffStrand, float overlapFraction, 
+                      bool reciprocal) 
+{
 
     BIN startBin, endBin;
     startBin = (start >> _binFirstShift);
@@ -297,7 +302,10 @@ void BedFile::allHits(string chrom, CHRPOS start, CHRPOS end, string strand,
                 CHRPOS e = min(end, bedItr->end);
                 int overlapBases = (e - s); 
                 // 1. is there sufficient overlap w.r.t A?
-                if ( (float) overlapBases / (float) aLength  >= overlapFraction) {
+                if ( (float) overlapBases 
+                      / 
+                     (float) aLength  >= overlapFraction) 
+                {
                     CHRPOS bLength = (bedItr->end - bedItr->start);
                     float bOverlap = ( (float) overlapBases / (float) bLength );
                     bool strands_are_same = (strand == bedItr->strand);
@@ -352,7 +360,10 @@ bool BedFile::anyHits(string chrom, CHRPOS start, CHRPOS end, string strand,
                 CHRPOS e = min(end, bedItr->end);
                 int overlapBases = (e - s); 
                 // 1. is there sufficient overlap w.r.t A?
-                if ( (float) overlapBases / (float) aLength  >= overlapFraction) {
+                if ( (float) overlapBases 
+                      / 
+                     (float) aLength  >= overlapFraction) 
+                {
                     CHRPOS bLength = (bedItr->end - bedItr->start);
                     float bOverlap = ( (float) overlapBases / (float) bLength );
                     bool strands_are_same = (strand == bedItr->strand);
@@ -393,9 +404,9 @@ void BedFile::countHits(const BED &a, bool sameStrand, bool diffStrand, bool cou
         // loop through each bin at this level of the hierarchy
         BIN offset = _binOffsetsExtended[i];
         for (BIN j = (startBin+offset); j <= (endBin+offset); ++j) {
-            // loop through each feature in this chrom/bin and see if it overlaps
-            // with the feature that was passed in.  if so, add the feature to
-            // the list of hits.
+            // loop through each feature in this chrom/bin and 
+            // see if it overlaps with the feature that was passed in.  
+            // if so, add the feature to the list of hits.
             vector<BEDCOV>::iterator bedItr = bedCovMap[a.chrom][j].begin();
             vector<BEDCOV>::iterator bedEnd = bedCovMap[a.chrom][j].end();
             for (; bedItr != bedEnd; ++bedItr) {
@@ -408,8 +419,9 @@ void BedFile::countHits(const BED &a, bool sameStrand, bool diffStrand, bool cou
                 {
                     continue;
                 }
-                else if (overlaps(bedItr->start, bedItr->end, a.start, a.end) > 0) {
-
+                else if (overlaps(bedItr->start, bedItr->end, a.start, a.end) 
+                         > 0) 
+                {
                     bedItr->count++;
                     if (countsOnly == false) {
                         if (a.zeroLength == false) {
@@ -417,9 +429,10 @@ void BedFile::countHits(const BED &a, bool sameStrand, bool diffStrand, bool cou
                             bedItr->depthMap[a.end].ends++;
                         }
                         else {
-                            // correct for the fact that we artificially expanded the zeroLength feature
+                            // correct for the fact that we artificially 
+                            // expanded the zeroLength feature
                             bedItr->depthMap[a.start+2].starts++;
-                            bedItr->depthMap[a.end-1].ends++;                        
+                            bedItr->depthMap[a.end-1].ends++;                   
                         }
 
                         if (a.start < bedItr->minOverlapStart) {
@@ -456,15 +469,16 @@ void BedFile::countSplitHits(const vector<BED> &bedBlocks, bool sameStrand, bool
             // loop through each bin at this level of the hierarchy
             BIN offset = _binOffsetsExtended[i];
             for (BIN j = (startBin+offset); j <= (endBin+offset); ++j) {
-
-                // loop through each feature in this chrom/bin and see if it overlaps
-                // with the feature that was passed in.  if so, add the feature to
-                // the list of hits.
-                vector<BEDCOV>::iterator bedItr = bedCovMap[blockItr->chrom][j].begin();
-                vector<BEDCOV>::iterator bedEnd = bedCovMap[blockItr->chrom][j].end();
+                // loop through each feature in this chrom/bin and see if it 
+                // overlaps with the feature that was passed in.  
+                // if so, add the feature to the list of hits.
+                vector<BEDCOV>::iterator 
+                    bedItr = bedCovMap[blockItr->chrom][j].begin();
+                vector<BEDCOV>::iterator 
+                    bedEnd = bedCovMap[blockItr->chrom][j].end();
                 for (; bedItr != bedEnd; ++bedItr) {
-
-                    bool strands_are_same = (blockItr->strand == bedItr->strand);
+                    bool strands_are_same = 
+                        (blockItr->strand == bedItr->strand);
                     // skip the hit if not on the same strand (and we care)
                     if ((sameStrand == true && strands_are_same == false) ||
                         (diffStrand == true && strands_are_same == true)
@@ -472,14 +486,17 @@ void BedFile::countSplitHits(const vector<BED> &bedBlocks, bool sameStrand, bool
                     {
                         continue;
                     }
-                    else if (overlaps(bedItr->start, bedItr->end, blockItr->start, blockItr->end) > 0) {
+                    else if (overlaps(bedItr->start, bedItr->end, 
+                                      blockItr->start, blockItr->end) > 0) 
+                    {
                         if (countsOnly == false) {
                             if (blockItr->zeroLength == false) {
                                 bedItr->depthMap[blockItr->start+1].starts++;
                                 bedItr->depthMap[blockItr->end].ends++;
                             }
                             else {
-                                // correct for the fact that we artificially expanded the zeroLength feature
+                                // correct for the fact that we artificially 
+                                // expanded the zeroLength feature
                                 bedItr->depthMap[blockItr->start+2].starts++;
                                 bedItr->depthMap[blockItr->end-1].ends++;
                             }
@@ -501,8 +518,8 @@ void BedFile::countSplitHits(const vector<BED> &bedBlocks, bool sameStrand, bool
     set< vector<BEDCOV>::iterator >::iterator validHitsItr = validHits.begin();
     set< vector<BEDCOV>::iterator >::iterator validHitsEnd = validHits.end();
     for (; validHitsItr != validHitsEnd; ++validHitsItr)
-        // the validHitsItr points to another itr, hence the (*itr)-> dereferencing.
-        // ugly, but that's C++.
+        // the validHitsItr points to another itr, hence 
+        // the (*itr)-> dereferencing. ugly, but that's C++.
         (*validHitsItr)->count++;
 }
 
@@ -520,11 +537,13 @@ void BedFile::countListHits(const BED &a, int index, bool sameStrand, bool diffS
         BIN offset = _binOffsetsExtended[i];
         for (BIN j = (startBin+offset); j <= (endBin+offset); ++j) {
 
-            // loop through each feature in this chrom/bin and see if it overlaps
-            // with the feature that was passed in.  if so, add the feature to
-            // the list of hits.
-            vector<BEDCOVLIST>::iterator bedItr = bedCovListMap[a.chrom][j].begin();
-            vector<BEDCOVLIST>::iterator bedEnd = bedCovListMap[a.chrom][j].end();
+            // loop through each feature in this chrom/bin and see if it 
+            // overlaps with the feature that was passed in.  if so, 
+            // add the feature tothe list of hits.
+            vector<BEDCOVLIST>::iterator 
+                bedItr = bedCovListMap[a.chrom][j].begin();
+            vector<BEDCOVLIST>::iterator 
+                bedEnd = bedCovListMap[a.chrom][j].end();
             for (; bedItr != bedEnd; ++bedItr) {
 
                 bool strands_are_same = (a.strand == bedItr->strand);
@@ -535,16 +554,19 @@ void BedFile::countListHits(const BED &a, int index, bool sameStrand, bool diffS
                 {
                     continue;
                 }
-                else if (overlaps(bedItr->start, bedItr->end, a.start, a.end) > 0) {
+                else if (overlaps(bedItr->start, bedItr->end, 
+                                  a.start, a.end) > 0) 
+                {
                     bedItr->counts[index]++;
                     if (a.zeroLength == false) {
                         bedItr->depthMapList[index][a.start+1].starts++;
                         bedItr->depthMapList[index][a.end].ends++;
                     }
                     else {
-                        // correct for the fact that we artificially expanded the zeroLength feature
+                        // correct for the fact that we artificially expanded 
+                        // the zeroLength feature
                         bedItr->depthMapList[index][a.start+2].starts++;
-                        bedItr->depthMapList[index][a.end-1].ends++;                        
+                        bedItr->depthMapList[index][a.end-1].ends++;
                     }
 
                     if (a.start < bedItr->minOverlapStarts[index]) {
@@ -656,7 +678,10 @@ void BedFile::loadBedFileIntoMapNoBin() {
 
     // sort the BED entries for each chromosome
     // in ascending order of start position
-    for (masterBedMapNoBin::iterator m = this->bedMapNoBin.begin(); m != this->bedMapNoBin.end(); ++m) {
+    for (masterBedMapNoBin::iterator m = this->bedMapNoBin.begin(); 
+         m != this->bedMapNoBin.end(); 
+         ++m) 
+    {
         sort(m->second.begin(), m->second.end(), sortByStart);
     }
 }
