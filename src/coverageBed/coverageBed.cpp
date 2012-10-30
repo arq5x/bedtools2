@@ -13,9 +13,12 @@
 #include "coverageBed.h"
 
 // build
-BedCoverage::BedCoverage(string &bedAFile, string &bedBFile, bool sameStrand, bool diffStrand,
-                         bool writeHistogram, bool bamInput, bool obeySplits, 
-                         bool eachBase, bool countsOnly) {
+BedCoverage::BedCoverage(string &bedAFile, string &bedBFile, 
+                         bool sameStrand, bool diffStrand,
+                         bool writeHistogram, bool bamInput, 
+                         bool obeySplits, bool eachBase, 
+                         bool countsOnly) 
+{
 
     _bedAFile       = bedAFile;
     _bedBFile       = bedBFile;
@@ -58,14 +61,17 @@ void BedCoverage::CollectCoverageBed() {
         if (_bedA->_status == BED_VALID) {
             // process the BED entry as a single block
             if (_obeySplits == false)
-                _bedB->countHits(a, _sameStrand, _diffStrand, _countsOnly);
-            // split the BED into discrete blocksand process each independently.
+                _bedB->countHits(a, _sameStrand, 
+                                 _diffStrand, _countsOnly);
+            // split the BED into discrete blocksand process 
+            // each independently.
             else {
                 bedVector bedBlocks;
                 GetBedBlocks(a, bedBlocks);
-                // use countSplitHits to avoid over-counting each split chunk
-                // as distinct read coverage.
-                _bedB->countSplitHits(bedBlocks, _sameStrand, _diffStrand, _countsOnly);
+                // use countSplitHits to avoid over-counting 
+                // each split chunk as distinct read coverage.
+                _bedB->countSplitHits(bedBlocks, _sameStrand, 
+                                      _diffStrand, _countsOnly);
             }
         }
     }
@@ -102,7 +108,8 @@ void BedCoverage::CollectCoverageBam(string bamFile) {
         if (bam.IsMapped()) {
             // treat the BAM alignment as a single "block"
             if (_obeySplits == false) {
-                // construct a new BED entry from the current BAM alignment.
+                // construct a new BED entry from the current 
+                // BAM alignment.
                 BED a;
                 
                 try 
@@ -113,12 +120,14 @@ void BedCoverage::CollectCoverageBam(string bamFile) {
                     a.strand = "+";
                     if (bam.IsReverseStrand()) a.strand = "-";
 
-                    _bedB->countHits(a, _sameStrand, _diffStrand, _countsOnly);
+                    _bedB->countHits(a, _sameStrand, 
+                                     _diffStrand, _countsOnly);
                 }
                 catch (out_of_range& oor) 
                 {
                   cerr << bam.Name 
-                       << " is said to be mapped (0x4 == false), yet the chrom is missing.  Skipping." 
+                       << " is said to be mapped (0x4 == false), "
+                       << "yet the chrom is missing.  Skipping." 
                        << endl;
                 }
             }
@@ -127,20 +136,23 @@ void BedCoverage::CollectCoverageBam(string bamFile) {
             else {
                 // vec to store the discrete BED "blocks" from a
                 bedVector bedBlocks;
-                // since we are counting coverage, we do want to split blocks when a
-                // deletion (D) CIGAR op is encountered (hence the true for the last parm)
+                // since we are counting coverage, we do want 
+                // to split blocks when a deletion (D) CIGAR op 
+                // is encountered (hence the true for the last parm)
                 try 
                 {
                     string chrom  = refs.at(bam.RefID).RefName;
                     GetBamBlocks(bam, chrom, bedBlocks, false, true);
-                    // use countSplitHits to avoid over-counting each split chunk
-                    // as distinct read coverage.
-                    _bedB->countSplitHits(bedBlocks, _sameStrand, _diffStrand, _countsOnly);
+                    // use countSplitHits to avoid over-counting 
+                    // each split chunk as distinct read coverage.
+                    _bedB->countSplitHits(bedBlocks, _sameStrand, 
+                                          _diffStrand, _countsOnly);
                 }
                 catch (out_of_range& oor) 
                 {
                   cerr << bam.Name 
-                       << " is said to be mapped (0x4 == false), yet the chrom is missing.  Skipping." 
+                       << " is said to be mapped (0x4 == false), "
+                       << "yet the chrom is missing.  Skipping." 
                        << endl;
                 }
             }
@@ -207,33 +219,39 @@ void BedCoverage::ReportCoverage() {
                 int depth          = 0; // tracks the depth at the current base
 
                 // the start is either the first base in the feature OR
-                // the leftmost position of an overlapping feature. e.g. (s = start):
+                // the leftmost position of an overlapping feature. 
+                // e.g. (s = start):
                 // A    ----------
                 // B    s    ------------
-                int start          = min(bedItr->minOverlapStart, bedItr->start);
+                int start = min(bedItr->minOverlapStart, bedItr->start);
 
                 // track the number of bases in the feature covered by
                 // 0, 1, 2, ... n features in A
                 map<unsigned int, unsigned int> depthHist;
                 map<unsigned int, DEPTH>::const_iterator depthItr;
 
-                // compute the coverage observed at each base in the feature marching from start to end.
+                // compute the coverage observed at each base in 
+                // the feature marching from start to end.
                 for (CHRPOS pos = start+1; pos <= bedItr->end; pos++)
                 {
-                    // map pointer grabbing the starts and ends observed at this position
+                    // map pointer grabbing the starts and 
+                    // ends observed at this position
                     depthItr = bedItr->depthMap.find(pos);
                     // increment coverage if starts observed at this position.
                     if (depthItr != bedItr->depthMap.end())
                         depth += depthItr->second.starts;
-                    // update coverage assuming the current position is within the current B feature
+                    // update coverage assuming the current position is 
+                    // within the current B feature
                     if ((pos > bedItr->start) && (pos <= bedItr->end)) {
                         if (depth == 0) zeroDepthCount++;
-                        // update our histograms, assuming we are not reporting "per-base" coverage.
+                        // update our histograms, assuming we are not 
+                        // reporting "per-base" coverage.
                         if (_eachBase == false) {
                             depthHist[depth]++;
                             allDepthHist[depth]++;
                         }
-                        else if ((_eachBase == true) && (bedItr->zeroLength == false))
+                        else if ((_eachBase == true) && 
+                                 (bedItr->zeroLength == false))
                         {
                             _bedB->reportBedTab(*bedItr);
                             printf("%d\t%d\n", pos-bedItr->start, depth);
@@ -269,26 +287,35 @@ void BedCoverage::ReportCoverage() {
                     // print a summary of the coverage
                     if (_writeHistogram == false) {
                         _bedB->reportBedTab(*bedItr);
-                        printf("%d\t%d\t%d\t%0.7f\n", bedItr->count, nonZeroBases, length, fractCovered);
+                        printf("%d\t%d\t%d\t%0.7f\n", 
+                               bedItr->count, nonZeroBases, 
+                               length, fractCovered);
                     }
                     // HISTOGRAM
                     // report the number of bases with coverage == x
                     else {
                         // produce a histogram when not a zero length feature.
                         if (bedItr->zeroLength == false) {
-                            map<unsigned int, unsigned int>::const_iterator histItr = depthHist.begin();
-                            map<unsigned int, unsigned int>::const_iterator histEnd = depthHist.end();
+                            map<unsigned int, unsigned int>::const_iterator 
+                                histItr = depthHist.begin();
+                            map<unsigned int, unsigned int>::const_iterator 
+                                histEnd = depthHist.end();
                             for (; histItr != histEnd; ++histItr)
                             {
-                                float fractAtThisDepth = (float) histItr->second / length;
+                                float fractAtThisDepth = (float) 
+                                    histItr->second / length;
+                                
                                 _bedB->reportBedTab(*bedItr);
-                                printf("%d\t%d\t%d\t%0.7f\n", histItr->first, histItr->second, length, fractAtThisDepth);
+                                printf("%d\t%d\t%d\t%0.7f\n", 
+                                       histItr->first, histItr->second, 
+                                       length, fractAtThisDepth);
                             }
                         }
                         // special case when it is a zero length feauture.
                         else {
                             _bedB->reportBedTab(*bedItr);
-                            printf("%d\t%d\t%d\t%0.7f\n", bedItr->count, 0, 0, 1.0000000);
+                            printf("%d\t%d\t%d\t%0.7f\n", 
+                                   bedItr->count, 0, 0, 1.0000000);
                         }
                     }
                 }
@@ -298,11 +325,15 @@ void BedCoverage::ReportCoverage() {
     // report a histogram of coverage among _all_
     // features in B.
     if (_writeHistogram == true) {
-        map<unsigned long, unsigned long>::const_iterator histItr = allDepthHist.begin();
-        map<unsigned long, unsigned long>::const_iterator histEnd = allDepthHist.end();
+        map<unsigned long, unsigned long>::const_iterator 
+            histItr = allDepthHist.begin();
+        map<unsigned long, unsigned long>::const_iterator 
+            histEnd = allDepthHist.end();
         for (; histItr != histEnd; ++histItr) {
             float fractAtThisDepth = (float) histItr->second / totalLength;
-            printf("all\t%lu\t%lu\t%lu\t%0.7f\n", histItr->first, histItr->second, totalLength, fractAtThisDepth);
+            printf("all\t%lu\t%lu\t%lu\t%0.7f\n", 
+                   histItr->first, histItr->second, 
+                   totalLength, fractAtThisDepth);
         }
     }
 }
