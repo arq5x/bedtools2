@@ -492,6 +492,7 @@ private:
     string _header;
     bool _firstLine;
     vector<string> _bedFields;
+    unsigned int _numFields;
     int _merged_start;
     int _merged_end;
     string _merged_chrom;
@@ -517,42 +518,38 @@ private:
         parseLine: converts a lineVector into either BED or BEDCOV (templated, hence in header to avoid linker issues.)
     */
     template <typename T>
-    inline BedLineStatus parseLine (T &bed, const vector<string> &lineVector) {
+    inline BedLineStatus parseLine (T &bed, const vector<string> &fields) {
         
         // clear out the data from the last line.
         bed = _nullBed;
-        unsigned int numFields = lineVector.size();
-
         // bail out if we have a blank line
-        if (numFields == 0) {
+        if (_numFields == 0) {
             return BED_BLANK;
         }
         // bail out if we have a comment line
-        if ( (lineVector[0].find("#")       == 0) ||
-             (lineVector[0].find("browser") == 0) ||
-             (lineVector[0].find("track")   == 0) 
+        if ( (fields[0].find("#")       == 0) ||
+             (fields[0].find("browser") == 0) ||
+             (fields[0].find("track")   == 0) 
            )
         {
             return BED_HEADER;
         }
 
-        if (numFields >= 3) {
+        if (_numFields >= 3) {
             // line parsing for all lines after the first non-header line
             if (_typeIsKnown == true) {
                 switch(_fileType) {
                     case BED_FILETYPE:
-                        if (parseBedLine(bed, lineVector, 
-                                        _lineNum, numFields) == true) 
-                        {return BED_VALID;}
-                            
+                        if (parseBedLine(bed, fields) == true) 
+                            return BED_VALID;
                     case VCF_FILETYPE:
-                        if (parseVcfLine(bed, lineVector, 
-                                         _lineNum, numFields) == true) 
-                        {return BED_VALID;}
+                        if (parseVcfLine(bed, fields) == true)
+                        {
+                            return BED_VALID;
+                        }
                     case GFF_FILETYPE:
-                        if (parseGffLine(bed, lineVector, 
-                                         _lineNum, numFields) == true) 
-                        {return BED_VALID;}
+                        if (parseGffLine(bed, fields) == true) 
+                                return BED_VALID;
                     default:
                         printf("ERROR: file type encountered. Exiting\n");
                         exit(1);
@@ -561,61 +558,54 @@ private:
             // line parsing for first non-header line: figure out file contents
             else {
                 // it's BED format if columns 2 and 3 are integers
-                if (isInteger(lineVector[1]) && isInteger(lineVector[2])) {
+                if (isInteger(fields[1]) && isInteger(fields[2])) {
                     setGff(false);
                     setZeroBased(true);
                     setFileType(BED_FILETYPE);
                     // we now expect numFields columns in each line
-                    setBedType(numFields);
+                    setBedType(_numFields);
                     
                     // test to see if the file has true blocked BED12 records
-                    if (numFields == 12) {
-                        int cdsStart = atoi(lineVector[6].c_str());
-                        int cdsEnd   = atoi(lineVector[7].c_str());
-                        int numExons = atoi(lineVector[9].c_str());
+                    if (_numFields == 12) {
+                        int cdsStart = atoi(fields[6].c_str());
+                        int cdsEnd   = atoi(fields[7].c_str());
+                        int numExons = atoi(fields[9].c_str());
 
                         if (cdsStart > 0 && cdsEnd > 0&& numExons > 0 &&
-                            lineVector[10].find(",") == 0 &&
-                            lineVector[11].find(",") == 0)
+                            fields[10].find(",") == 0 &&
+                            fields[11].find(",") == 0)
                         {
                             setBed12(true);
                         }
                         else setBed12(false);
                     }
-                    if (parseBedLine(bed, lineVector, 
-                                    _lineNum, numFields) == true) 
-                    {
+                    if (parseBedLine(bed, fields) == true) 
                         return BED_VALID;
-                    }
                 }
                 // it's VCF, assuming the second column is numeric and 
                 // there are at least 8 fields.
-                else if (isInteger(lineVector[1]) && numFields >= 8) {
+                else if (isInteger(fields[1]) && _numFields >= 8) {
                     setGff(false);
                     setVcf(true);
                     setZeroBased(false);
                     setFileType(VCF_FILETYPE);
                     // we now expect numFields columns in each line
-                    setBedType(numFields);
-                    if (parseVcfLine(bed, lineVector, 
-                                     _lineNum, numFields) == true) 
-                    {
+                    setBedType(_numFields);
+                    if (parseVcfLine(bed, fields) == true) 
                         return BED_VALID;
-                    }
                 }
                 // it's GFF, assuming columns columns 4 and 5 are numeric 
                 // and we have 9 fields total.
-                else if ((numFields >= 8) && 
-                          isInteger(lineVector[3]) && 
-                          isInteger(lineVector[4])) 
+                else if ((_numFields >= 8) && 
+                          isInteger(fields[3]) && 
+                          isInteger(fields[4])) 
                 {
                     setGff(true);
                     setZeroBased(false);
                     setFileType(GFF_FILETYPE);
                     // we now expect numFields columns in each line
-                    setBedType(numFields);
-                    if (parseGffLine(bed, lineVector, 
-                                     _lineNum, numFields) == true) 
+                    setBedType(_numFields);
+                    if (parseGffLine(bed, fields) == true) 
                     {
                         return BED_VALID;
                     }
@@ -648,16 +638,15 @@ private:
         parseBedLine: converts a lineVector into either BED or BEDCOV (templated, hence in header to avoid linker issues.)
     */
     template <typename T>
-    inline bool parseBedLine (T &bed, const vector<string> &lineVector, 
-                              int _lineNum, unsigned int numFields) 
+    inline bool parseBedLine (T &bed, const vector<string> &fields) 
     {
         // process as long as the number of fields in this
         // line matches what we expect for this file.
-        if (numFields == this->bedType) {
-            bed.fields = lineVector;
-            bed.chrom = lineVector[0];
+        if (_numFields == this->bedType) {
+            bed.fields = fields;
+            bed.chrom = fields[0];
             int i;
-            i = atoi(lineVector[1].c_str());
+            i = atoi(fields[1].c_str());
             if (i<0) {
                  cerr << "Error: malformed BED entry at line " 
                       << _lineNum 
@@ -666,7 +655,7 @@ private:
                  exit(1);
             }
             bed.start = (CHRPOS)i;
-            i = atoi(lineVector[2].c_str());
+            i = atoi(fields[2].c_str());
             if (i<0) {
                 cerr << "Error: malformed BED entry at line " 
                      << _lineNum 
@@ -684,22 +673,22 @@ private:
             }
             
             if (this->bedType == 4) {
-                bed.name = lineVector[3];
+                bed.name = fields[3];
             }
             else if (this->bedType == 5) {
-                bed.name = lineVector[3];
-                bed.score = lineVector[4];
+                bed.name = fields[3];
+                bed.score = fields[4];
             }
             else if (this->bedType == 6) {
-                bed.name = lineVector[3];
-                bed.score = lineVector[4];
-                bed.strand = lineVector[5];
+                bed.name = fields[3];
+                bed.score = fields[4];
+                bed.strand = fields[5];
             }
             else if (this->bedType > 6) {
-                bed.name = lineVector[3];
-                bed.score = lineVector[4];
-                bed.strand = lineVector[5];
-                for (unsigned int i = 6; i < lineVector.size(); ++i) {
+                bed.name = fields[3];
+                bed.score = fields[4];
+                bed.strand = fields[5];
+                for (unsigned int i = 6; i < fields.size(); ++i) {
                     bed.other_idxs.push_back(i);
                 }
             }
@@ -724,21 +713,21 @@ private:
                 exit(1);
             }
         }
-        else if (numFields == 1) {
+        else if (_numFields == 1) {
             cerr << "Only one BED field detected: " 
                  << _lineNum 
                  << ".  Verify that your files are TAB-delimited.  Exiting..." 
                  << endl;
             exit(1);
         }
-        else if ((numFields != this->bedType) && (numFields != 0)) {
+        else if ((_numFields != this->bedType) && (_numFields != 0)) {
             cerr << "Differing number of BED fields encountered at line: " 
                  << _lineNum 
                  << ".  Exiting..." 
                  << endl;
             exit(1);
         }
-        else if ((numFields < 3) && (numFields != 0)) {
+        else if ((_numFields < 3) && (_numFields != 0)) {
             cerr << "TAB delimited BED file with at least 3 fields"
                  << " (chrom, start, end) is required at line: "
                  << _lineNum 
@@ -754,26 +743,25 @@ private:
         parseVcfLine: converts a lineVector into either BED or BEDCOV (templated, hence in header to avoid linker issues.)
     */
     template <typename T>
-    inline bool parseVcfLine (T &bed, const vector<string> &lineVector, 
-                             int _lineNum, unsigned int numFields) 
+    inline bool parseVcfLine (T &bed, const vector<string> &fields) 
     {
-        if (numFields == this->bedType) {
-            bed.fields = lineVector;
-            bed.chrom  = lineVector[0];
+        if (_numFields >= this->bedType) {
+            bed.fields = fields;
+            bed.chrom  = fields[0];
             // VCF is one-based
-            bed.start  = atoi(lineVector[1].c_str()) - 1;  
+            bed.start  = atoi(fields[1].c_str()) - 1;  
             // VCF 4.0 stores the size of the affected REF allele.
-            bed.end    = bed.start + lineVector[3].size(); 
+            bed.end    = bed.start + fields[3].size(); 
             bed.strand = "+";
             // construct the name from the ref and alt alleles.
             // if it's an annotated variant, add the rsId as well.
-            bed.name   = lineVector[3] + "/" + lineVector[4];
-            if (lineVector[2] != ".") {
-                bed.name += "_" + lineVector[2];
+            bed.name   = fields[3] + "/" + fields[4];
+            if (fields[2] != ".") {
+                bed.name += "_" + fields[2];
             }
 
             if (this->bedType > 2) {
-                for (unsigned int i = 2; i < numFields; ++i)
+                for (unsigned int i = 2; i < _numFields; ++i)
                     bed.other_idxs.push_back(i);
             }
 
@@ -795,7 +783,7 @@ private:
                 exit(1);
             }
         }
-        else if (numFields == 1) {
+        else if (_numFields == 1) {
             cerr << "Only one VCF field detected: " 
                  << _lineNum 
                  << ".  Verify that your files are TAB-delimited. "
@@ -803,14 +791,14 @@ private:
                  << endl;
             exit(1);
         }
-        else if ((numFields != this->bedType) && (numFields != 0)) {
+        else if ((_numFields != this->bedType) && (_numFields != 0)) {
             cerr << "Differing number of VCF fields encountered at line: " 
                  << _lineNum 
                  << ".  Exiting..." 
                  << endl;
             exit(1);
         }
-        else if ((numFields < 2) && (numFields != 0)) {
+        else if ((_numFields < 2) && (_numFields != 0)) {
             cerr << "TAB delimited VCF file with at least 2 fields "
                  << "(chrom, pos) is required at line: "
                  << _lineNum 
@@ -827,20 +815,19 @@ private:
         parseGffLine: converts a lineVector into either BED or BEDCOV (templated, hence in header to avoid linker issues.)
     */
     template <typename T>
-    inline bool parseGffLine (T &bed, const vector<string> &lineVector, 
-                             int lineNum, unsigned int numFields) 
+    inline bool parseGffLine (T &bed, const vector<string> &fields) 
     {
-        if (numFields == this->bedType) {
-            bed.fields = lineVector;
+        if (_numFields == this->bedType) {
+            bed.fields = fields;
             if (this->bedType >= 8 && _isGff) {
-                bed.chrom = lineVector[0];
-                if (isInteger(lineVector[3]))
-                    bed.start  = atoi(lineVector[3].c_str());
-                if (isInteger(lineVector[4]))
-                    bed.end  = atoi(lineVector[4].c_str());
-                bed.name   = lineVector[2];
-                bed.score  = lineVector[5];
-                bed.strand = lineVector[6].c_str();
+                bed.chrom = fields[0];
+                if (isInteger(fields[3]))
+                    bed.start  = atoi(fields[3].c_str());
+                if (isInteger(fields[4]))
+                    bed.end  = atoi(fields[4].c_str());
+                bed.name   = fields[2];
+                bed.score  = fields[5];
+                bed.strand = fields[6].c_str();
                 // add GFF "source". unused in BED
                 bed.other_idxs.push_back(1); 
                 // add GFF "fname". unused in BED
@@ -853,7 +840,7 @@ private:
             }
             else {
                 cerr << "Error: unexpected number of fields at line: " 
-                    << lineNum 
+                    << _lineNum 
                     << ".  Verify that your files are TAB-delimited and that "
                     << "your GFF file has 8 or 9 fields.  Exiting..." 
                     << endl;
@@ -861,38 +848,38 @@ private:
             }
             if (bed.start > bed.end) {
                 cerr << "Error: malformed GFF entry at line " 
-                     << lineNum 
+                     << _lineNum 
                      << ". Start was greater than end. Exiting." 
                      << endl;
                 exit(1);
             }
             if ( (bed.start < 0) || (bed.end < 0) ) {
                 cerr << "Error: malformed GFF entry at line " 
-                     << lineNum 
+                     << _lineNum 
                      << ". Coordinate detected that is < 1. Exiting." 
                      << endl;
                 exit(1);
             }
             return true;
         }
-        else if (numFields == 1) {
+        else if (_numFields == 1) {
             cerr << "Only one GFF field detected: " 
-                 << lineNum 
+                 << _lineNum 
                  << ".  Verify that your files are TAB-delimited.  Exiting..." 
                  << endl;
             exit(1);
         }
-        else if ((numFields != this->bedType) && (numFields != 0)) {
+        else if ((_numFields != this->bedType) && (_numFields != 0)) {
             cerr << "Differing number of GFF fields encountered at line: " 
-                 << lineNum 
+                 << _lineNum 
                  << ".  Exiting..." 
                  << endl;
             exit(1);
         }
-        else if ((numFields < 8) && (numFields != 0)) {
+        else if ((_numFields < 8) && (_numFields != 0)) {
             cerr << "TAB delimited GFF file with 8 or 9 fields is required"
                  << " at line: "
-                 << lineNum 
+                 << _lineNum 
                  << ".  Exiting..." 
                  << endl;
             exit(1);

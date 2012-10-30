@@ -154,6 +154,13 @@ void BedFile::GetHeader(void) {
            )
         {
             _header += _bedLine + '\n';
+            
+            if (_bedLine.find("##fileformat=VCF") == 0) {
+                _typeIsKnown = true;
+                setFileType(VCF_FILETYPE);
+                setGff(false);
+                setVcf(true);
+            }
         }
         // we are done with the header. stop looking
         // and indicate that the first data line has been read
@@ -187,8 +194,11 @@ bool BedFile::GetNextBed(BED &bed, bool forceSorted) {
             // of reading the header.
             Tokenize(_bedLine, _bedFields);
             _firstLine = false;
+            setBedType(_bedFields.size());
         }
         // load the BED struct as long as it's a valid BED entry.
+        
+        _numFields = _bedFields.size();
         _status = parseLine(bed, _bedFields);
         if (_status == BED_INVALID) return false;
         

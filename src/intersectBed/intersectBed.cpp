@@ -279,13 +279,13 @@ void BedIntersect::IntersectBed() {
         hit_set.second.reserve(10000);
         while (sweep.Next(hit_set)) {
             if (_obeySplits == false) {
-				processHits(hit_set.first, hit_set.second);
-			}
+                processHits(hit_set.first, hit_set.second);
+            }
             else {
                 bedVector a_blocks; 
                 GetBedBlocks(hit_set.first, a_blocks);
                 FindBlockedOverlaps(hit_set.first, a_blocks, 
-									hit_set.second, false);
+                                    hit_set.second, false);
             }
         }
     }
