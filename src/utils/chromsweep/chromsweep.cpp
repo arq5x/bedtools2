@@ -70,7 +70,6 @@ void ChromSweep::ScanCache() {
     list<BED>::iterator c = _cache.begin();
     while (c != _cache.end())
     {
-
         if ((_curr_qy.chrom == c->chrom) && !(after(_curr_qy, *c))) {
             if (IsValidHit(_curr_qy, *c)) {
                 _hits.push_back(*c);
@@ -94,7 +93,7 @@ bool ChromSweep::ChromChange()
 	// fast-forward the database to catch-up.
     else if ((_curr_qy.chrom > _curr_db.chrom) && (!_db->Empty())) {
         while (_db->GetNextBed(_curr_db, true) && 
-			   _curr_db.chrom < _curr_qy.chrom)
+               _curr_db.chrom < _curr_qy.chrom)
         {
         }
         _cache.clear();
@@ -160,16 +159,16 @@ bool ChromSweep::Next(pair<BED, vector<BED> > &next) {
             // scan the database cache for hits
             ScanCache();
             // advance the db until we are ahead of the query. 
-			// update hits and cache as necessary
+            // update hits and cache as necessary
             while (!_db->Empty() && 
                    _curr_qy.chrom == _curr_db.chrom && 
                    !(after(_curr_db, _curr_qy)))
             {
                 if (IsValidHit(_curr_qy, _curr_db)) {
                     _hits.push_back(_curr_db);
-				}
-				_cache.push_back(_curr_db);
-				_db->GetNextBed(_curr_db, true);
+                }
+                _cache.push_back(_curr_db);
+                _db->GetNextBed(_curr_db, true);
             }
             // add the hits for this query to the pump
             _results.push(make_pair(_curr_qy, _hits));
