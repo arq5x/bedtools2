@@ -184,8 +184,8 @@ void BedCoverage::ReportCounts() {
 
 void BedCoverage::ReportCoverage() {
 
-    map<unsigned int, unsigned int> allDepthHist;
-    unsigned int totalLength = 0;
+    map<unsigned long, unsigned long> allDepthHist;
+    unsigned long totalLength = 0;
 
     // process each chromosome
     masterBedCovMap::const_iterator chromItr = _bedB->bedCovMap.begin();
@@ -298,11 +298,11 @@ void BedCoverage::ReportCoverage() {
     // report a histogram of coverage among _all_
     // features in B.
     if (_writeHistogram == true) {
-        map<unsigned int, unsigned int>::const_iterator histItr = allDepthHist.begin();
-        map<unsigned int, unsigned int>::const_iterator histEnd = allDepthHist.end();
+        map<unsigned long, unsigned long>::const_iterator histItr = allDepthHist.begin();
+        map<unsigned long, unsigned long>::const_iterator histEnd = allDepthHist.end();
         for (; histItr != histEnd; ++histItr) {
             float fractAtThisDepth = (float) histItr->second / totalLength;
-            printf("all\t%d\t%d\t%d\t%0.7f\n", histItr->first, histItr->second, totalLength, fractAtThisDepth);
+            printf("all\t%lu\t%lu\t%lu\t%0.7f\n", histItr->first, histItr->second, totalLength, fractAtThisDepth);
         }
     }
 }
