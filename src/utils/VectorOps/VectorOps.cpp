@@ -313,3 +313,17 @@ string VectorOps::GetFreqAsc(void)
     
     return buffer.str();
 }
+
+
+string VectorOps::GetFirst(void)
+{
+    return _vecs[0];
+}
+
+
+string VectorOps::GetLast(void)
+{
+    return _vecs[_vecs.size() - 1];
+}
+
+
