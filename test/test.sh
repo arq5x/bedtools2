@@ -31,6 +31,9 @@ cd getfasta; sh test-getfasta.sh; cd ..
 echo " Testing bedtools intersect:"
 cd intersect; sh test-intersect.sh; cd ..
 
+echo " Testing bedtools jaccard:"
+cd jaccard; sh test-jaccard.sh; cd ..
+
 echo " Testing bedtools map:"
 cd map; sh test-map.sh; cd ..
 
