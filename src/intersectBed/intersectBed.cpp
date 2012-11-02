@@ -288,7 +288,7 @@ void BedIntersect::IntersectBed() {
         ChromSweep sweep = ChromSweep(_bedA, _bedB, 
                                       _sameStrand, _diffStrand, 
                                       _overlapFraction, _reciprocal,
-                                      _printHeader);
+                                      false, _printHeader);
 
         pair<BED, vector<BED> > hit_set;
         hit_set.second.reserve(10000);

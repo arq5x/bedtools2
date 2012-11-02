@@ -52,6 +52,7 @@ int genomecoverage_main(int argc, char* argv[]);//
 int getoverlap_main(int argc, char* argv[]);//
 int groupby_main(int argc, char* argv[]);//
 int intersect_main(int argc, char* argv[]); //
+int jaccard_main(int argc, char* argv[]); //
 int links_main(int argc, char* argv[]);//
 int maskfastafrombed_main(int argc, char* argv[]);//
 int map_main(int argc, char* argv[]); //
@@ -123,6 +124,9 @@ int main(int argc, char *argv[])
     else if (sub_cmd == "maskfasta")   return maskfastafrombed_main(argc-1, argv+1);
     else if (sub_cmd == "nuc")         return nuc_main(argc-1, argv+1);
 
+    // statistics tools
+    else if (sub_cmd == "jaccard")     return jaccard_main(argc-1, argv+1);
+
     // misc. tools
     else if (sub_cmd == "overlap")     return getoverlap_main(argc-1, argv+1);
     else if (sub_cmd == "igv")         return bedtoigv_main(argc-1, argv+1);
@@ -130,6 +134,8 @@ int main(int argc, char *argv[])
     else if (sub_cmd == "makewindows") return windowmaker_main(argc-1, argv+1);
     else if (sub_cmd == "groupby")     return groupby_main(argc-1, argv+1);
     else if (sub_cmd == "expand")      return expand_main(argc-1, argv+1);
+
+    
 
     // help
     else if (sub_cmd == "-h" || sub_cmd == "--help" ||
@@ -222,6 +228,10 @@ int bedtools_help(void)
     cout  << "[ BAM focused tools ]" << endl;
     cout  << "    multicov      "  << "Counts coverage from multiple BAMs at specific intervals.\n";
     cout  << "    tag           "  << "Tag BAM alignments based on overlaps with interval files.\n";
+    
+    cout  << endl;
+    cout  << "[ Statistics tools ]" << endl;
+    cout  << "    jaccard       "  << "Calculates the Jaccard statistic b/w two sets of intervals.\n";
 
     cout  << endl;
     cout  << "[ Miscellaneous tools ]" << endl;

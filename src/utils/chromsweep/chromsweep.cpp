@@ -21,7 +21,7 @@ bool after(const BED &a, const BED &b);
 ChromSweep::ChromSweep(BedFile *query, BedFile *db, 
                        bool sameStrand, bool diffStrand, 
                        float overlapFraction, bool reciprocal,
-                       bool printHeader)
+                       bool useMergedIntervals, bool printHeader)
 
 
 : _query(query)
@@ -30,6 +30,7 @@ ChromSweep::ChromSweep(BedFile *query, BedFile *db,
 , _sameStrand(sameStrand)
 , _diffStrand(diffStrand)
 , _reciprocal(reciprocal)
+, _useMergedIntervals(useMergedIntervals)
 {
     _hits.reserve(100000);
 
@@ -37,8 +38,8 @@ ChromSweep::ChromSweep(BedFile *query, BedFile *db,
     if (printHeader) _query->PrintHeader();
     _db->Open();
     
-    _query->GetNextBed(_curr_qy);
-    _db->GetNextBed(_curr_db);
+    NextQuery();
+    NextDatabase();
 }
 
 /*
@@ -54,10 +55,24 @@ ChromSweep::ChromSweep(string &queryFile, string &dbFile)
     _query->Open();
     _db->Open();
     
-    _query->GetNextBed(_curr_qy);
-    _db->GetNextBed(_curr_db);
+    NextQuery();
+    NextDatabase();
 }
 
+
+bool ChromSweep::NextQuery() {
+    if (!_useMergedIntervals)
+        return _query->GetNextBed(_curr_qy, true);
+    else
+        return _query->GetNextMergedBed(_curr_qy);
+}
+
+bool ChromSweep::NextDatabase() {
+    if (!_useMergedIntervals)
+        return _db->GetNextBed(_curr_db, true);
+    else
+        return _db->GetNextMergedBed(_curr_db);
+}
 
 /*
     Destructor
@@ -92,7 +107,8 @@ bool ChromSweep::ChromChange()
     // the query is ahead of the database. 
 	// fast-forward the database to catch-up.
     else if ((_curr_qy.chrom > _curr_db.chrom) && (!_db->Empty())) {
-        while (_db->GetNextBed(_curr_db, true) && 
+
+        while (NextDatabase() && 
                _curr_db.chrom < _curr_qy.chrom)
         {
         }
@@ -114,7 +130,7 @@ bool ChromSweep::ChromChange()
             _results.push(make_pair(_curr_qy, _no_hits));
             _cache.clear();
         }
-        _query->GetNextBed(_curr_qy, true);
+        NextQuery();
         _curr_chrom = _curr_qy.chrom;
         return true;
     }
@@ -168,13 +184,13 @@ bool ChromSweep::Next(pair<BED, vector<BED> > &next) {
                     _hits.push_back(_curr_db);
                 }
                 _cache.push_back(_curr_db);
-                _db->GetNextBed(_curr_db, true);
+                NextDatabase();
             }
             // add the hits for this query to the pump
             _results.push(make_pair(_curr_qy, _hits));
             // reset for the next query
             _hits.clear();
-            _query->GetNextBed(_curr_qy, true);
+            NextQuery();
             _curr_chrom = _curr_qy.chrom;
         }
     }

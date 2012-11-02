@@ -115,6 +115,9 @@ void BedFile::Open(void) {
 // Rewind the pointer back to the beginning of the file
 void BedFile::Rewind(void) {
     _bedStream->seekg(0, ios::beg);
+    
+    _prev_start = -1;
+    _prev_chrom = "";
 }
 
 // Jump to a specific byte in the file
@@ -129,7 +132,8 @@ bool BedFile::Empty(void) {
 
 // Close the BED file
 void BedFile::Close(void) {
-    if (bedFile != "stdin" && bedFile != "-") delete _bedStream;
+    if (bedFile != "stdin" && bedFile != "-")
+        delete _bedStream;
 }
 
 void BedFile::GetLine(void) {
@@ -269,15 +273,18 @@ bool BedFile::GetNextMergedBed(BED &merged_bed) {
                 }
             }
         }
+
         // handle the last merged block in the file.
         if (_status == BED_INVALID)
         {
+            _status = BED_VALID;
             merged_bed.chrom = _merged_chrom;
             merged_bed.start = _merged_start;
             merged_bed.end   = _merged_end;
             return true;
         }
     }
+    _status = BED_INVALID;
     return false;
 }
 
