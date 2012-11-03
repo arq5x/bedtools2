@@ -1,3 +1,87 @@
+Version 2.17.0 (3-Nov-2012)
+=====================
+===   New Tool   ===
+=====================
+
+We have added a new tool (bedtools "jaccard") for measuring the Jaccard statistic 
+between two interval files.  The Jaccard stat measures the ratio of the length 
+of the intersection over the length of the union of the two sets.  In this
+case, the union is measured as the sum of the lengths of the intervals in each
+set minus the length of the intersecting intervals.  As such, the Jaccard 
+statistic provides a "distance" measure between 0 (no intersections) 
+and 1 (self intersection). The higher the score, the more the two sets of 
+intervals overlap one another.  This tool was motivated by Favorov et al, 2012.
+For more details, see see PMID: 22693437.
+
+We anticipate releasing other statistical measures in forthcoming releases.
+
+
+
+===================================
+=== New Features & enhancements ===
+===================================
+1. The genome file drives the BAM header in "bedtools bedtobam"
+
+2. Substantially improvement the performance of the -sorted option in 
+   "bedtools intersect" and "bedtools map".  For many applications, 
+   bedtools is now nearly as fast as the BEDOPS suite when intersecting 
+   pre-sorted data.  This improvement is thanks to Neil Kindlon, a staff
+   scientist in the Quinlan lab.
+
+3. Tightened the logic for handling split (blocked) BAM and BED records
+
+4. Added ranged column selection to "bedtools groupby".  Thanks to Brent Pedersen"
+	- e.g., formerly "bedtools groupby -g 1,2,3,4,5"; now "-g 1-5"
+
+5. "bedtools getfasta" now properly extracts sequences based on blocked (BED12)
+   records (e.g., exons from genes in BED12 format).
+   
+6. "bedtools groupby" now allows a header line in the input.
+
+7. With -N, the user can now force the closest interval to have a different name
+   field in "bedtools closest"
+
+8. With -A, the user can now force the subtraction of entire interval when 
+   any overlap exists in "bedtools subtract".
+   
+9. "bedtools shuffle" can now shuffle BEDPE records.
+
+10. Improved random number generation.
+
+11. Added -split, -s, -S, -f, -r options to "bedtools multicov"
+
+12. Improvements to the regression testing framework.
+
+13. Standardized the tag reporting logic in "bedtools bamtobed"
+
+14. Improved the auto-detection of VCF format.  Thanks to Michael James Clark.
+
+====================
+===  Bug  fixes  ===
+====================
+1. Fixed a bug in bedtobam's -bed12 mode.
+
+2. Properly include unaligned BAM alignments with "bedtools intersect"'s -v option.
+
+3. Fixed off by one error in "bedtools closest"'s -d option
+
+4."bedtools bamtobed" fails properly for non-existent file.
+
+5. Corrected missing tab in "bedtools annotate"'s header.
+
+6. Allow int or uint tags in "bedtools bamtobed"
+
+7. "bedtools flank" no longer attempts to take flanks prior to the start of a
+   chromosome.
+
+8. Eliminated an extraneous tab from "bedtools window" -c.
+
+9. Fixed a corner case in the -sorted algorithm.
+
+10.Prevent numeric overflow in "bedtools coverage -hist"
+
+
+
 Version 2.14.1-3 (2-Nov-2011)
 
 Bug Fixes
