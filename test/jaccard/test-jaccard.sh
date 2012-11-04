@@ -42,6 +42,6 @@ echo "    jaccard.t04...\c"
 echo \
 "intersection	union	jaccard
 0	210	0" > exp
-$BT jaccard -a a.bed -b b.bed > obs
+$BT jaccard -a a.bed -b d.bed > obs
 check obs exp
 rm obs exp
