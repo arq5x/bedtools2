@@ -43,6 +43,9 @@ cd merge; sh test-merge.sh; cd ..
 echo " Testing bedtools multicov:"
 cd multicov; sh test-multicov.sh; cd ..
 
+echo " Testing bedtools reldist:"
+cd reldist; sh test-reldist.sh; cd ..
+
 echo " Testing bedtools slop:"
 cd slop; sh test-slop.sh; cd ..
 

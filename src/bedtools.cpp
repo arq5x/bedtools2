@@ -63,6 +63,7 @@ int nuc_main(int argc, char* argv[]);//
 int pairtobed_main(int argc, char* argv[]);//
 int pairtopair_main(int argc, char* argv[]);//
 int random_main(int argc, char* argv[]); //
+int reldist_main(int argc, char* argv[]); //
 int shuffle_main(int argc, char* argv[]); //
 int slop_main(int argc, char* argv[]); //
 int sort_main(int argc, char* argv[]); //
@@ -126,6 +127,7 @@ int main(int argc, char *argv[])
 
     // statistics tools
     else if (sub_cmd == "jaccard")     return jaccard_main(argc-1, argv+1);
+    else if (sub_cmd == "reldist")     return reldist_main(argc-1, argv+1);
 
     // misc. tools
     else if (sub_cmd == "overlap")     return getoverlap_main(argc-1, argv+1);
@@ -230,8 +232,9 @@ int bedtools_help(void)
     cout  << "    tag           "  << "Tag BAM alignments based on overlaps with interval files.\n";
     
     cout  << endl;
-    cout  << "[ Statistics tools ]" << endl;
-    cout  << "    jaccard       "  << "Calculates the Jaccard statistic b/w two sets of intervals.\n";
+    cout  << "[ Statistical relationships ]" << endl;
+    cout  << "    jaccard       "  << "Calculate the Jaccard statistic b/w two sets of intervals.\n";
+    cout  << "    reldist       "  << "Calculate the distribution of relative distances b/w two files.\n";
 
     cout  << endl;
     cout  << "[ Miscellaneous tools ]" << endl;
