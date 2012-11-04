@@ -1,4 +1,4 @@
-BT=../../bin/bedtools
+BT=${BT-../../bin/bedtools}
 
 lines_a=$($BT groupby -g 3-1 -o collapse -c 4 -i ../map/values3.bed | wc -l)
 lines_b=$($BT groupby -g 1-3 -o collapse -c 4 -i ../map/values3.bed | wc -l)
