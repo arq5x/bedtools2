@@ -72,6 +72,8 @@ void BedCluster::ClusterBedStranded() {
     // that we can easily compare "A" to it for overlaps
     _bed->loadBedFileIntoMapNoBin();
     
+    uint32_t cluster_id = 0;
+
     // loop through each chromosome and merge their BED entries
     masterBedMapNoBin::const_iterator m    = _bed->bedMapNoBin.begin();
     masterBedMapNoBin::const_iterator mEnd = _bed->bedMapNoBin.end();
@@ -85,7 +87,6 @@ void BedCluster::ClusterBedStranded() {
         vector<string> strands(2);
         strands[0] = "+";
         strands[1] = "-";
-        uint32_t cluster_id = 0;
         // do two passes, one for each strand.
         for (unsigned int s = 0; s < strands.size(); s++) {
             // cluster overlapping features for this chromosome.
