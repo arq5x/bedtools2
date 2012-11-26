@@ -141,7 +141,7 @@ void coverage_help(void) {
 
     cerr << "Options: " << endl;
 
-    cerr << "\t-abam\t"         << "The A input file is in BAM format." << endl << endl;
+    cerr << "\t-abam\t"         << "The A input file is in BAM format. Replaces -a." << endl << endl;
 
     cerr << "\t-s\t"            << "Require same strandedness.  That is, only counts hits in A that" << endl;
     cerr                        << "\t\toverlap B on the _same_ strand." << endl;

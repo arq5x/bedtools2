@@ -178,7 +178,7 @@ void pairtobed_help(void) {
 
     cerr << "Options: " << endl;
 
-    cerr << "\t-abam\t"         << "The A input file is in BAM format.  Output will be BAM as well." << endl;
+    cerr << "\t-abam\t"         << "The A input file is in BAM format.  Output will be BAM as well. Replaces -a." << endl;
     cerr                        << "\t\t- Requires BAM to be grouped or sorted by query." << endl << endl;
 
     cerr << "\t-ubam\t"         << "Write uncompressed BAM output. Default writes compressed BAM." << endl << endl;
