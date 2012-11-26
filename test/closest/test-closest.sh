@@ -81,3 +81,23 @@ chr1	55	58	break2	chr1	40	50	break1	6" > exp
 $BT closest -a a.names.bed -b b.names.bed -d -N > obs
 check obs exp
 rm obs exp
+
+###########################################################
+# test closest forcing -s yet no matching strands on chrom
+###########################################################
+echo "    closest.t7...\c"
+echo \
+"chr1	100	200	a	10	+	.	-1	-1	.	-1	." > exp
+$BT closest -a strand-test-a.bed -b strand-test-b.bed -s > obs
+check obs exp
+rm obs exp
+
+###########################################################
+# test closest forcing -S with only an opp strands on chrom
+###########################################################
+echo "    closest.t8...\c"
+echo \
+"chr1	100	200	a	10	+	chr1	90	120	b	1	-" > exp
+$BT closest -a strand-test-a.bed -b strand-test-b.bed -S > obs
+check obs exp
+rm obs exp

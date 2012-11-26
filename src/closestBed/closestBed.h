@@ -59,8 +59,8 @@ private:
     BedFile *_bedA, *_bedB;
 
     // methods
-    void reportNullB();
     void FindWindowOverlaps(BED &, vector<BED> &);
+    void ReportClosestNotFound(const BED &a);
 
 };
 #endif /* CLOSEST_H */

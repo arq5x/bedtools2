@@ -53,6 +53,16 @@ BedClosest::BedClosest(string &bedAFile, string &bedBFile, bool sameStrand,
 BedClosest::~BedClosest(void) {
 }
 
+void BedClosest::ReportClosestNotFound(const BED &a) {
+    _bedA->reportBedTab(a);
+    if (_reportDistance == true) {
+        _bedB->reportNullBedTab();
+        cout << -1 << endl;
+    }
+    else
+        _bedB->reportNullBedNewLine();
+}
+
 
 void BedClosest::FindWindowOverlaps(BED &a, vector<BED> &hits) {
 
@@ -194,58 +204,58 @@ void BedClosest::FindWindowOverlaps(BED &a, vector<BED> &hits) {
             // if no overlaps were found, we'll widen the range
             // by SLOPGROWTH in each direction and search again.
             slop += SLOPGROWTH;
+        } // while ((numOverlaps == 0) && (slop <= MAXSLOP))
+        
+        // report the closest feature(s) in B to the current A feature.
+        // obey the user's reporting request (_tieMode)
+        if (numOverlaps > 0) {
+            if (closestB.size() == 1 || 
+                (_tieMode == "first" && closestB.size() > 0)) 
+            {
+                _bedA->reportBedTab(a);
+                if (_reportDistance == true) {
+                    _bedB->reportBedTab(closestB[0]);
+                    cout << distances[0] << endl;
+                }
+                else
+                    _bedB->reportBedNewLine(closestB[0]);
+            }
+            else {
+                if (_tieMode == "all") {
+                    size_t i = 0;
+                    vector<BED>::iterator b = closestB.begin();
+                    for (; b != closestB.end(); ++b) 
+                    {
+                        _bedA->reportBedTab(a);
+                        if (_reportDistance == true) {
+                            _bedB->reportBedTab(*b);
+                            cout << distances[i++] <<endl;
+                        }
+                        else
+                            _bedB->reportBedNewLine(*b);
+                    }
+                }
+                else if (_tieMode == "last" && closestB.size() > 0) {
+                    _bedA->reportBedTab(a);
+                    if (_reportDistance == true) {
+                        _bedB->reportBedTab(closestB[closestB.size()-1]);
+                        cout << distances[distances.size() - 1]<<endl;
+                    }
+                    else
+                        _bedB->reportBedNewLine(closestB[closestB.size()-1]);
+                }
+            }
+        }
+        // there were B features on the same chrom as A, but there were
+        // none that met the user's criteria (e.g., that it be on the 
+        // same chrom)
+        else if (numOverlaps == 0) {
+            ReportClosestNotFound(a);
         }
     }
     // there is no feature in B on the same chromosome as A
     else {
-        _bedA->reportBedTab(a);
-        if (_reportDistance == true) {
-            _bedB->reportNullBedTab();
-            cout << -1 << endl;
-        }
-        else
-            _bedB->reportNullBedNewLine();
-    }
-
-    // report the closest feature(s) in B to the current A feature.
-    // obey the user's reporting request (_tieMode)
-    if (numOverlaps > 0) {
-        if (closestB.size() == 1 || 
-            (_tieMode == "first" && closestB.size() > 0)) 
-        {
-            _bedA->reportBedTab(a);
-            if (_reportDistance == true) {
-                _bedB->reportBedTab(closestB[0]);
-                cout << distances[0] << endl;
-            }
-            else
-                _bedB->reportBedNewLine(closestB[0]);
-        }
-        else {
-            if (_tieMode == "all") {
-                size_t i = 0;
-                vector<BED>::iterator b = closestB.begin();
-                for (; b != closestB.end(); ++b) 
-                {
-                    _bedA->reportBedTab(a);
-                    if (_reportDistance == true) {
-                        _bedB->reportBedTab(*b);
-                        cout << distances[i++] <<endl;
-                    }
-                    else
-                        _bedB->reportBedNewLine(*b);
-                }
-            }
-            else if (_tieMode == "last" && closestB.size() > 0) {
-                _bedA->reportBedTab(a);
-                if (_reportDistance == true) {
-                    _bedB->reportBedTab(closestB[closestB.size()-1]);
-                    cout << distances[distances.size() - 1]<<endl;
-                }
-                else
-                    _bedB->reportBedNewLine(closestB[closestB.size()-1]);
-            }
-        }
+        ReportClosestNotFound(a);
     }
 }
 
