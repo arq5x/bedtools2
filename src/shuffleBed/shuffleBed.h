@@ -79,6 +79,7 @@ private:
     void Shuffle();
     void ShuffleWithExclusions();
     void ShuffleWithInclusions();
+    void ShuffleWithInclusionsAndExclusions();
 
     void ChooseLocus(BED &);
     void ChooseLocusFromInclusionFile(BED &);
