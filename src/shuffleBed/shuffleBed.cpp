@@ -253,7 +253,6 @@ void BedShuffle::ShuffleWithInclusionsAndExclusions() {
             {
                 // choose a new locus
                 ChooseLocusFromInclusionFile(bedEntry);
-                
                 haveOverlap = _exclude->anyHits(bedEntry.chrom, 
                                                 bedEntry.start, 
                                                 bedEntry.end,

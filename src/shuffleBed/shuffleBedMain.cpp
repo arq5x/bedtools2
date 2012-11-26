@@ -40,7 +40,7 @@ int shuffle_main(int argc, char* argv[]) {
     bool haveExclude      = false;
     bool haveInclude      = false;
     bool haveSeed         = false;
-    float overlapFraction = 0.0;
+    float overlapFraction = 1E-9;
     int seed              = -1;
     bool sameChrom        = false;
     bool chooseChrom      = false;
