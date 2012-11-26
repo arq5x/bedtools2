@@ -126,13 +126,6 @@ int shuffle_main(int argc, char* argv[]) {
       showHelp = true;
     }
 
-    /*
-    if (haveInclude && haveExclude) {
-      cerr << endl << "*****" << endl << "*****ERROR: Cannot use -incl and -excl together." << endl << "*****" << endl;
-      showHelp = true;
-    }
-    */
-
     if (!showHelp) {
         BedShuffle *bc = new BedShuffle(bedFile, genomeFile, excludeFile,
                                         includeFile, haveSeed, haveExclude,
