@@ -264,7 +264,8 @@ void intersect_help(void) {
 
     cerr << "\t-wa\t"           << "Write the original entry in A for each overlap." << endl << endl;
 
-    cerr << "\t-wb\t"           << "Write the original entry in B for each overlap." << endl;
+    cerr << "\t-wb\t"           << "Follow the A entry with the original "
+                                << "entry in B for each overlap." << endl;
     cerr                        << "\t\t- Useful for knowing _what_ A overlaps. Restricted by -f and -r." << endl << endl;
     
     cerr << "\t-loj\t"          << "Perform a \"left outer join\". That is, for each feature in A" << endl;
