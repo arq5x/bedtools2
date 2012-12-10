@@ -29,7 +29,7 @@ public:
     // constructor
     BedSubtract(string &bedAFile, string &bedBFile, 
                 float overlapFraction, bool sameStrand, 
-                bool diffStrand, bool removeAll);
+                bool diffStrand, bool removeAll, bool removeAny);
 
     // destructor
     ~BedSubtract(void);
@@ -44,6 +44,7 @@ private:
     bool _sameStrand;
     bool _diffStrand;
     bool _removeAll;
+    bool _removeAny;
 
     // instances of bed file class.
     BedFile *_bedA, *_bedB;

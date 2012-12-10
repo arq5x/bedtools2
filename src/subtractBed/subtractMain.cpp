@@ -44,6 +44,7 @@ int subtract_main(int argc, char* argv[]) {
     bool sameStrand = false;
     bool diffStrand = false;
     bool removeAll = false;
+    bool removeAny = false;
 
     // check to see if we should print out some help
     if(argc <= 1) showHelp = true;
@@ -94,6 +95,9 @@ int subtract_main(int argc, char* argv[]) {
         else if (PARAMETER_CHECK("-A", 2, parameterLength)) {
             removeAll = true;
         }
+        else if (PARAMETER_CHECK("-N", 2, parameterLength)) {
+            removeAny = true;
+        }
         else {
             cerr << endl 
                     << "*****ERROR: Unrecognized parameter: " 
@@ -109,10 +113,14 @@ int subtract_main(int argc, char* argv[]) {
                 << endl << "*****" << endl;
         showHelp = true;
     }
-    
+    if (removeAny && !haveFraction){
+        cerr << endl << "*****" << endl
+                << "*****WARNING: -N is no different from -A without -f"
+                << endl << "*****" << endl;
+    }
     if (sameStrand && diffStrand) {
         cerr << endl << "*****" << endl 
-                << "*****ERROR: Request either -s OR -S, not both." 
+                << "*****ERROR: Request either -s OR -S, not both."
                 << endl << "*****" << endl;
         showHelp = true;
     }
@@ -121,7 +129,7 @@ int subtract_main(int argc, char* argv[]) {
 
         BedSubtract *bs = new BedSubtract(bedAFile, bedBFile, 
                                           overlapFraction, sameStrand,
-                                          diffStrand, removeAll);
+                                          diffStrand, removeAll, removeAny);
         delete bs;
         return 0;
     }
@@ -156,6 +164,9 @@ void subtract_help(void) {
     cerr << "\t-A\t"            << "Remove entire feature if any overlap.  That is, by default," << endl;
     cerr                        << "\t\tonly subtract the portion of A that overlaps B. Here, if" << endl;
     cerr                        << "\t\tany overlap is found (or -f amount), the entire feature is removed." << endl << endl;
+    
+    cerr << "\t-N\t"            << "Same as -A except when used with -f, the amount is the sum" << endl;
+    cerr                        << "\t\tof all features (not any single feature)." << endl << endl;
 
     // end the program here
     exit(1);

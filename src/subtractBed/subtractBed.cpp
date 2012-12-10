@@ -11,20 +11,21 @@
 ******************************************************************************/
 #include "lineFileUtilities.h"
 #include "subtractBed.h"
-
+#include <numeric>
 
 /*
     Constructor
 */
 BedSubtract::BedSubtract(string &bedAFile, string &bedBFile, 
                          float overlapFraction, bool sameStrand, 
-                         bool diffStrand, bool removeAll)
+                         bool diffStrand, bool removeAll, bool removeAny)
     : _bedAFile(bedAFile)
     , _bedBFile(bedBFile)
     , _overlapFraction(overlapFraction)
     , _sameStrand(sameStrand)
     , _diffStrand(diffStrand)
     , _removeAll(removeAll)
+    , _removeAny(removeAny)
 {
     _bedA = new BedFile(bedAFile);
     _bedB = new BedFile(bedBFile);
@@ -54,7 +55,6 @@ void BedSubtract::FindAndSubtractOverlaps(BED &a, vector<BED> &hits) {
     vector<BED>::const_iterator h = hits.begin();
     vector<BED>::const_iterator hitsEnd = hits.end();
     for (; h != hitsEnd; ++h) {
-
         int s = max(a.start, h->start);
         int e = min(a.end, h->end);
         int overlapBases = (e - s);
@@ -69,7 +69,7 @@ void BedSubtract::FindAndSubtractOverlaps(BED &a, vector<BED> &hits) {
                 numOverlaps++;
                 numConsumedByB++;
             }
-            else if ( overlap >= _overlapFraction ) {
+            else if ( overlap >= _overlapFraction || _removeAny) {
                 numOverlaps++;
                 bOverlaps.push_back(*h);
             }
@@ -80,7 +80,7 @@ void BedSubtract::FindAndSubtractOverlaps(BED &a, vector<BED> &hits) {
         // no overlap found, so just report A as-is.
         _bedA->reportBedNewLine(a);
     }
-    else if (numOverlaps == 1) {
+    else if ((numOverlaps == 1) && (!_removeAny)) {
         // one overlap found.  only need to look at the single
         // entry in bOverlaps.
 
@@ -116,14 +116,17 @@ void BedSubtract::FindAndSubtractOverlaps(BED &a, vector<BED> &hits) {
             }
         }
     }
-    else if (numOverlaps > 1) {
+    else if ((numOverlaps > 1) || _removeAny) {
         // multiple overlapz found.  look at all the hits
         // and figure out which bases in A survived.  then
         // report the contigous intervals that survived.
 
         vector<bool> aKeep(a.end - a.start, true);
 
-        if ((numConsumedByB == 0) && (_removeAll == false)) {
+        if ((numConsumedByB == 0)) {
+            if(_removeAll){ return; }
+            
+            // if there's any overlap, then we don't report.
             // track the number of hit starts and ends at each position in A
             for (vector<BED>::iterator h = bOverlaps.begin(); 
                  h != bOverlaps.end();
@@ -134,6 +137,14 @@ void BedSubtract::FindAndSubtractOverlaps(BED &a, vector<BED> &hits) {
 
                 for (int i = s+1; i <= e; ++i) {
                     aKeep[i-a.start-1] = false;
+                }
+            }
+            if (_removeAny){
+                int asum = std::accumulate(aKeep.rbegin(), aKeep.rend(), 0);
+                float afrac = 1.0 - (float)asum / aKeep.size();
+                if(afrac > _overlapFraction){ return ; }
+                for (unsigned int i = 0; i < aKeep.size(); ++i) {
+                    aKeep[i] = true;
                 }
             }
             // report the remaining blocks.

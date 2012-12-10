@@ -111,3 +111,23 @@ echo \
 $BT subtract -a a.bed -b b.bed -A -f 0.1 > obs
 check obs exp
 rm obs exp
+
+
+###########################################################
+# test -N with -f subtraction
+###########################################################
+echo "    subtract.t9...\c"
+echo \
+"chr1	0	10" > exp
+$BT subtract -a c.bed -b d.bed -N -f 0.4 > obs
+check obs exp
+rm obs exp
+
+###########################################################
+# test -N with -f subtraction
+###########################################################
+echo "    subtract.t10...\c"
+touch exp
+$BT subtract -a c.bed -b d.bed -N -f 0.39 > obs
+check obs exp
+rm obs exp
