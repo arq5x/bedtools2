@@ -3,4 +3,5 @@ testingData
 *.pdf
 bin/*
 obj/*
+docs/_build/
 

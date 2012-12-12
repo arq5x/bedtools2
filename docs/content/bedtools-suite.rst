@@ -14,7 +14,7 @@ Table of contents
 .. toctree::
    :maxdepth: 1
 
-   intersectBed
+   intersect
    pairToBed
    pairToPair
    bamToBed

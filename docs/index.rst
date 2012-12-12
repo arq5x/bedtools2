@@ -22,6 +22,7 @@ Table of contents
    content/bedtools-suite
    content/example-usage
    content/advanced-usage
+   content/FAQ
 
 
 =================
