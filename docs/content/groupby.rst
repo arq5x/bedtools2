@@ -3,10 +3,11 @@
 ###############
 ``bedtools groupby`` is a useful tool that mimics the "group by" clause in database 
 systems. Given a file or stream that is sorted by the appropriate "grouping 
-columns", ``groupby`` will compute summary statistics on another column in the 
-file or stream. This will work with output from all BEDTools as well as any other
-tab-delimited file or stream.  As such, this is a generally useful tool for
-all command-line analyses, not just genomics related research.
+columns" (``-g``), ``groupby`` will compute summary statistics on another 
+column (``-c``) in the file or stream. This will work with output from all 
+BEDTools as well as any other tab-delimited file or stream.  As such, this is a 
+generally useful tool for all command-line analyses, not just genomics related 
+research.
 
 .. note::
     When using ``bedtools groupby``, the input data must be ordered by the same
@@ -24,12 +25,12 @@ all command-line analyses, not just genomics related research.
 Usage
 ::
 
-    bedtools groupby [OPTIONS] -i <input> -c <input column> -o <operation>
+    bedtools groupby [OPTIONS] -i <input> -g <group columns> -c <op. column> -o <operation>
   
 or:
 ::
 
-    groupBy [OPTIONS] -i <input> -c <input column> -o <operation>
+    groupBy [OPTIONS] -i <input> -g <group columns> -c <op. column> -o <operation>
   
 ===========================      ===============================================================================================================================================================================================================
 Option                           Description
