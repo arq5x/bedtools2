@@ -35,7 +35,7 @@ Table of contents
    overlap
    bedToIgv
    bed12ToBed6
-   groupBy
+   groupby
    unionBedGraphs
    annotateBed
    
