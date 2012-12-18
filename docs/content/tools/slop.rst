@@ -1,5 +1,5 @@
 ###############
-5.14 slopBed
+*slop*
 ###############
 **slopBed** will increase the size of each feature in a feature file be a user-defined number of bases. While
 something like this could be done with an "**awk '{OFS="\t" print $1,$2-<slop>,$3+<slop>}'**",

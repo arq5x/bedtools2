@@ -1,5 +1,5 @@
 ###############
-5.19 overlap
+*overlap*
 ###############
 **overlap** computes the amount of overlap (in the case of positive values) or distance (in the case of
 negative values) between feature coordinates occurring on the same input line and reports the result at

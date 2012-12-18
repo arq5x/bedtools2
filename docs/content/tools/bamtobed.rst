@@ -1,5 +1,5 @@
 ###############
-5.4 bamToBed
+*bamtobed*
 ###############
 
 **bamToBed** is a general purpose tool that will convert sequence alignments in BAM format to either

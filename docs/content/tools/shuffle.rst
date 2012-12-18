@@ -1,5 +1,5 @@
 ###############
-5.13 shuffleBed
+*shuffle*
 ###############
 **shuffleBed** will randomly permute the genomic locations of a fearure file among a genome defined in a
 genome file. One can also provide an "exclusions" BED/GFF/VCF file that lists regions where you do

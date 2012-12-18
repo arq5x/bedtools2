@@ -1,5 +1,5 @@
 ###############
-5.8 mergeBed
+*merge*
 ###############
 **mergeBed** combines overlapping or "book-ended" (that is, one base pair away) features in a feature file
 into a single feature which spans all of the combined features.

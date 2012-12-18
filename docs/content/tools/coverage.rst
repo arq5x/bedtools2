@@ -1,5 +1,5 @@
 ###############
-5.9 coverageBed
+*coverage*
 ###############
 **coverageBed** computes both the *depth* and *breadth* of coverage of features in file A across the features
 in file B. For example, **coverageBed** can compute the coverage of sequence alignments (file A) across 1

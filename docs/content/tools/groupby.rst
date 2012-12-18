@@ -1,5 +1,5 @@
 ###############
-5.22 *groupby*
+*groupby*
 ###############
 ``bedtools groupby`` is a useful tool that mimics the "group by" clause in database 
 systems. Given a file or stream that is sorted by the appropriate "grouping 

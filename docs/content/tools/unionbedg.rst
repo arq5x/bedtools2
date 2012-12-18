@@ -1,5 +1,5 @@
 ###############
-5.23 unionBedGraphs
+*unionbedg*
 ###############
 **unionBedGraphs** combines multiple BEDGRAPH files into a single file such that one can directly
 compare coverage (and other text-values such as genotypes) across multiple sample

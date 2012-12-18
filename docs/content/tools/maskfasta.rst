@@ -1,5 +1,5 @@
 ###############
-5.12 maskFastaFromBed
+*maskfasta*
 ###############
 **maskFastaFromBed** masks sequences in a FASTA file based on intervals defined in a feature file. The
 headers in the input FASTA file must exactly match the chromosome column in the feature file. This

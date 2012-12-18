@@ -1,5 +1,5 @@
 ###############
-5.18 bedToBam
+*bedtobam*
 ###############
 **bedToBam** converts features in a feature file to BAM format. This is useful as an efficient means of
 storing large genome annotations in a compact, indexed format for visualization purposes.

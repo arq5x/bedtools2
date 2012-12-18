@@ -1,5 +1,5 @@
 ###############
-5.10 genomeCoverageBed
+*genomecov*
 ###############
 **genomeCoverageBed** computes a histogram of feature coverage (e.g., aligned sequences) for a given
 genome. Optionally, by using the **-d** option, it will report the depth of coverage at *each base* on each

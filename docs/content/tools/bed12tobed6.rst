@@ -1,5 +1,5 @@
 ###############
-5.21 bed12ToBed6
+*bed12tobed6*
 ###############
 **bed12ToBed6** is a convenience tool that converts BED features in BED12 (a.k.a. "blocked" BED
 features such as genes) to discrete BED6 features. For example, in the case of a gene with six exons,

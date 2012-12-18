@@ -1,5 +1,5 @@
 ###############
-5.7 subtractBed
+*subtract*
 ###############
 **subtractBed** searches for features in B that overlap A. If an overlapping feature is found in B, the
 overlapping portion is removed from A and the remaining portion of A is reported. If a feature in B

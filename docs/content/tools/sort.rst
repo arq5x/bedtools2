@@ -1,5 +1,5 @@
 ###############
-5.15 sortBed
+*sort*
 ###############
 **sortBed** sorts a feature file by chromosome and other criteria.
 

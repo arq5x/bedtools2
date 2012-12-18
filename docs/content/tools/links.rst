@@ -1,5 +1,5 @@
 ###############
-5.16 linksBed
+*links*
 ###############
 Creates an HTML file with links to an instance of the UCSC Genome Browser for all features /
 intervals in a file. This is useful for cases when one wants to manually inspect through a large set of

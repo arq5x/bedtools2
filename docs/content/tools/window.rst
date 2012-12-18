@@ -1,5 +1,5 @@
 ###############
-5.5 windowBed
+*window*
 ###############
 
 Similar to **intersectBed**, **windowBed** searches for overlapping features in A and B. However,

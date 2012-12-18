@@ -1,5 +1,5 @@
 ###############
-5.6 closestBed
+*closest*
 ###############
 Similar to **intersectBed, closestBed** searches for overlapping features in A and B. In the event that
 no feature in B overlaps the current feature in A, **closestBed** will report the *closest* (that is, least

@@ -1,5 +1,5 @@
 ###############
-5.3 pairToPair
+*pairtopair*
 ###############
 **pairToPair** compares two BEDPE files in search of overlaps where each end of a BEDPE feature in A
 overlaps with the ends of a feature in B. For example, using pairToPair, one could screen for the exact

@@ -1,45 +1,59 @@
-###############
+##################
 The BEDTools suite
-###############
+##################
 
-This section covers the functionality and default / optional usage for each of the available BEDTools.
-Example "figures" are provided in some cases in an effort to convey the purpose of the tool. The
-behavior of each available parameter is discussed for each tool in abstract terms. More concrete usage
-examples are provided in **Section 6**.
+`bedtools` consists of a suite of sub-commands that are invoked as follows::
 
+    bedtools [sub-command] [options]
 
-=================
-Table of contents
-=================
+For example, to intersect two BED files, one would invoke the following::
+
+    bedtools intersect -a a.bed -b b.bed
+
+=========================================
+The full list of `bedtools` sub-commands.
+=========================================
 .. toctree::
    :maxdepth: 1
 
-   intersect
-   pairToBed
-   pairToPair
-   bamToBed
-   windowBed
-   closestBed
-   subtractBed
-   mergeBed
-   coverageBed
-   genomecoverageBed
-   fastafromBed
-   maskfastafromBed
-   shuffleBed
-   slopBed
-   sortBed
-   linksBed
-   complementBed
-   bedToBam
-   overlap
-   bedToIgv
-   bed12ToBed6
-   groupby
-   unionBedGraphs
-   annotateBed
-   
-   
+   tools/annotate   
+   tools/bamtobed    
+   tools/bamtofastq  
+   tools/bed12tobed6 
+   tools/bedpetobam  
+   tools/bedtobam    
+   tools/closest    
+   tools/cluster    
+   tools/complement 
+   tools/coverage   
+   tools/expand     
+   tools/flank      
+   tools/genomecov  
+   tools/getfasta    
+   tools/groupby    
+   tools/igv        
+   tools/intersect  
+   tools/jaccard    
+   tools/links      
+   tools/makewindows
+   tools/map        
+   tools/maskfasta   
+   tools/merge      
+   tools/multicov    
+   tools/multiinter  
+   tools/nuc         
+   tools/overlap    
+   tools/pairtobed   
+   tools/pairtopair  
+   tools/random     
+   tools/reldist    
+   tools/shuffle    
+   tools/slop       
+   tools/sort       
+   tools/subtract   
+   tools/tag         
+   tools/unionbedg   
+   tools/window  
    
    
   

@@ -1,5 +1,5 @@
 ###############
-5.11 fastaFromBed
+*getfasta*
 ###############
 **fastaFromBed** extracts sequences from a FASTA file for each of the intervals defined in a BED file.
 The headers in the input FASTA file must exactly match the chromosome column in the BED file.

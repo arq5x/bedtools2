@@ -1,5 +1,5 @@
 #########################################
-5.1 *intersect* 
+*intersect* 
 #########################################
 
 By far, the most common question asked of two sets of genomic features 

@@ -1,5 +1,5 @@
 ###############
-5.17 complementBed
+*complement*
 ###############
 **complementBed** returns the intervals in a genome that are not by the features in a feature file. An
 example usage of this tool would be to return the intervals of the genome that are not annotated as a

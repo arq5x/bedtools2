@@ -1,5 +1,5 @@
 ###############
-5.24 annotateBed
+*annotate*
 ###############
 **annotateBed** annotates one BED/VCF/GFF file with the coverage and number of overlaps observed
 from multiple other BED/VCF/GFF files. In this way, it allows one to ask to what degree one feature
