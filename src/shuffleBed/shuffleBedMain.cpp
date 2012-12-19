@@ -45,6 +45,7 @@ int shuffle_main(int argc, char* argv[]) {
     bool sameChrom        = false;
     bool chooseChrom      = false;
     bool isBedpe          = false;
+    size_t maxTries       = 1000;
 
 
     for(int i = 1; i < argc; i++) {
@@ -111,6 +112,12 @@ int shuffle_main(int argc, char* argv[]) {
                 i++;
             }
         }
+        else if(PARAMETER_CHECK("-maxTries", 9, parameterLength)) {
+            if ((i+1) < argc) {
+                maxTries = atoi(argv[i + 1]);
+                i++;
+            }
+        }
         else if(PARAMETER_CHECK("-bedpe", 6, parameterLength)) {
             isBedpe = true;
         }
@@ -129,8 +136,10 @@ int shuffle_main(int argc, char* argv[]) {
     if (!showHelp) {
         BedShuffle *bc = new BedShuffle(bedFile, genomeFile, excludeFile,
                                         includeFile, haveSeed, haveExclude,
-                                        haveInclude, sameChrom, overlapFraction, 
-                                        seed, chooseChrom, isBedpe);
+                                        haveInclude, sameChrom, 
+                                        overlapFraction, seed, 
+                                        chooseChrom, isBedpe,
+                                        maxTries);
         delete bc;
         return 0;
     }
@@ -181,6 +190,10 @@ void shuffle_help(void) {
     
     cerr << "\t-bedpe\t"            << "Indicate that the A file is in BEDPE format." << endl << endl;
 
+
+    cerr << "\t-maxTries\t"         << "\n\t\tMax. number of attempts to find a home for a shuffled interval" << endl;
+    cerr                            << "\t\tin the presence of -incl or -excl." << endl;
+    cerr                            << "\t\tDefault = 1000." << endl;
 
     cerr << "Notes: " << endl;
     cerr << "\t(1)  The genome file should tab delimited and structured as follows:" << endl;

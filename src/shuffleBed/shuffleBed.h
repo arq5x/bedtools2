@@ -25,8 +25,6 @@
 #include <algorithm>  // for binary search
 using namespace std;
 
-const int MAX_TRIES = 1000000;
-
 //************************************************
 // Class methods and elements
 //************************************************
@@ -40,7 +38,8 @@ public:
                bool haveSeed, bool haveExclude, 
                bool haveInclude, bool sameChrom, 
                float overlapFraction, int seed, 
-               bool chooseChrom, bool isBedpe);
+               bool chooseChrom, bool isBedpe,
+               size_t _maxTries);
 
     // destructor
     ~BedShuffle(void);
@@ -59,6 +58,7 @@ private:
     bool _haveSeed;
     bool _chooseChrom;
     bool _isBedpe;
+    size_t _maxTries;
 
 
     // The BED file from which to compute coverage.
