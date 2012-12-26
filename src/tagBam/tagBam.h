@@ -59,7 +59,6 @@ private:
     string _tag;
 
     // instance of a bed file class.
-    BedFile *_bed;
     vector<BedFile*> _annoFiles;
 
     // should we use the name field from the annotation files?

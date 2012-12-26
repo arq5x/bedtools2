@@ -33,7 +33,6 @@ TagBam::TagBam(const string &bamFile, const vector<string> &annoFileNames,
 
 // destroy and delete the open file pointers
 TagBam::~TagBam(void) {
-    delete _bed;
     CloseAnnoFiles();
 }
 
