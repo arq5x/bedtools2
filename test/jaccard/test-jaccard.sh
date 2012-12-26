@@ -11,7 +11,7 @@ check()
 
 ###########################################################
 #  Test a basic self intersection
-############################################################
+###########################################################
 echo "    jaccard.t01...\c"
 echo \
 "intersection	union	jaccard
@@ -45,3 +45,24 @@ echo \
 $BT jaccard -a a.bed -b d.bed > obs
 check obs exp
 rm obs exp
+
+###########################################################
+#  Test stdin
+###########################################################
+echo "    jaccard.t05...\c"
+echo \
+"intersection	union	jaccard
+10	140	0.0714286" > exp
+cat a.bed | $BT jaccard -a a.bed -b b.bed > obs
+check obs exp
+rm obs exp
+
+
+###########################################################
+#  Test symmetry
+###########################################################
+echo "    jaccard.t06...\c"
+$BT jaccard -a a.bed -b b.bed > obs1
+$BT jaccard -a b.bed -b a.bed > obs2
+check obs1 obs2
+
