@@ -126,6 +126,7 @@ void BedClosest::FindWindowOverlaps(BED &a, vector<BED> &hits) {
                         closestB.clear();
                         distances.clear();
                     }
+                    minDistance = 0;
                     closestB.push_back(*h);
                     distances.push_back(0);
                 }

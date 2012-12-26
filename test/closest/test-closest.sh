@@ -101,3 +101,69 @@ echo \
 $BT closest -a strand-test-a.bed -b strand-test-b.bed -S > obs
 check obs exp
 rm obs exp
+
+
+###########################################################
+# test reproting of all overlapping features
+###########################################################
+echo "    closest.t9...\c"
+echo \
+"chr1	100	101	chr1	100	101
+chr1	200	201	chr1	150	201
+chr1	200	201	chr1	175	375
+chr1	300	301	chr1	175	375
+chr1	100000	100010	chr1	175	375
+chr1	100020	100040	chr1	175	375
+chr2	1	10	.	-1	-1
+chr2	20	30	.	-1	-1" > exp
+$BT closest -a close-a.bed -b close-b.bed > obs
+check obs exp
+rm obs exp
+
+###########################################################
+# test reproting of first overlapping feature
+###########################################################
+echo "    closest.t10...\c"
+echo \
+"chr1	100	101	chr1	100	101
+chr1	200	201	chr1	150	201
+chr1	300	301	chr1	175	375
+chr1	100000	100010	chr1	175	375
+chr1	100020	100040	chr1	175	375
+chr2	1	10	.	-1	-1
+chr2	20	30	.	-1	-1" > exp
+$BT closest -a close-a.bed -b close-b.bed -t first > obs
+check obs exp
+rm obs exp
+
+###########################################################
+# test reproting of last overlapping feature
+###########################################################
+echo "    closest.t11...\c"
+echo \
+"chr1	100	101	chr1	100	101
+chr1	200	201	chr1	175	375
+chr1	300	301	chr1	175	375
+chr1	100000	100010	chr1	175	375
+chr1	100020	100040	chr1	175	375
+chr2	1	10	.	-1	-1
+chr2	20	30	.	-1	-1" > exp
+$BT closest -a close-a.bed -b close-b.bed -t last > obs
+check obs exp
+rm obs exp
+
+###########################################################
+# test reproting of no overlapping feature
+###########################################################
+echo "    closest.t12...\c"
+echo \
+"chr1	100	101	chr1	150	201
+chr1	200	201	chr1	100	101
+chr1	300	301	chr1	150	201
+chr1	100000	100010	chr1	175	375
+chr1	100020	100040	chr1	175	375
+chr2	1	10	.	-1	-1
+chr2	20	30	.	-1	-1" > exp
+$BT closest -a close-a.bed -b close-b.bed -io > obs
+check obs exp
+rm obs exp
