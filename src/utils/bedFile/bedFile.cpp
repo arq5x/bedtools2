@@ -79,7 +79,8 @@ BedFile::BedFile(string &bedFile)
   _merged_end(-1),
   _merged_chrom(""),
   _prev_start(-1),
-  _prev_chrom("")
+  _prev_chrom(""),
+  _total_length(0)
 {}
 
 // Destructor
@@ -225,6 +226,7 @@ bool BedFile::GetNextBed(BED &bed, bool forceSorted) {
                 _prev_chrom = bed.chrom;
                 _prev_start = bed.start;
             }
+            _total_length += (bed.end - bed.start);
             return true;
         }
         else if (_status == BED_HEADER || _status == BED_BLANK) 
@@ -259,6 +261,8 @@ bool BedFile::GetNextMergedBed(BED &merged_bed) {
                         _merged_start = bed.start;
                         _merged_end   = bed.end;
 
+                        _total_flattened_length += \
+                            (merged_bed.end - merged_bed.start);
                         return true;
                     }
                     else {
@@ -281,6 +285,9 @@ bool BedFile::GetNextMergedBed(BED &merged_bed) {
             merged_bed.chrom = _merged_chrom;
             merged_bed.start = _merged_start;
             merged_bed.end   = _merged_end;
+            
+            _total_flattened_length += \
+                (merged_bed.end - merged_bed.start);
             return true;
         }
     }
@@ -288,6 +295,14 @@ bool BedFile::GetNextMergedBed(BED &merged_bed) {
     return false;
 }
 
+
+unsigned long BedFile::getTotalLength(void) {
+    return _total_length;
+}
+
+unsigned long BedFile::getTotalFlattenedLength(void) {
+    return _total_flattened_length;
+}
 
 void BedFile::allHits(string chrom, CHRPOS start, 
                       CHRPOS end, string strand, 

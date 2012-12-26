@@ -461,6 +461,16 @@ public:
     // that the feature overlaps
     void countListHits(const BED &a, int index, 
                        bool sameStrand, bool diffStrand);
+    
+    
+    // return the total length of all the intervals in the file.
+    // use with GetNextBed()
+    unsigned long getTotalLength(void);
+
+    // return the total _flattened_ length of all the intervals in the file.
+    // use with GetNextMergedBed()
+    unsigned long getTotalFlattenedLength(void);
+    
 
     // the bedfile with which this instance is associated
     string bedFile;
@@ -498,6 +508,8 @@ private:
     string _merged_chrom;
     int _prev_start;
     string _prev_chrom;
+    unsigned long _total_length;
+    unsigned long _total_flattened_length;
 
     void setZeroBased(bool zeroBased);
     void setGff (bool isGff);

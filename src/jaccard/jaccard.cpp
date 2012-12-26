@@ -53,27 +53,6 @@ Jaccard::~Jaccard(void) {
 }
 
 
-unsigned long Jaccard::GetUnion() {
-
-    // create new BED file objects for A and B
-    _bedA = new BedFile(_bedAFile);
-    _bedB = new BedFile(_bedBFile);
-
-    unsigned long U = 0;
-    BED bed;    
-    _bedA->Open();
-    while (_bedA->GetNextMergedBed(bed)) {
-        U += bed.end - bed.start;
-    }
-    
-    _bedB->Open();
-    while (_bedB->GetNextMergedBed(bed)) {
-        U += bed.end - bed.start;
-    }
-    
-    return U;
-}
-
 unsigned long Jaccard::GetIntersection() {
     
     _bedA = new BedFile(_bedAFile);
@@ -97,10 +76,10 @@ unsigned long Jaccard::GetIntersection() {
 
 void Jaccard::CalculateJaccard() {
 
-    unsigned long U = GetUnion();
-    delete _bedA;
-    delete _bedB;
     unsigned long I = GetIntersection();
+    
+    unsigned long U = _bedA->getTotalFlattenedLength() + \
+                      _bedB->getTotalFlattenedLength();
     
     // header
     cout << "intersection\t"
