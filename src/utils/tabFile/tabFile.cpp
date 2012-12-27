@@ -36,8 +36,14 @@ void TabFile::Open(void) {
             delete _tabStream;
             _tabStream = new igzstream(_tabFile.c_str(), ios::in);
         }
-        if ( !(_tabStream->good()) ) {
-            cerr << "Error: The requested file (" << _tabFile << ") could not be opened. Exiting!" << endl;
+        if ( _tabStream->fail() ) {
+            cerr << "Error: The requested file (" 
+                 << _tabFile
+                 << ") " 
+                 << "could not be opened. "
+                 << "Error message: ("
+                 << strerror(errno)
+                 << "). Exiting!" << endl;
             exit (1);
         }
     }

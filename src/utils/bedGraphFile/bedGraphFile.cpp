@@ -38,8 +38,14 @@ void BedGraphFile::Open() {
             _bedGraphStream = new igzstream(bedGraphFile.c_str(), ios::in);
         }
         // can we open the file?
-        if ( !(_bedGraphStream->good()) ) {
-            cerr << "Error: The requested bed file (" << bedGraphFile << ") could not be opened. Exiting!" << endl;
+        if ( _bedGraphStream->fail() ) {
+            cerr << "Error: The requested file (" 
+                 << bedGraphFile
+                 << ") " 
+                 << "could not be opened. "
+                 << "Error message: ("
+                 << strerror(errno)
+                 << "). Exiting!" << endl;
             exit (1);
         }
     }

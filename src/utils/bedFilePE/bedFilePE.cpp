@@ -36,8 +36,14 @@ void BedFilePE::Open(void) {
             _bedStream = new igzstream(bedFile.c_str(), ios::in);
         }
         // can we open the file?
-        if ( !(_bedStream->good()) ) {
-            cerr << "Error: The requested bed file (" << bedFile << ") could not be opened. Exiting!" << endl;
+        if ( _bedStream->fail() ) {
+            cerr << "Error: The requested BEDPE file (" 
+                 << bedFile
+                 << ") " 
+                 << "could not be opened. "
+                 << "Error message: ("
+                 << strerror(errno)
+                 << "). Exiting!" << endl;
             exit (1);
         }
     }
