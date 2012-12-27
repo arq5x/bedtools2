@@ -1,0 +1,54 @@
+@import url('rtd.css');
+
+/* Styles for floating Edit on GitHub box */
+#editor-trap {
+    margin: 1em;
+    padding: 1em;
+    border: 1px solid black;
+    box-shadow: 0 0 3px black;
+    width: 200px;
+
+    background: #fefabc;
+    position: fixed;
+    bottom: 1em;
+    left: 1em;
+    font-size: 60%;
+    text-align: left;
+    z-index: 2;
+
+    -moz-transform: rotate(-4deg);
+    -webkit-transform: rotate(-4deg);
+    -o-transform: rotate(-4deg);
+    -ms-transform: rotate(-4deg);
+    transform: rotate(-4deg);
+    box-shadow: 0px 4px 6px #333;
+    -moz-box-shadow: 0px 4px 6px #333;
+    -webkit-box-shadow: 0px 4px 6px #333;
+
+
+    cursor: pointer;
+}
+
+#editor-trap h3 {
+    margin: 0 0 0.5em 0;
+    padding: 0;
+    background: transparent;
+}
+
+#editor-trap ol {
+    margin: 0;
+    padding: 0 0 0 2em;
+}
+
+/* Hide trick */
+
+#editor-trap.toggled > * {
+    display: none;
+}
+
+
+#editor-trap.toggled > h3 {
+    display: block;
+}
+
+
