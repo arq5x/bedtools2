@@ -144,6 +144,11 @@ void BedFile::Close(void) {
 void BedFile::GetLine(void) {
     // parse the bedStream pointer
     getline(*_bedStream, _bedLine);
+    
+    // ditch \r for Windows.
+    if (_bedLine[_bedLine.size()-1] == '\r') {
+        _bedLine.resize(_bedLine.size()-1);
+    }
     // increment the line number
     _lineNum++;
     // split into a string vector.
@@ -201,6 +206,11 @@ bool BedFile::GetNextBed(BED &bed, bool forceSorted) {
         else {
             // handle the first line as a special case because
             // of reading the header.
+            
+            // ditch \r for Windows if necessary.
+            if (_bedLine[_bedLine.size()-1] == '\r') {
+                _bedLine.resize(_bedLine.size()-1);
+            }
             Tokenize(_bedLine, _bedFields);
             _firstLine = false;
             setBedType(_bedFields.size());

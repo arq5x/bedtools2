@@ -66,6 +66,11 @@ TabLineStatus TabFile::GetNextTabLine(TAB_FIELDS &tabFields, int &lineNum) {
 
         // parse the tabStream pointer
         getline(*_tabStream, tabLine);
+        
+        if (tabLine[tabLine.size()-1] == '\r') {
+            tabLine.resize(tabLine.size()-1);
+        }
+        
         lineNum++;
 
         // split into a string vector.
