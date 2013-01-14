@@ -53,7 +53,7 @@ echo "    jaccard.t05...\c"
 echo \
 "intersection	union	jaccard
 10	140	0.0714286" > exp
-cat a.bed | $BT jaccard -a a.bed -b b.bed > obs
+cat a.bed | $BT jaccard -a - -b b.bed > obs
 check obs exp
 rm obs exp
 
