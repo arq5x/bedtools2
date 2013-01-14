@@ -66,16 +66,18 @@ Option                           Description
 By default, if an overlap is found, ``bedtools intersect`` reports the shared interval between the two
 overlapping features.
 
-For example::
+For example:
 
-  cat A.bed
+.. code-block:: bash
+
+  $ cat A.bed
   chr1  10  20
   chr1  30  40
 
-  cat B.bed
+  $ cat B.bed
   chr1  15   20
 
-  bedtools intersect -a A.bed -b B.bed
+  $ bedtools intersect -a A.bed -b B.bed
   chr1  15   20
 
 
@@ -98,15 +100,17 @@ Instead, one can force ``bedtools intersect`` to report the *original* **"A"** f
 shown below, the entire "A" feature is reported, not just the portion that overlaps with the "B" feature.
 
 For example:
-::
-  cat A.bed
+
+.. code-block:: bash
+
+  $ cat A.bed
   chr1  10  20
   chr1  30   40
 
-  cat B.bed
+  $ cat B.bed
   chr1  15  20
 
-  bedtools intersect -a A.bed -b B.bed -wa
+  $ bedtools intersect -a A.bed -b B.bed -wa
   chr1  10   20
 
 .. plot::
@@ -129,17 +133,17 @@ just -wb is used, the overlapping portion of A will be reported followed by the 
 and -wb are used, the *originals* of both **"A"** and **"B"** will be reported.
 
 For example (-wb alone):
-::
-For example:
-::
-  cat A.bed
+
+.. code-block:: bash
+
+  $ cat A.bed
   chr1  10  20
   chr1  30  40
 
-  cat B.bed
+  $ cat B.bed
   chr1  15   20
 
-  bedtools intersect -a A.bed -b B.bed -wb
+  $ bedtools intersect -a A.bed -b B.bed -wb
   chr1  15  20  chr 15  20
   
 

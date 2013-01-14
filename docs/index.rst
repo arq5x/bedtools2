@@ -16,6 +16,7 @@ Table of contents
 =================
 .. toctree::
    :maxdepth: 1
+   :numbered:
 
    content/overview
    content/installation
