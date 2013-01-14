@@ -65,7 +65,7 @@ BAM file that overlap.
    chr1 20000   30000   ivl3
    chr1 30000   40000   ivl4
    
-   $ bedtools multicov -bams aln1.bam aln2.bam aln3.bam
+   $ bedtools multicov -bams aln1.bam aln2.bam aln3.bam -bed ivls-of-interest.bed
    chr1	0	10000	ivl1	100 2234    0
    chr1	10000	20000	ivl2	123 3245    1000
    chr1	20000	30000	ivl3	213 2332    2034
@@ -88,7 +88,7 @@ command line.
 
 .. code-block:: bash
 
-   $ bedtools multicov -bams aln1.bam
+   $ bedtools multicov -bams aln1.bam -bed ivls-of-interest.bed
    chr1	0	10000	ivl1	100
    chr1	10000	20000	ivl2	123
    chr1	20000	30000	ivl3	213
