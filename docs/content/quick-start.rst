@@ -3,54 +3,67 @@ Quick start
 ###########
 
 ================
-Install BEDTools
+Install bedtools
 ================
-::
+
+.. code-block:: bash
 
   curl http://bedtools.googlecode.com/files/BEDTools.<version>.tar.gz > BEDTools.tar.gz
   tar -zxvf BEDTools.tar.gz
   cd BEDTools
-  make clean
-  make all
+  make
   sudo cp bin/* /usr/local/bin/
 
+
 ===============
-Use BEDTools
+Use bedtools
 ===============
-Below are examples of typical BEDTools usage. **Additional usage examples are described in
-section 6 of this manual.** Using the "-h" option with any BEDTools will report a list of all command
-line options.
+Below are examples of typical bedtools usage. Using the "-h" option with any 
+bedtools will report a list of all command line options.
 
-A. Report the base-pair overlap between the features in two BED files.
-::
 
-  intersectBed -a reads.bed -b genes.bed
+Report the base-pair overlap between the features in two BED files.
 
-B. Report those entries in A that overlap NO entries in B. Like "grep -v"
-::
+.. code-block:: bash
 
-  intersectBed -a reads.bed -b genes.bed ¨Cv
+  bedtools intersect -a reads.bed -b genes.bed
 
-C. Read BED A from stdin. Useful for stringing together commands. For example, find genes that overlap LINEs
-but not SINEs.
-::
 
-  intersectBed -a genes.bed -b LINES.bed | intersectBed -a stdin -b SINEs.bed ¨Cv
+Report those entries in A that overlap NO entries in B. Like "grep -v"
 
-D. Find the closest ALU to each gene.
-::
+.. code-block:: bash
 
-  closestBed -a genes.bed -b ALUs.bed
+  bedtools intersect  -a reads.bed -b genes.bed
+
+
+Read BED A from STDIN. Useful for stringing together commands. For example, 
+find genes that overlap LINEs but not SINEs.
+
+.. code-block:: bash
+
+  bedtools intersect -a genes.bed -b LINES.bed | \
+    bedtools intersect -a stdin -b SINEs.bed
+
+
+Find the closest ALU to each gene.
+
+.. code-block:: bash
+
+   bedtools closest -a genes.bed -b ALUs.bed
   
-E. Merge overlapping repetitive elements into a single entry, returning the number of entries merged.
-::
 
-  mergeBed -i repeatMasker.bed -n
+Merge overlapping repetitive elements into a single entry, returning the number of entries merged.
+
+.. code-block:: bash
+
+  bedtools merge -i repeatMasker.bed -n
   
-F. Merge nearby repetitive elements into a single entry, so long as they are within 1000 bp of one another.
-::
 
-  mergeBed -i repeatMasker.bed -d 1000
+Merge nearby repetitive elements into a single entry, so long as they are within 1000 bp of one another.
+
+.. code-block:: bash
+
+  bedtools merge -i repeatMasker.bed -d 1000
   
   
 

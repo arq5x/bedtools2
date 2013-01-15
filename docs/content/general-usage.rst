@@ -3,19 +3,19 @@ General usage
 ###############
 
 =======================
-4.1 Supported file formats
+Supported file formats
 =======================
 
 ----------------------
-4.1.1 BED format
+BED format
 ----------------------
 As described on the UCSC Genome Browser website (see link below), the BED format is a concise and
 flexible way to represent genomic features and annotations. The BED format description supports up to
 12 columns, but only the first 3 are required for the UCSC browser, the Galaxy browser and for
-BEDTools. BEDTools allows one to use the "BED12" format (that is, all 12 fields listed below).
+bedtools. bedtools allows one to use the "BED12" format (that is, all 12 fields listed below).
 However, only intersectBed, coverageBed, genomeCoverageBed, and bamToBed will obey the BED12
 "blocks" when computing overlaps, etc., via the **"-split"** option. For all other tools, the last six columns
-are not used for any comparisons by the BEDTools. Instead, they will use the entire span (start to end)
+are not used for any comparisons by the bedtools. Instead, they will use the entire span (start to end)
 of the BED12 entry to perform any relevant feature comparisons. The last six columns will be reported
 in the output of all comparisons.
 
@@ -34,26 +34,26 @@ The file description below is modified from: http://genome.ucsc.edu/FAQ/FAQforma
 4. **name** - Defines the name of the BED feature.
  - *Any string can be used*. For example, "LINE", "Exon3", "HWIEAS_0001:3:1:0:266#0/1", or "my_Feature".
  - *This column is optional*.
-5. **score** - The UCSC definition requires that a BED score range from 0 to 1000, inclusive. However, BEDTools allows any string to be stored in this field in order to allow greater flexibility in annotation features. For example, strings allow scientific notation for p-values, mean enrichment values, etc. It should be noted that this flexibility could prevent such annotations from being correctly displayed on the UCSC browser.
+5. **score** - The UCSC definition requires that a BED score range from 0 to 1000, inclusive. However, bedtools allows any string to be stored in this field in order to allow greater flexibility in annotation features. For example, strings allow scientific notation for p-values, mean enrichment values, etc. It should be noted that this flexibility could prevent such annotations from being correctly displayed on the UCSC browser.
  - *Any string can be used*. For example, 7.31E-05 (p-value), 0.33456 (mean enrichment value), "up", "down", etc.
  - *This column is optional*.
 6. **strand** - Defines the strand - either '+' or '-'.
  - *This column is optional*.
 7. **thickStart** - The starting position at which the feature is drawn thickly.
- - *Allowed yet ignored by BEDTools*.
+ - *Allowed yet ignored by bedtools*.
 8. **thickEnd** - The ending position at which the feature is drawn thickly.
- - *Allowed yet ignored by BEDTools*.
+ - *Allowed yet ignored by bedtools*.
 9. **itemRgb** - An RGB value of the form R,G,B (e.g. 255,0,0).
- - *Allowed yet ignored by BEDTools*.
+ - *Allowed yet ignored by bedtools*.
 10. **blockCount** - The number of blocks (exons) in the BED line.
- - *Allowed yet ignored by BEDTools*.
+ - *Allowed yet ignored by bedtools*.
 11. **blockSizes** - A comma-separated list of the block sizes.
- - *Allowed yet ignored by BEDTools*.
+ - *Allowed yet ignored by bedtools*.
 12. **blockStarts** - A comma-separated list of block starts.
- - *Allowed yet ignored by BEDTools*.
+ - *Allowed yet ignored by bedtools*.
  
  
-BEDTools requires that all BED input files (and input received from stdin) are **tab-delimited**. The following types of BED files are supported by BEDTools:
+bedtools requires that all BED input files (and input received from stdin) are **tab-delimited**. The following types of BED files are supported by bedtools:
 
 
 1.  | **BED3**: A BED file where each feature is described by **chrom**, **start**, and **end**.
@@ -69,7 +69,7 @@ BEDTools requires that all BED input files (and input received from stdin) are *
     | 11873 0 3 354,109,1189, 0,739,1347,
 
 ----------------------
-4.1.2 BEDPE format
+BEDPE format
 ----------------------
 We have defined a new file format (BEDPE) in order to concisely describe disjoint genome features,
 such as structural variations or paired-end sequence alignments. We chose to define a new format
@@ -106,7 +106,7 @@ The BEDPE format is described below. The description is modified from: http://ge
 7. **name** - Defines the name of the BEDPE feature.
  - *Any string can be used*. For example, "LINE", "Exon3", "HWIEAS_0001:3:1:0:266#0/1", or "my_Feature".
  - *This column is optional*.
-8. **score** - The UCSC definition requires that a BED score range from 0 to 1000, inclusive. *However, BEDTools allows any string to be stored in this field in order to allow greater flexibility in annotation features*. For example, strings allow scientific notation for p-values, mean enrichment values, etc. It should be noted that this flexibility could prevent such annotations from being correctly displayed on the UCSC browser.
+8. **score** - The UCSC definition requires that a BED score range from 0 to 1000, inclusive. *However, bedtools allows any string to be stored in this field in order to allow greater flexibility in annotation features*. For example, strings allow scientific notation for p-values, mean enrichment values, etc. It should be noted that this flexibility could prevent such annotations from being correctly displayed on the UCSC browser.
  - *Any string can be used*. For example, 7.31E-05 (p-value), 0.33456 (mean enrichment value), "up", "down", etc.
  - *This column is optional*.
 9. **strand1** - Defines the strand for the first end of the feature. Either '+' or '-'.
@@ -115,27 +115,29 @@ The BEDPE format is described below. The description is modified from: http://ge
 10. **strand2** - Defines the strand for the second end of the feature. Either '+' or '-'.
  - *This column is optional*.
  - *Use "." for unknown*.
-11. **Any number of additional, user-defined fields** - BEDTools allows one to add as many additional fields to the normal, 10-column BEDPE format as necessary. These columns are merely "passed through" **pairToBed** and **pairToPair** and are not part of any analysis. One would use these additional columns to add extra information (e.g., edit distance for each end of an alignment, or "deletion", "inversion", etc.) to each BEDPE feature.
+11. **Any number of additional, user-defined fields** - bedtools allows one to add as many additional fields to the normal, 10-column BEDPE format as necessary. These columns are merely "passed through" **pairToBed** and **pairToPair** and are not part of any analysis. One would use these additional columns to add extra information (e.g., edit distance for each end of an alignment, or "deletion", "inversion", etc.) to each BEDPE feature.
  - *These additional columns are optional*.
 
  
 Entries from an typical BEDPE file:
 ::
+
   chr1  100   200   chr5  5000  5100  bedpe_example1  30   +  -
   chr9  1000  5000  chr9  3000  3800  bedpe_example2  100  +  -
 
 
 Entries from a BEDPE file with two custom fields added to each record:
 ::
+
   chr1  10    20    chr5  50    60    a1     30       +    -  0  1
   chr9  30    40    chr9  80    90    a2     100      +    -  2  1
 
 
 
 ----------------------
-4.1.3 GFF format
+GFF format
 ----------------------
-The GFF format is described on the Sanger Institute's website (http://www.sanger.ac.uk/resources/software/gff/spec.html). The GFF description below is modified from the definition at this URL. All nine columns in the GFF format description are required by BEDTools.
+The GFF format is described on the Sanger Institute's website (http://www.sanger.ac.uk/resources/software/gff/spec.html). The GFF description below is modified from the definition at this URL. All nine columns in the GFF format description are required by bedtools.
 
 1. **seqname** - The name of the sequence (e.g. chromosome) on which the feature exists.
  - *Any string can be used*. For example, "chr1", "III", "myChrom", "contig1112.23".
@@ -147,10 +149,10 @@ The GFF format is described on the Sanger Institute's website (http://www.sanger
  - *This column is required*.
 4. **start** - The one-based starting position of feature on **seqname**.
  - *This column is required*. 
- - *BEDTools accounts for the fact the GFF uses a one-based position and BED uses a zero-based start position*.
+ - *bedtools accounts for the fact the GFF uses a one-based position and BED uses a zero-based start position*.
 5. **end** - The one-based ending position of feature on **seqname**.
  - *This column is required*.
-6. **score** - A score assigned to the GFF feature. Like BED format, BEDTools allows any string to be stored in this field in order to allow greater flexibility in annotation features. We note that this differs from the GFF definition in the interest of flexibility.
+6. **score** - A score assigned to the GFF feature. Like BED format, bedtools allows any string to be stored in this field in order to allow greater flexibility in annotation features. We note that this differs from the GFF definition in the interest of flexibility.
  - *This column is required*.
 7. **strand** - Defines the strand. Use '+', '-' or '.'
  - *This column is required*.
@@ -167,13 +169,13 @@ An entry from an example GFF file :
   
   
   
-----------------------
-4.1.3 GFF format
-----------------------
-Some of the BEDTools (e.g., genomeCoverageBed, complementBed, slopBed) need to know the size of
+------------------------
+*Genome* file format
+------------------------
+Some of the bedtools (e.g., genomeCoverageBed, complementBed, slopBed) need to know the size of
 the chromosomes for the organism for which your BED files are based. When using the UCSC Genome
 Browser, Ensemble, or Galaxy, you typically indicate which which species/genome build you are
-working. The way you do this for BEDTools is to create a "genome" file, which simply lists the names of
+working. The way you do this for bedtools is to create a "genome" file, which simply lists the names of
 the chromosomes (or scaffolds, etc.) and their size (in basepairs).
 
 
@@ -185,29 +187,28 @@ Genome files must be **tab-delimited** and are structured as follows (this is an
   chrX  17718854
   chrM  13794
 
-BEDTools includes pre-defined genome files for human and mouse in the **/genomes** directory included
-in the BEDTools distribution.
+bedtools includes pre-defined genome files for human and mouse in the **/genomes** directory included
+in the bedtools distribution.
 
 
 ----------------------
-4.1.5 SAM/BAM format
+SAM/BAM format
 ----------------------
 The SAM / BAM format is a powerful and widely-used format for storing sequence alignment data (see
 http://samtools.sourceforge.net/ for more details). It has quickly become the standard format to which
-most DNA sequence alignment programs write their output. Currently, the following BEDTools
-support inout in BAM format: *intersectBed, windowBed, coverageBed, genomeCoverageBed,
-pairToBed, bamToBed*. Support for the BAM format in BEDTools allows one to (to name a few):
+most DNA sequence alignment programs write their output. Currently, the following bedtools
+support input in BAM format: ``intersect``, ``window``, ``coverage``, ``genomecov``,
+``pairtobed``, ``bamtobed``. Support for the BAM format in bedtools allows one to (to name a few):
 compare sequence alignments to annotations, refine alignment datasets, screen for potential mutations
 and compute aligned sequence coverage.
 
-The details of how these tools work with BAM files are addressed in **Section 5** of this manual.
 
 
 ----------------------
-4.1.6 VCF format
+VCF format
 ----------------------
 The Variant Call Format (VCF) was conceived as part of the 1000 Genomes Project as a standardized
 means to report genetic variation calls from SNP, INDEL and structural variant detection programs
 (see http://www.1000genomes.org/wiki/doku.php?id=1000_genomes:analysis:vcf4.0 for details).
-BEDTools now supports the latest version of this format (i.e, Version 4.0). As a result, BEDTools can
+bedtools now supports the latest version of this format (i.e, Version 4.0). As a result, bedtools can
 be used to compare genetic variation calls with other genomic features.
