@@ -5,7 +5,7 @@ FAQ
 
 ====================
 Installation issues
-====================
+        ====================
 
 Why am I getting all of these zlib errors?
 ..........................................
