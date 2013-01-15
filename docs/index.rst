@@ -34,7 +34,7 @@ Table of contents
 =================
 Brief example
 =================
-Let's imagine you have a BED file of ChiP-seq peaks from two different]
+Let's imagine you have a BED file of ChiP-seq peaks from two different
 experiments. You want to identify peaks that were observed in *both* experiments
 (requiring 50% reciprocal overlap) and for those peaks, you want to find to 
 find the closest, non-overlapping gene. Such an analysis could be conducted 
