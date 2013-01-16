@@ -29,7 +29,8 @@ Table of contents
    content/advanced-usage
    content/tips-and-tricks
    content/faq
-
+   content/related-tools
+   
 
 =================
 Brief example
@@ -59,15 +60,11 @@ License
 bedtools is freely available under a GNU Public License (Version 2).
 
 =====================================
-Contributors.
+Acknowledgments
 =====================================
-As open-source software, BEDTools greatly benefits from contributions made by other developers and
-users of the tools. We encourage and welcome suggestions, contributions and complaints. This is how
-software matures, improves and stays on top of the needs of its user community. The Google Code
-(GC) site maintains a list of individuals who have contributed either source code or useful ideas for
-improving the tools. In the near future, we hope to maintain a source repository on the GC site in
-order to facilitate further contributions. We are currently unable to do so because we use Git for
-version control, which is not yet supported by GC.
+
+To do.
+    
 
 =================
 Mailing list
