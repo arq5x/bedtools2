@@ -54,3 +54,14 @@ that quantitates the expression level of alternatively spliced genes from
 RNA-Seq data, and identifies differentially regulated isoforms or exons across 
 samples." A subset of the functionality in MISO depends upon ``bedtools``. MISO
 is developed by Yarden Katz.
+
+
+-------------------
+RetroSeq
+-------------------
+
+`RetroSeq <http://bioinformatics.oxfordjournals.org/content/early/2012/12/10/bioinformatics.bts697.abstract>`_
+is "a tool for discovery and genotyping of transposable element variants (TEVs) 
+(also known as mobile element insertions) from next-gen sequencing reads aligned 
+to a reference genome in BAM format". RetroSeq is developed by Thomas Keane. 
+Source code can be obtained on `GitHub <https://github.com/tk2/RetroSeq>`_.
