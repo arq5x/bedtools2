@@ -8,7 +8,7 @@ discordant pair suggests the same structural variation in each file/sample.
 
 
 ================================
-5.3.1 Usage and option summary
+Usage and option summary
 ================================
 **Usage:**
 ::
@@ -37,7 +37,7 @@ Option                           Description
 
 
 ================================
-5.3.2 Default behavior
+Default behavior
 ================================
 By default, a BEDPE feature from A will be reported if *both* ends overlap a feature in the BEDPE B
 file. If strand information is present for the two BEDPE files, it will be further required that the
@@ -77,7 +77,7 @@ the same strands*.
 
   
 ==================================================
-5.3.3 (-type neither)Optional overlap requirements 
+``-type neither`` Optional overlap requirements 
 ==================================================
 Using then **-type neither, pairToPair** will only report A if *neither* end overlaps with a BEDPE
 feature in B.

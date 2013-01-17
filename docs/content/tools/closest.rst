@@ -35,7 +35,7 @@ Option                           Description
 
 
 ==========================================================================
-5.6.2 Default behavior
+Default behavior
 ==========================================================================
 **closestBed** first searches for features in B that overlap a feature in A. If overlaps are found, the feature
 in B that overlaps the highest fraction of A is reported. If no overlaps are found, **closestBed** looks for
@@ -66,7 +66,7 @@ For example:
 
 
 ==========================================================================
-5.6.3 (-s)Enforcing "strandedness" 
+``-s`` Enforcing "strandedness" 
 ==========================================================================
 This option behaves the same as the -s option for intersectBed while scanning for the closest
 (overlapping or not) feature in B. See the discussion in the intersectBed section for details.
@@ -74,7 +74,7 @@ This option behaves the same as the -s option for intersectBed while scanning fo
 
 
 ==========================================================================
-5.6.4 (-t)Controlling how ties for "closest" are broken 
+``-t`` Controlling how ties for "closest" are broken 
 ==========================================================================
 When there are two or more features in B that overlap the *same fraction* of A, **closestBed** will, by
 default, report both features in B. Imagine feature A is a SNP and file B contains genes. It can often
@@ -112,7 +112,7 @@ For example (note the difference between -l 200 and -l 300):
 
 
 ==========================================================================
-5.6.5 (-d)Reporting the distance to the closest feature in base pairs 
+``-d`` Reporting the distance to the closest feature in base pairs 
 ==========================================================================
 ClosestBed will optionally report the distance to the closest feature in the B file using the **-d** option.
 When a feature in B overlaps a feature in A, a distance of 0 is reported.

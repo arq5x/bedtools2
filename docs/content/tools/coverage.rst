@@ -9,7 +9,7 @@ computes the fraction of bases in B interval that were overlapped by one or more
 **coverageBed** also computes the *breadth* of coverage for each interval in B.
 
 ==========================================================================
-5.9.1 Usage and option summary
+Usage and option summary
 ==========================================================================
 Usage:
 ::
@@ -41,7 +41,7 @@ Option                           Description
 
 
 ==========================================================================
-5.9.2 Default behavior
+Default behavior
 ==========================================================================
 After each interval in B, **coverageBed** will report:
 
@@ -83,7 +83,7 @@ For example:
   
   
 ==========================================================================
-5.9.4 (-s)Calculating coverage by strand 
+``-s`` Calculating coverage by strand 
 ==========================================================================
 Use the "**-s**" option if one wants to only count coverage if features in A are on the same strand as the
 feature / window in B. This is especially useful for RNA-seq experiments.
@@ -112,7 +112,7 @@ For example (note the difference in coverage with and without **-s**:
   chr2  0   100 b3  1  +  0  0   100  0.0000000
 
 ==========================================================================
-5.9.5 (-hist)Creating a histogram of coverage for each feature in the B file 
+``-hist`` Creating a histogram of coverage for each feature in the B file 
 ==========================================================================
 One should use the "**-hist**" option to create, for each interval in B, a histogram of coverage of the
 features in A across B.
@@ -142,9 +142,9 @@ been reported, a histogram summarizing the coverage among all features in B will
 
 
 
-==========================================================================
-5.9.6 (-hist)Reporting the per-base of coverage for each feature in the B file 
-==========================================================================
+===========================================================================
+``-hist`` Reporting the per-base of coverage for each feature in the B file 
+===========================================================================
 One should use the "**-d**" option to create, for each interval in B, a detailed list of coverage at each of the
 positions across each B interval.
 
@@ -174,9 +174,9 @@ detected at that position.
 
   
   
-==========================================================================
-5.9.7 (-split)Reporting coverage with spliced alignments or blocked BED features 
-==========================================================================
+=============================================================================
+``-split`` Reporting coverage with spliced alignments or blocked BED features 
+=============================================================================
 As described in section 1.3.19, coverageBed will, by default, screen for overlaps against the entire span
 of a spliced/split BAM alignment or blocked BED12 feature. When dealing with RNA-seq reads, for
 example, one typically wants to only tabulate coverage for the portions of the reads that come from

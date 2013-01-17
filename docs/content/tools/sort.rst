@@ -4,7 +4,7 @@
 **sortBed** sorts a feature file by chromosome and other criteria.
 
 ==========================================================================
-5.15.1 Usage and option summary
+Usage and option summary
 ==========================================================================
 Usage:
 ::
@@ -24,7 +24,7 @@ Usage:
 
 
 ==========================================================================
-5.15.2 Default behavior
+Default behavior
 ==========================================================================
 By default, **sortBed** sorts a BED file by chromosome and then by start position in ascending order.
 
@@ -46,7 +46,7 @@ For example:
   
   
 ==========================================================================
-5.15.3 Optional sorting behavior
+Optional sorting behavior
 ==========================================================================
 **sortBed** will also sorts a BED file by chromosome and then by other criteria.
 

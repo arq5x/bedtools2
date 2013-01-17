@@ -8,7 +8,7 @@ but your target regions when aligning sequence data from a targeted capture expe
 
 
 ==========================================================================
-5.12.1 Usage and option summary
+Usage and option summary
 ==========================================================================
 Usage:
 ::
@@ -28,7 +28,7 @@ NOTE: The input and output FASTA files must be different.
 
 
 ==========================================================================
-5.12.2 Default behavior
+Default behavior
 ==========================================================================
 **maskFastaFromBed** will mask a FASTA file based on the intervals in a BED file. The newly masked
 FASTA file is written to the output FASTA file.
@@ -50,7 +50,7 @@ For example:
 
 
 ==========================================================================
-5.12.3 Soft-masking the FASTA file.
+Soft-masking the FASTA file.
 ==========================================================================
 Using the **-soft** option, one can optionally "soft-mask" the FASTA file.
 

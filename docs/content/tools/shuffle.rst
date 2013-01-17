@@ -12,7 +12,7 @@ of one feature with another.
 
 
 ==========================================================================
-5.13.1 Usage and option summary
+Usage and option summary
 ==========================================================================
 **Usage**:
 ::
@@ -41,7 +41,7 @@ of one feature with another.
 
 
 ==========================================================================
-5.13.2 Default behavior
+Default behavior
 ==========================================================================
 By default, `bedtools shuffle` will reposition each feature in the input BED 
 file on a random chromosome at a random position. The size and strand of each 

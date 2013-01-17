@@ -6,7 +6,7 @@ genome. Optionally, by using the **-d** option, it will report the depth of cove
 chromosome in the genome file (**-g**).
 
 ==========================================================================
-5.10.1 Usage and option summary
+Usage and option summary
 ==========================================================================
 Usage:
 ::
@@ -32,7 +32,7 @@ chromosome. A simple sort -k1,1 will suffice.
 
 
 ==========================================================================
-5.10.2 Default behavior
+Default behavior
 ==========================================================================
 By default, **genomeCoverageBed** will compute a histogram of coverage for the genome file provided.
 The default output format is as follows:
@@ -64,15 +64,16 @@ For example:
   
   
 ==========================================================================
-5.10.3 (-max)Controlling the histogram's maximum depth 
+``-max`` Controlling the histogram's maximum depth 
 ==========================================================================
-Using the **-max** option, **genomeCoverageBed** will "lump" all positions in the genome having feature
-coverage greather than or equal to **max** into the **max** histogram bin. For example, if one sets **-max**
-equal to 50, the max depth reported in the output will be 50 and all positions with a depth >= 50 will
-be represented in bin 50.
+Using the **-max** option, **genomeCoverageBed** will "lump" all positions in \
+the genome having feature coverage greater than or equal to **max** into 
+the **max** histogram bin. For example, if one sets **-max**
+equal to 50, the max depth reported in the output will be 50 and all positions 
+with a depth >= 50 will be represented in bin 50.
 
 ==========================================================================
-5.10.4 (-d)Reporting "per-base" genome coverage 
+``-d`` Reporting "per-base" genome coverage 
 ==========================================================================
 Using the **-d** option, **genomeCoverageBed** will compute the depth of feature coverage for each base
 on each chromosome in genome file provided.
@@ -107,9 +108,9 @@ For example:
 
   
   
-==========================================================================
-5.1.13 (-split)Reporting coverage with spliced alignments or blocked BED features 
-==========================================================================
+==============================================================================
+``-split`` Reporting coverage with spliced alignments or blocked BED features 
+==============================================================================
 As described in section 1.3.19, genomeCoverageBed will, by default, screen for overlaps against the
 entire span of a spliced/split BAM alignment or blocked BED12 feature. When dealing with RNA-seq
 reads, for example, one typically wants to only screen for overlaps for the portions of the reads that

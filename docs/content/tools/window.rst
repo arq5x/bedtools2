@@ -7,7 +7,7 @@ Similar to **intersectBed**, **windowBed** searches for overlapping features in 
 each feature in A. In effect, this allows features in B that are "near" features in A to be detected.
 
 ==========================================================================
-5.5.1 Usage and option summary
+Usage and option summary
 ==========================================================================
 **Usage:**
 ::
@@ -30,7 +30,7 @@ Option                           Description
 ===========================      =========================================================================================================================================================
 
 ==========================================================================
-5.5.2 Default behavior
+Default behavior
 ==========================================================================
 By default, **windowBed** adds 1000 bp upstream and downstream of each A feature and searches for
 features in B that overlap this "window". If an overlap is found in B, both the *original* A feature and the
@@ -59,7 +59,7 @@ For example:
 
 
 ==========================================================================
-5.5.3 (-w)Defining a custom window size 
+``-w`` Defining a custom window size 
 ==========================================================================
 Instead of using the default window size of 1000bp, one can define a custom, *symmetric* window around
 each feature in A using the **-w** option. One should specify the window size in base pairs. For example,
@@ -79,7 +79,7 @@ For example (note that in contrast to the default behavior, the second B entry i
   chr1  100  200  chr1  1300  2000
 
 ==========================================================================
-5.5.4 (-l and -r)Defining assymteric windows 
+``-l and -r`` Defining assymteric windows 
 ==========================================================================
 One can also define asymmetric windows where a differing number of bases are added upstream and
 downstream of each feature using the **-l (upstream)** and **-r (downstream)** options.
@@ -101,7 +101,7 @@ For example (note the difference between -l 200 and -l 300):
   chr1  100   200  chr1  10000  20000
   
 ==========================================================================
-5.5.5 (-sw)Defining assymteric windows based on strand 
+``-sw`` Defining assymteric windows based on strand 
 ==========================================================================
 Especially when dealing with gene annotations or RNA-seq experiments, you may want to define
 asymmetric windows based on "strand". For example, you may want to screen for overlaps that occur
@@ -130,27 +130,27 @@ For example (note the difference between -l 200 and -l 300):
 
   
 ==========================================================================
-5.5.6 (-sm)Enforcing "strandedness" 
+``-sm`` Enforcing "strandedness" 
 ==========================================================================
 This option behaves the same as the -s option for intersectBed while scanning for overlaps within the
 "window" surrounding A. See the discussion in the intersectBed section for details.
 
 ==========================================================================
-5.5.7 (-u)Reporting the presence of at least one overlapping feature 
+``-u`` Reporting the presence of at least one overlapping feature 
 ==========================================================================
 This option behaves the same as for intersectBed while scanning for overlaps within the "window"
 surrounding A. See the discussion in the intersectBed section for details.
 
 
 ==========================================================================
-5.5.8 (-c)Reporting the number of overlapping features 
+``-c`` Reporting the number of overlapping features 
 ==========================================================================
 This option behaves the same as for intersectBed while scanning for overlaps within the "window"
 surrounding A. See the discussion in the intersectBed section for details.
 
 
 ==========================================================================
-5.5.9 (-v)Reporting the absence of any overlapping features 
+``-v`` Reporting the absence of any overlapping features 
 ==========================================================================
 This option behaves the same as for intersectBed while scanning for overlaps within the "window"
 surrounding A. See the discussion in the intersectBed section for details.

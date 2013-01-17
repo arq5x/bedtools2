@@ -8,7 +8,7 @@ chromosome size).
 
 
 ==========================================================================
-5.14.1 Usage and option summary
+Usage and option summary
 ==========================================================================
 Usage:
 ::
@@ -26,7 +26,7 @@ Usage:
 
 
 ==========================================================================
-5.14.2 Default behavior
+Default behavior
 ==========================================================================
 By default, **slopBed** will either add a fixed number of bases in each direction (**-b**) or an asymmetric
 number of bases in each direction (**-l** and **-r**).
@@ -66,7 +66,7 @@ However, if the requested number of bases exceeds the boundaries of the chromoso
   
   
 ==========================================================================
-5.14.3 Resizing features according to strand
+Resizing features according to strand
 ==========================================================================
 **slopBed** will optionally increase the size of a feature based on strand.
 

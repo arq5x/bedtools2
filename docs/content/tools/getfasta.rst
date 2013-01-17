@@ -5,7 +5,7 @@
 The headers in the input FASTA file must exactly match the chromosome column in the BED file.
 
 ==========================================================================
-5.11.1 Usage and option summary 
+Usage and option summary 
 ==========================================================================
 Usage:
 ::
@@ -26,7 +26,7 @@ Usage:
 
 
 ==========================================================================
-5.11.2 Default behavior
+Default behavior
 ==========================================================================
 **fastaFromBed** will extract the sequence defined by the coordinates in a BED interval and create a
 new FASTA entry in the output file for each extracted sequence. By default, the FASTA header for each
@@ -51,7 +51,7 @@ For example:
 
   
 ==========================================================================
-5.11.3 Using the BED "name" column as a FASTA header.
+Using the BED "name" column as a FASTA header.
 ==========================================================================
 Using the **-name** option, one can set the FASTA header for each extracted sequence to be the "name"
 columns from the BED feature.
@@ -75,13 +75,8 @@ For example:
 
 
 
-
-
-
-
-
 ==========================================================================
-5.11.4 Creating a tab-delimited output file in lieu of FASTA output.
+Creating a tab-delimited output file in lieu of FASTA output.
 ==========================================================================
 Using the **-tab** option, the **-fo** output file will be tab-delimited instead of in FASTA format.
 
@@ -102,7 +97,7 @@ For example:
   
   
 ==========================================================================
-5.11.5 (-s)Forcing the extracted sequence to reflect the requested strand 
+``-s`` Forcing the extracted sequence to reflect the requested strand 
 ==========================================================================
 **fastaFromBed** will extract the sequence in the orientation defined in the strand column when the "-s"
 option is used.

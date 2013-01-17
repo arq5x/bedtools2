@@ -6,7 +6,7 @@ intervals in a file. This is useful for cases when one wants to manually inspect
 annotations or features.
 
 ==========================================================================
-5.16.1 Usage and option summary
+Usage and option summary
 ==========================================================================
 Usage:
 ::
@@ -24,7 +24,7 @@ Usage:
 
 
 ==========================================================================
-5.16.2 Default behavior
+Default behavior
 ==========================================================================
 By default, **linksBed** creates links to the public UCSC Genome Browser.
 
@@ -52,7 +52,7 @@ link on the page is built from the features in genes.bed:
 
 
 ==========================================================================
-5.16.3 Creating HTML links to a local UCSC Browser installation
+Creating HTML links to a local UCSC Browser installation
 ==========================================================================
 Optionally, **linksBed** will create links to a local copy of the UCSC Genome Browser.
 

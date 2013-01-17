@@ -20,7 +20,7 @@ with both BED/GFF/VCF and BAM files as input.
 
 
 ===============================
-5.1.1 Usage and option summary
+Usage and option summary
 ===============================
 **Usage**:
 ::
@@ -61,7 +61,7 @@ Option                           Description
 
 
 ===============================
-5.1.2 Default behavior
+Default behavior
 ===============================
 By default, if an overlap is found, ``bedtools intersect`` reports the shared interval between the two
 overlapping features.
@@ -94,7 +94,7 @@ For example:
 
 
 =============================================
-5.1.3 (-wa) Reporting the original A feature 
+``-wa`` Reporting the original A feature 
 =============================================
 Instead, one can force ``bedtools intersect`` to report the *original* **"A"** feature when an overlap is found. As
 shown below, the entire "A" feature is reported, not just the portion that overlaps with the "B" feature.
@@ -126,7 +126,7 @@ For example:
 
 
 =============================================
-5.1.4 (-wb) Reporting the original B feature 
+``-wb`` Reporting the original B feature 
 =============================================
 Similarly, one can force ``bedtools intersect`` to report the *original* **"B"** feature when an overlap is found. If
 just -wb is used, the overlapping portion of A will be reported followed by the *original* **"B"**. If both -wa
@@ -159,9 +159,9 @@ Now -wa and -wb:
   bedtools intersect -a A.bed -b B.bed -wa -wb
   chr1  10  20  chr 15  20
 
-=======================================================================
-5.1.5 (-loj) Left outer join. Report features in A with and without overlaps
-=======================================================================
+========================================================================
+``-loj`` Left outer join. Report features in A with and without overlaps
+========================================================================
 By default, ``bedtools intersect`` will only report features in A that
 have an overlap in B.  The ``-loj`` option will report every A feature
 no matter what.  When there is an overlap (or more than 1), it will report
@@ -195,7 +195,7 @@ Now *with* ``-loj``:
 
 
 =======================================================================
-5.1.6 (-wo) Write the *amount* of overlap between intersecting features 
+``-wo`` Write the *amount* of overlap between intersecting features 
 =======================================================================
 The ``-wo`` option reports a column after each combination of intersecting
 "A" and "B" features indicating the *amount* of overlap in bases pairs that
@@ -224,7 +224,7 @@ For example:
 
 
 =======================================================================
-5.1.7 (-wao) Write *amounts* of overlap for all features. 
+``-wao`` Write *amounts* of overlap for all features. 
 =======================================================================
 The ``-wao`` option extends upon the ``-wo`` option in that, unlike ``-wo``,
 it reports an overlap of 0 for features in A that do not have an intersection
@@ -245,9 +245,9 @@ For example:
     chr1    10    20    chr1    18  25  2
     chr1    30    40    .       -1  -1  0
 
-=======================================================================
-5.1.8 (-u) (unique) Reporting the mere presence of *any* overlapping features 
-=======================================================================
+==========================================================================
+``-u`` (unique) Reporting the mere presence of *any* overlapping features 
+==========================================================================
 Often you'd like to simply know a feature in "A" overlaps one or more
 features in B without reporting each and every intersection.  The ``-u``
 option will do exactly this: if an one or more overlaps exists, the 
@@ -291,7 +291,7 @@ Now with ``-u``:
 
 
 =======================================================================
-5.1.9 (-c) Reporting the number of overlapping features 
+``-c`` Reporting the number of overlapping features 
 =======================================================================
 The -c option reports a column after each "A" feature indicating the *number* (0 or more) of overlapping
 features found in "B". Therefore, *each feature in A is reported once*.
@@ -314,7 +314,7 @@ For example:
 
 
 =======================================================================
-5.1.10 (-v) Reporting the absence of any overlapping features 
+``-v`` Reporting the absence of any overlapping features 
 =======================================================================
 There will likely be cases where you'd like to know which "A" features 
 do not overlap with any of the "B" features. Perhaps you'd like to know 
@@ -347,7 +347,7 @@ For example:
 
 
 =======================================================================
-5.1.11 (-f) Requiring a minimal overlap fraction 
+``-f`` Requiring a minimal overlap fraction 
 =======================================================================
 By default, ``bedtools intersect`` will report an overlap between A and B so long as there is at least one base
 pair is overlapping. Yet sometimes you may want to restrict reported overlaps between A and B to cases
@@ -367,7 +367,7 @@ For example (note that the second B entry is not reported):
   chr1 100 200 chr1 130 201
 
 ==========================================================================
-5.1.12 (-r, combined with -f)Requiring reciprocal minimal overlap fraction 
+``-r, and -f`` Requiring reciprocal minimal overlap fraction 
 ==========================================================================
 Similarly, you may want to require that a minimal fraction of both the A and the B features is
 overlapped. For example, if feature A is 1kb and feature B is 1Mb, you might not want to report the
@@ -387,7 +387,7 @@ For example (note that the second B entry is not reported):
   chr1 100 200 chr1 130 201
 
 ==========================================================================
-5.1.13 (-s) Enforcing *same* strandedness 
+``-s`` Enforcing *same* strandedness 
 ==========================================================================
 By default, ``bedtools intersect`` will report overlaps between features 
 even if the features are on opposite strands. However, if strand information 
@@ -408,7 +408,7 @@ For example (note that the second B entry is not reported):
   
 
 ==========================================================================
-5.1.14 (-S) Enforcing *opposite* "strandedness" 
+``-S`` Enforcing *opposite* "strandedness" 
 ==========================================================================
 The ``-s`` option enforces that overlaps be on the *same* strand.  In some
 cases, you may want to enforce that overlaps be found on *opposite* strands.
@@ -428,7 +428,7 @@ For example:
   
   
 ==========================================================================
-5.1.15 (-abam) Default behavior when using BAM input 
+``-abam`` Default behavior when using BAM input 
 ==========================================================================
 When comparing alignments in BAM format (**-abam**) to features in BED format (**-b**), ``bedtools intersect``
 will, **by default**, write the output in BAM format. That is, each alignment in the BAM file that meets
@@ -454,9 +454,10 @@ For example:
   43830893 -4487 CTTTGGGAGGGCTTTGTAGCCTATCTGGAAAAAGGAAATATCTTCCCATG U
   \e^bgeTdg_Kgcg`ggeggg_gggggggggddgdggVg\gWdfgfgff XT:A:R NM:i:2 SM:i:0 AM:i:0 X0:i:10 X1:i:7 X M : i :
   2 XO:i:0 XG:i:0 MD:Z:1A2T45
-  
+
+
 ==========================================================================
-5.1.16 (-ubam) Default behavior when using BAM input 
+``-ubam`` Default behavior when using BAM input 
 ==========================================================================
 The ``-ubam`` option writes *uncompressed* BAM output to stdout.  This is
 useful for increasing the speed of pipelines that accept the output of
@@ -464,7 +465,7 @@ useful for increasing the speed of pipelines that accept the output of
 uncompress the data.
 
 ==========================================================================
-5.1.17 (-bed) Output BED format when using BAM input 
+``-bed`` Output BED format when using BAM input 
 ==========================================================================
 When comparing alignments in BAM format (**-abam**) to features in BED format (**-b**), ``bedtools intersect``
 will **optionally** write the output in BED format. That is, each alignment in the BAM file is converted
@@ -499,7 +500,7 @@ For example:
   chr8  42606164  42606214  BERTHA_0001:3:1:244:962#0/1  37  +
   
 ==================================================================================
-5.1.18 (-split) Reporting overlaps with spliced alignments or blocked BED features 
+``-split`` Reporting overlaps with spliced alignments or blocked BED features 
 ==================================================================================
 As described in section 1.3.19, bedtools intersect will, by default, screen for overlaps against the entire span
 of a spliced/split BAM alignment or blocked BED12 feature. When dealing with RNA-seq reads, for
@@ -537,7 +538,7 @@ In contrast, when using the **-split** option, only the exon overlaps are report
   
 
 ==========================================================================
-5.1.19 (-sorted) Invoke a memory-efficient algorithm for very large files.
+``-sorted`` Invoke a memory-efficient algorithm for very large files.
 ==========================================================================
 The default algorithm for detecting overlaps loads the B file into an R-tree
 structure in memory.  While fast, it can consume substantial memory for large
@@ -556,7 +557,7 @@ For example:
 
 
 ==========================================================================
-5.1.20 (-header) Print the header for the A file before reporting results.
+``-header`` Print the header for the A file before reporting results.
 ==========================================================================
 By default, if your A file has a header, it is ignored when reporting results.
 This option will instead tell bedtools to first print the header for the

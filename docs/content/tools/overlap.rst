@@ -7,7 +7,7 @@ the end of the same line. In this way, it is a useful method for computing custo
 the output of other BEDTools.
 
 ==========================================================================
-5.19.1 Usage and option summary
+Usage and option summary
 ==========================================================================
 Usage:
 ::
@@ -23,7 +23,7 @@ Usage:
 
 
 ==========================================================================
-5.19.2 Default behavior
+Default behavior
 ==========================================================================
 The default behavior is to compute the amount of overlap between the features you specify based on the
 start and end coordinates. For example:

@@ -20,7 +20,7 @@ research.
 
 
 ==========================================================================
-5.22.1 Usage and option summary
+Usage and option summary
 ==========================================================================
 Usage
 ::
@@ -71,7 +71,7 @@ Option                           Description
 
 
 ==========================================================================
-5.22.2 Default behavior.
+Default behavior.
 ==========================================================================
 Let's imagine we have three incredibly interesting genetic variants that we are 
 studying and we are interested in what annotated repeats these variants overlap.
@@ -82,7 +82,7 @@ studying and we are interested in what annotated repeats these variants overlap.
   chr21  9729310 9757478 variant2
   chr21  9795588 9796685 variant3
 
-  intersectBed -a variants.bed -b repeats.bed -wa -wb > variantsToRepeats.bed
+  bedtools intersect -a variants.bed -b repeats.bed -wa -wb > variantsToRepeats.bed
   cat variantsToRepeats.bed
   chr21  9719758 9729320 variant1   chr21  9719768 9721892 ALR/Alpha   1004  +
   chr21  9719758 9729320 variant1   chr21  9721905 9725582 ALR/Alpha   1010  +
@@ -113,7 +113,7 @@ several useful ways. The default behavior is to compute the *sum* of the opCol.
 
 
 ==========================================================================
-5.22.3 Computing the min and max.
+Computing the min and max.
 ==========================================================================
 Now let's find the *min* and *max* repeat score for each variant. We do this 
 by "grouping" on the variant coordinate columns (i.e. cols. 1,2 and 3) and 
@@ -145,7 +145,7 @@ variants so that we stay in BED format.
 
 
 ==========================================================================
-5.22.4 Computing the mean and median.
+Computing the mean and median.
 ==========================================================================
 Now let's find the *mean* and *median* repeat score for each variant.
 ::
@@ -162,7 +162,7 @@ Now let's find the *mean* and *median* repeat score for each variant.
 
 
 ==========================================================================
-5.22.5 Computing the mode and "antimode".
+Computing the mode and "antimode".
 ==========================================================================
 Now let's find the *mode* and *antimode* (i.e., the least frequent) repeat 
 score for each variant (in this case they are identical).
@@ -181,7 +181,7 @@ score for each variant (in this case they are identical).
   
   
 ==========================================================================
-5.22.6 Computing the count of lines for a given group.
+Computing the count of lines for a given group.
 ==========================================================================
 Figure:
 ::
@@ -195,7 +195,7 @@ Figure:
   
   
 ============================================================================
-5.22.7 Collapsing: listing all of the values in the opCol for a given group.
+Collapsing: listing all of the values in the opCol for a given group.
 ============================================================================
 Now for something different. What if we wanted all of the names of the repeats 
 listed on the same line as the variants? Use the collapse option. This 
@@ -210,7 +210,7 @@ listed on the same line as the variants? Use the collapse option. This
 
 
 ==========================================================================
-5.22.8 Computing frequencies: freqasc and freqdesc.
+Computing frequencies: freqasc and freqdesc.
 ==========================================================================
 What if we want to report each distinct value along with its number of 
 occurrence (much like uniq -c)?  The ``freqasc`` and freqdesc`` operations

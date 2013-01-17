@@ -5,7 +5,7 @@
 into a single feature which spans all of the combined features.
 
 ==========================================================================
-5.8.1 Usage and option summary 
+Usage and option summary 
 ==========================================================================
 Usage:
 ::
@@ -25,7 +25,7 @@ Option                           Description
 
 
 ==========================================================================
-5.8.2 Default behavior
+Default behavior
 ==========================================================================
 Figure:
 ::
@@ -56,14 +56,14 @@ For example:
   
 
 ==========================================================================
-5.8.3 (-s)Enforcing "strandedness" 
+``-s`` Enforcing "strandedness" 
 ==========================================================================
 This option behaves the same as the -s option for intersectBed while scanning for features that should
 be merged. Only features on the same strand will be merged. See the discussion in the intersectBed
 section for details.
 
 ==========================================================================
-5.8.4 (-n)Reporting the number of features that were merged 
+``-n`` Reporting the number of features that were merged 
 ==========================================================================
 The -n option will report the number of features that were combined from the original file in order to
 make the newly merged feature. If a feature in the original file was not merged with any other features,
@@ -83,7 +83,7 @@ For example:
 
 
 ==========================================================================
-5.8.5 (-d)Controlling how close two features must be in order to merge 
+``-d`` Controlling how close two features must be in order to merge 
 ==========================================================================
 By default, only overlapping or book-ended features are combined into a new feature. However, one can
 force mergeBed to combine more distant features with the -d option. For example, were one to set -d to
@@ -103,7 +103,7 @@ For example:
   chr1  100  200  1000
 
 ==========================================================================
-5.8.6 (-nms)Reporting the names of the features that were merged 
+``-nms`` Reporting the names of the features that were merged 
 ==========================================================================
 Occasionally, one might like to know that names of the features that were merged into a new feature.
 The -nms option will add an extra column to the mergeBed output which lists (separated by

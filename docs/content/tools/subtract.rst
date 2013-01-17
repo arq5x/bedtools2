@@ -7,7 +7,7 @@ overlaps all of a feature in A, the A feature will not be reported.
 
 
 ==========================================================================
-5.7.1 Usage and option summary
+Usage and option summary
 ==========================================================================
 Usage:
 ::
@@ -23,7 +23,7 @@ Option                           Description
 
 
 ==========================================================================
-5.7.2 Default behavior
+Default behavior
 ========================================================================== 
 Figure:
 ::
@@ -54,7 +54,7 @@ For example:
   
 
 ==========================================================================
-5.7.3  (-f)Requiring a minimal overlap fraction before subtracting
+``-f`` Requiring a minimal overlap fraction before subtracting
 ==========================================================================
 This option behaves the same as the -f option for intersectBed. In this case, subtractBed will only
 subtract an overlap with B if it covers at least the fraction of A defined by -f. If an overlap is found,
@@ -78,7 +78,7 @@ For example:
 
 
 ==========================================================================
-5.7.4 (-s)Enforcing "strandedness" 
+``-s`` Enforcing "strandedness" 
 ==========================================================================
 This option behaves the same as the -s option for intersectBed while scanning for features in B that
 should be subtracted from A. See the discussion in the intersectBed section for details.

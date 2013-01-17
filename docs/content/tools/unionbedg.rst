@@ -6,7 +6,7 @@ compare coverage (and other text-values such as genotypes) across multiple sampl
 
 
 ==========================================================================
-5.23.1 Usage and option summary
+Usage and option summary
 ==========================================================================
 Usage:
 ::
@@ -28,7 +28,7 @@ Usage:
 
 
 ==========================================================================
-5.23.2 Default behavior
+Default behavior
 ==========================================================================
 Figure:
 ::
@@ -59,7 +59,7 @@ Figure:
   chr1 2090 2100 20 0  20
 
 ==========================================================================
-5.23.3 Add a header line to the output
+``-header`` Add a header line to the output
 ==========================================================================
 Figure:
 ::
@@ -77,7 +77,7 @@ Figure:
 
 
 ==========================================================================
-5.23.4 Add a header line with custom file names to the output
+``-names`` Add a header line with custom file names to the output
 ==========================================================================
 Figure:
 ::
@@ -97,7 +97,7 @@ Figure:
   
   
 ==========================================================================
-5.23.5 Include regions that have zero coverage in all BEDGRAPH files.
+``-empty`` Include regions that have zero coverage in all BEDGRAPH files.
 ==========================================================================
 Figure:
 ::
@@ -119,7 +119,7 @@ Figure:
 
 
 ==========================================================================
-5.23.6 Use a custom value for missing values.
+``-filler`` Use a custom value for missing values.
 ==========================================================================
 Figure:
 ::
@@ -141,7 +141,7 @@ Figure:
 
   
 ==========================================================================
-5.23.7 Use BEDGRAPH files with non-numeric values.
+Use BEDGRAPH files with non-numeric values.
 ==========================================================================
 Figure:
 ::

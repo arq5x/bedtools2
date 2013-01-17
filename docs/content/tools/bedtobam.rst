@@ -5,7 +5,7 @@
 storing large genome annotations in a compact, indexed format for visualization purposes.
 
 ==========================================================================
-5.18.1 Usage and option summary
+Usage and option summary
 ==========================================================================
 Usage:
 ::
@@ -23,7 +23,7 @@ Usage:
 
 
 ==========================================================================
-5.18.2 Default behavior
+Default behavior
 ==========================================================================
 The default behavior is to assume that the input file is in unblocked format. For example:
 ::
@@ -45,7 +45,7 @@ The default behavior is to assume that the input file is in unblocked format. Fo
  
 
 ==========================================================================
-5.18.3 Creating "spliced" BAM entries from "blocked" BED features
+Creating "spliced" BAM entries from "blocked" BED features
 ==========================================================================
 Optionally, **bedToBam** will create spliced BAM entries from "blocked" BED features by using the
 -bed12 option. This will create CIGAR strings in the BAM output that will be displayed as "spliced"
