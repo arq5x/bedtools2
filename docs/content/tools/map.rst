@@ -1,9 +1,19 @@
 ###############
 *map*
 ###############
+
+|
+
+.. image:: ../images/tool-glyphs/map-glyph.png 
+    :width: 600pt 
+    :align: center
+
+|
 ``bedtools map`` allows one to map overlapping features in a B file onto 
 features in an A file and apply statistics and/or summary operations on those 
-features.  For example, one could use ``bedtools map`` to compute the average
+features.  
+
+For example, one could use ``bedtools map`` to compute the average
 score of BEDGRAPH records that overlap genes. Since the fourth column in 
 BEDGRAPH is the score, the following command illustrates how this would be done:
 
@@ -19,7 +29,8 @@ Another example is discussed in this Biostars
 
     ``bedtools map`` requires each input file to be sorted by genome coordinate.
     For BED files, this can be done with ``sort -k1,1 -k2,2n``.
-    
+
+
 
 ==========================================================================
 Usage and option summary
