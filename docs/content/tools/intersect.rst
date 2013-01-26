@@ -2,6 +2,13 @@
 *intersect* 
 #########################################
 
+|
+
+.. image:: ../images/tool-glyphs/intersect-glyph.png 
+    :width: 600pt 
+
+|
+
 By far, the most common question asked of two sets of genomic features 
 is whether or not any of the features in the two sets "overlap" 
 with one another. This is known as feature intersection. 
@@ -81,17 +88,6 @@ For example:
   chr1  15   20
 
 
-.. plot::
-
-    a = """chr1	10	20\nchr1	30	40"""
-    b = """chr1	15	20"""
-
-    title = "bedtools intersect -a A.bed -b B.bed"
-    import matplotlib.pyplot as plt
-    from pyplots.plotter import plot_a_b_tool
-    plot_a_b_tool(a, b, 'intersect', title, 'A.bed', 'B.bed')
-    plt.show()
-
 
 =============================================
 ``-wa`` Reporting the original A feature 
@@ -112,17 +108,6 @@ For example:
 
   $ bedtools intersect -a A.bed -b B.bed -wa
   chr1  10   20
-
-.. plot::
-
-    a = """chr1	10	20\nchr1	30	40"""
-    b = """chr1	15	20"""
-
-    title = "bedtools intersect -a A.bed -b B.bed -wa"
-    from matplotlib.pyplot import show
-    from pyplots.plotter import plot_a_b_tool
-    plot_a_b_tool(a, b, 'intersect', title, 'A.bed', 'B.bed', wa=True)
-    show()
 
 
 =============================================
@@ -148,15 +133,17 @@ For example (-wb alone):
   
 
 Now -wa and -wb:
-::
-  cat A.bed
+
+.. code-block:: bash
+
+  $ cat A.bed
   chr1  10  20
   chr1  30  40
 
-  cat B.bed
+  $ cat B.bed
   chr1  15   20
 
-  bedtools intersect -a A.bed -b B.bed -wa -wb
+  $ bedtools intersect -a A.bed -b B.bed -wa -wb
   chr1  10  20  chr 15  20
 
 ========================================================================
@@ -169,27 +156,31 @@ A with its overlaps. Yet when there are no overlaps, an A feature will be
 reported with a NULL B feature to indicate that there were no overlaps
 
 For example (*without* ``-loj``):
-::
-  cat A.bed
+
+.. code-block:: bash
+
+  $ cat A.bed
   chr1  10  20
   chr1  30  40
 
-  cat B.bed
+  $ cat B.bed
   chr1  15   20
   
-  bedtools intersect -a A.bed -b B.bed
+  $ bedtools intersect -a A.bed -b B.bed
   chr1  10  20  chr 15  20
   
 Now *with* ``-loj``:
-::
-    cat A.bed
+
+.. code-block:: bash
+
+    $ cat A.bed
     chr1  10  20
     chr1  30  40
 
-    cat B.bed
+    $ cat B.bed
     chr1  15   20
 
-    bedtools intersect -a A.bed -b B.bed -loj
+    $ bedtools intersect -a A.bed -b B.bed -loj
     chr1  10  20  chr 15  20
     chr1  30  40  . -1  -1
 
@@ -207,18 +198,17 @@ is observed between the two features.
     reported.  If you would like to report such intervals with an overlap equal
     to 0, see the ``-wao`` option.
 
+.. code-block:: bash
 
-For example:
-::
-    cat A.bed
+    $ cat A.bed
     chr1    10    20
     chr1    30    40
 
-    cat B.bed
+    $ cat B.bed
     chr1    15  20
     chr1    18  25
 
-    bedtools intersect -a A.bed -b B.bed -wo
+    $ bedtools intersect -a A.bed -b B.bed -wo
     chr1    10    20    chr1    15  20  5
     chr1    10    20    chr1    18  25  2
 
@@ -230,17 +220,17 @@ The ``-wao`` option extends upon the ``-wo`` option in that, unlike ``-wo``,
 it reports an overlap of 0 for features in A that do not have an intersection
 in B. 
 
-For example:
-::
-    cat A.bed
+.. code-block:: bash
+
+    $ cat A.bed
     chr1    10    20
     chr1    30    40
 
-    cat B.bed
+    $ cat B.bed
     chr1    15  20
     chr1    18  25
 
-    bedtools intersect -a A.bed -b B.bed -wao
+    $ bedtools intersect -a A.bed -b B.bed -wao
     chr1    10    20    chr1    15  20  5
     chr1    10    20    chr1    18  25  2
     chr1    30    40    .       -1  -1  0
@@ -254,40 +244,33 @@ option will do exactly this: if an one or more overlaps exists, the
 A feature is reported.  Otherwise, nothing is reported.
 
 For example, without ``-u``:
-::
-    cat A.bed
+
+.. code-block:: bash
+
+    $ cat A.bed
     chr1  10  20
 
-    cat B.bed
+    $ cat B.bed
     chr1  15  20
     chr1  17  22
 
-    bedtools intersect -a A.bed -b B.bed
+    $ bedtools intersect -a A.bed -b B.bed
     chr1  10   20
     chr1  10   20
     
 Now with ``-u``:
-::
-    cat A.bed
+
+.. code-block:: bash
+
+    $ cat A.bed
     chr1  10  20
 
-    cat B.bed
+    $ cat B.bed
     chr1  15  20
     chr1  17  22
 
-    bedtools intersect -a A.bed -b B.bed -u
+    $ bedtools intersect -a A.bed -b B.bed -u
     chr1  10   20
-
-.. plot::
-
-    a = """chr1	10	20\nchr1	30	40"""
-    b = """chr1	15	20"""
-
-    title = "bedtools intersect -a A -b B -v"
-    from matplotlib.pyplot import show
-    from pyplots.plotter import plot_a_b_tool
-    plot_a_b_tool(a, b, 'intersect', title, 'A.bed', 'B.bed', v=True)
-    show()
 
 
 =======================================================================
@@ -296,17 +279,17 @@ Now with ``-u``:
 The -c option reports a column after each "A" feature indicating the *number* (0 or more) of overlapping
 features found in "B". Therefore, *each feature in A is reported once*.
 
-For example:
-::
-    cat A.bed
+.. code-block:: bash
+
+    $ cat A.bed
     chr1    10    20
     chr1    30    40
 
-    cat B.bed
+    $ cat B.bed
     chr1    15  20
     chr1    18  25
 
-    bedtools intersect -a A.bed -b B.bed -c
+    $ bedtools intersect -a A.bed -b B.bed -c
     chr1    10    20    2
     chr1    30    40    0
 
@@ -322,28 +305,18 @@ which SNPs don't overlap with any gene annotations. The ``-v``
 (an homage to "grep -v") option will only report those "A" features 
 that have no overlaps in "B".
 
-For example:
-::
-    cat A.bed
+.. code-block:: bash
+
+    $ cat A.bed
     chr1  10  20
     chr1  30  40
 
-    cat B.bed
+    $ cat B.bed
     chr1  15  20
 
-    bedtools intersect -a A.bed -b B.bed -v
+    $ bedtools intersect -a A.bed -b B.bed -v
     chr1  30   40
 
-.. plot::
-
-    a = """chr1	10	20\nchr1	30	40"""
-    b = """chr1	15	20"""
-
-    title = "bedtools intersect -a A -b B -v"
-    from matplotlib.pyplot import show
-    from pyplots.plotter import plot_a_b_tool
-    plot_a_b_tool(a, b, 'intersect', title, 'A.bed', 'B.bed', v=True)
-    show()
 
 
 =======================================================================
@@ -355,15 +328,17 @@ where the feature in B overlaps at least X% (e.g. 50%) of the A feature. The -f 
 this.
 
 For example (note that the second B entry is not reported):
-::
-  cat A.bed
+
+.. code-block:: bash
+
+  $ cat A.bed
   chr1 100 200
   
-  cat B.bed
+  $ cat B.bed
   chr1 130 201
   chr1 180 220
   
-  bedtools intersect -a A.bed -b B.bed -f 0.50 -wa -wb
+  $ bedtools intersect -a A.bed -b B.bed -f 0.50 -wa -wb
   chr1 100 200 chr1 130 201
 
 ==========================================================================
@@ -375,15 +350,17 @@ overlap as feature A can overlap at most 1% of feature B. If one set -f to say, 
 enable the -r (reciprocal overlap fraction required), this overlap would not be reported.
 
 For example (note that the second B entry is not reported):
-::
-  cat A.bed
+
+.. code-block:: bash
+
+  $ cat A.bed
   chr1 100 200
   
-  cat B.bed
+  $ cat B.bed
   chr1 130 201
   chr1 130 200000
   
-  bedtools intersect -a A.bed -b B.bed -f 0.50 -r -wa -wb
+  $ bedtools intersect -a A.bed -b B.bed -f 0.50 -r -wa -wb
   chr1 100 200 chr1 130 201
 
 ==========================================================================
@@ -394,16 +371,18 @@ even if the features are on opposite strands. However, if strand information
 is present in both BED files and the "-s" option is used, overlaps will only 
 be reported when features are on the same strand.
 
-For example (note that the second B entry is not reported):
-::
-  cat A.bed
+For example (note that the first B entry is not reported):
+
+.. code-block:: bash
+
+  $ cat A.bed
   chr1 100 200 a1 100 +
   
-  cat B.bed
+  $ cat B.bed
   chr1 130 201 b1 100 -
   chr1 132 203 b2 100 +
   
-  bedtools intersect -a A.bed -b B.bed -wa -wb -s
+  $ bedtools intersect -a A.bed -b B.bed -wa -wb -s
   chr1 100 200 a1 100 + chr1 132 203 b2 100 +
   
 
@@ -415,15 +394,17 @@ cases, you may want to enforce that overlaps be found on *opposite* strands.
 In this, case use the ``-S`` option.
 
 For example:
-::
-  cat A.bed
+
+.. code-block:: bash
+
+  $ cat A.bed
   chr1 100 200 a1 100 +
   
-  cat B.bed
+  $ cat B.bed
   chr1 130 201 b1 100 -
   chr1 132 203 b2 100 +
   
-  bedtools intersect -a A.bed -b B.bed -wa -wb -S
+  $ bedtools intersect -a A.bed -b B.bed -wa -wb -S
   chr1 100 200 a1 100 + chr1 130 201 b1 100 -
   
   
@@ -439,9 +420,11 @@ feature in B, then that end will be written to the BAM output. By contrast, the 
 pair will not be written. One should use **pairToBed(Section 5.2)** if one wants each BAM alignment
 for a pair to be written to BAM output.
 
-For example:
-::
-  bedtools intersect -abam reads.unsorted.bam -b simreps.bed | samtools view - | head -3
+.. code-block:: bash
+
+  $ bedtools intersect -abam reads.unsorted.bam -b simreps.bed | \
+         samtools view - | \
+             head -3
   
   BERTHA_0001:3:1:15:1362#0 99 chr4 9236904 0 50M = 9242033 5 1 7 9
   AGACGTTAACTTTACACACCTCTGCCAAGGTCCTCATCCTTGTATTGAAG W c T U ] b \ g c e g X g f c b f c c b d d g g V Y P W W _
@@ -474,9 +457,9 @@ alignment will be reported in BED format. The BED "name" field is comprised of t
 the BAM alignment. If mate information is available, the mate (e.g., "/1" or "/2") field will be
 appended to the name. The "score" field is the mapping quality score from the BAM alignment.
 
-For example:
-::
-  bedtools intersect -abam reads.unsorted.bam -b simreps.bed -bed | head -20
+.. code-block:: bash
+
+  $ bedtools intersect -abam reads.unsorted.bam -b simreps.bed -bed | head -20
   
   chr4  9236903   9236953   BERTHA_0001:3:1:15:1362#0/1  0   +
   chr6  114221671 114221721 BERTHA_0001:3:1:16:994#0/1   37  -
@@ -550,10 +533,14 @@ like the way database systems join two tables.  This option is invoked with the
 ``-sorted`` option.
 
 For example:
-::
-  sort -k1,1 -k2,2n big.bed > big.sorted.bed
-  sort -k1,1 -k2,2n huge.bed > huge.sorted.bed  
-  bedtools intersect -a big.sorted.bed -b huge.sorted.bed -sorted
+
+.. code-block:: bash
+
+  $ sort -k1,1 -k2,2n big.bed > big.sorted.bed
+  
+  $ sort -k1,1 -k2,2n huge.bed > huge.sorted.bed  
+  
+  $ bedtools intersect -a big.sorted.bed -b huge.sorted.bed -sorted
 
 
 ==========================================================================
