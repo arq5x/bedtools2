@@ -4,7 +4,7 @@
 
 |
 
-.. image:: ../images/tool-glyphs/intersect-glyph.png 
+.. image:: ../images/tool-glyphs/slop-glyph.png 
     :width: 600pt 
 
 |
@@ -31,6 +31,7 @@ Usage and option summary
   bedtools slop [OPTIONS] -i <BED/GFF/VCF> -g <GENOME> [-b or (-l and -r)]
 
 **(or):**
+::
 
   bedtools slop [OPTIONS] -i <BED/GFF/VCF> -g <GENOME> [-b or (-l and -r)]
     
@@ -41,8 +42,8 @@ Usage and option summary
 **-l**					         The number of base pairs to subtract from the start coordinate. *Integer*.
 **-r**                           The number of base pairs to add to the end coordinate. *Integer*.
 **-s**                           Define -l and -r based on strand. For example. if used, -l 500 for a negative-stranded feature, it will add 500 bp to the *end* coordinate.
-**-pct**                         
-**-header**                       
+**-pct**                         Define -l and -r as a fraction of the feature's length. E.g. if used on a 1000bp feature, -l 0.50, will add 500 bp "upstream".  Default = false.
+**-header**                      Print the header from the input file prior to results.
 ===========================      ===============================================================================================================================================================================================================
 
 

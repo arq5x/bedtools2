@@ -25,7 +25,11 @@ with both BED/GFF/VCF and BAM files as input.
     for BED files) and then use the ``-sorted`` option.  This invokes a 
     memory-efficient algorithm designed for large files.
 
+.. seealso::
 
+    :doc:`../tools/subtract`
+    :doc:`../tools/window`
+    
 ===============================
 Usage and option summary
 ===============================
@@ -38,8 +42,9 @@ Usage and option summary
 ::
   
   intersectBed [OPTIONS] [-a|-abam] -b <BED/GFF/VCF>
-  
-  
+
+
+
 
 ===========================      =========================================================================================================================================================
 Option                           Description
@@ -72,8 +77,6 @@ Default behavior
 ===============================
 By default, if an overlap is found, ``bedtools intersect`` reports the shared interval between the two
 overlapping features.
-
-For example:
 
 .. code-block:: bash
 
