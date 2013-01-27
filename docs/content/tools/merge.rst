@@ -34,7 +34,7 @@ Usage and option summary
 **(or)**:
 ::
 
-  mergeBed [OPTIONS] -i <BED/GFF/VCF> -g <GENOME>
+  mergeBed [OPTIONS] -i <BED/GFF/VCF>
 
 
   
@@ -89,7 +89,7 @@ The ``-s`` option will only merge intervals that are overlapping/bookended
   chr1  250  500   a3  3 - 
   chr1  501  1000  a4  4 +
 
-  $ bedtools merge -i A.bed
+  $ bedtools merge -i A.bed -s
   chr1  100  250    +
   chr1  501  1000   +
   chr1  250  500    -
