@@ -21,6 +21,7 @@ file into a single feature which spans all of the combined features.
 .. seealso::
 
     :doc:`../tools/cluster`
+    :doc:`../tools/complement`
     
 
 ==========================================================================

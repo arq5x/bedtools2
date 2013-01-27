@@ -44,7 +44,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'bedtools'
-copyright = u'2012'
+copyright = u'2009 - 2013, Aaron R. Quinlan'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -135,7 +135,9 @@ html_last_updated_fmt = '%b %d, %Y'
 #html_use_smartypants = True
 
 # Custom sidebar templates, maps document names to template names.
-#html_sidebars = {}
+html_sidebars = {
+    'index': ['sidebar-intro.html', 'sourcelink.html', 'searchbox.html']
+}
 
 # Additional templates that should be rendered to pages, maps page names to
 # template names.
