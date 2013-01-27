@@ -21,6 +21,9 @@ user-defined number of bases. While something like this could be done with an
     ``bedtools slop`` requires a *genome* file defining the length of each 
     chromosome or contig.
 
+.. seealso::
+
+    :doc:`../tools/flank`
 
 ==========================================================================
 Usage and option summary
@@ -33,7 +36,7 @@ Usage and option summary
 **(or):**
 ::
 
-  bedtools slop [OPTIONS] -i <BED/GFF/VCF> -g <GENOME> [-b or (-l and -r)]
+  slopBed [OPTIONS] -i <BED/GFF/VCF> -g <GENOME> [-b or (-l and -r)]
     
 ===========================      ===============================================================================================================================================================================================================
  Option                           Description
@@ -95,7 +98,7 @@ chromosome, ``bedtools slop`` will "clip" the feature accordingly.
 ==========================================================================
 ``-s`` Resizing features according to strand
 ==========================================================================
-**bedtools slop** will optionally increase the size of a feature based on strand.
+``bedtools slop`` will optionally increase the size of a feature based on strand.
 
 For example:
 
@@ -116,7 +119,7 @@ For example:
 ==========================================================================
 ``-pct`` Resizing features by a given fraction
 ==========================================================================
-**bedtools slop** will optionally increase the size of a feature by a 
+``bedtools slop`` will optionally increase the size of a feature by a 
 user-specific fraction.
 
 For example:
