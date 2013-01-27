@@ -103,3 +103,33 @@ To display the help for a specific tool (e.g., ``bedtools shuffle``), use:
     
     	-n	Report the number of BED entries that were merged.
     		- Note: "1" is reported if no merging occurred.
+
+
+
+            
+
+====================
+Issues with output
+====================
+
+------------------------------------------------------------------------
+I *know* there are overlaps, but none are reported. What might be wrong?
+------------------------------------------------------------------------
+
+There are two common causes of this problem.  The first cause is non-obvious 
+differences in the way chromosomes are named in files being compared.  
+For example, "1" is not the same as "chr1" just as "   chr1" is not the same 
+as "chr1".  Secondly, users often copy files from a Windows machine to a UNIX 
+machine.  This causes issues because Windows uses two bytes to represent
+the end of a line (``\r\n``) whereas the UNIX convention uses a single byte
+(``\n``).  If your files don't conform to the UNIX convention, you will have 
+problems.  One can convert files from Windows to UNIX with
+the following command:
+
+.. code-block:: bash
+
+   perl -i -p -e 's/\r\n/\n/g;' file.windows > file.unix
+
+
+
+
