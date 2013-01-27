@@ -1,15 +1,42 @@
 ###############
 *merge*
 ###############
-**mergeBed** combines overlapping or "book-ended" (that is, one base pair away) features in a feature file
-into a single feature which spans all of the combined features.
+
+|
+
+.. image:: ../images/tool-glyphs/merge-glyph.png 
+    :width: 600pt 
+|
+
+
+``bedtools merge`` combines overlapping or "book-ended" features in an interval 
+file into a single feature which spans all of the combined features.
+
+.. note::
+
+    ``bedtools merge`` requires that you presort your data by chromosome and
+    then by start position (e.g., ``sort k1,1 -k2,2n in.bed > in.sorted.bed``
+    for BED files).
+    
+.. seealso::
+
+    :doc:`../tools/cluster`
+    
 
 ==========================================================================
-Usage and option summary 
+Usage and option summary
 ==========================================================================
-Usage:
+**Usage**:
 ::
-  mergeBed [OPTIONS] -i <BED/GFF/VCF>
+
+  bedtools merge [OPTIONS] -i <BED/GFF/VCF> 
+
+**(or)**:
+::
+
+  mergeBed [OPTIONS] -i <BED/GFF/VCF> -g <GENOME>
+
+
   
 ===========================      ===============================================================================================================================================================================================================
 Option                           Description
@@ -18,6 +45,11 @@ Option                           Description
 **-n**					         Report the number of BED entries that were merged. *1 is reported if no merging occurred*.
 **-d**                           Maximum distance between features allowed for features to be merged. *Default is 0. That is, overlapping and/or book-ended features are merged*.
 **-nms**                         Report the names of the merged features separated by semicolons.
+**-scores**	                     | Report the scores of the merged features. Specify one of 
+		                         | the following options for reporting scores:
+		                         | sum, min, max,
+		                         | mean, median, mode, antimode,
+		                         | collapse (i.e., print a semicolon-separated list)
 ===========================      ===============================================================================================================================================================================================================
 
 
@@ -27,57 +59,59 @@ Option                           Description
 ==========================================================================
 Default behavior
 ==========================================================================
-Figure:
-::
-  Chromosome  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+By default, ``bedtools merge`` combines overlapping (by at least 1 bp) and/or
+bookended intervals into a single, "flattened" or "merged" interval.
   
-  BED FILE       *************   ***************   **********************
-                         ********
-  
-  Result         ===============================   ======================
-  
-  
-  
-For example:
-::
-  cat A.bed
+.. code-block:: bash
+
+  $ cat A.bed
   chr1  100  200
   chr1  180  250
   chr1  250  500
   chr1  501  1000
 
-  mergeBed -i A.bed
+  $ bedtools merge -i A.bed
   chr1  100  500
   chr1  501  1000
-  
-  
-  
-  
-  
+
 
 ==========================================================================
 ``-s`` Enforcing "strandedness" 
 ==========================================================================
-This option behaves the same as the -s option for intersectBed while scanning for features that should
-be merged. Only features on the same strand will be merged. See the discussion in the intersectBed
-section for details.
+The ``-s`` option will only merge intervals that are overlapping/bookended
+*and* are on the same strand.
+
+.. code-block:: bash
+
+  $ cat A.bed
+  chr1  100  200   a1  1 +
+  chr1  180  250   a2  2 +
+  chr1  250  500   a3  3 - 
+  chr1  501  1000  a4  4 +
+
+  $ bedtools merge -i A.bed
+  chr1  100  250    +
+  chr1  501  1000   +
+  chr1  250  500    -
+
+
 
 ==========================================================================
 ``-n`` Reporting the number of features that were merged 
 ==========================================================================
-The -n option will report the number of features that were combined from the original file in order to
-make the newly merged feature. If a feature in the original file was not merged with any other features,
-a "1" is reported.
+The -n option will report the number of features that were combined from the 
+original file in order to make the newly merged feature. If a feature in the 
+original file was not merged with any other features, a "1" is reported.
 
-For example:
-::
-  cat A.bed
+.. code-block:: bash
+
+  $ cat A.bed
   chr1  100  200
   chr1  180  250
   chr1  250  500
   chr1  501  1000
   
-  mergeBed -i A.bed -n
+  $ bedtools merge -i A.bed -n
   chr1  100  500  3
   chr1  501  1000 1
 
@@ -85,36 +119,68 @@ For example:
 ==========================================================================
 ``-d`` Controlling how close two features must be in order to merge 
 ==========================================================================
-By default, only overlapping or book-ended features are combined into a new feature. However, one can
-force mergeBed to combine more distant features with the -d option. For example, were one to set -d to
-1000, any features that overlap or are within 1000 base pairs of one another will be combined.
+By default, only overlapping or book-ended features are combined into a new 
+feature. However, one can force ``merge`` to combine more distant features 
+with the ``-d`` option. For example, were one to set ``-d`` to 1000, any 
+features that overlap or are within 1000 base pairs of one another will be 
+combined.
 
-For example:
-::
-  cat A.bed
+.. code-block:: bash
+
+  $ cat A.bed
   chr1  100  200
   chr1  501  1000
   
-  mergeBed -i A.bed
+  $ bedtools merge -i A.bed
   chr1  100  200
   chr1  501  1000
 
-  mergeBed -i A.bed -d 1000
+  $ bedtools merge -i A.bed -d 1000
   chr1  100  200  1000
+
 
 ==========================================================================
 ``-nms`` Reporting the names of the features that were merged 
 ==========================================================================
-Occasionally, one might like to know that names of the features that were merged into a new feature.
-The -nms option will add an extra column to the mergeBed output which lists (separated by
-semicolons) the names of the merged features.
+Occasionally, one might like to know that names of the features that were 
+merged into a new feature. The ``-nms`` option will add an extra column to the 
+``merge`` output which lists (separated by semicolons) the names of the
+merged features.
 
-For example:
-::
-  cat A.bed
+.. code-block:: bash
+
+  $ cat A.bed
   chr1  100  200  A1
   chr1  150  300  A2
   chr1  250  500  A3
  
-  mergeBed -i A.bed -nms
+  $ bedtools merge -i A.bed -nms
   chr1  100  500  A1;A2;A3
+  
+
+==========================================================================
+``-scores`` Reporting the scores of the features that were merged 
+==========================================================================
+Similarly, we might like to know that scores of the features that were 
+merged into a new feature. Enter the ``-scores`` option.  One can specify 
+how the scores from each overlapping interval should be reported.  
+
+.. code-block:: bash
+
+  $ cat A.bed
+  chr1  100  200  A1 1
+  chr1  150  300  A2 2
+  chr1  250  500  A3 3
+ 
+  $ bedtools merge -i A.bed -scores mean
+  chr1  100  500  2
+  
+  $ bedtools merge -i A.bed -scores max
+  chr1  100  500  3
+
+  $ bedtools merge -i A.bed -scores collapse
+  chr1  100  500  1,2,3
+  
+  
+  
+
