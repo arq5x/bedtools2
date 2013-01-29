@@ -35,7 +35,7 @@ Usage and option summary
 **(or)**:
 ::
   
-  genomeCovergaBed [OPTIONS] [-i|-ibam] -g (iff. -i)
+  genomeCoverageBed [OPTIONS] [-i|-ibam] -g (iff. -i)
 
 
 

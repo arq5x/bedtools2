@@ -21,7 +21,7 @@ void BedMerge::ReportMergedNames(const vector<string> &names) {
         vector<string>::const_iterator nameEnd = names.end();
         for (; nameItr != nameEnd; ++nameItr) {
             if (nameItr < (nameEnd - 1))
-                cout << *nameItr << ";";
+                cout << *nameItr << _delimiter;
             else
                 cout << *nameItr;
         }
@@ -29,7 +29,9 @@ void BedMerge::ReportMergedNames(const vector<string> &names) {
     else {
         cerr << endl 
              << "*****" << endl 
-             << "*****ERROR: No names found to report for the -names option. Exiting." << endl 
+             << "*****ERROR: "
+             << "No names found to report for the -names option. Exiting." 
+             << endl 
              << "*****" << endl;
         exit(1);
     }
@@ -58,7 +60,7 @@ void BedMerge::ReportMergedScores(const vector<string> &scores) {
         else if (_scoreOp == "antimode")
             buffer << setprecision (PRECISION) << vo.GetAntiMode();
         else if (_scoreOp == "collapse")
-            buffer << setprecision (PRECISION) << vo.GetCollapse();
+            buffer << setprecision (PRECISION) << vo.GetCollapse(_delimiter);
         cout << "\t" << buffer.str();
     }
     else {        
@@ -79,14 +81,16 @@ BedMerge::BedMerge(string &bedFile,
                    bool forceStrand, 
                    bool reportNames, 
                    bool reportScores,
-                   const string &scoreOp) :
+                   const string &scoreOp,
+                   const string &delimiter) :
     _bedFile(bedFile),
     _numEntries(numEntries),
     _forceStrand(forceStrand),
     _reportNames(reportNames),
     _reportScores(reportScores),
     _scoreOp(scoreOp),
-    _maxDistance(maxDistance)
+    _maxDistance(maxDistance),
+    _delimiter(delimiter)
 {
     _bed = new BedFile(bedFile);
 

@@ -41,6 +41,7 @@ int merge_main(int argc, char* argv[]) {
     bool forceStrand     = false;
     bool reportNames     = false;
     bool reportScores    = false;
+    string delimiter     = ",";
 
     for(int i = 1; i < argc; i++) {
         int parameterLength = (int)strlen(argv[i]);
@@ -87,6 +88,12 @@ int merge_main(int argc, char* argv[]) {
                 i++;
             }
         }
+        else if (PARAMETER_CHECK("-delim", 6, parameterLength)) {
+            if ((i+1) < argc) {
+                delimiter      = argv[i + 1];
+                i++;
+            }
+        }
         else {
             cerr << endl << "*****ERROR: Unrecognized parameter: " << argv[i] << " *****" << endl << endl;
             showHelp = true;
@@ -98,15 +105,28 @@ int merge_main(int argc, char* argv[]) {
         cerr << endl << "*****" << endl << "*****ERROR: Need -i BED file. " << endl << "*****" << endl;
         showHelp = true;
     }
-    if ((reportScores == true) && (scoreOp != "sum")  && (scoreOp != "max")    && (scoreOp != "min") && (scoreOp != "mean") &&
-        (scoreOp != "mode") && (scoreOp != "median") && (scoreOp != "antimode") && (scoreOp != "collapse")) 
+    if ((reportScores == true) && (scoreOp != "sum")  
+         && (scoreOp != "max")  && (scoreOp != "min") 
+         && (scoreOp != "mean") && (scoreOp != "mode") 
+         && (scoreOp != "median") && (scoreOp != "antimode") 
+         && (scoreOp != "collapse")) 
     {
-        cerr << endl << "*****" << endl << "*****ERROR: Invalid scoreOp selection \"" << scoreOp << endl << "\"  *****" << endl;
+        cerr << endl 
+             << "*****" 
+             << endl 
+             << "*****ERROR: Invalid scoreOp selection \"" 
+             << scoreOp 
+             << endl 
+             << "\"  *****" 
+             << endl;
         showHelp = true;
     }
 
     if (!showHelp) {
-        BedMerge *bm = new BedMerge(bedFile, numEntries, maxDistance, forceStrand, reportNames, reportScores, scoreOp);
+        BedMerge *bm = new BedMerge(bedFile, numEntries, 
+                                    maxDistance, forceStrand, 
+                                    reportNames, reportScores, 
+                                    scoreOp, delimiter);
         delete bm;
     }
     else {
@@ -137,7 +157,8 @@ void merge_help(void) {
     cerr                                 << "\t\t- Def. 0. That is, overlapping & book-ended features are merged." << endl;
     cerr                                 << "\t\t- (INTEGER)" << endl << endl;
 
-    cerr << "\t-nms\t"                   << "Report the names of the merged features separated by semicolons." << endl << endl;
+    cerr << "\t-nms\t"                   << "Report the names of the merged features separated by commas." << endl;
+    cerr                                 << "\t\tChange delim. with -delim." << endl << endl;
     
     cerr << "\t-scores\t"                << "Report the scores of the merged features. Specify one of " << endl;
     cerr                                 << "\t\tthe following options for reporting scores:" << endl;
@@ -145,6 +166,11 @@ void merge_help(void) {
     cerr                                 << "\t\t  mean, median, mode, antimode," << endl;
     cerr                                 << "\t\t  collapse (i.e., print a semicolon-separated list)," << endl;
     cerr                                 << "\t\t- (INTEGER)" << endl << endl;
+    
+    cerr << "\t-delim\t"                 << "Specify a custom delimiter for the -nms and -scores concat options" << endl;
+    cerr                                 << "\t\t- Example: -delim \"|\"" << endl;
+    cerr                                 << "\t\t- Default: \",\"." << endl << endl;
+    
     
     cerr << "Notes: " << endl;
     cerr << "\t(1) All output, regardless of input type (e.g., GFF or VCF)" << endl;

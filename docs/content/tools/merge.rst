@@ -45,12 +45,15 @@ Option                           Description
 **-s**				             Force strandedness. That is, only merge features that are the same strand. *By default, this is disabled*.
 **-n**					         Report the number of BED entries that were merged. *1 is reported if no merging occurred*.
 **-d**                           Maximum distance between features allowed for features to be merged. *Default is 0. That is, overlapping and/or book-ended features are merged*.
-**-nms**                         Report the names of the merged features separated by semicolons.
+**-nms**                         Report the names of the merged features separated by commas.  Change delimiter with ``-delim``
 **-scores**	                     | Report the scores of the merged features. Specify one of 
-		                         | the following options for reporting scores:
-		                         | sum, min, max,
-		                         | mean, median, mode, antimode,
-		                         | collapse (i.e., print a semicolon-separated list)
+                                 | the following options for reporting scores:
+                                 | sum, min, max,
+                                 | mean, median, mode, antimode,
+                                 | collapse (i.e., print a semicolon-separated list)
+**-delim**                       | Specify a custom delimiter for the -nms and -scores concat options
+                                 | Example: ``-delim "|"``
+                                 | ``Default: ","``
 ===========================      ===============================================================================================================================================================================================================
 
 
@@ -156,7 +159,7 @@ merged features.
   chr1  250  500  A3
  
   $ bedtools merge -i A.bed -nms
-  chr1  100  500  A1;A2;A3
+  chr1  100  500  A1,A2,A3
   
 
 ==========================================================================
@@ -183,5 +186,29 @@ how the scores from each overlapping interval should be reported.
   chr1  100  500  1,2,3
   
   
-  
+==========================================================================
+``-delim`` Change the delimiter for ``-nms`` and ``-scores collapse``
+==========================================================================
+One can override the use of a comma as the delimiter for the ``-nms`` and
+``-scores collapse`` options via the use of the ``-delim`` option.
 
+.. code-block:: bash
+
+  $ cat A.bed
+  chr1  100  200  A1
+  chr1  150  300  A2
+  chr1  250  500  A3
+
+Compare:
+ 
+.. code-block:: bash
+
+  $ bedtools merge -i A.bed -nms
+  chr1  100  500  A1,A2,A3
+  
+to:
+
+.. code-block:: bash
+
+  $ bedtools merge -i A.bed -nms -delim "|"
+  chr1  100  500  A1|A2|A3

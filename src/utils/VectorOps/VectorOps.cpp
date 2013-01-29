@@ -208,12 +208,12 @@ uint32_t VectorOps::GetCountDistinct(void)
     return _vecs.size();
 }
 
-string VectorOps::GetCollapse(void)
+string VectorOps::GetCollapse(string delimiter)
 {
     ostringstream collapse;
     for( size_t i = 0; i < _vecs.size(); i++ ) {
         if (i>0)
-            collapse << ",";
+            collapse << delimiter;
         collapse << _vecs[i];
     }
     return collapse.str();

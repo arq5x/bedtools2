@@ -34,7 +34,8 @@ public:
   // constructor
   BedMerge(string &bedFile, bool numEntries, 
            int maxDistance, bool forceStrand, 
-           bool reportNames, bool reportScores, const string &scoreOp);
+           bool reportNames, bool reportScores, 
+           const string &scoreOp, const string &delimiter);
 
   // destructor
   ~BedMerge(void);
@@ -51,11 +52,20 @@ private:
     bool   _reportScores;
     string _scoreOp;
     int    _maxDistance;
+    string _delimiter;
     // instance of a bed file class.
     BedFile *_bed;
 
-    void Report(string chrom, int start, int end, const vector<string> &names, const vector<string> &scores, int mergeCount);
-    void ReportStranded(string chrom, int start, int end, const vector<string> &names, const vector<string> &scores, int mergeCount, string strand);
+    void Report(string chrom, int start, int end, 
+                const vector<string> &names, 
+                const vector<string> &scores, 
+                int mergeCount);
+
+    void ReportStranded(string chrom, int start, int end, 
+                        const vector<string> &names, 
+                        const vector<string> &scores, 
+                        int mergeCount, 
+                        string strand);
     void ReportMergedNames(const vector<string> &names);
     void ReportMergedScores(const vector<string> &scores);
     
