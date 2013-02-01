@@ -12,7 +12,7 @@ INCLUDES = -I$(UTILITIES_DIR)/BamTools/include \
 # define our source and object files
 # ----------------------------------
 SOURCES= BlockedIntervals.cpp BlockedIntervals.h
-OBJECTS= $(SOURCES:.cpp=.o)
+OBJECTS= BlockedIntervals.o
 _EXT_OBJECTS=bedFile.o fileType.o gzstream.o
 EXT_OBJECTS=$(patsubst %,$(OBJ_DIR)/%,$(_EXT_OBJECTS))
 BUILT_OBJECTS= $(patsubst %,$(OBJ_DIR)/%,$(OBJECTS))
