@@ -37,7 +37,7 @@ Option                           Description
 ===========================      ===============================================================================================================================================================================================================
 **-i**                           The input file that should be grouped and summarized. *Use "stdin" when using piped input*. 
                                  **Note: if -i is omitted, input is assumed to come from standard input (stdin)**
-**-g (-grp)**					 Specifies which column(s) (1-based) should be used to group the input. The columns must be comma-separated and each column must be explicitly listed. No ranges (e.g. 1-4) yet allowed. *Default: 1,2,3*
+**-g (-grp)**					 Specifies which column(s) (1-based) should be used to group the input. Columns may be comma-separated with each column must be explicitly listed. Or, ranges (e.g. 1-4) are also allowed. *Default: 1,2,3*
 **-c (-opCol)**                  Specify the column (1-based) that should be summarized. *Required*.
 **-o (-op)**                     Specify the operation that should be applied to **opCol**.
 
@@ -75,15 +75,16 @@ Default behavior.
 ==========================================================================
 Let's imagine we have three incredibly interesting genetic variants that we are 
 studying and we are interested in what annotated repeats these variants overlap.
-::
 
-  cat variants.bed
+.. code-block:: bash
+
+  $ cat variants.bed
   chr21  9719758 9729320 variant1
   chr21  9729310 9757478 variant2
   chr21  9795588 9796685 variant3
 
-  bedtools intersect -a variants.bed -b repeats.bed -wa -wb > variantsToRepeats.bed
-  cat variantsToRepeats.bed
+  $ bedtools intersect -a variants.bed -b repeats.bed -wa -wb > variantsToRepeats.bed
+  $ cat variantsToRepeats.bed
   chr21  9719758 9729320 variant1   chr21  9719768 9721892 ALR/Alpha   1004  +
   chr21  9719758 9729320 variant1   chr21  9721905 9725582 ALR/Alpha   1010  +
   chr21  9719758 9729320 variant1   chr21  9725582 9725977 L1PA3       3288  +
@@ -103,9 +104,10 @@ studying and we are interested in what annotated repeats these variants overlap.
 We can see that variant1 overlaps with 3 repeats, variant2 with 4 and variant3 
 with 6. We can use bedtools groupby to summarize the hits for each variant in 
 several useful ways. The default behavior is to compute the *sum* of the opCol.
-::
 
-  bedtools groupby -i variantsToRepeats.bed -g 1,2,3 -c 9
+.. code-block:: bash
+
+  $ bedtools groupby -i variantsToRepeats.bed -g 1,2,3 -c 9
   chr21 9719758 9729320 6353
   chr21 9729310 9757478 14482
   chr21 9795588 9796685 3604
@@ -118,26 +120,29 @@ Computing the min and max.
 Now let's find the *min* and *max* repeat score for each variant. We do this 
 by "grouping" on the variant coordinate columns (i.e. cols. 1,2 and 3) and 
 ask for the min and max of the repeat score column (i.e. col. 9).
-::
 
-  bedtools groupby -i variantsToRepeats.bed -g 1,2,3 -c 9 -o min
+.. code-block:: bash
+
+  $ bedtools groupby -i variantsToRepeats.bed -g 1,2,3 -c 9 -o min
   chr21 9719758 9729320 1004
   chr21 9729310 9757478 1036
   chr21 9795588 9796685 308
   
 We can also group on just the *name* column with similar effect.
-::
 
-  bedtools groupby -i variantsToRepeats.bed -g 4 -c 9 -o min
+.. code-block:: bash
+
+  $ bedtools groupby -i variantsToRepeats.bed -g 4 -c 9 -o min
   variant1 1004
   variant2 1036
   variant3 308
   
 What about the *max* score? Let's keep the coordinates and the name of the 
 variants so that we stay in BED format.
-::
 
-  bedtools groupby -i variantsToRepeats.bed -grp 1-4 -c 9 -o max
+.. code-block:: bash
+
+  $ bedtools groupby -i variantsToRepeats.bed -grp 1-4 -c 9 -o max
   chr21 9719758 9729320 variant1 3288
   chr21 9729310 9757478 variant2 8367
   chr21 9795588 9796685 variant3 891
@@ -148,14 +153,15 @@ variants so that we stay in BED format.
 Computing the mean and median.
 ==========================================================================
 Now let's find the *mean* and *median* repeat score for each variant.
-::
 
-  cat variantsToRepeats.bed | bedtools groupby -g 1-4 -c 9 -o mean
+.. code-block:: bash
+
+  $ cat variantsToRepeats.bed | bedtools groupby -g 1-4 -c 9 -o mean
   chr21 9719758 9729320 variant1 1588.25
   chr21 9729310 9757478 variant2 3620.5
   chr21 9795588 9796685 variant3 600.6667
 
-  bedtools groupby -i variantsToRepeats.bed -g 1-4 -c 9 -op median
+  $ bedtools groupby -i variantsToRepeats.bed -g 1-4 -c 9 -op median
   chr21 9719758 9729320 variant1 1030.5
   chr21 9729310 9757478 variant2 2539.5
   chr21 9795588 9796685 variant3 652
@@ -166,14 +172,15 @@ Computing the mode and "antimode".
 ==========================================================================
 Now let's find the *mode* and *antimode* (i.e., the least frequent) repeat 
 score for each variant (in this case they are identical).
-::
 
-  bedtools groupby -i variantsToRepeats.bed -g 1-4 -c 9 -o mode
+.. code-block:: bash
+
+  $ bedtools groupby -i variantsToRepeats.bed -g 1-4 -c 9 -o mode
   chr21 9719758 9729320 variant1 1004
   chr21 9729310 9757478 variant2 1036
   chr21 9795588 9796685 variant3 308
 
-  bedtools groupby -i variantsToRepeats.bed -g 1-4 -c 9 -o antimode
+  $ bedtools groupby -i variantsToRepeats.bed -g 1-4 -c 9 -o antimode
   chr21 9719758 9729320 variant1 1004
   chr21 9729310 9757478 variant2 1036
   chr21 9795588 9796685 variant3 308
@@ -184,9 +191,10 @@ score for each variant (in this case they are identical).
 Computing the count of lines for a given group.
 ==========================================================================
 Figure:
-::
 
-  bedtools groupby -i variantsToRepeats.bed -g 1-4 -c 9 -c count
+.. code-block:: bash
+
+  $ bedtools groupby -i variantsToRepeats.bed -g 1-4 -c 9 -c count
   chr21 9719758 9729320 variant1 4
   chr21 9729310 9757478 variant2 4
   chr21 9795588 9796685 variant3 6
@@ -200,9 +208,10 @@ Collapsing: listing all of the values in the opCol for a given group.
 Now for something different. What if we wanted all of the names of the repeats 
 listed on the same line as the variants? Use the collapse option. This 
 "denormalizes" things. Now you have a list of all the repeats on a single line.
-::
 
-  bedtools groupby -i variantsToRepeats.bed -grp 1-4 -c 9 -o collapse
+.. code-block:: bash
+
+  $ bedtools groupby -i variantsToRepeats.bed -grp 1-4 -c 9 -o collapse
   chr21 9719758 9729320 variant1 ALR/Alpha,ALR/Alpha,L1PA3,ALR/Alpha,
   chr21 9729310 9757478 variant2 L1PA3,L1P1,ALR/Alpha,ALR/Alpha,
   chr21 9795588 9796685 variant3 (GAATG)n,(GAATG)n,(GAATG)n,(GAATG)n,(GAATG)n,(GAATG)n,
@@ -215,11 +224,12 @@ Computing frequencies: freqasc and freqdesc.
 What if we want to report each distinct value along with its number of 
 occurrence (much like uniq -c)?  The ``freqasc`` and freqdesc`` operations
 handle this.
-::
 
-  cat variantsToRepeats.bed | bedtools groupby -g 1 -c 8 -o freqdesc
+.. code-block:: bash
+
+  $ cat variantsToRepeats.bed | bedtools groupby -g 1 -c 8 -o freqdesc
   chr21 (GAATG)n:6,ALR/Alpha:5,L1PA3:2,L1P1:1,
   
-  cat variantsToRepeats.bed | bedtools groupby -g 1 -c 8 -o freqasc
+  $ cat variantsToRepeats.bed | bedtools groupby -g 1 -c 8 -o freqasc
   chr21 L1P1:1,L1PA3:2,ALR/Alpha:5,(GAATG)n:6,
   
