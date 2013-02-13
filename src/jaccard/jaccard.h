@@ -57,7 +57,7 @@ private:
     //------------------------------------------------
     // private methods
     //------------------------------------------------
-    unsigned long GetIntersection();
+    unsigned long GetIntersection(size_t &n_intersections);
     unsigned long GetUnion();
     void CalculateJaccard();
 
