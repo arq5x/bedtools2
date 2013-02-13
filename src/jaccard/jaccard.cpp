@@ -53,7 +53,7 @@ Jaccard::~Jaccard(void) {
 }
 
 
-unsigned long Jaccard::GetIntersection() {
+unsigned long Jaccard::GetIntersection(size_t &n_intersections) {
     
     _bedA = new BedFile(_bedAFile);
     _bedB = new BedFile(_bedBFile);
@@ -70,13 +70,15 @@ unsigned long Jaccard::GetIntersection() {
     hit_set.second.reserve(10000);
     while (sweep.Next(hit_set)) {
         I += GetTotalIntersection(hit_set.first, hit_set.second);
+        n_intersections += hit_set.second.size();
     }
     return I;
 }
 
 void Jaccard::CalculateJaccard() {
 
-    unsigned long I = GetIntersection();
+    size_t n_intersections = 0;
+    unsigned long I = GetIntersection(n_intersections);
     
     unsigned long U = _bedA->getTotalFlattenedLength() + \
                       _bedB->getTotalFlattenedLength();
@@ -84,13 +86,15 @@ void Jaccard::CalculateJaccard() {
     // header
     cout << "intersection\t"
          << "union\t"
-         << "jaccard"
+         << "jaccard\t"
+         << "n_intersections"
          << endl;
     
     // result
     cout << I << "\t" 
          << U - I << "\t"
-         << (float) I / ((float) U - (float) I)
+         << (float) I / ((float) U - (float) I) << "\t"
+         << n_intersections
          << endl;
 }
 
