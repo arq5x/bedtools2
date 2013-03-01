@@ -49,8 +49,6 @@ Usage and option summary
 **-tab**					     Report extract sequences in a tab-delimited format instead of in FASTA format.
 **-s**                           Force strandedness. If the feature occupies the antisense strand, the sequence will be reverse complemented. *Default: strand information is ignored*.
 **-split**	                     Given BED12 input, extract and concatenate the sequences from the BED "blocks" (e.g., exons)
-**-s**	                         | Force strandedness. If the feature occupies the antisense strand, the sequence will be reverse complemented.
-		                         | By default, strand information is ignored.
 ===========================      ===============================================================================================================================================================================================================
 
 
