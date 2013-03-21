@@ -59,7 +59,7 @@ Below are the number of features in A (N=...) overlapping B and fraction of base
   BED File A  ^^^^ ^^^^              ^^             ^^^^^^^^^    ^^^ ^^ ^^^^
                 ^^^^^^^^                                      ^^^^^ ^^^^^ ^^
   
-  Result      [  N=3, 10/15 ]     [  N=1, 2/16 ]     [N=1,6/6]   [N=5, 11/12 ]
+  Result      [  N=3, 10/15 ]     [  N=1, 2/15 ]     [N=1,6/6]   [N=6, 12/14 ]
 
 
 For example:
