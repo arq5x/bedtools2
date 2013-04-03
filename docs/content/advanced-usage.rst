@@ -51,7 +51,7 @@ it to be counted, you can first use intersectBed with the "-f 1.0" option.
 .. code-block:: bash
 
   bedtools intersect -a features.bed -b windows.bed -f 1.0 | \
-  bedtools coverage -a - -b \
+  bedtools coverage -a - -b windows.bed \
   > windows.bed.coverage
 
 
