@@ -69,7 +69,7 @@ For example, to sort by chromosome and then by feature size (in descending order
 will sort BED files more quickly while using less memory. For example, UNIX sort will sort a BED file
 by chromosome then by start position in the following manner:
 ::
-  sort -k 1,1 -k2,2 -n a.bed
+  sort -k 1,1 -k2,2n a.bed
   chr1 1   10
   chr1 80  180
   chr1 750 10000
