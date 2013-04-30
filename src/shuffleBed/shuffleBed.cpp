@@ -429,7 +429,9 @@ void BedShuffle::ChooseLocusFromInclusionFile(BED &bedEntry) {
         }
         else {
             cerr << "Error, line " << _bed->_lineNum 
-                 << ": the requested chromosome cannot "
+                 << ": the requested chromosome ("
+                 << chrom
+                 << ") cannot "
                  << "be found in the -incl file " << endl;
         }
     }
