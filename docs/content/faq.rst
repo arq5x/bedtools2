@@ -132,4 +132,38 @@ the following command:
 
 
 
+====================
+Installation issues
+====================
+
+
+---------------------------------------------------------------------------
+Bedtools compilation fails with errors related to zlib.  How do I fix this?
+---------------------------------------------------------------------------
+
+Some systems, especially Ubuntu, do not come pre-installed with up to date
+versions of the zlib compression utilities that tools such as `bedtools` and
+`samtools` depend upon. This can cause compilation errors when you try to 
+compile `bedtools`.  Errors include:
+
+.. code-block:: bash
+
+    ../utils//gzstream/gzstream.h:50: error: ‘gzFile’ does not name a type 
+    
+
+or
+
+.. code-block:: bash
+
+    fatal error: zlib.h: No such file or directory  
+
+This indicates that you need to install the zlib libraries on your system, which
+turns out to not be too difficult through the use of package installers.  For
+example, on Ubuntu, you'd want to run:
+
+.. code-block:: bash
+
+    sudo apt-get install zlib1g-dev
+    sudo apt-get install zlib
+
 
