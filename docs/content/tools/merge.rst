@@ -15,7 +15,7 @@ file into a single feature which spans all of the combined features.
 .. note::
 
     ``bedtools merge`` requires that you presort your data by chromosome and
-    then by start position (e.g., ``sort k1,1 -k2,2n in.bed > in.sorted.bed``
+    then by start position (e.g., ``sort -k1,1 -k2,2n in.bed > in.sorted.bed``
     for BED files).
     
 .. seealso::
