@@ -83,6 +83,18 @@ BedFile::BedFile(string &bedFile)
   _total_length(0)
 {}
 
+BedFile::BedFile(void)
+: _isGff(false),
+  _isVcf(false),
+  _typeIsKnown(false),
+  _merged_start(-1),
+  _merged_end(-1),
+  _merged_chrom(""),
+  _prev_start(-1),
+  _prev_chrom(""),
+  _total_length(0)
+{}
+
 // Destructor
 BedFile::~BedFile(void) {
 }
@@ -654,6 +666,11 @@ void BedFile::loadBedFileIntoMap() {
         }
     }
     Close();
+}
+
+void BedFile::addBEDIntoMap(BED bedEntry) {
+    BIN bin = getBin(bedEntry.start, bedEntry.end);
+    bedMap[bedEntry.chrom][bin].push_back(bedEntry);
 }
 
 

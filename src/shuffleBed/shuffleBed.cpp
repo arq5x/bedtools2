@@ -18,7 +18,8 @@ BedShuffle::BedShuffle(string &bedFile, string &genomeFile,
                        bool haveSeed, bool haveExclude,
                        bool haveInclude, bool sameChrom, 
                        float overlapFraction, int seed,
-                       bool chooseChrom, bool isBedpe, size_t maxTries) {
+                       bool chooseChrom, bool isBedpe, size_t maxTries,
+                       bool noOverlapping) {
 
     _bedFile         = bedFile;
     _genomeFile      = genomeFile;
@@ -32,7 +33,7 @@ BedShuffle::BedShuffle(string &bedFile, string &genomeFile,
     _chooseChrom     = chooseChrom;
     _isBedpe         = isBedpe;
     _maxTries        = maxTries;
-
+    _noOverlapping   = noOverlapping;
 
     // use the supplied seed for the random
     // number generation if given.  else,
@@ -60,6 +61,12 @@ BedShuffle::BedShuffle(string &bedFile, string &genomeFile,
     if (_haveExclude) {
         _exclude = new BedFile(excludeFile);
         _exclude->loadBedFileIntoMap();
+    }
+    else if (_noOverlapping) {
+        // create an empty map that we add to as we iterate.
+        _exclude = new BedFile();
+        // force down correct code-path.
+        _haveExclude = true;
     }
     
     if (_haveInclude) {
@@ -99,6 +106,9 @@ void BedShuffle::Shuffle() {
         while (_bed->GetNextBed(bedEntry)) {
             if (_bed->_status == BED_VALID) {
                 ChooseLocus(bedEntry);
+                if(_noOverlapping){
+                    _exclude->addBEDIntoMap(bedEntry);
+                }
                 _bed->reportBedNewLine(bedEntry);
             }
         }
@@ -150,7 +160,7 @@ void BedShuffle::ShuffleWithExclusions() {
                                                     _overlapFraction, false);
                     tries++;
                 } while ((haveOverlap == true) && (tries <= _maxTries));
-            
+
 
                 if (tries > _maxTries) {
                     cerr << "Error, line " << _bed->_lineNum 
@@ -159,6 +169,10 @@ void BedShuffle::ShuffleWithExclusions() {
                          << "excluded regions.  Ignoring entry and moving on." 
                          << endl;                }
                 else {
+                    if(_noOverlapping){
+                        // future entries cannot overlap this one
+                        _exclude->addBEDIntoMap(bedEntry);
+                    }
                     _bed->reportBedNewLine(bedEntry);
                 }
             }
@@ -237,8 +251,15 @@ void BedShuffle::ShuffleWithInclusions() {
                 tries++;
             } while ((bedEntry.end > chromSize)
                     && (tries <= _maxTries));
-             
-            _bed->reportBedNewLine(bedEntry);
+            if (tries > _maxTries) {
+                cerr << "Error, line " << _bed->_lineNum 
+                     << ": tried " << _maxTries 
+                     << " potential loci for entry, but could not avoid "
+                     << "excluded regions.  Ignoring entry and moving on." 
+                     << endl;                }
+            else {
+                _bed->reportBedNewLine(bedEntry);
+           }
         }
     }
     _bed->Close();
@@ -280,6 +301,9 @@ void BedShuffle::ShuffleWithInclusionsAndExclusions() {
                      << endl;                }
             else {
                 _bed->reportBedNewLine(bedEntry);
+                if (_noOverlapping){
+                    _exclude->addBEDIntoMap(bedEntry);
+                }
             }
         }
     }
