@@ -46,6 +46,7 @@ int shuffle_main(int argc, char* argv[]) {
     bool chooseChrom      = false;
     bool isBedpe          = false;
     size_t maxTries       = 1000;
+    bool noOverlapping    = false;
 
 
     for(int i = 1; i < argc; i++) {
@@ -121,6 +122,9 @@ int shuffle_main(int argc, char* argv[]) {
         else if(PARAMETER_CHECK("-bedpe", 6, parameterLength)) {
             isBedpe = true;
         }
+        else if(PARAMETER_CHECK("-noOverlapping", 14, parameterLength)) {
+            noOverlapping = true;
+        }
         else {
           cerr << endl << "*****ERROR: Unrecognized parameter: " << argv[i] << " *****" << endl << endl;
             showHelp = true;
@@ -139,7 +143,7 @@ int shuffle_main(int argc, char* argv[]) {
                                         haveInclude, sameChrom, 
                                         overlapFraction, seed, 
                                         chooseChrom, isBedpe,
-                                        maxTries);
+                                        maxTries, noOverlapping);
         delete bc;
         return 0;
     }
@@ -194,6 +198,7 @@ void shuffle_help(void) {
     cerr << "\t-maxTries\t"         << "\n\t\tMax. number of attempts to find a home for a shuffled interval" << endl;
     cerr                            << "\t\tin the presence of -incl or -excl." << endl;
     cerr                            << "\t\tDefault = 1000." << endl;
+    cerr << "\t-noOverlapping\t"         << "\n\t\tdont allow shuffled intervals to overlap." << endl;
 
     cerr << "Notes: " << endl;
     cerr << "\t(1)  The genome file should tab delimited and structured as follows:" << endl;
