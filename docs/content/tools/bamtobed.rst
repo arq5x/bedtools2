@@ -33,7 +33,9 @@ Option          Description
                 Lastly, when an end is unmapped, the chromosome and strand will 
                 be set to "." and the start and end coordinates will be set 
                 to -1. *By default, this is disabled and the output will be 
-                reported in BED format*.				 
+                reported in BED format*.
+**-mate1**      When writing BEDPE (-bedpe) format,
+                always report mate one as the first BEDPE "block".		 
 **-bed12**      Write "blocked" BED (a.k.a. BED12) format. This will convert 
                 "spliced" BAM alignments (denoted by the "N" CIGAR operation) 
                 to BED12.
