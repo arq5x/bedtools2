@@ -39,7 +39,7 @@ public:
                bool haveInclude, bool sameChrom, 
                float overlapFraction, int seed, 
                bool chooseChrom, bool isBedpe,
-               size_t _maxTries);
+               size_t _maxTries, bool noOverlapping);
 
     // destructor
     ~BedShuffle(void);
@@ -59,6 +59,7 @@ private:
     bool _chooseChrom;
     bool _isBedpe;
     size_t _maxTries;
+    bool _noOverlapping;
 
 
     // The BED file from which to compute coverage.
