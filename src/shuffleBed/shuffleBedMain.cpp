@@ -198,7 +198,7 @@ void shuffle_help(void) {
     cerr << "\t-maxTries\t"         << "\n\t\tMax. number of attempts to find a home for a shuffled interval" << endl;
     cerr                            << "\t\tin the presence of -incl or -excl." << endl;
     cerr                            << "\t\tDefault = 1000." << endl;
-    cerr << "\t-noOverlapping\t"         << "\n\t\tdont allow shuffled intervals to overlap." << endl;
+    cerr << "\t-noOverlapping\t"         << "\n\t\tDon't allow shuffled intervals to overlap." << endl;
 
     cerr << "Notes: " << endl;
     cerr << "\t(1)  The genome file should tab delimited and structured as follows:" << endl;

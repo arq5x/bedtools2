@@ -47,6 +47,7 @@ Usage and option summary
 **-chromFirst**                  Instead of choosing a position randomly among the entire genome (the default), first choose a chrom randomly, and then choose a random start coordinate on that chrom.  This leads to features being ~uniformly distributed among the chroms, as opposed to features being distribute as a function of chrom size.
 **-bedpe**	                     Indicate that the A file is in BEDPE format.
 **-maxTries**                    Max. number of attempts to find a home for a shuffled interval in the presence of -incl or -excl. *Default = 1000.*
+**-noOverlapping**               Don't allow shuffled intervals to overlap.
 ===========================      ===============================================================================================================================================================================================================
 
 
@@ -192,3 +193,18 @@ of the chromosome*):
   $ bedtools shuffle -i A.bed -g my.genome -seed 927442958
   chr1 6177 6277 a1 1 +
   chr1 8119 9119 a2 2 -
+
+==========================================================================
+``-noOverlapping`` Prevent shuffled intervals from overlapping.
+==========================================================================
+There often arise cases where one wants to shuffle intervals throughout 
+the genome, yet one wants to prevent the intervals from occupying a single
+common base pair.  The ``-noOverlapping`` option allows one to enforce
+no such overlaps.
+
+.. code-block:: bash
+
+  $ bedtools shuffle -i A.bed -g my.genome -noOverlapping
+
+
+
