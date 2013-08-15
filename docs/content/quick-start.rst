@@ -33,7 +33,7 @@ Report those entries in A that overlap NO entries in B. Like "grep -v"
 
 .. code-block:: bash
 
-  bedtools intersect  -a reads.bed -b genes.bed
+  bedtools intersect  -a reads.bed -b genes.bed -v
 
 
 Read BED A from STDIN. Useful for stringing together commands. For example, 
