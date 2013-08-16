@@ -42,7 +42,7 @@ find genes that overlap LINEs but not SINEs.
 .. code-block:: bash
 
   bedtools intersect -a genes.bed -b LINES.bed | \
-    bedtools intersect -a stdin -b SINEs.bed
+    bedtools intersect -a stdin -b SINEs.bed -v
 
 
 Find the closest ALU to each gene.
