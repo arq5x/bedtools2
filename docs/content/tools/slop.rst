@@ -9,7 +9,7 @@
 
 |
 
-``bedtools slop`` will increase the size of each feature in a feature file be a 
+``bedtools slop`` will increase the size of each feature in a feature file by a 
 user-defined number of bases. While something like this could be done with an 
 ``awk '{OFS="\t" print $1,$2-<slop>,$3+<slop>}'``,
 ``bedtools slop`` will restrict the resizing to the size of the chromosome 
