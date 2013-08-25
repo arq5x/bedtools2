@@ -479,13 +479,26 @@ void PrintBed(const BamAlignment &bam,  const RefVector &refs,
         unsigned int i;
         for (i = 0; i < bedBlocks.size(); ++i) {
             BED curr = bedBlocks[i];
-            printf("%s\t%d\t%d\t\%s\t%d\t%s\n", 
-                   chrom.c_str(), 
-                   curr.start,
-                   curr.end,
-                   name.c_str(),
-                   bam.MapQuality,
-                   strand.c_str());
+
+            if (bamTag == "") {
+                printf("%s\t%d\t%d\t\%s\t%d\t%s\n", 
+                       chrom.c_str(), 
+                       curr.start,
+                       curr.end,
+                       name.c_str(),
+                       bam.MapQuality,
+                       strand.c_str());
+            }
+            else {
+                cout << chrom << "\t"
+                     << bam.Position << "\t"
+                     << curr.start << "\t"
+                     << curr.end << "\t"
+                     << name << "\t"
+                     << PrintTag(bam, bamTag) << "\t"
+                     << strand
+                     << endl;            
+            }
         }
     }
 }
