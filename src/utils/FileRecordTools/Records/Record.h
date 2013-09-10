@@ -1,0 +1,117 @@
+/*
+ * Record.h
+ *
+ *  Created on: Nov 8, 2012
+ *      Author: nek3d
+ */
+
+using namespace std;
+
+#ifndef RECORD_H_
+#define RECORD_H_
+
+#include "FreeList.h"
+#include "QuickString.h"
+#include "FileRecordTypeChecker.h"
+
+class FileRecordMgr;
+class FileReader;
+class ChromIdLookup;
+
+class Record {
+public:
+	friend class RecordMgr;
+	friend class RecordOutputMgr;
+
+	friend class FreeList<Record>;
+
+	typedef enum { FORWARD, REVERSE, UNKNOWN } strandType;
+	Record();
+	virtual bool initFromFile(FileReader *) =0;
+	virtual void clear();
+	virtual void print(QuickString &outBuf) const {}
+	virtual void print(QuickString &outBuf, int start, int end) const {}
+	virtual void print(QuickString &outBuf, const QuickString & start, const QuickString & end) const {}
+	virtual void printNull(QuickString &outBuf) const {}
+	virtual const Record & operator=(const Record &);
+
+	virtual const QuickString &getChrName() const { return _chrName; }
+	virtual void setChrName(const QuickString &chr) { _chrName = chr; }
+	virtual void setChrName(const string &chr) { _chrName = chr; }
+	virtual void setChrName(const char *chr) { _chrName = chr; }
+
+
+	virtual int getChromId() const { return _chrId; }
+	virtual void setChromId(int id) { _chrId = id; }
+
+	virtual int getStartPos() const { return _startPos; }
+	virtual void setStartPos(int startPos) { _startPos = startPos; }
+	virtual const QuickString &getStartPosStr() const { return _startPosStr; }
+	virtual void setStartPosStr(const QuickString &str) { _startPosStr = str; }
+
+	virtual int getEndPos() const { return _endPos; }
+	virtual void setEndPos(int endPos) { _endPos = endPos; }
+	virtual const QuickString &getEndPosStr() const { return _endPosStr; }
+	virtual void setEndPosStr(const QuickString &str) { _endPosStr = str; }
+
+
+	virtual strandType getStrand() const { return _strand; }
+	virtual void setStrand(strandType val) { _strand = val; }
+	virtual void setStrand(char val);
+	virtual char getStrandChar() const;
+
+	//And we have a similar problem with name and score
+	virtual const QuickString &getName() const { return _name; }
+	virtual void setName(const QuickString &chr) { _name = chr; }
+	virtual void setName(const string &chr) { _name = chr; }
+	virtual void setName(const char *chr) { _name = chr; }
+
+	virtual const QuickString &getScore() const { return _score; }
+	virtual void setScore(const QuickString &chr) { _score = chr; }
+	virtual void setScore(const string &chr) { _score = chr; }
+	virtual void setScore(const char *chr) { _score = chr; }
+
+	virtual FileRecordTypeChecker::RECORD_TYPE getType() const { return FileRecordTypeChecker::UNKNOWN_RECORD_TYPE; }
+
+	virtual bool operator < (const Record &other) const;
+	virtual bool operator > (const Record &other) const;
+
+
+	//is this on the same chromosome as another record?
+	bool sameChrom(const Record *other) const;
+	bool chromBefore(const Record *other) const;
+	bool chromAfter(const Record *other) const;
+
+	//is this record after the other one?
+	virtual bool after(const Record *other) const;
+
+	//does this record intersect with another record?
+	virtual bool intersects(const Record *otherRecord,
+			bool sameStrand, bool diffStrand, float overlapFraction, bool reciprocal) const;
+
+	// *** WARNING !!! ** sameChromIntersects is a faster version of the intersects method,
+	// BUT the caller MUST ensure that the records are on the same
+	//chromosome. If you're not absolutely sure, use the regular intersects method.
+	virtual bool sameChromIntersects(const Record *otherRecord,
+			bool sameStrand, bool diffStrand, float overlapFraction, bool reciprocal) const;
+
+
+protected:
+	virtual ~Record(); //by making the destructor protected, only the friend class(es) can actually delete Record objects, or objects derived from Record.
+
+	QuickString _chrName;
+	int _chrId;
+	int _startPos;
+	int _endPos;
+	//It is actually faster to also store the start and end positions as their original strings than to
+	//have to convert their integer representations back to strings when printing them.
+	QuickString _startPosStr;
+	QuickString _endPosStr;
+	QuickString _name;
+	QuickString _score;
+	strandType _strand;
+};
+
+
+
+#endif /* RECORD_H_ */

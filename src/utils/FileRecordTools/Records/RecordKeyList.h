@@ -1,0 +1,60 @@
+/*
+ * RecordKeyList.h
+ *
+ *  Created on: Dec 14, 2012
+ *      Author: nek3d
+ */
+
+#ifndef KEYLIST_H_
+#define KEYLIST_H_
+
+
+
+
+using namespace std;
+
+#include "Record.h"
+#include "BTlist.h"
+
+class RecordKeyList {
+public:
+	typedef const Record * elemType;
+	typedef BTlist<elemType> listType;
+	typedef const BTlistNode<elemType> *const_iterator_type;
+	RecordKeyList();
+    RecordKeyList(elemType item);
+    RecordKeyList(elemType item, const listType &list);
+    ~RecordKeyList();
+
+    const RecordKeyList &operator=(const RecordKeyList &other);
+    const const_iterator_type begin();
+    const const_iterator_type next();
+    const const_iterator_type end();
+    size_t size() const ;
+    bool empty() const ; //only checks whether list is empty. Doesn't check key.
+    void push_back(elemType item);
+    elemType getKey() const ;
+    void setKey(elemType key);
+
+    //setListNoCopy will make our list share the nodes of another
+    //list, not copy them.
+    void setListNoCopy(listType &list);
+
+    // WARNING! clearList will NOT delete records pointed to by list nodes. Caller must do that separately, since the RecordKeyList
+    // does not have it's own RecordMgr member.
+    void clearList();
+
+    void clearAll() {
+    	setKey(NULL);
+    	clearList();
+    }
+    bool allClear() { return (_key == NULL && empty()); }
+
+
+private:
+    elemType _key;
+    listType _list;
+};
+
+
+#endif /* RECORDKEYLIST_H_ */
