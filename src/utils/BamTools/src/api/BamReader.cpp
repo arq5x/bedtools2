@@ -259,6 +259,11 @@ bool BamReader::Open(const std::string& filename) {
     return d->Open(filename);
 }
 
+bool BamReader::OpenStream(std::istream* stream) {
+    return d->OpenStream(stream);
+}
+
+
 /*! \fn bool BamReader::OpenIndex(const std::string& indexFilename)
     \brief Opens a BAM index file.
 

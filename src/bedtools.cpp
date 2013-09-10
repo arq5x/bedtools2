@@ -45,6 +45,7 @@ int closest_main(int argc, char* argv[]); //
 int cluster_main(int argc, char* argv[]); //
 int complement_main(int argc, char* argv[]);//
 int coverage_main(int argc, char* argv[]); //
+int regress_test_main(int argc, char **argv); //
 int expand_main(int argc, char* argv[]);//
 int fastafrombed_main(int argc, char* argv[]);//
 int flank_main(int argc, char* argv[]); //
@@ -59,6 +60,7 @@ int map_main(int argc, char* argv[]); //
 int merge_main(int argc, char* argv[]); //
 int multibamcov_main(int argc, char* argv[]);//
 int multiintersect_main(int argc, char* argv[]);//
+int nek_sandbox1_main(int argc, char* argv[]);//
 int nuc_main(int argc, char* argv[]);//
 int pairtobed_main(int argc, char* argv[]);//
 int pairtopair_main(int argc, char* argv[]);//
@@ -136,9 +138,8 @@ int main(int argc, char *argv[])
     else if (sub_cmd == "makewindows") return windowmaker_main(argc-1, argv+1);
     else if (sub_cmd == "groupby")     return groupby_main(argc-1, argv+1);
     else if (sub_cmd == "expand")      return expand_main(argc-1, argv+1);
-
-    
-
+    else if (sub_cmd == "neksb1")	   	return nek_sandbox1_main(argc-1, argv+1);
+    else if (sub_cmd == "regresstest")	return regress_test_main(argc, argv); //this command does need all the orig args.
     // help
     else if (sub_cmd == "-h" || sub_cmd == "--help" ||
              sub_cmd == "-help")
@@ -230,7 +231,7 @@ int bedtools_help(void)
     cout  << "[ BAM focused tools ]" << endl;
     cout  << "    multicov      "  << "Counts coverage from multiple BAMs at specific intervals.\n";
     cout  << "    tag           "  << "Tag BAM alignments based on overlaps with interval files.\n";
-    
+
     cout  << endl;
     cout  << "[ Statistical relationships ]" << endl;
     cout  << "    jaccard       "  << "Calculate the Jaccard statistic b/w two sets of intervals.\n";

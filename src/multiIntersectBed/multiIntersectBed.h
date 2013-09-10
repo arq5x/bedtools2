@@ -17,7 +17,7 @@
 #include <vector>
 #include <string>
 #include "bedFile.h"
-#include "genomeFile.h"
+#include "GenomeFile.h"
 #include "Point.h"
 
 class MultiIntersectBed

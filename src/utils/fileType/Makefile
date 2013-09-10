@@ -4,26 +4,28 @@ UTILITIES_DIR = ../../utils/
 # -------------------
 # define our includes
 # -------------------
-INCLUDES = 
+INCLUDES = -I$(UTILITIES_DIR)/BamTools/include/ \
+			-I$(UTILITIES_DIR)/general
 
 # ----------------------------------
 # define our source and object files
 # ----------------------------------
-SOURCES= fileType.cpp fileType.h
-OBJECTS= $(SOURCES:.cpp=.o)
-_EXT_OBJECTS=	
-EXT_OBJECTS=$(patsubst %,$(OBJ_DIR)/%,$(_EXT_OBJECTS))
+SOURCES= fileType.cpp fileType.h FileRecordTypeChecker.cpp FileRecordTypeChecker.h
+OBJECTS= fileType.o FileRecordTypeChecker.o
+#_EXT_OBJECTS=ParseTools.o QuickString.o
+#EXT_OBJECTS=$(patsubst %,$(OBJ_DIR)/%,$(_EXT_OBJECTS))
 BUILT_OBJECTS= $(patsubst %,$(OBJ_DIR)/%,$(OBJECTS))
+
+all: $(BUILT_OBJECTS)
+
+.PHONY: all
 
 $(BUILT_OBJECTS): $(SOURCES)
 	@echo "  * compiling" $(*F).cpp
 	@$(CXX) -c -o $@ $(*F).cpp $(LDFLAGS) $(CXXFLAGS) $(INCLUDES)
 
-$(EXT_OBJECTS):
-	@$(MAKE) --no-print-directory -C $(INCLUDES)
-
 clean:
 	@echo "Cleaning up."
-	@rm -f $(OBJ_DIR)/* $(BIN_DIR)/*
+	@rm -f $(OBJ_DIR)/fileType.o $(OBJ_DIR)/FileRecordTypeChecker.o
 
 .PHONY: clean

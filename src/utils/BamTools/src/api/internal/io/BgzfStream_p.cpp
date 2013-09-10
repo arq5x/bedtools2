@@ -286,6 +286,28 @@ void BgzfStream::Open(const string& filename, const IBamIODevice::OpenMode mode)
     }
 }
 
+void BgzfStream::OpenStream(std::istream* stream, const IBamIODevice::OpenMode mode) {
+
+    // close current device if necessary
+    Close();
+    BT_ASSERT_X( (m_device == 0), "BgzfStream::Open() - unable to properly close previous IO device" );
+
+    // run-time sanity check
+    if ( stream == NULL )
+        throw BamException("BgzfStream::Open", "null input stream");
+
+    // retrieve new IO device for std::stream*
+    m_device = BamDeviceFactory::CreateDevice(stream);
+    BT_ASSERT_X( m_device, "BgzfStream::Open() - unable to create IO device from stream" );
+
+    // if device fails to open
+    if ( !m_device->Open(mode) ) {
+        const string deviceError = m_device->GetErrorString();
+        const string message = string("could not open BGZF stream: \n\t") + deviceError;
+        throw BamException("BgzfStream::Open", message);
+    }
+}
+
 // reads BGZF data into a byte buffer
 size_t BgzfStream::Read(char* data, const size_t dataLength) {
 
@@ -345,6 +367,8 @@ void BgzfStream::ReadBlock(void) {
 
     // read block header from file
     char header[Constants::BGZF_BLOCK_HEADER_LENGTH];
+    memset(header, 0, Constants::BGZF_BLOCK_HEADER_LENGTH);
+
     int64_t numBytesRead = m_device->Read(header, Constants::BGZF_BLOCK_HEADER_LENGTH);
 
     // check for device error

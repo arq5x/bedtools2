@@ -29,6 +29,7 @@ namespace Internal {
 class BamDeviceFactory {
     public:
         static IBamIODevice* CreateDevice(const std::string& source);
+        static IBamIODevice* CreateDevice(std::istream *stream);
 };
 
 } // namespace Internal

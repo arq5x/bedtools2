@@ -46,6 +46,8 @@ class API_EXPORT BamReader {
         bool Jump(int refID, int position = 0);
         // opens a BAM file
         bool Open(const std::string& filename);
+        bool OpenStream(std::istream* stream);
+
         // returns internal file pointer to beginning of alignment data
         bool Rewind(void);
         // sets the target region of interest

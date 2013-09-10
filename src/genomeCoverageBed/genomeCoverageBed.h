@@ -10,7 +10,7 @@ aaronquinlan@gmail.com
 Licenced under the GNU General Public License 2.0 license.
 ******************************************************************************/
 #include "bedFile.h"
-#include "genomeFile.h"
+#include "GenomeFile.h"
 
 #include "BlockedIntervals.h"
 #include "api/BamReader.h"

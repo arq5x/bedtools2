@@ -12,6 +12,8 @@
 #include "api/internal/io/BamFtp_p.h"
 #include "api/internal/io/BamHttp_p.h"
 #include "api/internal/io/BamPipe_p.h"
+#include "api/internal/io/StdStreamDevice_p.h"
+
 using namespace BamTools;
 using namespace BamTools::Internal;
 
@@ -34,4 +36,10 @@ IBamIODevice* BamDeviceFactory::CreateDevice(const string& source) {
 
     // otherwise assume a "normal" file
     return new BamFile(source);
+}
+
+IBamIODevice* BamDeviceFactory::CreateDevice(std::istream *stream) {
+    // compile-time sanity check
+    BT_ASSERT_X( stream, "BamDeviceFactory::CreateDevice - null input stream");
+    return new StdStreamDevice(stream);
 }

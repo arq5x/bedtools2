@@ -38,7 +38,9 @@ bool isRegularFile(const string& filename) {
 returns TRUE if the file has a GZIP header.
 Should only be run on regular files.
 */
-bool isGzipFile(istream *file) {    
+bool isGzipFile(istream *file) {
+    //see http://www.gzip.org/zlib/rfc-gzip.html#file-format
+    
     /*
        11-Sep-2011: 
        We now only peek at the first byte and test for GZIPiness.
@@ -52,19 +54,18 @@ bool isGzipFile(istream *file) {
 //      unsigned char cm;
     } gzip_header;
 
-    /*
-       26-Dec-2012:
-       Just peek at the first byte instead of reading it so that we don't
-       affect the istream's failbit.  This modification was wisely proposed
-       by John Marshall in response to Issue 30:
-       https://github.com/arq5x/bedtools/issues/30
-       */
-    
-    // Check to see if the first byte matches expectations for a
-    // GZIP header.
-    // Deatils: http://www.gzip.org/zlib/rfc-gzip.html#file-format
-    if (file->peek() != 0x1f)
+    if (!file->read((char*)&gzip_header, sizeof(gzip_header))) {
         return false;
-    else
+    }
+
+    if ( gzip_header.id1 == 0x1f )
+//       &&
+//       gzip_header.id2 == 0x8b
+//       &&
+//       gzip_header.cm == 8 )
+    {
         return true;
+    }
+    file->putback(gzip_header.id1);
+    return false;
 }

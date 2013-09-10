@@ -16,11 +16,11 @@ export BIN_DIR	= bin
 export SRC_DIR	= src
 export UTIL_DIR	= src/utils
 export CXX		= g++
-ifeq ($(DEBUG),1)
-export CXXFLAGS = -Wall -O0 -g -fno-inline -fkeep-inline-functions -D_FILE_OFFSET_BITS=64 -fPIC -DDEBUG -D_DEBUG
-else
+#ifeq ($(DEBUG),1)
+#export CXXFLAGS = -Wall -O0 -g -fno-inline -fkeep-inline-functions -D_FILE_OFFSET_BITS=64 -fPIC -DDEBUG -D_DEBUG
+#else
 export CXXFLAGS = -Wall -O2 -D_FILE_OFFSET_BITS=64 -fPIC
-endif
+#endif
 export LIBS		= -lz
 export BT_ROOT  = src/utils/BamTools/
 
@@ -42,7 +42,7 @@ SUBDIRS = $(SRC_DIR)/annotateBed \
 		  $(SRC_DIR)/genomeCoverageBed \
 		  $(SRC_DIR)/getOverlap \
 		  $(SRC_DIR)/groupBy \
-		  $(SRC_DIR)/intersectBed \
+		  $(SRC_DIR)/intersectFile \
 		  $(SRC_DIR)/jaccard \
 		  $(SRC_DIR)/linksBed \
 		  $(SRC_DIR)/maskFastaFromBed \
@@ -50,10 +50,12 @@ SUBDIRS = $(SRC_DIR)/annotateBed \
 		  $(SRC_DIR)/mergeBed \
 		  $(SRC_DIR)/multiBamCov \
 		  $(SRC_DIR)/multiIntersectBed \
+		   $(SRC_DIR)/nekSandbox1 \
 		  $(SRC_DIR)/nucBed \
 		  $(SRC_DIR)/pairToBed \
 		  $(SRC_DIR)/pairToPair \
 		  $(SRC_DIR)/randomBed \
+		  $(SRC_DIR)/regressTest \
 		  $(SRC_DIR)/reldist \
 		  $(SRC_DIR)/shuffleBed \
 		  $(SRC_DIR)/slopBed \
@@ -65,12 +67,17 @@ SUBDIRS = $(SRC_DIR)/annotateBed \
 		  $(SRC_DIR)/windowMaker
 
 UTIL_SUBDIRS =	$(SRC_DIR)/utils/bedFile \
+				$(SRC_DIR)/utils/BinTree \
 				$(SRC_DIR)/utils/version \
 				$(SRC_DIR)/utils/bedGraphFile \
 				$(SRC_DIR)/utils/chromsweep \
+				$(SRC_DIR)/utils/Contexts \
+				$(SRC_DIR)/utils/FileRecordTools \
+				$(SRC_DIR)/utils/general \
 				$(SRC_DIR)/utils/gzstream \
 				$(SRC_DIR)/utils/fileType \
 				$(SRC_DIR)/utils/bedFilePE \
+				$(SRC_DIR)/utils/NewChromsweep \
 				$(SRC_DIR)/utils/sequenceUtilities \
 				$(SRC_DIR)/utils/tabFile \
 				$(SRC_DIR)/utils/BamTools \
@@ -78,7 +85,7 @@ UTIL_SUBDIRS =	$(SRC_DIR)/utils/bedFile \
 				$(SRC_DIR)/utils/BlockedIntervals \
 				$(SRC_DIR)/utils/Fasta \
 				$(SRC_DIR)/utils/VectorOps \
-				$(SRC_DIR)/utils/genomeFile
+				$(SRC_DIR)/utils/GenomeFile
 
 BUILT_OBJECTS = $(OBJ_DIR)/*.o
 

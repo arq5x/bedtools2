@@ -5,7 +5,7 @@ BIN_DIR = ../../bin/
 # -------------------
 # define our includes
 # -------------------
-INCLUDES = -I$(UTILITIES_DIR)/genomeFile/ \
+INCLUDES = -I$(UTILITIES_DIR)/GenomeFile/ \
            -I$(UTILITIES_DIR)/bedFile/ \
            -I$(UTILITIES_DIR)/gzstream/ \
            -I$(UTILITIES_DIR)/fileType/ \

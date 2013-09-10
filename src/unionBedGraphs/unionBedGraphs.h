@@ -16,7 +16,7 @@
 #include <vector>
 #include <string>
 #include "bedGraphFile.h"
-#include "genomeFile.h"
+#include "GenomeFile.h"
 #include "Point.h"
 
 class UnionBedGraphs

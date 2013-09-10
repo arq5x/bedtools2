@@ -47,6 +47,7 @@ class BamReaderPrivate {
         const std::string Filename(void) const;
         bool IsOpen(void) const;
         bool Open(const std::string& filename);
+        bool OpenStream(std::istream* stream);
         bool Rewind(void);
         bool SetRegion(const BamRegion& region);
 

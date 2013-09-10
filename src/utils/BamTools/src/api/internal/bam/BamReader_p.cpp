@@ -388,6 +388,35 @@ bool BamReaderPrivate::Open(const string& filename) {
     }
 }
 
+bool BamReaderPrivate::OpenStream(std::istream* stream) {
+
+    try {
+
+        // make sure we're starting with fresh state
+        Close();
+
+        // open BgzfStream
+        m_stream.OpenStream(stream, IBamIODevice::ReadOnly);
+
+        // load BAM metadata
+        LoadHeaderData();
+        LoadReferenceData();
+
+        // store "filename" & offset of first alignment
+        m_filename = "stream";                              // or whatever
+        m_alignmentsBeginOffset = m_stream.Tell();
+
+        // return success
+        return true;
+
+    } catch ( BamException& e ) {
+        const string error = e.what();
+        const string message = string("could not open input stream: \n\t") + error;
+        SetErrorString("BamReader::Open", message);
+        return false;
+    }
+}
+
 bool BamReaderPrivate::OpenIndex(const std::string& indexFilename) {
 
     if ( m_randomAccessController.OpenIndex(indexFilename, this) )

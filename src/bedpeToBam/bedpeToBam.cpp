@@ -11,7 +11,7 @@
 ******************************************************************************/
 #include "lineFileUtilities.h"
 #include "bedFilePE.h"
-#include "genomeFile.h"
+#include "GenomeFile.h"
 #include "version.h"
 
 

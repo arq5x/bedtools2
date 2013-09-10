@@ -9,7 +9,7 @@
 
   Licenced under the GNU General Public License 2.0 license.
 ******************************************************************************/
-#include "genomeFile.h"
+#include "GenomeFile.h"
 
 #include <vector>
 #include <iostream>

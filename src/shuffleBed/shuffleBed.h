@@ -11,7 +11,7 @@
 ******************************************************************************/
 #include "bedFile.h"
 #include "bedFilePE.h"
-#include "genomeFile.h"
+#include "GenomeFile.h"
 
 #include <vector>
 #include <iostream>

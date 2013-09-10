@@ -139,7 +139,9 @@ struct API_EXPORT BamAlignment {
                            unsigned int& numBytesParsed) const;
 
     // internal data
-    private:
+    public: //had to change this from private.
+        //needed to expose some members of support data that
+        //were otherwise inaccessible when using only core alignments.
 
         struct BamAlignmentSupportData {
       
@@ -163,6 +165,7 @@ struct API_EXPORT BamAlignment {
         BamAlignmentSupportData SupportData;
         friend class Internal::BamReaderPrivate;
         friend class Internal::BamWriterPrivate;
+        friend class BamFileReader;
 
         mutable std::string ErrorString; // mutable to allow updates even in logically const methods
     //! \endinternal

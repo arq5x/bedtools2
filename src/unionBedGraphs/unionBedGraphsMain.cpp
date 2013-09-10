@@ -19,7 +19,7 @@
 #include <getopt.h>
 #include <libgen.h> //for basename()
 
-#include "genomeFile.h"
+#include "GenomeFile.h"
 #include "unionBedGraphs.h"
 #include "version.h"
 
