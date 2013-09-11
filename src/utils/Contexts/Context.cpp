@@ -94,6 +94,10 @@ void Context::parseCmdArgs(int argc, char **argv, int skipFirstArgs) {
 	_argc = argc;
 	_argv = argv;
 	_skipFirstArgs = skipFirstArgs;
+	if (argc < 2) {
+		setShowHelp(true);
+		return;
+	}
 
 	_argsProcessed.resize(argc - skipFirstArgs, false);
 

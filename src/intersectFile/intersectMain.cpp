@@ -24,12 +24,14 @@ int intersect_main(int argc, char* argv[]) {
 
     Context *context = new Context();
     context->parseCmdArgs(argc, argv, 1);
-    if (!context->isValidState()) {
-    	fprintf(stderr, "%s\n", context->getErrorMsg().c_str());
+    if (context->getShowHelp() || !context->isValidState()) {
+    	if (!context->getErrorMsg().empty()) {
+    		cerr << context->getErrorMsg() << endl;
+    	}
     	intersect_help();
+    	delete context;
     	return 0;
     }
-
 	FileIntersect *fileIntersect = new FileIntersect(context);
 
 	bool retVal = fileIntersect->intersectFiles();
