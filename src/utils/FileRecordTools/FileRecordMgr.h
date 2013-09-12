@@ -157,6 +157,7 @@ private:
 	set<QuickString> _foundChroms;
 	QuickString _prevChrom;
 	int _prevStart;
+	int _prevChromId;
 
 	//members for handling merged records
 	DualQueue<Record *, DualQueueAscending > _storedRecords;
@@ -173,6 +174,8 @@ private:
 
 	void allocateFileReader();
 	void testInputSortOrder(const Record *record);
+	void sortError(const Record *record, bool genomeFileError);
+
 	void deleteAllMergedItemsButKey(RecordKeyList &recList);
 	void addToStorage(Record *record);
 	Record *tryToTakeFromStorage();

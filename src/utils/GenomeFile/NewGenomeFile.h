@@ -45,10 +45,10 @@ public:
 
 private:
     QuickString  _genomeFileName;
-    typedef map<QuickString, pair<CHRPOS, CHRPOS> > lookupType;
+    typedef map<QuickString, pair<CHRPOS, int> > lookupType;
     lookupType _chromSizeIds;
     vector<QuickString> _chromList;
-    CHRPOS _maxId;
+    int _maxId;
 
     // projecting chroms onto a single coordinate system
     CHRPOS _genomeLength;
@@ -57,7 +57,7 @@ private:
     //cache members for quick lookup
     QuickString _currChromName;
     CHRPOS _currChromSize;
-    CHRPOS _currChromId;
+    int _currChromId;
 
 };
 

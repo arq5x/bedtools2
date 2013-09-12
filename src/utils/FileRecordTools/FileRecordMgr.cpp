@@ -17,6 +17,7 @@ FileRecordMgr::FileRecordMgr(int fileIdx, Context *context)
   _useFullBamTags(false),
   _headerSet(false),
   _prevStart(INT_MAX),
+  _prevChromId(-1),
   _mustBeForward(false),
   _mustBeReverse(false),
   _totalRecordLength(0),
@@ -144,28 +145,44 @@ void FileRecordMgr::testInputSortOrder(const Record *record)
 	if (currChrom != _prevChrom) {
 		if ( _foundChroms.find(currChrom) != _foundChroms.end()) {
 			//this is a different chrom than the last record had, but we've already seen this chrom.
-			fprintf(stderr, "Error: Sorted input specified, but the file %s has the following out of order record:\n", _context->getInputFileName(_contextFileIdx).c_str());
-			QuickString errBuf;
-			record->print(errBuf);
-			fprintf(stderr, "%s\n", errBuf.c_str());
-			exit(1);
+			sortError(record, false);
 		} else {
 			//new chrom has not been seen before.
+			//TBD: test genome file for ChromId.
+			if (_context->hasGenomeFile()) {
+				//For BAM records, the chromId of the BAM file will not necessarily be the same as the one from the genome file.
+				int currChromId = _context->getGenomeFile()->getChromId(currChrom);
+				if (currChromId < _prevChromId) {
+					sortError(record, true);
+				} else {
+					_prevChromId = currChromId;
+				}
+			}
 			_foundChroms.insert(currChrom);
 			_prevChrom = currChrom;
 			_prevStart = INT_MAX;
 		}
 	} else if (record->getStartPos() < _prevStart) { //same chrom as last record, but with lower startPos, so still out of order.
-		fprintf(stderr, "Error: Sorted input specified, but the file %s has the following out of order record:\n", _context->getInputFileName(_contextFileIdx).c_str());
-		QuickString errBuf;
-		record->print(errBuf);
-		fprintf(stderr, "%s\n", errBuf.c_str());
-		exit(1);
+		sortError(record, false);
 	}
 	_prevStart = record->getStartPos();
 
 }
 
+void FileRecordMgr::sortError(const Record *record, bool genomeFileError)
+{
+	if (genomeFileError) {
+		fprintf(stderr, "Error: Sorted input specified, but the file %s has the following record with a different sort order than the genomeFile %s:\n",
+				_context->getInputFileName(_contextFileIdx).c_str(), _context->getGenomeFile()->getGenomeFileName().c_str());
+	} else {
+		fprintf(stderr, "Error: Sorted input specified, but the file %s has the following out of order record:\n", _context->getInputFileName(_contextFileIdx).c_str());
+	}
+	QuickString errBuf;
+	record->print(errBuf);
+	fprintf(stderr, "%s\n", errBuf.c_str());
+	exit(1);
+
+}
 void FileRecordMgr::deleteRecord(const Record *record) {
 	_recordMgr->deleteRecord(record);
 }
