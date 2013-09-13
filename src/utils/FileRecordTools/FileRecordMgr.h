@@ -173,7 +173,8 @@ private:
 
 
 	void allocateFileReader();
-	void testInputSortOrder(const Record *record);
+	void testInputSortOrder(Record *record);
+	void assignChromId(Record *);
 	void sortError(const Record *record, bool genomeFileError);
 
 	void deleteAllMergedItemsButKey(RecordKeyList &recList);

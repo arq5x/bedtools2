@@ -24,7 +24,6 @@ bool Bed3Interval::initFromFile(FileReader *fileReader)
 bool Bed3Interval::initFromFile(SingleLineDelimTextFileReader *fileReader)
 {
 	fileReader->getField(0, _chrName);
-	_chrId = fileReader->getCurrChromdId();
 	fileReader->getField(1, _startPosStr);
 	fileReader->getField(2, _endPosStr);
 	_startPos = str2chrPos(_startPosStr);

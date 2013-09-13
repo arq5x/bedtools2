@@ -128,12 +128,24 @@ Record *FileRecordMgr::allocateAndGetNextRecord()
 	//test for sorted order, if necessary.
 	if (_context->getSortedInput()) {
 		testInputSortOrder(record);
+	} else {
+		assignChromId(record);
 	}
 	_totalRecordLength += (unsigned long)(record->getEndPos() - record->getStartPos());
 	return record;
 }
 
-void FileRecordMgr::testInputSortOrder(const Record *record)
+void FileRecordMgr::assignChromId(Record *record) {
+	const QuickString &currChrom = record->getChrName();
+	if (currChrom != _prevChrom  && _context->hasGenomeFile()) {
+		_prevChromId = _context->getGenomeFile()->getChromId(currChrom);
+		record->setChromId(_prevChromId);
+	} else {
+		record->setChromId(_prevChromId);
+	}
+}
+
+void FileRecordMgr::testInputSortOrder(Record *record)
 {
 	//user specified that file must be sorted. Check that it is so.
 	// TBD: In future versions, we might not want/need all files to be sorted,
@@ -150,7 +162,6 @@ void FileRecordMgr::testInputSortOrder(const Record *record)
 			//new chrom has not been seen before.
 			//TBD: test genome file for ChromId.
 			if (_context->hasGenomeFile()) {
-				//For BAM records, the chromId of the BAM file will not necessarily be the same as the one from the genome file.
 				int currChromId = _context->getGenomeFile()->getChromId(currChrom);
 				if (currChromId < _prevChromId) {
 					sortError(record, true);
@@ -161,6 +172,7 @@ void FileRecordMgr::testInputSortOrder(const Record *record)
 			_foundChroms.insert(currChrom);
 			_prevChrom = currChrom;
 			_prevStart = INT_MAX;
+			record->setChromId(_prevChromId);
 		}
 	} else if (record->getStartPos() < _prevStart) { //same chrom as last record, but with lower startPos, so still out of order.
 		sortError(record, false);

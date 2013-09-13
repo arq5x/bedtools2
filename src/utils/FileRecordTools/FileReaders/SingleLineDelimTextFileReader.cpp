@@ -75,10 +75,6 @@ bool SingleLineDelimTextFileReader::readEntry()
 	if (!findDelimiters()) {
 		return false;
 	}
-	if (_context->hasGenomeFile()) {
-		getField(0, _currChromStr);
-		_currChromId = _context->getGenomeFile()->getChromId(_currChromStr);
-	}
 	return true;
 }
 

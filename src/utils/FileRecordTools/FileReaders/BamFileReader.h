@@ -41,7 +41,7 @@ public:
 
 
 	void getChrName(QuickString &) const;
-	int getChrId() const;
+	int getBamChrId() const;
 	int getStartPos() const;
 	int getEndPos() const;
 	void getName(QuickString &) const;

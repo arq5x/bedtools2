@@ -73,7 +73,7 @@ void BamFileReader::getChrName(QuickString &str) const
 	str =  _references[refId].RefName;
 }
 
-int BamFileReader::getChrId() const
+int BamFileReader::getBamChrId() const
 {
 	return _bamAlignment.RefID;
 }

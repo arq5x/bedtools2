@@ -33,6 +33,46 @@ int nek_sandbox1_main(int argc,char** argv)
 		cerr << "Error: Need one input file. Use \"-\" for stdin." << endl;
 	}
 
+	ifstream myFile(argv[1]);
+	if (!myFile.good()) {
+		cerr << "Error: Can't open genome file" << argv[1] << "Exiting..." << endl;
+		exit(1);
+	}
+	string sLine;
+	vector<QuickString> fields;
+	QuickString chrName;
+
+	vector<QuickString> chroms;
+	chroms.push_back("1");
+	chroms.push_back("2");
+	chroms.push_back("10");
+	chroms.push_back("11");
+
+	vector<int> chromCounts(4, 0);
+	int chromIdx = 0;
+	while (!myFile.eof()) {
+		sLine.clear();
+		fields.clear();
+		getline(myFile, sLine);
+		if (sLine[0] == '@') {
+			cout << sLine << endl;
+			continue;
+		}
+		Tokenize(sLine.c_str(), fields);
+		const QuickString &currChrom = fields[2];
+		if (currChrom == chroms[chromIdx]) {
+			cout << sLine << endl;
+			chromCounts[chromIdx]++;
+			if (chromCounts[chromIdx] >= 3000) {
+				chromIdx++;
+			}
+			if (chromIdx > 3) {
+				break;
+			}
+		}
+	}
+
+	return 0;
 
 	Context context;
 	context.addInputFile(argv[1]);

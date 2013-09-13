@@ -24,7 +24,6 @@ void GffRecord::clear()
 bool GffRecord::initFromFile(SingleLineDelimTextFileReader *fileReader)
 {
 	fileReader->getField(0, _chrName);
-	_chrId = fileReader->getCurrChromdId();
 	fileReader->getField(3, _startPosStr);
 	_startPos = str2chrPos(_startPosStr);
 	_startPos--; // VCF is one-based. Here we intentionally don't decrement the string version,

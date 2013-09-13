@@ -3,6 +3,7 @@
 #include "RecordKeyList.h"
 
 BamRecord::BamRecord()
+: _bamChromId(-1)
 {
 
 }
@@ -31,7 +32,7 @@ bool BamRecord::initFromFile(BamFileReader *bamFileReader)
 {
 	bamFileReader->getChrName(_chrName);
 
-	_chrId = bamFileReader->getCurrChromdId();
+	_bamChromId = bamFileReader->getCurrChromdId();
 	_startPos = bamFileReader->getStartPos();
 	int2str(_startPos, _startPosStr);
 	_endPos = bamFileReader->getEndPos();
@@ -48,7 +49,7 @@ bool BamRecord::initFromFile(BamFileReader *bamFileReader)
 void BamRecord::clear()
 {
 	Bed6Interval::clear();
-
+	_bamChromId = -1;
 	//For now, we're going to not clear the BamAlignment object, as all of its
 	//fields will be reset next time it is used anyway. If testing shows this to be a
 	//problem, we'll revisit.

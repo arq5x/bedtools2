@@ -36,6 +36,7 @@ public:
 	virtual FileRecordTypeChecker::RECORD_TYPE getType() const { return FileRecordTypeChecker::BAM_RECORD_TYPE; }
 
 	const BamTools::BamAlignment &getAlignment() const { return _bamAlignment; }
+	int getBamChromId() const { return _bamChromId; }
 
 protected:
 	virtual ~BamRecord();
@@ -43,6 +44,8 @@ protected:
 
 
 	BamTools::BamAlignment _bamAlignment;
+	int _bamChromId; //different from chromId, because BAM file may be in different order
+	//than the genomeFile.
 
 };
 
