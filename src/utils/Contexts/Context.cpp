@@ -44,6 +44,8 @@ Context::Context()
   _reportNames(false),
   _reportScores(false)
 {
+	_programNames["intersect"] = INTERSECT;
+
 	_validScoreOps.insert("sum");
 	_validScoreOps.insert("max");
 	_validScoreOps.insert("min");
@@ -90,14 +92,16 @@ void Context::openGenomeFile(const BamTools::RefVector &refVector)
 	_genomeFile = new NewGenomeFile(refVector);
 }
 
-void Context::parseCmdArgs(int argc, char **argv, int skipFirstArgs) {
+bool Context::parseCmdArgs(int argc, char **argv, int skipFirstArgs) {
 	_argc = argc;
 	_argv = argv;
 	_skipFirstArgs = skipFirstArgs;
 	if (argc < 2) {
 		setShowHelp(true);
-		return;
+		return false;
 	}
+
+	setProgram(_programNames[argv[0]]);
 
 	_argsProcessed.resize(argc - skipFirstArgs, false);
 
@@ -112,6 +116,10 @@ void Context::parseCmdArgs(int argc, char **argv, int skipFirstArgs) {
 			i++;
 			markUsed(i - skipFirstArgs);
 		} else if (strcmp(argv[i], "-g") == 0) {
+			if (argc <= i+1) {
+				_errorMsg = "Error: -g option given, but no genome file specified.";
+				return false;
+			}
 			openGenomeFile(argv[i+1]);
 			markUsed(i - skipFirstArgs);
 			i++;
@@ -128,6 +136,11 @@ void Context::parseCmdArgs(int argc, char **argv, int skipFirstArgs) {
             markUsed(i - skipFirstArgs);
         }
 		if (strcmp(argv[i], "-a") == 0) {
+			if (argc <= i+1) {
+				_errorMsg = "Error: -a option given, but no query file specified.";
+				return false;
+			}
+
 			addInputFile(argv[i+1]);
 			_queryFileIdx = getNumInputFiles() -1;
 			markUsed(i - skipFirstArgs);
@@ -135,6 +148,10 @@ void Context::parseCmdArgs(int argc, char **argv, int skipFirstArgs) {
 			markUsed(i - skipFirstArgs);
 		}
         else if(strcmp(argv[i], "-abam") == 0) {
+			if (argc <= i+1) {
+				_errorMsg = "Error: -abam option given, but no query BAM file specified.";
+				return false;
+			}
 			addInputFile(argv[i+1]);
 			_queryFileIdx = getNumInputFiles() -1;
 			markUsed(i - skipFirstArgs);
@@ -143,6 +160,10 @@ void Context::parseCmdArgs(int argc, char **argv, int skipFirstArgs) {
 			setInputFileType(_queryFileIdx, FileRecordTypeChecker::BAM_FILE_TYPE);
         }
         else if (strcmp(argv[i], "-b") == 0) {
+			if (argc <= i+1) {
+				_errorMsg = "Error: -b option given, but no database file specified.";
+				return false;
+			}
 			addInputFile(argv[i+1]);
 			_databaseFileIdx = getNumInputFiles() -1;
 			markUsed(i - skipFirstArgs);
@@ -218,13 +239,20 @@ void Context::parseCmdArgs(int argc, char **argv, int skipFirstArgs) {
             markUsed(i - skipFirstArgs);
         }
 	}
+	return true;
 }
 
 bool Context::isValidState()
 {
-	if (!Context::cmdArgsValid()) {
+	if (!cmdArgsValid()) {
 		return false;
 	}
+
+	if (getProgram() == INTERSECT && (_queryFileIdx == -1 || _databaseFileIdx == -1)) {
+		_errorMsg = "Error: Intersect program was not given a query and database file.";
+		return false;
+	}
+
 	if (getAnyHit() && getNoHit()) {
 		_errorMsg = "Error: request either -u for anyHit OR -v for noHit, not both.";
 		return false;

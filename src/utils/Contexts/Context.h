@@ -74,7 +74,7 @@ public:
 	void setOutputFileType(ContextFileType fileType) { _outputFileType = fileType; }
 	ContextFileType getOutputFileType() const { return _outputFileType; }
 
-	void parseCmdArgs(int argc, char **argv, int skipFirstArgs);
+	bool parseCmdArgs(int argc, char **argv, int skipFirstArgs);
 
 	 //isValidState checks that parameters to context are in an acceptable state.
 	// If not, the error msg string will be set with a reason why it failed.
@@ -193,6 +193,7 @@ protected:
 		ContextRecordType _recordType;
 	};
 	vector<FileEntryType> _inputFiles;
+	map<QuickString, PROGRAM_TYPE> _programNames;
 
 	bool _useMergedIntervals;
 	NewGenomeFile *_genomeFile;
