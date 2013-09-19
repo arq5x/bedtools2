@@ -113,6 +113,7 @@ void RecordOutputMgr::printRecord(RecordKeyList &keyList, RecordKeyList *blockLi
 		_outBuf.append(_context->getHeader(_context->getQueryFileIdx()));
 		_context->setPrintHeader(false);
 	}
+	const_cast<Record *>(keyList.getKey())->undoZeroLength();
 
 	_currBlockList = blockList;
 
@@ -157,15 +158,67 @@ void RecordOutputMgr::printRecord(RecordKeyList &keyList, RecordKeyList *blockLi
 void RecordOutputMgr::reportOverlapDetail(const Record *keyRecord, const Record *hitRecord)
 {
 	//get the max start and min end as strings.
-	const QuickString &startStr = keyRecord->getStartPos() > hitRecord->getStartPos() ? keyRecord->getStartPosStr() : hitRecord->getStartPosStr();
-	const QuickString &endStr = keyRecord->getEndPos() < hitRecord->getEndPos() ? keyRecord->getEndPosStr() : hitRecord->getEndPosStr();
+	const_cast<Record *>(hitRecord)->undoZeroLength();
 
-	int maxStart = max(keyRecord->getStartPos(), hitRecord->getStartPos());
-	int minEnd = min(keyRecord->getEndPos(), hitRecord->getEndPos());
 
+	const QuickString *startStr = NULL;
+	const QuickString *endStr = NULL;
+	int maxStart = 0;
+	int minEnd = 0;
+
+	int keyStart = keyRecord->getStartPos();
+	int keyEnd = keyRecord->getEndPos();
+	int hitStart = hitRecord->getStartPos();
+	int hitEnd = hitRecord->getEndPos();
+
+	if (  keyStart>= hitStart) {
+		//the key start is after the hit start, but we need to check and make sure the hit end is at least after the keyStart.
+		//The reason for this is that, in some rare cases, such as both the key and hit having been zero length intervals,
+		//the normal process for intersection that allows us to simply report the maxStart and minEnd do not necessarily apply.
+		if (hitEnd >= keyStart) {
+			//this is ok. We have a normal intersection where the key comes after the hit.
+
+			maxStart = keyStart;
+			startStr = &(keyRecord->getStartPosStr());
+
+			minEnd = min(keyEnd, hitEnd);
+			endStr = keyRecord->getEndPos() < hitRecord->getEndPos() ? &(keyRecord->getEndPosStr()) : &(hitRecord->getEndPosStr());
+
+		} else {
+			//this is the weird case of not a "real" intersection. The keyStart is greater than the hitEnd. So just report the key as is.
+			maxStart = keyStart;
+			minEnd = keyEnd;
+			startStr = &(keyRecord->getStartPosStr());
+			endStr = &(keyRecord->getEndPosStr());
+		}
+
+	} else {
+		//all of the above, but backwards. keyStart is before hitStart.
+		if (keyEnd >= hitStart) {
+			//normal intersection, key first
+			maxStart = hitStart;
+			startStr = &(hitRecord->getStartPosStr());
+			minEnd = min(keyEnd, hitEnd);
+			endStr = keyRecord->getEndPos() < hitRecord->getEndPos() ? &(keyRecord->getEndPosStr()) : &(hitRecord->getEndPosStr());
+		} else {
+			//this is the weird case of not a "real" intersection. The hitStart is greater than the keyEnd. So just report the hit as is.
+			maxStart = hitStart;
+			minEnd = hitEnd;
+			startStr = &(hitRecord->getStartPosStr());
+			endStr = &(hitRecord->getEndPosStr());
+
+		}
+	}
+
+//	const QuickString &startStr = keyRecord->getStartPos() > hitRecord->getStartPos() ? keyRecord->getStartPosStr() : hitRecord->getStartPosStr();
+//	const QuickString &endStr = keyRecord->getEndPos() < hitRecord->getEndPos() ? keyRecord->getEndPosStr() : hitRecord->getEndPosStr();
+//
+//	int maxStart = max(keyRecord->getStartPos(), hitRecord->getStartPos());
+//	int minEnd = min(keyRecord->getEndPos(), hitRecord->getEndPos());
+//
 
 	if (!_context->getWriteA() && !_context->getWriteB() && !_context->getWriteOverlap() && !_context->getLeftJoin()) {
-		printKey(keyRecord, startStr, endStr);
+		printKey(keyRecord, *startStr, *endStr);
 		newline();
 	}
 	else if ((_context->getWriteA() && _context->getWriteB()) || _context->getLeftJoin()) {
@@ -179,7 +232,7 @@ void RecordOutputMgr::reportOverlapDetail(const Record *keyRecord, const Record 
 		newline();
 	}
 	else if (_context->getWriteB()) {
-		printKey(keyRecord, startStr, endStr);
+		printKey(keyRecord, *startStr, *endStr);
 		tab();
 		hitRecord->print(_outBuf);
 		newline();

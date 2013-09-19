@@ -6,7 +6,8 @@ Record::Record()
 : _chrId(-1),
   _startPos(-1),
   _endPos(-1),
-  _strand(UNKNOWN)
+  _strand(UNKNOWN),
+  _zeroLength(false)
 {
 }
 
@@ -176,4 +177,38 @@ bool Record::sameChromIntersects(const Record *record,
 	}
 
 	return false;
+}
+
+bool Record::coordsValid() {
+	if (_startPos < 0 || _endPos < 0 || _endPos < _startPos) {
+		return false;
+	}
+	adjustZeroLength();
+	return true;
+}
+
+void Record::adjustZeroLength()
+{
+	if (_startPos == _endPos) {
+		_zeroLength = true;
+		_startPos--;
+		_endPos++;
+	}
+}
+
+void Record::undoZeroLength()
+{
+	if (_zeroLength) {
+		_startPos++;
+		_endPos--;
+		_zeroLength = false;
+	}
+}
+
+ostream &operator << (ostream &out, const Record &record)
+{
+	QuickString errBuf;
+	record.print(errBuf);
+	out << errBuf;
+	return out;
 }

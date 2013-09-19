@@ -141,6 +141,7 @@ public:
 	void setFullBamFlags(bool flag) { _useFullBamTags = flag; }
 
 private:
+	QuickString _filename;
 	BufferedStreamMgr *_bufStreamMgr;
 	int _contextFileIdx;
 

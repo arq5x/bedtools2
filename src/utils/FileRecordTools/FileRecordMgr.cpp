@@ -44,10 +44,10 @@ FileRecordMgr::~FileRecordMgr(){
 
 bool FileRecordMgr::open(){
 
-	const QuickString &filename = _context->getInputFileName(_contextFileIdx);
-	_bufStreamMgr = new BufferedStreamMgr(filename);
+	_filename = _context->getInputFileName(_contextFileIdx);
+	_bufStreamMgr = new BufferedStreamMgr(_filename);
 	if (!_bufStreamMgr->init()) {
-		fprintf(stderr, "Error: unable to open file or unable to determine types for file %s.\n", filename.c_str());
+		cerr << "Error: unable to open file or unable to determine types for file " << _filename << endl;
 		delete _bufStreamMgr;
 		_bufStreamMgr = NULL;
 		exit(1);
@@ -56,7 +56,7 @@ bool FileRecordMgr::open(){
 	_fileType = _bufStreamMgr->getTypeChecker().getFileType();
 	_recordType = _bufStreamMgr->getTypeChecker().getRecordType();
 	if (_fileType == FileRecordTypeChecker::UNKNOWN_FILE_TYPE || _recordType == FileRecordTypeChecker::UNKNOWN_RECORD_TYPE) {
-		fprintf(stderr, "Error: Unable to determine type for file %s.\n", filename.c_str());
+		cerr << "Error: Unable to determine type for file " << _filename << endl;
 		delete _bufStreamMgr;
 		_bufStreamMgr = NULL;
 		exit(1);
@@ -64,11 +64,11 @@ bool FileRecordMgr::open(){
 	allocateFileReader();
 	_recordMgr = new RecordMgr(_recordType, _freeListBlockSize);
 
-	_fileReader->setFileName(filename.c_str());
+	_fileReader->setFileName(_filename.c_str());
 	_fileReader->setInputStream(_bufStreamMgr);
 	_fileReader->setContext(_context);
 	if (!_fileReader->open()) {
-		fprintf(stderr, "Error: Types determined but can't open file %s.\n", filename.c_str());
+		cerr << "Error: Types determined but can't open file " << _filename << endl;
 		delete _bufStreamMgr;
 		_bufStreamMgr = NULL;
 		exit(1);
@@ -123,6 +123,11 @@ Record *FileRecordMgr::allocateAndGetNextRecord()
 	if (!record->initFromFile(_fileReader)) {
 		_recordMgr->deleteRecord(record);
 		return NULL;
+	}
+
+	if (!record->coordsValid()) {
+		cerr << "Error: Invalid record in file " << _filename << ". Record is " << endl << *record << endl;
+		exit(1);
 	}
 
 	//test for sorted order, if necessary.
@@ -184,17 +189,16 @@ void FileRecordMgr::testInputSortOrder(Record *record)
 void FileRecordMgr::sortError(const Record *record, bool genomeFileError)
 {
 	if (genomeFileError) {
-		fprintf(stderr, "Error: Sorted input specified, but the file %s has the following record with a different sort order than the genomeFile %s:\n",
-				_context->getInputFileName(_contextFileIdx).c_str(), _context->getGenomeFile()->getGenomeFileName().c_str());
+		cerr << "Error: Sorted input specified, but the file " << _filename << " has the following record with a different sort order than the genomeFile " <<
+				_context->getGenomeFile()->getGenomeFileName() << endl;
 	} else {
-		fprintf(stderr, "Error: Sorted input specified, but the file %s has the following out of order record:\n", _context->getInputFileName(_contextFileIdx).c_str());
+		cerr << "Error: Sorted input specified, but the file " << _filename << " has the following out of order record" << endl;
 	}
-	QuickString errBuf;
-	record->print(errBuf);
-	fprintf(stderr, "%s\n", errBuf.c_str());
+	cerr << *record << endl;
 	exit(1);
-
 }
+
+
 void FileRecordMgr::deleteRecord(const Record *record) {
 	_recordMgr->deleteRecord(record);
 }

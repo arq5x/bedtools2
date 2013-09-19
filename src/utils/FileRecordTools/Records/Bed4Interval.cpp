@@ -23,6 +23,7 @@ bool Bed4Interval::initFromFile(SingleLineDelimTextFileReader *fileReader)
 void Bed4Interval::print(QuickString &outBuf) const
 {
 	Bed3Interval::print(outBuf);
+	outBuf.append('\t');
 	outBuf.append(_name);
 }
 

@@ -33,6 +33,8 @@ public:
 	virtual void print(QuickString &outBuf, int start, int end) const {}
 	virtual void print(QuickString &outBuf, const QuickString & start, const QuickString & end) const {}
 	virtual void printNull(QuickString &outBuf) const {}
+	friend ostream &operator << (ostream &out, const Record &record);
+
 	virtual const Record & operator=(const Record &);
 
 	virtual const QuickString &getChrName() const { return _chrName; }
@@ -54,13 +56,14 @@ public:
 	virtual const QuickString &getEndPosStr() const { return _endPosStr; }
 	virtual void setEndPosStr(const QuickString &str) { _endPosStr = str; }
 
+	virtual bool getZeroLength() const { return _zeroLength; }
+	virtual void setZeroLength(bool val) { _zeroLength = val; }
 
 	virtual strandType getStrand() const { return _strand; }
 	virtual void setStrand(strandType val) { _strand = val; }
 	virtual void setStrand(char val);
 	virtual char getStrandChar() const;
 
-	//And we have a similar problem with name and score
 	virtual const QuickString &getName() const { return _name; }
 	virtual void setName(const QuickString &chr) { _name = chr; }
 	virtual void setName(const string &chr) { _name = chr; }
@@ -72,6 +75,18 @@ public:
 	virtual void setScore(const char *chr) { _score = chr; }
 
 	virtual FileRecordTypeChecker::RECORD_TYPE getType() const { return FileRecordTypeChecker::UNKNOWN_RECORD_TYPE; }
+
+	virtual bool coordsValid(); //test that no coords negative, end not less than start, check zeroLength (see below).
+
+	//Some files can have insertions of the form 2,2. If found this should translate to cover the base before and after,
+	//thus meaning the startPos is decremented and the endPos is incremented. This method will find and handle that case.
+	//Don't adjust the startPosStr and endPosStr strings because they aren't used in
+	//calculation. They're only used in output, and it would be slower to change them
+	//and then change them back.
+	virtual void adjustZeroLength();
+	virtual void undoZeroLength(); //change it back just before output;
+	virtual bool isZeroLength() const { return _zeroLength; }
+
 
 	virtual bool operator < (const Record &other) const;
 	virtual bool operator > (const Record &other) const;
@@ -110,6 +125,7 @@ protected:
 	QuickString _name;
 	QuickString _score;
 	strandType _strand;
+	bool _zeroLength;
 };
 
 
