@@ -87,6 +87,11 @@ public:
 	virtual void undoZeroLength(); //change it back just before output;
 	virtual bool isZeroLength() const { return _zeroLength; }
 
+	// "Unmapped" only applies to BamRecord, but for design reasons, it has to be here,
+	// because we want to short circuit the intersects method if either record is an unmapped
+	// Bam record.
+	bool isUnmapped() const { return _isUnmapped; }
+
 
 	virtual bool operator < (const Record &other) const;
 	virtual bool operator > (const Record &other) const;
@@ -126,6 +131,7 @@ protected:
 	QuickString _score;
 	strandType _strand;
 	bool _zeroLength;
+	bool _isUnmapped;
 };
 
 

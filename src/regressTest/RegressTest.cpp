@@ -16,7 +16,8 @@ const string RegressTest::_randomCmd = "RANDOM";
 const string RegressTest::_space = " ";
 const string RegressTest::_redirect = " > ";
 const string RegressTest::_devNull = " /dev/null ";
-const string RegressTest::_bedOpsCmd = "/home/nek3d/testWorkspace/bedops/bin/bedmap --echo  --echo-map  --bp-ovr 1 ";
+//const string RegressTest::_bedOpsCmd = "/home/nek3d/testWorkspace/bedops/bin/bedmap --echo  --echo-map  --bp-ovr 1 ";
+const string RegressTest::_bedOpsCmd = "/home/nek3d/testWorkspace/bedops/bin/bedops --intersect ";
 
 
 RegressTest::RegressTest()

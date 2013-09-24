@@ -39,13 +39,12 @@ public:
 	int getBamChromId() const { return _bamChromId; }
 
 protected:
-	virtual ~BamRecord();
-	void printRemainingBamFields();
-
-
 	BamTools::BamAlignment _bamAlignment;
 	int _bamChromId; //different from chromId, because BAM file may be in different order
 	//than the genomeFile.
+
+	virtual ~BamRecord();
+	void printRemainingBamFields();
 
 };
 

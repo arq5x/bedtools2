@@ -43,6 +43,7 @@ bool BamRecord::initFromFile(BamFileReader *bamFileReader)
 	setStrand(strandChar);
 
 	_bamAlignment = bamFileReader->getAlignment();
+	_isUnmapped = !_bamAlignment.IsMapped();
 	return true;
 }
 

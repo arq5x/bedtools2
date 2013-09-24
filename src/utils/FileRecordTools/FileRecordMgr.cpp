@@ -152,13 +152,25 @@ void FileRecordMgr::assignChromId(Record *record) {
 
 void FileRecordMgr::testInputSortOrder(Record *record)
 {
-	//user specified that file must be sorted. Check that it is so.
+	// User specified that file must be sorted. Check that it is so.
 	// TBD: In future versions, we might not want/need all files to be sorted,
 	// even if the -sorted option is used, depending on number of input files
 	// and program being run. Should that occur, this block will need adjusting.
 	// NEK - 9/5/13
 
+
+	// Special: For BAM records that aren't mapped, we actually don't want
+	// to test the sort order. Another ugly hack sponsored by the letters B, A, and M.
+	if (record->getType() == FileRecordTypeChecker::BAM_RECORD_TYPE && (static_cast<const BamRecord *>(record))->isUnmapped()) {
+		return;
+	}
+
+
 	const QuickString &currChrom = record->getChrName();
+	int currStart = record->getStartPos();
+	if (record->isZeroLength()) {
+		currStart++;
+	}
 	if (currChrom != _prevChrom) {
 		if ( _foundChroms.find(currChrom) != _foundChroms.end()) {
 			//this is a different chrom than the last record had, but we've already seen this chrom.
@@ -179,10 +191,10 @@ void FileRecordMgr::testInputSortOrder(Record *record)
 			_prevStart = INT_MAX;
 			record->setChromId(_prevChromId);
 		}
-	} else if (record->getStartPos() < _prevStart) { //same chrom as last record, but with lower startPos, so still out of order.
+	} else if (currStart < _prevStart) { //same chrom as last record, but with lower startPos, so still out of order.
 		sortError(record, false);
 	}
-	_prevStart = record->getStartPos();
+	_prevStart = currStart;
 
 }
 
