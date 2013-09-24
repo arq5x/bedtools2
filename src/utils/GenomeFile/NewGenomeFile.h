@@ -13,6 +13,7 @@
 #ifndef NEW_GENOMEFILE_H
 #define NEW_GENOMEFILE_H
 
+#include <algorithm> // for bsearch lower_bound()
 
 #include "BedtoolsTypes.h"
 
