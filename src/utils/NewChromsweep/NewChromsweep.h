@@ -81,6 +81,7 @@ private:
     Record *_currDatabaseRec;
     // a cache of the current chrom from the query. used to handle chrom changes.
     QuickString _currChromName;
+    bool _runToQueryEnd;
 
     void nextRecord(bool query); //true fetches next query record, false fetches next db record.
     void nextDatabase();

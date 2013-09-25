@@ -28,14 +28,19 @@ RecordOutputMgr::RecordOutputMgr()
 : _context(NULL),
   _printable(true),
   _bamWriter(NULL),
-  _currBlockList(NULL)
+  _currBlockList(NULL),
+  _numWrites(0)
 {
 
 }
 
 RecordOutputMgr::~RecordOutputMgr()
 {
-	flush();
+	if (_outBuf.size() > 0) {
+		flush();
+		_numWrites++;
+	}
+	cerr << "Total number of buffer writes was " << _numWrites << endl;
 	if (_bamWriter != NULL) {
 		_bamWriter->Close();
 		delete _bamWriter;
@@ -105,7 +110,10 @@ RecordOutputMgr::printBamType RecordOutputMgr::printBamRecord(RecordKeyList &key
 
 void RecordOutputMgr::printRecord(RecordKeyList &keyList, RecordKeyList *blockList)
 {
-	if (needsFlush()) flush();
+	if (needsFlush()) {
+		flush();
+		_numWrites++;
+	}
 
 	//The first time we print a record is when we print any header, because the header
 	//hasn't been read from the query file until after the first record has also been read.

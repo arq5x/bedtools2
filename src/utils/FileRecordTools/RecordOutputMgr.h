@@ -40,6 +40,7 @@ private:
 	RecordKeyList *_currBlockList;
 
 	QuickString _outBuf;
+	int _numWrites;
 
 	//some helper functions to neaten the code.
 	void tab() { _outBuf.append('\t'); }
@@ -48,7 +49,7 @@ private:
 
 	void printKey(const Record *key);
 	void printKey(const Record *key, const QuickString & start, const QuickString & end);
-	static const unsigned int MAX_OUTBUF_SIZE = 33554432; //32 Mb
+	static const unsigned int MAX_OUTBUF_SIZE = 16384; //16 K
 	bool needsFlush() const { return _outBuf.size() >= MAX_OUTBUF_SIZE *.9; }
 	void flush();
 };

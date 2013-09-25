@@ -24,7 +24,8 @@ NewChromSweep::NewChromSweep(Context *context,
  	_databaseRecordsTotalLength(0),
  	_wasInitialized(false),
  	_currQueryRec(NULL),
- 	_currDatabaseRec(NULL)
+ 	_currDatabaseRec(NULL),
+ 	_runToQueryEnd(false)
 
 {
 }
@@ -51,6 +52,13 @@ bool NewChromSweep::init() {
     nextRecord(false);
     if (_currDatabaseRec == NULL) {
     	return false;
+    }
+
+    //determine whether to stop when the database end is hit, or keep going until the
+    //end of the query file is hit as well.
+
+    if (_context->getNoHit() || _context->getWriteCount() || _context->getWriteOverlap() || _context->getWriteAllOverlap() || _context->getLeftJoin()) {
+    	_runToQueryEnd = true;
     }
     _wasInitialized = true;
     return true;
@@ -155,7 +163,7 @@ bool NewChromSweep::next(RecordKeyList &next) {
 		return false;
 	}
 
-	if (_currDatabaseRec == NULL && _cache.empty()) {
+	if (_currDatabaseRec == NULL && _cache.empty() && !_runToQueryEnd) {
 		return false;
 	}
 	_hits.clear();
