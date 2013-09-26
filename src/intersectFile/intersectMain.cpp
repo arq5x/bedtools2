@@ -106,8 +106,11 @@ void intersect_help(void) {
 
     cerr << "\t-split\t"        << "Treat \"split\" BAM or BED12 entries as distinct BED intervals." << endl << endl;
 
-    cerr << "\t-sorted\t"       << "Use the \"chromsweep\" algorithm for sorted (-k1,1 -k2,2n) input" << endl << endl;
+    cerr << "\t-sorted\t"       << "Use the \"chromsweep\" algorithm for sorted (-k1,1 -k2,2n) input." << endl << endl;
     
+    cerr << "\t-g\t"       		<< "Provide a genome file to enforce consistent chromosome sort order" << endl;
+    cerr 						<<"\t\tacross input files. Only applies when used with -sorted option." << endl << endl;
+
     cerr << "\t-header\t"       << "Print the header from the A file prior to results." << endl << endl;
  
     cerr << "Notes: " << endl;
