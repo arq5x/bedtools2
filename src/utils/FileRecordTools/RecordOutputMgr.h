@@ -40,7 +40,6 @@ private:
 	RecordKeyList *_currBlockList;
 
 	QuickString _outBuf;
-	int _numWrites;
 
 	//some helper functions to neaten the code.
 	void tab() { _outBuf.append('\t'); }

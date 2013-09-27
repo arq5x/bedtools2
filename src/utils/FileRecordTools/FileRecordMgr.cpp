@@ -133,9 +133,8 @@ Record *FileRecordMgr::allocateAndGetNextRecord()
 	//test for sorted order, if necessary.
 	if (_context->getSortedInput()) {
 		testInputSortOrder(record);
-	} else {
-		assignChromId(record);
 	}
+	assignChromId(record);
 	_totalRecordLength += (unsigned long)(record->getEndPos() - record->getStartPos());
 	return record;
 }

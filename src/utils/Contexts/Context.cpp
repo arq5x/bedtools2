@@ -111,6 +111,10 @@ bool Context::parseCmdArgs(int argc, char **argv, int skipFirstArgs) {
 		}
 
 		if (strcmp(argv[i], "-i") == 0) {
+			if (argc <= i+1) {
+				_errorMsg = "Error: -i option given, but no input file specified.";
+				return false;
+			}
 			addInputFile(argv[i+1]);
 			markUsed(i - skipFirstArgs);
 			i++;
