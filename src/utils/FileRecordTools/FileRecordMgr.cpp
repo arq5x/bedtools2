@@ -124,7 +124,12 @@ Record *FileRecordMgr::allocateAndGetNextRecord()
 		_recordMgr->deleteRecord(record);
 		return NULL;
 	}
-
+	// In the rare case of Bam records where both the read and it's mate failed to map,
+	// Ignore the record. Delete and return null
+	if (record->isUnmapped() && record->isMateUnmapped()) {
+		_recordMgr->deleteRecord(record);
+		return NULL;
+	}
 	if (!record->coordsValid()) {
 		cerr << "Error: Invalid record in file " << _filename << ". Record is " << endl << *record << endl;
 		exit(1);
@@ -160,7 +165,7 @@ void FileRecordMgr::testInputSortOrder(Record *record)
 
 	// Special: For BAM records that aren't mapped, we actually don't want
 	// to test the sort order. Another ugly hack sponsored by the letters B, A, and M.
-	if (record->getType() == FileRecordTypeChecker::BAM_RECORD_TYPE && (static_cast<const BamRecord *>(record))->isUnmapped()) {
+	if (record->isUnmapped()) {
 		return;
 	}
 
@@ -268,9 +273,6 @@ bool FileRecordMgr::allocateAndGetNextMergedRecord(RecordKeyList & recList, WANT
 			addToStorage(startRecord);
 			startRecord = NULL;
 		}
-	}
-	if (startRecord->getStartPos() == 107071272) {
-		printf("Break point.\n");
 	}
 
 	// OK!! We have a start record!

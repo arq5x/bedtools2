@@ -8,7 +8,8 @@ Record::Record()
   _endPos(-1),
   _strand(UNKNOWN),
   _zeroLength(false),
-  _isUnmapped(false)
+  _isUnmapped(false),
+  _isMateUnmapped(false)
 {
 }
 
@@ -38,7 +39,7 @@ void Record::clear() {
 	_endPosStr.clear();
 	_zeroLength = false;
 	_isUnmapped = false;
-
+	_isMateUnmapped = false;
 }
 
 void Record::setStrand(char val)

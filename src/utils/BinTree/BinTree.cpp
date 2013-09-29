@@ -111,6 +111,7 @@ void BinTree::getHits(Record *record, RecordKeyList &hitSet)
 	if (_showBinMetrics) {
 		return; //don't care about query entries just yet.
 	}
+
     const QuickString &chr = record->getChrName();
 	mainMapType::iterator mainIter = _mainMap.find(chr);
 	if (mainIter == _mainMap.end()) {
@@ -172,7 +173,6 @@ bool BinTree::addRecordToTree(const Record *record)
 	const QuickString &chr = record->getChrName();
 	uint32_t startPos = (uint32_t)(record->getStartPos());
 	uint32_t endPos = (uint32_t)(record->getEndPos());
-
 
 	//is this chr currently in the main map?
 	allBinsType bins = NULL;

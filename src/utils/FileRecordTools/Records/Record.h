@@ -91,6 +91,7 @@ public:
 	// because we want to short circuit the intersects method if either record is an unmapped
 	// Bam record.
 	bool isUnmapped() const { return _isUnmapped; }
+	bool isMateUnmapped() const { return _isMateUnmapped; }
 
 
 	virtual bool operator < (const Record &other) const;
@@ -132,6 +133,7 @@ protected:
 	strandType _strand;
 	bool _zeroLength;
 	bool _isUnmapped;
+	bool _isMateUnmapped;
 };
 
 

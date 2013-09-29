@@ -44,6 +44,7 @@ bool BamRecord::initFromFile(BamFileReader *bamFileReader)
 
 	_bamAlignment = bamFileReader->getAlignment();
 	_isUnmapped = !_bamAlignment.IsMapped();
+	_isMateUnmapped = !_bamAlignment.IsMateMapped();
 	return true;
 }
 
