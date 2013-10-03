@@ -89,24 +89,51 @@ void BamRecord::printRemainingBamFields(QuickString &outBuf, RecordKeyList *keyL
 	outBuf.append(_endPos);
 	outBuf.append("\t0,0,0", 6);
 	outBuf.append('\t');
-	outBuf.append((int)keyList->size());
 
-	vector<int> blockLengths;
-	vector<int> blockStarts;
-	for (RecordKeyList::const_iterator_type iter = keyList->begin(); iter != keyList->end(); iter = keyList->next()) {
-		const Record *block = iter->value();
-		blockLengths.push_back(block->getEndPos() - block->getStartPos());
-		blockStarts.push_back(block->getStartPos() - _bamAlignment.Position);
-	}
+	int numBlocks = (int)keyList->size();
 
-	outBuf.append('\t');
-	for (int i=0; i < (int)blockLengths.size(); i++) {
-		outBuf.append(blockLengths[i]);
-		outBuf.append(',');
+	if (numBlocks > 0) {
+		outBuf.append(numBlocks);
+
+		vector<int> blockLengths;
+		vector<int> blockStarts;
+		for (RecordKeyList::const_iterator_type iter = keyList->begin(); iter != keyList->end(); iter = keyList->next()) {
+			const Record *block = iter->value();
+			blockLengths.push_back(block->getEndPos() - block->getStartPos());
+			blockStarts.push_back(block->getStartPos() - _bamAlignment.Position);
+		}
+
+		outBuf.append('\t');
+		for (int i=0; i < (int)blockLengths.size(); i++) {
+			outBuf.append(blockLengths[i]);
+			outBuf.append(',');
+		}
+		outBuf.append('\t');
+		for (int i=0; i < (int)blockStarts.size(); i++) {
+			outBuf.append( blockStarts[i]);
+			outBuf.append(',');
+		}
 	}
-	outBuf.append('\t');
-	for (int i=0; i < (int)blockStarts.size(); i++) {
-		outBuf.append( blockStarts[i]);
-		outBuf.append(',');
+	else {
+		outBuf.append("1\t0,\t0,");
 	}
+}
+
+void BamRecord::printUnmapped(QuickString &outBuf) const {
+	outBuf.append(_chrName);
+	outBuf.append("\t-1\t-1\t");
+	outBuf.append(_name);
+	outBuf.append('\t');
+	outBuf.append(_score);
+	outBuf.append("\t.\t-1\t-1\t-1\t0,0,0\t0\t.\t."); // dot for strand, -1 for blockStarts and blockEnd
+}
+
+bool BamRecord::sameChromIntersects(const Record *record,
+		bool wantSameStrand, bool wantDiffStrand, float overlapFraction, bool reciprocal) const
+{
+	// Special: For BAM records that are unmapped, intersect should automatically return false
+	if (_isUnmapped || record->isUnmapped()) {
+		return false;
+	}
+	return Record::sameChromIntersects(record, wantSameStrand, wantDiffStrand, overlapFraction, reciprocal);
 }

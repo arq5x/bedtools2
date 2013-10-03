@@ -92,6 +92,8 @@ public:
 	// Bam record.
 	bool isUnmapped() const { return _isUnmapped; }
 	bool isMateUnmapped() const { return _isMateUnmapped; }
+	virtual void printUnmapped(QuickString &outBuf) const {}
+
 
 
 	virtual bool operator < (const Record &other) const;

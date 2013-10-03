@@ -135,11 +135,6 @@ bool Record::intersects(const Record *record,
 bool Record::sameChromIntersects(const Record *record,
 		bool wantSameStrand, bool wantDiffStrand, float overlapFraction, bool reciprocal) const
 {
-	// Special: For BAM records that are unmapped, intersect should automatically return false
-	if (_isUnmapped || record->_isUnmapped) {
-		return false;
-	}
-
 	//If user requested hits only on same strand, or only on different strands,
 	//rule out different strandedness first.
 	//If the strand is unknown in either case, then queries regarding strandedness

@@ -97,7 +97,11 @@ RecordOutputMgr::printBamType RecordOutputMgr::printBamRecord(RecordKeyList &key
 			return BAM_AS_BAM;
 		} else {
 			if (!bamOutputOnly) {
-				static_cast<const BamRecord *>(record)->print(_outBuf, _currBlockList);
+				if (record->isUnmapped()) {
+					record->printUnmapped(_outBuf);
+				} else {
+					static_cast<const BamRecord *>(record)->print(_outBuf, _currBlockList);
+				}
 			}
 			return BAM_AS_BED;
 		}

@@ -30,13 +30,16 @@ public:
 	virtual void print(QuickString &outBuf, RecordKeyList *keyList) const;
 	virtual void print(QuickString &outBuf, const QuickString & start, const QuickString & end, RecordKeyList *keyList) const;
 	virtual void printNull(QuickString &outBuf) const;
-	void printRemainingBamFields(QuickString &outBuf, RecordKeyList *keyList) const;
-
+	virtual void printRemainingBamFields(QuickString &outBuf, RecordKeyList *keyList) const;
+	virtual void printUnmapped(QuickString &outBuf) const;
 
 	virtual FileRecordTypeChecker::RECORD_TYPE getType() const { return FileRecordTypeChecker::BAM_RECORD_TYPE; }
 
 	const BamTools::BamAlignment &getAlignment() const { return _bamAlignment; }
 	int getBamChromId() const { return _bamChromId; }
+
+	virtual bool sameChromIntersects(const Record *otherRecord,
+			bool sameStrand, bool diffStrand, float overlapFraction, bool reciprocal) const;
 
 protected:
 	BamTools::BamAlignment _bamAlignment;

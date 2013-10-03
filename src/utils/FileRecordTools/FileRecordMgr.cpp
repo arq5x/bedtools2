@@ -126,18 +126,16 @@ Record *FileRecordMgr::allocateAndGetNextRecord()
 	}
 	// In the rare case of Bam records where both the read and it's mate failed to map,
 	// Ignore the record. Delete and return null
-	if (record->isUnmapped() && record->isMateUnmapped()) {
-		_recordMgr->deleteRecord(record);
-		return NULL;
-	}
-	if (!record->coordsValid()) {
-		cerr << "Error: Invalid record in file " << _filename << ". Record is " << endl << *record << endl;
-		exit(1);
-	}
+	if (!(record->isUnmapped() && record->isMateUnmapped())) {
+		if (!record->coordsValid()) {
+			cerr << "Error: Invalid record in file " << _filename << ". Record is " << endl << *record << endl;
+			exit(1);
+		}
 
-	//test for sorted order, if necessary.
-	if (_context->getSortedInput()) {
-		testInputSortOrder(record);
+		//test for sorted order, if necessary.
+		if (_context->getSortedInput()) {
+			testInputSortOrder(record);
+		}
 	}
 	assignChromId(record);
 	_totalRecordLength += (unsigned long)(record->getEndPos() - record->getStartPos());
