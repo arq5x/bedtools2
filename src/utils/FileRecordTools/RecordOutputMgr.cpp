@@ -114,7 +114,9 @@ void RecordOutputMgr::printRecord(RecordKeyList &keyList, RecordKeyList *blockLi
 	if (needsFlush()) {
 		flush();
 	}
-
+//	if (keyList.getKey()->getChrName() == "chr1" && keyList.getKey()->getStartPos() == 11996) {
+//		printf("Break point here.\n");
+//	}
 	//The first time we print a record is when we print any header, because the header
 	//hasn't been read from the query file until after the first record has also been read.
 	if (_context->getPrintHeader()) {

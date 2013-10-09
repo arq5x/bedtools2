@@ -39,6 +39,7 @@ Context::Context()
   _databaseFileIdx(-1),
   _bamHeaderAndRefIdx(-1),
   _maxNumDatabaseFields(0),
+  _useFullBamTags(false),
   _reportCount(false),
   _maxDistance(0),
   _reportNames(false),
@@ -234,6 +235,10 @@ bool Context::parseCmdArgs(int argc, char **argv, int skipFirstArgs) {
             setUncompressedBam(true);
             markUsed(i - skipFirstArgs);
         }
+        else if (strcmp(argv[i], "-fbam") == 0) {
+        	setUseFullBamTags(true);
+            markUsed(i - skipFirstArgs);
+        }
         else if(strcmp(argv[i], "-sorted") == 0) {
             setSortedInput(true);
             markUsed(i - skipFirstArgs);
@@ -327,7 +332,7 @@ bool Context::cmdArgsValid()
 
 int Context::getBamHeaderAndRefIdx() {
 	if (_bamHeaderAndRefIdx != -1) {
-		//already found which BAM file to usefor the header
+		//already found which BAM file to use for the header
 		return _bamHeaderAndRefIdx;
 	}
 	if (_inputFiles[_queryFileIdx]._fileType == FileRecordTypeChecker::BAM_FILE_TYPE) {

@@ -162,6 +162,9 @@ public:
 	bool getPrintable() const { return _printable; }
 	void setPrintable(bool val) { _printable = val; }
 
+	bool getUseFullBamTags() const { return _useFullBamTags; }
+	void setUseFullBamTags(bool val) { _useFullBamTags = val; }
+
 	//
 	// MERGE METHODS
 	//
@@ -234,6 +237,7 @@ protected:
     int _databaseFileIdx;
     int _bamHeaderAndRefIdx;
     int _maxNumDatabaseFields;
+    bool _useFullBamTags;
 
 	bool _reportCount;
 	int _maxDistance;

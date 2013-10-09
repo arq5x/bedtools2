@@ -38,9 +38,6 @@ public:
 	const BamTools::BamAlignment &getAlignment() const { return _bamAlignment; }
 	int getBamChromId() const { return _bamChromId; }
 
-	virtual bool sameChromIntersects(const Record *otherRecord,
-			bool sameStrand, bool diffStrand, float overlapFraction, bool reciprocal) const;
-
 protected:
 	BamTools::BamAlignment _bamAlignment;
 	int _bamChromId; //different from chromId, because BAM file may be in different order

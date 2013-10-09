@@ -227,7 +227,7 @@ void FileRecordMgr::allocateFileReader()
 
 	case FileRecordTypeChecker::BAM_FILE_TYPE:
 		_fileReader = new BamFileReader();
-		(static_cast<BamFileReader *>(_fileReader))->setUseTags(_useFullBamTags);
+		(static_cast<BamFileReader *>(_fileReader))->setUseTags(_context->getUseFullBamTags());
 		break;
 	default:
 		break;

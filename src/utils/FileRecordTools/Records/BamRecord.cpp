@@ -52,9 +52,37 @@ void BamRecord::clear()
 {
 	Bed6Interval::clear();
 	_bamChromId = -1;
-	//For now, we're going to not clear the BamAlignment object, as all of its
-	//fields will be reset next time it is used anyway. If testing shows this to be a
-	//problem, we'll revisit.
+
+
+	//Clear the BamAlignment object. Sadly, it does not have a clear() method,
+	//so we have to do each member manually.
+	_bamAlignment.Name.clear();
+	_bamAlignment.Length = 0;
+	_bamAlignment.QueryBases.clear();
+	_bamAlignment.AlignedBases.clear();
+	_bamAlignment.Qualities.clear();
+	_bamAlignment.TagData.clear();
+	_bamAlignment.RefID = -1;
+	_bamAlignment.Position = -1;
+	_bamAlignment.Bin = 0;
+	_bamAlignment.MapQuality = 0;
+	_bamAlignment.AlignmentFlag = 0;
+	_bamAlignment.CigarData.clear();
+	_bamAlignment.MateRefID = -1;
+	_bamAlignment.MatePosition = -1;
+	_bamAlignment.InsertSize = -1;
+	_bamAlignment.Filename.clear();
+
+	_bamAlignment.SupportData.AllCharData.clear();
+	_bamAlignment.SupportData.BlockLength = 0;
+	_bamAlignment.SupportData.NumCigarOperations = 0;
+	_bamAlignment.SupportData.QueryNameLength = 0;
+	_bamAlignment.SupportData.QuerySequenceLength = 0;
+	_bamAlignment.SupportData.HasCoreOnly = false;
+
+	_bamAlignment.ErrorString.clear();
+
+
 }
 
 void BamRecord::print(QuickString &outBuf, RecordKeyList *keyList) const
@@ -126,14 +154,4 @@ void BamRecord::printUnmapped(QuickString &outBuf) const {
 	outBuf.append('\t');
 	outBuf.append(_score);
 	outBuf.append("\t.\t-1\t-1\t-1\t0,0,0\t0\t.\t."); // dot for strand, -1 for blockStarts and blockEnd
-}
-
-bool BamRecord::sameChromIntersects(const Record *record,
-		bool wantSameStrand, bool wantDiffStrand, float overlapFraction, bool reciprocal) const
-{
-	// Special: For BAM records that are unmapped, intersect should automatically return false
-	if (_isUnmapped || record->isUnmapped()) {
-		return false;
-	}
-	return Record::sameChromIntersects(record, wantSameStrand, wantDiffStrand, overlapFraction, reciprocal);
 }
