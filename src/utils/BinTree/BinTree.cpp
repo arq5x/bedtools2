@@ -85,7 +85,8 @@ bool BinTree::loadDB()
 	Record *record = NULL;
 	while (!_dbFileMgr->eof()) {
 		record = _dbFileMgr->allocateAndGetNextRecord();
-		if (record == NULL) {
+		//In addition to NULL records, we also don't want to add unmapped reads.
+		if (record == NULL || record->isUnmapped()) {
 			continue;
 		}
 
@@ -111,7 +112,9 @@ void BinTree::getHits(Record *record, RecordKeyList &hitSet)
 	if (_showBinMetrics) {
 		return; //don't care about query entries just yet.
 	}
-
+	if (record->isUnmapped()) {
+		return;
+	}
     const QuickString &chr = record->getChrName();
 	mainMapType::iterator mainIter = _mainMap.find(chr);
 	if (mainIter == _mainMap.end()) {
@@ -169,7 +172,7 @@ void BinTree::getHits(Record *record, RecordKeyList &hitSet)
 
 bool BinTree::addRecordToTree(const Record *record)
 {
-	//TBD. get chr, bin. allocate all bins and single bins as needed.
+	// Get chr, bin. allocate all bins and single bins as needed.
 	const QuickString &chr = record->getChrName();
 	uint32_t startPos = (uint32_t)(record->getStartPos());
 	uint32_t endPos = (uint32_t)(record->getEndPos());
