@@ -10,6 +10,8 @@
 #include "gzstream.h"
 #include "CompressionTools.h"
 
+const char *InputStreamMgr::FIFO_STRING_LITERAL = "/dev/fd";
+
 InputStreamMgr::InputStreamMgr(const QuickString &filename, bool buildScanBuffer)
 :
  _filename(filename),
@@ -55,6 +57,9 @@ bool InputStreamMgr::init()
 		}
 		_pushBackStreamBuf = new PushBackStreamBuf(cin.rdbuf());
 	} else {
+		if (strncmp(_filename.c_str(), FIFO_STRING_LITERAL, strlen(FIFO_STRING_LITERAL)) == 0) {
+			_isStdin = true;
+		}
 		_inputFileStream = new ifstream(_filename.c_str());
 		if (_inputFileStream->fail()) {
 			cerr << "Error: Unable to open file " << _filename << ". Exiting." << endl;

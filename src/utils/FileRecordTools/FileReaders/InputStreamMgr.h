@@ -52,6 +52,8 @@ private:
 	static const int SCAN_BUFFER_SIZE = 4096; // 4 K buffer
 	static const int MIN_SCAN_BUFFER_SIZE = 2048;
 	int _numBytesInBuffer; //this will hold the length of the buffer after the scan.
+
+	static const char *FIFO_STRING_LITERAL;
 	bool bamDetected(int numChars, int currChar);
 	void decompressBuffer();
 
