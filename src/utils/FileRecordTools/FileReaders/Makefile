@@ -5,6 +5,7 @@ UTILITIES_DIR = ../../../utils/
 # define our includes
 # -------------------
 INCLUDES = -I$(UTILITIES_DIR)/BamTools/include/ \
+			-I$(UTILITIES_DIR)/BamTools/src/ \
 			-I$(UTILITIES_DIR)/fileType/ \
 			 -I$(UTILITIES_DIR)/Contexts/ \
 			-I$(UTILITIES_DIR)/GenomeFile/ \

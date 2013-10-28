@@ -11,7 +11,8 @@ INCLUDES = -I$(UTILITIES_DIR)/general/ \
            -I$(UTILITIES_DIR)/FileRecordTools/ \
            -I$(UTILITIES_DIR)/FileRecordTools/FileReaders/ \
            -I$(UTILITIES_DIR)/FileRecordTools/Records/ \
-           -I$(UTILITIES_DIR)/BamTools/include 
+           -I$(UTILITIES_DIR)/BamTools/include \
+           -I$(UTILITIES_DIR)/BamTools/src
          
 # ----------------------------------
 # define our source and object files

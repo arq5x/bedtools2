@@ -16,19 +16,19 @@ public:
 	FileReader();
 	virtual ~FileReader();
 	void setFileName(const string &filename) { _filename = filename; }
-	void setInputStream(istream *inputStream) {
-		_inputStream = inputStream;
-		_externalInputStream = true;
-	}
+//	void setInputStream(istream *inputStream) {
+//		_inputStream = inputStream;
+//		_externalInputStream = true;
+//	}
 	void setInputStream(BufferedStreamMgr *bufStreamMgr) {
 		_bufStreamMgr = bufStreamMgr;
-		_inputStream = _bufStreamMgr->getStream();
-		_externalInputStream = true;
-		_useBufStream = true;
+//		_inputStream = _bufStreamMgr->getStream();
+//		_externalInputStream = true;
+//		_useBufStream = true;
 
 		// This will short circuit the open method. BufferedStreamMgr does it's own file opening.
 		//However, for BAM, we want to re-open it.
-		_isFileOpen = _bufStreamMgr->getTypeChecker().isBam() ? false : true;
+		_isFileOpen = true; //_bufStreamMgr->getTypeChecker().isBam() ? false : true;
 
 	}
 	void setContext(const Context *context) { _context = context; }
@@ -43,13 +43,13 @@ public:
 	virtual const QuickString &getHeader() const =0;
 protected:
 	string _filename;
-	istream   *_inputStream;
+//	istream   *_inputStream;
 	BufferedStreamMgr *_bufStreamMgr;
 
 	bool _isFileOpen;
-	bool _mustDeleteInputStream;
-	bool _externalInputStream;
-	bool _useBufStream;
+//	bool _mustDeleteInputStream;
+//	bool _externalInputStream;
+//	bool _useBufStream;
 	int _currChromId;
 	Context const *_context;
 

@@ -27,6 +27,7 @@
 
 #include "FreeList.h"
 #include "QuickString.h"
+#include <stack>
 #include <cstring> //for memset
 
 template <class T> class BTlist;
@@ -168,6 +169,31 @@ public:
 		_size++;
 	}
 
+//	void push_front(const T &val) {
+//		BTlistNode<T> *newNode = new BTlistNode<T>(val);
+//		if (empty()) {
+//			_begin = newNode;
+//			_currEnd = newNode;
+//			_prevCursor = NULL;
+//		} else {
+//			newNode->_next = _begin;
+//			_begin = newNode;
+//			_prevCursor = _currEnd;
+//		}
+//		_size++;
+//	}
+//	void push_front(BTlist<T> &newList) {
+//		stack<T> theStack;
+//		for (const_iterator_type iter = newList.begin(); iter != newList.end(); iter = newList.next()) {
+//			theStack.push(iter->_val);
+//		}
+//		while (!theStack.empty()) {
+//			const T &val = theStack.top();
+//			theStack.pop();
+//			push_front(val);
+//		}
+//	}
+
 	void clear() {
 		if (_dontDelete) {
 			return;
@@ -207,6 +233,8 @@ public:
 	//this method will convert the contents of the list into a QuickString.
 	//It assumes that the templated type of the listNode can be converted to a
 	//char using the (char) cast. The user must ensure that this is the case.
+	//The 2nd parameter needs only be true if you wish to append the data
+	//to the QuickString's existing contents. Otherwise, it will be cleared first.
 	void toStr(QuickString &str, bool append = false) const {
 		if (!append) {
 			str.clear();

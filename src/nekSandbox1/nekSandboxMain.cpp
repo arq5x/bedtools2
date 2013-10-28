@@ -16,6 +16,8 @@ using namespace std;
 #include "InflateStreamBuf.h"
 #include "InputStreamMgr.h"
 #include "BufferedStreamMgr.h"
+#include "api/internal/io/BgzfStream_p.h"
+
 //void doSweep(const Context *context);
 //void testDualQueue(Context *context);
 //
@@ -32,48 +34,95 @@ int nek_sandbox1_main(int argc,char** argv)
 	if (argc < 2) {
 		cerr << "Error: Need one input file. Use \"-\" for stdin." << endl;
 	}
-
-	ifstream myFile(argv[1]);
-	if (!myFile.good()) {
-		cerr << "Error: Can't open genome file" << argv[1] << "Exiting..." << endl;
-		exit(1);
-	}
-	string sLine;
-	vector<QuickString> fields;
-	QuickString chrName;
-
-	vector<QuickString> chroms;
-	chroms.push_back("1");
-	chroms.push_back("2");
-	chroms.push_back("10");
-	chroms.push_back("11");
-
-	vector<int> chromCounts(4, 0);
-	int chromIdx = 0;
-	while (!myFile.eof()) {
-		sLine.clear();
-		fields.clear();
-		getline(myFile, sLine);
-		if (sLine[0] == '@') {
-			cout << sLine << endl;
-			continue;
-		}
-		Tokenize(sLine.c_str(), fields);
-		const QuickString &currChrom = fields[2];
-		if (currChrom == chroms[chromIdx]) {
-			cout << sLine << endl;
-			chromCounts[chromIdx]++;
-			if (chromCounts[chromIdx] >= 3000) {
-				chromIdx++;
-			}
-			if (chromIdx > 3) {
-				break;
-			}
-		}
-	}
-
-	return 0;
-
+//	ifstream inFileStream(argv[1]);
+//	static const int BUF_SIZE = 8192;
+//	BamTools::Internal::BgzfStream bgStream;
+//	bgStream.OpenStream(&inFileStream, BamTools::IBamIODevice::ReadOnly);
+//	char sLine[BUF_SIZE];
+//	while (bgStream.IsOpen()) {
+//		memset(sLine, 0, BUF_SIZE);
+//		bgStream.Read(sLine, BUF_SIZE-1);
+//		if((int)strlen(sLine) < BUF_SIZE-1) {
+//			bgStream.Close();
+//		}
+//		printf("%s", sLine);
+//	}
+//	return 0;
+//	QuickString filename(argv[1]);
+//	istream *inputStream = NULL;
+//	if (filename  == "-") {
+//		inputStream = &cin;
+//	} else {
+//		inputStream = new ifstream(filename.c_str());
+//	}
+//
+//	BamTools::BamReader _bamReader;
+//	try {
+//		_bamReader.OpenStream(inputStream);
+//	}
+//	catch (...) {
+//		fprintf(stderr, "ERROR: Unable to open BAM file from standard input.\n");
+//		exit(1);
+//	}
+////	try {
+////		_bamReader.Open(argv[1]);
+////	}
+////	catch (...) {
+////		fprintf(stderr, "ERROR: Unable to open BAM file %s\n",argv[1]);
+////		exit(1);
+////	}
+////	}
+//    QuickString _bamHeader = _bamReader.GetHeaderText();
+//    BamTools::RefVector _references = _bamReader.GetReferenceData();
+//
+//    if (_bamHeader.empty() || _references.empty()) {
+//    	cout << "This is not a bam file." << endl;
+//    } else {
+//    	cout << "This is a BAM file." << endl;
+//    }
+//	return 0;
+//
+//	ifstream myFile(argv[1]);
+//	if (!myFile.good()) {
+//		cerr << "Error: Can't open genome file" << argv[1] << "Exiting..." << endl;
+//		exit(1);
+//	}
+//	string sLine;
+//	vector<QuickString> fields;
+//	QuickString chrName;
+//
+//	vector<QuickString> chroms;
+//	chroms.push_back("1");
+//	chroms.push_back("2");
+//	chroms.push_back("10");
+//	chroms.push_back("11");
+//
+//	vector<int> chromCounts(4, 0);
+//	int chromIdx = 0;
+//	while (!myFile.eof()) {
+//		sLine.clear();
+//		fields.clear();
+//		getline(myFile, sLine);
+//		if (sLine[0] == '@') {
+//			cout << sLine << endl;
+//			continue;
+//		}
+//		Tokenize(sLine.c_str(), fields);
+//		const QuickString &currChrom = fields[2];
+//		if (currChrom == chroms[chromIdx]) {
+//			cout << sLine << endl;
+//			chromCounts[chromIdx]++;
+//			if (chromCounts[chromIdx] >= 3000) {
+//				chromIdx++;
+//			}
+//			if (chromIdx > 3) {
+//				break;
+//			}
+//		}
+//	}
+//
+//	return 0;
+//
 	Context context;
 	context.addInputFile(argv[1]);
 	context.setSortedInput(true);
@@ -100,9 +149,6 @@ int nek_sandbox1_main(int argc,char** argv)
 			break;
 		}
 
-		if (record->getStartPos() == 90647945) {
-			printf("Breakpoint here.\n");
-		}
 		outbuf.clear();
 		record->print(outbuf);
 		printf("%s\n", outbuf.c_str());

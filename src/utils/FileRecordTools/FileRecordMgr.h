@@ -171,6 +171,7 @@ private:
 	unsigned long _totalMergedRecordLength;
 
 	BlockMgr *_blockMgr;
+	BamTools::BamReader *_bamReader;
 
 
 	void allocateFileReader();

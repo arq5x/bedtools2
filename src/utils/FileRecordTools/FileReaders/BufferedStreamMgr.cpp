@@ -16,7 +16,9 @@ BufferedStreamMgr::BufferedStreamMgr(const QuickString &filename)
    	_filename(filename),
   	_mainBufCurrStartPos(0),
   	_mainBufCurrLen(0),
-  	_eof(false)
+  	_eof(false),
+  	_useBufSize(0),
+  	_streamFinished(false)
 {
 
 }
@@ -49,9 +51,14 @@ bool BufferedStreamMgr::init()
 	if (!getTypeData()) {
 		return false;
 	}
+	if (_inputStreamMgr->isGzipped()) {
+		_useBufSize = GZIP_LINE_BUF_SIZE;
+	} else {
+		_useBufSize =  MAIN_BUF_READ_SIZE;
+	}
 
-	_mainBuf = new bufType[MAIN_BUF_READ_SIZE +1];
-	memset(_mainBuf, 0, MAIN_BUF_READ_SIZE +1);
+	_mainBuf = new bufType[_useBufSize +1];
+	memset(_mainBuf, 0, _useBufSize +1);
 
 	return true;
 }
@@ -106,10 +113,17 @@ bool BufferedStreamMgr::readFileChunk()
 	if (eof()) {
 		return false;
 	}
-	memset(_mainBuf, 0, MAIN_BUF_READ_SIZE +1);
-
-	_inputStreamMgr->getFinalStream()->read((char *)_mainBuf, MAIN_BUF_READ_SIZE);
-	_mainBufCurrLen = _inputStreamMgr->getFinalStream()->gcount();
+	memset(_mainBuf, 0, _useBufSize +1);
 	_mainBufCurrStartPos = 0;
-	return _mainBufCurrLen > 0;
+
+	if (!_streamFinished) {
+		_mainBufCurrLen = _inputStreamMgr->read((char *)_mainBuf, _useBufSize);
+		if (_mainBufCurrLen < _useBufSize) {
+			_streamFinished = true;
+		}
+		return _mainBufCurrLen > 0;
+	} else {
+		_mainBufCurrLen = 0;
+		return false;
+	}
 }

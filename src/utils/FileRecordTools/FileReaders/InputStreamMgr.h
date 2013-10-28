@@ -13,6 +13,8 @@ using namespace std;
 #include "PushBackStreamBuf.h"
 #include "InflateStreamBuf.h"
 #include "QuickString.h"
+#include "api/BamReader.h"
+#include "api/internal/io/BgzfStream_p.h"
 
 #include <iostream>
 
@@ -22,9 +24,10 @@ public:
 	InputStreamMgr(const QuickString &filename, bool buildScanBuffer = true);
 	~InputStreamMgr();
 	bool init();
+	int read(char *data, size_t dataSize);
 
 	//use getScanBuffer for auto-detection of file types.
-	istream *getFinalStream() { return _finalInputStream; }
+//	istream *getFinalStream() { return _finalInputStream; }
 	const BTlist<int> &getScanBuffer() const { return _scanBuffer; }
 	int getBufferLength() const { return _numBytesInBuffer; }
 	void populateScanBuffer();
@@ -34,6 +37,7 @@ public:
 	PushBackStreamBuf *getPushBackStreamBuf() const {return _pushBackStreamBuf; }
 	void getSavedData(QuickString &str) const { str = _saveDataStr; }
 	bool isBam() const { return _isBam; }
+	BamTools::BamReader *getBamReader() { return _bamReader; }
 
 private:
 	QuickString _filename;
@@ -48,13 +52,18 @@ private:
 	bool _isStdin;
 	bool _isGzipped;
 	bool _isBam;
+	bool _isBgzipped;
+	bool _bamRuledOut;
 	vector<int> _possibleBamCode;
 	static const int SCAN_BUFFER_SIZE = 4096; // 4 K buffer
+	static const int BAM_SCAN_BUFFER_SIZE = 32768; // 32K
 	static const int MIN_SCAN_BUFFER_SIZE = 2048;
 	int _numBytesInBuffer; //this will hold the length of the buffer after the scan.
+	BamTools::BamReader *_bamReader;
+	BamTools::Internal::BgzfStream *_bgStream;
 
 	static const char *FIFO_STRING_LITERAL;
-	bool bamDetected(int numChars, int currChar);
+	bool detectBamOrBgzip(int &numChars, int currChar, bool &mustAppend);
 	void decompressBuffer();
 
 };

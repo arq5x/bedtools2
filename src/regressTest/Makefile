@@ -13,6 +13,7 @@ INCLUDES = -I$(UTILITIES_DIR)/bedFile/ \
            -I$(UTILITIES_DIR)/fileType/ \
            -I$(UTILITIES_DIR)/general/ \
            -I$(UTILITIES_DIR)/BamTools/include \
+           -I$(UTILITIES_DIR)/BamTools/src \
            -I$(UTILITIES_DIR)/version/ \
            -I$(UTILITIES_DIR)/FileRecordTools/ \
 		   -I$(UTILITIES_DIR)/FileRecordTools/FileReaders \

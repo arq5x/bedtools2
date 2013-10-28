@@ -31,9 +31,10 @@ public:
 	//this is set to false, so not using them, which reduces
 	//the run time of reading a BAM file by more than half.
 	virtual void setUseTags(bool flag) { _useTags = flag; }
+	void setBamReader(BamTools::BamReader *bamReader) { _bamReader = bamReader; }
 	virtual bool readEntry();
 
-	virtual bool hasHeader() const { return _bamReader.IsOpen(); } //any open Bam file automatically has a header
+	virtual bool hasHeader() const { return _bamReader->IsOpen(); } //any open Bam file automatically has a header
 	virtual const QuickString &getHeader() const { return _bamHeader; }
 	const BamTools::RefVector &getReferences() const { return _references; }
 
@@ -49,12 +50,13 @@ public:
 	char getStrand() const;
 
 protected:
-	BamTools::BamReader _bamReader;
+	BamTools::BamReader *_bamReader;
 	BamTools::BamAlignment _bamAlignment;
 	bool _eof;
 	QuickString _bamHeader;
 	BamTools::RefVector _references;
 	bool _useTags;
+	bool _shouldDeleteBamReader;
 
 
 	void extractNameFromCore();
