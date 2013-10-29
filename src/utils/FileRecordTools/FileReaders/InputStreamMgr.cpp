@@ -175,9 +175,8 @@ bool InputStreamMgr::detectBamOrBgzip(int &numChars, int currChar, bool &mustApp
 			_bamReader = new BamTools::BamReader();
 			_bamReader->OpenStream(_finalInputStream);
 			QuickString bamHeader(_bamReader->GetHeaderText());
-			BamTools::RefVector bamRefs(_bamReader->GetReferenceData());
 
-			if (bamHeader.empty() || bamRefs.empty()) {
+			if (bamHeader.empty()) {
 				//This is NOT a bam file.
 				_pushBackStreamBuf->clear();
 				_compressedSaveData.clear();
