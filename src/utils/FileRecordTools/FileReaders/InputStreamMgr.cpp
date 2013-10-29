@@ -57,6 +57,10 @@ InputStreamMgr::~InputStreamMgr() {
 		delete _bgStream;
 		_bgStream = NULL;
 	}
+	if (_finalInputStream != NULL) {
+		delete _finalInputStream;
+		_finalInputStream = NULL;
+	}
 }
 
 bool InputStreamMgr::init()
@@ -225,7 +229,7 @@ void InputStreamMgr::reset()
 	}
 	if (!_isStdin) {
 		//For file input, just re-open the file.
-		_oldInputStream = _finalInputStream;
+		delete _finalInputStream;
 		_finalInputStream = new ifstream(_filename.c_str());
 	} else {
 		if (_isBgzipped) {
