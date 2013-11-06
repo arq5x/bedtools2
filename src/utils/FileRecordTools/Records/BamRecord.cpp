@@ -148,10 +148,10 @@ void BamRecord::printRemainingBamFields(QuickString &outBuf, RecordKeyList *keyL
 }
 
 void BamRecord::printUnmapped(QuickString &outBuf) const {
-	outBuf.append(_chrName);
+	outBuf.append(_chrName.empty() ? "." : _chrName);
 	outBuf.append("\t-1\t-1\t");
-	outBuf.append(_name);
+	outBuf.append(_name.empty() ? "." : _name);
 	outBuf.append('\t');
-	outBuf.append(_score);
+	outBuf.append(_score.empty() ? "." : _score);
 	outBuf.append("\t.\t-1\t-1\t-1\t0,0,0\t0\t.\t."); // dot for strand, -1 for blockStarts and blockEnd
 }
