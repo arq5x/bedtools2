@@ -219,11 +219,74 @@ echo \
 .	-1	-1	FCC1MK2ACXX:1:1102:6799:2633#/2	0	.	-1	-1	-1	0,0,0	0	.	." > exp
 $BT intersect -a a_with_bothUnmapped.bam -b b.bed -bed -v > obs
 check obs exp
-#rm obs exp
+rm obs exp
 
 
+###########################################################
+#  Test intersection of bam file containing read where one
+# mate is mapped and one is not.
+############################################################
+echo "    intersect.new.t19...\c"
+echo \
+"chr1	98650	98704	FCC1MK2ACXX:1:1212:13841:9775#/1	0	+	98604	98704	0,0,0	1	100,	0," > exp
+$BT intersect -a oneUnmapped.bam -b j1.bed -bed > obs
+check obs exp
+rm obs exp
+
+###########################################################
+#  Test intersection of bam file containing read where one
+# mate is mapped and one is not, with noHit (-v) option.
+############################################################
+echo "    intersect.new.t20...\c"
+echo \
+"chr1	-1	-1	FCC1MK2ACXX:1:1212:13841:9775#/2	0	.	-1	-1	-1	0,0,0	0	.	." > exp
+$BT intersect -a oneUnmapped.bam -b j1.bed -bed -v > obs
+check obs exp
+rm obs exp
 
 
+###########################################################
+#  Test intersection with -sorted, see that order specified
+#  in genome file is enforced.
+############################################################
+echo "    intersect.new.t21...\c"
+echo \
+"Error: Sorted input specified, but the file chromOrderA.bed has the following record with a different sort order than the genomeFile human.hg19.genome
+chr10	10	20	a3	100	+" > exp
+$BT intersect -a chromOrderA.bed -b chromOrderB.bed -sorted -g human.hg19.genome 2>obs
+check obs exp
+rm obs exp
+
+
+###########################################################
+#  Test intersection with -sorted, see that hits are missed
+#  With no genome file
+############################################################
+echo "    intersect.new.t22...\c"
+echo \
+"chr1	15	20	a1	100	+
+chr2	15	20	a2	100	+
+chrX	15	20	a5	100	+" > exp
+$BT intersect -a chromOrderA.bed -b chromOrderB.bed -sorted > obs
+check obs exp
+rm obs exp
+
+
+###########################################################
+#  Test intersection with -sorted, see that hits are correct
+#  when sort order of files matches genome file sort order
+############################################################
+echo "    intersect.new.t23...\c"
+echo \
+"chr1	15	20	a1	100	+
+chr2	15	20	a2	100	+
+chr10	15	20	a3	100	+
+chr11	15	20	a4	100	+
+chrX	15	20	a5	100	+
+chrM	15	20	a6	100	+" > exp
+$BT intersect -a chromOrderA.bed -b chromOrderB.bed -sorted -g human.hg19.vSort.genome > obs
+check obs exp
+rm obs exp
 
 
 
