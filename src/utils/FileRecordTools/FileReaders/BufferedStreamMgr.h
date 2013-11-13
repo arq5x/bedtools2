@@ -42,6 +42,7 @@ private:
 	bool _eof;
 	int _useBufSize;
 	bool _streamFinished;
+	QuickString _currScanBuffer;
 	//The minus ones in these constants are for leaving room for a null terminator after reading into buffers.
 	static const int MAIN_BUF_READ_SIZE = 67108863; //64 Mb minus 1
 	static const int TYPE_CHECK_READ_SIZE = 4095; // 4K

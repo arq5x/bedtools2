@@ -57,26 +57,30 @@ bool BufferedStreamMgr::init()
 		_useBufSize =  MAIN_BUF_READ_SIZE;
 	}
 
+	size_t trueBufSize = max(_useBufSize, (int)_currScanBuffer.size());
+	_useBufSize = trueBufSize;
 	_mainBuf = new bufType[_useBufSize +1];
 	memset(_mainBuf, 0, _useBufSize +1);
+	memcpy(_mainBuf, _currScanBuffer.c_str(), _currScanBuffer.size());
+	_mainBufCurrLen = _currScanBuffer.size();
 
 	return true;
 }
 
 bool BufferedStreamMgr::getTypeData()
 {
-	QuickString currScanBuffer;
-	_inputStreamMgr->getSavedData(currScanBuffer);
+	_currScanBuffer = _inputStreamMgr->getSavedData();
 	do {
-		if (!_typeChecker.scanBuffer(currScanBuffer.c_str(), currScanBuffer.size()) && !_typeChecker.needsMoreData()) {
+		if (!_typeChecker.scanBuffer(_currScanBuffer.c_str(), _currScanBuffer.size()) && !_typeChecker.needsMoreData()) {
 			return false;
 		} else if (_typeChecker.needsMoreData()) {
 			_inputStreamMgr->populateScanBuffer();
-			currScanBuffer.clear();
-			_inputStreamMgr->getSavedData(currScanBuffer);
+			_currScanBuffer.append(_inputStreamMgr->getSavedData());
 		}
 	} while (_typeChecker.needsMoreData());
-	_inputStreamMgr->reset();
+	if (_inputStreamMgr->resetStream()) {
+		_currScanBuffer.clear();
+	}
 	return true;
 }
 

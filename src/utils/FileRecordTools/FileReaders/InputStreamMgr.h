@@ -31,13 +31,14 @@ public:
 	const BTlist<int> &getScanBuffer() const { return _scanBuffer; }
 	int getBufferLength() const { return _numBytesInBuffer; }
 	void populateScanBuffer();
-	void reset();
 	const QuickString &getSavedData() const { return _saveDataStr; }
 	bool isGzipped() const { return _isGzipped; }
 	PushBackStreamBuf *getPushBackStreamBuf() const {return _pushBackStreamBuf; }
-	void getSavedData(QuickString &str) const { str = _saveDataStr; }
+//	void getSavedData(QuickString &str) const { str = _saveDataStr; }
 	bool isBam() const { return _isBam; }
 	BamTools::BamReader *getBamReader() { return _bamReader; }
+	bool resetStream();
+
 
 private:
 	QuickString _filename;
@@ -45,7 +46,6 @@ private:
 	ifstream *_inputFileStream;
 	BTlist<int> _scanBuffer;
 	QuickString _saveDataStr;
-	BTlist<int> _compressedSaveData;
 	InflateStreamBuf *_infStreamBuf;
 	istream * _finalInputStream;
 	istream *_oldInputStream;
@@ -53,7 +53,9 @@ private:
 	bool _isGzipped;
 	bool _isBam;
 	bool _isBgzipped;
+	char *_tmpZipBuf;
 	bool _bamRuledOut;
+	bool _streamFinished;
 	vector<int> _possibleBamCode;
 	static const int SCAN_BUFFER_SIZE = 4096; // 4 K buffer
 	static const int BAM_SCAN_BUFFER_SIZE = 32768; // 32K
@@ -63,8 +65,9 @@ private:
 	BamTools::Internal::BgzfStream *_bgStream;
 
 	static const char *FIFO_STRING_LITERAL;
-	bool detectBamOrBgzip(int &numChars, int currChar, bool &mustAppend);
-	void decompressBuffer();
+	void readZipChunk();
+	bool detectBamOrBgzip(int &numChars, int currChar);
+//	void decompressBuffer();
 
 };
 

@@ -31,6 +31,11 @@ int nek_sandbox1_main2(int argc,char** argv);
 int nek_sandbox1_main(int argc,char** argv)
 {
 
+//	for (int i=0; i < 4000; i++) {
+//		cout << "# This is line " << i << " of a file with a large header." << endl;
+//	}
+//	return 0;
+
 	if (argc < 2) {
 		cerr << "Error: Need one input file. Use \"-\" for stdin." << endl;
 	}
@@ -165,7 +170,7 @@ int nek_sandbox1_main(int argc,char** argv)
 
 		frm.deleteRecord(record);
 	}
-	cout << "Final header is: " << frm.getHeader() << endl;
+//	cout << "Final header is: " << frm.getHeader() << endl;
 	frm.close();
 
 	return 0;

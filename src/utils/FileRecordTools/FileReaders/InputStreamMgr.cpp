@@ -23,7 +23,9 @@ InputStreamMgr::InputStreamMgr(const QuickString &filename, bool buildScanBuffer
  _isGzipped(false),
  _isBam(false),
  _isBgzipped(false),
+ _tmpZipBuf(NULL),
  _bamRuledOut(false),
+ _streamFinished(false),
  _numBytesInBuffer(0),
  _bamReader(NULL),
  _bgStream(NULL)
@@ -61,6 +63,10 @@ InputStreamMgr::~InputStreamMgr() {
 		delete _finalInputStream;
 		_finalInputStream = NULL;
 	}
+	if (_tmpZipBuf != NULL) {
+		delete [] _tmpZipBuf;
+		_tmpZipBuf = NULL;
+	}
 }
 
 bool InputStreamMgr::init()
@@ -92,26 +98,54 @@ bool InputStreamMgr::init()
 	//now we have a PushBackStreamBuf. Make a new stream.
 	_finalInputStream = new istream(_pushBackStreamBuf);
 	populateScanBuffer();
+//	resetStream();
 	return true;
 }
 
 int InputStreamMgr::read(char *data, size_t dataSize)
 {
+	size_t origRead = 0;
+	if (!_saveDataStr.empty()) {
+		//must first copy contents of savedData into requested data read buffer.
+		if (dataSize >= _saveDataStr.size()) {
+			//They asked for the same amount of data or more than we saved. Give them all the saved data,
+			//then decrement the requested data size accordingly.
+			origRead = _saveDataStr.size();
+			memcpy(data, _saveDataStr.c_str(), origRead);
+			data += origRead;
+			dataSize -= origRead;
+			_saveDataStr.clear();
+		} else {
+			//This part is tricky. They want less data than we saved. Give them what they
+			//requested, then delete from the front of the saveDataStr by using it's substr method.
+			memcpy(data, _saveDataStr.c_str(), dataSize);
+			QuickString newDataStr;
+			_saveDataStr.substr(newDataStr, dataSize, _saveDataStr.size() - dataSize);
+			_saveDataStr = newDataStr;
+			return dataSize;
+		}
+	}
+	if (_streamFinished) {
+		return origRead;
+	}
 	if (_isBgzipped) {
-		return (int)(_bgStream->Read(data, dataSize));
+		return (int)(origRead + _bgStream->Read(data, dataSize));
 	}
 	_finalInputStream->read(data, dataSize);
-	return _finalInputStream->gcount();
+	return origRead + _finalInputStream->gcount();
 }
 
 void InputStreamMgr::populateScanBuffer()
 {
 	_scanBuffer.clear();
+	_saveDataStr.clear();
 	int numChars=0;
 	int currChar = 0;
-	bool mustAppend = true;
 	while (1) {
-		mustAppend = true;
+		if (_isGzipped && _bamRuledOut) {
+			readZipChunk();
+			return;
+		}
 		currChar = _pushBackStreamBuf->sbumpc();
 		//Stop when EOF hit.
 		if (currChar == EOF) {
@@ -120,35 +154,28 @@ void InputStreamMgr::populateScanBuffer()
 		numChars++;
 		_scanBuffer.push_back(currChar);
 		if (_isGzipped) {
-			if (!_bamRuledOut && detectBamOrBgzip(numChars, currChar, mustAppend)) {
+			if (!_bamRuledOut && detectBamOrBgzip(numChars, currChar)) {
 				return;
 			}
 			if (numChars == 0) {
 				continue; //this will only happen when we've just discovered that this
 				//is definitely not BAM, and want to start over.
 			}
-			if (mustAppend) {
-				_compressedSaveData.push_back(currChar);
-			}
 		}
 
-		//For non-gzip, also stop if we have the minimum number of bytes and newline is hit.
+		//Stop if we have the minimum number of bytes and newline is hit.
 		//For gzip, stop at SCAN_BUFFER_SIZE.
-		if ((!_isGzipped && (currChar == '\n' && numChars >= MIN_SCAN_BUFFER_SIZE )) || (_isGzipped && numChars >= SCAN_BUFFER_SIZE)) {
+		if (currChar == '\n' && numChars >= MIN_SCAN_BUFFER_SIZE ){
 			break;
 		}
 	}
 	_numBytesInBuffer = _scanBuffer.size();
 
-	//append it to the savedDataStr. If it's gzipped, decompress it first.
-	if (_isGzipped) {
-		decompressBuffer();
-	} else {
-		_scanBuffer.toStr(_saveDataStr, true);
-	}
+	//append it to the savedDataStr.
+	_scanBuffer.toStr(_saveDataStr, true);
 }
 
-bool InputStreamMgr::detectBamOrBgzip(int &numChars, int currChar, bool &mustAppend)
+bool InputStreamMgr::detectBamOrBgzip(int &numChars, int currChar)
 {
 	//Look for the BAM magic string "BAM\1" in the first fouur characters of the input stream.
 	//In compressed form, the first char is the gzip signifier, which was already found.
@@ -181,14 +208,12 @@ bool InputStreamMgr::detectBamOrBgzip(int &numChars, int currChar, bool &mustApp
 			QuickString bamHeader(_bamReader->GetHeaderText());
 
 			if (bamHeader.empty()) {
-				//This is NOT a bam file.
+				//This is NOT a bam file, but it is bgzipped.
 				_pushBackStreamBuf->clear();
-				_compressedSaveData.clear();
 				//Put all bytes read so far back onto the scan buffer, then reset
 				//everything so that we're effectively starting over.
 				_pushBackStreamBuf->pushBack(_scanBuffer);
 				_scanBuffer.clear();
-				mustAppend = false;
 				numChars = 0;
 				_isBam = false;
 				_isBgzipped = true;
@@ -196,69 +221,81 @@ bool InputStreamMgr::detectBamOrBgzip(int &numChars, int currChar, bool &mustApp
 				_numBytesInBuffer = 0;
 				delete _bamReader;
 				_bamReader = NULL;
+
+				//Alter the finalInputSream to become a bgzfReader.
+				_bgStream = new BamTools::Internal::BgzfStream();
+				_bgStream->OpenStream(_finalInputStream, BamTools::IBamIODevice::ReadOnly);
+
 				return false;
 			}
+			//This is a BAM file.
 			_isBam = true;
 			_numBytesInBuffer = _scanBuffer.size();
 			return true;
+		} else if (numChars == 4) {
+			//This is a gzipped file, and it is not bgzipped or BAM.
+			_pushBackStreamBuf->clear();
+			_pushBackStreamBuf->pushBack(_scanBuffer);
+			_scanBuffer.clear();
+			numChars = 0;
+			_isBam = false;
+			_isBgzipped = false;
+			_bamRuledOut = true;
+			_numBytesInBuffer = 0;
+			_infStreamBuf = new InflateStreamBuf(_finalInputStream);
+			if (_oldInputStream != NULL) {
+				delete _oldInputStream;
+			}
+			_oldInputStream = _finalInputStream;
+			_finalInputStream = new istream(_infStreamBuf);
+			return false;
 		}
 	}
 	return false;
 }
 
-void InputStreamMgr::decompressBuffer()
+//void InputStreamMgr::decompressBuffer()
+//{
+//	//allocate an array to hold uncompressed data.
+//	_saveDataStr.clear();
+//	uInt maxDecompressSize = 20 * _numBytesInBuffer;
+//	unsigned char *newScanBuffer = new unsigned char[maxDecompressSize];
+//	memset(newScanBuffer, 0, maxDecompressSize);
+//
+//	unsigned int numDecompressChars = inflateGzippedArray(_scanBuffer, newScanBuffer, maxDecompressSize, _numBytesInBuffer);
+//
+//	// newScanBuffer should now contain uncompressed data.
+//	//delete old buffer, point it at new buffer.
+//	_saveDataStr.append((char *)newScanBuffer, numDecompressChars);
+//
+//	delete [] newScanBuffer;
+//}
+
+void InputStreamMgr::readZipChunk()
 {
-	//allocate an array to hold uncompressed data.
-	uInt maxDecompressSize = 20 * _numBytesInBuffer;
-	unsigned char *newScanBuffer = new unsigned char[maxDecompressSize];
-	memset(newScanBuffer, 0, maxDecompressSize);
-
-	unsigned int numDecompressChars = inflateGzippedArray(_scanBuffer, newScanBuffer, maxDecompressSize, _numBytesInBuffer);
-
-	// newScanBuffer should now contain uncompressed data.
-	//delete old buffer, point it at new buffer.
-	_saveDataStr.append((char *)newScanBuffer, numDecompressChars);
-
-	delete [] newScanBuffer;
+	if (_tmpZipBuf == NULL) {
+		_tmpZipBuf = new char[SCAN_BUFFER_SIZE +1];
+	}
+	memset(_tmpZipBuf, 0, SCAN_BUFFER_SIZE +1);
+	size_t numCharsRead = read(_tmpZipBuf, (size_t)SCAN_BUFFER_SIZE);
+	_saveDataStr.append(_tmpZipBuf);
+	_numBytesInBuffer = _saveDataStr.size();
+	if (numCharsRead < SCAN_BUFFER_SIZE) {
+		_streamFinished = true;
+	}
+	return;
 }
 
-void InputStreamMgr::reset()
+bool InputStreamMgr::resetStream()
 {
-	if (_isBam) {
-		return;
-	}
-	if (!_isStdin) {
-		//For file input, just re-open the file.
+	_saveDataStr.clear();
+	if (!_isBam && !_isStdin && !_isGzipped) {
+		//For non-compressed, non-stdin file input, just re-open the file.
 		delete _finalInputStream;
 		_finalInputStream = new ifstream(_filename.c_str());
-	} else {
-		if (_isBgzipped) {
-			for (BTlist<int>::const_iterator_type iter = _pushBackStreamBuf->_buffer.begin();
-					iter != _pushBackStreamBuf->_buffer.end(); iter = _pushBackStreamBuf->_buffer.next()) {
-				_compressedSaveData.push_back(iter->value());
-			}
-			_pushBackStreamBuf->clear();
-			_pushBackStreamBuf->pushBack(_compressedSaveData);
-		} else if (_isGzipped) {
-			_pushBackStreamBuf->pushBack(_compressedSaveData);
-		} else {
-			_pushBackStreamBuf->pushBack(BTlist<int>(_saveDataStr));
-		}
-//		_finalInputStream = new istream(_pushBackStreamBuf);
+		return true;
 	}
-	if (_isBgzipped) {
-		//The file is bgzipped, but not BAM.
-		_bgStream = new BamTools::Internal::BgzfStream();
-		_bgStream->OpenStream(_finalInputStream, BamTools::IBamIODevice::ReadOnly);
-	} else if (_isGzipped) {
-		//the file is gzipped, but is not bgzipped or BAM.
-		_infStreamBuf = new InflateStreamBuf(_finalInputStream);
-		if (_oldInputStream != NULL) {
-			delete _oldInputStream;
-		}
-		_oldInputStream = _finalInputStream;
-		_finalInputStream = new istream(_infStreamBuf);
-	}
+	return false;
 }
 
 

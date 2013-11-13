@@ -160,6 +160,7 @@ void QuickString::set(const char *inBuf, size_t newLen) {
 }
 
 void QuickString::reserve(size_t newLen) {
+	newLen++; //always leave room for a null termninator.
 	if (_currCapacity <= newLen) {
 		while (_currCapacity <= newLen) {
 			_currCapacity = _currCapacity << 1;
