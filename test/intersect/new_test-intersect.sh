@@ -553,4 +553,39 @@ check obs aWithHeaderVsB.txt
 rm obs
 
 
+###########################################################
+#  Test enforcement of sort order when using -sorted option.
+#  Show that detect chrom "jumping", i.e. chr1, chr2, then
+#  back to chr1
+############################################################
+echo "    intersect.new.t48...\c"
+echo "Error: Sorted input specified" > exp
+$BT intersect -a chromsOutOfOrder.bed -b b.bed -sorted 2>&1 > /dev/null | grep "Error: Sorted input specified, " | cut -f1 --delimiter=',' > obs
+check obs exp
+rm obs exp
+
+###########################################################
+#  Test enforcement of sort order when using -sorted option.
+#  Show that detect chrom "jumping", i.e. chr1, chr2, then
+#  back to chr1
+############################################################
+echo "    intersect.new.t49...\c"
+echo "Error: Sorted input specified" > exp
+$BT intersect -a recordsOutOfOrder.bed -b b.bed -sorted 2>&1 > /dev/null | grep "Error: Sorted input specified, " | cut -f1 --delimiter=',' > obs
+check obs exp
+rm obs exp
+
+###########################################################
+#  Test that we throw an error for non-existant files
+############################################################
+echo "    intersect.new.t50...\c"
+echo "Error: Unable to open file nonExistantFile.bed. Exiting." > exp
+$BT intersect -a nonExistantFile.bed -b b.bed -sorted 2>&1 > /dev/null | cat - >obs
+check obs exp
+rm obs exp
+
+
+
+
+
 
