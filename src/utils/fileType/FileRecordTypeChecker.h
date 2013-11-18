@@ -32,6 +32,7 @@ public:
 	typedef enum  { UNKNOWN_RECORD_TYPE, BED3_RECORD_TYPE, BED4_RECORD_TYPE, BEDGRAPH_RECORD_TYPE, BED5_RECORD_TYPE,
 		BED6_RECORD_TYPE, BED12_RECORD_TYPE, BED_PLUS_RECORD_TYPE, BAM_RECORD_TYPE, VCF_RECORD_TYPE, GFF_RECORD_TYPE} RECORD_TYPE;
 
+	void setFilename(const QuickString & filename) { _filename = filename; }
 	bool scanBuffer(const char *buf, size_t len=0);
 	bool needsMoreData() const { return _insufficientData; }
 
@@ -80,6 +81,7 @@ private:
 	FILE_TYPE _fileType;
 	RECORD_TYPE _recordType;
 
+	QuickString _filename; //useful for reporting errors with file.
 	vector<QuickString> _lines;
 	vector<QuickString> _currLineElems;
 	int _firstValidDataLineIdx;

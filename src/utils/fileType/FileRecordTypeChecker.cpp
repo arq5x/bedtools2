@@ -77,7 +77,7 @@ bool FileRecordTypeChecker::scanBuffer(const char *buffer, size_t len)
 	}
 	_numBytesInBuffer = len;
 	if (_numBytesInBuffer == 0) {
-		cerr << "Error: Type checker received empty buffer." << endl;
+		cerr << "Error: " << _filename << " is an empty file."<< endl;
 		exit(1);
 	}
 

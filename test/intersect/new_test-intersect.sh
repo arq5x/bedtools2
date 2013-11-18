@@ -584,6 +584,18 @@ $BT intersect -a nonExistantFile.bed -b b.bed -sorted 2>&1 > /dev/null | cat - >
 check obs exp
 rm obs exp
 
+###########################################################
+#  Test that we throw an error for empty files
+############################################################
+echo "    intersect.new.t51...\c"
+echo "is an empty file." > exp
+touch dummy.txt
+$BT intersect -a dummy.txt -b b.bed 2>&1 > /dev/null | cut -f3-6 --delimiter=' ' > obs
+check obs exp
+rm obs exp dummy.txt
+
+
+
 
 
 
