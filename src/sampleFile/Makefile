@@ -6,27 +6,26 @@ BIN_DIR = ../../bin/
 # define our includes
 # -------------------
 INCLUDES = -I$(UTILITIES_DIR)/Contexts/ \
+			-I$(UTILITIES_DIR)/general/ \
 			-I$(UTILITIES_DIR)/fileType/ \
-			-I$(UTILITIES_DIR)/FileRecordTools/ \
-		   -I$(UTILITIES_DIR)/FileRecordTools/FileReaders \
-           -I$(UTILITIES_DIR)/FileRecordTools/Records \
-           -I$(UTILITIES_DIR)/general \
-           -I$(UTILITIES_DIR)/NewChromsweep \
+			-I$(UTILITIES_DIR)/gzstream/ \
            -I$(UTILITIES_DIR)/GenomeFile/ \
            -I$(UTILITIES_DIR)/BamTools/include \
-           -I$(UTILITIES_DIR)/BamTools/src/ \
-           -I$(UTILITIES_DIR)/version/
-           
-           
-
+           -I$(UTILITIES_DIR)/BamTools/src \
+           -I$(UTILITIES_DIR)/BlockedIntervals \
+           -I$(UTILITIES_DIR)/BamTools-Ancillary \
+           -I$(UTILITIES_DIR)/FileRecordTools/ \
+           -I$(UTILITIES_DIR)/FileRecordTools/FileReaders/ \
+           -I$(UTILITIES_DIR)/FileRecordTools/Records/ \
+            -I$(UTILITIES_DIR)/version/
 
 # ----------------------------------
 # define our source and object files
 # ----------------------------------
-SOURCES= nekSandboxMain.cpp 
-OBJECTS= nekSandboxMain.o
+SOURCES= sampleMain.cpp SampleFile.cpp SampleFile.h
+OBJECTS= sampleMain.o SampleFile.o
 BUILT_OBJECTS= $(patsubst %,$(OBJ_DIR)/%,$(OBJECTS))
-PROGRAM= nekSandbox1
+PROGRAM= sample
 
 all: $(BUILT_OBJECTS)
 
@@ -38,6 +37,6 @@ $(BUILT_OBJECTS): $(SOURCES)
 	
 clean:
 	@echo "Cleaning up."
-	@rm -f $(OBJ_DIR)/nekSandboxMain.o
+	@rm -f $(OBJ_DIR)/sampleMain.o $(OBJ_DIR)/SampleFile.o
 
 .PHONY: clean

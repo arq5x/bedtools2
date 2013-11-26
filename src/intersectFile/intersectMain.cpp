@@ -12,7 +12,6 @@
 using namespace std;
 
 #include "intersectFile.h"
-#include "version.h"
 #include "Context.h"
 
 // define our program name
@@ -23,7 +22,6 @@ void intersect_help(void);
 int intersect_main(int argc, char* argv[]) {
 
     Context *context = new Context();
-
     if (!context->parseCmdArgs(argc, argv, 1) || context->getShowHelp() || !context->isValidState()) {
     	if (!context->getErrorMsg().empty()) {
     		cerr << context->getErrorMsg() << endl;

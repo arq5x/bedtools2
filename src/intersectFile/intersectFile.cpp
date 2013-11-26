@@ -37,16 +37,16 @@ FileIntersect::~FileIntersect(void) {
 }
 
 void FileIntersect::processHits(RecordKeyList &hits) {
-	if (hits.getKey()->getType() == FileRecordTypeChecker::BAM_RECORD_TYPE) {
-		RecordKeyList blockList(hits.getKey());
-		bool deleteBlocks = false;
-		_blockMgr->getBlocks(blockList, deleteBlocks);
-		_recordOutputMgr->printRecord(hits, &blockList);
-		if (deleteBlocks) {
-			_blockMgr->deleteBlocks(blockList);
-		}
-		return;
-	}
+//	if (hits.getKey()->getType() == FileRecordTypeChecker::BAM_RECORD_TYPE) {
+//		RecordKeyList blockList(hits.getKey());
+//		bool deleteBlocks = false;
+//		_blockMgr->getBlocks(blockList, deleteBlocks);
+//		_recordOutputMgr->printRecord(hits, &blockList);
+//		if (deleteBlocks) {
+//			_blockMgr->deleteBlocks(blockList);
+//		}
+//		return;
+//	}
     _recordOutputMgr->printRecord(hits);
 }
 

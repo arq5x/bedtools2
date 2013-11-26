@@ -9,15 +9,15 @@
 #define CONTEXTBASE_H_
 
 
-// This is an abstract base class for all context objects.
-//
-// Context classes handle the settings for an operation,
+// The Context class handles the settings for an operation,
 // such as merge, intersect, jaccard, etc.
 //
 // Settings include the input and output parameters, such as input
 // files, file types (if explicitly provided), genome files,
 // run options, output format, etc.
 
+#include <cstdlib>
+#include "version.h"
 #include "BedtoolsTypes.h"
 #include "FileRecordTypeChecker.h"
 #include "NewGenomeFile.h"
@@ -34,7 +34,7 @@ public:
 	typedef FileRecordTypeChecker::RECORD_TYPE ContextRecordType;
 
 	typedef enum {UNSPECIFIED_PROGRAM, INTERSECT, WINDOW, CLOSEST, COVERAGE, MAP, GENOMECOV, MERGE, CLUSTER,
-		COMPLEMENT, SUBTRACT, SLOP, FLANK, SORT, RANDOM, SHUFFLE, ANNOTATE, MULTIINTER, UNIONBEDG, PAIRTOBED,
+		COMPLEMENT, SUBTRACT, SLOP, FLANK, SORT, RANDOM, SAMPLE, SHUFFLE, ANNOTATE, MULTIINTER, UNIONBEDG, PAIRTOBED,
 		PAIRTOPAIR,BAMTOBED, BEDTOBAM, BEDTOFASTQ, BEDPETOBAM, BED12TOBED6, GETFASTA, MASKFASTA, NUC,
 		MULTICOV, TAG, JACCARD, OVERLAP, IGV, LINKS,MAKEWINDOWS, GROUPBY, EXPAND } PROGRAM_TYPE;
 
@@ -53,6 +53,15 @@ public:
 	void setInputFileType(int fileNum, ContextFileType fileType) { _inputFiles[fileNum]._fileType = fileType; }
 	ContextRecordType getInputRecordType(int fileNum) const { return _inputFiles[fileNum]._recordType; }
 	void setInputRecordType(int fileNum, ContextRecordType recordType) { _inputFiles[fileNum]._recordType = recordType; }
+	//HERE ARE SOME SIMPLER VERSIONS OF THE ABOVE FOR APPS THAT HAVE ONLY ONE INPUT FILE
+	const QuickString &getInputFileName() const { return _inputFiles[0]._fileName; }
+	ContextFileType getInputFileType() const { return _inputFiles[0]._fileType; }
+	void setInputFileType(ContextFileType fileType) { _inputFiles[0]._fileType = fileType; }
+	ContextRecordType getInputRecordType() const { return _inputFiles[0]._recordType; }
+	void setInputRecordType(ContextRecordType recordType) { _inputFiles[0]._recordType = recordType; }
+	int getInputFileIdx() const { return 0; }
+
+
 
 
 	bool determineOutputType();
@@ -149,6 +158,8 @@ public:
 
 	bool getSameStrand() const {return _sameStrand; }
 	void setSameStrand(bool val) { _sameStrand = val; }
+	bool getForwardOnly() const { return _forwardOnly; }
+	bool getReverseOnly() const { return _reverseOnly; }
 
 	bool getDiffStrand() const {return _diffStrand; }
 	void setDiffStrand(bool val) { _diffStrand = val; }
@@ -183,6 +194,21 @@ public:
 	const QuickString &getScoreOp() const { return _scoreOp; }
 	void setScoreOp(const QuickString &op) { _scoreOp = op; }
 
+
+	// METHODS FOR PROGRAMS WITH USER_SPECIFIED NUMBER
+	// OF OUTPUT RECORDS.
+	int getNumOutputRecords() const { return _numOutputRecords; }
+	void setNumOutputRecords(int val) { _numOutputRecords = val; }
+
+	//SEED OPS FOR APPS WITH RANDOMNESS
+	//When a seed has been specified on the command line, srand
+	//will have been already been called during command line parsing.
+	//For reference, srand is the C function that initializes the
+	//psuedo-random number generator. If a seed has not been
+	//specifified, the user may call the
+	bool hasConstantSeed() const { return _hasConstantSeed; }
+	int getConstantSeed() const { return _seed; }
+	int getUnspecifiedSeed();
 
 protected:
 	PROGRAM_TYPE _program;
@@ -235,7 +261,7 @@ protected:
     bool _explicitBedOutput;
     int _queryFileIdx;
     int _databaseFileIdx;
-    int _bamHeaderAndRefIdx;
+    size_t _bamHeaderAndRefIdx;
     int _maxNumDatabaseFields;
     bool _useFullBamTags;
 
@@ -246,10 +272,18 @@ protected:
 	QuickString _scoreOp;
 	set<QuickString> _validScoreOps;
 
+	int _numOutputRecords;
+
+	bool _hasConstantSeed;
+	int _seed;
+	bool _forwardOnly;
+	bool _reverseOnly;
+
 	void markUsed(int i) { _argsProcessed[i] = true; }
 	bool isUsed(int i) const { return _argsProcessed[i]; }
 	bool cmdArgsValid();
-
+	bool isValidIntersectState();
+	bool isValidSampleState();
 };
 
 #endif /* CONTEXT_H_ */

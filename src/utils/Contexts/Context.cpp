@@ -6,6 +6,8 @@
  */
 
 #include "Context.h"
+#include <unistd.h>
+#include <sys/types.h>
 
 Context::Context()
 :
@@ -43,9 +45,15 @@ Context::Context()
   _reportCount(false),
   _maxDistance(0),
   _reportNames(false),
-  _reportScores(false)
+  _reportScores(false),
+  _numOutputRecords(0),
+  _hasConstantSeed(false),
+  _seed(0),
+  _forwardOnly(false),
+  _reverseOnly(false)
 {
 	_programNames["intersect"] = INTERSECT;
+	_programNames["sample"] = SAMPLE;
 
 	_validScoreOps.insert("sum");
 	_validScoreOps.insert("max");
@@ -71,15 +79,35 @@ bool Context::determineOutputType() {
 	}
 	//test whether output should be BED or BAM.
 	//If the user explicitly requested BED, then it's BED.
+	if (getExplicitBedOutput()) {
+		setOutputFileType(FileRecordTypeChecker::SINGLE_LINE_DELIM_TEXT_FILE_TYPE);
+		_outputTypeDetermined = true;
+		return true;
+	}
+	//If this is an intersection, and the query is BAM, then
+	//the output is BAM.
+	if (_program == INTERSECT && getQueryFileType() == FileRecordTypeChecker::BAM_FILE_TYPE) {
+		setOutputFileType(FileRecordTypeChecker::BAM_FILE_TYPE);
+		_outputTypeDetermined = true;
+		return true;
+
+	}
 	//Otherwise, if there are any BAM files in the input,
 	//then the output should be BAM.
-	if (getExplicitBedOutput() || getQueryFileType() != FileRecordTypeChecker::BAM_FILE_TYPE) {
-		setOutputFileType(FileRecordTypeChecker::SINGLE_LINE_DELIM_TEXT_FILE_TYPE);
-	} else {
-		setOutputFileType(FileRecordTypeChecker::BAM_FILE_TYPE);
+	for (size_t i = 0; i < _inputFiles.size(); i++) {
+		if (_inputFiles[i]._fileType == FileRecordTypeChecker::BAM_FILE_TYPE) {
+			setOutputFileType(FileRecordTypeChecker::BAM_FILE_TYPE);
+			_bamHeaderAndRefIdx = i;
+			_outputTypeDetermined = true;
+			return true;
+		}
 	}
+
+	//Okay, it's bed.
+	setOutputFileType(FileRecordTypeChecker::SINGLE_LINE_DELIM_TEXT_FILE_TYPE);
 	_outputTypeDetermined = true;
 	return true;
+
 
 }
 
@@ -222,6 +250,23 @@ bool Context::parseCmdArgs(int argc, char **argv, int skipFirstArgs) {
         else if (strcmp(argv[i], "-s") == 0) {
             setSameStrand(true);
             markUsed(i - skipFirstArgs);
+
+        	if (_program == SAMPLE) {
+    			if (argc <= i+1) {
+    				_errorMsg = "Error: -s option given, but \"forward\" or \"reverse\" not specified.";
+    				return false;
+    			}
+    			if (strcmp(argv[i+1], "forward") == 0) {
+    				_forwardOnly = true;
+    			} else if (strcmp(argv[i+1], "reverse") == 0) {
+    				_reverseOnly = true;
+    			} else {
+    				_errorMsg = "Error: -s option given, but \"forward\" or \"reverse\" not specified.";
+    				return false;
+    			}
+                i++;
+                markUsed(i - skipFirstArgs);
+        	}
         }
         else if (strcmp(argv[i], "-S") == 0) {
             setDiffStrand(true);
@@ -246,6 +291,26 @@ bool Context::parseCmdArgs(int argc, char **argv, int skipFirstArgs) {
         else if(strcmp(argv[i], "-header") == 0) {
             setPrintHeader(true);
             markUsed(i - skipFirstArgs);
+        } else if (strcmp(argv[i], "-n") == 0) {
+			if (argc <= i+1) {
+				_errorMsg = "Error: -n option given, but no number of output records specified.";
+				return false;
+			}
+        	setNumOutputRecords(atoi(argv[i + 1]));
+        	markUsed(i - skipFirstArgs);
+        	i++;
+        	markUsed(i - skipFirstArgs);
+        } else if (strcmp(argv[i], "-seed") == 0) {
+			if (argc <= i+1) {
+				_errorMsg = "Error: -seed option given, but no seed specified.";
+				return false;
+			}
+        	_hasConstantSeed = true;
+        	_seed  = atoi(argv[i+1]);
+        	srand(_seed);
+        	markUsed(i - skipFirstArgs);
+        	i++;
+        	markUsed(i - skipFirstArgs);
         }
 	}
 	return true;
@@ -257,8 +322,55 @@ bool Context::isValidState()
 		return false;
 	}
 
-	if (getProgram() == INTERSECT && (_queryFileIdx == -1 || _databaseFileIdx == -1)) {
-		_errorMsg = "Error: Intersect program was not given a query and database file.";
+	if (_program == INTERSECT) {
+		return isValidIntersectState();
+	}
+	if (_program == SAMPLE) {
+		return isValidSampleState();
+	}
+	return false;
+}
+
+
+bool Context::cmdArgsValid()
+{
+	bool retval = true;
+	for (int i = _skipFirstArgs; i < _argc; i++) {
+		if (!isUsed(i - _skipFirstArgs)) {
+			_errorMsg += "\nERROR. Unrecognized argument: ";
+			_errorMsg += _argv[i];
+			retval = false;
+		}
+	}
+	return retval;
+}
+
+int Context::getBamHeaderAndRefIdx() {
+	if (_bamHeaderAndRefIdx != -1) {
+		//already found which BAM file to use for the header
+		return _bamHeaderAndRefIdx;
+	}
+	if (_inputFiles[_queryFileIdx]._fileType == FileRecordTypeChecker::BAM_FILE_TYPE) {
+		_bamHeaderAndRefIdx = _queryFileIdx;
+	} else {
+		_bamHeaderAndRefIdx = _databaseFileIdx;
+	}
+	return _bamHeaderAndRefIdx;
+}
+
+int Context::getUnspecifiedSeed()
+{
+	// thanks to Rob Long for the tip.
+	_seed = (unsigned)time(0)+(unsigned)getpid();
+	srand(_seed);
+	return _seed;
+}
+
+
+bool Context::isValidIntersectState()
+{
+	if (_queryFileIdx == -1 || _databaseFileIdx == -1) {
+		_errorMsg = "Error: query and database files not specified.";
 		return false;
 	}
 
@@ -317,32 +429,17 @@ bool Context::isValidState()
 	return _inputFiles.size() > 0;
 }
 
-bool Context::cmdArgsValid()
+bool Context::isValidSampleState()
 {
-	bool retval = true;
-	for (int i = _skipFirstArgs; i < _argc; i++) {
-		if (!isUsed(i - _skipFirstArgs)) {
-			_errorMsg += "\nERROR. Unrecognized argument: ";
-			_errorMsg += _argv[i];
-			retval = false;
-		}
+	if (_inputFiles.size() != 1) {
+		_errorMsg = "Error: input file not specified.";
+		// Allow one and only input file for now
+		return false;
 	}
-	return retval;
+	if (_numOutputRecords < 1) {
+		_errorMsg = "Error: number of output records not specified.";
+		return false;
+	}
+	return true;
 }
-
-int Context::getBamHeaderAndRefIdx() {
-	if (_bamHeaderAndRefIdx != -1) {
-		//already found which BAM file to use for the header
-		return _bamHeaderAndRefIdx;
-	}
-	if (_inputFiles[_queryFileIdx]._fileType == FileRecordTypeChecker::BAM_FILE_TYPE) {
-		_bamHeaderAndRefIdx = _queryFileIdx;
-	} else {
-		_bamHeaderAndRefIdx = _databaseFileIdx;
-	}
-	return _bamHeaderAndRefIdx;
-}
-
-
-
 

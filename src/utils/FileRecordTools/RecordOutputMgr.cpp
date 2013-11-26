@@ -7,7 +7,7 @@
 
 #include "RecordOutputMgr.h"
 #include "Context.h"
-
+#include "BlockMgr.h"
 #include "Bed3Interval.h"
 #include "Bed4Interval.h"
 #include "BedGraphInterval.h"
@@ -28,9 +28,10 @@ RecordOutputMgr::RecordOutputMgr()
 : _context(NULL),
   _printable(true),
   _bamWriter(NULL),
-  _currBlockList(NULL)
+  _currBlockList(NULL),
+  _blockMgr(NULL)
 {
-
+	_blockMgr = new BlockMgr();
 }
 
 RecordOutputMgr::~RecordOutputMgr()
@@ -43,10 +44,14 @@ RecordOutputMgr::~RecordOutputMgr()
 		delete _bamWriter;
 		_bamWriter = NULL;
 	}
+	delete _blockMgr;
+	_blockMgr = NULL;
+
 }
 
 bool RecordOutputMgr::init(Context *context) {
 	_context = context;
+	_blockMgr->setContext(_context);
 	if (_context->getOutputFileType() == FileRecordTypeChecker::BAM_FILE_TYPE) {
 		//set-up BAM writer.
 		_bamWriter = new BamTools::BamWriter();
@@ -57,23 +62,18 @@ bool RecordOutputMgr::init(Context *context) {
 		//for everything but BAM, we'll copy output to an output buffer before printing.
 		_outBuf.reserve(MAX_OUTBUF_SIZE);
 	}
-	if (_context->getAnyHit() || _context->getNoHit() || _context->getWriteCount()) {
-		_printable = false;
-	}
-	if (!_context->isValidState()) {
-		fprintf(stderr, "%s\n", context->getErrorMsg().c_str());
-		exit(1);
-	}
-	if (_context->getPrintHeader()) {
-		_outBuf.append(_context->getHeader(_context->getQueryFileIdx()));
+	if (_context->getProgram() == Context::INTERSECT) {
+		if (_context->getAnyHit() || _context->getNoHit() || _context->getWriteCount()) {
+			_printable = false;
+		}
 	}
 	return true;
 }
 
-void RecordOutputMgr::printHeader(const string &header)
-{
-	_outBuf.append(header);
-}
+//void RecordOutputMgr::printHeader(const string &header)
+//{
+//	_outBuf.append(header);
+//}
 
 bool RecordOutputMgr::printKeyAndTerminate(RecordKeyList &keyList) {
 	printBamType bamCode = printBamRecord(keyList);
@@ -109,60 +109,98 @@ RecordOutputMgr::printBamType RecordOutputMgr::printBamRecord(RecordKeyList &key
 	return NOT_BAM;
 }
 
+void RecordOutputMgr::printRecord(const Record *record)
+{
+	RecordKeyList keyList(record);
+	printRecord(keyList);
+}
+
+void RecordOutputMgr::printRecord(RecordKeyList &keyList) {
+	if (keyList.getKey()->getType() == FileRecordTypeChecker::BAM_RECORD_TYPE) {
+		RecordKeyList blockList(keyList.getKey());
+		bool deleteBlocks = false;
+		_blockMgr->getBlocks(blockList, deleteBlocks);
+		printRecord(keyList, &blockList);
+		if (deleteBlocks) {
+			_blockMgr->deleteBlocks(blockList);
+		}
+		return;
+	}
+    printRecord(keyList, NULL);
+
+}
+
 void RecordOutputMgr::printRecord(RecordKeyList &keyList, RecordKeyList *blockList)
 {
 	if (needsFlush()) {
 		flush();
 	}
-//	if (keyList.getKey()->getChrName() == "chr1" && keyList.getKey()->getStartPos() == 11996) {
-//		printf("Break point here.\n");
-//	}
 	//The first time we print a record is when we print any header, because the header
 	//hasn't been read from the query file until after the first record has also been read.
 	if (_context->getPrintHeader()) {
-		_outBuf.append(_context->getHeader(_context->getQueryFileIdx()));
-		_context->setPrintHeader(false);
+		checkForHeader();
 	}
 	const_cast<Record *>(keyList.getKey())->undoZeroLength();
-
 	_currBlockList = blockList;
 
-	if (_printable) {
-		if (keyList.empty()) {
-			if (_context->getWriteAllOverlap()) {
-				// -wao the user wants to force the reporting of 0 overlap
-				if (printKeyAndTerminate(keyList)) {
+	if (_context->getProgram() == Context::INTERSECT) {
+		if (_printable) {
+			if (keyList.empty()) {
+				if (_context->getWriteAllOverlap()) {
+					// -wao the user wants to force the reporting of 0 overlap
+					if (printKeyAndTerminate(keyList)) {
+						_currBlockList = NULL;
+						return;
+					}
+					tab();
+					null(false, true);
+					tab();
+					_outBuf.append('0');
+					newline();
+				}
+				else if (_context->getLeftJoin()) {
+					if (printKeyAndTerminate(keyList)) {
+						_currBlockList = NULL;
+						return;
+					}
+					tab();
+					null(false, true);
+					newline();
 					_currBlockList = NULL;
 					return;
 				}
-				tab();
-				null(false, true);
-				tab();
-				_outBuf.append('0');
-				newline();
-			}
-			else if (_context->getLeftJoin()) {
-				if (printKeyAndTerminate(keyList)) {
+			} else {
+				if (printBamRecord(keyList, true) == BAM_AS_BAM) {
 					_currBlockList = NULL;
 					return;
 				}
-				tab();
-				null(false, true);
-				newline();
+				for (RecordKeyList::const_iterator_type iter = keyList.begin(); iter != keyList.end(); iter = keyList.next()) {
+					reportOverlapDetail(keyList.getKey(), iter->value());
+				}
 			}
-		} else {
-			if (printBamRecord(keyList, true) == BAM_AS_BAM) {
-				_currBlockList = NULL;
-				return;
-			}
-			for (RecordKeyList::const_iterator_type iter = keyList.begin(); iter != keyList.end(); iter = keyList.next()) {
-				reportOverlapDetail(keyList.getKey(), iter->value());
-			}
+		} else { // not printable
+			reportOverlapSummary(keyList);
 		}
-	} else { // not printable
-		reportOverlapSummary(keyList);
+		_currBlockList = NULL;
+	} else if (_context->getProgram() == Context::SAMPLE) {
+		if (!printKeyAndTerminate(keyList)) {
+			newline();
+		}
+		_currBlockList = NULL;
+		return;
 	}
-	_currBlockList = NULL;
+}
+
+void RecordOutputMgr::checkForHeader() {
+	if (_context->getProgram() == Context::INTERSECT) {
+		if (_context->getPrintHeader()) {
+			_outBuf.append(_context->getHeader(_context->getQueryFileIdx()));
+		}
+	} else if (_context->getProgram() == Context::SAMPLE) {
+		if (_context->getPrintHeader()) {
+			_outBuf.append(_context->getHeader(_context->getInputFileIdx()));
+		}
+	}
 }
 
 void RecordOutputMgr::reportOverlapDetail(const Record *keyRecord, const Record *hitRecord)
@@ -285,15 +323,15 @@ void RecordOutputMgr::reportOverlapSummary(RecordKeyList &keyList)
 void RecordOutputMgr::null(bool queryType, bool dbType)
 {
 	FileRecordTypeChecker::RECORD_TYPE recordType = FileRecordTypeChecker::UNKNOWN_RECORD_TYPE;
-	if (queryType) {
-		recordType = _context->getQueryRecordType();
-	} else if (dbType) {
-		recordType = _context->getDatabaseRecordType();
-	} else {
-		return; //TBD? Implement printNull for records that are neither query nor database.
-		//Not sure if this would ever be necessary.
+	if (_context->getProgram() == Context::INTERSECT) {
+		if (queryType) {
+			recordType = _context->getQueryRecordType();
+		} else if (dbType) {
+			recordType = _context->getDatabaseRecordType();
+		}
+	} else if (_context->getProgram() == Context::SAMPLE) {
+		recordType = _context->getInputRecordType();
 	}
-
 	//This is kind of a hack. Need an instance of the correct class of record in order to call it's printNull method.
 	Record *dummyRecord = NULL;
 

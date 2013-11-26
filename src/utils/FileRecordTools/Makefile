@@ -11,7 +11,9 @@ INCLUDES = -I$(UTILITIES_DIR)/fileType/ \
            -I$(UTILITIES_DIR)/general/ \
            -I$(UTILITIES_DIR)/Contexts/ \
 			-I$(UTILITIES_DIR)/BamTools/include \
-			-I$(UTILITIES_DIR)/BamTools/src
+			-I$(UTILITIES_DIR)/BamTools/src/ \
+           -I$(UTILITIES_DIR)/version/
+			
 
 SUBDIRS = ./FileReaders \
 		  ./Records \
