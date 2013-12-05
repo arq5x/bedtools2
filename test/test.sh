@@ -29,7 +29,7 @@ echo " Testing bedtools getfasta:"
 cd getfasta; sh test-getfasta.sh; cd ..
 
 echo " Testing bedtools intersect:"
-cd intersect; sh test-intersect.sh; sh new_test-intersect.sh cd ..
+cd intersect; sh test-intersect.sh; sh new_test-intersect.sh; cd ..
 
 echo " Testing bedtools jaccard:"
 cd jaccard; sh test-jaccard.sh; cd ..
@@ -51,3 +51,7 @@ cd slop; sh test-slop.sh; cd ..
 
 echo " Testing bedtools subtract:"
 cd subtract; sh test-subtract.sh; cd ..
+
+echo " Testing bedtools sample:"
+cd sample; sh test-sample.sh; cd ..
+
