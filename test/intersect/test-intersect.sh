@@ -281,7 +281,7 @@ rm obs exp
 echo "    intersect.t25...\c"
 echo \
 "chr1	0	30	one_blocks	40	-	0	30	0,0,0	1	30,	0,	1" > exp
-$BT intersect -abam one_block.bam -b c.bed -c > obs
+$BT intersect -abam one_block.bam -b c.bed -c -bed > obs
 check obs exp
 rm obs exp
 
@@ -291,7 +291,7 @@ rm obs exp
 echo "    intersect.t26...\c"
 echo \
 "chr1	0	30	one_blocks	40	-	0	30	0,0,0	1	30,	0,	chr1	0	100	c1	1	+	30" > exp
-$BT intersect -abam one_block.bam -b c.bed -wo > obs
+$BT intersect -abam one_block.bam -b c.bed -wo -bed > obs
 check obs exp
 rm obs exp
 
@@ -301,10 +301,10 @@ rm obs exp
 echo "    intersect.t27...\c"
 echo \
 "chr1	0	30	one_blocks	40	-	0	30	0,0,0	1	30,	0,	chr1	0	100	c1	1	+	30" > exp
-$BT intersect -abam one_block.bam -b c.bed -wo > obs
+$BT intersect -abam one_block.bam -b c.bed -wo -bed > obs
 check obs exp
 
 
 rm obs exp
 
-rm *.bam
+rm one_block.bam two_blocks.bam three_blocks.bam

@@ -35,7 +35,7 @@ int sample_main(int argc, char **argv)
 
 void sample_help(void) {
 
-    cerr << "\nTool:    bedtools sample (aka sampleBed)" << endl;
+    cerr << "\nTool:    bedtools sample (aka sampleFile)" << endl;
     cerr << "Version: " << VERSION << "\n";
     cerr << "Summary: Take sample of input file(s) using reservoir sampling algorithm." << endl << endl;
 

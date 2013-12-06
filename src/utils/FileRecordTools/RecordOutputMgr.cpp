@@ -201,6 +201,7 @@ void RecordOutputMgr::checkForHeader() {
 			_outBuf.append(_context->getHeader(_context->getInputFileIdx()));
 		}
 	}
+	_context->setPrintHeader(false);
 }
 
 void RecordOutputMgr::reportOverlapDetail(const Record *keyRecord, const Record *hitRecord)

@@ -34,6 +34,7 @@ private:
 	size_t _currRecordNum;
 	int _seed;
 
+	static const int DEFAULT_NUM_SAMPLES = 1000000;
 	bool keepRecord(Record *record);
 	bool strandComplies(const Record * record);
 

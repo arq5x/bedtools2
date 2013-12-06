@@ -261,7 +261,7 @@ protected:
     bool _explicitBedOutput;
     int _queryFileIdx;
     int _databaseFileIdx;
-    size_t _bamHeaderAndRefIdx;
+    int _bamHeaderAndRefIdx;
     int _maxNumDatabaseFields;
     bool _useFullBamTags;
 

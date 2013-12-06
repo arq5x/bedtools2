@@ -1,57 +1,57 @@
 echo " Performing general tests:"
-cd general; sh test-general.sh; cd ..
+cd general; bash test-general.sh; cd ..
 
 echo " Testing bedtools bed12tobed6:"
-cd bed12tobed6; sh test-bed12tobed6.sh; cd ..
+cd bed12tobed6; bash test-bed12tobed6.sh; cd ..
 
 echo " Testing bedtools bamtobed:"
-cd bamtobed; sh test-bamtobed.sh; cd ..
+cd bamtobed; bash test-bamtobed.sh; cd ..
 
 echo " Testing bedtools closest:"
-cd closest; sh test-closest.sh; cd ..
+cd closest; bash test-closest.sh; cd ..
 
 echo " Testing bedtools cluster:"
-cd cluster; sh test-cluster.sh; cd ..
+cd cluster; bash test-cluster.sh; cd ..
 
 echo " Testing bedtools coverage:"
-cd coverage; sh test-coverage.sh; cd ..
+cd coverage; bash test-coverage.sh; cd ..
 
 echo " Testing bedtools expand:"
-cd expand; sh test-expand.sh; cd ..
+cd expand; bash test-expand.sh; cd ..
 
 echo " Testing bedtools flank:"
-cd flank; sh test-flank.sh; cd ..
+cd flank; bash test-flank.sh; cd ..
 
 echo " Testing bedtools genomecov:"
-cd genomecov; sh test-genomecov.sh; cd ..
+cd genomecov; bash test-genomecov.sh; cd ..
 
 echo " Testing bedtools getfasta:"
-cd getfasta; sh test-getfasta.sh; cd ..
+cd getfasta; bash test-getfasta.sh; cd ..
 
 echo " Testing bedtools intersect:"
-cd intersect; sh test-intersect.sh; sh new_test-intersect.sh; cd ..
+cd intersect; bash test-intersect.sh; bash new_test-intersect.sh; cd ..
 
 echo " Testing bedtools jaccard:"
-cd jaccard; sh test-jaccard.sh; cd ..
+cd jaccard; bash test-jaccard.sh; cd ..
 
 echo " Testing bedtools map:"
-cd map; sh test-map.sh; cd ..
+cd map; bash test-map.sh; cd ..
 
 echo " Testing bedtools merge:"
-cd merge; sh test-merge.sh; cd ..
+cd merge; bash test-merge.sh; cd ..
 
 echo " Testing bedtools multicov:"
-cd multicov; sh test-multicov.sh; cd ..
+cd multicov; bash test-multicov.sh; cd ..
 
 echo " Testing bedtools reldist:"
-cd reldist; sh test-reldist.sh; cd ..
+cd reldist; bash test-reldist.sh; cd ..
 
 echo " Testing bedtools slop:"
-cd slop; sh test-slop.sh; cd ..
+cd slop; bash test-slop.sh; cd ..
 
 echo " Testing bedtools subtract:"
-cd subtract; sh test-subtract.sh; cd ..
+cd subtract; bash test-subtract.sh; cd ..
 
 echo " Testing bedtools sample:"
-cd sample; sh test-sample.sh; cd ..
+cd sample; bash test-sample.sh; cd ..
 

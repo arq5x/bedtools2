@@ -30,8 +30,8 @@ $BT random -l 1000 -n 1000 -g human.hg19.genome >> mainFile.bed
 #  Test that help is printed when no args are given
 ############################################################
 echo "    sample.t01...\c"
-$BT sample 2>&1 > /dev/null | cat - > obs
-check obs sample_help.txt
+$BT sample 2>&1 > /dev/null | grep -iv version > obs
+check obs sample_help_withoutVersion.txt
 rm obs
 
 

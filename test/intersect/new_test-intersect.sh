@@ -599,7 +599,7 @@ rm obs exp dummy.txt
 #  Test that we throw an error for unrecognized arguments
 ############################################################
 echo "    intersect.new.t52...\c"
-echo "ERROR. Unrecognized argument: -wrongArg" > exp
+echo "***** ERROR: Unrecognized parameter: -wrongArg *****" > exp
 $BT intersect -a a.bed -b b.bed -wrongArg 2>&1 > /dev/null | head -2 | tail -1 > obs
 check obs exp
 rm obs exp

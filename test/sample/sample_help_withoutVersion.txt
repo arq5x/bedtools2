@@ -1,6 +1,5 @@
 
 Tool:    bedtools sample (aka sampleFile)
-Version: v2.17.0-144-gb1aa9ab-dirty
 Summary: Take sample of input file(s) using reservoir sampling algorithm.
 
 Usage:   bedtools sample [OPTIONS] -i <bed/gff/vcf/bam>

@@ -23,6 +23,9 @@ SampleFile::SampleFile(Context *context)
 	_currRecordNum(0)
 {
 	_numSamples = context->getNumOutputRecords();
+	if (_numSamples == 0) {
+		_numSamples = DEFAULT_NUM_SAMPLES;
+	}
 }
 
 SampleFile::~SampleFile() {
@@ -65,7 +68,7 @@ bool SampleFile::takeSample()
 
 	if (_currRecordNum < _numSamples) {
 		//die with error;
-		cerr << "Error: Input file has fewer records than the requested number of output records." << endl;
+		cerr << "\n***** ERROR: Input file has fewer records than the requested number of output records. *****" << endl << endl;
 		exit(1);
  	}
 

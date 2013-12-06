@@ -141,7 +141,7 @@ bool Context::parseCmdArgs(int argc, char **argv, int skipFirstArgs) {
 
 		if (strcmp(argv[i], "-i") == 0) {
 			if (argc <= i+1) {
-				_errorMsg = "Error: -i option given, but no input file specified.";
+				_errorMsg = "\n***** ERROR: -i option given, but no input file specified. *****";
 				return false;
 			}
 			addInputFile(argv[i+1]);
@@ -150,7 +150,7 @@ bool Context::parseCmdArgs(int argc, char **argv, int skipFirstArgs) {
 			markUsed(i - skipFirstArgs);
 		} else if (strcmp(argv[i], "-g") == 0) {
 			if (argc <= i+1) {
-				_errorMsg = "Error: -g option given, but no genome file specified.";
+				_errorMsg = "\n***** ERROR: -g option given, but no genome file specified. *****";
 				return false;
 			}
 			openGenomeFile(argv[i+1]);
@@ -170,7 +170,7 @@ bool Context::parseCmdArgs(int argc, char **argv, int skipFirstArgs) {
         }
 		if (strcmp(argv[i], "-a") == 0) {
 			if (argc <= i+1) {
-				_errorMsg = "Error: -a option given, but no query file specified.";
+				_errorMsg = "\n***** ERROR: -a option given, but no query file specified. *****";
 				return false;
 			}
 
@@ -182,7 +182,7 @@ bool Context::parseCmdArgs(int argc, char **argv, int skipFirstArgs) {
 		}
         else if(strcmp(argv[i], "-abam") == 0) {
 			if (argc <= i+1) {
-				_errorMsg = "Error: -abam option given, but no query BAM file specified.";
+				_errorMsg = "\n***** ERROR: -abam option given, but no query BAM file specified. *****";
 				return false;
 			}
 			addInputFile(argv[i+1]);
@@ -194,7 +194,7 @@ bool Context::parseCmdArgs(int argc, char **argv, int skipFirstArgs) {
         }
         else if (strcmp(argv[i], "-b") == 0) {
 			if (argc <= i+1) {
-				_errorMsg = "Error: -b option given, but no database file specified.";
+				_errorMsg = "\n***** ERROR: -b option given, but no database file specified. *****";
 				return false;
 			}
 			addInputFile(argv[i+1]);
@@ -253,7 +253,7 @@ bool Context::parseCmdArgs(int argc, char **argv, int skipFirstArgs) {
 
         	if (_program == SAMPLE) {
     			if (argc <= i+1) {
-    				_errorMsg = "Error: -s option given, but \"forward\" or \"reverse\" not specified.";
+    				_errorMsg = "\n***** ERROR: -s option given, but \"forward\" or \"reverse\" not specified. *****";
     				return false;
     			}
     			if (strcmp(argv[i+1], "forward") == 0) {
@@ -261,7 +261,7 @@ bool Context::parseCmdArgs(int argc, char **argv, int skipFirstArgs) {
     			} else if (strcmp(argv[i+1], "reverse") == 0) {
     				_reverseOnly = true;
     			} else {
-    				_errorMsg = "Error: -s option given, but \"forward\" or \"reverse\" not specified.";
+    				_errorMsg = "\n***** ERROR: -s option given, but \"forward\" or \"reverse\" not specified. *****";
     				return false;
     			}
                 i++;
@@ -293,7 +293,7 @@ bool Context::parseCmdArgs(int argc, char **argv, int skipFirstArgs) {
             markUsed(i - skipFirstArgs);
         } else if (strcmp(argv[i], "-n") == 0) {
 			if (argc <= i+1) {
-				_errorMsg = "Error: -n option given, but no number of output records specified.";
+				_errorMsg = "\n***** ERROR: -n option given, but no number of output records specified. *****";
 				return false;
 			}
         	setNumOutputRecords(atoi(argv[i + 1]));
@@ -302,7 +302,7 @@ bool Context::parseCmdArgs(int argc, char **argv, int skipFirstArgs) {
         	markUsed(i - skipFirstArgs);
         } else if (strcmp(argv[i], "-seed") == 0) {
 			if (argc <= i+1) {
-				_errorMsg = "Error: -seed option given, but no seed specified.";
+				_errorMsg = "\n***** ERROR: -seed option given, but no seed specified. *****";
 				return false;
 			}
         	_hasConstantSeed = true;
@@ -337,8 +337,9 @@ bool Context::cmdArgsValid()
 	bool retval = true;
 	for (int i = _skipFirstArgs; i < _argc; i++) {
 		if (!isUsed(i - _skipFirstArgs)) {
-			_errorMsg += "\nERROR. Unrecognized argument: ";
+			_errorMsg += "\n***** ERROR: Unrecognized parameter: ";
 			_errorMsg += _argv[i];
+			_errorMsg += " *****";
 			retval = false;
 		}
 	}
@@ -370,42 +371,42 @@ int Context::getUnspecifiedSeed()
 bool Context::isValidIntersectState()
 {
 	if (_queryFileIdx == -1 || _databaseFileIdx == -1) {
-		_errorMsg = "Error: query and database files not specified.";
+		_errorMsg = "\n***** ERROR: query and database files not specified. *****";
 		return false;
 	}
 
 	if (getAnyHit() && getNoHit()) {
-		_errorMsg = "Error: request either -u for anyHit OR -v for noHit, not both.";
+		_errorMsg = "\n***** ERROR: request either -u for anyHit OR -v for noHit, not both. *****";
 		return false;
 	}
 	if (getWriteCount()) {
 		if (getAnyHit()) {
-			_errorMsg = "Error: request either -c for writeCount OR -u for anyHit, not both.";
+			_errorMsg = "\n***** ERROR: request either -c for writeCount OR -u for anyHit, not both. *****";
 			return false;
 		}  else if (getWriteB()) {
-			_errorMsg = "Error: request either -c for writeCount OR -wb for writeB, not both.";
+			_errorMsg = "\n***** ERROR: request either -c for writeCount OR -wb for writeB, not both. *****";
 			return false;
 		} else if (getQueryFileType() == FileRecordTypeChecker::BAM_FILE_TYPE && !getExplicitBedOutput()) {
-			_errorMsg = "Error: writeCount option is not valid with BAM query input, unless bed output is specified with -bed option.";
+			_errorMsg = "\n***** ERROR: writeCount option is not valid with BAM query input, unless bed output is specified with -bed option. *****";
 			return false;
 		}
 	}
 	if (getWriteOverlap()) {
 
 		if (getWriteA()) {
-			_errorMsg = "Error: request either -wa for writeA OR -wo for writeOverlap, not both.";
+			_errorMsg = "\n***** ERROR: request either -wa for writeA OR -wo for writeOverlap, not both. *****";
 			return false;
 		} else if (getWriteB()) {
-			_errorMsg = "Error: request either -wb for writeB OR -wo for writeOverlap, not both.";
+			_errorMsg = "\n***** ERROR: request either -wb for writeB OR -wo for writeOverlap, not both. *****";
 			return false;
 		}  else if (getWriteCount()) {
-			_errorMsg = "Error: request either -c for writeCount OR -wo for writeOverlap, not both.";
+			_errorMsg = "\n***** ERROR: request either -c for writeCount OR -wo for writeOverlap, not both. *****";
 			return false;
 		} else if (getAnyHit()) {
-			_errorMsg = "Error: request either -u for anyHit OR -wo for writeOverlap, not both.";
+			_errorMsg = "\n***** ERROR: request either -u for anyHit OR -wo for writeOverlap, not both. *****";
 			return false;
 		} else if (getQueryFileType() == FileRecordTypeChecker::BAM_FILE_TYPE && !getExplicitBedOutput()) {
-			_errorMsg = "Error: writeAllOverlap option is not valid with BAM query input, unless bed output is specified with -bed option.";
+			_errorMsg = "\n***** ERROR: writeAllOverlap option is not valid with BAM query input, unless bed output is specified with -bed option. *****";
 			return false;
 		}
 	}
@@ -415,7 +416,7 @@ bool Context::isValidIntersectState()
 		}
 	}
 	if (getSameStrand() && getDiffStrand()) {
-		_errorMsg = "Error: request -s for sameStrand, or -S for diffStrand, not both.";
+		_errorMsg = "\n***** ERROR: request -s for sameStrand, or -S for diffStrand, not both. *****";
 		return false;
 	}
 
@@ -432,14 +433,14 @@ bool Context::isValidIntersectState()
 bool Context::isValidSampleState()
 {
 	if (_inputFiles.size() != 1) {
-		_errorMsg = "Error: input file not specified.";
+		_errorMsg = "\n***** ERROR: input file not specified. *****";
 		// Allow one and only input file for now
 		return false;
 	}
-	if (_numOutputRecords < 1) {
-		_errorMsg = "Error: number of output records not specified.";
-		return false;
-	}
+//	if (_numOutputRecords < 1) {
+//		_errorMsg = "\n***** ERROR: number of output records not specified. *****";
+//		return false;
+//	}
 	return true;
 }
 
