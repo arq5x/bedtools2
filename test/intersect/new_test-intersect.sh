@@ -560,7 +560,7 @@ rm obs
 ############################################################
 echo "    intersect.new.t48...\c"
 echo "Error: Sorted input specified" > exp
-$BT intersect -a chromsOutOfOrder.bed -b b.bed -sorted 2>&1 > /dev/null | grep "Error: Sorted input specified, " | cut -f1 --delimiter=',' > obs
+$BT intersect -a chromsOutOfOrder.bed -b b.bed -sorted 2>&1 > /dev/null | grep "Error: Sorted input specified, " | cut -f1 -d ',' > obs
 check obs exp
 rm obs exp
 
@@ -571,7 +571,7 @@ rm obs exp
 ############################################################
 echo "    intersect.new.t49...\c"
 echo "Error: Sorted input specified" > exp
-$BT intersect -a recordsOutOfOrder.bed -b b.bed -sorted 2>&1 > /dev/null | grep "Error: Sorted input specified, " | cut -f1 --delimiter=',' > obs
+$BT intersect -a recordsOutOfOrder.bed -b b.bed -sorted 2>&1 > /dev/null | grep "Error: Sorted input specified, " | cut -f1 -d ',' > obs
 check obs exp
 rm obs exp
 
@@ -590,7 +590,7 @@ rm obs exp
 echo "    intersect.new.t51...\c"
 echo "is an empty file." > exp
 touch dummy.txt
-$BT intersect -a dummy.txt -b b.bed 2>&1 > /dev/null | cut -f3-6 --delimiter=' ' > obs
+$BT intersect -a dummy.txt -b b.bed 2>&1 > /dev/null | cut -f3-6 -d ' ' > obs
 check obs exp
 rm obs exp dummy.txt
 
