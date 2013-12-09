@@ -11,7 +11,7 @@
 ******************************************************************************/
 #include "bedFile.h"
 #include "bedFilePE.h"
-#include "GenomeFile.h"
+#include "genomeFile.h"
 
 #include <vector>
 #include <iostream>
@@ -39,7 +39,8 @@ public:
                bool haveInclude, bool sameChrom, 
                float overlapFraction, int seed, 
                bool chooseChrom, bool isBedpe,
-               size_t _maxTries, bool noOverlapping);
+               size_t _maxTries, bool noOverlapping,
+               bool preventExceedingChromEnd);
 
     // destructor
     ~BedShuffle(void);
@@ -60,6 +61,7 @@ private:
     bool _isBedpe;
     size_t _maxTries;
     bool _noOverlapping;
+    bool _preventExceedingChromEnd;
 
 
     // The BED file from which to compute coverage.

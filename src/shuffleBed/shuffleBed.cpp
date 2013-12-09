@@ -19,7 +19,8 @@ BedShuffle::BedShuffle(string &bedFile, string &genomeFile,
                        bool haveInclude, bool sameChrom, 
                        float overlapFraction, int seed,
                        bool chooseChrom, bool isBedpe, size_t maxTries,
-                       bool noOverlapping) {
+                       bool noOverlapping, bool preventExceedingChromEnd) 
+{
 
     _bedFile         = bedFile;
     _genomeFile      = genomeFile;
@@ -34,6 +35,8 @@ BedShuffle::BedShuffle(string &bedFile, string &genomeFile,
     _isBedpe         = isBedpe;
     _maxTries        = maxTries;
     _noOverlapping   = noOverlapping;
+    _preventExceedingChromEnd = preventExceedingChromEnd;
+
 
     // use the supplied seed for the random
     // number generation if given.  else,
@@ -337,6 +340,14 @@ void BedShuffle::ChooseLocus(BED &bedEntry) {
             bedEntry.start = location.second;
             bedEntry.end   = bedEntry.start + length;
             chromSize      = _genome->getChromSize(location.first);
+
+            if ((bedEntry.end > chromSize) && 
+                (_preventExceedingChromEnd == false))
+            {
+                bedEntry.end = chromSize;
+                break;
+            }
+
         } while (bedEntry.end > chromSize);
         // keep looking if we have exceeded the end of the chrom.
     }
@@ -361,6 +372,14 @@ void BedShuffle::ChooseLocus(BED &bedEntry) {
                 bedEntry.start = randomStart;
                 bedEntry.end   = randomStart + length;
             }
+
+            if ((bedEntry.end > chromSize) && 
+                (_preventExceedingChromEnd == false))
+            {
+                bedEntry.end = chromSize;
+                break;
+            }
+
         } while (bedEntry.end > chromSize);
     }
 }

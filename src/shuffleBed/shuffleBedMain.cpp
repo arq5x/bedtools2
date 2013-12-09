@@ -47,6 +47,7 @@ int shuffle_main(int argc, char* argv[]) {
     bool isBedpe          = false;
     size_t maxTries       = 1000;
     bool noOverlapping    = false;
+    bool allowBeyondChromEnd = false;
 
 
     for(int i = 1; i < argc; i++) {
@@ -125,6 +126,9 @@ int shuffle_main(int argc, char* argv[]) {
         else if(PARAMETER_CHECK("-noOverlapping", 14, parameterLength)) {
             noOverlapping = true;
         }
+        else if(PARAMETER_CHECK("-allowBeyondChromEnd", 20, parameterLength)) {
+            allowBeyondChromEnd = true;
+        }
         else {
           cerr << endl << "*****ERROR: Unrecognized parameter: " << argv[i] << " *****" << endl << endl;
             showHelp = true;
@@ -143,7 +147,8 @@ int shuffle_main(int argc, char* argv[]) {
                                         haveInclude, sameChrom, 
                                         overlapFraction, seed, 
                                         chooseChrom, isBedpe,
-                                        maxTries, noOverlapping);
+                                        maxTries, noOverlapping,
+                                        !(allowBeyondChromEnd));
         delete bc;
         return 0;
     }
@@ -198,7 +203,14 @@ void shuffle_help(void) {
     cerr << "\t-maxTries\t"         << "\n\t\tMax. number of attempts to find a home for a shuffled interval" << endl;
     cerr                            << "\t\tin the presence of -incl or -excl." << endl;
     cerr                            << "\t\tDefault = 1000." << endl;
-    cerr << "\t-noOverlapping\t"         << "\n\t\tDon't allow shuffled intervals to overlap." << endl;
+    cerr << "\t-noOverlapping\t"    << "\n\t\tDon't allow shuffled intervals to overlap." << endl;
+
+    cerr << "\t-allowBeyondChromEnd\t"  << "\n\t\tAllow shuffled intervals to be relocated to a position" << endl;
+    cerr                                 << "\t\tin which the entire original interval cannot fit w/o exceeding" << endl;
+    cerr                                 << "\t\tthe end of the chromosome.  In this case, the end coordinate of the" << endl;
+    cerr                                 << "\t\tshuffled interval will be set to the chromosome's length." << endl;
+    cerr                                 << "\t\tBy default, an interval's original length must be fully-contained" << endl;
+    cerr                                 << "\t\twithin the chromosome." << endl;
 
     cerr << "Notes: " << endl;
     cerr << "\t(1)  The genome file should tab delimited and structured as follows:" << endl;
