@@ -18,6 +18,7 @@ samtools view -Sb one_block.sam > one_block.bam 2>/dev/null
 samtools view -Sb two_blocks.sam > two_blocks.bam 2>/dev/null
 samtools view -Sb three_blocks.sam > three_blocks.bam 2>/dev/null
 samtools view -Sb sam-w-del.sam > sam-w-del.bam 2>/dev/null
+samtools view -Sb two_blocks_w_D.sam > two_blocks_w_D.bam 2>/dev/null
 
 
 ##################################################################
@@ -109,5 +110,67 @@ $BT bamtobed -i three_blocks.bam -split > split
 $BT bamtobed -i three_blocks.bam -bed12 |  $BT bed12tobed6 > bed12
 check split bed12
 rm split bed12
+
+##################################################################
+# Test an alignment with a D operator and N operator -split option
+##################################################################
+echo "    bamtobed.t9...\c"
+echo \
+"chr1	0	15	two_blocks_1_1/2	40	+
+chr1	25	40	two_blocks_1_1/2	40	+
+chr1	99	129	two_blocks_1_2/1	40	+
+chr1	0	15	two_blocks_2_1/2	40	+
+chr1	25	42	two_blocks_2_1/2	40	+
+chr1	99	129	two_blocks_2_2/1	40	+" > exp
+$BT bamtobed -i two_blocks_w_D.bam -split > obs
+check exp obs
+rm exp obs
+
+
+##################################################################
+# Test an alignment with a D operator and N operator -splitD option
+##################################################################
+echo "    bamtobed.t10...\c"
+echo \
+"chr1	0	15	two_blocks_1_1/2	40	+
+chr1	25	40	two_blocks_1_1/2	40	+
+chr1	99	129	two_blocks_1_2/1	40	+
+chr1	0	15	two_blocks_2_1/2	40	+
+chr1	25	35	two_blocks_2_1/2	40	+
+chr1	37	42	two_blocks_2_1/2	40	+
+chr1	99	129	two_blocks_2_2/1	40	+" > exp
+$BT bamtobed -i two_blocks_w_D.bam -splitD > obs
+check exp obs
+rm exp obs
+
+
+##################################################################
+# Test an alignment with a D operator and N operator -bed12 option
+##################################################################
+echo "    bamtobed.t9...\c"
+echo \
+"chr1	0	40	two_blocks_1_1/2	40	+	0	40	255,0,0	2	15,15	0,25
+chr1	99	129	two_blocks_1_2/1	40	+	99	129	255,0,0	1	30	0
+chr1	0	42	two_blocks_2_1/2	40	+	0	42	255,0,0	2	15,17	0,25
+chr1	99	129	two_blocks_2_2/1	40	+	99	129	255,0,0	1	30	0" > exp
+$BT bamtobed -i two_blocks_w_D.bam -bed12 > obs
+check exp obs
+rm exp obs
+
+
+##################################################################
+# Test an alignment with a D operator and N operator -bed12 option
+##################################################################
+echo "    bamtobed.t11...\c"
+echo \
+"chr1	0	40	two_blocks_1_1/2	40	+	0	40	255,0,0	2	15,15	0,25
+chr1	99	129	two_blocks_1_2/1	40	+	99	129	255,0,0	1	30	0
+chr1	0	42	two_blocks_2_1/2	40	+	0	42	255,0,0	3	15,10,5	0,25,37
+chr1	99	129	two_blocks_2_2/1	40	+	99	129	255,0,0	1	30	0" > exp
+$BT bamtobed -i two_blocks_w_D.bam -bed12 -splitD > obs
+
+check exp obs
+rm exp obs
+
 
 rm *.bam
