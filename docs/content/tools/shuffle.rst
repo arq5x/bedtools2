@@ -48,6 +48,7 @@ Usage and option summary
 **-bedpe**	                     Indicate that the A file is in BEDPE format.
 **-maxTries**                    Max. number of attempts to find a home for a shuffled interval in the presence of -incl or -excl. *Default = 1000.*
 **-noOverlapping**               Don't allow shuffled intervals to overlap.
+**-allowBeyondChromEnd**         Allow the original the length of the original records to extebd beyond the length of the chromosome.
 ===========================      ===============================================================================================================================================================================================================
 
 
@@ -205,6 +206,25 @@ no such overlaps.
 .. code-block:: bash
 
   $ bedtools shuffle -i A.bed -g my.genome -noOverlapping
+
+
+==========================================================================
+``-allowBeyondChromEnd`` Allow records to extend beyond the chrom. length.
+==========================================================================
+By default, ``shuffle`` requires that an interval's original length must be 
+fully-contained within the chromosome. Yet there are cases where you might 
+want to allow shuffled intervals to be relocated to a position
+in which the entire original interval cannot fit w/o exceeding
+the end of the chromosome.  By using the ``-noOverlapping`` option, 
+``shuffle`` will allow intervals to be shuffled to locations that are so close
+to the chromosome end that the full length of the original record cannot
+be contained within the chromosome length.  In such cases, the end coordinate
+for the shuffled interval will be set (i.e., truncated) 
+to the chromosome's length.
+
+.. code-block:: bash
+
+  $ bedtools shuffle -i A.bed -g my.genome -allowBeyondChromEnd
 
 
 

@@ -38,9 +38,11 @@ Option          Description
                 always report mate one as the first BEDPE "block".		 
 **-bed12**      Write "blocked" BED (a.k.a. BED12) format. This will convert 
                 "spliced" BAM alignments (denoted by the "N" CIGAR operation) 
-                to BED12.
+                to BED12. `Forces -split`.
 **-split**      Report each portion of a "split" BAM (i.e., having an "N" CIGAR 
                 operation) alignment as a distinct BED intervals.
+**-splitD**     Report each portion of a "split" BAM while obeying noth "N" CIGAR 
+                and "D" operation. Forces `-split`.
 **-ed**         Use the "edit distance" tag (NM) for the BED score field. 
                 Default for BED is to use mapping quality. Default for BEDPE is 
                 to use the *minimum* of the two mapping qualities for the pair. 

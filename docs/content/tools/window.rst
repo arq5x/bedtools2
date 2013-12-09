@@ -103,7 +103,7 @@ and ``-r`` (downstream)** options.
 
 .. note::
 
-    By default, the ``-l`` and ``-r`` options ignore.  If you want to define
+    By default, the ``-l`` and ``-r`` options ignore strand.  If you want to define
     *upstream* and *downstream* based on strand, use the ``-sw`` option (below)
     with the ``-l`` and ``-r`` options.
     

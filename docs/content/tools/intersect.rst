@@ -21,7 +21,7 @@ with both BED/GFF/VCF and BAM files as input.
 
     If you are trying to intersect very large files and are having trouble
     with excessive memory usage, please presort your data by chromosome and
-    then by start position (e.g., ``sort k1,1 -k2,2n in.bed > in.sorted.bed``
+    then by start position (e.g., ``sort -k1,1 -k2,2n in.bed > in.sorted.bed``
     for BED files) and then use the ``-sorted`` option.  This invokes a 
     memory-efficient algorithm designed for large files.
 

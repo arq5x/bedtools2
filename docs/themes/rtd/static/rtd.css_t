@@ -525,6 +525,9 @@ div.warning p.admonition-title {
 }
 
 
+
+
+
 /* Sidebars only */
 div.sidebar {
   max-width: 200px;

@@ -119,7 +119,7 @@ For example:
   # are 20bp whereas the flanking intervals from the first record
   # are only 10bp
   ################################################################
-  $ bedtools flank -i A.bed -g my.genome -b 0.5 -pct
+  $ bedtools flank -i A.bed -g my.genome -b 0.1 -pct
   chr1	90	100
   chr1	200	210
   chr1	480	500
