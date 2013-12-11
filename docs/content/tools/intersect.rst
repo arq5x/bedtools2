@@ -46,9 +46,9 @@ Usage and option summary
 
 
 
-===========================      =========================================================================================================================================================
-Option                           Description
-===========================      =========================================================================================================================================================
+===========================    =========================================================================================================================================================
+Option                         Description
+===========================    =========================================================================================================================================================
 **-a**		                     BED/GFF/VCF file A. Each feature in A is compared to B in search of overlaps. Use "stdin" if passing A with a UNIX pipe.
 **-b**		                     BED/GFF/VCF file B. Use "stdin" if passing B with a UNIX pipe.
 **-abam**	                     BAM file A. Each BAM alignment in A is compared to B in search of overlaps. Use "stdin" if passing A with a UNIX pipe: For example: samtools view -b <BAM> | bedtools intersect -abam stdin -b genes.bed                                                   
@@ -65,11 +65,13 @@ Option                           Description
 **-f**		                     Minimum overlap required as a fraction of A. Default is 1E-9 (i.e. 1bp).
 **-r**		                     Require that the fraction of overlap be reciprocal for A and B. In other words, if -f is 0.90 and -r is used, this requires that B overlap at least 90% of A and that A also overlaps at least 90% of B.
 **-s**		                     Force "strandedness". That is, only report hits in B that overlap A on the same strand. By default, overlaps are reported without respect to strand.
-**-S**	                         Require different strandedness.  That is, only report hits in B that overlap A on the _opposite_ strand. By default, overlaps are reported without respect to strand.
-**-split**	                     Treat "split" BAM (i.e., having an "N" CIGAR operation) or BED12 entries as distinct BED intervals.
-**-sorted**	                     For very large B files, invoke a "sweeping" algorithm that requires position-sorted (e.g., ``sort -k1,1 -k2,2n`` for BED files) input.  When using -sorted, memory usage remains low even for very large files.
-**-header**	                     Print the header from the A file prior to results.
-===========================      =========================================================================================================================================================
+**-S**	                       Require different strandedness.  That is, only report hits in B that overlap A on the _opposite_ strand. By default, overlaps are reported without respect to strand.
+**-split**	                   Treat "split" BAM (i.e., having an "N" CIGAR operation) or BED12 entries as distinct BED intervals.
+**-sorted**	                   For very large B files, invoke a "sweeping" algorithm that requires position-sorted (e.g., ``sort -k1,1 -k2,2n`` for BED files) input.  
+                               When using -sorted, memory usage remains low even for very large files.
+**-g**                         Specify a genome file the defines the expected chromosome order in the input files for use with the ``-sorted`` option.
+**-header**	                   Print the header from the A file prior to results.
+===========================    =========================================================================================================================================================
 
 
 ===============================
@@ -412,7 +414,7 @@ For example:
   
   
 ==========================================================================
-``-abam`` Default behavior when using BAM input 
+``-abam`` Default behavior when using BAM input (deprecated since 2.18.0)
 ==========================================================================
 When comparing alignments in BAM format (**-abam**) to features in BED format (**-b**), ``bedtools intersect``
 will, **by default**, write the output in BAM format. That is, each alignment in the BAM file that meets
@@ -440,6 +442,12 @@ for a pair to be written to BAM output.
   43830893 -4487 CTTTGGGAGGGCTTTGTAGCCTATCTGGAAAAAGGAAATATCTTCCCATG U
   \e^bgeTdg_Kgcg`ggeggg_gggggggggddgdggVg\gWdfgfgff XT:A:R NM:i:2 SM:i:0 AM:i:0 X0:i:10 X1:i:7 X M : i :
   2 XO:i:0 XG:i:0 MD:Z:1A2T45
+
+.. note::
+
+  As of version 2.18.0, it is no longer necessary to specify a BAM input file via ``-abam``. 
+  Bedtools now autodetects this when ``-a`` is used.
+
 
 
 ==========================================================================
@@ -544,6 +552,96 @@ For example:
   $ sort -k1,1 -k2,2n huge.bed > huge.sorted.bed  
   
   $ bedtools intersect -a big.sorted.bed -b huge.sorted.bed -sorted
+
+
+==========================================================================
+``-g`` Define an alternate chromosome sort order via a genome file.
+==========================================================================
+By default, the ``-sorted`` option expects that the input files are sorted
+alphanumerically by chromosome. However, there arise cases where ones input
+files are sorted by a different criteria and it is to computationally onerous
+to resort the files alphanumerically.  For example, the GATK expects that 
+BAM files are sorted in a very specific manner.  The ``-g`` option allows
+one to specify an exact ording that should be expected in the input (e.g.,
+BAM, BED, etc.) files. All you need to do is re-order you genome file to 
+specify the order.
+
+For example, an alphanumerically ordered genome file would look like the 
+following:
+
+.. code-block:: bash
+
+    $ cat hg19.genome
+    chr1  249250621
+    chr10 135534747
+    chr11 135006516
+    chr12 133851895
+    chr13 115169878
+    chr14 107349540
+    chr15 102531392
+    chr16 90354753
+    chr17 81195210
+    chr18 78077248
+    chr19 59128983
+    chr2  243199373
+    chr20 63025520
+    chr21 48129895
+    chr22 51304566
+    chr3  198022430
+    chr4  191154276
+    chr5  180915260
+    chr6  171115067
+    chr7  159138663
+    chr8  146364022
+    chr9  141213431
+    chrM  16571
+    chrX  155270560
+    chrY  59373566
+
+However, if your input BAM or BED files are ordered such as ``chr1, chr2, chr3``, etc., 
+one need to simply reorder the genome file accordingly:
+
+.. code-block:: bash
+
+    $ sort -k1,1V hg19.genome > hg19.versionsorted.genome
+    $ cat hg19.versionsorted.genome
+    chr1  249250621
+    chr2  243199373
+    chr3  198022430
+    chr4  191154276
+    chr5  180915260
+    chr6  171115067
+    chr7  159138663
+    chr8  146364022
+    chr9  141213431
+    chr10 135534747
+    chr11 135006516
+    chr12 133851895
+    chr13 115169878
+    chr14 107349540
+    chr15 102531392
+    chr16 90354753
+    chr17 81195210
+    chr18 78077248
+    chr19 59128983
+    chr20 63025520
+    chr21 48129895
+    chr22 51304566
+    chrM  16571
+    chrX  155270560
+    chrY  59373566
+
+At this point, one can now use the ``-sorted`` option along with the genome file
+in order to properly process the input files that abide by something other than an
+alphanumeric sorting order.
+
+.. code-block:: bash
+
+    $ bedtools intersect -a a.versionsorted.bam -b b.versionsorted.bed \
+        -sorted \
+        -g hg19.versionsorted.genome
+
+Et voila.
 
 
 ==========================================================================
