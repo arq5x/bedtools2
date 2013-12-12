@@ -36,12 +36,12 @@ Usage and option summary
 **Usage**:
 ::
 
-  bedtools intersect [OPTIONS] [-a|-abam] -b <BED/GFF/VCF>
+  bedtools intersect [OPTIONS] -a <BED/BAM/GFF/VCF> -b <BED/BAM/GFF/VCF>
 
 **(or)**:
 ::
   
-  intersectBed [OPTIONS] [-a|-abam] -b <BED/GFF/VCF>
+  intersectBed [OPTIONS] -a <BED/BAM/GFF/VCF> -b <BED/GFF/VCF>
 
 
 
