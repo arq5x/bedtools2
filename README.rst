@@ -16,7 +16,7 @@ While each individual tool is designed to do a relatively simple task (e.g., int
 
 Details
 -------
-First created out through urgency and adrenaline by Aaron Quinlan Spring 2009. 
+First created through urgency and adrenaline by Aaron Quinlan Spring 2009. 
 Maintained by the Quinlan Laboratory at the University of Virginia.
 
 1. **Lead developers**:           Aaron Quinlan, Neil Kindlon
