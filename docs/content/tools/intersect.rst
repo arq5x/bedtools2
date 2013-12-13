@@ -543,13 +543,23 @@ start position. When both input files are position-sorted, the algorithm can
 like the way database systems join two tables.  This option is invoked with the
 ``-sorted`` option.
 
+.. note::
+
+  By default, the ``-sorted`` option requires that the records are **GROUPED** 
+  by chromosome and that within each chromosome group, the records are sorted by
+  chromosome position. One way to achieve this (for BED files for example) is use
+  the UNIX sort utility to sort both files by chromosome and then by position. 
+  That is, ``sort -k1,1 -k2,2n in.bed > in.sorted.bed``. However, since we merely 
+  require that the chromsomes are grouped (that is, all records for a given chromosome
+  come in a single block in the file), sorting criteria other than the alphanumeric
+  criteria that is used by the ``sort`` utility are fine. For example, you could use
+  the "version sort" (``-V``) option in newer versions of GNU sort to make the chromosomes
+  come in this (chr1, chr2, chr3) order instead of this (chr1, chr10, chr11) order.
+
+
 For example:
 
 .. code-block:: bash
-
-  $ sort -k1,1 -k2,2n big.bed > big.sorted.bed
-  
-  $ sort -k1,1 -k2,2n huge.bed > huge.sorted.bed  
   
   $ bedtools intersect -a big.sorted.bed -b huge.sorted.bed -sorted
 
@@ -557,14 +567,17 @@ For example:
 ==========================================================================
 ``-g`` Define an alternate chromosome sort order via a genome file.
 ==========================================================================
-By default, the ``-sorted`` option expects that the input files are sorted
-alphanumerically by chromosome. However, there arise cases where ones input
+As described above, the ``-sorted`` option expects that the input files are grouped 
+by chromosome. However, there arise cases where ones input
 files are sorted by a different criteria and it is to computationally onerous
 to resort the files alphanumerically.  For example, the GATK expects that 
 BAM files are sorted in a very specific manner.  The ``-g`` option allows
 one to specify an exact ording that should be expected in the input (e.g.,
 BAM, BED, etc.) files. All you need to do is re-order you genome file to 
-specify the order.
+specify the order. Also, the use of a genome file to specify the expected
+order allows the ``intersect`` tool to detect when two files are internally 
+grouped but each file actually follows a different order.  This will cause
+incorrect results and the ``-g`` file will alert you to such problems.
 
 For example, an alphanumerically ordered genome file would look like the 
 following:
