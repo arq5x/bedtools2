@@ -1,3 +1,78 @@
+Version 2.18.0 (13-Dec-2013)
+% bedtools 2.18.0 release
+% Aaron Quinlan
+% December 13, 2013
+
+
+The Google Code site is deprecated
+----------------------------------
+It looks like the Google Code service is going the way of the venerable Google Reader. As such, we are moving the repository and all formal release tarballs to Github. We have started a new repository prosaically named "bedtools2". The original bedtools repository will remain for historical purposes, but we created a new repository to distinguish the two code bases as they will become rather different over time.
+
+[https://github.com/arq5x/bedtools2](https://github.com/arq5x/bedtools2)
+
+
+We gutted the core API and algorithms
+-------------------------------------
+
+Much of Neil's hard work has been devoted to completely rewriting the core file/stream writing API to be much more flexible in the adoption of new formats. In addition, he has substantially improved many of the core algorithms for detecting interval intersections.
+
+
+Improved performance
+--------------------
+
+The 2.18.0 release leverages these improvements in the "intersect" tool.  Forthcoming releases will see the new API applied to other tools, but we started with intersect as it is the most widely used tool in the suite. 
+
+**Performance with sorted datasets.** The "chromsweep" algorithm we use for detecting intersections is now **60 times 
+faster** than when it was first release in version 2.16.2, and is **** than the 2.17 release. This makes the 
+algorithm slightly faster
+that the algorithm used in the bedops ``bedmap`` tool. As an example, the following [figure](https://dl.dropboxusercontent.com/u/515640/bedtools-intersect-sorteddata.png) demonstrates the speed
+when intersecting GENCODE exons against 1, 10, and 100 million BAM alignments from an exome capture experiment.
+Whereas in version 2.16.2 this wuld have taken 80 minutes, **it now takes 80 seconds**. 
+
+**Greater flexibility.** In addition, BAM, BED, GFF/GTF, or VCF files are now automatically detected whether they are a file, stream, or FIFO in either compressed or uncompressed form. As such, one now longer has specify `-abam` when using BAM input as the "A" file with ``intersect``. Moreover, any file type can be used for either the A or
+the B file.
+
+
+Better support for different chromosome sorting criteria
+--------------------------------------------------------
+Genomic analysis is plagued by different chromosome naming and sorting conventions. Prior to this release,
+the ``-sorted`` option in the ``intersect`` tool required that the chromosomes were sorted in alphanumeric
+order (e.g. chr1, chr10, etc. or 1, 10, etc.). Starting with this release, we now simply require by default 
+that the records are **GROUPED** by chromosome and that within each chromosome group, the records are sorted by
+chromosome position. This will allow greater flexibility.
+
+One problem that can arise however, is if two different files are each grouped by chromosome, yet the two
+files follow a different chromosome order.  In order to detect and enforce the same order, one can explicitly
+state the expected chromosome order through the use of a genome (aka chromsizes) file. Please see the 
+documentation [here](http://bedtools.readthedocs.org/en/latest/content/tools/intersect.html#sorted-invoke-a-memory-efficient-algorithm-for-very-large-files) and [here](http://bedtools.readthedocs.org/en/latest/content/tools/intersect.html#g-define-an-alternate-chromosome-sort-order-via-a-genome-file) for examples.
+
+
+New tools
+---------
+1. The ``jaccard`` tool. While not exactly new, there have been improvements to the tool and there is finally
+documentation. Read more here: http://bedtools.readthedocs.org/en/latest/content/tools/jaccard.html
+
+2. The ``reldist`` tool. Details here: http://bedtools.readthedocs.org/en/latest/content/tools/reldist.html
+
+3. The ``sample`` tool. Uses reservoir sampling to randomly sample a specified number of records from BAM, BED,
+VCF, and GFF/GTF files.
+
+
+Enhancements
+------------
+1. Improvements in the consistency of the output of the ``merge`` tool. Thanks to @kcha.
+2. A new ``-allowBeyondChromEnd`` option in the ``shuffle`` tool. Thanks to @stephenturner.
+[docs](http://bedtools.readthedocs.org/en/latest/content/tools/shuffle.html#allowbeyondchromend-allow-records-to-extend-beyond-the-chrom-length)
+3. A new ``-noOverlapping`` option that prevents shuffled intervals from overlapping one another. Thanks to @brentp. [docs](http://bedtools.readthedocs.org/en/latest/content/tools/shuffle.html#nooverlapping-prevent-shuffled-intervals-from-overlapping)
+4. Allow the user to specify the maximum number of shuffling attempts via the ``-maxTries`` option in the ``shuffle`` tool.
+4. Various improvements to the documentation provided by manu different users. Thanks to all.
+5. Added the number of intersections (``n_intersections``) to the Jaccard output. Thanks to @brentp.
+6. Various improvements to the ``tag`` tool.
+7. Added the ``-N`` (remove any) option to the ``subtract`` tool.
+
+
+
+
 Version 2.17.0 (3-Nov-2012)
 =====================
 ===   New Tool   ===
