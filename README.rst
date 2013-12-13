@@ -16,15 +16,15 @@ While each individual tool is designed to do a relatively simple task (e.g., int
 
 Details
 -------
-Created out of urgency by Aaron Quinlan Spring 2009. 
+First created out through urgency and adrenaline by Aaron Quinlan Spring 2009. 
 Maintained by the Quinlan Laboratory at the University of Virginia.
 
-Lead developers:           Aaron Quinlan, Neil Kindlon
-Significant contributions: Assaf Gordon, Royden Clark, John Marshall, Brent Pedersen, Ryan Dale
-Repository:                https://github.com/arq5x/bedtools2
-Stable releases:           https://github.com/arq5x/bedtools2/releases
-Documentation:             bedtools.readthedocs.org
-License:                   Released under GNU public license version 2 (GPL v2).
+1. **Lead developers**:           Aaron Quinlan, Neil Kindlon
+2. **Significant contributions**: Assaf Gordon, Royden Clark, John Marshall, Brent Pedersen, Ryan Dale
+3. **Repository**:                https://github.com/arq5x/bedtools2
+4. **Stable releases**:           https://github.com/arq5x/bedtools2/releases
+5. **Documentation**:             bedtools.readthedocs.org
+6. **License**:                   Released under GNU public license version 2 (GPL v2).
 
 
 
