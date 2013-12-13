@@ -33,12 +33,11 @@ Usage and option summary
 ===========================      ===============================================================================================================================================================================================================
 Option                           Description
 ===========================      ===============================================================================================================================================================================================================
-**-f**				             Minimum overlap required as a fraction of A. Default is 1E-9 (i.e. 1bp).
-**-s**		                     Force "strandedness". That is, only report hits in B that overlap A on the same strand. By default, overlaps are reported without respect to strand.
+**-f**				                   Minimum overlap required as a fraction of A. Default is 1E-9 (i.e. 1bp).
+**-s**		                       Force "strandedness". That is, only report hits in B that overlap A on the same strand. By default, overlaps are reported without respect to strand.
 **-S**	                         Require different strandedness.  That is, only report hits in B that overlap A on the _opposite_ strand. By default, overlaps are reported without respect to strand.
 **-A**	                         Remove entire feature if any overlap.  That is, by default, only subtract the portion of A that overlaps B. Here, if any overlap is found (or ``-f`` amount), the entire feature is removed.
-**-N**                           Same as -A except when used with -f, the amount is the sum
-    of all features (not any single feature).
+**-N**                           Same as -A except when used with -f, the amount is the sum of all features (not any single feature).
 ===========================      ===============================================================================================================================================================================================================
 
 
