@@ -2,46 +2,29 @@
           BEDTools         
 ==============================
 
-Created by Aaron Quinlan Spring 2009.
-
-Copyright 2009,2010,2011 Aaron Quinlan. All rights reserved.
-
-Stable releases: http://code.google.com/p/bedtools
-
-Repository:      https://github.com/arq5x/bedtools
-
-Released under GNU public license version 2 (GPL v2).
-
+Note
+-------
+Stable release for bedtools were formerly archived on Google Code. Unfortunately, Google Code
+is shutting down so henceforth, all source code and stable releases will be maintained via this
+Github repository.
 
 Summary
 -------
-BEDTools is a collection of utilities for comparing, summarizing, and 
-intersecting genomic features in BED, GTF/GFF, VCF and BAM formats. 
+Collectively, the bedtools utilities are a swiss-army knife of tools for a wide-range of genomics analysis tasks. The most widely-used tools enable genome arithmetic: that is, set theory on the genome. For example, bedtools allows one to intersect, merge, count, complement, and shuffle genomic intervals from multiple files in widely-used genomic file formats such as BAM, BED, GFF/GTF, VCF.
 
+While each individual tool is designed to do a relatively simple task (e.g., intersect two interval files), quite sophisticated analyses can be conducted by combining multiple bedtools operations on the UNIX command line.
 
-Manual
-------
-See the extensive PDF manual included at: http://code.google.com/p/bedtools/downloads/detail?name=BEDTools-User-Manual.v4.pdf.
+Details
+-------
+Created out of urgency by Aaron Quinlan Spring 2009. 
+Maintained by the Quinlan Laboratory at the University of Virginia.
 
-This manual covers many common usage examples.  There are also examples available at:
-http://code.google.com/p/bedtools/wiki/Usage
-http://code.google.com/p/bedtools/wiki/UsageAdvanced
+Lead developers:           Aaron Quinlan, Neil Kindlon
+Significant contributions: Assaf Gordon, Royden Clark, John Marshall, Brent Pedersen, Ryan Dale
+Repository:                https://github.com/arq5x/bedtools2
+Stable releases:           https://github.com/arq5x/bedtools2/releases
+Documentation:             bedtools.readthedocs.org
+License:                   Released under GNU public license version 2 (GPL v2).
 
-Installation
-------------
-Git
-...
-git clone git://github.com/arq5x/bedtools.git
-
-Download tarball - that big gray button on the upper right.
-...........................................................
-1. Unpack the source downloaded tarball.
-2. cd into the expanded folder.
-3. Type "make" and hit enter.
-4. If you encountered no errors, then bedtools should now be in bin/
-  If not, try to troubleshoot then email me: aaronquinlan at gmail dot com
-5. Run the test suite with: "make test"
-6. Copy the files in bin/ to ~/bin or if you have the privileges, to /usr/local/bin.  Make sure that the directory to which you copy the tools is in your $PATH
-7. Use the tools.
 
 
