@@ -23,7 +23,7 @@ Maintained by the Quinlan Laboratory at the University of Virginia.
 2. **Significant contributions**: Assaf Gordon, Royden Clark, John Marshall, Brent Pedersen, Ryan Dale
 3. **Repository**:                https://github.com/arq5x/bedtools2
 4. **Stable releases**:           https://github.com/arq5x/bedtools2/releases
-5. **Documentation**:             bedtools.readthedocs.org
+5. **Documentation**:             http://bedtools.readthedocs.org
 6. **License**:                   Released under GNU public license version 2 (GPL v2).
 
 
