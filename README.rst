@@ -27,4 +27,11 @@ Maintained by the Quinlan Laboratory at the University of Virginia.
 6. **License**:                   Released under GNU public license version 2 (GPL v2).
 
 
+Citation
+--------
+*Please cite the following article if you use BEDTools in your research*:
+  * Quinlan AR and Hall IM, 2010. BEDTools: a flexible suite of utilities for comparing genomic features. Bioinformatics. 26, 6, pp. 841–842. 
+
+Also, if you use *pybedtools*, please cite the following.
+  * Dale RK, Pedersen BS, and Quinlan AR. Pybedtools: a flexible Python library for manipulating genomic datasets and annotations. Bioinformatics (2011). doi:10.1093/bioinformatics/btr539
 
