@@ -13,7 +13,7 @@ using namespace std;
 #include <string>
 #include "QuickString.h"
 #include <set>
-#include "DualQueue.h"
+//#include "DualQueue.h"
 
 //include headers for all FileReader and derivative classes.
 #include "Context.h"
@@ -80,7 +80,7 @@ public:
 	Record *allocateAndGetNextRecord();
 	void deleteRecord(const Record *);
 
-
+#ifdef false
 	//////////////////////////////////////////////////////////////////////////////////
 	//
 	// 			MERGED RECORDS
@@ -121,7 +121,7 @@ public:
 	// 				END MERGED RECORDS
 	//
 	//////////////////////////////////////////////////////////////////////////////////
-
+#endif
 
 	//File statistics
 	unsigned long getTotalRecordLength() const { return _totalRecordLength; } //sum of length of all returned records
@@ -161,7 +161,7 @@ private:
 	int _prevChromId;
 
 	//members for handling merged records
-	DualQueue<Record *, DualQueueAscending > _storedRecords;
+//	DualQueue<Record *, DualQueueAscending > _storedRecords;
 
 	bool _mustBeForward;
 	bool _mustBeReverse;
@@ -178,11 +178,6 @@ private:
 	void testInputSortOrder(Record *record);
 	void assignChromId(Record *);
 	void sortError(const Record *record, bool genomeFileError);
-
-	void deleteAllMergedItemsButKey(RecordKeyList &recList);
-	void addToStorage(Record *record);
-	Record *tryToTakeFromStorage();
-	Record *tryToTakeFromStorage(bool strand);
 	void testBufferedMgr() const {
 		if (_bufStreamMgr ==  NULL) {
 			cerr << "Error: attempted to access type information for file " << _context->getInputFileName(_contextFileIdx) << " before it was opened." << endl;
@@ -190,6 +185,12 @@ private:
 		}
 	}
 
+#ifdef false
+	void deleteAllMergedItemsButKey(RecordKeyList &recList);
+	void addToStorage(Record *record);
+	Record *tryToTakeFromStorage();
+	Record *tryToTakeFromStorage(bool strand);
+#endif
 
 
 };

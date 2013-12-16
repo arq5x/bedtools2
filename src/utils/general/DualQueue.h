@@ -4,7 +4,7 @@
  *  Created on: Jan 29, 2013
  *      Author: nek3d
  */
-
+#ifdef false
 #ifndef DUALQUEUE_H_
 #define DUALQUEUE_H_
 
@@ -121,3 +121,4 @@ private:
 
 
 #endif /* DUALQUEUE_H_ */
+#endif

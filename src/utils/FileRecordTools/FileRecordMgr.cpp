@@ -103,7 +103,8 @@ void FileRecordMgr::close(){
 }
 
 bool FileRecordMgr::eof(){
-	return _storedRecords.empty() && _fileReader->eof() ? true:  false;
+	return _fileReader->eof();
+//	return _storedRecords.empty() && _fileReader->eof() ? true:  false;
 }
 
 Record *FileRecordMgr::allocateAndGetNextRecord()
@@ -234,6 +235,9 @@ void FileRecordMgr::allocateFileReader()
 		break;
 	}
 }
+
+
+#ifdef false
 
 Record *FileRecordMgr::allocateAndGetNextMergedRecord(WANT_STRAND_TYPE desiredStrand, int maxDistance) {
 	RecordKeyList recList;
@@ -403,4 +407,4 @@ void FileRecordMgr::deleteAllMergedItemsButKey(RecordKeyList &recList) {
 	}
 	recList.clearList();
 }
-
+#endif

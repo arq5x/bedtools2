@@ -280,7 +280,7 @@ void InputStreamMgr::readZipChunk()
 	size_t numCharsRead = read(_tmpZipBuf, (size_t)SCAN_BUFFER_SIZE);
 	_saveDataStr.append(_tmpZipBuf);
 	_numBytesInBuffer = _saveDataStr.size();
-	if (numCharsRead < SCAN_BUFFER_SIZE) {
+	if ((int)numCharsRead < SCAN_BUFFER_SIZE) {
 		_streamFinished = true;
 	}
 	return;
