@@ -1,8 +1,9 @@
-Version 2.18.0 (13-Dec-2013)
-% bedtools 2.18.0 release
-% Aaron Quinlan
-% December 13, 2013
+Version 2.18.1 (16-Dec-2013)
 
+Fixes that address compilation errors with CLANG and force compilation of custom BamTools library.
+
+
+Version 2.18.0 (13-Dec-2013)
 
 The Google Code site is deprecated
 ----------------------------------

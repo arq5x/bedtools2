@@ -2,6 +2,8 @@
           BEDTools         
 ==============================
 
+**Current version**: 2.18.1
+
 Note
 -------
 Stable release for bedtools were formerly archived on Google Code. Unfortunately, Google Code
