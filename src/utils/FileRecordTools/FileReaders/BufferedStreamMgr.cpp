@@ -54,7 +54,7 @@ bool BufferedStreamMgr::init()
 	if (_inputStreamMgr->isGzipped()) {
 		_useBufSize = GZIP_LINE_BUF_SIZE;
 	} else {
-		_useBufSize =  67108863; //64Mb -1
+		_useBufSize =  MAIN_BUF_READ_SIZE;
 	}
 
 	size_t trueBufSize = max(_useBufSize, (int)_currScanBuffer.size());

@@ -43,7 +43,7 @@ private:
 	bool _streamFinished;
 	QuickString _currScanBuffer;
 	//The minus ones in these constants are for leaving room for a null terminator after reading into buffers.
-//	static const int MAIN_BUF_READ_SIZE = 2047; //64 Mb minus 1
+	static const int MAIN_BUF_READ_SIZE = 2047; // 2 Kb minus 1
 	static const int GZIP_LINE_BUF_SIZE = 8191; // 8K
 	bool readFileChunk();
 	bool getTypeData();
