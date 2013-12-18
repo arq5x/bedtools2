@@ -52,7 +52,7 @@ private:
 	void reportOverlapDetail(const Record *keyRecord, const Record *hitRecord);
 	void reportOverlapSummary(RecordKeyList &keyList);
 
-	static const unsigned int MAX_OUTBUF_SIZE = 16384; //16 K
+	static const unsigned int MAX_OUTBUF_SIZE = 16386; //16 K
 	bool needsFlush() const { return _outBuf.size() >= MAX_OUTBUF_SIZE *.9; }
 	void flush();
 };
