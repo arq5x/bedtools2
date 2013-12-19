@@ -20,6 +20,7 @@ Context::Context()
   _showHelp(false),
   _obeySplits(false),
   _uncompressedBam(false),
+  _useBufferedOutput(true),
   _anyHit(false),
   _noHit(false),
   _writeA(false),
@@ -286,6 +287,10 @@ bool Context::parseCmdArgs(int argc, char **argv, int skipFirstArgs) {
         }
         else if(strcmp(argv[i], "-sorted") == 0) {
             setSortedInput(true);
+            markUsed(i - skipFirstArgs);
+        }
+        else if(strcmp(argv[i], "-nobuf") == 0) {
+        	setUseBufferedOutput(false);
             markUsed(i - skipFirstArgs);
         }
         else if(strcmp(argv[i], "-header") == 0) {
