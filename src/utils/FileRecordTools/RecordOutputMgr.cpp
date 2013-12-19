@@ -82,6 +82,7 @@ bool RecordOutputMgr::printKeyAndTerminate(RecordKeyList &keyList) {
 	} else if (bamCode == NOT_BAM) {
 		keyList.getKey()->print(_outBuf);
 		return false;
+
 	}
 	//otherwise, it was BAM_AS_BED, and the key was printed.
 	return false;
@@ -157,6 +158,7 @@ void RecordOutputMgr::printRecord(RecordKeyList &keyList, RecordKeyList *blockLi
 					tab();
 					_outBuf.append('0');
 					newline();
+					if (needsFlush()) flush();
 				}
 				else if (_context->getLeftJoin()) {
 					if (printKeyAndTerminate(keyList)) {
@@ -166,6 +168,7 @@ void RecordOutputMgr::printRecord(RecordKeyList &keyList, RecordKeyList *blockLi
 					tab();
 					null(false, true);
 					newline();
+					if (needsFlush()) flush();
 					_currBlockList = NULL;
 					return;
 				}
@@ -202,6 +205,7 @@ void RecordOutputMgr::checkForHeader() {
 		}
 	}
 	_context->setPrintHeader(false);
+	if (needsFlush()) flush();
 }
 
 void RecordOutputMgr::reportOverlapDetail(const Record *keyRecord, const Record *hitRecord)
@@ -269,22 +273,26 @@ void RecordOutputMgr::reportOverlapDetail(const Record *keyRecord, const Record 
 	if (!_context->getWriteA() && !_context->getWriteB() && !_context->getWriteOverlap() && !_context->getLeftJoin()) {
 		printKey(keyRecord, *startStr, *endStr);
 		newline();
+		if (needsFlush()) flush();
 	}
 	else if ((_context->getWriteA() && _context->getWriteB()) || _context->getLeftJoin()) {
 		printKey(keyRecord);
 		tab();
 		hitRecord->print(_outBuf);
 		newline();
+		if (needsFlush()) flush();
 	}
 	else if (_context->getWriteA()) {
 		printKey(keyRecord);
 		newline();
+		if (needsFlush()) flush();
 	}
 	else if (_context->getWriteB()) {
 		printKey(keyRecord, *startStr, *endStr);
 		tab();
 		hitRecord->print(_outBuf);
 		newline();
+		if (needsFlush()) flush();
 	}
 	else if (_context->getWriteOverlap()) {
 		int printOverlapBases = max(0, minEnd-maxStart);
@@ -294,6 +302,7 @@ void RecordOutputMgr::reportOverlapDetail(const Record *keyRecord, const Record 
 		tab();
 		int2str(printOverlapBases, _outBuf, true);
 		newline();
+		if (needsFlush()) flush();
 	}
 }
 
@@ -305,6 +314,7 @@ void RecordOutputMgr::reportOverlapSummary(RecordKeyList &keyList)
 			return;
 		}
 		newline();
+		if (needsFlush()) flush();
 	} else if (_context->getWriteCount()) {
 		if (printKeyAndTerminate(keyList)) {
 			return;
@@ -312,11 +322,13 @@ void RecordOutputMgr::reportOverlapSummary(RecordKeyList &keyList)
 		tab();
 		int2str(numOverlapsFound, _outBuf, true);
 		newline();
+		if (needsFlush()) flush();
 	} else if (_context->getNoHit() && numOverlapsFound == 0) {
 		if (printKeyAndTerminate(keyList)) {
 			return;
 		}
 		newline();
+		if (needsFlush()) flush();
 	}
 }
 

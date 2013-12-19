@@ -105,6 +105,9 @@ public:
 
     bool getUncompressedBam() const { return _uncompressedBam; }
     void setUncompressedBam(bool val) { _uncompressedBam = val; }
+
+    bool getUseBufferedOutput() const { return _useBufferedOutput; }
+    void setUseBufferedOutput(bool val) { _useBufferedOutput = val; }
 	//
 	// INTERSECT METOHDS
 	//
@@ -241,6 +244,7 @@ protected:
 	bool _showHelp;
     bool _obeySplits;
     bool _uncompressedBam;
+    bool _useBufferedOutput;
 
 	bool _anyHit;
     bool _noHit;

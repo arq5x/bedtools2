@@ -10,10 +10,10 @@
 
 using namespace std;
 
+#include "Context.h"
 #include "RecordKeyList.h"
 #include "api/BamWriter.h"
 
-class Context;
 class BlockMgr;
 
 class RecordOutputMgr {
@@ -53,7 +53,13 @@ private:
 	void reportOverlapSummary(RecordKeyList &keyList);
 
 	static const unsigned int MAX_OUTBUF_SIZE = 16384; //16 K
-	bool needsFlush() const { return _outBuf.size() >= MAX_OUTBUF_SIZE *.9; }
+
+	// If we are using buffered output, only flush the output buffer if it's least
+	// 90% full. If we're not using buffered output, flush if it's not empty
+	bool needsFlush() const {
+		return ((_context->getUseBufferedOutput() &&_outBuf.size() >= MAX_OUTBUF_SIZE *.9) ||
+				(!_context->getUseBufferedOutput() && !_outBuf.empty()));
+	}
 	void flush();
 };
 

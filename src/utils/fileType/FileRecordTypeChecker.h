@@ -85,7 +85,6 @@ private:
 	vector<QuickString> _lines;
 	vector<QuickString> _currLineElems;
 	int _firstValidDataLineIdx;
-	static const int SCAN_BUFFER_SIZE = 8192; //8 KB buffer
 	int _numBytesInBuffer; //this will hold the length of the buffer after the scan.
 
 	int _numFields;

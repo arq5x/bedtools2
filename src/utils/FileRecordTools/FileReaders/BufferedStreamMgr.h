@@ -23,7 +23,6 @@ public:
 	bool init();
 
 	const FileRecordTypeChecker & getTypeChecker() const { return _typeChecker; }
-//	istream *getStream() { return _inputStreamMgr->getFinalStream(); }
 
 	bool eof() const { return _eof; }
 	bool getLine(QuickString &line);
@@ -44,12 +43,10 @@ private:
 	bool _streamFinished;
 	QuickString _currScanBuffer;
 	//The minus ones in these constants are for leaving room for a null terminator after reading into buffers.
-	static const int MAIN_BUF_READ_SIZE = 67108863; //64 Mb minus 1
-	static const int TYPE_CHECK_READ_SIZE = 4095; // 4K
+	static const int MAIN_BUF_READ_SIZE = 1023; // 2 Kb minus 1
 	static const int GZIP_LINE_BUF_SIZE = 8191; // 8K
 	bool readFileChunk();
 	bool getTypeData();
-//	void resetStream();
 };
 
 
