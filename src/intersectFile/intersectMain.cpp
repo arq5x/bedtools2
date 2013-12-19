@@ -110,7 +110,15 @@ void intersect_help(void) {
     cerr 						<<"\t\tacross input files. Only applies when used with -sorted option." << endl << endl;
 
     cerr << "\t-header\t"       << "Print the header from the A file prior to results." << endl << endl;
- 
+
+    cerr << "\t-nobuf\t"       << "Disable buffered output. Using this option will cause each line"<< endl;
+    cerr 						<<"\t\tof output to be printed as it is generated, rather than saved" << endl;
+    cerr 						<<"\t\tin a buffer. This will make printing large output files " << endl;
+
+    cerr 						<<"\t\tnoticeably slower, but can be useful in conjunction with" << endl;
+    cerr 						<<"\t\tother software tools and scripts that need to process one" << endl;
+    cerr 						<<"\t\tline of bedtools output at a time." << endl << endl;
+
     cerr << "Notes: " << endl;
     cerr << "\t(1) When a BAM file is used for the A file, the alignment is retained if overlaps exist," << endl;
     cerr << "\tand exlcuded if an overlap cannot be found.  If multiple overlaps exist, they are not" << endl;
