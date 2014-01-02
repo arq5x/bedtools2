@@ -40,7 +40,7 @@ Option                           Description
 **-r**					         Base pairs added downstream (right of) of each entry in A when searching for overlaps in B. *Allows one to create assymetrical "windows". Default is 1000bp*.
 **-sw** 				         Define -l and -r based on strand. For example if used, -l 500 for a negative-stranded feature will add 500 bp downstream. *By default, this is disabled*.
 **-sm** 				         Only report hits in B that overlap A on the same strand. *By default, overlaps are reported without respect to strand*.
-**-Sm** 				         Only report hits in B that overlap A on the same strand. *By default, overlaps are reported without respect to strand*.
+**-Sm** 				         Only report hits in B that overlap A on the opposite strand. *By default, overlaps are reported without respect to strand*.
 **-u**					         Write original A entry once if any overlaps found in B. In other words, just report the fact at least one overlap was found in B.
 **-c**                           For each entry in A, report the number of hits in B while restricting to -f. Reports 0 for A entries that have no overlap with B.							
 **-v**                           Only report those entries in A that have *no overlaps* with B.
@@ -170,7 +170,7 @@ in B will only be included if the B interval is on the *same* strand as the A
 interval.
 
 ==========================================================================
-``-Sm`` Enforcing matches with the *same* "strandedness" 
+``-Sm`` Enforcing matches with the *opposite* "strandedness" 
 ==========================================================================
 This option behaves the same as the ``-S`` option for ``bedtools intersect`` while 
 scanning for overlaps within the "window" surrounding A. That is, overlaps in

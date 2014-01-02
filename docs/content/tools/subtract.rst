@@ -109,7 +109,7 @@ while scanning for features in B that should be subtracted from A.
   chr1  180  300    b2  1   -
 
   $ bedtools subtract -a A.bed -b B.bed -s
-  chr1  120  120    a1  1   +
+  chr1  120  200    a1  1   +
   
 
 ==========================================================================
