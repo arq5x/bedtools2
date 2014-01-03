@@ -6,9 +6,9 @@
 
 Note
 -------
-Stable release for bedtools were formerly archived on Google Code. Unfortunately, Google Code
-is shutting down so henceforth, all source code and stable releases will be maintained via this
-Github repository.
+Stable release for bedtools were formerly archived on Google Code. Unfortunately, the Google Code
+downloads facility is shutting down; so henceforth, all source code and stable releases will be 
+maintained via this Github repository.
 
 Summary
 -------
