@@ -12,6 +12,7 @@ computes the fraction of bases in B interval that were overlapped by one or more
 Usage and option summary
 ==========================================================================
 Usage:
+
 ::
   coverageBed [OPTIONS] -a <BED/GFF/VCF> -b <BED/GFF/VCF>
   
@@ -51,6 +52,7 @@ After each interval in B, **coverageBed** will report:
 4) The fraction of bases in B that had non-zero coverage from features in A.
 
 Below are the number of features in A (N=...) overlapping B and fraction of bases in B with coverage.
+
 ::
   Chromosome  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   
@@ -63,6 +65,7 @@ Below are the number of features in A (N=...) overlapping B and fraction of base
 
 
 For example:
+
 ::
   cat A.bed
   chr1  10  20
@@ -89,6 +92,7 @@ Use the "**-s**" option if one wants to only count coverage if features in A are
 feature / window in B. This is especially useful for RNA-seq experiments.
 
 For example (note the difference in coverage with and without **-s**:
+
 ::
   cat A.bed
   chr1  10  20  a1  1  -
@@ -120,6 +124,7 @@ features in A across B.
 In this case, each entire feature in B will be reported, followed by the depth of coverage, the number of
 bases at that depth, the size of the feature, and the fraction covered. After all of the features in B have
 been reported, a histogram summarizing the coverage among all features in B will be reported.
+
 ::
   cat A.bed
   chr1  10  20  a1  1  -
@@ -150,6 +155,7 @@ positions across each B interval.
 
 The output will consist of a line for each one-based position in each B feature, followed by the coverage
 detected at that position.
+
 ::
   cat A.bed
   chr1  0  5

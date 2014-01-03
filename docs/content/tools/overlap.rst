@@ -10,6 +10,7 @@ the output of other BEDTools.
 Usage and option summary
 ==========================================================================
 Usage:
+
 ::
   overlap [OPTIONS] -i <input> -cols s1,e1,s2,e2
 
@@ -27,6 +28,7 @@ Default behavior
 ==========================================================================
 The default behavior is to compute the amount of overlap between the features you specify based on the
 start and end coordinates. For example:
+
 ::
   windowBed -a A.bed -b B.bed -w 10
   chr1  10  20  A  chr1  15  25  B
@@ -34,6 +36,7 @@ start and end coordinates. For example:
   
 # Now let's say we want to compute the number of base pairs of overlap
 # between the overlapping features from the output of windowBed.
+
 ::
   windowBed -a A.bed -b B.bed -w 10 | overlap -i stdin -cols 2,3,6,7
   chr1  10  20  A  chr1  15  25  B  5

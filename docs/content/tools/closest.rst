@@ -11,6 +11,7 @@ overlapping feature as the closest---that is, it does not restrict to closest *n
 5.6.1 Usage and option summary
 ==========================================================================
 **Usage:**
+
 ::
   closestBed [OPTIONS] -a <BED/GFF/VCF> -b <BED/GFF/VCF>
   
@@ -41,6 +42,7 @@ Default behavior
 in B that overlaps the highest fraction of A is reported. If no overlaps are found, **closestBed** looks for
 the feature in B that is *closest* (that is, least genomic distance to the start or end of A) to A. For
 example, in the figure below, feature B1 would be reported as the closest feature to A1.
+
 ::
   Chromosome  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   
@@ -52,6 +54,7 @@ example, in the figure below, feature B1 would be reported as the closest featur
   
 
 For example:
+
 ::
   cat A.bed
   chr1  100  200
@@ -84,6 +87,7 @@ choose the just first or last feature (in terms of where it occurred in the inpu
 position) that occurred in B.
 
 For example (note the difference between -l 200 and -l 300):
+
 ::
   cat A.bed
   chr1  100  101  rs1234
@@ -116,6 +120,7 @@ For example (note the difference between -l 200 and -l 300):
 ==========================================================================
 ClosestBed will optionally report the distance to the closest feature in the B file using the **-d** option.
 When a feature in B overlaps a feature in A, a distance of 0 is reported.
+
 ::
   cat A.bed
   chr1  100  200

@@ -9,6 +9,7 @@
     :align: center
 
 |
+
 ``bedtools map`` allows one to map overlapping features in a B file onto 
 features in an A file and apply statistics and/or summary operations on those 
 features.  

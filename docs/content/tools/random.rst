@@ -23,12 +23,14 @@ that should be generated.
 Usage and option summary
 ==========================================================================
 **Usage**:
+
 ::
 
   bedtools random [OPTIONS] -g <GENOME>
 
 **(or)**:
-::
+:
+:
 
   randomBed [OPTIONS] -g <GENOME>
 

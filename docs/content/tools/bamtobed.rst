@@ -145,6 +145,7 @@ BED format.
 the entire span of a spliced/split BAM alignment. However, when using the 
 ``-split`` command, a BED12 feature is reported where BED blocks will be 
 created for each aligned portion of the sequencing read.
+
 ::
   Chromosome  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
              

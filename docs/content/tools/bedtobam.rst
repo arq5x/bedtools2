@@ -8,6 +8,7 @@ storing large genome annotations in a compact, indexed format for visualization 
 Usage and option summary
 ==========================================================================
 Usage:
+
 ::
   bedToBam [OPTIONS] -i <BED/GFF/VCF> -g <GENOME> > <BAM>
   
@@ -26,6 +27,7 @@ Usage:
 Default behavior
 ==========================================================================
 The default behavior is to assume that the input file is in unblocked format. For example:
+
 ::
   head -5 rmsk.hg18.chr21.bed
   chr21 9719768  9721892  ALR/Alpha  1004  +
@@ -53,6 +55,7 @@ alignments. The image illustrates this behavior, as the top track is a BAM repre
 bedToBam) of a BED file of UCSC genes.
 
 For example:
+
 ::
   bedToBam -i knownGene.hg18.chr21.bed -g human.hg18.genome -bed12 > knownGene.bam
   

@@ -120,11 +120,11 @@ For example (note the difference between -l 200 and -l 300):
   chr1  10000 20000
   
   $ bedtools window -a A.bed -b B.bed -l 200 -r 20000
-  chr1  100   200  chr1  10000  20000
+  chr1  1000   2000  chr1  10000  20000
   
   $ bedtools window -a A.bed -b B.bed -l 300 -r 20000
-  chr1  100   200  chr1  500    800
-  chr1  100   200  chr1  10000  20000
+  chr1  1000   2000  chr1  500    800
+  chr1  1000   2000  chr1  10000  20000
 
   
 ==========================================================================

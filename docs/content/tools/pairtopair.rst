@@ -11,6 +11,7 @@ discordant pair suggests the same structural variation in each file/sample.
 Usage and option summary
 ================================
 **Usage:**
+
 ::
   pairToPair [OPTIONS] -a <BEDPE> -b <BEDPE>
   
@@ -45,6 +46,7 @@ overlaps on each end be on the same strand. This way, an otherwise overlapping (
 locations) F/R alignment will not be matched with a R/R alignment.
 
 Default: Report A if *both* ends overlaps B.
+
 ::
   Chromosome  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   
@@ -57,6 +59,7 @@ Default: Report A if *both* ends overlaps B.
 
 Default when strand information is present in both BEDPE files: Report A if *both* ends overlaps B *on
 the same strands*.
+
 ::
   Chromosome  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   
@@ -83,6 +86,7 @@ Using then **-type neither, pairToPair** will only report A if *neither* end ove
 feature in B.
 
 **-type neither**: Report A only if *neither* end overlaps B.
+
 ::
   Chromosome  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   

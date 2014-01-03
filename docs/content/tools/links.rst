@@ -9,6 +9,7 @@ annotations or features.
 Usage and option summary
 ==========================================================================
 Usage:
+
 ::
   linksBed [OPTIONS] -i <BED/GFF/VCF> > <HTML file>
   
@@ -29,6 +30,7 @@ Default behavior
 By default, **linksBed** creates links to the public UCSC Genome Browser.
 
 For example:
+
 ::
   head genes.bed
   chr21 9928613  10012791  uc002yip.1 0  -
@@ -57,6 +59,7 @@ Creating HTML links to a local UCSC Browser installation
 Optionally, **linksBed** will create links to a local copy of the UCSC Genome Browser.
 
 For example:
+
 ::
   head -3 genes.bed
   chr21 9928613 10012791 uc002yip.1 0 -
@@ -65,6 +68,7 @@ For example:
   linksBed -i genes.bed -base http://mirror.uni.edu > genes.html
   
 One can point the links to the appropriate organism and genome build as well:
+
 ::
   head -3 genes.bed
   chr21 9928613 10012791 uc002yip.1 0 -

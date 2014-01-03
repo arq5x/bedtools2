@@ -506,6 +506,7 @@ For example, the diagram below illustrates the *default* behavior. The blue dots
 spliced" portion of the alignment (i.e., CIGAR "N" operation). In this case, the two exon annotations
 are reported as overlapping with the "split" BAM alignment, but in addition, a third feature that
 overlaps the "split" portion of the alignment is also reported.
+
 ::
   Chromosome  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   
@@ -519,6 +520,7 @@ overlaps the "split" portion of the alignment is also reported.
 
   
 In contrast, when using the **-split** option, only the exon overlaps are reported.
+
 ::
   Chromosome  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   

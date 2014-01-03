@@ -9,6 +9,7 @@ compare coverage (and other text-values such as genotypes) across multiple sampl
 Usage and option summary
 ==========================================================================
 Usage:
+
 ::
   unionBedGraphs [OPTIONS] -i FILE1 FILE2 FILE3 ... FILEn
   
@@ -31,6 +32,7 @@ Usage:
 Default behavior
 ==========================================================================
 Figure:
+
 ::
   cat 1.bg
   chr1 1000 1500 10
@@ -62,6 +64,7 @@ Figure:
 ``-header`` Add a header line to the output
 ==========================================================================
 Figure:
+
 ::
   unionBedGraphs -i 1.bg 2.bg 3.bg -header
   chrom  start  end  1  2  3
@@ -80,6 +83,7 @@ Figure:
 ``-names`` Add a header line with custom file names to the output
 ==========================================================================
 Figure:
+
 ::
   unionBedGraphs -i 1.bg 2.bg 3.bg -header -names WT-1 WT-2 KO-1
   chrom  start  end   WT-1  WT-2  KO-1
@@ -100,6 +104,7 @@ Figure:
 ``-empty`` Include regions that have zero coverage in all BEDGRAPH files.
 ==========================================================================
 Figure:
+
 ::
   unionBedGraphs -i 1.bg 2.bg 3.bg -empty -g sizes.txt -header
   chrom  start  end  WT-1  WT-2  KO-1
@@ -122,6 +127,7 @@ Figure:
 ``-filler`` Use a custom value for missing values.
 ==========================================================================
 Figure:
+
 ::
   unionBedGraphs -i 1.bg 2.bg 3.bg -empty -g sizes.txt -header -filler N/A
   chrom start end  WT-1  WT-2  KO-1
@@ -144,6 +150,7 @@ Figure:
 Use BEDGRAPH files with non-numeric values.
 ==========================================================================
 Figure:
+
 ::
   cat 1.snp.bg
   chr1 0 1 A/G
