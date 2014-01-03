@@ -204,10 +204,7 @@ bool InputStreamMgr::detectBamOrBgzip(int &numChars, int currChar)
 
 
 			_bamReader = new BamTools::BamReader();
-			_bamReader->OpenStream(_finalInputStream);
-			QuickString bamHeader(_bamReader->GetHeaderText());
-
-			if (bamHeader.empty()) {
+			if (!_bamReader->OpenStream(_finalInputStream)) {
 				//This is NOT a bam file, but it is bgzipped.
 				_pushBackStreamBuf->clear();
 				//Put all bytes read so far back onto the scan buffer, then reset

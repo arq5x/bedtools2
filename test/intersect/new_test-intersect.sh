@@ -605,6 +605,15 @@ check obs exp
 rm obs exp
 
 
+###########################################################
+#  Test that we can process a Bam file with no text in 
+#  it's header. 
+############################################################
+echo "    intersect.new.t53...\c"
+$BT intersect -a gdc.bam -b gdc.bam -bed > obs
+check obs gdc_exp
+rm obs
+
 
 
 
