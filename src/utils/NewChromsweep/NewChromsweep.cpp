@@ -11,10 +11,10 @@
 ******************************************************************************/
 
 #include "NewChromsweep.h"
-#include "Context.h"
+#include "ContextIntersect.h"
 #include "FileRecordMgr.h"
 
-NewChromSweep::NewChromSweep(Context *context,
+NewChromSweep::NewChromSweep(ContextIntersect *context,
                        bool useMergedIntervals)
 :	_context(context),
  	_queryFRM(NULL),

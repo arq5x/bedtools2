@@ -16,7 +16,7 @@ using namespace std;
 //#include "DualQueue.h"
 
 //include headers for all FileReader and derivative classes.
-#include "Context.h"
+#include "ContextBase.h"
 #include "BufferedStreamMgr.h"
 #include "FileReader.h"
 #include "SingleLineDelimTextFileReader.h"
@@ -31,7 +31,7 @@ using namespace std;
 class Record;
 class FileRecordMgr {
 public:
-	FileRecordMgr(int inputFileIdx, Context *context);
+	FileRecordMgr(int inputFileIdx, ContextBase *context);
 	~FileRecordMgr();
 	bool open();
 	void close();
@@ -145,7 +145,7 @@ private:
 	BufferedStreamMgr *_bufStreamMgr;
 	int _contextFileIdx;
 
-	Context *_context;
+	ContextBase *_context;
 	FileReader *_fileReader;
 	FileRecordTypeChecker::FILE_TYPE _fileType;
 	FileRecordTypeChecker::RECORD_TYPE _recordType;

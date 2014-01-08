@@ -6,7 +6,8 @@
  */
 
 #include "RecordOutputMgr.h"
-#include "Context.h"
+#include "ContextBase.h"
+#include "ContextIntersect.h"
 #include "BlockMgr.h"
 #include "Bed3Interval.h"
 #include "Bed4Interval.h"
@@ -49,9 +50,8 @@ RecordOutputMgr::~RecordOutputMgr()
 
 }
 
-bool RecordOutputMgr::init(Context *context) {
+bool RecordOutputMgr::init(ContextBase *context) {
 	_context = context;
-	_blockMgr->setContext(_context);
 	if (_context->getOutputFileType() == FileRecordTypeChecker::BAM_FILE_TYPE) {
 		//set-up BAM writer.
 		_bamWriter = new BamTools::BamWriter();
@@ -62,8 +62,9 @@ bool RecordOutputMgr::init(Context *context) {
 		//for everything but BAM, we'll copy output to an output buffer before printing.
 		_outBuf.reserve(MAX_OUTBUF_SIZE);
 	}
-	if (_context->getProgram() == Context::INTERSECT) {
-		if (_context->getAnyHit() || _context->getNoHit() || _context->getWriteCount()) {
+	if (_context->getProgram() == ContextBase::INTERSECT) {
+		if ((static_cast<ContextIntersect *>(_context))->getAnyHit() || (static_cast<ContextIntersect *>(_context))->getNoHit() ||
+				(static_cast<ContextIntersect *>(_context))->getWriteCount()) {
 			_printable = false;
 		}
 	}
@@ -144,10 +145,10 @@ void RecordOutputMgr::printRecord(RecordKeyList &keyList, RecordKeyList *blockLi
 	const_cast<Record *>(keyList.getKey())->undoZeroLength();
 	_currBlockList = blockList;
 
-	if (_context->getProgram() == Context::INTERSECT) {
+	if (_context->getProgram() == ContextBase::INTERSECT) {
 		if (_printable) {
 			if (keyList.empty()) {
-				if (_context->getWriteAllOverlap()) {
+				if ((static_cast<ContextIntersect *>(_context))->getWriteAllOverlap()) {
 					// -wao the user wants to force the reporting of 0 overlap
 					if (printKeyAndTerminate(keyList)) {
 						_currBlockList = NULL;
@@ -160,7 +161,7 @@ void RecordOutputMgr::printRecord(RecordKeyList &keyList, RecordKeyList *blockLi
 					newline();
 					if (needsFlush()) flush();
 				}
-				else if (_context->getLeftJoin()) {
+				else if ((static_cast<ContextIntersect *>(_context))->getLeftJoin()) {
 					if (printKeyAndTerminate(keyList)) {
 						_currBlockList = NULL;
 						return;
@@ -185,7 +186,7 @@ void RecordOutputMgr::printRecord(RecordKeyList &keyList, RecordKeyList *blockLi
 			reportOverlapSummary(keyList);
 		}
 		_currBlockList = NULL;
-	} else if (_context->getProgram() == Context::SAMPLE) {
+	} else if (_context->getProgram() == ContextBase::SAMPLE) {
 		if (!printKeyAndTerminate(keyList)) {
 			newline();
 		}
@@ -195,11 +196,11 @@ void RecordOutputMgr::printRecord(RecordKeyList &keyList, RecordKeyList *blockLi
 }
 
 void RecordOutputMgr::checkForHeader() {
-	if (_context->getProgram() == Context::INTERSECT) {
+	if (_context->getProgram() == ContextBase::INTERSECT) {
 		if (_context->getPrintHeader()) {
-			_outBuf.append(_context->getHeader(_context->getQueryFileIdx()));
+			_outBuf.append(_context->getHeader((static_cast<ContextIntersect *>(_context))->getQueryFileIdx()));
 		}
-	} else if (_context->getProgram() == Context::SAMPLE) {
+	} else if (_context->getProgram() == ContextBase::SAMPLE) {
 		if (_context->getPrintHeader()) {
 			_outBuf.append(_context->getHeader(_context->getInputFileIdx()));
 		}
@@ -270,31 +271,33 @@ void RecordOutputMgr::reportOverlapDetail(const Record *keyRecord, const Record 
 //	int minEnd = min(keyRecord->getEndPos(), hitRecord->getEndPos());
 //
 
-	if (!_context->getWriteA() && !_context->getWriteB() && !_context->getWriteOverlap() && !_context->getLeftJoin()) {
+	if (!(static_cast<ContextIntersect *>(_context))->getWriteA() && !(static_cast<ContextIntersect *>(_context))->getWriteB()
+			&& !(static_cast<ContextIntersect *>(_context))->getWriteOverlap() && !(static_cast<ContextIntersect *>(_context))->getLeftJoin()) {
 		printKey(keyRecord, *startStr, *endStr);
 		newline();
 		if (needsFlush()) flush();
 	}
-	else if ((_context->getWriteA() && _context->getWriteB()) || _context->getLeftJoin()) {
+	else if (((static_cast<ContextIntersect *>(_context))->getWriteA() &&
+			(static_cast<ContextIntersect *>(_context))->getWriteB()) || (static_cast<ContextIntersect *>(_context))->getLeftJoin()) {
 		printKey(keyRecord);
 		tab();
 		hitRecord->print(_outBuf);
 		newline();
 		if (needsFlush()) flush();
 	}
-	else if (_context->getWriteA()) {
+	else if ((static_cast<ContextIntersect *>(_context))->getWriteA()) {
 		printKey(keyRecord);
 		newline();
 		if (needsFlush()) flush();
 	}
-	else if (_context->getWriteB()) {
+	else if ((static_cast<ContextIntersect *>(_context))->getWriteB()) {
 		printKey(keyRecord, *startStr, *endStr);
 		tab();
 		hitRecord->print(_outBuf);
 		newline();
 		if (needsFlush()) flush();
 	}
-	else if (_context->getWriteOverlap()) {
+	else if ((static_cast<ContextIntersect *>(_context))->getWriteOverlap()) {
 		int printOverlapBases = max(0, minEnd-maxStart);
 		printKey(keyRecord);
 		tab();
@@ -309,13 +312,13 @@ void RecordOutputMgr::reportOverlapDetail(const Record *keyRecord, const Record 
 void RecordOutputMgr::reportOverlapSummary(RecordKeyList &keyList)
 {
 	int numOverlapsFound = (int)keyList.size();
-	if (_context->getAnyHit() && numOverlapsFound > 0) {
+	if ((static_cast<ContextIntersect *>(_context))->getAnyHit() && numOverlapsFound > 0) {
 		if (printKeyAndTerminate(keyList)) {
 			return;
 		}
 		newline();
 		if (needsFlush()) flush();
-	} else if (_context->getWriteCount()) {
+	} else if ((static_cast<ContextIntersect *>(_context))->getWriteCount()) {
 		if (printKeyAndTerminate(keyList)) {
 			return;
 		}
@@ -323,7 +326,7 @@ void RecordOutputMgr::reportOverlapSummary(RecordKeyList &keyList)
 		int2str(numOverlapsFound, _outBuf, true);
 		newline();
 		if (needsFlush()) flush();
-	} else if (_context->getNoHit() && numOverlapsFound == 0) {
+	} else if ((static_cast<ContextIntersect *>(_context))->getNoHit() && numOverlapsFound == 0) {
 		if (printKeyAndTerminate(keyList)) {
 			return;
 		}
@@ -336,13 +339,13 @@ void RecordOutputMgr::reportOverlapSummary(RecordKeyList &keyList)
 void RecordOutputMgr::null(bool queryType, bool dbType)
 {
 	FileRecordTypeChecker::RECORD_TYPE recordType = FileRecordTypeChecker::UNKNOWN_RECORD_TYPE;
-	if (_context->getProgram() == Context::INTERSECT) {
+	if (_context->getProgram() == ContextBase::INTERSECT) {
 		if (queryType) {
-			recordType = _context->getQueryRecordType();
+			recordType = (static_cast<ContextIntersect *>(_context))->getQueryRecordType();
 		} else if (dbType) {
-			recordType = _context->getDatabaseRecordType();
+			recordType = (static_cast<ContextIntersect *>(_context))->getDatabaseRecordType();
 		}
-	} else if (_context->getProgram() == Context::SAMPLE) {
+	} else if (_context->getProgram() == ContextBase::SAMPLE) {
 		recordType = _context->getInputRecordType();
 	}
 	//This is kind of a hack. Need an instance of the correct class of record in order to call it's printNull method.
@@ -369,18 +372,18 @@ void RecordOutputMgr::null(bool queryType, bool dbType)
 		break;
 	case FileRecordTypeChecker::BED_PLUS_RECORD_TYPE:
 		dummyRecord = new BedPlusInterval();
-		(static_cast<BedPlusInterval *>(dummyRecord))->setNumPrintFields(_context->getMaxNumDatabaseFields());
+		(static_cast<BedPlusInterval *>(dummyRecord))->setNumPrintFields((static_cast<ContextIntersect *>(_context))->getMaxNumDatabaseFields());
 		break;
 	case FileRecordTypeChecker::VCF_RECORD_TYPE:
 		dummyRecord = new VcfRecord();
-		(static_cast<VcfRecord *>(dummyRecord))->setNumPrintFields(_context->getMaxNumDatabaseFields());
+		(static_cast<VcfRecord *>(dummyRecord))->setNumPrintFields((static_cast<ContextIntersect *>(_context))->getMaxNumDatabaseFields());
 		break;
 	case FileRecordTypeChecker::BAM_RECORD_TYPE:
 		dummyRecord = new BamRecord();
 		break;
 	case FileRecordTypeChecker::GFF_RECORD_TYPE:
 		dummyRecord = new GffRecord();
-		(static_cast<GffRecord *>(dummyRecord))->setNumFields(_context->getMaxNumDatabaseFields());
+		(static_cast<GffRecord *>(dummyRecord))->setNumFields((static_cast<ContextIntersect *>(_context))->getMaxNumDatabaseFields());
 		break;
 	default:
 		break;

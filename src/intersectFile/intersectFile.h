@@ -18,20 +18,20 @@ using namespace std;
 
 using namespace std;
 
-class Context;
+class ContextIntersect;
 class BlockMgr;
 class RecordOutputMgr;
 
 class FileIntersect {
 
 public:
-    FileIntersect(Context *context);
+    FileIntersect(ContextIntersect *context);
     ~FileIntersect(void);
 
     bool intersectFiles();
 
 private:
-    Context *_context;
+    ContextIntersect *_context;
 	Record *_queryRec;
 	Record *_databaseRec;
 	BlockMgr *_blockMgr;

@@ -6,7 +6,6 @@
 #include "ParseTools.h"
 #include <sys/stat.h>
 #include <ctime>
-#include "Context.h"
 
 const string RegressTest::_hardOptsCmd = "HARD_OPTIONS";
 const string RegressTest::_correctCmd = "CORRECT";

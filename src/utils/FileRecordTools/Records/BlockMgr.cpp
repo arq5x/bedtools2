@@ -7,7 +7,7 @@
 
 #include "BlockMgr.h"
 #include "RecordMgr.h"
-#include "Context.h"
+#include "ContextIntersect.h"
 #include "Bed12Interval.h"
 #include "BamRecord.h"
 #include "ParseTools.h"

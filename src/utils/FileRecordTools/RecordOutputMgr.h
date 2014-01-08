@@ -10,7 +10,7 @@
 
 using namespace std;
 
-#include "Context.h"
+#include "ContextBase.h"
 #include "RecordKeyList.h"
 #include "api/BamWriter.h"
 
@@ -22,7 +22,7 @@ public:
 	~RecordOutputMgr();
 
 	//The init method must be called after all the input files are open.
-	bool init(Context *context);
+	bool init(ContextBase *context);
 
 //	void printHeader(const string &);
 	void printRecord(const Record *record);
@@ -31,7 +31,7 @@ public:
 private:
 	typedef enum { NOT_BAM, BAM_AS_BAM, BAM_AS_BED} printBamType;
 
-	Context *_context;
+	ContextBase *_context;
 	bool _printable;
 	BamTools::BamWriter *_bamWriter;
 	RecordKeyList *_currBlockList;

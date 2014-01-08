@@ -2,7 +2,7 @@
 #include "FileRecordMgr.h"
 
 
-BinTree::BinTree(int databaseFileIdx, Context *context)
+BinTree::BinTree(int databaseFileIdx, ContextIntersect *context)
 : _databaseFileIdx(databaseFileIdx),
   _context(context),
   _binOffsetsExtended(NULL),

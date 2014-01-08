@@ -10,7 +10,7 @@
 
 using namespace std;
 
-#include "Context.h"
+#include "ContextSample.h"
 #include "Record.h"
 #include <vector>
 
@@ -20,12 +20,12 @@ class RecordOutputMgr;
 
 class SampleFile {
 public:
-	SampleFile(Context *context);
+	SampleFile(ContextSample *context);
 	~SampleFile();
 	bool takeSample();
 
 private:
-	Context *_context;
+	ContextSample *_context;
 	FileRecordMgr *_inputFile;
 	RecordOutputMgr *_outputMgr;
 	vector<Record *> _samples;
