@@ -25,12 +25,12 @@ using namespace std;
 
 class Record;
 class FileRecordMgr;
-class Context;
+class ContextIntersect;
 
 class NewChromSweep {
 public:
 
-    NewChromSweep(Context *context, bool useMergedIntervals = false);
+    NewChromSweep(ContextIntersect *context, bool useMergedIntervals = false);
     
     
     ~NewChromSweep(void);
@@ -60,7 +60,7 @@ public:
     //     getDatabaseTotalRecordLength()
 
 private:
-    Context *_context;
+    ContextIntersect *_context;
     FileRecordMgr *_queryFRM;
     FileRecordMgr *_databaseFRM;
 

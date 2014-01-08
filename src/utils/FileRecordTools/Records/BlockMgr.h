@@ -16,14 +16,14 @@ using namespace std;
 #include "FileRecordTypeChecker.h"
 #include "RecordKeyList.h"
 
-class Context;
+class ContextIntersect;
 class RecordMgr;
 
 class BlockMgr {
 public:
 	BlockMgr();
 	~BlockMgr();
-	void setContext(Context *context) { _context = context; }
+	void setContext(ContextIntersect *context) { _context = context; }
 
 	// Return value is the number of blocks this main record has been split into.
 	void getBlocks(RecordKeyList &keyList, bool &mustDelete);
@@ -44,7 +44,7 @@ public:
 
 private:
 	RecordMgr *_blockRecordsMgr;
-	Context *_context;
+	ContextIntersect *_context;
 	bool _breakOnDeletionOps;
 	bool _breakOnSkipOps;
 

@@ -17,24 +17,23 @@ using namespace std;
 
 #include "QuickString.h"
 #include "RecordKeyList.h"
-#include "Context.h"
+#include "ContextIntersect.h"
 
 class FileRecordMgr;
 class Record;
 
 class BinTree {
 public:
-	BinTree(int databaseFileIdx, Context *context);
+	BinTree(int databaseFileIdx, ContextIntersect *context);
 
 	~BinTree();
 	bool loadDB();
 	void getHits(Record *record, RecordKeyList &hitSet);
 
-
 private:
 
 	int _databaseFileIdx;
-	Context *_context;
+	ContextIntersect *_context;
 
     //
     // BIN HANDLING

@@ -6,7 +6,7 @@
  */
 
 #include <iostream>
-#include "Context.h"
+#include "ContextSample.h"
 #include "SampleFile.h"
 
 #define PROGRAM_NAME "bedtools sample"
@@ -15,7 +15,7 @@ void sample_help(void);
 
 int sample_main(int argc, char **argv)
 {
-    Context *context = new Context();
+    ContextSample *context = new ContextSample();
     if (!context->parseCmdArgs(argc, argv, 1) || context->getShowHelp() || !context->isValidState()) {
     	if (!context->getErrorMsg().empty()) {
     		cerr << context->getErrorMsg() << endl;

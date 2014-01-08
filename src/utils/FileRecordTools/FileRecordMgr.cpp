@@ -1,10 +1,10 @@
 
 #include "FileRecordMgr.h"
-#include "Context.h"
+#include "ContextIntersect.h"
 #include "FreeList.h"
 #include "Record.h"
 
-FileRecordMgr::FileRecordMgr(int fileIdx, Context *context)
+FileRecordMgr::FileRecordMgr(int fileIdx, ContextBase *context)
 :
   _bufStreamMgr(NULL),
   _contextFileIdx(fileIdx),
@@ -66,7 +66,6 @@ bool FileRecordMgr::open(){
 
 	_fileReader->setFileName(_filename.c_str());
 	_fileReader->setInputStream(_bufStreamMgr);
-	_fileReader->setContext(_context);
 	if (!_fileReader->open()) {
 		cerr << "Error: Types determined but can't open file " << _filename << endl;
 		delete _bufStreamMgr;
@@ -79,8 +78,11 @@ bool FileRecordMgr::open(){
 	//if this is a database file, and the numFields is greater than the numFields in other DB files, update.
 	// TBD: This is one of many things that will need to be changed to support multiple database files in future versions.
 	int numFields = _bufStreamMgr->getTypeChecker().getNumFields();
-	if (_contextFileIdx == _context->getDatabaseFileIdx() && numFields > _context->getMaxNumDatabaseFields()) {
-		_context->setMaxNumDatabaseFields(numFields);
+	if (_context->hasIntersectMethods()) {
+		if (_contextFileIdx == (static_cast<ContextIntersect *>(_context))->getDatabaseFileIdx() && numFields >
+		(static_cast<ContextIntersect *>(_context))->getMaxNumDatabaseFields()) {
+			(static_cast<ContextIntersect *>(_context))->setMaxNumDatabaseFields(numFields);
+		}
 	}
 	if (_fileType == FileRecordTypeChecker::BAM_FILE_TYPE) {
 		_context->setHeader(_contextFileIdx, _fileReader->getHeader());

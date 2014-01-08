@@ -1,6 +1,6 @@
 using namespace std;
 
-#include "Context.h"
+#include "ContextIntersect.h"
 #include "FileRecordMgr.h"
 #include <iostream>
 #include <cstdio>
@@ -128,7 +128,7 @@ int nek_sandbox1_main(int argc,char** argv)
 //
 //	return 0;
 //
-	Context context;
+	ContextIntersect context;
 	context.addInputFile(argv[1]);
 	context.setSortedInput(true);
 //	context.setObeySplits(true);

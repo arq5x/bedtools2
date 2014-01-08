@@ -6,7 +6,7 @@
  */
 
 #include "SampleFile.h"
-#include "Context.h"
+#include "ContextSample.h"
 #include "FileRecordMgr.h"
 #include "RecordOutputMgr.h"
 
@@ -14,7 +14,7 @@ static const bool SampleRecordLtFn(const Record *rec1, const Record *rec2) {
 	return (*rec1 < *rec2);
 }
 
-SampleFile::SampleFile(Context *context)
+SampleFile::SampleFile(ContextSample *context)
 :	_context(context),
 	_inputFile(NULL),
 	_outputMgr(NULL),
