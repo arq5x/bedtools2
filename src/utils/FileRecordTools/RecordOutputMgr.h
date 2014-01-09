@@ -27,6 +27,8 @@ public:
 //	void printHeader(const string &);
 	void printRecord(const Record *record);
 	void printRecord(RecordKeyList &keyList);
+	// Added by ARQ
+	void printRecord(const Record *record, const string value);
 
 private:
 	typedef enum { NOT_BAM, BAM_AS_BAM, BAM_AS_BED} printBamType;

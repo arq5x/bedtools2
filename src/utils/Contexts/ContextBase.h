@@ -210,7 +210,8 @@ protected:
     int _bamHeaderAndRefIdx;
     int _maxNumDatabaseFields;
     bool _useFullBamTags;
-
+    string _columnOperation;
+    int _column;
 	bool _reportCount;
 	int _maxDistance;
 	bool _reportNames;

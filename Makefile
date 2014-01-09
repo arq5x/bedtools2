@@ -46,7 +46,7 @@ SUBDIRS = $(SRC_DIR)/annotateBed \
 		  $(SRC_DIR)/jaccard \
 		  $(SRC_DIR)/linksBed \
 		  $(SRC_DIR)/maskFastaFromBed \
-		  $(SRC_DIR)/mapBed \
+		  $(SRC_DIR)/mapFile \
 		  $(SRC_DIR)/mergeBed \
 		  $(SRC_DIR)/multiBamCov \
 		  $(SRC_DIR)/multiIntersectBed \

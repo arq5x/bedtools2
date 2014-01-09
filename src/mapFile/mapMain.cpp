@@ -9,21 +9,37 @@
 
   Licenced under the GNU General Public License 2.0 license.
 ******************************************************************************/
-#include "mapBed.h"
-#include "version.h"
-
 using namespace std;
+
+#include "mapFile.h"
+#include "ContextMap.h"
 
 // define our program name
 #define PROGRAM_NAME "bedtools map"
 
-
-// define our parameter checking macro
-#define PARAMETER_CHECK(param, paramLen, actualLen) (strncmp(argv[i], param, min(actualLen, paramLen))== 0) && (actualLen == paramLen)
-
-// function declarations
 void map_help(void);
 
+int map_main(int argc, char* argv[]) {
+
+    ContextMap *context = new ContextMap();
+    if (!context->parseCmdArgs(argc, argv, 1) || context->getShowHelp() || !context->isValidState()) {
+        if (!context->getErrorMsg().empty()) {
+            cerr << context->getErrorMsg() << endl;
+        }
+        map_help();
+        delete context;
+        return 0;
+    }
+    FileMap *fileMap = new FileMap(context);
+
+    bool retVal = fileMap->mapFiles();
+    delete fileMap;
+    delete context;
+    return retVal ? 0 : 1;
+}
+
+
+/*
 int map_main(int argc, char* argv[]) {
 
     // our configuration variables
@@ -158,6 +174,7 @@ int map_main(int argc, char* argv[]) {
         return 0;
     }
 }
+*/
 
 void map_help(void) {
 

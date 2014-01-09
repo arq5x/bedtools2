@@ -1,5 +1,5 @@
 /*****************************************************************************
-  mapBed.h
+  mapFile.h
 
   (c) 2009 - Aaron Quinlan
   Hall Laboratory
@@ -9,9 +9,52 @@
 
   Licenced under the GNU General Public License 2.0 license.
 ******************************************************************************/
-#ifndef MAPBED_H
-#define MAPBED_H
+#ifndef MAPFILE_H
+#define MAPFILE_H
 
+using namespace std;
+
+#include <sstream>
+#include <iomanip>
+#include "VectorOps.h"
+#include "RecordKeyList.h"
+
+using namespace std;
+
+class ContextMap;
+class BlockMgr;
+class RecordOutputMgr;
+
+class FileMap {
+
+public:
+    FileMap(ContextMap *context);
+    ~FileMap(void);
+
+    bool mapFiles();
+
+private:
+    ContextMap *_context;
+    Record *_queryRec;
+    Record *_databaseRec;
+    BlockMgr *_blockMgr;
+    RecordOutputMgr *_recordOutputMgr;
+
+    vector<string> _column_vec; // vector to hold current column's worth of data
+
+    //------------------------------------------------
+    // private methods
+    //------------------------------------------------
+    void Map();
+    string MapHits(RecordKeyList &hits);
+    void ExtractColumnFromHits(RecordKeyList &hits);
+
+};
+
+#endif /* MAPFILE_H */
+
+
+/*
 #include "bedFile.h"
 #include "chromsweep.h"
 #include "VectorOps.h"
@@ -75,5 +118,5 @@ private:
     string MapHits(const BED &a, const vector<BED> &hits);
     void ExtractColumnFromHits(const vector<BED> &hits);
 };
-
-#endif /* MAPBED_H */
+*/
+//#endif /* MAPFILE_H */

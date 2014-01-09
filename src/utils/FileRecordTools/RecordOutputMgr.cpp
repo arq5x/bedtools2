@@ -117,6 +117,18 @@ void RecordOutputMgr::printRecord(const Record *record)
 	printRecord(keyList);
 }
 
+void RecordOutputMgr::printRecord(const Record *record, const string value)
+{	
+	RecordKeyList keyList(record);
+	printRecord(keyList);
+	_outBuf.append(value.c_str());
+	newline();
+
+	if (needsFlush()) {
+		flush();
+	}
+}
+
 void RecordOutputMgr::printRecord(RecordKeyList &keyList) {
 	if (keyList.getKey()->getType() == FileRecordTypeChecker::BAM_RECORD_TYPE) {
 		RecordKeyList blockList(keyList.getKey());
@@ -129,7 +141,6 @@ void RecordOutputMgr::printRecord(RecordKeyList &keyList) {
 		return;
 	}
     printRecord(keyList, NULL);
-
 }
 
 void RecordOutputMgr::printRecord(RecordKeyList &keyList, RecordKeyList *blockList)
@@ -189,6 +200,12 @@ void RecordOutputMgr::printRecord(RecordKeyList &keyList, RecordKeyList *blockLi
 	} else if (_context->getProgram() == ContextBase::SAMPLE) {
 		if (!printKeyAndTerminate(keyList)) {
 			newline();
+		}
+		_currBlockList = NULL;
+		return;
+	} else if (_context->getProgram() == ContextBase::MAP) {
+		if (!printKeyAndTerminate(keyList)) {
+			tab();
 		}
 		_currBlockList = NULL;
 		return;

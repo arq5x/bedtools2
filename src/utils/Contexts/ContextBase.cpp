@@ -55,6 +55,7 @@ ContextBase::ContextBase()
 {
 	_programNames["intersect"] = INTERSECT;
 	_programNames["sample"] = SAMPLE;
+	_programNames["map"] = MAP;
 
 	_validScoreOps.insert("sum");
 	_validScoreOps.insert("max");
