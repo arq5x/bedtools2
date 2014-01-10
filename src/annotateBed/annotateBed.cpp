@@ -189,11 +189,14 @@ void BedAnnotate::ReportAnnotations() {
                     int nonZeroBases   = (length - zeroDepthCount);
                     float fractCovered = (float) nonZeroBases / length;
                     if (_reportCounts == false && _reportBoth == false)
-                        printf("%f\t", fractCovered);
+                        printf("%f", fractCovered);
                     else if (_reportCounts == true && _reportBoth == false)
-                        printf("%d\t", bedItr->counts[i]);
+                        printf("%d", bedItr->counts[i]);
                     else if (_reportCounts == false && _reportBoth == true)
-                        printf("%d\t%f\t", bedItr->counts[i], fractCovered);
+                        printf("%d\t%f", bedItr->counts[i], fractCovered);
+
+                    if (i != _annoFiles.size() - 1)
+                        printf("\t");
                 }
                 // print newline for next feature.
                 printf("\n");
