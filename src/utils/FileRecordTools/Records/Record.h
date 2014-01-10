@@ -59,10 +59,18 @@ public:
 	virtual bool getZeroLength() const { return _zeroLength; }
 	virtual void setZeroLength(bool val) { _zeroLength = val; }
 
-	virtual strandType getStrand() const { return _strand; }
-	virtual void setStrand(strandType val) { _strand = val; }
-	virtual void setStrand(char val);
-	virtual char getStrandChar() const;
+	virtual const QuickString &getStrand() const { return _strand; }
+	virtual void setStrand(const QuickString &val) { _strand = val;
+		_strandVal = (val == "+" ? FORWARD : (val == "-" ? REVERSE : UNKNOWN));
+	}
+	virtual void setStrand(char val) { _strand = val;
+		_strandVal = (val == '+' ? FORWARD : (val == '-' ? REVERSE : UNKNOWN));
+	}
+	virtual void adjustStrandVal() {
+		_strandVal = (_strand == "+" ? FORWARD : (_strand == "-" ? REVERSE : UNKNOWN));
+	}
+
+	virtual strandType getStrandVal() const {return _strandVal; }
 
 	virtual const QuickString &getName() const { return _name; }
 	virtual void setName(const QuickString &chr) { _name = chr; }
@@ -132,7 +140,8 @@ protected:
 	QuickString _endPosStr;
 	QuickString _name;
 	QuickString _score;
-	strandType _strand;
+	QuickString _strand;
+	strandType _strandVal;
 	bool _zeroLength;
 	bool _isUnmapped;
 	bool _isMateUnmapped;

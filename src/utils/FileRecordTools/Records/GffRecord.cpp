@@ -38,9 +38,8 @@ bool GffRecord::initFromFile(SingleLineDelimTextFileReader *fileReader)
 	fileReader->getField(5, _score);
 
 	//GFF allows a '.' for the strandChar, signifying it is not known.
-	char strandChar = 0;
-	fileReader->getField(6, strandChar);
-	setStrand(strandChar);
+	fileReader->getField(6, _strand);
+	adjustStrandVal();
 
 	fileReader->getField(7, _frame);
 	_numFields = fileReader->getNumFields();
@@ -104,7 +103,7 @@ void GffRecord::printRemainingFields(QuickString &outBuf) const
 {
 	outBuf.append(_score);
 	outBuf.append('\t');
-	outBuf.append(getStrandChar());
+	outBuf.append(_strand);
 	outBuf.append('\t');
 	outBuf.append(_frame);
 	if (_numFields == 9) {

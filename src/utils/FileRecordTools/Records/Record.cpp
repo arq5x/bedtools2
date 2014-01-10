@@ -6,7 +6,7 @@ Record::Record()
 : _chrId(-1),
   _startPos(-1),
   _endPos(-1),
-  _strand(UNKNOWN),
+  _strandVal(UNKNOWN),
   _zeroLength(false),
   _isUnmapped(false),
   _isMateUnmapped(false)
@@ -23,6 +23,7 @@ const Record &Record::operator=(const Record &other)
 	_startPos = other._startPos;
 	_endPos = other._endPos;
 	_strand = other._strand;
+	_strandVal = other._strandVal;
 	_name = other._name;
 	return *this;
 }
@@ -34,43 +35,13 @@ void Record::clear() {
 	_endPos = -1;
 	_name.clear();
 	_score.clear();
-	_strand = UNKNOWN;
+	_strand.clear();
+	_strandVal = UNKNOWN;
 	_startPosStr.clear();
 	_endPosStr.clear();
 	_zeroLength = false;
 	_isUnmapped = false;
 	_isMateUnmapped = false;
-}
-
-void Record::setStrand(char val)
-{
-	switch (val) {
-	case '+':
-		_strand = FORWARD;
-		break;
-	case '-':
-		_strand = REVERSE;
-		break;
-	default:
-		_strand = UNKNOWN;
-		break;
-	}
-}
-
-char Record::getStrandChar() const
-{
-	switch (_strand) {
-	case FORWARD:
-		return '+';
-		break;
-	case REVERSE:
-		return '-';
-		break;
-	case UNKNOWN:
-	default:
-		return '.';
-	}
-//	return '.';
 }
 
 bool Record::operator < (const Record &other) const
@@ -144,8 +115,8 @@ bool Record::sameChromIntersects(const Record *record,
 	//rule out different strandedness first.
 	//If the strand is unknown in either case, then queries regarding strandedness
 	//can not be answered, so we return false;
-	bool isSameStrand = (_strand == record->_strand && _strand != UNKNOWN);
-	bool isDiffStrand = ( _strand != UNKNOWN && record->_strand != UNKNOWN && _strand != record->_strand);
+	bool isSameStrand = (_strandVal == record->_strandVal && _strandVal != UNKNOWN);
+	bool isDiffStrand = ( _strandVal != UNKNOWN && record->_strandVal != UNKNOWN && _strandVal != record->_strandVal);
 
 	if (wantSameStrand && !isSameStrand) {
 		return false; //want same, but they're not same.
