@@ -304,6 +304,86 @@ echo \
 $BT intersect -abam one_block.bam -b c.bed -wo -bed > obs
 check obs exp
 
+##################################################################
+#  Test BED3 with BED3 
+##################################################################
+echo "    intersect.t28...\c"
+echo \
+"chr1^I10^I20^Ichr1^I10^I20" > exp
+$BT intersect -a bed3.bed -b bed3.bed -wa -wb | cat -t > obs
+check obs exp
+
+##################################################################
+#  Test BED4 with BED3 
+##################################################################
+echo "    intersect.t29...\c"
+echo \
+"chr1^I10^I20^I345.7^Ichr1^I10^I20" > exp
+$BT intersect -a bed4.bed -b bed3.bed -wa -wb | cat -t > obs
+check obs exp
+
+##################################################################
+#  Test BED5 with BED3 
+##################################################################
+echo "    intersect.t30...\c"
+echo \
+"chr1^I10^I20^I345.7^Iwhy?^Ichr1^I10^I20" > exp
+$BT intersect -a bed5.bed -b bed3.bed -wa -wb | cat -t > obs
+check obs exp
+
+##################################################################
+#  Test BED6 (without a proper strand) with BED3 
+##################################################################
+echo "    intersect.t31...\c"
+echo \
+"chr1^I10^I20^I345.7^Iwhy?^I11^Ichr1^I10^I20" > exp
+$BT intersect -a bed6.bed -b bed3.bed -wa -wb | cat -t > obs
+check obs exp
+
+##################################################################
+#  Test BED6 (with a strand) with BED3 
+##################################################################
+echo "    intersect.t32...\c"
+echo \
+"chr1^I10^I20^I345.7^Iwhy?^I-^Ichr1^I10^I20" > exp
+$BT intersect -a bed6.strand.bed -b bed3.bed -wa -wb | cat -t > obs
+check obs exp
+
+##################################################################
+#  Test BED PLUS with BED3 
+##################################################################
+echo "    intersect.t33...\c"
+echo \
+"chr1^I10^I20^I345.7^Iwhy?^I11^Ifoo^Ibar^Ibiz^I11^Ibang^Ibop^I99^Ichr1^I10^I20" > exp
+$BT intersect -a bedplus.bed -b bed3.bed -wa -wb | cat -t > obs
+check obs exp
+
+##################################################################
+#  Test for strand matches with BED3 
+##################################################################
+echo "    intersect.t34...\c"
+echo \
+"chr1^I10^I20^I345.7^Iwhy?^I11^Ichr1^I10^I20^I345.7^Iwhy?^I-" > exp
+$BT intersect -a bed6.bed -b bed6.strand.bed -wa -wb | cat -t > obs
+check obs exp
+
+##################################################################
+#  Test for strand matches with BED3 
+##################################################################
+echo "    intersect.t35...\c"
+echo \
+"chr1^I10^I20^I345.7^Iwhy?^I-^Ichr1^I10^I20^I345.7^Iwhy?^I-" > exp
+$BT intersect -a bed6.strand.bed -b bed6.strand2.bed -wa -wb -s | cat -t > obs
+check obs exp
+
+##################################################################
+#  Test for strand matches with BED3 
+##################################################################
+echo "    intersect.t35...\c"
+echo \
+"chr1^I10^I20^I345.7^Iwhy?^I-^Ichr1^I11^I21^I345.7^Iwhy?^I+" > exp
+$BT intersect -a bed6.strand.bed -b bed6.strand2.bed -wa -wb -S | cat -t > obs
+check obs exp
 
 rm obs exp
 
