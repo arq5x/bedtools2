@@ -379,7 +379,7 @@ check obs exp
 ##################################################################
 #  Test for strand matches with BED3 
 ##################################################################
-echo "    intersect.t35...\c"
+echo "    intersect.t36...\c"
 echo \
 "chr1^I10^I20^I345.7^Iwhy?^I-^Ichr1^I11^I21^I345.7^Iwhy?^I+" > exp
 $BT intersect -a bed6.strand.bed -b bed6.strand2.bed -wa -wb -S | cat -t > obs
