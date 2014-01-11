@@ -114,19 +114,15 @@ QuickString BedPlusInterval::getField(int fieldNum) const
 	//chrom, start, end, name, score, and strand, in that order.
 	//A request for field 6+ will go to the otherIdxs.
 
-	QuickString buffer;
-
 	switch (fieldNum) {
 	case 0:
 		return _chrName;
 		break; //redundant after a return, but good practice anyway.
 	case 1:
-		int2str(_startPos, buffer);
-		return buffer;
+		return _startPosStr;
 		break;
 	case 2:
-		int2str(_endPos, buffer);
-		return buffer;
+		return _endPosStr;
 		break;
 	case 3:
 		return _name;
@@ -135,8 +131,7 @@ QuickString BedPlusInterval::getField(int fieldNum) const
 		return _score;
 		break;
 	case 5:
-		buffer.append(getStrandChar());
-		return buffer;
+		return _strand;
 		break;
 	default:
 		return (*(_otherIdxs[fieldNum - startOtherIdx]));

@@ -120,10 +120,10 @@ bool SampleFile::strandComplies(const Record * record) {
 	if (!_context->getSameStrand()) {
 		return true;
 	}
-	if (_context->getForwardOnly() && record->getStrand() == Record::FORWARD) {
+	if (_context->getForwardOnly() && record->getStrandVal() == Record::FORWARD) {
 		return true;
 	}
-	if (_context->getReverseOnly() && record->getStrand() == Record::REVERSE) {
+	if (_context->getReverseOnly() && record->getStrandVal() == Record::REVERSE) {
 		return true;
 	}
 	return false;

@@ -18,10 +18,8 @@ bool Bed6Interval::initFromFile(SingleLineDelimTextFileReader *fileReader)
 
 	fileReader->getField(3, _name);
 	fileReader->getField(4, _score);
-	char strandChar = 0;
-	fileReader->getField(5, strandChar);
-	setStrand(strandChar);
-
+	fileReader->getField(5, _strand);
+	adjustStrandVal();
 	return baseRetFlag;
 }
 
@@ -34,7 +32,7 @@ void Bed6Interval::print(QuickString &outBuf) const
 	outBuf.append('\t');
 	outBuf.append(_score);
 	outBuf.append('\t');
-	outBuf.append(getStrandChar());
+	outBuf.append(_strand);
 }
 
 void Bed6Interval::print(QuickString &outBuf, int start, int end) const
@@ -45,7 +43,7 @@ void Bed6Interval::print(QuickString &outBuf, int start, int end) const
 	outBuf.append('\t');
 	outBuf.append(_score);
 	outBuf.append('\t');
-	outBuf.append(getStrandChar());
+	outBuf.append(_strand);
 }
 
 void Bed6Interval::print(QuickString &outBuf, const QuickString & start, const QuickString & end) const
@@ -56,7 +54,7 @@ void Bed6Interval::print(QuickString &outBuf, const QuickString & start, const Q
 	outBuf.append('\t');
 	outBuf.append(_score);
 	outBuf.append('\t');
-	outBuf.append(getStrandChar());
+	outBuf.append(_strand);
 }
 
 
