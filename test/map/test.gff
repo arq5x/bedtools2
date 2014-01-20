@@ -1,0 +1,7 @@
+chr1	hg19_ccdsGene	start_codon	1	9	0.000000	+	.	gene_id "CCDS30744.1"; transcript_id "CCDS30744.1"; 
+chr1	hg19_ccdsGene	CDS	2	11	0.000000	+	0	gene_id "CCDS30744.1"; transcript_id "CCDS30744.1"; 
+chr1	hg19_ccdsGene	exon	8	20	0.000000	+	.	gene_id "CCDS30744.1"; transcript_id "CCDS30744.1"; 
+chr1	hg19_ccdsGene	CDS	9	17	0.000000	+	2	gene_id "CCDS30744.1"; transcript_id "CCDS30744.1"; 
+chr1	hg19_ccdsGene	exon	40	200	0.000000	+	.	gene_id "CCDS30744.1"; transcript_id "CCDS30744.1"; 
+
+
