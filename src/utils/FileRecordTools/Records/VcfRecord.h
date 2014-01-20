@@ -29,6 +29,7 @@ public:
 	//if the number of fields frequently differ between this object and the one being copied.
 	const BedPlusInterval &operator=(const VcfRecord &other);
 
+	virtual const QuickString &getField(int fieldNum) const;
 
 protected:
 	QuickString _varAlt;
