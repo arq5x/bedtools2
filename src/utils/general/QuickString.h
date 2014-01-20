@@ -45,6 +45,7 @@ public:
 	bool operator < (const QuickString &) const;
 	bool operator > (const QuickString &) const;
 	const char *c_str() const { return _buffer; }
+	const string str() const { return _buffer; }
 	const char &operator [] (int pos) const { return _buffer[pos]; }
 	char &operator [] (int pos) { return _buffer[pos]; }
 
