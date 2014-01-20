@@ -120,3 +120,40 @@ void GffRecord::printNull(QuickString &outBuf) const
 	}
 }
 
+const QuickString &GffRecord::getField(int fieldNum) const
+{
+	if (fieldNum == 9 && _numFields == 9) {
+		return _group;
+	}
+	switch (fieldNum) {
+	case 1:
+		return _chrName;
+		break;
+	case 2:
+		return _source;
+		break;
+	case 3:
+		return _name;
+		break;
+	case 4:
+		return _startPosStr;
+		break;
+	case 5:
+		return _endPosStr;
+		break;
+	case 6:
+		return _score;
+		break;
+	case 7:
+		return _strand;
+		break;
+	case 8:
+		return _frame;
+		break;
+	default:
+		return Bed6Interval::getField(fieldNum);
+		break;
+	}
+}
+
+

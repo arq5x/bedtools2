@@ -27,9 +27,10 @@ public:
 	virtual const QuickString &getSource() const { return _source; }
 	virtual const QuickString &getFrame() const { return _frame; }
 	virtual const QuickString &getGroup() const { return _group; }
-	virtual const int getNumFields() const { return _numFields; }
+	virtual int getNumFields() const { return _numFields; }
 	virtual void setNumFields(int val) { _numFields = val; }
 
+	virtual const QuickString &getField(int fieldNum) const;
 	//Note: using the assignment operator in a GffRecord can potentially be a performance hit,
 	//if the number of fields frequently differ between this object and the one being copied.
 	const GffRecord &operator=(const GffRecord &other);
