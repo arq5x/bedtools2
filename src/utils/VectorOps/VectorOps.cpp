@@ -25,6 +25,17 @@ double MakeDouble(const string &element) {
     return x;
 }
 
+// functor to convert the abs() of single string to a double
+double MakeAbsDouble(const string &element) {
+    std::istringstream i(element);
+    double x;
+    if (!(i >> x)) {
+        cerr << "Error: Could not properly convert string to numeric (\"" + element + "\")" << endl;
+        exit(1);
+    }
+    return fabs(x);
+}
+
 struct ValueGreaterThan
 {
     bool operator()( const vector< pair<int, string> >::value_type& lhs,
@@ -127,6 +138,13 @@ double VectorOps::GetMin(void)
     return *min_element( _vecd.begin(), _vecd.end() );
 }
 
+double VectorOps::GetAbsMin(void)
+{
+    // convert the vec of strings to a vec of doubles
+    transform(_vecs.begin(), _vecs.end(), back_inserter(_vecd), MakeAbsDouble);
+    return *min_element( _vecd.begin(), _vecd.end() );
+}
+
 double VectorOps::GetMax(void)
 {
     // convert the vec of strings to a vec of doubles
@@ -134,6 +152,12 @@ double VectorOps::GetMax(void)
     return *max_element( _vecd.begin(), _vecd.end() );
 }
 
+double VectorOps::GetAbsMax(void)
+{
+    // convert the vec of strings to a vec of doubles
+    transform(_vecs.begin(), _vecs.end(), back_inserter(_vecd), MakeAbsDouble);
+    return *max_element( _vecd.begin(), _vecd.end() );
+}
 
 string VectorOps::GetMode(void)
 {
