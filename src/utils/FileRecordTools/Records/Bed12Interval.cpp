@@ -119,4 +119,30 @@ void Bed12Interval::printNull(QuickString &outBuf) const
 	outBuf.append("\t.\t.\t.\t.\t.\t.", 12);
 }
 
+const QuickString &Bed12Interval::getField(int fieldNum) const
+{
+	switch (fieldNum) {
+	case 7:
+		return _thickStartStr;
+		break;
+	case 8:
+		return _thickEndStr;
+		break;
+	case 9:
+		return _itemRGB;
+		break;
+	case 10:
+		return _blockCountStr;
+		break;
+	case 11:
+		return _blockSizes;
+		break;
+	case 12:
+		return _blockStarts;
+		break;
+	default:
+		return Bed6Interval::getField(fieldNum);
+		break;
+	}
+}
 

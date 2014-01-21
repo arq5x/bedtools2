@@ -82,6 +82,9 @@ public:
 	virtual void setScore(const string &chr) { _score = chr; }
 	virtual void setScore(const char *chr) { _score = chr; }
 
+	virtual const QuickString &getField(int fieldNum) const;
+	virtual int getNumFields() const  = 0;
+
 	virtual FileRecordTypeChecker::RECORD_TYPE getType() const { return FileRecordTypeChecker::UNKNOWN_RECORD_TYPE; }
 
 	virtual bool coordsValid(); //test that no coords negative, end not less than start, check zeroLength (see below).

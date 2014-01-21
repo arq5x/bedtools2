@@ -52,6 +52,9 @@ public:
 	virtual void setBlockStarts(const string & blockStarts) { _blockStarts = blockStarts; }
 	virtual void setBlockStarts(const char *blockStarts) { _blockStarts = blockStarts; }
 
+	virtual const QuickString &getField(int fieldNum) const;
+	virtual int getNumFields() const  { return 12; }
+
 
 protected:
 	virtual ~Bed12Interval();

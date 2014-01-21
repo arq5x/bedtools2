@@ -30,7 +30,9 @@ public:
 	//if the number of fields frequently differ between this object and the one being copied.
 	const BedPlusInterval &operator=(const BedPlusInterval &other);
 
-	virtual QuickString getField(int fieldNum) const;
+	virtual const QuickString &getField(int fieldNum) const;
+	virtual int getNumFields() const  { return startOtherIdx + _otherIdxs.size(); }
+
 	virtual void setField(int fieldNum, const QuickString &str) { (*(_otherIdxs[fieldNum])) = str; }
 	virtual void setField(int fieldNum, const string &str) { (*(_otherIdxs[fieldNum])) = str; }
 	virtual void setField(int fieldNum, const char *str) { (*(_otherIdxs[fieldNum])) = str; }

@@ -192,3 +192,17 @@ ostream &operator << (ostream &out, const Record &record)
 	out << errBuf;
 	return out;
 }
+
+const QuickString &Record::getField(int fieldNum) const
+{
+//    try {
+//        _column_vec.push_back(hits[i].fields.at(_column));
+//    }
+//    catch(std::out_of_range& e) {
+        cerr << endl << "*****" << endl
+             << "*****ERROR: requested column " << fieldNum +1 <<
+             " , but record only has fields 1 - " << getNumFields() << ". Exiting." << endl
+              << endl << "*****" << endl;
+        exit(1);
+//    }
+}
