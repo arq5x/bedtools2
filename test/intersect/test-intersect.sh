@@ -129,6 +129,16 @@ $BT intersect -a a.bed -b b.bed -wo -s > obs
 check obs exp
 rm obs exp
 
+
+###########################################################
+#  Test with -wo (write overlap) with -split
+############################################################
+echo "    intersect.t11.5...\c"
+echo "chr1	0	50	three_blocks_match	0	+	0	0	0	3	10,10,10,	0,20,40,	chr1	5	15	5" > exp
+$BT intersect -a three_blocks_match.bed -b d.bed -split -wo > obs
+check obs exp
+rm obs exp
+
 ###########################################################
 #  Test with -wao (write all overlap) with -s
 ############################################################
