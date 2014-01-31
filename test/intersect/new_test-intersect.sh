@@ -223,8 +223,8 @@ rm obs exp
 
 
 ###########################################################
-#  Test intersection of bam file containing read where one
-# mate is mapped and one is not.
+#  Test intersection of bam file containing read where query
+#  is mapped and mate is not.
 ############################################################
 echo "    intersect.new.t19...\c"
 echo \
@@ -234,8 +234,8 @@ check obs exp
 rm obs exp
 
 ###########################################################
-#  Test intersection of bam file containing read where one
-# mate is mapped and one is not, with noHit (-v) option.
+#  Test intersection of bam file containing read where query
+#  is mapped and mate is not, with noHit (-v) option.
 ############################################################
 echo "    intersect.new.t20...\c"
 echo \
@@ -243,6 +243,30 @@ echo \
 $BT intersect -a oneUnmapped.bam -b j1.bed -bed -v > obs
 check obs exp
 rm obs exp
+
+
+###########################################################
+#  Test intersection of bam file containing read where query
+#  is unmapped but mate is mapped.
+############################################################
+echo "    intersect.new.t20.b...\c"
+touch exp
+$BT intersect -a queryUnmappedMateMappedCoordsInvalid.bam -b j1.bed -bed > obs
+check obs exp
+rm obs exp
+
+###########################################################
+#  Test intersection of bam file containing read where one
+# mate is mapped and one is not, with noHit (-v) option.
+############################################################
+echo "    intersect.new.t20.c...\c"
+echo ".	-1	-1	TTTACCTTT:4FSQ5P1:286:D2GA7ACXX:6:2316:20858:89646	0	.	-1	-1	-1	0,0,0	0	.	." > exp
+$BT intersect -a queryUnmappedMateMappedCoordsInvalid.bam -b j1.bed -bed -v > obs
+check obs exp
+rm obs exp
+
+
+
 
 
 ###########################################################

@@ -266,12 +266,6 @@ void RecordOutputMgr::reportOverlapDetail(const Record *keyRecord, const Record 
 		}
 	}
 
-//	const QuickString &startStr = keyRecord->getStartPos() > hitRecord->getStartPos() ? keyRecord->getStartPosStr() : hitRecord->getStartPosStr();
-//	const QuickString &endStr = keyRecord->getEndPos() < hitRecord->getEndPos() ? keyRecord->getEndPosStr() : hitRecord->getEndPosStr();
-//
-//	int maxStart = max(keyRecord->getStartPos(), hitRecord->getStartPos());
-//	int minEnd = min(keyRecord->getEndPos(), hitRecord->getEndPos());
-//
 
 	if (!(static_cast<ContextIntersect *>(_context))->getWriteA() && !(static_cast<ContextIntersect *>(_context))->getWriteB()
 			&& !(static_cast<ContextIntersect *>(_context))->getWriteOverlap() && !(static_cast<ContextIntersect *>(_context))->getLeftJoin()) {
@@ -300,7 +294,12 @@ void RecordOutputMgr::reportOverlapDetail(const Record *keyRecord, const Record 
 		if (needsFlush()) flush();
 	}
 	else if ((static_cast<ContextIntersect *>(_context))->getWriteOverlap()) {
-		int printOverlapBases = _splitInfo->getOverlapBases(hitIdx);
+		int printOverlapBases = 0;
+		if (_context->getObeySplits()) {
+			printOverlapBases = _splitInfo->getOverlapBases(hitIdx);
+		} else {
+			printOverlapBases = minEnd - maxStart;
+		}
 		printKey(keyRecord);
 		tab();
 		hitRecord->print(_outBuf);

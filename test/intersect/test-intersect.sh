@@ -131,15 +131,6 @@ rm obs exp
 
 
 ###########################################################
-#  Test with -wo (write overlap) with -split
-############################################################
-echo "    intersect.t11.5...\c"
-echo "chr1	0	50	three_blocks_match	0	+	0	0	0	3	10,10,10,	0,20,40,	chr1	5	15	5" > exp
-$BT intersect -a three_blocks_match.bed -b d.bed -split -wo > obs
-check obs exp
-rm obs exp
-
-###########################################################
 #  Test with -wao (write all overlap) with -s
 ############################################################
 echo "    intersect.t12...\c"
@@ -260,6 +251,67 @@ rm obs exp
 echo "    intersect.t22...\c"
 touch exp
 $BT intersect -abam three_blocks.bam -b three_blocks_match_1bp.bed -split -f 0.1 | samtools view - > obs
+check obs exp
+rm obs exp
+
+
+
+###########################################################
+#  Test three blocks with -split -wo only shows 5 overlap
+#  bases, not ten.
+############################################################
+echo "    intersect.t22.a...\c"
+echo "chr1	0	50	three_blocks_match	0	+	0	0	0	3	10,10,10,	0,20,40,	chr1	5	15	5" > exp
+$BT intersect -a three_blocks_match.bed -b d.bed -split -wo > obs
+check obs exp
+rm obs exp
+
+###########################################################
+#  Same test but for BAM file
+############################################################
+echo "    intersect.t22.b...\c"
+echo "chr1	0	50	three_blocks_match	255	+	0	50	0,0,0	3	10,10,10,	0,20,40,	chr1	5	15	5" > exp
+$BT intersect -a three_blocks_match.bam -b d.bed -split -wo -bed > obs
+check obs exp
+rm obs exp
+
+
+###########################################################
+#  Test three blocks with -split -wo, and DB record also has
+#  blocks that somewhat intersect
+############################################################
+echo "    intersect.t22.c...\c"
+echo "chr1	0	50	three_blocks_match	0	+	0	0	0	3	10,10,10,	0,20,40,	chr1	0	45	three_blocks_match	0	+	0	0	0	2	5,10,	25,35,	10" > exp
+$BT intersect -a three_blocks_match.bed -b two_blocks_partial.bed -split -wo > obs
+check obs exp
+rm obs exp
+
+###########################################################
+#  Same test but for BAM file
+############################################################
+echo "    intersect.t22.d...\c"
+echo "chr1	0	50	three_blocks_match	255	+	0	50	0,0,0	3	10,10,10,	0,20,40,	chr1	0	45	three_blocks_match	0	+	0	0	0	2	5,10,	25,35,	10" > exp
+$BT intersect -a three_blocks_match.bam -b two_blocks_partial.bed -split -wo -bed > obs
+check obs exp
+rm obs exp
+
+###########################################################
+#  Test three blocks with -split -wo, and DB record also has
+#  blocks that do not intersect
+############################################################
+echo "    intersect.t22.e...\c"
+touch exp
+$BT intersect -a three_blocks_match.bed -b three_blocks_nomatch.bed -split -wo > obs
+check obs exp
+rm obs exp
+
+
+###########################################################
+#  Same test but for BAM file
+############################################################
+echo "    intersect.t22.f...\c"
+touch exp
+$BT intersect -a three_blocks_match.bam -b three_blocks_nomatch.bed -split -wo -bed > obs
 check obs exp
 rm obs exp
 
