@@ -191,7 +191,7 @@ void map_help(void) {
 
     cerr << "\t-o\t"             << "Specify the operation that should be applied to -c." << endl;
     cerr                         << "\t\t Valid operations:" << endl;
-    cerr                         << "\t\t    sum, min, max," << endl;
+    cerr                         << "\t\t    sum, min, max, absmin, absmax," << endl;
     cerr                         << "\t\t    mean, median," << endl;
     cerr                         << "\t\t    collapse (i.e., print a comma separated list (duplicates allowed)), " << endl;
     cerr                         << "\t\t    distinct (i.e., print a comma separated list (NO duplicates allowed)), " << endl;
@@ -214,6 +214,9 @@ void map_help(void) {
     cerr << "\t-S\t"             << "Require different strandedness.  That is, only report hits in B" << endl;
     cerr                         << "\t\tthat overlap A on the _opposite_ strand." << endl;
     cerr                         << "\t\t- By default, overlaps are reported without respect to strand." << endl << endl;
+
+    cerr << "\t-g\t"             << "Provide a genome file to enforce consistent chromosome sort order" << endl;
+    cerr                         <<"\t\tacross input files." << endl << endl;
 
     cerr << "\t-null\t"          << "The value to print if no overlaps are found for an A interval." << endl;
     cerr                         << "\t\t- Default - \".\"" << endl << endl;

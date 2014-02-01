@@ -42,11 +42,13 @@ private:
 
     vector<string> _column_vec; // vector to hold current column's worth of data
 
+    ostringstream _tmp_output;
+    QuickString _output;  // placeholder for the results of mapping B to each a in A.
     //------------------------------------------------
     // private methods
     //------------------------------------------------
     void Map();
-    string MapHits(RecordKeyList &hits);
+    void SummarizeHits(RecordKeyList &hits);
     void ExtractColumnFromHits(RecordKeyList &hits);
 
 };
