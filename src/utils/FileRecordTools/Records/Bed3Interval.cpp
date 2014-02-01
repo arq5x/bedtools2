@@ -61,3 +61,21 @@ void Bed3Interval::print(QuickString &outBuf, const QuickString & start, const Q
 void Bed3Interval::printNull(QuickString &outBuf) const {
 	outBuf.append(".\t-1\t-1", 7);
 }
+
+const QuickString &Bed3Interval::getField(int fieldNum) const
+{
+	switch (fieldNum) {
+	case 1:
+		return _chrName;
+		break;
+	case 2:
+		return _startPosStr;
+		break;
+	case 3:
+		return _endPosStr;
+		break;
+	default:
+		return Record::getField(fieldNum);
+		break;
+	}
+}

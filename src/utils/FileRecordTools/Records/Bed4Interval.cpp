@@ -48,3 +48,15 @@ void Bed4Interval::printNull(QuickString &outBuf) const
 	outBuf.append("\t.", 2);
 }
 
+const QuickString &Bed4Interval::getField(int fieldNum) const
+{
+	switch (fieldNum) {
+	case 4:
+		return _name;
+		break;
+	default:
+		return Bed3Interval::getField(fieldNum);
+		break;
+	}
+}
+

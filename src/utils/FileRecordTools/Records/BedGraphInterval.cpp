@@ -48,3 +48,15 @@ void BedGraphInterval::printNull(QuickString &outBuf) const
 	outBuf.append("\t.", 2);
 }
 
+const QuickString &BedGraphInterval::getField(int fieldNum) const
+{
+	switch (fieldNum) {
+	case 4:
+		return _name;
+		break;
+	default:
+		return Bed3Interval::getField(fieldNum);
+		break;
+	}
+}
+

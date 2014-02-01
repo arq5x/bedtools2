@@ -64,3 +64,20 @@ void Bed6Interval::printNull(QuickString &outBuf) const
 	outBuf.append("\t.\t-1\t.", 7);
 }
 
+const QuickString &Bed6Interval::getField(int fieldNum) const
+{
+	switch (fieldNum) {
+	case 4:
+		return _name;
+		break;
+	case 5:
+		return _score;
+		break;
+	case 6:
+		return _strand;
+		break;
+	default:
+		return Bed3Interval::getField(fieldNum);
+		break;
+	}
+}
