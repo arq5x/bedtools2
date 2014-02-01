@@ -8,12 +8,13 @@
 
 #include "Fasta.h"
 
-FastaIndexEntry::FastaIndexEntry(string name, int length, long long offset, int line_blen, int line_len)
+FastaIndexEntry::FastaIndexEntry(string name, int length, long long offset, int line_blen, int line_len, bool useFullHeader)
     : name(name)
     , length(length)
     , offset(offset)
     , line_blen(line_blen)
     , line_len(line_len)
+    , useFullHeader(useFullHeader)
 {}
 
 FastaIndexEntry::FastaIndexEntry(void) // empty constructor
@@ -30,16 +31,19 @@ void FastaIndexEntry::clear(void)
                   // check if we have already recorded a real offset
     line_blen = NULL;
     line_len  = NULL;
+    useFullHeader = false;
 }
 
 ostream& operator<<(ostream& output, const FastaIndexEntry& e) {
     // just write the first component of the name, for compliance with other tools
-    output << split(e.name, ' ').at(0) << "\t" << e.length << "\t" << e.offset << "\t" <<
-        e.line_blen << "\t" << e.line_len;
+  output << (e.useFullHeader? e.name : split(e.name, ' ').at(0))
+	   << "\t" << e.length << "\t" << e.offset << "\t"
+	   << e.line_blen << "\t" << e.line_len;
     return output;  // for multiple << operators.
 }
 
-FastaIndex::FastaIndex(void) 
+FastaIndex::FastaIndex(bool useFullHeader) 
+  : useFullHeader(useFullHeader)
 {}
 
 void FastaIndex::readIndexFile(string fname) {
@@ -55,12 +59,14 @@ void FastaIndex::readIndexFile(string fname) {
             if (fields.size() == 5) {  // if we don't get enough fields then there is a problem with the file
                 // note that fields[0] is the sequence name
                 char* end;
-                string name = split(fields[0], " \t").at(0);  // key by first token of name
+                string name = useFullHeader ? fields[0] :
+		  split(fields[0], " \t").at(0);  // key by first token of name
                 sequenceNames.push_back(name);
                 this->insert(make_pair(name, FastaIndexEntry(fields[0], atoi(fields[1].c_str()),
-                                                    strtoll(fields[2].c_str(), &end, 10),
-                                                    atoi(fields[3].c_str()),
-                                                    atoi(fields[4].c_str()))));
+							     strtoll(fields[2].c_str(), &end, 10),
+							     atoi(fields[3].c_str()),
+							     atoi(fields[4].c_str()),
+							     useFullHeader)));
             } else {
                 cerr << "Warning: malformed fasta index file " << fname << 
                     "does not have enough fields @ line " << linenum << endl;
@@ -181,12 +187,13 @@ void FastaIndex::indexReference(string refname) {
 }
 
 void FastaIndex::flushEntryToIndex(FastaIndexEntry& entry) {
-    string name = split(entry.name, " \t").at(0);  // key by first token of name
+    string name = useFullHeader? entry.name :
+      split(entry.name, " \t").at(0);  // key by first token of name
     sequenceNames.push_back(name);
     this->insert(make_pair(name, FastaIndexEntry(entry.name, entry.length,
-                        entry.offset, entry.line_blen,
-                        entry.line_len)));
-
+						 entry.offset, entry.line_blen,
+						 entry.line_len,
+						 useFullHeader)));
 }
 
 void FastaIndex::writeIndexFile(string fname) {
@@ -225,13 +232,15 @@ bool FastaIndex::chromFound(string name) {
 
 string FastaIndex::indexFileExtension() { return ".fai"; }
 
-void FastaReference::open(string reffilename, bool usemmap) {
+void FastaReference::open(string reffilename, bool usemmap, bool useFullHeader) {
     filename = reffilename;
     if (!(file = fopen(filename.c_str(), "r"))) {
         cerr << "could not open " << filename << endl;
         exit(1);
     }
-    index = new FastaIndex();
+    if (useFullHeader)
+      usingfullheader = true;
+    index = new FastaIndex(useFullHeader);
     struct stat stFileInfo; 
     string indexFileName = filename + index->indexFileExtension(); 
     // if we can find an index file, use it
