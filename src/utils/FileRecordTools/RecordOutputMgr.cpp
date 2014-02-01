@@ -117,11 +117,10 @@ void RecordOutputMgr::printRecord(const Record *record)
 	printRecord(keyList);
 }
 
-void RecordOutputMgr::printRecord(const Record *record, const string value)
+void RecordOutputMgr::printRecord(const Record *record, const QuickString & value)
 {	
-	RecordKeyList keyList(record);
-	printRecord(keyList);
-	_outBuf.append(value.c_str());
+	printRecord(record);
+	_outBuf.append(value);
 	newline();
 
 	if (needsFlush()) {
@@ -213,7 +212,8 @@ void RecordOutputMgr::printRecord(RecordKeyList &keyList, RecordKeyList *blockLi
 }
 
 void RecordOutputMgr::checkForHeader() {
-	if (_context->getProgram() == ContextBase::INTERSECT) {
+	if (_context->getProgram() == ContextBase::INTERSECT ||
+		_context->getProgram() == ContextBase::MAP) {
 		if (_context->getPrintHeader()) {
 			_outBuf.append(_context->getHeader((static_cast<ContextIntersect *>(_context))->getQueryFileIdx()));
 		}
