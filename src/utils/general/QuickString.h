@@ -63,7 +63,7 @@ private:
 	size_t _currCapacity;
 	size_t _currSize;
 
-	static const int DEFAULT_CAPACITY = 256;
+	static const int DEFAULT_CAPACITY = 8;
 	void build();
 	void set(const char *len, size_t size);
 };
