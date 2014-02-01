@@ -80,3 +80,32 @@ void VcfRecord::printOtherFields(QuickString &outBuf) const {
 	}
 
 }
+
+const QuickString &VcfRecord::getField(int fieldNum) const
+{
+	//a request for any of the first six fields will retrieve
+	//chrom, start, end, name, score, and strand, in that order.
+	//A request for field 6+ will go to the otherIdxs.
+
+	switch (fieldNum) {
+	case 1:
+		return _chrName;
+		break;
+	case 2:
+		return _startPosStr;
+		break;
+	case 3:
+		return _name;
+	case 4:
+		return _varAlt;
+		break;
+	case 5:
+		return _varRef;
+		break;
+	case 6:
+		return _score;
+	default:
+		return BedPlusInterval::getField(fieldNum);
+		break;
+	}
+}

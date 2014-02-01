@@ -25,6 +25,10 @@ public:
 	virtual void printNull(QuickString &outBuf) const;
 	virtual FileRecordTypeChecker::RECORD_TYPE getType() const { return FileRecordTypeChecker::BED6_RECORD_TYPE; }
 
+	virtual const QuickString &getField(int fieldNum) const;
+	virtual int getNumFields() const  { return 6; }
+
+
 protected:
 	virtual ~Bed6Interval();
 };

@@ -105,36 +105,16 @@ void BedPlusInterval::printNull(QuickString &outBuf) const
 	for (int i=startOtherIdx; i < _numPrintFields; i++) {
 		outBuf.append("\t.");
 	}
-
 }
 
-QuickString BedPlusInterval::getField(int fieldNum) const
+const QuickString &BedPlusInterval::getField(int fieldNum) const
 {
 	//a request for any of the first six fields will retrieve
 	//chrom, start, end, name, score, and strand, in that order.
 	//A request for field 6+ will go to the otherIdxs.
 
-	switch (fieldNum) {
-	case 0:
-		return _chrName;
-		break; //redundant after a return, but good practice anyway.
-	case 1:
-		return _startPosStr;
-		break;
-	case 2:
-		return _endPosStr;
-		break;
-	case 3:
-		return _name;
-		break;
-	case 4:
-		return _score;
-		break;
-	case 5:
-		return _strand;
-		break;
-	default:
+	if (fieldNum > startOtherIdx && fieldNum < startOtherIdx + (int)_otherIdxs.size()) {
 		return (*(_otherIdxs[fieldNum - startOtherIdx]));
-		break;
 	}
+	return Bed6Interval::getField(fieldNum);
 }

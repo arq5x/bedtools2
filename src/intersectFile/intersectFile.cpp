@@ -23,9 +23,12 @@ FileIntersect::FileIntersect(ContextIntersect *context)
   _blockMgr(NULL),
   _recordOutputMgr(NULL)
 {
-	_blockMgr = new BlockMgr();
-	_blockMgr->setContext(context);
 	_recordOutputMgr = new RecordOutputMgr();
+	if (_context->getObeySplits()) {
+		_blockMgr = new BlockMgr();
+		_blockMgr->setContext(context);
+		_recordOutputMgr->setSplitInfo(_blockMgr);
+	}
 }
 
 FileIntersect::~FileIntersect(void) {

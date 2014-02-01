@@ -24,9 +24,11 @@ public:
 	//The init method must be called after all the input files are open.
 	bool init(ContextBase *context);
 
-//	void printHeader(const string &);
 	void printRecord(const Record *record);
 	void printRecord(RecordKeyList &keyList);
+
+	//where necessary, pass additional information about splits through the blockMgr.
+	void setSplitInfo(const BlockMgr *blockMgr) { _splitInfo = blockMgr; }
 
 private:
 	typedef enum { NOT_BAM, BAM_AS_BAM, BAM_AS_BED} printBamType;
@@ -34,10 +36,13 @@ private:
 	ContextBase *_context;
 	bool _printable;
 	BamTools::BamWriter *_bamWriter;
-	RecordKeyList *_currBlockList;
+	RecordKeyList *_currBamBlockList;
 
 	QuickString _outBuf;
-	BlockMgr *_blockMgr;
+
+	//
+	BlockMgr *_bamBlockMgr;
+	const BlockMgr *_splitInfo;
 	//some helper functions to neaten the code.
 	void tab() { _outBuf.append('\t'); }
 	void newline() { _outBuf.append('\n'); }
@@ -49,7 +54,7 @@ private:
 	bool printKeyAndTerminate(RecordKeyList &keyList);
 	printBamType printBamRecord(RecordKeyList &keyList, bool bamOutputOnly = false);
 	void checkForHeader();
-	void reportOverlapDetail(const Record *keyRecord, const Record *hitRecord);
+	void reportOverlapDetail(const Record *keyRecord, const Record *hitRecord, int hitIdx = 0);
 	void reportOverlapSummary(RecordKeyList &keyList);
 
 	static const unsigned int MAX_OUTBUF_SIZE = 16384; //16 K

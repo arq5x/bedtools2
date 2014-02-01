@@ -38,6 +38,9 @@ public:
 	const BamTools::BamAlignment &getAlignment() const { return _bamAlignment; }
 	int getBamChromId() const { return _bamChromId; }
 
+	virtual const QuickString &getField(int fieldNum) const;
+	virtual int getNumFields() const  { return 12; }
+
 protected:
 	BamTools::BamAlignment _bamAlignment;
 	int _bamChromId; //different from chromId, because BAM file may be in different order

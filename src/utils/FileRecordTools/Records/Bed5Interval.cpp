@@ -55,3 +55,18 @@ void Bed5Interval::printNull(QuickString &outBuf) const
 	outBuf.append("\t.\t-1", 5);
 }
 
+const QuickString &Bed5Interval::getField(int fieldNum) const
+{
+	switch (fieldNum) {
+	case 4:
+		return _name;
+		break;
+	case 5:
+		return _score;
+		break;
+
+	default:
+		return Bed3Interval::getField(fieldNum);
+		break;
+	}
+}
