@@ -29,7 +29,8 @@ using namespace std;
 class FastaIndexEntry {
     friend ostream& operator<<(ostream& output, const FastaIndexEntry& e);
     public:
-        FastaIndexEntry(string name, int length, long long offset, int line_blen, int line_len);
+        FastaIndexEntry(string name, int length, long long offset,
+			int line_blen, int line_len, bool useFullHeader);
         FastaIndexEntry(void);
         ~FastaIndexEntry(void);
         string name;  // sequence name
@@ -37,14 +38,16 @@ class FastaIndexEntry {
         long long offset;  // bytes offset of sequence from start of file
         int line_blen;  // line length in bytes, sequence characters
         int line_len;  // line length including newline
+	bool useFullHeader;
         void clear(void);
 };
 
 class FastaIndex : public map<string, FastaIndexEntry> {
     friend ostream& operator<<(ostream& output, FastaIndex& i);
     public:
-        FastaIndex(void);
+        FastaIndex(bool useFullHeader);
         ~FastaIndex(void);
+	bool useFullHeader;
         vector<string> sequenceNames;
         void indexReference(string refName);
         void readIndexFile(string fname);
@@ -58,10 +61,12 @@ class FastaIndex : public map<string, FastaIndexEntry> {
 
 class FastaReference {
     public:
-        void open(string reffilename, bool usemmap = false);
+        void open(string reffilename, bool usemmap = false,
+		  bool useFullHeader = false);
         bool usingmmap;
         string filename;
-        FastaReference(void) : usingmmap(false) { }
+	bool usingfullheader;
+        FastaReference(void) : usingmmap(false), usingfullheader(false) { }
         ~FastaReference(void);
         FILE* file;
         void* filemm;

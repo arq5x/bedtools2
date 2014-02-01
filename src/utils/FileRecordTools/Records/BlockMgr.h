@@ -36,17 +36,20 @@ public:
 	// and checking that their total intersection meets any overlapFraction and reciprocal criteria compared to
 	// the total block lengths of the hitList and keyList. All hits that pass will be in the resultList.
 	// Return value is the number of hits in the result set.
+
 	int findBlockedOverlaps(RecordKeyList &keyList, RecordKeyList &hitList, RecordKeyList &resultList);
 
 	//these are setting options for splitting BAM records
 	void setBreakOnDeletionOps(bool val) { _breakOnDeletionOps = val; }
 	void setBreakOnSkipOps(bool val) { _breakOnSkipOps = val; }
+	int getOverlapBases(int hitIdx) const { return _overlapBases[hitIdx]; }
 
 private:
 	RecordMgr *_blockRecordsMgr;
 	ContextIntersect *_context;
 	bool _breakOnDeletionOps;
 	bool _breakOnSkipOps;
+	vector<int> _overlapBases;
 
 	// For now, all records will be split into Bed6 records.
 	const static FileRecordTypeChecker::RECORD_TYPE _blockRecordsType = FileRecordTypeChecker::BED6_RECORD_TYPE;

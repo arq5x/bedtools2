@@ -35,12 +35,13 @@ int nuc_main(int argc, char* argv[]) {
     string pattern;
 
     // checks for existence of parameters
-    bool haveFastaDb = false;
-    bool haveBed     = false;
-    bool printSeq    = false;
-    bool hasPattern  = false;
-    bool forceStrand = false;
-    bool ignoreCase  = false;
+    bool haveFastaDb   = false;
+    bool haveBed       = false;
+    bool printSeq      = false;
+    bool hasPattern    = false;
+    bool forceStrand   = false;
+    bool ignoreCase    = false;
+    bool useFullHeader = false;
 
     // check to see if we should print out some help
     if(argc <= 1) showHelp = true;
@@ -90,6 +91,9 @@ int nuc_main(int argc, char* argv[]) {
                 pattern = argv[i + 1];
                 i++;
             }
+	}
+        else if(PARAMETER_CHECK("-useFullHeader", 11, parameterLength)) {
+            useFullHeader = true;
         }
         else {
             cerr << "*****ERROR: Unrecognized parameter: " << argv[i] << " *****" << endl << endl;
@@ -104,7 +108,8 @@ int nuc_main(int argc, char* argv[]) {
     if (!showHelp) {
 
         NucBed *nuc = new NucBed(fastaDbFile, bedFile, printSeq, 
-                                 hasPattern, pattern, forceStrand, ignoreCase);
+                                 hasPattern, pattern, forceStrand, ignoreCase,
+				 useFullHeader);
         delete nuc;
     }
     else {
@@ -134,8 +139,12 @@ void nuc_help(void) {
     cerr << "\t-pattern\tReport the number of times a user-defined sequence" << endl;
     cerr << "\t\t\tis observed (case-sensitive)." << endl << endl;    
 
-    cerr << "\t-C\tIgore case when matching -pattern. By defaulty, case matters." << endl << endl;
-    
+    cerr << "\t-C\tIgnore case when matching -pattern. By defaulty, case matters." << endl << endl;
+
+    cerr << "\t-fullHeader\tUse full fasta header." << endl;
+    cerr << "\t\t- By default, only the word before the first space or tab "
+	 << "is used." << endl << endl;
+
     cerr << "Output format: " << endl;
     cerr << "\tThe following information will be reported after each BED entry:" << endl;
     cerr << "\t    1) %AT content" << endl;

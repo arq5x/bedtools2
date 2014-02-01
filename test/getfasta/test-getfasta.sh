@@ -59,3 +59,12 @@ if [ "$SEQ" != "tag" ]; then
 else
     echo ok
 fi
+
+# test -fullHeader
+echo "    getfasta.t06...\c"
+LINES=$(echo $'chr1 assembled by consortium X\t1\t10' | $BT getfasta -fullHeader -fi t_fH.fa -bed stdin -fo - | awk 'END{ print NR }')
+if [ "$LINES" != "2" ]; then
+    echo fail
+else
+    echo ok
+fi

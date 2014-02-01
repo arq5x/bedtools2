@@ -15,16 +15,17 @@
 
 NucBed::NucBed(string &dbFile, string &bedFile, bool printSeq, 
                bool hasPattern, const string &pattern, 
-               bool forceStrand, bool ignoreCase) 
+               bool forceStrand, bool ignoreCase, bool useFullHeader) 
 {
 
-    _dbFile       = dbFile;
-    _bedFile      = bedFile;
-    _printSeq     = printSeq;
-    _hasPattern   = hasPattern;
-    _pattern      = pattern;
-    _forceStrand  = forceStrand;
-    _ignoreCase   = ignoreCase;
+    _dbFile        = dbFile;
+    _bedFile       = bedFile;
+    _printSeq      = printSeq;
+    _hasPattern    = hasPattern;
+    _pattern       = pattern;
+    _forceStrand   = forceStrand;
+    _ignoreCase    = ignoreCase;
+    _useFullHeader = useFullHeader;
     _bed = new BedFile(_bedFile);
 
     // Compute the DNA content in each BED/GFF/VCF interval
@@ -109,7 +110,7 @@ void NucBed::ProfileDNA() {
     // open and memory-map genome file
     FastaReference fr;
     bool memmap = true;    
-    fr.open(_dbFile, memmap);
+    fr.open(_dbFile, memmap, _useFullHeader);
 
     bool headerReported = false;
     BED bed;

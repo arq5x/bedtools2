@@ -17,14 +17,15 @@
 Bed2Fa::Bed2Fa(bool useName, const string &dbFile, 
                const string &bedFile, const string &fastaOutFile, 
                bool useFasta, bool useStrand, 
-               bool useBlocks) :
+               bool useBlocks, bool useFullHeader) :
     _useName(useName),
     _dbFile(dbFile),
     _bedFile(bedFile),
     _fastaOutFile(fastaOutFile),
     _useFasta(useFasta),
     _useStrand(useStrand),
-    _useBlocks(useBlocks)
+    _useBlocks(useBlocks),
+    _useFullHeader(useFullHeader)
 {
     _bed = new BedFile(_bedFile);
 
@@ -110,7 +111,7 @@ void Bed2Fa::ReportDNA(const BED &bed, string &dna) {
 //******************************************************************************
 void Bed2Fa::ExtractDNA() {
 
-    /* Make sure that we can oen all of the files successfully*/
+    /* Make sure that we can open all of the files successfully*/
 
     // open the fasta database for reading
     ifstream faDb(_dbFile.c_str(), ios::in);
@@ -124,7 +125,7 @@ void Bed2Fa::ExtractDNA() {
     // open and memory-map genome file
     FastaReference *fr = new FastaReference;
     bool memmap = true;
-    fr->open(_dbFile, memmap);
+    fr->open(_dbFile, memmap, _useFullHeader);
 
     BED bed, nullBed;
     string sequence;

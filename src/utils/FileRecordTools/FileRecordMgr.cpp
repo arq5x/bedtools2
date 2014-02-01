@@ -127,9 +127,11 @@ Record *FileRecordMgr::allocateAndGetNextRecord()
 		_recordMgr->deleteRecord(record);
 		return NULL;
 	}
+
 	// In the rare case of Bam records where both the read and it's mate failed to map,
-	// Ignore the record. Delete and return null
-	if (!(record->isUnmapped() && record->isMateUnmapped())) {
+	// Ignore the record. Delete and return null.
+
+	if (!(record->isUnmapped() )) {
 		if (!record->coordsValid()) {
 			cerr << "Error: Invalid record in file " << _filename << ". Record is " << endl << *record << endl;
 			exit(1);

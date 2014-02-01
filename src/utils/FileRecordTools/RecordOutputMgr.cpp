@@ -29,10 +29,10 @@ RecordOutputMgr::RecordOutputMgr()
 : _context(NULL),
   _printable(true),
   _bamWriter(NULL),
-  _currBlockList(NULL),
-  _blockMgr(NULL)
+  _currBamBlockList(NULL),
+  _bamBlockMgr(NULL)
 {
-	_blockMgr = new BlockMgr();
+	_bamBlockMgr = new BlockMgr();
 }
 
 RecordOutputMgr::~RecordOutputMgr()
@@ -45,8 +45,8 @@ RecordOutputMgr::~RecordOutputMgr()
 		delete _bamWriter;
 		_bamWriter = NULL;
 	}
-	delete _blockMgr;
-	_blockMgr = NULL;
+	delete _bamBlockMgr;
+	_bamBlockMgr = NULL;
 
 }
 
@@ -102,7 +102,7 @@ RecordOutputMgr::printBamType RecordOutputMgr::printBamRecord(RecordKeyList &key
 				if (record->isUnmapped()) {
 					record->printUnmapped(_outBuf);
 				} else {
-					static_cast<const BamRecord *>(record)->print(_outBuf, _currBlockList);
+					static_cast<const BamRecord *>(record)->print(_outBuf, _currBamBlockList);
 				}
 			}
 			return BAM_AS_BED;
@@ -132,10 +132,10 @@ void RecordOutputMgr::printRecord(RecordKeyList &keyList) {
 	if (keyList.getKey()->getType() == FileRecordTypeChecker::BAM_RECORD_TYPE) {
 		RecordKeyList blockList(keyList.getKey());
 		bool deleteBlocks = false;
-		_blockMgr->getBlocks(blockList, deleteBlocks);
+		_bamBlockMgr->getBlocks(blockList, deleteBlocks);
 		printRecord(keyList, &blockList);
 		if (deleteBlocks) {
-			_blockMgr->deleteBlocks(blockList);
+			_bamBlockMgr->deleteBlocks(blockList);
 		}
 		return;
 	}
@@ -153,7 +153,7 @@ void RecordOutputMgr::printRecord(RecordKeyList &keyList, RecordKeyList *blockLi
 		checkForHeader();
 	}
 	const_cast<Record *>(keyList.getKey())->undoZeroLength();
-	_currBlockList = blockList;
+	_currBamBlockList = blockList;
 
 	if (_context->getProgram() == ContextBase::INTERSECT) {
 		if (_printable) {
@@ -161,7 +161,7 @@ void RecordOutputMgr::printRecord(RecordKeyList &keyList, RecordKeyList *blockLi
 				if ((static_cast<ContextIntersect *>(_context))->getWriteAllOverlap()) {
 					// -wao the user wants to force the reporting of 0 overlap
 					if (printKeyAndTerminate(keyList)) {
-						_currBlockList = NULL;
+						_currBamBlockList = NULL;
 						return;
 					}
 					tab();
@@ -173,34 +173,36 @@ void RecordOutputMgr::printRecord(RecordKeyList &keyList, RecordKeyList *blockLi
 				}
 				else if ((static_cast<ContextIntersect *>(_context))->getLeftJoin()) {
 					if (printKeyAndTerminate(keyList)) {
-						_currBlockList = NULL;
+						_currBamBlockList = NULL;
 						return;
 					}
 					tab();
 					null(false, true);
 					newline();
 					if (needsFlush()) flush();
-					_currBlockList = NULL;
+					_currBamBlockList = NULL;
 					return;
 				}
 			} else {
 				if (printBamRecord(keyList, true) == BAM_AS_BAM) {
-					_currBlockList = NULL;
+					_currBamBlockList = NULL;
 					return;
 				}
+				int hitIdx = 0;
 				for (RecordKeyList::const_iterator_type iter = keyList.begin(); iter != keyList.end(); iter = keyList.next()) {
-					reportOverlapDetail(keyList.getKey(), iter->value());
+					reportOverlapDetail(keyList.getKey(), iter->value(), hitIdx);
+					hitIdx++;
 				}
 			}
 		} else { // not printable
 			reportOverlapSummary(keyList);
 		}
-		_currBlockList = NULL;
+		_currBamBlockList = NULL;
 	} else if (_context->getProgram() == ContextBase::SAMPLE) {
 		if (!printKeyAndTerminate(keyList)) {
 			newline();
 		}
-		_currBlockList = NULL;
+		_currBamBlockList = NULL;
 		return;
 	} else if (_context->getProgram() == ContextBase::MAP) {
 		if (!printKeyAndTerminate(keyList)) {
@@ -226,7 +228,7 @@ void RecordOutputMgr::checkForHeader() {
 	if (needsFlush()) flush();
 }
 
-void RecordOutputMgr::reportOverlapDetail(const Record *keyRecord, const Record *hitRecord)
+void RecordOutputMgr::reportOverlapDetail(const Record *keyRecord, const Record *hitRecord, int hitIdx)
 {
 	//get the max start and min end as strings.
 	const_cast<Record *>(hitRecord)->undoZeroLength();
@@ -281,12 +283,6 @@ void RecordOutputMgr::reportOverlapDetail(const Record *keyRecord, const Record 
 		}
 	}
 
-//	const QuickString &startStr = keyRecord->getStartPos() > hitRecord->getStartPos() ? keyRecord->getStartPosStr() : hitRecord->getStartPosStr();
-//	const QuickString &endStr = keyRecord->getEndPos() < hitRecord->getEndPos() ? keyRecord->getEndPosStr() : hitRecord->getEndPosStr();
-//
-//	int maxStart = max(keyRecord->getStartPos(), hitRecord->getStartPos());
-//	int minEnd = min(keyRecord->getEndPos(), hitRecord->getEndPos());
-//
 
 	if (!(static_cast<ContextIntersect *>(_context))->getWriteA() && !(static_cast<ContextIntersect *>(_context))->getWriteB()
 			&& !(static_cast<ContextIntersect *>(_context))->getWriteOverlap() && !(static_cast<ContextIntersect *>(_context))->getLeftJoin()) {
@@ -315,7 +311,12 @@ void RecordOutputMgr::reportOverlapDetail(const Record *keyRecord, const Record 
 		if (needsFlush()) flush();
 	}
 	else if ((static_cast<ContextIntersect *>(_context))->getWriteOverlap()) {
-		int printOverlapBases = max(0, minEnd-maxStart);
+		int printOverlapBases = 0;
+		if (_context->getObeySplits()) {
+			printOverlapBases = _splitInfo->getOverlapBases(hitIdx);
+		} else {
+			printOverlapBases = minEnd - maxStart;
+		}
 		printKey(keyRecord);
 		tab();
 		hitRecord->print(_outBuf);
@@ -416,7 +417,7 @@ void RecordOutputMgr::printKey(const Record *key, const QuickString & start, con
 	if (key->getType() != FileRecordTypeChecker::BAM_RECORD_TYPE) {
 		key->print(_outBuf, start, end);
 	} else {
-		static_cast<const BamRecord *>(key)->print(_outBuf, start, end, _currBlockList);
+		static_cast<const BamRecord *>(key)->print(_outBuf, start, end, _currBamBlockList);
 	}
 }
 
@@ -425,7 +426,7 @@ void RecordOutputMgr::printKey(const Record *key)
 	if (key->getType() != FileRecordTypeChecker::BAM_RECORD_TYPE) {
 		key->print(_outBuf);
 	} else {
-		static_cast<const BamRecord *>(key)->print(_outBuf, _currBlockList);
+		static_cast<const BamRecord *>(key)->print(_outBuf, _currBamBlockList);
 	}
 }
 

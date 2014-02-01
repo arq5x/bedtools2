@@ -161,17 +161,23 @@ int BlockMgr::findBlockedOverlaps(RecordKeyList &keyList, RecordKeyList &hitList
 {
 	bool deleteKeyBlocks = false;
 	if (keyList.empty()) {
+		//get all the blocks for the query record, put them in it's list.
 		getBlocks(keyList, deleteKeyBlocks);
 	}
+	_overlapBases.clear();
 	int keyBlocksSumLength = getTotalBlockLength(keyList);
+	//Loop through every database record the query intersected with
 	for (RecordKeyList::const_iterator_type hitListIter = hitList.begin(); hitListIter != hitList.end(); hitListIter = hitList.next()) {
 		RecordKeyList hitBlocks(hitListIter->value());
 		bool deleteHitBlocks = false;
-		getBlocks(hitBlocks, deleteHitBlocks);
-		int hitBlockSumLength = getTotalBlockLength(hitBlocks);
+		getBlocks(hitBlocks, deleteHitBlocks); //get all blocks for the hit record.
+		int hitBlockSumLength = getTotalBlockLength(hitBlocks); //get total lentgh of the bocks for the hitRecord.
 		int totalHitOverlap = 0;
 		bool hitHasOverlap = false;
+
+		//loop through every block of the database record.
 		for (RecordKeyList::const_iterator_type hitBlockIter = hitBlocks.begin(); hitBlockIter != hitBlocks.end(); hitBlockIter = hitBlocks.next()) {
+			//loop through every block of the query record.
 			for (RecordKeyList::const_iterator_type keyListIter = keyList.begin(); keyListIter != keyList.end(); keyListIter = keyList.next()) {
 				const Record *keyBlock = keyListIter->value();
 				const Record *hitBlock = hitBlockIter->value();
@@ -186,6 +192,7 @@ int BlockMgr::findBlockedOverlaps(RecordKeyList &keyList, RecordKeyList &hitList
 
 			}
 		}
+		_overlapBases.push_back(totalHitOverlap);
 		if (hitHasOverlap) {
 			if ((float) totalHitOverlap / (float)keyBlocksSumLength > _context->getOverlapFraction()) {
 				if (_context->getReciprocal() &&
