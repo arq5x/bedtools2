@@ -33,7 +33,7 @@ public:
     Bed2Fa(bool useName, const string &dbFile, 
            const string &bedFile, const string &fastaOutFile, 
            bool useFasta, bool useStrand, 
-           bool useBlocks);
+           bool useBlocks, bool useFullHeader);
 
     // destructor
     ~Bed2Fa(void);
@@ -52,6 +52,7 @@ private:
     bool _useStrand;    // should the extracted sequence obey strandedness?
     bool _useBlocks;    // should the extracted sequence obey BED blocks
                         // (for example, exons?)
+    bool _useFullHeader;
 
     // instance of a bed file class.
     BedFile  *_bed;

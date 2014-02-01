@@ -44,6 +44,7 @@ int fastafrombed_main(int argc, char* argv[]) {
     bool useFasta = true;
     bool useStrand = false;
     bool useBlocks = false;
+    bool useFullHeader = false;
 
     // check to see if we should print out some help
     if(argc <= 1) showHelp = true;
@@ -97,6 +98,9 @@ int fastafrombed_main(int argc, char* argv[]) {
         else if(PARAMETER_CHECK("-s", 2, parameterLength)) {
             useStrand = true;
         }
+        else if(PARAMETER_CHECK("-fullHeader", 11, parameterLength)) {
+            useFullHeader = true;
+        }
         else {
             cerr << "*****ERROR: Unrecognized parameter: " 
                  << argv[i] 
@@ -115,7 +119,7 @@ int fastafrombed_main(int argc, char* argv[]) {
         Bed2Fa *b2f = new Bed2Fa(useNameOnly, fastaDbFile, 
                                  bedFile, fastaOutFile, 
                                  useFasta, useStrand, 
-                                 useBlocks);
+                                 useBlocks, useFullHeader);
         delete b2f;
     }
     else {
@@ -148,6 +152,9 @@ void fastafrombed_help(void) {
          << endl;
     cerr << "\t\tstrand, the sequence will be reverse complemented." << endl;
     cerr << "\t\t- By default, strand information is ignored." << endl << endl;
+    cerr << "\t-fullHeader\tUse full fasta header." << endl;
+    cerr << "\t\t- By default, only the word before the first space or tab "
+	 << "is used." << endl << endl;
 
     // end the program here
     exit(1);
