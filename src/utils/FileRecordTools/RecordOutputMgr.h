@@ -26,7 +26,6 @@ public:
 
 	void printRecord(const Record *record);
 	void printRecord(RecordKeyList &keyList);
-	// Added by ARQ
 	void printRecord(const Record *record, const QuickString & value);
 
 	//where necessary, pass additional information about splits through the blockMgr.
