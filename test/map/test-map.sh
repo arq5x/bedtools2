@@ -617,4 +617,47 @@ chr10	20	30	." > exp
 $BT map -g genome -a a.vsorted.bed -b b.vsorted.bed -c 1 -o collapse > obs
 check obs exp
 
+###########################################################
+#  Test invalid column
+############################################################
+echo "    map.t41..\c"
+echo \
+"
+*****
+*****ERROR: requested column 41 , but record only has fields 1 - 6. Exiting.
+
+*****" > exp
+$BT map -a ivls.bed -b values5.bed -c 41 -o collapse 2> obs
+check obs exp
+
+rm obs exp
+
+###########################################################
+#  Test invalid column
+############################################################
+echo "    map.t42..\c"
+echo \
+"
+*****
+*****ERROR: requested column -1 , but record only has fields 1 - 6. Exiting.
+
+*****" > exp
+$BT map -a ivls.bed -b values5.bed -c -1 -o collapse 2> obs
+check obs exp
+
+rm obs exp
+
+###########################################################
+#  Test invalid column
+############################################################
+echo "    map.t43..\c"
+echo \
+"
+*****
+*****ERROR: requested column 0 , but record only has fields 1 - 6. Exiting.
+
+*****" > exp
+$BT map -a ivls.bed -b values5.bed -c 0 -o collapse 2> obs
+check obs exp
+
 rm obs exp
