@@ -51,18 +51,18 @@ Commands used:
 
 .. code-block:: bash
 
-    # bedtools unsorted
-    $ bedtools intersect \
-               -a ccds.exons.bed -b aln.bam.bed \
-               -c
-
     # bedtools sorted
     $ bedtools intersect \
                -a ccds.exons.bed -b aln.bam.bed \
                -c \
                -sorted
 
-    # bedmap (no error checking)
+    # bedtools unsorted
+    $ bedtools intersect \
+               -a ccds.exons.bed -b aln.bam.bed \
+               -c
+
+    # bedmap (without error checking)
     $ bedmap --echo --count --bp-ovr 1 \
              ccds.exons.bed aln.bam.bed
 
