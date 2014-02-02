@@ -10,11 +10,11 @@ BT=${BT-../../bin/bedtools}
 
 check()
 {
-	if $1 = $2; then
-    	echo ok
-	else
-    	echo fail
-	fi
+    if diff $1 $2; then
+        echo ok
+    else
+        echo fail
+    fi
 }
 
 echo "    getfasta.t01...\c"
@@ -68,3 +68,12 @@ if [ "$LINES" != "2" ]; then
 else
     echo ok
 fi
+
+# test without -fullHeader
+echo "    getfasta.t07...\c"
+echo "WARNING. chromosome (chr1 assembled by consortium X) was not found in the FASTA file. Skipping." > exp
+echo $'chr1 assembled by consortium X\t1\t10' | $BT getfasta -fi t_fH.fa -bed - -fo - 2> obs
+
+check obs exp
+
+rm obs exp
