@@ -219,7 +219,7 @@ void BedMerge::ReportStranded(string chrom, int start,
     else if (_numEntries == false && _reportNames == true &&
         _reportScores == false) {
         ReportMergedNames(names);
-        printf("\t\t%s\n", strand.c_str());
+        printf("\t.\t%s\n", strand.c_str());
     }
     // merged intervals and scores        
     else if (_numEntries == false && _reportNames == false && 

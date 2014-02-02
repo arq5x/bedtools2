@@ -66,3 +66,4 @@ $BT jaccard -a a.bed -b b.bed > obs1
 $BT jaccard -a b.bed -b a.bed > obs2
 check obs1 obs2
 
+rm obs1 obs2
