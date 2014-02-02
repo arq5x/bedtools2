@@ -140,6 +140,7 @@ void RecordOutputMgr::printRecord(RecordKeyList &keyList) {
 		return;
 	}
     printRecord(keyList, NULL);
+
 }
 
 void RecordOutputMgr::printRecord(RecordKeyList &keyList, RecordKeyList *blockList)
@@ -208,7 +209,7 @@ void RecordOutputMgr::printRecord(RecordKeyList &keyList, RecordKeyList *blockLi
 		if (!printKeyAndTerminate(keyList)) {
 			tab();
 		}
-		_currBlockList = NULL;
+		_currBamBlockList = NULL;
 		return;
 	}
 }
