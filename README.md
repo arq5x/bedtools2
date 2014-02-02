@@ -1,4 +1,4 @@
-===================================================
+
 bedtools - a swiss army knife for genome arithmetic         
 ===================================================
 
@@ -23,6 +23,10 @@ As of version 2.18, ``bedtools`` is substantially more scalable thanks to improv
 by chromosome and start position. As you can see in the plots below, the speed and memory consumption scale nicely
 with sorted data as compared to the poor scaling for unsorted data. The current version of bedtools intersect is as fast as (or slightly faster) than the ``bedops`` package's ``bedmap`` which uses a similar algorithm for sorted data.  The plots below represent counting the number of intersecting alignments from exome capture BAM files against CCDS exons.
 The alignments have been converted to BED to facilitate comparisons to ``bedops``. We compare to the bedmap ``--ec`` option because similar error checking is enforced by ``bedtools``.
+
+
+**Note:** bedtools could not complete when using 100 million alignments and the R-Tree algorithm used for unsorted data.
+
 
 ![Speed Comparison](http://bedtools.readthedocs.org/en/latest/_images/speed-comparo.png)
 ![Memory Comparison](http://bedtools.readthedocs.org/en/latest/_images/memory-comparo.png)
