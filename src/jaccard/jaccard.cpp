@@ -85,7 +85,7 @@ void Jaccard::CalculateJaccard() {
     
     // header
     cout << "intersection\t"
-         << "union\t"
+         << "union-intersection\t"
          << "jaccard\t"
          << "n_intersections"
          << endl;
