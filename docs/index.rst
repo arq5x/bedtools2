@@ -40,7 +40,7 @@ by chromosome and start position. As you can see in the plots below, the speed a
 with sorted data as compared to the poor scaling for unsorted data. The current version of bedtools intersect is as fast as (or slightly faster) than the ``bedops`` package's ``bedmap`` which uses a similar algorithm for sorted data.  The plots below represent counting the number of intersecting alignments from exome capture BAM files against CCDS exons.
 The alignments have been converted to BED to facilitate comparisons to ``bedops``. We compare to the bedmap ``--ec`` option because similar error checking is enforced by ``bedtools``.
 
-Note: bedtools could not complete when using 100 million alignments and the R-Tree algorithm used for unsorted data.
+Note: bedtools could not complete when using 100 million alignments and the R-Tree algorithm used for unsorted data owing to a lack of memory.
 
 .. image:: content/images/speed-comparo.png 
     :width: 300pt 
