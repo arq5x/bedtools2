@@ -33,6 +33,44 @@ Table of contents
    
 
 =================
+Performance
+=================
+As of version 2.18, ``bedtools`` is substantially more scalable thanks to improvements we have made in the algorithm used to process datasets that are pre-sorted
+by chromosome and start position. As you can see in the plots below, the speed and memory consumption scale nicely
+with sorted data as compared to the poor scaling for unsorted data. The current version of bedtools intersect is as fast as (or slightly faster) than the ``bedops`` package's ``bedmap`` which uses a similar algorithm for sorted data.  The plots below represent counting the number of intersecting alignments from exome capture BAM files against CCDS exons.
+The alignments have been converted to BED to facilitate comparisons to ``bedops``. We compare to the bedmap ``--ec`` option because similar error checking is enforced by ``bedtools``.
+
+.. image:: content/images/speed-comparo.png 
+    :width: 300pt 
+.. image:: content/images/memory-comparo.png 
+    :width: 300pt 
+
+Commands used:
+
+.. code-block:: bash
+
+    # bedtools unsorted
+    $ bedtools intersect \
+               -a ccds.exons.bed -b aln.bam.bed \
+               -c
+
+    # bedtools sorted
+    $ bedtools intersect \
+               -a ccds.exons.bed -b aln.bam.bed \
+               -c \
+               -sorted
+
+    # bedmap (no error checking)
+    $ bedmap --echo --count --bp-ovr 1 \
+             ccds.exons.bed aln.bam.bed
+
+    # bedmap (no error checking)
+    $ bedmap --ec --echo --count --bp-ovr 1 \
+             ccds.exons.bed aln.bam.bed
+
+
+
+=================
 Brief example
 =================
 Let's imagine you have a BED file of ChiP-seq peaks from two different
