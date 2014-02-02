@@ -16,6 +16,18 @@ Collectively, the bedtools utilities are a swiss-army knife of tools for a wide-
 
 While each individual tool is designed to do a relatively simple task (e.g., intersect two interval files), quite sophisticated analyses can be conducted by combining multiple bedtools operations on the UNIX command line.
 
+
+Performance
+-----------
+As of version 2.18, ``bedtools`` is substantially more scalable thanks to improvements we have made in the algorithm used to process datasets that are pre-sorted
+by chromosome and start position. As you can see in the plots below, the speed and memory consumption scale nicely
+with sorted data as compared to the poor scaling for unsorted data. The current version of bedtools intersect is as fast as (or slightly faster) than the ``bedops`` package's ``bedmap`` which uses a similar algorithm for sorted data.  The plots below represent counting the number of intersecting alignments from exome capture BAM files against CCDS exons.
+The alignments have been converted to BED to facilitate comparisons to ``bedops``. We compare to the bedmap ``--ec`` option because similar error checking is enforced by ``bedtools``.
+
+![Speed Comparison](http://bedtools.readthedocs.org/en/latest/_images/speed-comparo.png)
+![Memory Comparison](http://bedtools.readthedocs.org/en/latest/_images/memory-comparo.png)
+
+
 Details
 -------
 First created through urgency and adrenaline by Aaron Quinlan Spring 2009. 
