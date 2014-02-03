@@ -34,12 +34,14 @@ size_t Jaccard::GetTotalIntersection(const BED &a, const vector<BED> &hits)
     Constructor
 */
 Jaccard::Jaccard(string bedAFile, string bedBFile, 
-                 float overlapFraction, bool reciprocal)
+                 float overlapFraction, bool reciprocal,
+                 bool valueOnly)
 {
     _bedAFile            = bedAFile;
     _bedBFile            = bedBFile;
     _overlapFraction     = overlapFraction;
     _reciprocal          = reciprocal;
+    _valueOnly           = valueOnly;
 
         
     CalculateJaccard();
@@ -83,19 +85,26 @@ void Jaccard::CalculateJaccard() {
     unsigned long U = _bedA->getTotalFlattenedLength() + \
                       _bedB->getTotalFlattenedLength();
     
-    // header
-    cout << "intersection\t"
-         << "union-intersection\t"
-         << "jaccard\t"
-         << "n_intersections"
-         << endl;
+    float jaccard_stat = (float) I / ((float) U - (float) I);
     
-    // result
-    cout << I << "\t" 
-         << U - I << "\t"
-         << (float) I / ((float) U - (float) I) << "\t"
-         << n_intersections
-         << endl;
+    if (!_valueOnly) {
+        // header
+        cout << "intersection\t"
+           << "union-intersection\t"
+           << "jaccard\t"
+           << "n_intersections"
+           << endl;
+
+        // result
+        cout << I << "\t" 
+           << U - I << "\t"
+           << jaccard_stat << "\t"
+           << n_intersections
+           << endl;
+    }
+    else {
+        cout << jaccard_stat << endl;
+    }
 }
 
 

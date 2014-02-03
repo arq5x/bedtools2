@@ -40,6 +40,7 @@ int jaccard_main(int argc, char* argv[]) {
     bool haveBedB           = false;
     bool haveFraction       = false;
     bool reciprocalFraction = false;
+    bool valueOnly = false;
 
     // check to see if we should print out some help
     if(argc <= 1) showHelp = true;
@@ -84,6 +85,9 @@ int jaccard_main(int argc, char* argv[]) {
         else if(PARAMETER_CHECK("-r", 2, parameterLength)) {
             reciprocalFraction = true;
         }
+        else if(PARAMETER_CHECK("-valueOnly", 10, parameterLength)) {
+            valueOnly = true;
+        }
         else {
             cerr << endl 
                  << "*****ERROR: Unrecognized parameter: " 
@@ -108,7 +112,8 @@ int jaccard_main(int argc, char* argv[]) {
     if (!showHelp) {
 
         Jaccard *j = new Jaccard(bedAFile, bedBFile,
-                                 overlapFraction, reciprocalFraction);
+                                 overlapFraction, reciprocalFraction,
+                                 valueOnly);
         delete j;
         return 0;
     }
