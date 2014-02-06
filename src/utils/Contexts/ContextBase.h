@@ -20,6 +20,7 @@
 #include "version.h"
 #include "BedtoolsTypes.h"
 #include "FileRecordTypeChecker.h"
+#include "FileRecordMgr.h"
 #include "NewGenomeFile.h"
 #include "api/BamReader.h"
 #include "api/BamAux.h"
@@ -39,34 +40,20 @@ public:
 		MULTICOV, TAG, JACCARD, OVERLAP, IGV, LINKS,MAKEWINDOWS, GROUPBY, EXPAND } PROGRAM_TYPE;
 
 	PROGRAM_TYPE getProgram() const { return _program; }
+	FileRecordMgr *getFile(int fileIdx) { return _files[fileIdx]; }
 	void setProgram(PROGRAM_TYPE program) { _program = program; }
 
-	void addInputFile(const QuickString &inputFile,
-			ContextFileType explicitFileType = FileRecordTypeChecker::UNKNOWN_FILE_TYPE,
-			ContextRecordType explicitRecordType = FileRecordTypeChecker::UNKNOWN_RECORD_TYPE) {
-		_inputFiles.push_back(FileEntryType(inputFile, explicitFileType, explicitRecordType));
-	}
+	void addInputFile(const QuickString &inputFile) { _fileNames.push_back(inputFile); }
 
-	int getNumInputFiles() const { return _inputFiles.size(); }
-	const QuickString &getInputFileName(int fileNum) const { return _inputFiles[fileNum]._fileName; }
-	ContextFileType getInputFileType(int fileNum) const { return _inputFiles[fileNum]._fileType; }
-	void setInputFileType(int fileNum, ContextFileType fileType) { _inputFiles[fileNum]._fileType = fileType; }
-	ContextRecordType getInputRecordType(int fileNum) const { return _inputFiles[fileNum]._recordType; }
-	void setInputRecordType(int fileNum, ContextRecordType recordType) { _inputFiles[fileNum]._recordType = recordType; }
-	//HERE ARE SOME SIMPLER VERSIONS OF THE ABOVE FOR APPS THAT HAVE ONLY ONE INPUT FILE
-	const QuickString &getInputFileName() const { return _inputFiles[0]._fileName; }
-	ContextFileType getInputFileType() const { return _inputFiles[0]._fileType; }
-	void setInputFileType(ContextFileType fileType) { _inputFiles[0]._fileType = fileType; }
-	ContextRecordType getInputRecordType() const { return _inputFiles[0]._recordType; }
-	void setInputRecordType(ContextRecordType recordType) { _inputFiles[0]._recordType = recordType; }
-	int getInputFileIdx() const { return 0; }
+	int getNumInputFiles() const { return _fileNames.size(); }
+	const QuickString &getInputFileName(int fileNum) const { return _fileNames[fileNum]; }
+	ContextFileType getInputFileType(int fileNum) const { return _files[fileNum]->getFileType(); }
+	ContextRecordType getInputRecordType(int fileNum) const { return _files[fileNum]->getRecordType(); }
 
 	virtual bool determineOutputType();
 
-	const QuickString &getHeader(int fileIdx) { return _headers[fileIdx]; }
-	void setHeader(int fileIdx, const QuickString &header) { _headers[fileIdx] = header; }
-	const BamTools::RefVector &getReferences(int fileIdx)  { return _references[fileIdx]; }
-	void setReferences(int fileIdx, const BamTools::RefVector &refs) { _references[fileIdx] = refs; }
+	const QuickString &getHeader(int fileIdx) { return _files[fileIdx]->getHeader(); }
+	const BamTools::RefVector &getBamReferences(int fileIdx)  { return _files[fileIdx]->getBamReferences(); }
 	int getBamHeaderAndRefIdx(); //return idx of 1st query that is BAM. If none, first DB that is BAM.
 
 	bool getUseMergedIntervals() const { return _useMergedIntervals; }
@@ -160,15 +147,9 @@ public:
 protected:
 	PROGRAM_TYPE _program;
 
-	class FileEntryType {
-	public:
-		FileEntryType(const QuickString &filename, ContextFileType fileType, ContextRecordType recordType)
-		: _fileName(filename), _fileType(fileType), _recordType(recordType) {}
-		QuickString _fileName;
-		ContextFileType _fileType;
-		ContextRecordType _recordType;
-	};
-	vector<FileEntryType> _inputFiles;
+	vector<QuickString> _fileNames;
+	vector<FileRecordMgr *> _files;
+	bool _allFilesOpened;
 	map<QuickString, PROGRAM_TYPE> _programNames;
 
 	bool _useMergedIntervals;
@@ -230,6 +211,7 @@ protected:
 	void markUsed(int i) { _argsProcessed[i] = true; }
 	bool isUsed(int i) const { return _argsProcessed[i]; }
 	bool cmdArgsValid();
+	bool openFiles();
 
 	//set cmd line params and counter, i, as members so code
 	//is more readable (as opposed to passing all 3 everywhere).

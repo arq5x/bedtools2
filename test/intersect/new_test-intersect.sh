@@ -638,6 +638,17 @@ $BT intersect -a gdc.bam -b gdc.bam -bed > obs
 check obs gdc_exp
 rm obs
 
+###########################################################
+#  Test that if the query is BAM, and bed output is not 
+#  explicit, and they asked for an output option that is not
+# valid with BAM output, an error is thrown.
+############################################################
+echo "    intersect.new.t54...\c"
+echo "***** ERROR: writeAllOverlap option is not valid with BAM query input, unless bed output is specified with -bed option. *****" > exp
+$BT intersect -a a.bam -b b.bed  -wao 2>&1 > /dev/null  | head -2 | tail -1 > obs
+check obs exp
+rm obs exp
+
 
 
 

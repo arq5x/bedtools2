@@ -48,8 +48,10 @@ public:
 	void getName(QuickString &) const;
 	void getScore(QuickString &) const;
 	char getStrand() const;
+	virtual int getNumFields() const { return MINIMUM_PRINTABLE_BAM_FIELDS; }
 
 protected:
+
 	BamTools::BamReader *_bamReader;
 	BamTools::BamAlignment _bamAlignment;
 	bool _eof;
@@ -58,7 +60,7 @@ protected:
 	bool _useTags;
 	bool _shouldDeleteBamReader;
 
-
+	static const int MINIMUM_PRINTABLE_BAM_FIELDS = 6;
 	void extractNameFromCore();
 };
 

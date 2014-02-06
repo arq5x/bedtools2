@@ -128,36 +128,36 @@ int nek_sandbox1_main(int argc,char** argv)
 //
 //	return 0;
 //
-	ContextIntersect context;
-	context.addInputFile(argv[1]);
-	context.setSortedInput(true);
-//	context.setObeySplits(true);
-
-	FileRecordMgr frm(0, &context);
-//	frm.getBlockMgr()->setBreakOnSkipOps(true);
-	if (!frm.open()) {
-		cerr << "Error: couldn't open file " << argv[1] << ". Exiting." << endl;
-		exit(1);
-	}
-	cout << "File Type is : " << frm.getFileType() << ", " << frm.getFileTypeName() << "." << endl;
-	cout << "RecordType is : " << frm.getRecordType() << ", " << frm.getRecordTypeName() << "."  << endl;
-
-	bool headerFound = false;
-	QuickString outbuf;
-	while (!frm.eof()) {
-		Record *record = frm.allocateAndGetNextRecord();
-		if (!headerFound && frm.hasHeader()) {
-			cout << frm.getHeader() << endl;
-			headerFound = true;
-		}
-		if (record == NULL) {
-			break;
-		}
-
-		outbuf.clear();
-		record->print(outbuf);
-		printf("%s\n", outbuf.c_str());
-
+//	ContextIntersect context;
+//	context.addInputFile(argv[1]);
+//	context.setSortedInput(true);
+////	context.setObeySplits(true);
+//
+//	FileRecordMgr frm(0, &context);
+////	frm.getBlockMgr()->setBreakOnSkipOps(true);
+//	if (!frm.open()) {
+//		cerr << "Error: couldn't open file " << argv[1] << ". Exiting." << endl;
+//		exit(1);
+//	}
+//	cout << "File Type is : " << frm.getFileType() << ", " << frm.getFileTypeName() << "." << endl;
+//	cout << "RecordType is : " << frm.getRecordType() << ", " << frm.getRecordTypeName() << "."  << endl;
+//
+//	bool headerFound = false;
+//	QuickString outbuf;
+//	while (!frm.eof()) {
+//		Record *record = frm.allocateAndGetNextRecord();
+//		if (!headerFound && frm.hasHeader()) {
+//			cout << frm.getHeader() << endl;
+//			headerFound = true;
+//		}
+//		if (record == NULL) {
+//			break;
+//		}
+//
+//		outbuf.clear();
+//		record->print(outbuf);
+//		printf("%s\n", outbuf.c_str());
+//
 //		RecordKeyList recList(record);
 //		int blockCount = frm.getBlockMgr()->getBlocks(recList);
 //		printf("The %d blocks are:\n", blockCount);
@@ -168,10 +168,10 @@ int nek_sandbox1_main(int argc,char** argv)
 //		printf("\n\n");
 //		frm.getBlockMgr()->deleteBlocks(recList);
 
-		frm.deleteRecord(record);
-	}
+//		frm.deleteRecord(record);
+//	}
 //	cout << "Final header is: " << frm.getHeader() << endl;
-	frm.close();
+//	frm.close();
 
 	return 0;
 }

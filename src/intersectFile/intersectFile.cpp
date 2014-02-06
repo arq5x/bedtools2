@@ -24,18 +24,16 @@ FileIntersect::FileIntersect(ContextIntersect *context)
   _recordOutputMgr(NULL)
 {
 	_recordOutputMgr = new RecordOutputMgr();
+	_recordOutputMgr->init(_context);
 	if (_context->getObeySplits()) {
-		_blockMgr = new BlockMgr();
-		_blockMgr->setContext(context);
+		_blockMgr = new BlockMgr(_context->getOverlapFraction(), _context->getReciprocal());
 		_recordOutputMgr->setSplitInfo(_blockMgr);
 	}
 }
 
 FileIntersect::~FileIntersect(void) {
-	if (_blockMgr != NULL) {
-		delete _blockMgr;
-		_blockMgr = NULL;
-	}
+	delete _blockMgr;
+	_blockMgr = NULL;
 	delete _recordOutputMgr;
 }
 
@@ -59,9 +57,6 @@ bool FileIntersect::processSortedFiles()
     if (!sweep.init()) {
     	return false;
     }
-    if (!_recordOutputMgr->init(_context)) {
-    	return false;
-    }
 
     RecordKeyList hitSet;
     while (sweep.next(hitSet)) {
@@ -79,23 +74,11 @@ bool FileIntersect::processSortedFiles()
 
 bool FileIntersect::processUnsortedFiles()
 {
-	const QuickString &databaseFilename = _context->getDatabaseFileName();
-	BinTree *binTree = new BinTree(_context->getDatabaseFileIdx(), _context);
+	BinTree *binTree = new BinTree( _context);
+	binTree->loadDB();
 
-	FileRecordMgr *queryFRM = new FileRecordMgr(_context->getQueryFileIdx(), _context);
-	if (!queryFRM->open()) {
-		return false;
-	}
+	FileRecordMgr *queryFRM = _context->getFile(_context->getQueryFileIdx());
 
-	if (!binTree->loadDB()) {
-		fprintf(stderr, "Error: Unable to load database file %s.\n", databaseFilename.c_str());
-		delete binTree;
-		exit(1);
-	}
-
-
-    _context->determineOutputType();
-    _recordOutputMgr->init(_context);
 
 	while (!queryFRM->eof()) {
 		Record *queryRecord = queryFRM->allocateAndGetNextRecord();
@@ -117,7 +100,6 @@ bool FileIntersect::processUnsortedFiles()
 	queryFRM->close();
 
 	//clean up.
-	delete queryFRM;
 	delete binTree;
 	return true;
 }

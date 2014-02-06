@@ -29,6 +29,7 @@ public:
 	virtual int getCurrChromdId() const { return _currChromId; }
 	virtual bool hasHeader() const = 0;
 	virtual const QuickString &getHeader() const =0;
+	virtual int getNumFields() const = 0;
 protected:
 	string _filename;
 	BufferedStreamMgr *_bufStreamMgr;

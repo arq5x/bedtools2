@@ -16,14 +16,12 @@ using namespace std;
 #include "FileRecordTypeChecker.h"
 #include "RecordKeyList.h"
 
-class ContextIntersect;
 class RecordMgr;
 
 class BlockMgr {
 public:
-	BlockMgr();
+	BlockMgr(float overlapFraction = 1E-9, bool hasReciprocal = false);
 	~BlockMgr();
-	void setContext(ContextIntersect *context) { _context = context; }
 
 	// Return value is the number of blocks this main record has been split into.
 	void getBlocks(RecordKeyList &keyList, bool &mustDelete);
@@ -46,10 +44,12 @@ public:
 
 private:
 	RecordMgr *_blockRecordsMgr;
-	ContextIntersect *_context;
 	bool _breakOnDeletionOps;
 	bool _breakOnSkipOps;
 	vector<int> _overlapBases;
+
+	float _overlapFraction;
+	bool _hasReciprocal;
 
 	// For now, all records will be split into Bed6 records.
 	const static FileRecordTypeChecker::RECORD_TYPE _blockRecordsType = FileRecordTypeChecker::BED6_RECORD_TYPE;

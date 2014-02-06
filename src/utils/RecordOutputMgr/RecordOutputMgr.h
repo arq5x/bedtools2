@@ -22,7 +22,7 @@ public:
 	~RecordOutputMgr();
 
 	//The init method must be called after all the input files are open.
-	bool init(ContextBase *context);
+	void init(ContextBase *context);
 
 	void printRecord(const Record *record);
 	void printRecord(RecordKeyList &keyList);

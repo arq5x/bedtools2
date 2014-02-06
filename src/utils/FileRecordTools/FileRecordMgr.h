@@ -16,7 +16,6 @@ using namespace std;
 //#include "DualQueue.h"
 
 //include headers for all FileReader and derivative classes.
-#include "ContextBase.h"
 #include "BufferedStreamMgr.h"
 #include "FileReader.h"
 #include "SingleLineDelimTextFileReader.h"
@@ -29,50 +28,47 @@ using namespace std;
 #include "BlockMgr.h"
 
 class Record;
+class NewGenomeFile;
+
 class FileRecordMgr {
 public:
-	FileRecordMgr(int inputFileIdx, ContextBase *context);
+	FileRecordMgr(const QuickString & filename, bool isSorted = false);
 	~FileRecordMgr();
 	bool open();
 	void close();
 	bool eof();
 
-	//NOTE: FOR Non-BAM FILES, HEADER INFORMATION IS CURRENTLY ONLY AVAILABLE AFTER 1st CALL
-	//TO allocateAndGetNextRecord().
+	const QuickString &getFileName() const { return _filename;}
 	bool hasHeader() const { return _fileReader->hasHeader(); }
 	const QuickString &getHeader() const { return _fileReader->getHeader(); }
 
 	bool recordsHaveName() const {
-		testBufferedMgr();
 		return _bufStreamMgr->getTypeChecker().recordTypeHasName(_recordType);
 	}
 	bool recordsHaveScore() const {
-		testBufferedMgr();
 		return _bufStreamMgr->getTypeChecker().recordTypeHasScore(_recordType);
 	}
 	bool recordsHaveStrand() const {
-		testBufferedMgr();
 		return _bufStreamMgr->getTypeChecker().recordTypeHasStrand(_recordType);
 	}
 
 	FileRecordTypeChecker::FILE_TYPE getFileType() const {
-		testBufferedMgr();
 		return _fileType;
 	}
 	FileRecordTypeChecker::RECORD_TYPE getRecordType() const {
-		testBufferedMgr();
 		return _recordType;
 	}
 	const string &getFileTypeName() const {
-		testBufferedMgr();
 		return _bufStreamMgr->getTypeChecker().getFileTypeName();
 	}
 
 	const string &getRecordTypeName() const {
-		testBufferedMgr();
 		return _bufStreamMgr->getTypeChecker().getRecordTypeName();
 	}
 
+	const BamTools::RefVector &getBamReferences();
+
+	int getNumFields() const { return _fileReader->getNumFields(); }
 	//This is an all-in-one method to give the user a new record that is initialized with
 	//the next entry in the data file.
 	//NOTE!! User MUST pass back the returned pointer to deleteRecord method for cleanup!
@@ -139,20 +135,22 @@ public:
 	//will use all the tags, if more information is desired.
 	//MUST BE CALLED BEFORE THE BAM FILE IS OPEN.
 	void setFullBamFlags(bool flag) { _useFullBamTags = flag; }
+	void setGenomeFile(NewGenomeFile *genomeFile) {
+		_genomeFile = genomeFile;
+		_hasGenomeFile = true;
+	}
 
 private:
 	QuickString _filename;
 	BufferedStreamMgr *_bufStreamMgr;
-	int _contextFileIdx;
 
-	ContextBase *_context;
 	FileReader *_fileReader;
 	FileRecordTypeChecker::FILE_TYPE _fileType;
 	FileRecordTypeChecker::RECORD_TYPE _recordType;
 	RecordMgr *_recordMgr;
+	bool _isSortedInput;
 	int _freeListBlockSize;
 	bool _useFullBamTags;
-	bool _headerSet;
 
 	//members for enforcing sorted order.
 	set<QuickString> _foundChroms;
@@ -172,18 +170,14 @@ private:
 
 	BlockMgr *_blockMgr;
 	BamTools::BamReader *_bamReader;
-
+	bool _hasGenomeFile;
+	NewGenomeFile *_genomeFile;
 
 	void allocateFileReader();
 	void testInputSortOrder(Record *record);
 	void assignChromId(Record *);
 	void sortError(const Record *record, bool genomeFileError);
-	void testBufferedMgr() const {
-		if (_bufStreamMgr ==  NULL) {
-			cerr << "Error: attempted to access type information for file " << _context->getInputFileName(_contextFileIdx) << " before it was opened." << endl;
-			exit (1);
-		}
-	}
+
 
 #ifdef false
 	void deleteAllMergedItemsButKey(RecordKeyList &recList);

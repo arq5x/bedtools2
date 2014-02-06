@@ -24,17 +24,16 @@ FileMap::FileMap(ContextMap *context)
   _recordOutputMgr(NULL)
 {
   // FIX ME - block manager only works for intersect
-  //_blockMgr = new BlockMgr();
-  //_blockMgr->setContext(context);
+  _blockMgr = new BlockMgr(_context->getOverlapFraction(), _context->getReciprocal());
   _recordOutputMgr = new RecordOutputMgr();
+  _recordOutputMgr->init(_context);
 }
 
 FileMap::~FileMap(void) {
-  if (_blockMgr != NULL) {
-    delete _blockMgr;
-    _blockMgr = NULL;
-  }
-  delete _recordOutputMgr;
+	delete _blockMgr;
+	_blockMgr = NULL;
+	delete _recordOutputMgr;
+	_recordOutputMgr = NULL;
 }
 
 bool FileMap::mapFiles()
@@ -43,20 +42,18 @@ bool FileMap::mapFiles()
     if (!sweep.init()) {
       return false;
     }
-    if (!_recordOutputMgr->init(_context)) {
-      return false;
-    }
     RecordKeyList hitSet;
     while (sweep.next(hitSet)) {
-      //if (_context->getObeySplits()) {
-      //  RecordKeyList keySet(hitSet.getKey());
-      //  RecordKeyList resultSet(hitSet.getKey());
-      //  _blockMgr->findBlockedOverlaps(keySet, hitSet, resultSet);
-      //} else {
-      //}
-      //_recordOutputMgr->printKeyAndTerminate(hitSet);
-      SummarizeHits(hitSet);
-      _recordOutputMgr->printRecord(hitSet.getKey(), _output);
+    	if (_context->getObeySplits()) {
+			RecordKeyList keySet(hitSet.getKey());
+			RecordKeyList resultSet(hitSet.getKey());
+			_blockMgr->findBlockedOverlaps(keySet, hitSet, resultSet);
+			SummarizeHits(resultSet);
+			_recordOutputMgr->printRecord(resultSet.getKey(), _output);
+    	} else {
+			SummarizeHits(hitSet);
+			_recordOutputMgr->printRecord(hitSet.getKey(), _output);
+		}
     }
     return true;
 }
@@ -116,7 +113,7 @@ void FileMap::SummarizeHits(RecordKeyList &hits) {
     else if (operation == "distinct")
         _tmp_output << vo.GetDistinct();
     else {
-        cerr << "ERROR: " << operation << " is an unrecoginzed operation\n";
+        cerr << "ERROR: " << operation << " is an unrecognized operation\n";
         exit(1);
     }
     _output.append(_tmp_output.str());

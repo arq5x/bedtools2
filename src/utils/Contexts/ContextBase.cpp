@@ -12,6 +12,7 @@
 ContextBase::ContextBase()
 :
   _program(UNSPECIFIED_PROGRAM),
+  _allFilesOpened(false),
   _useMergedIntervals(false),
   _genomeFile(NULL),
   _outputFileType(FileRecordTypeChecker::UNKNOWN_FILE_TYPE),
@@ -69,9 +70,14 @@ ContextBase::ContextBase()
 
 ContextBase::~ContextBase()
 {
-	if (_genomeFile != NULL) {
-		delete _genomeFile;
-		_genomeFile = NULL;
+	delete _genomeFile;
+	_genomeFile = NULL;
+
+	//close all files and delete FRM objects.
+	for (int i=0; i < (int)_files.size(); i++) {
+		_files[i]->close();
+		delete _files[i];
+		_files[i] = NULL;
 	}
 }
 
@@ -89,8 +95,8 @@ bool ContextBase::determineOutputType() {
 
 	//Otherwise, if there are any BAM files in the input,
 	//then the output should be BAM.
-	for (_i = 0; _i < (int)_inputFiles.size(); _i++) {
-		if (_inputFiles[_i]._fileType == FileRecordTypeChecker::BAM_FILE_TYPE) {
+	for (_i = 0; _i < (int)_files.size(); _i++) {
+		if (_files[_i]->getFileType() == FileRecordTypeChecker::BAM_FILE_TYPE) {
 			setOutputFileType(FileRecordTypeChecker::BAM_FILE_TYPE);
 			_bamHeaderAndRefIdx = _i;
 			_outputTypeDetermined = true;
@@ -176,7 +182,16 @@ bool ContextBase::parseCmdArgs(int argc, char **argv, int skipFirstArgs) {
 
 bool ContextBase::isValidState()
 {
-	return cmdArgsValid();
+	if (!openFiles()) {
+		return false;
+	}
+	if (!cmdArgsValid()) {
+		return false;
+	}
+	if (!determineOutputType()) {
+		return false;
+	}
+	return true;
 }
 
 
@@ -194,12 +209,36 @@ bool ContextBase::cmdArgsValid()
 	return retval;
 }
 
+bool ContextBase::openFiles() {
+
+	//Make a vector of FileRecordMgr objects by going through the vector
+	//of filenames and opening each one.
+	if (_allFilesOpened) {
+		return true;
+	}
+	_files.resize(_fileNames.size());
+
+	for (int i = 0; i < (int)_fileNames.size(); i++) {
+		FileRecordMgr *frm = new FileRecordMgr(_fileNames[i], _sortedInput);
+		if (hasGenomeFile()) {
+			frm->setGenomeFile(_genomeFile);
+		}
+		frm->setFullBamFlags(_useFullBamTags);
+		if (!frm->open()) {
+			return false;
+		}
+		_files[i] = frm;
+	}
+	_allFilesOpened = true;
+	return true;
+}
+
 int ContextBase::getBamHeaderAndRefIdx() {
 	if (_bamHeaderAndRefIdx != -1) {
 		//already found which BAM file to use for the header
 		return _bamHeaderAndRefIdx;
 	}
-	if (_inputFiles[_queryFileIdx]._fileType == FileRecordTypeChecker::BAM_FILE_TYPE) {
+	if (_files[_queryFileIdx]->getFileType() == FileRecordTypeChecker::BAM_FILE_TYPE) {
 		_bamHeaderAndRefIdx = _queryFileIdx;
 	} else {
 		_bamHeaderAndRefIdx = _databaseFileIdx;

@@ -37,18 +37,9 @@ bool NewChromSweep::init() {
 	//Open them, and get the first record from each.
 	//if any of that goes wrong, return false;
 	//otherwise, return true.
-    _queryFRM = new FileRecordMgr(_context->getQueryFileIdx(), _context);
-    _databaseFRM = new FileRecordMgr(_context->getDatabaseFileIdx(), _context);
+    _queryFRM = _context->getFile(_context->getQueryFileIdx());
+    _databaseFRM = _context->getFile(_context->getDatabaseFileIdx());
     
-    if (!_queryFRM->open()) {
-    	return false;
-    }
-    if (!_databaseFRM->open()) {
-    	return false;
-    }
-
-    _context->determineOutputType();
-
     nextRecord(false);
     if (_currDatabaseRec == NULL) {
     	return false;
@@ -85,10 +76,6 @@ NewChromSweep::~NewChromSweep(void) {
 	}
 	_queryFRM->close();
 	_databaseFRM->close();
-
-	delete _queryFRM;
-	delete _databaseFRM;
-
 }
 
 

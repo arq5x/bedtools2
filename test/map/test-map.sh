@@ -661,3 +661,24 @@ $BT map -a ivls.bed -b values5.bed -c 0 -o collapse 2> obs
 check obs exp
 
 rm obs exp
+
+
+###########################################################
+#  Test that Bam database is not allowed
+############################################################
+echo "    map.t44...\c"
+echo -e "\n*****\n***** ERROR: BAM database file not currently supported for the map tool." > exp
+$BT map -a ivls.bed -b values.bam 2> obs
+check obs exp
+rm obs exp
+
+
+
+###########################################################
+#  Test that Bam database is not allowed
+############################################################
+echo "    map.t45...\c"
+echo "chr1	0	50	three_blocks_match	15	+	0	0	0	3	10,10,10,	0,20,40,	." > exp
+$BT map -o sum -a three_blocks_match.bed -b three_blocks_nomatch.bed -split > obs
+check obs exp
+rm obs exp
