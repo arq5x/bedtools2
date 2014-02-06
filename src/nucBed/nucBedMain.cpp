@@ -92,7 +92,7 @@ int nuc_main(int argc, char* argv[]) {
                 i++;
             }
 	}
-        else if(PARAMETER_CHECK("-useFullHeader", 11, parameterLength)) {
+        else if(PARAMETER_CHECK("-fullHeader", 11, parameterLength)) {
             useFullHeader = true;
         }
         else {
