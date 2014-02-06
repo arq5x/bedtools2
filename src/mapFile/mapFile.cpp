@@ -23,7 +23,6 @@ FileMap::FileMap(ContextMap *context)
   _blockMgr(NULL),
   _recordOutputMgr(NULL)
 {
-  // FIX ME - block manager only works for intersect
   _blockMgr = new BlockMgr(_context->getOverlapFraction(), _context->getReciprocal());
   _recordOutputMgr = new RecordOutputMgr();
   _recordOutputMgr->init(_context);
