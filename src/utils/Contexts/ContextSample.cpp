@@ -43,10 +43,10 @@ bool ContextSample::parseCmdArgs(int argc, char **argv, int skipFirstArgs) {
 
 bool ContextSample::isValidState()
 {
-	if (!cmdArgsValid()) {
+	if (!ContextBase::isValidState()) {
 		return false;
 	}
-	if (_inputFiles.size() != 1) {
+	if (_files.size() != 1) {
 		_errorMsg = "\n***** ERROR: input file not specified. *****";
 		// Allow one and only input file for now
 		return false;

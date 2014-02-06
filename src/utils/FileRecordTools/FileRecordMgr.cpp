@@ -1,50 +1,47 @@
 
 #include "FileRecordMgr.h"
-#include "ContextIntersect.h"
 #include "FreeList.h"
 #include "Record.h"
+#include "NewGenomeFile.h"
 
-FileRecordMgr::FileRecordMgr(int fileIdx, ContextBase *context)
+FileRecordMgr::FileRecordMgr(const QuickString &filename, bool isSorted)
 :
+  _filename(filename),
   _bufStreamMgr(NULL),
-  _contextFileIdx(fileIdx),
-  _context(context),
   _fileReader(NULL),
   _fileType(FileRecordTypeChecker::UNKNOWN_FILE_TYPE),
   _recordType(FileRecordTypeChecker::UNKNOWN_RECORD_TYPE),
   _recordMgr(NULL),
+  _isSortedInput(isSorted),
   _freeListBlockSize(512),
   _useFullBamTags(false),
-  _headerSet(false),
   _prevStart(INT_MAX),
   _prevChromId(-1),
   _mustBeForward(false),
   _mustBeReverse(false),
   _totalRecordLength(0),
-  _totalMergedRecordLength(0)
+  _totalMergedRecordLength(0),
+  _blockMgr(NULL),
+  _bamReader(NULL),
+  _hasGenomeFile(false),
+  _genomeFile(NULL)
 {
 }
 
 FileRecordMgr::~FileRecordMgr(){
 
-	if (_bufStreamMgr != NULL) {
-		delete _bufStreamMgr;
-		_bufStreamMgr = NULL;
-	}
-	if (_fileReader != NULL) {
-		close(); //just make sure file was closed.
-		delete _fileReader;
-		_fileReader = NULL;
-	}
-	if (_recordMgr != NULL) {
-		delete _recordMgr;
-		_recordMgr = NULL;
-	}
+	delete _bufStreamMgr;
+	_bufStreamMgr = NULL;
+
+	close(); //just make sure file was closed.
+	delete _fileReader;
+	_fileReader = NULL;
+
+	delete _recordMgr;
+	_recordMgr = NULL;
 }
 
 bool FileRecordMgr::open(){
-
-	_filename = _context->getInputFileName(_contextFileIdx);
 	_bufStreamMgr = new BufferedStreamMgr(_filename);
 	if (!_bufStreamMgr->init()) {
 		cerr << "Error: unable to open file or unable to determine types for file " << _filename << endl;
@@ -72,31 +69,14 @@ bool FileRecordMgr::open(){
 		_bufStreamMgr = NULL;
 		exit(1);
 	}
-	_context->setInputFileType(_contextFileIdx, _fileType);
-	_context->setInputRecordType(_contextFileIdx, _recordType);
 
-	//if this is a database file, and the numFields is greater than the numFields in other DB files, update.
-	// TBD: This is one of many things that will need to be changed to support multiple database files in future versions.
-	int numFields = _bufStreamMgr->getTypeChecker().getNumFields();
-	if (_context->hasIntersectMethods()) {
-		if (_contextFileIdx == (static_cast<ContextIntersect *>(_context))->getDatabaseFileIdx() && numFields >
-		(static_cast<ContextIntersect *>(_context))->getMaxNumDatabaseFields()) {
-			(static_cast<ContextIntersect *>(_context))->setMaxNumDatabaseFields(numFields);
-		}
-	}
-	if (_fileType == FileRecordTypeChecker::BAM_FILE_TYPE) {
-		_context->setHeader(_contextFileIdx, _fileReader->getHeader());
-		_context->setReferences(_contextFileIdx, static_cast<BamFileReader *>(_fileReader)->getReferences());
-		_headerSet = true;
-	}
 	return true;
 }
 
 void FileRecordMgr::close(){
-	if (_bufStreamMgr != NULL) {
-		delete _bufStreamMgr;
-		_bufStreamMgr = NULL;
-	}
+	delete _bufStreamMgr;
+	_bufStreamMgr = NULL;
+
 	if (_fileReader != NULL) {
 		_fileReader->close();
 		delete _fileReader;
@@ -106,7 +86,6 @@ void FileRecordMgr::close(){
 
 bool FileRecordMgr::eof(){
 	return _fileReader->eof();
-//	return _storedRecords.empty() && _fileReader->eof() ? true:  false;
 }
 
 Record *FileRecordMgr::allocateAndGetNextRecord()
@@ -117,10 +96,6 @@ Record *FileRecordMgr::allocateAndGetNextRecord()
 	if (!_fileReader->readEntry()) {
 		return NULL;
 	}
-	if (!_headerSet && _fileReader->hasHeader()) {
-		_context->setHeader(_contextFileIdx, _fileReader->getHeader());
-		_headerSet = true;
-	}
 	Record *record = NULL;
 	record = _recordMgr->allocateRecord();
 	if (!record->initFromFile(_fileReader)) {
@@ -128,17 +103,18 @@ Record *FileRecordMgr::allocateAndGetNextRecord()
 		return NULL;
 	}
 
-	// In the rare case of Bam records where both the read and it's mate failed to map,
-	// Ignore the record. Delete and return null.
+	// If the record is unmapped, don't test for valid coords or sort order,
+	// but still return it so the -v (noHit) option and the like will still
+	// see it.
 
-	if (!(record->isUnmapped() )) {
+	if (!record->isUnmapped()) {
 		if (!record->coordsValid()) {
 			cerr << "Error: Invalid record in file " << _filename << ". Record is " << endl << *record << endl;
 			exit(1);
 		}
 
 		//test for sorted order, if necessary.
-		if (_context->getSortedInput()) {
+		if (_isSortedInput) {
 			testInputSortOrder(record);
 		}
 	}
@@ -149,8 +125,8 @@ Record *FileRecordMgr::allocateAndGetNextRecord()
 
 void FileRecordMgr::assignChromId(Record *record) {
 	const QuickString &currChrom = record->getChrName();
-	if (currChrom != _prevChrom  && _context->hasGenomeFile()) {
-		_prevChromId = _context->getGenomeFile()->getChromId(currChrom);
+	if (currChrom != _prevChrom  && _hasGenomeFile) {
+		_prevChromId = _genomeFile->getChromId(currChrom);
 		record->setChromId(_prevChromId);
 	} else {
 		record->setChromId(_prevChromId);
@@ -185,8 +161,8 @@ void FileRecordMgr::testInputSortOrder(Record *record)
 		} else {
 			//new chrom has not been seen before.
 			//TBD: test genome file for ChromId.
-			if (_context->hasGenomeFile()) {
-				int currChromId = _context->getGenomeFile()->getChromId(currChrom);
+			if (_hasGenomeFile) {
+				int currChromId = _genomeFile->getChromId(currChrom);
 				if (currChromId < _prevChromId) {
 					sortError(record, true);
 				} else {
@@ -209,7 +185,7 @@ void FileRecordMgr::sortError(const Record *record, bool genomeFileError)
 {
 	if (genomeFileError) {
 		cerr << "Error: Sorted input specified, but the file " << _filename << " has the following record with a different sort order than the genomeFile " <<
-				_context->getGenomeFile()->getGenomeFileName() << endl;
+				_genomeFile->getGenomeFileName() << endl;
 	} else {
 		cerr << "Error: Sorted input specified, but the file " << _filename << " has the following out of order record" << endl;
 	}
@@ -232,7 +208,7 @@ void FileRecordMgr::allocateFileReader()
 
 	case FileRecordTypeChecker::BAM_FILE_TYPE:
 		_fileReader = new BamFileReader();
-		(static_cast<BamFileReader *>(_fileReader))->setUseTags(_context->getUseFullBamTags());
+		(static_cast<BamFileReader *>(_fileReader))->setUseTags(_useFullBamTags);
 		(static_cast<BamFileReader *>(_fileReader))->setBamReader(_bufStreamMgr->getBamReader());
 		break;
 	default:
@@ -240,6 +216,14 @@ void FileRecordMgr::allocateFileReader()
 	}
 }
 
+const BamTools::RefVector & FileRecordMgr::getBamReferences() {
+	// exta safety check to insure user checked the file type first.
+	if (_fileType != FileRecordTypeChecker::BAM_FILE_TYPE) {
+		cerr << "Error: Attempted to get BAM references from file " << _filename << ", which is NOT a BAM file." << endl;
+		exit(1);
+	}
+	return static_cast<BamFileReader *>(_fileReader)->getReferences();
+}
 
 #ifdef false
 

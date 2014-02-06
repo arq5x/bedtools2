@@ -88,7 +88,7 @@ bool ContextIntersect::parseCmdArgs(int argc, char **argv, int skipFirstArgs) {
 
 bool ContextIntersect::isValidState()
 {
-	if (!cmdArgsValid()) {
+	if (!ContextBase::isValidState()) {
 		return false;
 	}
 
@@ -149,7 +149,7 @@ bool ContextIntersect::isValidState()
 	if (getAnyHit() || getNoHit() || getWriteCount()) {
 		setPrintable(false);
 	}
-	if (_inputFiles.size() < 2 ) {
+	if (_files.size() != 2 ) {
 		return false;
 	}
 	return true;
@@ -159,6 +159,15 @@ bool ContextIntersect::determineOutputType() {
 	if (_outputTypeDetermined) {
 		return true;
 	}
+
+	//determine the maximum number of database fields.
+	for (int i=0; i < (int)_files.size(); i++) {
+		int numFields = _files[i]->getNumFields();
+		if ( numFields > _maxNumDatabaseFields) {
+			_maxNumDatabaseFields = numFields;
+		}
+	}
+
 	//If the query is BAM, and bed output wasn't specified, then the output is BAM.
 	if (getQueryFileType() == FileRecordTypeChecker::BAM_FILE_TYPE && !getExplicitBedOutput()) {
 		setOutputFileType(FileRecordTypeChecker::BAM_FILE_TYPE);
@@ -196,7 +205,6 @@ bool ContextIntersect::handle_abam()
 	markUsed(_i - _skipFirstArgs);
 	_i++;
 	markUsed(_i - _skipFirstArgs);
-	setInputFileType(_queryFileIdx, FileRecordTypeChecker::BAM_FILE_TYPE);
 	return true;
 }
 

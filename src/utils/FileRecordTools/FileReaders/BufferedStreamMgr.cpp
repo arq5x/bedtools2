@@ -26,13 +26,11 @@ BufferedStreamMgr::BufferedStreamMgr(const QuickString &filename)
 BufferedStreamMgr::~BufferedStreamMgr()
 {
 
-	if (_mainBuf != NULL) {
-		delete [] _mainBuf;
-	}
-	if (_inputStreamMgr != NULL) {
-		delete _inputStreamMgr;
-		_inputStreamMgr = NULL;
-	}
+	delete [] _mainBuf;
+	_mainBuf = NULL;
+
+	delete _inputStreamMgr;
+	_inputStreamMgr = NULL;
 }
 
 bool BufferedStreamMgr::init()

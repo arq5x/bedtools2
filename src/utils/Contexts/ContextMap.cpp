@@ -60,11 +60,9 @@ bool ContextMap::parseCmdArgs(int argc, char **argv, int skipFirstArgs) {
 
 bool ContextMap::isValidState()
 {
-	if (!cmdArgsValid()) {
+	if (!ContextIntersect::isValidState()) {
 		return false;
 	}
-
-	ContextIntersect::isValidState();
 
     if (getDatabaseFileType() == FileRecordTypeChecker::BAM_FILE_TYPE) {
          //throw Error
@@ -76,8 +74,7 @@ bool ContextMap::isValidState()
     }
 	// TODO 
 	// enforce any specific checks for Map.
-
-	return ContextIntersect::isValidState();
+    return true;
 }
 
 

@@ -215,6 +215,8 @@ void map_help(void) {
     cerr                         << "\t\tthat overlap A on the _opposite_ strand." << endl;
     cerr                         << "\t\t- By default, overlaps are reported without respect to strand." << endl << endl;
 
+    cerr << "\t-split\t"        << "Treat \"split\" BAM or BED12 entries as distinct BED intervals." << endl << endl;
+
     cerr << "\t-g\t"             << "Provide a genome file to enforce consistent chromosome sort order" << endl;
     cerr                         <<"\t\tacross input files." << endl << endl;
 

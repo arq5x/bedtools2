@@ -7,17 +7,18 @@
 
 #include "BlockMgr.h"
 #include "RecordMgr.h"
-#include "ContextIntersect.h"
 #include "Bed12Interval.h"
 #include "BamRecord.h"
 #include "ParseTools.h"
 #include "api/BamAlignment.h"
 #include "api/BamAux.h"
 
-BlockMgr::BlockMgr()
+BlockMgr::BlockMgr(float overlapFraction, bool hasReciprocal)
 : 	_blockRecordsMgr(NULL),
   	_breakOnDeletionOps(false),
-  	_breakOnSkipOps(true)
+  	_breakOnSkipOps(true),
+  	_overlapFraction(overlapFraction),
+  	_hasReciprocal(hasReciprocal)
 {
 	_blockRecordsMgr = new RecordMgr(_blockRecordsType);
 }
@@ -194,11 +195,11 @@ int BlockMgr::findBlockedOverlaps(RecordKeyList &keyList, RecordKeyList &hitList
 		}
 		_overlapBases.push_back(totalHitOverlap);
 		if (hitHasOverlap) {
-			if ((float) totalHitOverlap / (float)keyBlocksSumLength > _context->getOverlapFraction()) {
-				if (_context->getReciprocal() &&
-						((float)totalHitOverlap / (float)hitBlockSumLength > _context->getOverlapFraction())) {
+			if ((float) totalHitOverlap / (float)keyBlocksSumLength > _overlapFraction) {
+				if (_hasReciprocal &&
+						((float)totalHitOverlap / (float)hitBlockSumLength > _overlapFraction)) {
 					resultList.push_back(hitListIter->value());
-				} else if (!_context->getReciprocal()) {
+				} else if (!_hasReciprocal) {
 					resultList.push_back(hitListIter->value());
 				}
 			}

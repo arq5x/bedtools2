@@ -9,8 +9,7 @@ INCLUDES = -I$(UTILITIES_DIR)/fileType/ \
            -I$(UTILITIES_DIR)/FileRecordTools/Records/ \
            -I$(UTILITIES_DIR)/GenomeFile/ \
            -I$(UTILITIES_DIR)/general/ \
-           -I$(UTILITIES_DIR)/Contexts/ \
-			-I$(UTILITIES_DIR)/BamTools/include \
+ 			-I$(UTILITIES_DIR)/BamTools/include \
 			-I$(UTILITIES_DIR)/BamTools/src/ \
            -I$(UTILITIES_DIR)/version/
 			
@@ -22,7 +21,7 @@ SUBDIRS = ./FileReaders \
 # ----------------------------------
 # define our source and object files
 # ----------------------------------
-SOURCES= FileRecordMgr.cpp FileRecordMgr.h RecordOutputMgr.cpp RecordOutputMgr.h
+SOURCES= FileRecordMgr.cpp FileRecordMgr.h
 OBJECTS= FileRecordMgr.o RecordOutputMgr.o
 _EXT_OBJECTS=SingleLineDelimTextFileReader.o BamFileReader.o Bed3Interval.o Bed6Interval.o BedPlusInterval.o Bed12Interval.o BamRecord.o \
 	SingleLineDelimTransferBuffer.o FileRecordTypeChecker.o QuickString.o ParseTools.o RecordKeyList.o BufferedStreamMgr.o
@@ -32,8 +31,6 @@ BUILT_OBJECTS= $(patsubst %,$(OBJ_DIR)/%,$(OBJECTS))
 $(BUILT_OBJECTS): $(SOURCES) $(SUBDIRS)
 	@echo "  * compiling FileRecordMgr.cpp"
 	@$(CXX) -c -o $(OBJ_DIR)/FileRecordMgr.o FileRecordMgr.cpp $(LDFLAGS) $(CXXFLAGS) $(INCLUDES)
-	@echo "  * compiling RecordOutputMgr.cpp"
-	@$(CXX) -c -o $(OBJ_DIR)/RecordOutputMgr.o RecordOutputMgr.cpp $(LDFLAGS) $(CXXFLAGS) $(INCLUDES)
 	
 	
 
@@ -49,7 +46,6 @@ clean:
 	@rm -f $(OBJ_DIR)/FileRecordTypeChecker.o
 	@rm -f $(OBJ_DIR)/SingleLineDelimTextFileReader.o
 	@rm -f $(OBJ_DIR)/SingleLineDelimTransferBuffer.o
-	@rm -f $(OBJ_DIR)/RecordOutputMgr.o
 	
 
 .PHONY: clean

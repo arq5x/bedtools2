@@ -25,12 +25,12 @@ public:
 	void setQueryFileIdx(int idx) { _queryFileIdx = idx; }
 	int getDatabaseFileIdx() const { return _databaseFileIdx; }
 	void setDatabaseFileIdx(int idx) { _databaseFileIdx = idx; }
-	const QuickString &getQueryFileName() const { return _inputFiles[_queryFileIdx]._fileName; }
-	const QuickString &getDatabaseFileName() const { return _inputFiles[_databaseFileIdx]._fileName; }
-	ContextFileType getQueryFileType() const { return _inputFiles[_queryFileIdx]._fileType; }
-	ContextFileType getDatabaseFileType() const { return _inputFiles[_databaseFileIdx]._fileType; }
-	ContextRecordType getQueryRecordType() const { return _inputFiles[_queryFileIdx]._recordType; }
-	ContextRecordType getDatabaseRecordType() const { return _inputFiles[_databaseFileIdx]._recordType; }
+	const QuickString &getQueryFileName() const { return _files[_queryFileIdx]->getFileName(); }
+	const QuickString &getDatabaseFileName() const { return _files[_databaseFileIdx]->getFileName(); }
+	ContextFileType getQueryFileType() const { return _files[_queryFileIdx]->getFileType(); }
+	ContextFileType getDatabaseFileType() const { return _files[_databaseFileIdx]->getFileType(); }
+	ContextRecordType getQueryRecordType() const { return _files[_queryFileIdx]->getRecordType(); }
+	ContextRecordType getDatabaseRecordType() const { return _files[_databaseFileIdx]->getRecordType(); }
 	int getMaxNumDatabaseFields() const { return _maxNumDatabaseFields; }
 	void setMaxNumDatabaseFields(int val) { _maxNumDatabaseFields = val; }
 

@@ -50,14 +50,15 @@ RecordOutputMgr::~RecordOutputMgr()
 
 }
 
-bool RecordOutputMgr::init(ContextBase *context) {
+void RecordOutputMgr::init(ContextBase *context) {
 	_context = context;
 	if (_context->getOutputFileType() == FileRecordTypeChecker::BAM_FILE_TYPE) {
 		//set-up BAM writer.
 		_bamWriter = new BamTools::BamWriter();
 		_bamWriter->SetCompressionMode(_context->getUncompressedBam() ?  BamTools::BamWriter::Uncompressed : BamTools::BamWriter::Compressed);
 
-		_bamWriter->Open("stdout", _context->getHeader(_context->getBamHeaderAndRefIdx()).c_str(), _context->getReferences(_context->getBamHeaderAndRefIdx()));
+		int bamFileIdx = _context->getBamHeaderAndRefIdx();
+		_bamWriter->Open("stdout", _context->getFile(bamFileIdx)->getHeader().c_str(), _context->getFile(bamFileIdx)->getBamReferences());
 	} else {
 		//for everything but BAM, we'll copy output to an output buffer before printing.
 		_outBuf.reserve(MAX_OUTBUF_SIZE);
@@ -68,13 +69,7 @@ bool RecordOutputMgr::init(ContextBase *context) {
 			_printable = false;
 		}
 	}
-	return true;
 }
-
-//void RecordOutputMgr::printHeader(const string &header)
-//{
-//	_outBuf.append(header);
-//}
 
 bool RecordOutputMgr::printKeyAndTerminate(RecordKeyList &keyList) {
 	printBamType bamCode = printBamRecord(keyList);
@@ -215,15 +210,13 @@ void RecordOutputMgr::printRecord(RecordKeyList &keyList, RecordKeyList *blockLi
 }
 
 void RecordOutputMgr::checkForHeader() {
-	if (_context->getProgram() == ContextBase::INTERSECT ||
-		_context->getProgram() == ContextBase::MAP) {
-		if (_context->getPrintHeader()) {
-			_outBuf.append(_context->getHeader((static_cast<ContextIntersect *>(_context))->getQueryFileIdx()));
-		}
-	} else if (_context->getProgram() == ContextBase::SAMPLE) {
-		if (_context->getPrintHeader()) {
-			_outBuf.append(_context->getHeader(_context->getInputFileIdx()));
-		}
+	//if the program is based on intersection, we want the header from the query file.
+	if (_context->hasIntersectMethods()) {
+		int queryIdx = (static_cast<ContextIntersect *>(_context))->getQueryFileIdx();
+		const QuickString &header  = _context->getFile(queryIdx)->getHeader();
+		_outBuf.append(header);
+	} else {
+		_outBuf.append(_context->getFile(0)->getHeader());
 	}
 	_context->setPrintHeader(false);
 	if (needsFlush()) flush();
@@ -358,14 +351,14 @@ void RecordOutputMgr::reportOverlapSummary(RecordKeyList &keyList)
 void RecordOutputMgr::null(bool queryType, bool dbType)
 {
 	FileRecordTypeChecker::RECORD_TYPE recordType = FileRecordTypeChecker::UNKNOWN_RECORD_TYPE;
-	if (_context->getProgram() == ContextBase::INTERSECT) {
+	if (_context->hasIntersectMethods()) {
 		if (queryType) {
 			recordType = (static_cast<ContextIntersect *>(_context))->getQueryRecordType();
 		} else if (dbType) {
 			recordType = (static_cast<ContextIntersect *>(_context))->getDatabaseRecordType();
 		}
-	} else if (_context->getProgram() == ContextBase::SAMPLE) {
-		recordType = _context->getInputRecordType();
+	} else  {
+		recordType = _context->getFile(0)->getRecordType();
 	}
 	//This is kind of a hack. Need an instance of the correct class of record in order to call it's printNull method.
 	Record *dummyRecord = NULL;

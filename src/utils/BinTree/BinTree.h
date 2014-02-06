@@ -24,15 +24,15 @@ class Record;
 
 class BinTree {
 public:
-	BinTree(int databaseFileIdx, ContextIntersect *context);
+	BinTree(ContextIntersect *context);
 
 	~BinTree();
-	bool loadDB();
+	void loadDB();
 	void getHits(Record *record, RecordKeyList &hitSet);
 
 private:
 
-	int _databaseFileIdx;
+	FileRecordMgr *_databaseFile;
 	ContextIntersect *_context;
 
     //
@@ -59,8 +59,6 @@ private:
 	typedef QuickString mainKeyType;
 	typedef map<mainKeyType, allBinsType> mainMapType;
 	mainMapType _mainMap;
-
-	FileRecordMgr *_dbFileMgr;
 
 	bool _showBinMetrics;
 	uint32_t _maxBinNumFound;

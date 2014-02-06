@@ -2,11 +2,10 @@
 #include "FileRecordMgr.h"
 
 
-BinTree::BinTree(int databaseFileIdx, ContextIntersect *context)
-: _databaseFileIdx(databaseFileIdx),
+BinTree::BinTree(ContextIntersect *context)
+: _databaseFile(NULL),
   _context(context),
   _binOffsetsExtended(NULL),
-  _dbFileMgr(NULL),
   _showBinMetrics(false),
   _maxBinNumFound(0)
  {
@@ -37,7 +36,7 @@ BinTree::~BinTree() {
 				}
 				for (innerListIterType listIter = bin->begin(); listIter != bin->end(); listIter = bin->next()) {
 					const Record *record = listIter->value();
-					_dbFileMgr->deleteRecord(record);
+					_databaseFile->deleteRecord(record);
 				}
 				delete bin;
 				bin = NULL;
@@ -45,10 +44,6 @@ BinTree::~BinTree() {
 		}
 		delete [] bins;
 		bins = NULL;
-	}
-	if (_dbFileMgr != NULL) {
-		delete _dbFileMgr;
-		_dbFileMgr = NULL;
 	}
 	delete [] _binOffsetsExtended;
 
@@ -73,18 +68,13 @@ BinTree::~BinTree() {
 	}
 }
 
-bool BinTree::loadDB()
+void BinTree::loadDB()
 {
-	_dbFileMgr = new FileRecordMgr(_databaseFileIdx, _context);
-	if (!_dbFileMgr->open()) {
-		fprintf(stderr, "ERROR: Can't open database file %s to build tree.\n", _context->getInputFileName(_databaseFileIdx).c_str());
-		delete _dbFileMgr;
-		_dbFileMgr = NULL;
-		return false;
-	}
+	_databaseFile = _context->getFile(_context->getDatabaseFileIdx());
+
 	Record *record = NULL;
-	while (!_dbFileMgr->eof()) {
-		record = _dbFileMgr->allocateAndGetNextRecord();
+	while (!_databaseFile->eof()) {
+		record = _databaseFile->allocateAndGetNextRecord();
 		//In addition to NULL records, we also don't want to add unmapped reads.
 		if (record == NULL || record->isUnmapped()) {
 			continue;
@@ -92,19 +82,17 @@ bool BinTree::loadDB()
 
 		if (!addRecordToTree(record)) {
 			fprintf(stderr, "ERROR: Unable to add record to tree.\n");
-			_dbFileMgr->close();
-			return false;
+			_databaseFile->close();
+			exit(1);
 		}
 	}
-	_dbFileMgr->close();
+	_databaseFile->close();
 
 	//TBD: give ERROR and return false if tree is empty.
 	if (_mainMap.empty()) {
 		fprintf(stderr, "ERROR: Tree is empty, no records added.\n");
-		return false;
+		exit(1);
 	}
-	return true;
-
 }
 
 void BinTree::getHits(Record *record, RecordKeyList &hitSet)

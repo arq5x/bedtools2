@@ -35,11 +35,7 @@ SampleFile::~SampleFile() {
 bool SampleFile::takeSample()
 {
 	//we're only operating on one file, so the idx is zero.
-	_inputFile = new FileRecordMgr(0, _context);
-	if (!_inputFile->open()) {
-		return false; // FRM will give the error and die anyway,
-		//no error message needed here.
-	}
+	_inputFile =  _context->getFile(0);
 	_samples.resize(_numSamples, NULL);
 
 
@@ -50,7 +46,6 @@ bool SampleFile::takeSample()
 		_context->getUnspecifiedSeed();
 	}
 
-	_context->determineOutputType();
 	_outputMgr = new RecordOutputMgr();
 	_outputMgr->init(_context);
 
@@ -82,10 +77,6 @@ bool SampleFile::takeSample()
 	}
 	delete _outputMgr;
 	_inputFile->close();
-
-	//clean up.
-	delete _inputFile;
-
 	return true;
 }
 

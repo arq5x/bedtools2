@@ -86,7 +86,8 @@ UTIL_SUBDIRS =	$(SRC_DIR)/utils/bedFile \
 				$(SRC_DIR)/utils/BlockedIntervals \
 				$(SRC_DIR)/utils/Fasta \
 				$(SRC_DIR)/utils/VectorOps \
-				$(SRC_DIR)/utils/GenomeFile
+				$(SRC_DIR)/utils/GenomeFile \
+				$(SRC_DIR)/utils/RecordOutputMgr
 
 BUILT_OBJECTS = $(OBJ_DIR)/*.o
 
