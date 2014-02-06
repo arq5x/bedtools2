@@ -58,7 +58,6 @@ protected:
 	QuickString _bamHeader;
 	BamTools::RefVector _references;
 	bool _useTags;
-	bool _shouldDeleteBamReader;
 
 	static const int MINIMUM_PRINTABLE_BAM_FIELDS = 6;
 	void extractNameFromCore();

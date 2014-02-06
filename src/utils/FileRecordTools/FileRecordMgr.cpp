@@ -30,19 +30,15 @@ FileRecordMgr::FileRecordMgr(const QuickString &filename, bool isSorted)
 
 FileRecordMgr::~FileRecordMgr(){
 
-	if (_bufStreamMgr != NULL) {
-		delete _bufStreamMgr;
-		_bufStreamMgr = NULL;
-	}
-	if (_fileReader != NULL) {
-		close(); //just make sure file was closed.
-		delete _fileReader;
-		_fileReader = NULL;
-	}
-	if (_recordMgr != NULL) {
-		delete _recordMgr;
-		_recordMgr = NULL;
-	}
+	delete _bufStreamMgr;
+	_bufStreamMgr = NULL;
+
+	close(); //just make sure file was closed.
+	delete _fileReader;
+	_fileReader = NULL;
+
+	delete _recordMgr;
+	_recordMgr = NULL;
 }
 
 bool FileRecordMgr::open(){
@@ -78,10 +74,9 @@ bool FileRecordMgr::open(){
 }
 
 void FileRecordMgr::close(){
-	if (_bufStreamMgr != NULL) {
-		delete _bufStreamMgr;
-		_bufStreamMgr = NULL;
-	}
+	delete _bufStreamMgr;
+	_bufStreamMgr = NULL;
+
 	if (_fileReader != NULL) {
 		_fileReader->close();
 		delete _fileReader;
@@ -91,7 +86,6 @@ void FileRecordMgr::close(){
 
 bool FileRecordMgr::eof(){
 	return _fileReader->eof();
-//	return _storedRecords.empty() && _fileReader->eof() ? true:  false;
 }
 
 Record *FileRecordMgr::allocateAndGetNextRecord()
@@ -109,8 +103,9 @@ Record *FileRecordMgr::allocateAndGetNextRecord()
 		return NULL;
 	}
 
-	// In the rare case of Bam records where both the read and it's mate failed to map,
-	// Ignore the record. Delete and return null.
+	// If the record is unmapped, don't test for valid coords or sort order,
+	// but still return it so the -v (noHit) option and the like will still
+	// see it.
 
 	if (!record->isUnmapped()) {
 		if (!record->coordsValid()) {

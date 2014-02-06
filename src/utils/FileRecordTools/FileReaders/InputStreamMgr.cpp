@@ -35,38 +35,29 @@ InputStreamMgr::InputStreamMgr(const QuickString &filename, bool buildScanBuffer
 
 
 InputStreamMgr::~InputStreamMgr() {
-	if (_pushBackStreamBuf != NULL) {
-		delete _pushBackStreamBuf;
-		_pushBackStreamBuf = NULL;
-	}
-	if (_inputFileStream != NULL) {
-		delete _inputFileStream;
-		_inputFileStream = NULL;
-	}
-	if (_oldInputStream != NULL) {
-		delete _oldInputStream;
-		_oldInputStream = NULL;
-	}
-	if (_infStreamBuf != NULL) {
-		delete _infStreamBuf;
-		_infStreamBuf = NULL;
-	}
-	if (_bamReader != NULL) {
-		delete _bamReader;
-		_bgStream = NULL;
-	}
-	if (_bgStream != NULL) {
-		delete _bgStream;
-		_bgStream = NULL;
-	}
-	if (_finalInputStream != NULL) {
-		delete _finalInputStream;
-		_finalInputStream = NULL;
-	}
-	if (_tmpZipBuf != NULL) {
-		delete [] _tmpZipBuf;
-		_tmpZipBuf = NULL;
-	}
+	delete _pushBackStreamBuf;
+	_pushBackStreamBuf = NULL;
+
+	delete _inputFileStream;
+	_inputFileStream = NULL;
+
+	delete _oldInputStream;
+	_oldInputStream = NULL;
+
+	delete _infStreamBuf;
+	_infStreamBuf = NULL;
+
+	delete _bamReader;
+	_bgStream = NULL;
+
+	delete _bgStream;
+	_bgStream = NULL;
+
+	delete _finalInputStream;
+	_finalInputStream = NULL;
+
+	delete [] _tmpZipBuf;
+	_tmpZipBuf = NULL;
 }
 
 bool InputStreamMgr::init()
@@ -98,7 +89,6 @@ bool InputStreamMgr::init()
 	//now we have a PushBackStreamBuf. Make a new stream.
 	_finalInputStream = new istream(_pushBackStreamBuf);
 	populateScanBuffer();
-//	resetStream();
 	return true;
 }
 
@@ -240,9 +230,7 @@ bool InputStreamMgr::detectBamOrBgzip(int &numChars, int currChar)
 			_bamRuledOut = true;
 			_numBytesInBuffer = 0;
 			_infStreamBuf = new InflateStreamBuf(_finalInputStream);
-			if (_oldInputStream != NULL) {
-				delete _oldInputStream;
-			}
+			delete _oldInputStream;
 			_oldInputStream = _finalInputStream;
 			_finalInputStream = new istream(_infStreamBuf);
 			return false;
@@ -250,23 +238,6 @@ bool InputStreamMgr::detectBamOrBgzip(int &numChars, int currChar)
 	}
 	return false;
 }
-
-//void InputStreamMgr::decompressBuffer()
-//{
-//	//allocate an array to hold uncompressed data.
-//	_saveDataStr.clear();
-//	uInt maxDecompressSize = 20 * _numBytesInBuffer;
-//	unsigned char *newScanBuffer = new unsigned char[maxDecompressSize];
-//	memset(newScanBuffer, 0, maxDecompressSize);
-//
-//	unsigned int numDecompressChars = inflateGzippedArray(_scanBuffer, newScanBuffer, maxDecompressSize, _numBytesInBuffer);
-//
-//	// newScanBuffer should now contain uncompressed data.
-//	//delete old buffer, point it at new buffer.
-//	_saveDataStr.append((char *)newScanBuffer, numDecompressChars);
-//
-//	delete [] newScanBuffer;
-//}
 
 void InputStreamMgr::readZipChunk()
 {

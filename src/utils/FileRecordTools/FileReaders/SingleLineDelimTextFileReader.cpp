@@ -16,6 +16,7 @@ SingleLineDelimTextFileReader::SingleLineDelimTextFileReader(int numFields, char
 SingleLineDelimTextFileReader::~SingleLineDelimTextFileReader()
 {
 	delete [] _delimPositions;
+	_delimPositions = NULL;
 }
 
 bool SingleLineDelimTextFileReader::readEntry()

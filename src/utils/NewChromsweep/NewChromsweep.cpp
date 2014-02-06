@@ -68,12 +68,12 @@ NewChromSweep::~NewChromSweep(void) {
 	if (!_wasInitialized) {
 		return;
 	}
-	if (_currQueryRec != NULL) {
-		_queryFRM->deleteRecord(_currQueryRec);
-	}
-	if (_currDatabaseRec != NULL) {
-		_databaseFRM->deleteRecord(_currDatabaseRec);
-	}
+	_queryFRM->deleteRecord(_currQueryRec);
+	_currQueryRec = NULL;
+
+	_databaseFRM->deleteRecord(_currDatabaseRec);
+	_currDatabaseRec = NULL;
+
 	_queryFRM->close();
 	_databaseFRM->close();
 }

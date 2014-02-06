@@ -4,44 +4,17 @@
 BamFileReader::BamFileReader()
 :  _bamReader(NULL),
    _eof(false),
-   _useTags(true),
-   _shouldDeleteBamReader(false)
+   _useTags(true)
 {
 
 }
 
 BamFileReader::~BamFileReader()
 {
-	if (_bamReader != NULL && _shouldDeleteBamReader) {
-		delete _bamReader;
-		_shouldDeleteBamReader = false;
-		_bamReader = NULL;
-	}
 }
 
 bool BamFileReader::open()
 {
-//	if (_bamReader == NULL) {
-//		_bamReader = new BamTools::BamReader();
-//		_shouldDeleteBamReader = true;
-//	}
-//	if (_inputStream != NULL) {
-//		try {
-//			_bamReader->OpenStream(_inputStream);
-//		}
-//		catch (...) {
-//			fprintf(stderr, "ERROR: Unable to open BAM file from standard input.\n");
-//			exit(1);
-//		}
-//	} else {
-//		try {
-//			_bamReader->Open(_filename);
-//		}
-//		catch (...) {
-//			fprintf(stderr, "ERROR: Unable to open BAM file %s\n", _filename.c_str());
-//			exit(1);
-//		}
-//	}
     _bamHeader = _bamReader->GetHeaderText();
     _references = _bamReader->GetReferenceData();
 
