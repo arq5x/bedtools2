@@ -675,7 +675,7 @@ rm obs exp
 
 
 ###########################################################
-#  Test that Bam database is not allowed
+#  Test that -split option works correctly
 ############################################################
 echo "    map.t45...\c"
 echo "chr1	0	50	three_blocks_match	15	+	0	0	0	3	10,10,10,	0,20,40,	." > exp
