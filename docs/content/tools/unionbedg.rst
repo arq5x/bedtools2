@@ -1,4 +1,4 @@
-.. _unionbg:
+.. _unionbedg:
 
 ###############
 *unionbedg*
