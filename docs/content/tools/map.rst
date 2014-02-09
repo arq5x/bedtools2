@@ -64,6 +64,8 @@ Option                           Description
                                  | **count_distinct** - *numeric or text*
                                  | **min** - *numeric only*
                                  | **max** - *numeric only*
+                                 | **absmin** - *numeric only*
+                                 | **absmax** - *numeric only*
                                  | **mean** - *numeric only*
                                  | **median** - *numeric only*
                                  | **antimode** - *numeric or text*
@@ -81,6 +83,9 @@ Option                           Description
                                  | ``Default: "."``
 
 **-header**	                     Print the header from the A file prior to results.
+**-split**                       Treat "split" BAM (i.e., having an "N" CIGAR operation) or BED12 entries as distinct BED intervals.
+                                 When using -sorted, memory usage remains low even for very large files.
+**-g**                           Specify a genome file the defines the expected chromosome order in the input files.
 ===========================      ===============================================================================================================================================================================================================
 
 
