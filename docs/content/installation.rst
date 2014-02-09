@@ -76,7 +76,11 @@ package manager for OSX.
     
     brew install bedtools
 
+**MacPorts**. Alternatively, the MacPorts ports system can be used to install BEDTools on OSX.
 
+.. code-block:: bash
+
+    port install bedtools
 
 -----------------------------
 Development versions
