@@ -3,6 +3,7 @@
 #include <cstdlib>
 #include <cstdio>
 #include "ParseTools.h"
+#include "lineFileUtilities.h"
 
 QuickString::QuickString(size_t capacity)
 : _buffer(NULL),
@@ -82,6 +83,35 @@ QuickString &QuickString::operator = (const QuickString & inBuf){
 	return *this;
 }
 
+QuickString &QuickString::operator = (char val) {
+	clear();
+	append(val);
+	return *this;
+}
+QuickString &QuickString::operator = (int val) {
+	clear();
+	append(val);
+	return *this;
+}
+
+QuickString &QuickString::operator = (uint32_t val) {
+	clear();
+	append(val);
+	return *this;
+}
+
+QuickString &QuickString::operator = (float val) {
+	clear();
+	append(val);
+	return *this;
+}
+
+QuickString &QuickString::operator = (double val) {
+	clear();
+	append(val);
+	return *this;
+}
+
 
 QuickString &QuickString::operator += (const QuickString & inBuf)
 {
@@ -104,6 +134,26 @@ QuickString &QuickString::operator +=(char c) {
 QuickString &QuickString::operator += (const char *inBuf)
 {
 	append(inBuf, strlen(inBuf));
+	return *this;
+}
+
+QuickString &QuickString::operator += (int num) {
+	append(num);
+	return *this;
+}
+
+QuickString &QuickString::operator += (uint32_t num) {
+	append(num);
+	return *this;
+}
+
+QuickString &QuickString::operator += (float num) {
+	append(num);
+	return *this;
+}
+
+QuickString &QuickString::operator += (double num) {
+	append(num);
 	return *this;
 }
 
@@ -194,6 +244,21 @@ void QuickString::append(const char *inBuf, size_t inBufLen)
 void QuickString::append(int num) {
 	int2str(num, *this, true);
 }
+
+void QuickString::append(uint32_t num) {
+	int2str((int)num, *this, true);
+}
+
+void QuickString::append(float num) {
+	append(ToString(num));
+}
+
+void QuickString::append(double num) {
+	append(ToString(num));
+}
+
+
+
 QuickString &QuickString::assign(const char *inBuf, size_t inBufLen)
 {
 	clear();

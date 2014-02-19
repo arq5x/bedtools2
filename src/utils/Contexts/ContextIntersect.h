@@ -21,6 +21,8 @@ public:
 
 	//NOTE: Query and database files will only be marked as such by either the
 	//parseCmdArgs method, or by explicitly setting them.
+	FileRecordMgr *getQueryFile() { return getFile(_queryFileIdx); }
+	FileRecordMgr *getDatabaseFile() { return getFile(_databaseFileIdx); }
     int getQueryFileIdx() const { return _queryFileIdx; }
 	void setQueryFileIdx(int idx) { _queryFileIdx = idx; }
 	int getDatabaseFileIdx() const { return _databaseFileIdx; }

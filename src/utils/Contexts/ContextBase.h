@@ -191,15 +191,11 @@ protected:
     int _bamHeaderAndRefIdx;
     int _maxNumDatabaseFields;
     bool _useFullBamTags;
-    QuickString _columnOperation;
-    int _column;
-    QuickString _nullValue;
 	bool _reportCount;
 	int _maxDistance;
 	bool _reportNames;
 	bool _reportScores;
 	QuickString _scoreOp;
-	set<QuickString> _validScoreOps;
 
 	int _numOutputRecords;
 
