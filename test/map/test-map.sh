@@ -499,10 +499,8 @@ echo "    map.t33..\c"
 echo \
 "
 *****
-*****ERROR: requested column 15 , but record only has fields 1 - 12. Exiting.
-
-*****" > exp
-$BT map -a ivls.bed -b test.vcf -c 15 -o collapse 2> obs
+***** ERROR: Requested column 15, but database file test.vcf only has fields 1 - 12." > exp
+$BT map -a ivls.bed -b test.vcf -c 15 -o collapse 2>&1 > /dev/null | head -3> obs
 check obs exp
 rm obs exp
 
@@ -624,12 +622,9 @@ echo "    map.t41..\c"
 echo \
 "
 *****
-*****ERROR: requested column 41 , but record only has fields 1 - 6. Exiting.
-
-*****" > exp
-$BT map -a ivls.bed -b values5.bed -c 41 -o collapse 2> obs
+***** ERROR: Requested column 41, but database file test.vcf only has fields 1 - 12." > exp
+$BT map -a ivls.bed -b test.vcf -c 41 -o collapse 2>&1 > /dev/null | head -3> obs
 check obs exp
-
 rm obs exp
 
 ###########################################################
@@ -639,12 +634,9 @@ echo "    map.t42..\c"
 echo \
 "
 *****
-*****ERROR: requested column -1 , but record only has fields 1 - 6. Exiting.
-
-*****" > exp
-$BT map -a ivls.bed -b values5.bed -c -1 -o collapse 2> obs
+***** ERROR: Requested column -1, but database file test.vcf only has fields 1 - 12." > exp
+$BT map -a ivls.bed -b test.vcf -c -1 -o collapse 2>&1 > /dev/null | head -3> obs
 check obs exp
-
 rm obs exp
 
 ###########################################################
@@ -654,12 +646,9 @@ echo "    map.t43..\c"
 echo \
 "
 *****
-*****ERROR: requested column 0 , but record only has fields 1 - 6. Exiting.
-
-*****" > exp
-$BT map -a ivls.bed -b values5.bed -c 0 -o collapse 2> obs
+***** ERROR: Requested column 0, but database file test.vcf only has fields 1 - 12." > exp
+$BT map -a ivls.bed -b test.vcf -c 0 -o collapse 2>&1 > /dev/null | head -3> obs
 check obs exp
-
 rm obs exp
 
 

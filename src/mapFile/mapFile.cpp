@@ -21,11 +21,14 @@ const int PRECISION = 21;
 FileMap::FileMap(ContextMap *context)
 : _context(context),
   _blockMgr(NULL),
-  _recordOutputMgr(NULL)
+  _recordOutputMgr(NULL),
+  _colOps(_context->getColOps())
 {
   _blockMgr = new BlockMgr(_context->getOverlapFraction(), _context->getReciprocal());
   _recordOutputMgr = new RecordOutputMgr();
   _recordOutputMgr->init(_context);
+  _keyListOps.setNullValue(_context->getNullValue());
+  _keyListOps.setDelimStr(_context->getDelim());
 }
 
 FileMap::~FileMap(void) {
@@ -43,78 +46,174 @@ bool FileMap::mapFiles()
     }
     RecordKeyList hitSet;
     while (sweep.next(hitSet)) {
+    	_outputValues.clear();
     	if (_context->getObeySplits()) {
 			RecordKeyList keySet(hitSet.getKey());
 			RecordKeyList resultSet(hitSet.getKey());
 			_blockMgr->findBlockedOverlaps(keySet, hitSet, resultSet);
-			SummarizeHits(resultSet);
-			_recordOutputMgr->printRecord(resultSet.getKey(), _output);
+			calculateOutput(resultSet);
+			_recordOutputMgr->printRecord(resultSet.getKey(), _outputValues);
     	} else {
-			SummarizeHits(hitSet);
-			_recordOutputMgr->printRecord(hitSet.getKey(), _output);
+			calculateOutput(hitSet);
+			_recordOutputMgr->printRecord(hitSet.getKey(), _outputValues);
 		}
     }
     return true;
 }
 
-void FileMap::ExtractColumnFromHits(RecordKeyList &hits) {
-  _column_vec.clear();
-  RecordKeyList::const_iterator_type iter = hits.begin();
-  for (; iter != hits.end(); iter = hits.next()) 
-  {
-    _column_vec.push_back(iter->value()->getField(_context->getColumn()).str());
-  }
-} 
+void FileMap::calculateOutput(RecordKeyList &hits)
+{
+	//loop through all requested columns, and for each one, call the method needed
+	//for the operation specified.
+	_keyListOps.setKeyList(&hits);
 
-void FileMap::SummarizeHits(RecordKeyList &hits) {
+	double val = 0.0;
+	for (int i=0; i < (int)_colOps.size(); i++) {
+		int col = _colOps[i].first;
+		KeyListOps::OP_TYPES opCode = _colOps[i].second;
 
-    const QuickString & operation = _context->getColumnOperation();
-    _output.clear();
+		_keyListOps.setColumn(col);
+		switch (opCode) {
+		case KeyListOps::SUM:
+			val = _keyListOps.getSum();
+			if (isnan(val)) {
+				_outputValues.append(_context->getNullValue());
+			} else {
+				_outputValues.append(val);
+			}
+			break;
 
-    if (hits.size() == 0) {
-        if (operation == "count" || operation == "count_distinct")
-            _output.append("0");
-        else
-            _output.append(_context->getNullValue().str());
-        return;
-    } 
+		case KeyListOps::MEAN:
+			val = _keyListOps.getMean();
+			if (isnan(val)) {
+				_outputValues.append(_context->getNullValue());
+			} else {
+				_outputValues.append(val);
+			}
+			break;
 
-    _tmp_output.str("");
-    _tmp_output.clear();
+		case KeyListOps::STDDEV:
+			val = _keyListOps.getStddev();
+			if (isnan(val)) {
+				_outputValues.append(_context->getNullValue());
+			} else {
+				_outputValues.append(val);
+			}
+			break;
 
-    ExtractColumnFromHits(hits);
+		case KeyListOps::SAMPLE_STDDEV:
+			val = _keyListOps.getSampleStddev();
+			if (isnan(val)) {
+				_outputValues.append(_context->getNullValue());
+			} else {
+				_outputValues.append(val);
+			}
+			break;
 
-    VectorOps vo(_column_vec);
-    if (operation == "sum") 
-        _tmp_output << setprecision (PRECISION) << vo.GetSum();
-    else if (operation == "mean")
-        _tmp_output << setprecision (PRECISION) << vo.GetMean();
-    else if (operation == "median")
-        _tmp_output << setprecision (PRECISION) << vo.GetMedian();
-    else if (operation == "min")
-        _tmp_output << setprecision (PRECISION) << vo.GetMin();
-    else if (operation == "max")
-        _tmp_output << setprecision (PRECISION) << vo.GetMax();
-    else if (operation == "absmin")
-        _tmp_output << setprecision (PRECISION) << vo.GetAbsMin();
-    else if (operation == "absmax")
-        _tmp_output << setprecision (PRECISION) << vo.GetAbsMax();
-    else if (operation == "mode")
-        _tmp_output << vo.GetMode();
-    else if (operation == "antimode")
-        _tmp_output << vo.GetAntiMode();
-    else if (operation == "count") 
-        _tmp_output << setprecision (PRECISION) << vo.GetCount();
-    else if (operation == "count_distinct")
-        _tmp_output << setprecision (PRECISION) << vo.GetCountDistinct();
-    else if (operation == "collapse")
-        _tmp_output << vo.GetCollapse();
-    else if (operation == "distinct")
-        _tmp_output << vo.GetDistinct();
-    else {
-        cerr << "ERROR: " << operation << " is an unrecognized operation\n";
-        exit(1);
-    }
-    _output.append(_tmp_output.str());
+		case KeyListOps::MEDIAN:
+			val = _keyListOps.getMedian();
+			if (isnan(val)) {
+				_outputValues.append(_context->getNullValue());
+			} else {
+				_outputValues.append(val);
+			}
+			break;
 
+		case KeyListOps::MODE:
+			_outputValues.append(_keyListOps.getMode());
+			break;
+
+		case KeyListOps::ANTIMODE:
+			_outputValues.append(_keyListOps.getAntiMode());
+			break;
+
+		case KeyListOps::MIN:
+			val = _keyListOps.getMin();
+			if (isnan(val)) {
+				_outputValues.append(_context->getNullValue());
+			} else {
+				_outputValues.append(val);
+			}
+			break;
+
+		case KeyListOps::MAX:
+			val = _keyListOps.getMax();
+			if (isnan(val)) {
+				_outputValues.append(_context->getNullValue());
+			} else {
+				_outputValues.append(val);
+			}
+			break;
+
+		case KeyListOps::ABSMIN:
+			val = _keyListOps.getAbsMin();
+			if (isnan(val)) {
+				_outputValues.append(_context->getNullValue());
+			} else {
+				_outputValues.append(val);
+			}
+			break;
+
+		case KeyListOps::ABSMAX:
+			val = _keyListOps.getAbsMax();
+			if (isnan(val)) {
+				_outputValues.append(_context->getNullValue());
+			} else {
+				_outputValues.append(val);
+			}
+			break;
+
+		case KeyListOps::COUNT:
+			_outputValues.append(_keyListOps.getCount());
+			break;
+
+		case KeyListOps::DISTINCT:
+			_outputValues.append(_keyListOps.getDistinct());
+			break;
+
+		case KeyListOps::COUNT_DISTINCT:
+			_outputValues.append(_keyListOps.getCountDistinct());
+			break;
+
+		case KeyListOps::DISTINCT_ONLY:
+			_outputValues.append(_keyListOps.getDistinctOnly());
+			break;
+
+		case KeyListOps::COLLAPSE:
+			_outputValues.append(_keyListOps.getCollapse());
+			break;
+
+		case KeyListOps::CONCAT:
+			_outputValues.append(_keyListOps.getConcat());
+			break;
+
+		case KeyListOps::FREQ_ASC:
+			_outputValues.append(_keyListOps.getFreqAsc());
+			break;
+
+		case KeyListOps::FREQ_DESC:
+			_outputValues.append(_keyListOps.getFreqDesc());
+			break;
+
+		case KeyListOps::FIRST:
+			_outputValues.append(_keyListOps.getFirst());
+			break;
+
+		case KeyListOps::LAST:
+			_outputValues.append(_keyListOps.getLast());
+			break;
+
+		case KeyListOps::INVALID:
+		default:
+			// Any unrecognized operation should have been handled already in the context validation.
+			// It's thus unnecessary to handle it here, but throw an error to help us know if future
+			// refactoring or code changes accidentally bypass the validation phase.
+			cerr << "ERROR: Invalid operation given for column " << col << ". Exiting..." << endl;
+			break;
+		}
+		//if this isn't the last column, add a tab.
+		if (i < (int)_colOps.size() -1) {
+			_outputValues.append('\t');
+		}
+	}
 }

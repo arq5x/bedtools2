@@ -57,15 +57,6 @@ ContextBase::ContextBase()
 	_programNames["intersect"] = INTERSECT;
 	_programNames["sample"] = SAMPLE;
 	_programNames["map"] = MAP;
-
-	_validScoreOps.insert("sum");
-	_validScoreOps.insert("max");
-	_validScoreOps.insert("min");
-	_validScoreOps.insert("mean");
-	_validScoreOps.insert("mode");
-	_validScoreOps.insert("median");
-	_validScoreOps.insert("antimode");
-	_validScoreOps.insert("collapse");
 }
 
 ContextBase::~ContextBase()
