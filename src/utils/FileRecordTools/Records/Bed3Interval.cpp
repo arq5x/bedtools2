@@ -79,3 +79,23 @@ const QuickString &Bed3Interval::getField(int fieldNum) const
 		break;
 	}
 }
+
+bool Bed3Interval::isNumericField(int fieldNum) {
+	switch (fieldNum) {
+	case 1:
+		return false; //chrom
+		break;
+	case 2:
+		return true; //startPos
+		break;
+	case 3:
+		return true; //endPos
+		break;
+	default:
+	    cerr << endl << "*****" << endl
+	         << "*****ERROR: requested invalid column " << fieldNum << ". Exiting." << endl
+	          << endl << "*****" << endl;
+	    exit(1);
+	    break;
+	}
+}

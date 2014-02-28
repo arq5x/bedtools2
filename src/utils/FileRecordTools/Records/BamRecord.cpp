@@ -172,5 +172,10 @@ const QuickString &BamRecord::getField(int fieldNum) const
 	return Bed6Interval::getField(fieldNum);
 }
 
+bool BamRecord::isNumericField(int fieldNum) {
+
+	//TBD: As with getField, this isn't defined for BAM.
+	return (fieldNum > 6 ? false : Bed6Interval::isNumericField(fieldNum));
+}
 
 

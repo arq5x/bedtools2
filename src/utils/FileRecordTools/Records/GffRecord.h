@@ -34,6 +34,7 @@ public:
 	//Note: using the assignment operator in a GffRecord can potentially be a performance hit,
 	//if the number of fields frequently differ between this object and the one being copied.
 	const GffRecord &operator=(const GffRecord &other);
+	static bool isNumericField(int fieldNum);
 
 protected:
 	virtual ~GffRecord();

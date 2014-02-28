@@ -10,6 +10,7 @@
 
 using namespace std;
 #include <string>
+#include <stdint.h>
 #include <climits>
 #include <ostream>
 
@@ -32,10 +33,19 @@ public:
 	QuickString &operator = (const string &);
 	QuickString &operator = (const char *);
 	QuickString &operator = (const QuickString &);
+	QuickString &operator = (char);
+	QuickString &operator = (int);
+	QuickString &operator = (uint32_t);
+	QuickString &operator = (float);
+	QuickString &operator = (double);
 	QuickString &operator += (const QuickString &);
 	QuickString &operator += (const string &);
 	QuickString &operator += (const char *);
 	QuickString &operator += (char);
+	QuickString &operator += (int);
+	QuickString &operator += (uint32_t);
+	QuickString &operator += (float);
+	QuickString &operator += (double);
 
 	friend ostream &operator << (ostream &out, const QuickString &str);
 	bool operator == (const QuickString &) const;
@@ -52,7 +62,16 @@ public:
 	void append(const QuickString &str) { append(str.c_str(), str.size()); }
 	void append(const char *buf, size_t bufLen);
 	void append(char c);
+
+	//These are not templated because float and double require a stringstream based
+	//implementation, while the integer append uses a much faster home-brewed algorithm
+	//for better performance.
 	void append(int num);
+	void append(uint32_t num);
+	void append(float num);
+	void append(double num);
+
+
 
 	QuickString &assign(const char *str, size_t n);
 	void resize(size_t n, char c = '\0');

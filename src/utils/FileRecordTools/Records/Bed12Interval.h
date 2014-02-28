@@ -54,6 +54,7 @@ public:
 
 	virtual const QuickString &getField(int fieldNum) const;
 	virtual int getNumFields() const  { return 12; }
+	static bool isNumericField(int fieldNum);
 
 
 protected:

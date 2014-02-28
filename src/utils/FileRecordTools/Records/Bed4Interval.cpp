@@ -60,3 +60,8 @@ const QuickString &Bed4Interval::getField(int fieldNum) const
 	}
 }
 
+bool Bed4Interval::isNumericField(int fieldNum) {
+	return (fieldNum == 4 ? false : Bed3Interval::isNumericField(fieldNum));
+}
+
+

@@ -146,3 +146,29 @@ const QuickString &Bed12Interval::getField(int fieldNum) const
 	}
 }
 
+bool Bed12Interval::isNumericField(int fieldNum) {
+	switch (fieldNum) {
+	case 7:
+		return true;
+		break;
+	case 8:
+		return true;
+		break;
+	case 9:
+		return false;
+		break;
+	case 10:
+		return true;
+		break;
+	case 11:
+		return false;
+		break;
+	case 12:
+		return false;
+		break;
+	default:
+		return Bed6Interval::isNumericField(fieldNum);
+		break;
+	}
+}
+

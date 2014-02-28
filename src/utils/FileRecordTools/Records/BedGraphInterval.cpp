@@ -60,3 +60,14 @@ const QuickString &BedGraphInterval::getField(int fieldNum) const
 	}
 }
 
+bool BedGraphInterval::isNumericField(int fieldNum) {
+	switch (fieldNum) {
+	case 4:
+		return true;
+		break;
+	default:
+		return Bed3Interval::isNumericField(fieldNum);
+		break;
+	}
+}
+

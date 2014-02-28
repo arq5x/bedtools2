@@ -156,4 +156,40 @@ const QuickString &GffRecord::getField(int fieldNum) const
 	}
 }
 
+bool GffRecord::isNumericField(int fieldNum) {
+	switch (fieldNum) {
+	case 1:
+		return false;
+		break;
+	case 2:
+		return false;
+		break;
+	case 3:
+		return false;
+		break;
+	case 4:
+		return true;
+		break;
+	case 5:
+		return true;
+		break;
+	case 6:
+		return true;
+		break;
+	case 7:
+		return false;
+		break;
+	case 8:
+		return false;
+		break;
+	case 9:
+		return false;
+		break;
+	default:
+		return Bed6Interval::isNumericField(fieldNum);
+		break;
+	}
+
+}
+
 

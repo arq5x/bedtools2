@@ -52,20 +52,16 @@ ContextBase::ContextBase()
   _hasConstantSeed(false),
   _seed(0),
   _forwardOnly(false),
-  _reverseOnly(false)
+  _reverseOnly(false),
+  _hasColumnOpsMethods(false)
 {
 	_programNames["intersect"] = INTERSECT;
 	_programNames["sample"] = SAMPLE;
 	_programNames["map"] = MAP;
 
-	_validScoreOps.insert("sum");
-	_validScoreOps.insert("max");
-	_validScoreOps.insert("min");
-	_validScoreOps.insert("mean");
-	_validScoreOps.insert("mode");
-	_validScoreOps.insert("median");
-	_validScoreOps.insert("antimode");
-	_validScoreOps.insert("collapse");
+	if (hasColumnOpsMethods()) {
+		_keyListOps = new KeyListOps();
+	}
 }
 
 ContextBase::~ContextBase()
@@ -79,6 +75,11 @@ ContextBase::~ContextBase()
 		delete _files[i];
 		_files[i] = NULL;
 	}
+	if (hasColumnOpsMethods()) {
+		delete _keyListOps;
+		_keyListOps = NULL;
+	}
+
 }
 
 bool ContextBase::determineOutputType() {
@@ -176,6 +177,19 @@ bool ContextBase::parseCmdArgs(int argc, char **argv, int skipFirstArgs) {
         else if (strcmp(_argv[_i], "-seed") == 0) {
 			if (!handle_seed()) return false;
         }
+        else if (strcmp(_argv[_i], "-o") == 0) {
+			if (!handle_o()) return false;
+        }
+        else if (strcmp(_argv[_i], "-c") == 0) {
+			if (!handle_c()) return false;
+        }
+        else if (strcmp(_argv[_i], "-null") == 0) {
+			if (!handle_null()) return false;
+        }
+        else if (strcmp(_argv[_i], "-delim") == 0) {
+			if (!handle_delim()) return false;
+        }
+
 	}
 	return true;
 }
@@ -190,6 +204,12 @@ bool ContextBase::isValidState()
 	}
 	if (!determineOutputType()) {
 		return false;
+	}
+	if (hasColumnOpsMethods()) {
+		FileRecordMgr *dbFile = getFile(hasIntersectMethods() ? _databaseFileIdx : 0);
+		if (!_keyListOps->isValidColumnOps(dbFile)) {
+			return false;
+		}
 	}
 	return true;
 }
@@ -363,3 +383,85 @@ bool ContextBase::handle_ubam()
     markUsed(_i - _skipFirstArgs);
 	return true;
 }
+
+
+// Methods specific to column operations.
+// for col ops, -c is the string of columns upon which to operate
+bool ContextBase::handle_c()
+{
+	if (!hasColumnOpsMethods()) {
+		return false;
+	}
+    if ((_i+1) < _argc) {
+        _keyListOps->setColumns(_argv[_i + 1]);
+        markUsed(_i - _skipFirstArgs);
+        _i++;
+        markUsed(_i - _skipFirstArgs);
+    }
+    return true;
+}
+
+
+// for col ops, -o is the string of operations to apply to the columns (-c)
+bool ContextBase::handle_o()
+{
+	if (!hasColumnOpsMethods()) {
+		return false;
+	}
+    if ((_i+1) < _argc) {
+    	 _keyListOps->setOperations(_argv[_i + 1]);
+        markUsed(_i - _skipFirstArgs);
+        _i++;
+        markUsed(_i - _skipFirstArgs);
+    }
+    return true;
+}
+
+
+// for col ops, -null is a NULL vakue assigned
+// when no overlaps are detected.
+bool ContextBase::handle_null()
+{
+	if (!hasColumnOpsMethods()) {
+		return false;
+	}
+    if ((_i+1) < _argc) {
+    	 _keyListOps->setNullValue(_argv[_i + 1]);
+        markUsed(_i - _skipFirstArgs);
+        _i++;
+        markUsed(_i - _skipFirstArgs);
+    }
+    return true;
+}
+
+//for col ops, delimStr will appear between each item in
+//a collapsed but delimited list.
+bool ContextBase::handle_delim()
+{
+	if (!hasColumnOpsMethods()) {
+		return false;
+	}
+    if ((_i+1) < _argc) {
+    	 _keyListOps->setDelimStr(_argv[_i + 1]);
+        markUsed(_i - _skipFirstArgs);
+        _i++;
+        markUsed(_i - _skipFirstArgs);
+    }
+    return true;
+}
+
+void ContextBase::setColumnOpsMethods(bool val)
+{
+	_hasColumnOpsMethods = val;
+	if (val) {
+		_keyListOps = new KeyListOps();
+	}
+}
+
+const QuickString &ContextBase::getColumnOpsVal(RecordKeyList &keyList) const {
+	if (!hasColumnOpsMethods()) {
+		return _nullStr;
+	}
+	return _keyListOps->getOpVals(keyList);
+}
+

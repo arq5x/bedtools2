@@ -117,3 +117,18 @@ const QuickString &BedPlusInterval::getField(int fieldNum) const
 	}
 	return Bed6Interval::getField(fieldNum);
 }
+
+bool BedPlusInterval::isNumericField(int fieldNum) {
+
+	//
+	// TBD: There is no currently no good way to guarantee / enforce whether
+	// fields after the 6th are numeric, so for now we'll give the user the
+	// benefit of the doubt on those.
+	//
+	if (fieldNum > startOtherIdx) {
+		return true;
+	} else {
+		return Bed6Interval::isNumericField(fieldNum);
+	}
+}
+

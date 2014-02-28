@@ -32,6 +32,8 @@ public:
 	virtual const QuickString &getField(int fieldNum) const;
 	virtual int getNumFields() const  { return 3; }
 
+	static bool isNumericField(int fieldNum);
+
 protected:
 	virtual ~Bed3Interval();
 

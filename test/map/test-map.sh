@@ -499,10 +499,8 @@ echo "    map.t33..\c"
 echo \
 "
 *****
-*****ERROR: requested column 15 , but record only has fields 1 - 12. Exiting.
-
-*****" > exp
-$BT map -a ivls.bed -b test.vcf -c 15 -o collapse 2> obs
+***** ERROR: Requested column 15, but database file test.vcf only has fields 1 - 12." > exp
+$BT map -a ivls.bed -b test.vcf -c 15 -o collapse 2>&1 > /dev/null | head -3> obs
 check obs exp
 rm obs exp
 
@@ -624,12 +622,9 @@ echo "    map.t41..\c"
 echo \
 "
 *****
-*****ERROR: requested column 41 , but record only has fields 1 - 6. Exiting.
-
-*****" > exp
-$BT map -a ivls.bed -b values5.bed -c 41 -o collapse 2> obs
+***** ERROR: Requested column 41, but database file test.vcf only has fields 1 - 12." > exp
+$BT map -a ivls.bed -b test.vcf -c 41 -o collapse 2>&1 > /dev/null | head -3> obs
 check obs exp
-
 rm obs exp
 
 ###########################################################
@@ -639,12 +634,9 @@ echo "    map.t42..\c"
 echo \
 "
 *****
-*****ERROR: requested column -1 , but record only has fields 1 - 6. Exiting.
-
-*****" > exp
-$BT map -a ivls.bed -b values5.bed -c -1 -o collapse 2> obs
+***** ERROR: Requested column -1, but database file test.vcf only has fields 1 - 12." > exp
+$BT map -a ivls.bed -b test.vcf -c -1 -o collapse 2>&1 > /dev/null | head -3> obs
 check obs exp
-
 rm obs exp
 
 ###########################################################
@@ -654,12 +646,9 @@ echo "    map.t43..\c"
 echo \
 "
 *****
-*****ERROR: requested column 0 , but record only has fields 1 - 6. Exiting.
-
-*****" > exp
-$BT map -a ivls.bed -b values5.bed -c 0 -o collapse 2> obs
+***** ERROR: Requested column 0, but database file test.vcf only has fields 1 - 12." > exp
+$BT map -a ivls.bed -b test.vcf -c 0 -o collapse 2>&1 > /dev/null | head -3> obs
 check obs exp
-
 rm obs exp
 
 
@@ -667,7 +656,7 @@ rm obs exp
 #  Test that Bam database is not allowed
 ############################################################
 echo "    map.t44...\c"
-echo -e "\n*****\n***** ERROR: BAM database file not currently supported for the map tool." > exp
+echo -e "\n*****\n***** ERROR: BAM database file not currently supported for column operations." > exp
 $BT map -a ivls.bed -b values.bam 2> obs
 check obs exp
 rm obs exp
@@ -682,3 +671,71 @@ echo "chr1	0	50	three_blocks_match	15	+	0	0	0	3	10,10,10,	0,20,40,	." > exp
 $BT map -o sum -a three_blocks_match.bed -b three_blocks_nomatch.bed -split > obs
 check obs exp
 rm obs exp
+
+
+
+
+
+
+###########################################################
+#
+#
+#  Tests for multiple columns and operations
+#
+#
+############################################################
+
+
+###########################################################
+#  Test that error is given when ops outnumber columns
+############################################################
+echo "    map.t46...\c"
+echo \
+"
+*****
+***** ERROR: There are 1 columns given, but there are 2 operations."  > exp
+../../bin/bedtools map -a ivls.bed -b values.bed -o count,sum 2>&1 > /dev/null | head -3 > obs
+check obs exp
+rm obs exp
+
+
+###########################################################
+#  Test that error is given when columns outnumber ops,
+# if there are two or more ops.
+############################################################
+echo "    map.t47...\c"
+echo \
+"
+*****
+***** ERROR: There are 3 columns given, but there are 2 operations."  > exp
+../../bin/bedtools map -a ivls.bed -b values.bed -c 5,1,2 -o count,sum 2>&1 > /dev/null | head -3 > obs
+check obs exp
+rm obs exp
+
+
+###########################################################
+#  Test that numeric ops for non-numeric columns aren't allowed
+############################################################
+echo "    map.t48...\c"
+echo \
+"
+*****
+***** ERROR: Column 1 is not a numeric field for database file values.bed."  > exp
+../../bin/bedtools map -a ivls.bed -b values.bed -c 1 -o sum 2>&1 > /dev/null | head -3 > obs
+check obs exp
+rm obs exp
+
+
+###########################################################
+#  Test that multiple columns are allowed with a 
+# single operation
+############################################################
+#
+# TBD
+#
+#echo "    map.t49...\c"
+#../../bin/bedtools map -a ivls.bed -b values.bed -c 2 -o sum 2>&1 > /dev/null | head -3 > obs
+#check obs exp
+#rm obs exp
+
+

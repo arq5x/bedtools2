@@ -29,6 +29,7 @@ INCLUDES = -I$(UTILITIES_DIR)/Contexts/ \
            -I$(UTILITIES_DIR)/FileRecordTools/FileReaders/ \
            -I$(UTILITIES_DIR)/FileRecordTools/Records/ \
            -I$(UTILITIES_DIR)/RecordOutputMgr/ \
+			-I$(UTILITIES_DIR)/KeyListOps/ \
            -I$(UTILITIES_DIR)/NewChromsweep \
            -I$(UTILITIES_DIR)/VectorOps \
            -I$(UTILITIES_DIR)/BinTree \
