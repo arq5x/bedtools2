@@ -78,6 +78,7 @@ UTIL_SUBDIRS =	$(SRC_DIR)/utils/bedFile \
 				$(SRC_DIR)/utils/gzstream \
 				$(SRC_DIR)/utils/fileType \
 				$(SRC_DIR)/utils/bedFilePE \
+				$(SRC_DIR)/utils/KeyListOps \
 				$(SRC_DIR)/utils/NewChromsweep \
 				$(SRC_DIR)/utils/sequenceUtilities \
 				$(SRC_DIR)/utils/tabFile \
