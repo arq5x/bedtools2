@@ -730,12 +730,63 @@ rm obs exp
 #  Test that multiple columns are allowed with a 
 # single operation
 ############################################################
-#
-# TBD
-#
-#echo "    map.t49...\c"
-#../../bin/bedtools map -a ivls.bed -b values.bed -c 2 -o sum 2>&1 > /dev/null | head -3 > obs
-#check obs exp
-#rm obs exp
+echo "    map.t49...\c"
+echo \
+"chr1	0	100	65	9
+chr1	100	200	1	7
+chr2	0	100	.	.
+chr2	100	200	.	.
+chr3	0	100	6	7
+chr3	100	200	8	23" > exp
+../../bin/bedtools map -a ivls.bed -b values4.bed -c 5,7 -o sum > obs
+check obs exp
+rm obs exp
 
+
+###########################################################
+#  Test that multiple columns are allowed with an
+#  equal number of ops that aren't all the same
+############################################################
+echo "    map.t50...\c"
+echo \
+"chr1	0	100	13.5	65	9
+chr1	100	200	120	1	7
+chr2	0	100	.	.	.
+chr2	100	200	.	.	.
+chr3	0	100	10	6	7
+chr3	100	200	120	8	23" > exp
+../../bin/bedtools map -a ivls.bed -b values4.bed -c 2,5,7 -o mean,sum,sum > obs
+check obs exp
+rm obs exp
+
+
+###########################################################
+#  Test stddev
+############################################################
+echo "    map.t51...\c"
+echo \
+"chr1	0	100	12.9167
+chr1	100	200	0
+chr2	0	100	.
+chr2	100	200	.
+chr3	0	100	76.2222
+chr3	100	200	0.25" > exp
+../../bin/bedtools map -a ivls.bed -b values4.bed -c 7 -o stddev > obs
+check obs exp
+rm obs exp
+
+###########################################################
+#  Test sample_stddev
+############################################################
+echo "    map.t52...\c"
+echo \
+"chr1	0	100	15.5
+chr1	100	200	.
+chr2	0	100	.
+chr2	100	200	.
+chr3	0	100	114.333
+chr3	100	200	0.5" > exp
+../../bin/bedtools map -a ivls.bed -b values4.bed -c 7 -o sample_stddev > obs
+check obs exp
+rm obs exp
 
