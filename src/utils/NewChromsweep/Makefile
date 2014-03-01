@@ -11,6 +11,7 @@ INCLUDES = -I$(UTILITIES_DIR)/general/ \
            -I$(UTILITIES_DIR)/FileRecordTools/ \
            -I$(UTILITIES_DIR)/FileRecordTools/FileReaders/ \
            -I$(UTILITIES_DIR)/FileRecordTools/Records/ \
+			-I$(UTILITIES_DIR)/KeyListOps/ \
            -I$(UTILITIES_DIR)/BamTools/include \
            -I$(UTILITIES_DIR)/BamTools/src/ \
             -I$(UTILITIES_DIR)/version/

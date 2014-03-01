@@ -656,7 +656,7 @@ rm obs exp
 #  Test that Bam database is not allowed
 ############################################################
 echo "    map.t44...\c"
-echo -e "\n*****\n***** ERROR: BAM database file not currently supported for the map tool." > exp
+echo -e "\n*****\n***** ERROR: BAM database file not currently supported for column operations." > exp
 $BT map -a ivls.bed -b values.bam 2> obs
 check obs exp
 rm obs exp
@@ -671,3 +671,122 @@ echo "chr1	0	50	three_blocks_match	15	+	0	0	0	3	10,10,10,	0,20,40,	." > exp
 $BT map -o sum -a three_blocks_match.bed -b three_blocks_nomatch.bed -split > obs
 check obs exp
 rm obs exp
+
+
+
+
+
+
+###########################################################
+#
+#
+#  Tests for multiple columns and operations
+#
+#
+############################################################
+
+
+###########################################################
+#  Test that error is given when ops outnumber columns
+############################################################
+echo "    map.t46...\c"
+echo \
+"
+*****
+***** ERROR: There are 1 columns given, but there are 2 operations."  > exp
+../../bin/bedtools map -a ivls.bed -b values.bed -o count,sum 2>&1 > /dev/null | head -3 > obs
+check obs exp
+rm obs exp
+
+
+###########################################################
+#  Test that error is given when columns outnumber ops,
+# if there are two or more ops.
+############################################################
+echo "    map.t47...\c"
+echo \
+"
+*****
+***** ERROR: There are 3 columns given, but there are 2 operations."  > exp
+../../bin/bedtools map -a ivls.bed -b values.bed -c 5,1,2 -o count,sum 2>&1 > /dev/null | head -3 > obs
+check obs exp
+rm obs exp
+
+
+###########################################################
+#  Test that numeric ops for non-numeric columns aren't allowed
+############################################################
+echo "    map.t48...\c"
+echo \
+"
+*****
+***** ERROR: Column 1 is not a numeric field for database file values.bed."  > exp
+../../bin/bedtools map -a ivls.bed -b values.bed -c 1 -o sum 2>&1 > /dev/null | head -3 > obs
+check obs exp
+rm obs exp
+
+
+###########################################################
+#  Test that multiple columns are allowed with a 
+# single operation
+############################################################
+echo "    map.t49...\c"
+echo \
+"chr1	0	100	65	9
+chr1	100	200	1	7
+chr2	0	100	.	.
+chr2	100	200	.	.
+chr3	0	100	6	7
+chr3	100	200	8	23" > exp
+../../bin/bedtools map -a ivls.bed -b values4.bed -c 5,7 -o sum > obs
+check obs exp
+rm obs exp
+
+
+###########################################################
+#  Test that multiple columns are allowed with an
+#  equal number of ops that aren't all the same
+############################################################
+echo "    map.t50...\c"
+echo \
+"chr1	0	100	13.5	65	9
+chr1	100	200	120	1	7
+chr2	0	100	.	.	.
+chr2	100	200	.	.	.
+chr3	0	100	10	6	7
+chr3	100	200	120	8	23" > exp
+../../bin/bedtools map -a ivls.bed -b values4.bed -c 2,5,7 -o mean,sum,sum > obs
+check obs exp
+rm obs exp
+
+
+###########################################################
+#  Test stddev
+############################################################
+echo "    map.t51...\c"
+echo \
+"chr1	0	100	12.9167
+chr1	100	200	0
+chr2	0	100	.
+chr2	100	200	.
+chr3	0	100	76.2222
+chr3	100	200	0.25" > exp
+../../bin/bedtools map -a ivls.bed -b values4.bed -c 7 -o stddev > obs
+check obs exp
+rm obs exp
+
+###########################################################
+#  Test sample_stddev
+############################################################
+echo "    map.t52...\c"
+echo \
+"chr1	0	100	15.5
+chr1	100	200	.
+chr2	0	100	.
+chr2	100	200	.
+chr3	0	100	114.333
+chr3	100	200	0.5" > exp
+../../bin/bedtools map -a ivls.bed -b values4.bed -c 7 -o sample_stddev > obs
+check obs exp
+rm obs exp
+

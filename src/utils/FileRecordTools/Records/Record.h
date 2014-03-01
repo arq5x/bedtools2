@@ -129,6 +129,8 @@ public:
 	virtual bool sameChromIntersects(const Record *otherRecord,
 			bool sameStrand, bool diffStrand, float overlapFraction, bool reciprocal) const;
 
+//	virtual static bool isNumericField(int fieldNum) const = 0;
+
 
 protected:
 	virtual ~Record(); //by making the destructor protected, only the friend class(es) can actually delete Record objects, or objects derived from Record.

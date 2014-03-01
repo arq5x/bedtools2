@@ -1,37 +1,14 @@
 /*
  * KeyListOps.cpp
  *
- *  Created on: Feb 6, 2014
+ *  Created on: Feb 24, 2014
  *      Author: nek3d
  */
-
 #include "KeyListOps.h"
-#include <cfloat>
-#include <cmath>
-#include <algorithm>
+#include "FileRecordMgr.h"
+#include <cmath> //for isnan
 
-KeyListOps::KeyListOps()
-: _keyList(&_nullKeyList),
-  _column(1),
-  _nullVal("."),
-  _delimStr(","),
-  _iter(_nullKeyList.begin())
-{
-	init();
-
-}
-
-KeyListOps::KeyListOps(RecordKeyList *keyList, int column)
-: _keyList(keyList),
-  _column(column),
-  _nullVal("."),
-  _delimStr(","),
-  _iter(keyList->begin())
-{
-	init();
-}
-
-void KeyListOps::init() {
+KeyListOps::KeyListOps() {
 	_opCodes["sum"] = SUM;
 	_opCodes["mean"] = MEAN;
 	_opCodes["stddev"] = STDDEV;
@@ -53,11 +30,44 @@ void KeyListOps::init() {
 	_opCodes["freq_desc"] = FREQ_DESC;
 	_opCodes["first"] = FIRST;
 	_opCodes["last"] = LAST;
+
+	_isNumericOp[SUM] = true;
+	_isNumericOp[MEAN] = true;
+	_isNumericOp[STDDEV] = true;
+	_isNumericOp[MEDIAN] = true;
+	_isNumericOp[MODE] = false;
+	_isNumericOp[ANTIMODE] = false;
+	_isNumericOp[MIN] = true;
+	_isNumericOp[MAX] = true;
+	_isNumericOp[ABSMIN] = true;
+	_isNumericOp[COUNT] = false;
+	_isNumericOp[DISTINCT] = false;
+	_isNumericOp[COUNT_DISTINCT] = false;
+	_isNumericOp[DISTINCT_ONLY] = false;
+	_isNumericOp[COLLAPSE] = false;
+	_isNumericOp[CONCAT] = false;
+	_isNumericOp[FREQ_ASC] = false;
+	_isNumericOp[FREQ_DESC] = false;
+	_isNumericOp[FIRST] = false;
+	_isNumericOp[LAST] = false;
+
+	_methods.setDelimStr(",");
+	_methods.setNullValue(".");
+
+	// default to BED score column
+	_columns = "5";
+	// default to "sum"
+	_operations = "sum";
+
 }
 
+bool KeyListOps::isNumericOp(OP_TYPES op) const {
+	map<OP_TYPES, bool>::const_iterator iter = _isNumericOp.find(op);
+	return (iter == _isNumericOp.end() ? false : iter->second);
+}
 
-KeyListOps::~KeyListOps() {
-
+bool KeyListOps::isNumericOp(const QuickString &op) const {
+	return isNumericOp(getOpCode(op));
 }
 
 KeyListOps::OP_TYPES KeyListOps::getOpCode(const QuickString &operation) const {
@@ -70,336 +80,285 @@ KeyListOps::OP_TYPES KeyListOps::getOpCode(const QuickString &operation) const {
 	return iter->second;
 }
 
-// return the total of the values in the vector
-double KeyListOps::getSum() {
-	if (empty()) return NAN;
 
-	double theSum = 0.0;
-	for (begin(); !end(); next()) {
-		theSum += getColValNum();
+bool KeyListOps::isValidColumnOps(FileRecordMgr *dbFile) {
+
+    if (dbFile->getFileType() == FileRecordTypeChecker::BAM_FILE_TYPE) {
+         //throw Error
+        cerr << endl << "*****" << endl
+             << "***** ERROR: BAM database file not currently supported for column operations."
+             << endl;
+        exit(1);
+    }
+
+
+	//get the strings from context containing the comma-delimited lists of columns
+	//and operations. Split both of these into vectors. Get the operation code
+	//for each operation string. Finally, make a vector of pairs, where the first
+	//member of each pair is a column number, and the second member is the code for the
+	//operation to perform on that column.
+
+	vector<QuickString> columnsVec;
+	vector<QuickString> opsVec;
+	int numCols = Tokenize(_columns, columnsVec, ',');
+	int numOps = Tokenize(_operations, opsVec, ',');
+
+	if (numOps < 1 || numCols < 1) {
+		 cerr << endl << "*****" << endl
+		             << "***** ERROR: There must be at least one column and at least one operation named." << endl;
+		 return false;
 	}
-	return theSum;
-}
-
-// return the average value in the vector
-double KeyListOps::getMean() {
-	if (empty()) return NAN;
-
-	return getSum() / (float)getCount();
-}
-
-
- // return the standard deviation
-double KeyListOps::getStddev() {
-	if (empty()) return NAN;
-
-	double avg = getMean();
-	double squareDiffSum = 0.0;
-	for (begin(); !end(); next()) {
-		double val = getColValNum();
-		double diff = val - avg;
-		squareDiffSum += diff * diff;
+	if (numOps > 1 && numCols != numOps) {
+		 cerr << endl << "*****" << endl
+		             << "***** ERROR: There are " << numCols <<" columns given, but there are " << numOps << " operations." << endl;
+		cerr << "\tPlease provide either a single operation that will be applied to all listed columns, " << endl;
+		cerr << "\tor an operation for each column." << endl;
+		return false;
 	}
-	return squareDiffSum / (float)getCount();
-}
-// return the standard deviation
-double KeyListOps::getSampleStddev() {
-	if (empty()) return NAN;
+	for (int i=0; i < (int)columnsVec.size(); i++) {
+		int col = str2chrPos(columnsVec[i]);
 
-	double avg = getMean();
-	double squareDiffSum = 0.0;
-	for (begin(); !end(); next()) {
-		double val = getColValNum();
-		double diff = val - avg;
-		squareDiffSum += diff * diff;
+		//check that the column number is valid
+		if (col < 1 || col > dbFile->getNumFields()) {
+			 cerr << endl << "*****" << endl  << "***** ERROR: Requested column " << col << ", but database file "
+					 << dbFile->getFileName() << " only has fields 1 - " << dbFile->getNumFields() << "." << endl;
+			 return false;
+		}
+		const QuickString &operation = opsVec.size() > 1 ? opsVec[i] : opsVec[0];
+		OP_TYPES opCode = getOpCode(operation);
+		if (opCode == INVALID) {
+			cerr << endl << "*****" << endl
+								 << "***** ERROR: " << operation << " is not a valid operation. " << endl;
+			return false;
+		}
+		_colOps.push_back(pair<int, OP_TYPES>(col, opCode));
 	}
-	return  squareDiffSum / ((float)getCount() - 1.0);
-}
 
-// return the median value in the vector
-double KeyListOps::getMedian() {
-	if (empty()) return NAN;
 
-	//get sorted vector. if even number of elems, return middle val.
-	//if odd, average of two.
-	toArray(true, ASC);
-	size_t count = getCount();
-	if (count % 2) {
-		//odd number of elements. Take middle one.
-		return _numArray[count/2];
-	} else {
-		//even numnber of elements. Take average of middle 2.
-		double sum = _numArray[count/2 -1] + _numArray[count/2];
-		return sum / 2.0;
-	}
-}
+	//The final step we need to do is check that for each column/operation pair,
+	//if the operation is numeric, see if the database's record type supports
+	//numeric operations for that column. For instance, we can allow the mean
+	//of column 4 for a BedGraph file, because that's numeric, but not for Bed4,
+	//because that isn't.
 
-// return the most common value in the vector
-const QuickString &KeyListOps::getMode() {
-	if (empty()) return _nullVal;
+	for (int i = 0; i < (int)_colOps.size(); i++) {
+		int col = _colOps[i].first;
+		OP_TYPES opCode = _colOps[i].second;
+		FileRecordTypeChecker::RECORD_TYPE recordType = dbFile->getRecordType();
 
-	makeFreqMap();
+		if (isNumericOp(opCode)) {
+			bool isValidNumOp = false;
+			switch(recordType) {
+				case FileRecordTypeChecker::BED3_RECORD_TYPE:
+					isValidNumOp = Bed3Interval::isNumericField(col);
+					break;
 
-	//now pass through the freq map and keep track of which key has the highest occurance.
-	freqMapType::iterator maxIter = _freqMap.begin();
-	int maxVal = 0;
-	for (; _freqIter != _freqMap.end(); _freqIter++) {
-		if (_freqIter->second > maxVal) {
-			maxIter = _freqIter;
-			maxVal = _freqIter->second;
+				case FileRecordTypeChecker::BED4_RECORD_TYPE:
+					isValidNumOp = Bed4Interval::isNumericField(col);
+					break;
+
+				case FileRecordTypeChecker::BED5_RECORD_TYPE:
+					isValidNumOp = Bed5Interval::isNumericField(col);
+					break;
+
+				case FileRecordTypeChecker::BEDGRAPH_RECORD_TYPE:
+					isValidNumOp = BedGraphInterval::isNumericField(col);
+					break;
+
+				case FileRecordTypeChecker::BED6_RECORD_TYPE:
+					isValidNumOp = Bed6Interval::isNumericField(col);
+					break;
+
+				case FileRecordTypeChecker::BED_PLUS_RECORD_TYPE:
+					isValidNumOp = BedPlusInterval::isNumericField(col);
+					break;
+
+				case FileRecordTypeChecker::BED12_RECORD_TYPE:
+					isValidNumOp = Bed12Interval::isNumericField(col);
+					break;
+
+				case FileRecordTypeChecker::BAM_RECORD_TYPE:
+					isValidNumOp = BamRecord::isNumericField(col);
+					break;
+
+				case FileRecordTypeChecker::VCF_RECORD_TYPE:
+					isValidNumOp = VcfRecord::isNumericField(col);
+					break;
+
+				case FileRecordTypeChecker::GFF_RECORD_TYPE:
+					isValidNumOp = GffRecord::isNumericField(col);
+					break;
+
+				default:
+					break;
+			}
+			if (!isValidNumOp) {
+				 cerr << endl << "*****" << endl  << "***** ERROR: Column " << col << " is not a numeric field for database file "
+						 << dbFile->getFileName() << "." << endl;
+				 return false;
+			}
 		}
 	}
-	_retStr = maxIter->first;
-	return _retStr;
-}
-// return the least common value in the vector
-const QuickString &KeyListOps::getAntiMode() {
-	if (empty()) return _nullVal;
 
-	makeFreqMap();
-
-	//now pass through the freq map and keep track of which key has the highest occurance.
-	freqMapType::iterator minIter = _freqMap.begin();
-	int minVal = INT_MAX;
-	for (; _freqIter != _freqMap.end(); _freqIter++) {
-		if (_freqIter->second < minVal) {
-			minIter = _freqIter;
-			minVal = _freqIter->second;
-		}
-	}
-	_retStr =  minIter->first;
-	return _retStr;
-}
-// return the minimum element of the vector
-double KeyListOps::getMin() {
-	if (empty()) return NAN;
-
-	double minVal = DBL_MAX;
-	for (begin(); !end(); next()) {
-		double currVal = getColValNum();
-		minVal = (currVal < minVal) ? currVal : minVal;
-	}
-	return  minVal;
+    return true;
 }
 
-// return the maximum element of the vector
-double KeyListOps::getMax() {
-	if (empty()) return NAN;
-
-	double maxVal = DBL_MIN;
-	for (begin(); !end(); next()) {
-		double currVal = getColValNum();
-		maxVal = (currVal > maxVal) ? currVal : maxVal;
-	}
-	return maxVal;
-}
-
-// return the minimum absolute value of the vector
-double KeyListOps::getAbsMin() {
-	if (empty()) return NAN;
-
-	double minVal = DBL_MAX;
-	for (begin(); !end(); next()) {
-		double currVal = abs(getColValNum());
-		minVal = (currVal < minVal) ? currVal : minVal;
-	}
-	return minVal;
-}
-// return the maximum absolute value of the vector
-double KeyListOps::getAbsMax() {
-	if (empty()) return NAN;
-
-	double maxVal = DBL_MIN;
-	for (begin(); !end(); next()) {
-		double currVal = abs(getColValNum());
-		maxVal = (currVal > maxVal) ? currVal : maxVal;
-	}
-	return maxVal;
-}
-// return the count of element in the vector
-uint32_t KeyListOps::getCount() {
-	return _keyList->size();
-}
-// return a delimited list of the unique elements
-const QuickString &KeyListOps::getDistinct() {
-	if (empty()) return _nullVal;
-	// separated list of unique values. If something repeats, only report once.
-	makeFreqMap();
-	_retStr.clear();
-	for (; _freqIter != _freqMap.end(); _freqIter++) {
-		if (_freqIter != _freqMap.begin()) _retStr += _delimStr;
-		_retStr.append(_freqIter->first);
-	}
-	return _retStr;
-}
-
-const QuickString &KeyListOps::getDistinctOnly() {
-	if (empty()) return _nullVal;
-
-	//separated list of only unique values. If item repeats, discard.
-	makeFreqMap();
-	_retStr.clear();
-	for (; _freqIter != _freqMap.end(); _freqIter++) {
-		if (_freqIter->second != 1) continue;
-		if (_freqIter != _freqMap.begin()) _retStr += _delimStr;
-		_retStr.append(_freqIter->first);
-	}
-	return _retStr;
-}
-
-// return a the count of _unique_ elements in the vector
-uint32_t KeyListOps::getCountDistinct() {
-	if (empty()) return 0;
-
-	makeFreqMap();
-	return _freqMap.size();
-}
-// return a delimiter-separated list of elements
-const QuickString &KeyListOps::getCollapse(const QuickString &delimiter) {
-	if (empty()) return _nullVal;
-
-	//just put all items in one big separated list.
-	_retStr.clear();
-	int i=0;
-	for (begin(); !end(); next()) {
-		if (i > 0) _retStr += _delimStr;
-		_retStr.append(getColVal());
-		i++;
-	}
-	return _retStr;
-
-}
-// return a concatenation of all elements in the vector
-const QuickString &KeyListOps::getConcat() {
-	if (empty()) return _nullVal;
-
-	//like collapse but w/o commas. Just a true concat of all vals.
-	//just swap out the delimChar with '' and call collapse, then
-	//restore the delimChar.
-	QuickString oldDelimStr(_delimStr);
-	_delimStr = "";
-	getCollapse(); //this will store it's results in the _retStr method.
-	_delimStr = oldDelimStr;
-	return _retStr;
-}
-
-// return a histogram of values and their freqs. in desc. order of frequency
-const QuickString &KeyListOps::getFreqDesc() {
-	if (empty()) return _nullVal;
-
-	//for each uniq val, report # occurances, in desc order.
-	makeFreqMap();
-	//put freq map into multimap where key is the freq and val is the item. In other words, basically a reverse freq map.
-	histDescType hist;
-	for (; _freqIter != _freqMap.end(); _freqIter++) {
-		hist.insert(pair<int, QuickString>(_freqIter->second, _freqIter->first));
-	}
-	//now iterate through the reverse map we just made and output it's pairs in val:key format.
-	_retStr.clear();
-	for (histDescType::iterator histIter = hist.begin(); histIter != hist.end(); histIter++) {
-		if (histIter != hist.begin()) _retStr += _delimStr;
-		_retStr.append(histIter->second);
-		_retStr += ":";
-		_retStr.append(histIter->first);
-	}
-	return _retStr;
-}
-// return a histogram of values and their freqs. in asc. order of frequency
-const QuickString &KeyListOps::getFreqAsc() {
-	if (empty()) return _nullVal;
-
-	//for each uniq val, report # occurances, in asc order.
-	makeFreqMap();
-	//put freq map into multimap where key is the freq and val is the item. In other words, basically a reverse freq map.
-	histAscType hist;
-	for (; _freqIter != _freqMap.end(); _freqIter++) {
-		hist.insert(pair<int, QuickString>(_freqIter->second, _freqIter->first));
-//		hist[*(_freqIter->second)] = _freqIter->first;
-	}
-	//now iterate through the reverse map we just made and output it's pairs in val:key format.
-	_retStr.clear();
-	for (histAscType::iterator histIter = hist.begin(); histIter != hist.end(); histIter++) {
-		if (histIter != hist.begin()) _retStr += _delimStr;
-		_retStr.append(histIter->second);
-		_retStr += ":";
-		_retStr.append(histIter->first);
-	}
-	return _retStr;
-}
-// return the first value in the list
-const QuickString &KeyListOps::getFirst() {
-	if (empty()) return _nullVal;
-
-	//just the first item.
-	begin();
-	return getColVal();
-}
-// return the last value in the list
-const QuickString &KeyListOps::getLast() {
-	if (empty()) return _nullVal;
-
-	//just the last item.
-	begin();
-	for (size_t i = 0; i < getCount() -1; i++) {
-		next();
-	}
-	return getColVal();
-}
-
-const QuickString &KeyListOps::getColVal() {
-	return _iter->value()->getField(_column);
-}
-
-double KeyListOps::getColValNum() {
-	return atof(_iter->value()->getField(_column).c_str());
-}
-
-void KeyListOps::toArray(bool useNum, SORT_TYPE sortVal) {
-
-	//TBD: optimize performance with better memory management.
-	if (useNum) {
-		_numArray.resize(_keyList->size());
-		int i=0;
-		for (begin(); !end(); next()) {
-			_numArray[i] = getColValNum();
-			i++;
-		}
-	} else {
-		_qsArray.resize(_keyList->size());
-		int i=0;
-		for (begin(); !end(); next()) {
-			_qsArray[i] = getColVal();
-			i++;
-		}
-	}
-	if (sortVal != UNSORTED) {
-		sortArray(useNum, sortVal == ASC);
-	}
-}
-
-void KeyListOps::sortArray(bool useNum, bool ascOrder)
+const QuickString & KeyListOps::getOpVals(RecordKeyList &hits)
 {
-	if (useNum) {
-		if (ascOrder) {
-			sort(_numArray.begin(), _numArray.end(), less<double>());
-		} else {
-			sort(_numArray.begin(), _numArray.end(), greater<double>());
+	//loop through all requested columns, and for each one, call the method needed
+	//for the operation specified.
+	_methods.setKeyList(&hits);
+	_outVals.clear();
+	double val = 0.0;
+	for (int i=0; i < (int)_colOps.size(); i++) {
+		int col = _colOps[i].first;
+		OP_TYPES opCode = _colOps[i].second;
+
+		_methods.setColumn(col);
+		switch (opCode) {
+		case SUM:
+			val = _methods.getSum();
+			if (isnan(val)) {
+				_outVals.append(_methods.getNullValue());
+			} else {
+				_outVals.append(val);
+			}
+			break;
+
+		case MEAN:
+			val = _methods.getMean();
+			if (isnan(val)) {
+				_outVals.append(_methods.getNullValue());
+			} else {
+				_outVals.append(val);
+			}
+			break;
+
+		case STDDEV:
+			val = _methods.getStddev();
+			if (isnan(val)) {
+				_outVals.append(_methods.getNullValue());
+			} else {
+				_outVals.append(val);
+			}
+			break;
+
+		case SAMPLE_STDDEV:
+			val = _methods.getSampleStddev();
+			if (isnan(val)) {
+				_outVals.append(_methods.getNullValue());
+			} else {
+				_outVals.append(val);
+			}
+			break;
+
+		case MEDIAN:
+			val = _methods.getMedian();
+			if (isnan(val)) {
+				_outVals.append(_methods.getNullValue());
+			} else {
+				_outVals.append(val);
+			}
+			break;
+
+		case MODE:
+			_outVals.append(_methods.getMode());
+			break;
+
+		case ANTIMODE:
+			_outVals.append(_methods.getAntiMode());
+			break;
+
+		case MIN:
+			val = _methods.getMin();
+			if (isnan(val)) {
+				_outVals.append(_methods.getNullValue());
+			} else {
+				_outVals.append(val);
+			}
+			break;
+
+		case MAX:
+			val = _methods.getMax();
+			if (isnan(val)) {
+				_outVals.append(_methods.getNullValue());
+			} else {
+				_outVals.append(val);
+			}
+			break;
+
+		case ABSMIN:
+			val = _methods.getAbsMin();
+			if (isnan(val)) {
+				_outVals.append(_methods.getNullValue());
+			} else {
+				_outVals.append(val);
+			}
+			break;
+
+		case ABSMAX:
+			val = _methods.getAbsMax();
+			if (isnan(val)) {
+				_outVals.append(_methods.getNullValue());
+			} else {
+				_outVals.append(val);
+			}
+			break;
+
+		case COUNT:
+			_outVals.append(_methods.getCount());
+			break;
+
+		case DISTINCT:
+			_outVals.append(_methods.getDistinct());
+			break;
+
+		case COUNT_DISTINCT:
+			_outVals.append(_methods.getCountDistinct());
+			break;
+
+		case DISTINCT_ONLY:
+			_outVals.append(_methods.getDistinctOnly());
+			break;
+
+		case COLLAPSE:
+			_outVals.append(_methods.getCollapse());
+			break;
+
+		case CONCAT:
+			_outVals.append(_methods.getConcat());
+			break;
+
+		case FREQ_ASC:
+			_outVals.append(_methods.getFreqAsc());
+			break;
+
+		case FREQ_DESC:
+			_outVals.append(_methods.getFreqDesc());
+			break;
+
+		case FIRST:
+			_outVals.append(_methods.getFirst());
+			break;
+
+		case LAST:
+			_outVals.append(_methods.getLast());
+			break;
+
+		case INVALID:
+		default:
+			// Any unrecognized operation should have been handled already in the context validation.
+			// It's thus unnecessary to handle it here, but throw an error to help us know if future
+			// refactoring or code changes accidentally bypass the validation phase.
+			cerr << "ERROR: Invalid operation given for column " << col << ". Exiting..." << endl;
+			break;
 		}
-	} else {
-		if (ascOrder) {
-			sort(_qsArray.begin(), _qsArray.end(), less<QuickString>());
-		} else {
-			sort(_qsArray.begin(), _qsArray.end(), greater<QuickString>());
+		//if this isn't the last column, add a tab.
+		if (i < (int)_colOps.size() -1) {
+			_outVals.append('\t');
 		}
 	}
+	return _outVals;
 }
 
-void KeyListOps::makeFreqMap() {
-	_freqMap.clear();
 
-	//make a map of values to their number of times occuring.
-	for (begin(); !end(); next()) {
-		_freqMap[getColVal()]++;
-	}
-	_freqIter = _freqMap.begin();
-}

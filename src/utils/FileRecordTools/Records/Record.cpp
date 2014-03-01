@@ -187,9 +187,9 @@ void Record::undoZeroLength()
 
 ostream &operator << (ostream &out, const Record &record)
 {
-	QuickString errBuf;
-	record.print(errBuf);
-	out << errBuf;
+	QuickString outBuf;
+	record.print(outBuf);
+	out << outBuf;
 	return out;
 }
 

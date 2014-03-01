@@ -10,6 +10,7 @@ INCLUDES = -I$(UTILITIES_DIR)/Contexts/ \
 			-I$(UTILITIES_DIR)/FileRecordTools/ \
 		   -I$(UTILITIES_DIR)/FileRecordTools/FileReaders \
            -I$(UTILITIES_DIR)/FileRecordTools/Records \
+ 			-I$(UTILITIES_DIR)/KeyListOps/ \
            -I$(UTILITIES_DIR)/general \
            -I$(UTILITIES_DIR)/NewChromsweep \
            -I$(UTILITIES_DIR)/GenomeFile/ \

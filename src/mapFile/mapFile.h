@@ -38,11 +38,6 @@ private:
     ContextMap *_context;
     BlockMgr *_blockMgr;
     RecordOutputMgr *_recordOutputMgr;
-    KeyListOps _keyListOps;
-    const ContextMap::colOpsType & _colOps;
-    QuickString _outputValues;  // placeholder for the results of mapping B to each a in A.
-
-    void calculateOutput(RecordKeyList &hits);
 };
 
 #endif /* MAPFILE_H */

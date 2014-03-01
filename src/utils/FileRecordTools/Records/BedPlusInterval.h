@@ -38,6 +38,8 @@ public:
 	virtual void setField(int fieldNum, const char *str) { (*(_otherIdxs[fieldNum])) = str; }
 	virtual void setNumPrintFields(int num) { _numPrintFields = num; }
 	virtual int getNumPrintFields() const { return _numPrintFields; }
+	static bool isNumericField(int fieldNum);
+
 
 protected:
 	virtual ~BedPlusInterval();

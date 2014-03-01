@@ -24,6 +24,7 @@
 #include "NewGenomeFile.h"
 #include "api/BamReader.h"
 #include "api/BamAux.h"
+#include "KeyListOps.h"
 
 
 class ContextBase {
@@ -144,6 +145,13 @@ public:
     //methods.
     virtual bool hasIntersectMethods() const { return false; }
 
+    // determine whether column operations like those used in map
+    // are available.
+    void setColumnOpsMethods(bool val);
+    virtual bool hasColumnOpsMethods() const { return _hasColumnOpsMethods; }
+    const QuickString &getColumnOpsVal(RecordKeyList &keyList) const;
+    //methods applicable only to column operations.
+
 protected:
 	PROGRAM_TYPE _program;
 
@@ -204,6 +212,10 @@ protected:
 	bool _forwardOnly;
 	bool _reverseOnly;
 
+	bool _hasColumnOpsMethods;
+	KeyListOps *_keyListOps;
+	QuickString _nullStr; //placeholder return value when col ops aren't valid.
+
 	void markUsed(int i) { _argsProcessed[i] = true; }
 	bool isUsed(int i) const { return _argsProcessed[i]; }
 	bool cmdArgsValid();
@@ -227,6 +239,11 @@ protected:
 	virtual bool handle_split();
 	virtual bool handle_sorted();
 	virtual bool handle_ubam();
+
+	virtual bool handle_c();
+	virtual bool handle_o();
+	virtual bool handle_null();
+	virtual bool handle_delim();
 };
 
 #endif /* CONTEXTBASE_H_ */
