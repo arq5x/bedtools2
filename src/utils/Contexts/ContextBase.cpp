@@ -94,15 +94,9 @@ bool ContextBase::determineOutputType() {
 		return true;
 	}
 
-	//Otherwise, if there are any BAM files in the input,
-	//then the output should be BAM.
-	for (_i = 0; _i < (int)_files.size(); _i++) {
-		if (_files[_i]->getFileType() == FileRecordTypeChecker::BAM_FILE_TYPE) {
-			setOutputFileType(FileRecordTypeChecker::BAM_FILE_TYPE);
-			_bamHeaderAndRefIdx = _i;
-			_outputTypeDetermined = true;
-			return true;
-		}
+	//Otherwise, if the input is BAM, then the output is BAM
+	if (getFile(0)->getFileType() == FileRecordTypeChecker::BAM_FILE_TYPE) {
+		setOutputFileType(FileRecordTypeChecker::BAM_FILE_TYPE);
 	}
 
 	//Okay, it's bed.
