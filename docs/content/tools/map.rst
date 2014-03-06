@@ -31,7 +31,22 @@ Another example is discussed in this Biostars
 .. note::
 
     ``bedtools map`` requires each input file to be sorted by genome coordinate.
-    For BED files, this can be done with ``sort -k1,1 -k2,2n``.
+    For BED files, this can be done with ``sort -k1,1 -k2,2n``. Other sorting criteria are allowed if a genome file (`-g`) is provides that specifies the expected chromosome order.
+
+
+.. note::
+
+    The ``map`` tool is substantially faster in versions 2.19.0 and later. The plot below demonstrates the increased speed when, for example, counting the number of exome alignments that align to each exon. The bedtools times are compared to the bedops `bedmap` utility as a point of reference.
+
+|
+
+.. image:: ../images/tool-glyphs/map-speed-comparo.png 
+    :width: 500pt 
+    :align: center
+
+|
+
+
 
 
 
@@ -189,3 +204,21 @@ BED format) for all intervals in B that overlap each interval in A.
     chr1	10	20	a1	1	+	5
     chr1	50	60	a2	2	-	.
     chr1	80	90	a3	3	-	3
+
+
+================================================================================
+Multiple operations and columns at the same time.
+================================================================================
+
+As of version 2.19.1, multiple columns and operations are allowed at the same time in a single run. This greatly expedites analyses by preventing one from having to process the same file over an over for each column/operation.
+
+.. code-block:: bash
+
+    $ bedtools map -a a.bed -b b.bed -c 5,5,5,5 -o min,max,median,collapse
+
+Or, apply the same function to multiple columns:
+
+.. code-block:: bash
+
+    $ bedtools map -a a.bed -b b.bed -c 3,4,5,6 -o mean
+
