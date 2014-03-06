@@ -446,7 +446,16 @@ echo \
 "chr1^I10^I20^I345.7^Iwhy?^I-^Ichr1^I11^I21^I345.7^Iwhy?^I+" > exp
 $BT intersect -a bed6.strand.bed -b bed6.strand2.bed -wa -wb -S | cat -t > obs
 check obs exp
-
 rm obs exp
+
+##################################################################
+#  Test that intersect of bed query with BAM DB gives Bed output.
+##################################################################
+echo "    intersect.t37...\c"
+echo \
+"chr1	10	20	a1	1	+
+chr1	100	200	a2	2	-" > exp
+$BT intersect -a a.bed -b a.bam > obs
+
 
 rm one_block.bam two_blocks.bam three_blocks.bam
