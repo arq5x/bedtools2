@@ -8,10 +8,10 @@
 #ifndef PUSHBACKSTREAM_H_
 #define PUSHBACKSTREAM_H_
 
-using namespace std;
-
 #include <iostream>
 #include "BTlist.h"
+
+using namespace std;
 
 class PushBackStreamBuf: public std::streambuf {
 public:

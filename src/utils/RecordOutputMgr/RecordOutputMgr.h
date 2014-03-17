@@ -8,8 +8,6 @@
 #ifndef RECORDOUTPUTMGR_H_
 #define RECORDOUTPUTMGR_H_
 
-using namespace std;
-
 #include "ContextBase.h"
 #include "RecordKeyList.h"
 #include "api/BamWriter.h"

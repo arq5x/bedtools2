@@ -12,8 +12,6 @@
 #ifndef NEW_CHROMSWEEP_H
 #define NEW_CHROMSWEEP_H
 
-using namespace std;
-
 #include <string>
 #include "BTlist.h"
 #include "RecordKeyList.h"

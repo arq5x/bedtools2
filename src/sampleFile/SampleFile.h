@@ -8,11 +8,11 @@
 #ifndef SAMPLEFILE_H_
 #define SAMPLEFILE_H_
 
-using namespace std;
-
 #include "ContextSample.h"
 #include "Record.h"
 #include <vector>
+
+using namespace std;
 
 class FileRecordMgr;
 class Context;
