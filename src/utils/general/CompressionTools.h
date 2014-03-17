@@ -8,8 +8,6 @@
 #ifndef COMPRESSIONTOOLS_H_
 #define COMPRESSIONTOOLS_H_
 
-using namespace std;
-
 #include <zlib.h>
 #include "BTlist.h"
 

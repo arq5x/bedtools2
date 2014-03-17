@@ -8,11 +8,12 @@
 #ifndef QUICKSTRING_H_
 #define QUICKSTRING_H_
 
-using namespace std;
 #include <string>
 #include <stdint.h>
 #include <climits>
 #include <ostream>
+
+using namespace std;
 
 class QuickString {
 public:

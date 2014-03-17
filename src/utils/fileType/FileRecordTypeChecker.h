@@ -8,8 +8,6 @@
 #ifndef FILERECORDTYPECHECKER_H_
 #define FILERECORDTYPECHECKER_H_
 
-using namespace std;
-
 #include <string>
 #include <cstring>
 #include <cstdio>
@@ -19,6 +17,8 @@ using namespace std;
 #include <map>
 #include "PushBackStreamBuf.h"
 #include "Tokenizer.h"
+
+using namespace std;
 
 class FileRecordTypeChecker {
 public:

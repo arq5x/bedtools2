@@ -8,8 +8,6 @@
 #ifndef BUFFEREDSTREAMMGR_H_
 #define BUFFEREDSTREAMMGR_H_
 
-using namespace std;
-
 #include <iostream>
 #include "QuickString.h"
 #include "FileRecordTypeChecker.h"

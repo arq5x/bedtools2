@@ -7,13 +7,13 @@
 #ifndef STRANDQUEUE_H_
 #define STRANDQUEUE_H_
 
-using namespace std;
-
 #include <vector>
 #include <queue>
 #include <cstdio>
 #include <cstdlib>
 #include "Record.h"
+
+using namespace std;
 
 class StrandQueue {
 public:

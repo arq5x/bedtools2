@@ -8,8 +8,6 @@
 #ifndef INPUTSTREAMMGR_H_
 #define INPUTSTREAMMGR_H_
 
-using namespace std;
-
 #include "PushBackStreamBuf.h"
 #include "InflateStreamBuf.h"
 #include "QuickString.h"
@@ -17,6 +15,8 @@ using namespace std;
 #include "api/internal/io/BgzfStream_p.h"
 
 #include <iostream>
+
+using namespace std;
 
 class InputStreamMgr {
 public:

@@ -8,14 +8,15 @@
 #ifndef BLOCKMGR_H_
 #define BLOCKMGR_H_
 
+#include <vector>
+
 //This class handles blocks inside of a larger record, such as BED12 and BAM records.
 //Produce and manage seperate records for the sub-intervals inside the
-
-using namespace std;
 
 #include "FileRecordTypeChecker.h"
 #include "RecordKeyList.h"
 
+using namespace std;
 
 class RecordMgr;
 

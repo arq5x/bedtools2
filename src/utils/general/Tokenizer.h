@@ -8,10 +8,10 @@
 #ifndef TOKENIZER_H_
 #define TOKENIZER_H_
 
-using namespace std;
-
 #include "QuickString.h"
 #include <vector>
+
+using namespace std;
 
 class Tokenizer {
 public:

@@ -8,13 +8,13 @@
 #ifndef KEYLISTOPSMETHODS_H_
 #define KEYLISTOPSMETHODS_H_
 
-using namespace std;
-
 #include <map>
 #include <utility> //for pair
 #include "QuickString.h"
 #include <stdint.h>
 #include "RecordKeyList.h"
+
+using namespace std;
 
 class KeyListOpsMethods {
 public:

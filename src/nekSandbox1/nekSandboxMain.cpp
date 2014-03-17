@@ -1,5 +1,3 @@
-using namespace std;
-
 #include "ContextIntersect.h"
 #include "FileRecordMgr.h"
 #include <iostream>

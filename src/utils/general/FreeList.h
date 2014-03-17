@@ -8,11 +8,11 @@
 #ifndef FREELIST_H_
 #define FREELIST_H_
 
-using namespace std;
-
 #include <cstddef> //defines NULL
 #include <deque>
 #include <vector>
+
+using namespace std;
 
 template <class T>
 class FreeList {
