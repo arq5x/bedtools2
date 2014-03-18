@@ -107,8 +107,6 @@ private:
 	map<RECORD_TYPE, bool> _hasScore;
 	map<RECORD_TYPE, bool> _hasStrand;
 
-	//this will be used in determining whether we are looking at a binary or text file.
-	static const float PERCENTAGE_PRINTABLE = .9;
 	bool isBinaryBuffer(const char *buffer, size_t len);
 	bool isBAM(const char *buffer);
 	bool handleTextFormat(const char *buffer, size_t len);
