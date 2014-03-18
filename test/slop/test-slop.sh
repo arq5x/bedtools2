@@ -135,3 +135,15 @@ chr1	0	1000	a2	2	-" > exp
 $BT slop -i a.bed -b 2000 -s -g tiny.genome > obs
 check obs exp
 rm obs exp
+
+###########################################################
+# test slop factor being larger than a signed int
+###########################################################
+echo "    slop.t12...\c"
+echo \
+"chr1	0	1000	a1	1	+
+chr1	0	1000	a2	2	-" > exp
+$BT slop -i a.bed -b 3000000000 -s -g tiny.genome > obs
+check obs exp
+rm obs exp
+

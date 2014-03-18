@@ -57,5 +57,5 @@ private:
     void SlopBed();
 
     // method to add requested "slop" to a single BED entry
-    void AddSlop(BED &bed, int leftSlop, int rightSlop);
+    void AddSlop(BED &bed);
 };

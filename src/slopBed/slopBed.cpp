@@ -50,12 +50,12 @@ void BedSlop::SlopBed() {
     while (_bed->GetNextBed(bedEntry)) {    
         if (_bed->_status == BED_VALID) {
             if (_fractional == false) {
-                AddSlop(bedEntry, (int) _leftSlop, (int) _rightSlop);
+                AddSlop(bedEntry);
             }
             else {
-                int leftSlop  = (int) (_leftSlop  * bedEntry.size());
-                int rightSlop = (int) (_rightSlop * bedEntry.size());
-                AddSlop(bedEntry, leftSlop, rightSlop);
+                _leftSlop  = _leftSlop  * (float)bedEntry.size();
+                _rightSlop = _rightSlop * (float)bedEntry.size();
+                AddSlop(bedEntry);
             }
             _bed->reportBedNewLine(bedEntry);
         }
@@ -64,29 +64,29 @@ void BedSlop::SlopBed() {
 }
 
 
-void BedSlop::AddSlop(BED &bed, int leftSlop, int rightSlop) {
+void BedSlop::AddSlop(BED &bed) {
 
     // special handling if the BED entry is on the negative
     // strand and the user cares about strandedness.
-    CHRPOS chromSize = _genome->getChromSize(bed.chrom);
+    float chromSize = (float)_genome->getChromSize(bed.chrom);
 
     if ( (_forceStrand) && (bed.strand == "-") ) {
         // inspect the start
-        if ( (static_cast<int>(bed.start) - rightSlop) > 0 ) bed.start -= rightSlop;
-        else bed.start = 0;
+    	float newStart = (float)bed.start - _rightSlop;
+    	bed.start = (newStart > 0 ) ? (CHRPOS)newStart : 0;
 
-        // inspect the start
-        if ( (static_cast<int>(bed.end) + leftSlop) <= static_cast<int>(chromSize)) bed.end += leftSlop;
-        else bed.end = chromSize;
+        // inspect the end
+    	float newEnd = (float)bed.end + _leftSlop;
+    	bed.end = (newEnd < chromSize ) ? (CHRPOS)newEnd : (CHRPOS)chromSize;
     }
     else {
         // inspect the start
-        if ( (static_cast<int>(bed.start) - leftSlop) > 0) bed.start -= leftSlop;
-        else bed.start = 0;
+    	float newStart = (float)bed.start - _leftSlop;
+    	bed.start = (newStart > 0 ) ? (CHRPOS)newStart : 0;
 
         // inspect the end
-        if ( (static_cast<int>(bed.end) + rightSlop) <= static_cast<int>(chromSize)) bed.end += rightSlop;
-        else bed.end = chromSize;
+    	float newEnd = (float)bed.end + _rightSlop;
+    	bed.end = (newEnd < chromSize ) ? (CHRPOS)newEnd : (CHRPOS)chromSize;
     }
 }
 
