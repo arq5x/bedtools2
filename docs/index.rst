@@ -24,6 +24,7 @@ To whet your appetite, here are a few examples of ways in which bedtools has bee
 - `RNA-seq coverage analysis <http://www.cureffi.org/2013/11/18/an-mrna-seq-pipeline-using-gsnap-samtools-cufflinks-and-bedtools/>`_. Thanks to `Erik Minikel <https://twitter.com/cureffi>`_.
 - `Identifying targeted regions that lack coverage <https://twitter.com/aaronquinlan/status/421786507511205888>`_. Thanks to `Brent Pedersen <https://twitter.com/brent_p>`_.
 - `Calculating GC content for CCDS exons <http://www.biostars.org/p/47047/>`_.
+- `Making a master table of ChromHMM tracks for multiple cell types <https://gist.github.com/arq5x/3138599>`_.
 
 
 =================
