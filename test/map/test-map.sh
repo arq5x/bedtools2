@@ -694,7 +694,7 @@ echo \
 "
 *****
 ***** ERROR: There are 1 columns given, but there are 2 operations."  > exp
-../../bin/bedtools map -a ivls.bed -b values.bed -o count,sum 2>&1 > /dev/null | head -3 > obs
+$BT map -a ivls.bed -b values.bed -o count,sum 2>&1 > /dev/null | head -3 > obs
 check obs exp
 rm obs exp
 
@@ -708,7 +708,7 @@ echo \
 "
 *****
 ***** ERROR: There are 3 columns given, but there are 2 operations."  > exp
-../../bin/bedtools map -a ivls.bed -b values.bed -c 5,1,2 -o count,sum 2>&1 > /dev/null | head -3 > obs
+$BT map -a ivls.bed -b values.bed -c 5,1,2 -o count,sum 2>&1 > /dev/null | head -3 > obs
 check obs exp
 rm obs exp
 
@@ -721,7 +721,7 @@ echo \
 "
 *****
 ***** ERROR: Column 1 is not a numeric field for database file values.bed."  > exp
-../../bin/bedtools map -a ivls.bed -b values.bed -c 1 -o sum 2>&1 > /dev/null | head -3 > obs
+$BT map -a ivls.bed -b values.bed -c 1 -o sum 2>&1 > /dev/null | head -3 > obs
 check obs exp
 rm obs exp
 
@@ -738,7 +738,7 @@ chr2	0	100	.	.
 chr2	100	200	.	.
 chr3	0	100	6	7
 chr3	100	200	8	23" > exp
-../../bin/bedtools map -a ivls.bed -b values4.bed -c 5,7 -o sum > obs
+$BT map -a ivls.bed -b values4.bed -c 5,7 -o sum > obs
 check obs exp
 rm obs exp
 
@@ -755,7 +755,7 @@ chr2	0	100	.	.	.
 chr2	100	200	.	.	.
 chr3	0	100	10	6	7
 chr3	100	200	120	8	23" > exp
-../../bin/bedtools map -a ivls.bed -b values4.bed -c 2,5,7 -o mean,sum,sum > obs
+$BT map -a ivls.bed -b values4.bed -c 2,5,7 -o mean,sum,sum > obs
 check obs exp
 rm obs exp
 
@@ -771,7 +771,7 @@ chr2	0	100	.
 chr2	100	200	.
 chr3	0	100	76.2222
 chr3	100	200	0.25" > exp
-../../bin/bedtools map -a ivls.bed -b values4.bed -c 7 -o stddev > obs
+$BT map -a ivls.bed -b values4.bed -c 7 -o stddev > obs
 check obs exp
 rm obs exp
 
@@ -786,7 +786,7 @@ chr2	0	100	.
 chr2	100	200	.
 chr3	0	100	114.333
 chr3	100	200	0.5" > exp
-../../bin/bedtools map -a ivls.bed -b values4.bed -c 7 -o sample_stddev > obs
+$BT map -a ivls.bed -b values4.bed -c 7 -o sample_stddev > obs
 check obs exp
 rm obs exp
 
