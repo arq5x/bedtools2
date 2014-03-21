@@ -7,11 +7,24 @@ for a wide-range of genomics analysis tasks. The most widely-used
 tools enable *genome arithmetic*: that is, set theory on the genome.  For 
 example, **bedtools** allows one to *intersect*, *merge*, *count*, *complement*,
 and *shuffle* genomic intervals from multiple files in widely-used 
-genomic file formats such as BAM, BED, GFF/GTF, VCF. 
-
-While each individual tool is designed to do a relatively simple task (e.g., 
+genomic file formats such as BAM, BED, GFF/GTF, VCF. While each individual tool is designed to do a relatively simple task (e.g., 
 *intersect* two interval files), quite sophisticated analyses can be conducted
 by combining multiple bedtools operations on the UNIX command line.
+
+==========================
+Interesting usage examples
+==========================
+To whet your appetite, here are a few examples of ways in which bedtools has been used for genome research. If you have interesteding examples, please send them our way and we will add them to the list.
+
+
+- `Coverage analysis for targeted DNA capture <http://gettinggeneticsdone.blogspot.com/2014/03/visualize-coverage-exome-targeted-ngs-bedtools.html>`_. Thanks to `Stephen Turner <https://twitter.com/genetics_blog>`_.
+- `Measuring similarity of DNase hypersensitivity among many cell types <https://github.com/arq5x/bedtools-protocols/blob/master/bedtools.md#bp6--measuring-dataset-similarity>`_
+- `Extracting promoter sequences from a genome <http://www.biostars.org/p/17162/>`_
+- `Comparing intersections among many genome interval files <http://www.biostars.org/p/13516/>`_
+- `RNA-seq coverage analysis <http://www.cureffi.org/2013/11/18/an-mrna-seq-pipeline-using-gsnap-samtools-cufflinks-and-bedtools/>`_. Thanks to `Erik Minikel <https://twitter.com/cureffi>`_.
+- `Identifying targeted regions that lack coverage <https://twitter.com/aaronquinlan/status/421786507511205888>`_. Thanks to `Brent Pedersen <https://twitter.com/brent_p>`_.
+- `Calculating GC content for CCDS exons <http://www.biostars.org/p/47047/>`_.
+
 
 =================
 Table of contents
