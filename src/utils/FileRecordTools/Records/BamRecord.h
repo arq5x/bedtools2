@@ -23,9 +23,11 @@ public:
 
 	BamRecord();
 	virtual const BamRecord &operator=(const BamRecord &);
+	using Bed6Interval::initFromFile;
 	bool initFromFile(FileReader *);
 	virtual bool initFromFile(BamFileReader *);
 	virtual void clear();
+	using Bed6Interval::print;
 	virtual void print(QuickString &outBuf, int start, int end, RecordKeyList *keyList) const;
 	virtual void print(QuickString &outBuf, RecordKeyList *keyList) const;
 	virtual void print(QuickString &outBuf, const QuickString & start, const QuickString & end, RecordKeyList *keyList) const;
