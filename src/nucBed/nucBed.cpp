@@ -80,12 +80,12 @@ void NucBed::PrintHeader(void) {
     printf("%d_num_T\t", numOrigColumns + 6);
     printf("%d_num_N\t", numOrigColumns + 7);
     printf("%d_num_oth\t", numOrigColumns + 8);
-    printf("%d_seq_len\t", numOrigColumns + 9);
+    printf("%d_seq_len", numOrigColumns + 9);
     
     if (_printSeq)
-        printf("%d_seq", numOrigColumns + 10);
+        printf("\t%d_seq", numOrigColumns + 10);
     if (_hasPattern && !_printSeq)
-        printf("%d_user_patt_count", numOrigColumns + 10);
+        printf("\t%d_user_patt_count", numOrigColumns + 10);
     else if (_hasPattern && _printSeq)
         printf("\t%d_user_patt_count", numOrigColumns + 11);
     printf("\n");
