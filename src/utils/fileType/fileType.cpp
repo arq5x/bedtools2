@@ -70,7 +70,7 @@ bool isGzipFile(istream *file) {
         by John Marshall in response to Issue 30:
         https://github.com/arq5x/bedtools/issues/30
  */
-    if (file->peek() != 0x1f)
+    if (file->peek() == 0x1f)
     {
         return true;
     }
