@@ -6,7 +6,7 @@ using namespace std;
 #include <cstdio>
 #include "RecordKeyList.h"
 #include "NewChromsweep.h"
-#include "DualQueue.h"
+//#include "DualQueue.h"
 #include "ParseTools.h"
 #include <sstream>
 #include <iomanip>
@@ -145,7 +145,7 @@ int nek_sandbox1_main(int argc,char** argv)
 //	bool headerFound = false;
 //	QuickString outbuf;
 //	while (!frm.eof()) {
-//		Record *record = frm.allocateAndGetNextRecord();
+//		Record *record = frm.getNextRecord();
 //		if (!headerFound && frm.hasHeader()) {
 //			cout << frm.getHeader() << endl;
 //			headerFound = true;
@@ -287,7 +287,7 @@ void testDualQueue(Context *context) {
 
 	printf("Original record order is:\n");
 	while (!frm.eof()) {
-		Record *record = frm.allocateAndGetNextRecord();
+		Record *record = frm.getNextRecord();
 		if (record == NULL) {
 			continue;
 		}

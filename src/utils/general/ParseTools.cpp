@@ -19,6 +19,9 @@ int str2chrPos(const QuickString &str) {
 }
 
 int str2chrPos(const char *str, size_t ulen) {
+	if (ulen == 0) {
+		ulen = strlen(str);
+	}
 	int len=(int)ulen;
 	if (len < 1 || len > 10) {
 		return INT_MIN; //can't do more than 9 digits and a minus sign

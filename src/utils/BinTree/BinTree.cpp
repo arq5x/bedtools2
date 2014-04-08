@@ -74,7 +74,7 @@ void BinTree::loadDB()
 
 	Record *record = NULL;
 	while (!_databaseFile->eof()) {
-		record = _databaseFile->allocateAndGetNextRecord();
+		record = _databaseFile->getNextRecord();
 		//In addition to NULL records, we also don't want to add unmapped reads.
 		if (record == NULL || record->isUnmapped()) {
 			continue;

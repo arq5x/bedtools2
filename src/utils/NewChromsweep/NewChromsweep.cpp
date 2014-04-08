@@ -185,7 +185,7 @@ bool NewChromSweep::next(RecordKeyList &next) {
 void NewChromSweep::nextRecord(bool query) {
 	if (query) {
 //		if (!_context->getUseMergedIntervals()) {
-			_currQueryRec = _queryFRM->allocateAndGetNextRecord();
+			_currQueryRec = _queryFRM->getNextRecord();
 //		} else {
 //			_currQueryRec = _queryFRM->allocateAndGetNextMergedRecord(_context->getSameStrand() ? FileRecordMgr::SAME_STRAND_EITHER : FileRecordMgr::ANY_STRAND);
 //		}
@@ -194,7 +194,7 @@ void NewChromSweep::nextRecord(bool query) {
 		}
 	} else { //database
 //		if (!_context->getUseMergedIntervals()) {
-			_currDatabaseRec = _databaseFRM->allocateAndGetNextRecord();
+			_currDatabaseRec = _databaseFRM->getNextRecord();
 //		} else {
 //			_currDatabaseRec = _databaseFRM->allocateAndGetNextMergedRecord(_context->getSameStrand() ? FileRecordMgr::SAME_STRAND_EITHER : FileRecordMgr::ANY_STRAND);
 //		}
