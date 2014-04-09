@@ -8,12 +8,12 @@
 #ifndef PARSETOOLS_H_
 #define PARSETOOLS_H_
 
-using namespace std;
-
 #include <cstring> //for memset
 #include <string>
 #include <vector>
 #include "QuickString.h"
+
+using namespace std;
 
 bool isNumeric(const QuickString &str);
 

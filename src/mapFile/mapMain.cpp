@@ -9,10 +9,11 @@
 
   Licenced under the GNU General Public License 2.0 license.
 ******************************************************************************/
-using namespace std;
 
 #include "mapFile.h"
 #include "ContextMap.h"
+
+using namespace std;
 
 // define our program name
 #define PROGRAM_NAME "bedtools map"

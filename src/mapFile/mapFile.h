@@ -12,8 +12,6 @@
 #ifndef MAPFILE_H
 #define MAPFILE_H
 
-using namespace std;
-
 #include <sstream>
 #include <iomanip>
 #include "VectorOps.h"

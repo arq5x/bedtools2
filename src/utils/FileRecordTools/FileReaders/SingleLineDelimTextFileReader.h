@@ -8,8 +8,6 @@
 #ifndef SINGLELINETEXTFILEREADER_H_
 #define SINGLELINETEXTFILEREADER_H_
 
-using namespace std;
-
 #include "FileReader.h"
 #include "QuickString.h"
 

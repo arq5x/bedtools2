@@ -8,8 +8,6 @@
 #ifndef BINTREE_H_
 #define BINTREE_H_
 
-using namespace std;
-
 #include <stdint.h>
 #include <string>
 #include <set>
@@ -18,6 +16,8 @@ using namespace std;
 #include "QuickString.h"
 #include "RecordKeyList.h"
 #include "ContextIntersect.h"
+
+using namespace std;
 
 class FileRecordMgr;
 class Record;

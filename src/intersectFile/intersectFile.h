@@ -12,8 +12,6 @@
 #ifndef INTERSECTFILE_H
 #define INTERSECTFILE_H
 
-using namespace std;
-
 #include "RecordKeyList.h"
 
 using namespace std;
