@@ -22,7 +22,7 @@ bool isNumeric(const QuickString &str);
 //Empty strings, too long strings, or strings containing anything other than
 //digits (with the excpetion of a minus sign in the first position)
 //will result in error. Errors return INT_MIN.
-int str2chrPos(const char *str, size_t len);
+int str2chrPos(const char *str, size_t len = 0);
 int str2chrPos(const QuickString &str);
 
 

@@ -76,9 +76,15 @@ bool RecordOutputMgr::printKeyAndTerminate(RecordKeyList &keyList) {
 	if (bamCode == BAM_AS_BAM) {
 		return true;
 	} else if (bamCode == NOT_BAM) {
-		keyList.getKey()->print(_outBuf);
+		if (_context->getProgram() == ContextBase::MERGE) {
+			//when printing merged records, we want to force the printing into
+			//bed3 format, which is surprisingly difficult to do. Had to use the following:
+			const Bed3Interval *bed3 = static_cast<const Bed3Interval *>(keyList.getKey());
+			bed3->Bed3Interval::print(_outBuf);
+		} else {
+			keyList.getKey()->print(_outBuf);
+		}
 		return false;
-
 	}
 	//otherwise, it was BAM_AS_BED, and the key was printed.
 	return false;
@@ -114,6 +120,7 @@ void RecordOutputMgr::printRecord(const Record *record)
 
 void RecordOutputMgr::printRecord(const Record *record, const QuickString & value)
 {	
+	_afterVal = value;
 	printRecord(record);
 	_outBuf.append(value);
 	newline();
@@ -203,6 +210,17 @@ void RecordOutputMgr::printRecord(RecordKeyList &keyList, RecordKeyList *blockLi
 	} else if (_context->getProgram() == ContextBase::MAP) {
 		if (!printKeyAndTerminate(keyList)) {
 			tab();
+		}
+		_currBamBlockList = NULL;
+		return;
+	} else if (_context->getProgram() == ContextBase::MERGE) {
+		if (!printKeyAndTerminate(keyList)) {
+			if (_context->getDesiredStrand() != FileRecordMergeMgr::ANY_STRAND) {
+				//add the sign of the record
+				tab();
+				_outBuf.append(keyList.getKey()->getStrand());
+			}
+			if (!_afterVal.empty()) tab();
 		}
 		_currBamBlockList = NULL;
 		return;

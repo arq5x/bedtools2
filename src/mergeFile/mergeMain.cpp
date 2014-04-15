@@ -9,7 +9,7 @@
 
   Licenced under the GNU General Public License 2.0 license.
 ******************************************************************************/
-#include "mergeBed.h"
+#include "mergeFile.h"
 #include "version.h"
 
 using namespace std;
@@ -26,113 +26,21 @@ void merge_help(void);
 
 int merge_main(int argc, char* argv[]) {
 
-    // our configuration variables
-    bool showHelp = false;
-
-    // input files
-    string bedFile  = "stdin";
-    int maxDistance = 0;
-    string scoreOp  = "";
-
-    // input arguments
-    bool haveBed         = true;
-    bool numEntries      = false;
-    bool haveMaxDistance = false;
-    bool forceStrand     = false;
-    bool reportNames     = false;
-    bool reportScores    = false;
-    string delimiter     = ",";
-
-    for(int i = 1; i < argc; i++) {
-        int parameterLength = (int)strlen(argv[i]);
-
-        if((PARAMETER_CHECK("-h", 2, parameterLength)) ||
-        (PARAMETER_CHECK("--help", 5, parameterLength))) {
-            showHelp = true;
+    ContextMerge *context = new ContextMerge();
+    if (!context->parseCmdArgs(argc, argv, 1) || context->getShowHelp() || !context->isValidState()) {
+        if (!context->getErrorMsg().empty()) {
+            cerr << context->getErrorMsg() << endl;
         }
-    }
-
-    if(showHelp) merge_help();
-
-    // do some parsing (all of these parameters require 2 strings)
-    for(int i = 1; i < argc; i++) {
-
-        int parameterLength = (int)strlen(argv[i]);
-
-        if(PARAMETER_CHECK("-i", 2, parameterLength)) {
-            if ((i+1) < argc) {
-                bedFile = argv[i + 1];
-                i++;
-            }
-        }
-        else if(PARAMETER_CHECK("-n", 2, parameterLength)) {
-            numEntries = true;
-        }
-        else if(PARAMETER_CHECK("-d", 2, parameterLength)) {
-            if ((i+1) < argc) {
-                haveMaxDistance = true;
-                maxDistance = atoi(argv[i + 1]);
-                i++;
-            }
-        }
-        else if (PARAMETER_CHECK("-s", 2, parameterLength)) {
-            forceStrand = true;
-        }
-        else if (PARAMETER_CHECK("-nms", 4, parameterLength)) {
-            reportNames = true;
-        }
-        else if (PARAMETER_CHECK("-scores", 7, parameterLength)) {
-            reportScores = true;
-            if ((i+1) < argc) {
-                scoreOp      = argv[i + 1];
-                i++;
-            }
-        }
-        else if (PARAMETER_CHECK("-delim", 6, parameterLength)) {
-            if ((i+1) < argc) {
-                delimiter      = argv[i + 1];
-                i++;
-            }
-        }
-        else {
-            cerr << endl << "*****ERROR: Unrecognized parameter: " << argv[i] << " *****" << endl << endl;
-            showHelp = true;
-        }
-    }
-
-    // make sure we have both input files
-    if (!haveBed) {
-        cerr << endl << "*****" << endl << "*****ERROR: Need -i BED file. " << endl << "*****" << endl;
-        showHelp = true;
-    }
-    if ((reportScores == true) && (scoreOp != "sum")  
-         && (scoreOp != "max")  && (scoreOp != "min") 
-         && (scoreOp != "mean") && (scoreOp != "mode") 
-         && (scoreOp != "median") && (scoreOp != "antimode") 
-         && (scoreOp != "collapse")) 
-    {
-        cerr << endl 
-             << "*****" 
-             << endl 
-             << "*****ERROR: Invalid scoreOp selection \"" 
-             << scoreOp 
-             << endl 
-             << "\"  *****" 
-             << endl;
-        showHelp = true;
-    }
-
-    if (!showHelp) {
-        BedMerge *bm = new BedMerge(bedFile, numEntries, 
-                                    maxDistance, forceStrand, 
-                                    reportNames, reportScores, 
-                                    scoreOp, delimiter);
-        delete bm;
-    }
-    else {
         merge_help();
+        delete context;
+        return 0;
     }
-    return 0;
+    MergeFile *mergeFile = new MergeFile(context);
+
+    bool retVal = mergeFile->merge();
+    delete mergeFile;
+    delete context;
+    return retVal ? 0 : 1;
 }
 
 void merge_help(void) {

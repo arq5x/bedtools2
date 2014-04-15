@@ -30,18 +30,22 @@ $BT merge -i a.bed > obs
 check obs exp
 rm obs exp
 
-
+###########################################################
+#
+# NOTE: Testing for sorted input is now deprecated, as the
+# FileRecordMgr is already testing for that.
+#
 ###########################################################
 # Test #2
 #  Enforce coordinate sorted input.
 ###########################################################
-echo "    merge.t2...\c"
-command -v tac 2>/dev/null || alias tac="sed '1!G;h;\$!d'"
-tac a.bed | $BT merge -i - 2> obs
-echo "ERROR: input file: (-) is not sorted by chrom then start.
-       The start coordinate at line 3 is less than the start at line 2" > exp
-check obs exp
-rm obs exp
+#echo "    merge.t2...\c"
+#command -v tac 2>/dev/null || alias tac="sed '1!G;h;\$!d'"
+#tac a.bed | $BT merge -i - 2> obs
+#echo "ERROR: input file: (-) is not sorted by chrom then start.
+#       The start coordinate at line 3 is less than the start at line 2" > exp
+#check obs exp
+#rm obs exp
 
 
 ###########################################################
@@ -64,11 +68,9 @@ rm obs exp
 ###########################################################
 echo "    merge.t4...\c"
 echo \
-"chr1	10	20
-*****
-*****ERROR: No names found to report for the -names option. Exiting.
-*****" > exp
-$BT merge -i a.bed -nms > obs 2>&1
+"*****
+***** ERROR: Requested column 4, but database file a.bed only has fields 1 - 3." > exp
+$BT merge -i a.bed -nms 2>&1 > /dev/null | head -3 | tail -2 > obs
 check obs exp
 rm obs exp
 
@@ -130,7 +132,7 @@ chr1	30	100	a2,a3,a4	9	3
 chr2	10	20	a1	5	1
 chr2	30	40	a2	6	1
 chr2	42	100	a3,a4	15	2" > exp
-$BT merge -i a.full.bed -nms -n -scores sum> obs
+$BT merge -i a.full.bed -nms -scores sum -n> obs
 check obs exp
 rm obs exp
 
@@ -139,15 +141,15 @@ rm obs exp
 ###########################################################
 echo "    merge.t9...\c"
 echo \
-"chr1	10	20	a1	1	+	1
-chr1	30	40	a2	2	+	1
-chr1	45	100	a4	4	+	1
-chr1	40	50	a3	3	-	1
-chr2	10	20	a1	5	+	1
-chr2	30	40	a2	6	+	1
-chr2	42	50	a3	7	+	1
-chr2	45	100	a4	8	-	1" > exp
-$BT merge -i a.full.bed -s -nms -n -scores sum> obs
+"chr1	10	20	+	a1	1	1
+chr1	30	40	+	a2	2	1
+chr1	40	50	-	a3	3	1
+chr1	45	100	+	a4	4	1
+chr2	10	20	+	a1	5	1
+chr2	30	40	+	a2	6	1
+chr2	42	50	+	a3	7	1
+chr2	45	100	-	a4	8	1" > exp
+$BT merge -i a.full.bed -s -nms -scores sum -n> obs
 check obs exp
 rm obs exp
 

@@ -51,7 +51,7 @@ bool SampleFile::takeSample()
 
 
 	while (!_inputFile->eof()) {
-		Record *record = _inputFile->allocateAndGetNextRecord();
+		Record *record = _inputFile->getNextRecord();
 		if (record == NULL) {
 			continue;
 		}
