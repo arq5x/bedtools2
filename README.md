@@ -1,13 +1,15 @@
 bedtools - a swiss army knife for genome arithmetic         
 ===================================================
 
-**Current version**: 2.19.0
+**Current version**: 2.19.1
 
 Note
 -------
 Stable release for bedtools were formerly archived on Google Code. Unfortunately, the Google Code
 downloads facility is shutting down; so henceforth, all source code and stable releases will be 
 maintained via this Github repository.
+
+**Full documentation**:  http://bedtools.readthedocs.org
 
 Summary
 -------

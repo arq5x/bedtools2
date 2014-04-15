@@ -1,4 +1,5 @@
 BT=${BT-../../bin/bedtools}
+DATA=${DATA-../../data}
 
 check()
 {
@@ -17,8 +18,8 @@ echo "    reldist.t01...\c"
 echo \
 "reldist	count	total	fraction
 0.00	43424	43424	1.000" > exp
-$BT reldist -a ../../data/refseq.chr1.exons.bed.gz \
-            -b ../../data/refseq.chr1.exons.bed.gz > obs
+$BT reldist -a $DATA/refseq.chr1.exons.bed.gz \
+            -b $DATA/refseq.chr1.exons.bed.gz > obs
 check obs exp
 rm obs exp
 
@@ -79,8 +80,8 @@ echo \
 0.47	850	43408	0.020
 0.48	1006	43408	0.023
 0.49	937	43408	0.022" > exp
-$BT reldist -a ../../data/refseq.chr1.exons.bed.gz \
-            -b ../../data/aluY.chr1.bed.gz > obs
+$BT reldist -a $DATA/refseq.chr1.exons.bed.gz \
+            -b $DATA/aluY.chr1.bed.gz > obs
 check obs exp
 rm obs exp
 
@@ -143,7 +144,7 @@ echo \
 0.48	365	43422	0.008
 0.49	336	43422	0.008
 0.50	38	43422	0.001" > exp
-$BT reldist -a ../../data/refseq.chr1.exons.bed.gz \
-            -b ../../data/gerp.chr1.bed.gz > obs
+$BT reldist -a $DATA/refseq.chr1.exons.bed.gz \
+            -b $DATA/gerp.chr1.bed.gz > obs
 check obs exp
 rm obs exp

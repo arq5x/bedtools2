@@ -748,3 +748,17 @@ void BedFile::loadBedFileIntoMapNoBin() {
         sort(m->second.begin(), m->second.end(), sortByStart);
     }
 }
+
+void BedFile::loadBedFileIntoVector() {
+
+    BED bedEntry;
+    
+    Open();
+    while (GetNextBed(bedEntry)) {
+        if (_status == BED_VALID) {
+            bedList.push_back(bedEntry);
+        }
+    }
+    Close();
+}
+

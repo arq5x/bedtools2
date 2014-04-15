@@ -433,6 +433,9 @@ public:
     // load a BED file into a map keyed by chrom. value is vector of BEDs
     void loadBedFileIntoMapNoBin();
 
+    // load a BED file into a vector of BEDs
+    void loadBedFileIntoVector();
+
     // Given a chrom, start, end and strand for a single feature,
     // search for all overlapping features in another BED file.
     // Searches through each relevant genome bin on the same chromosome
@@ -487,6 +490,7 @@ public:
     masterBedCovMap      bedCovMap;
     masterBedCovListMap  bedCovListMap;
     masterBedMap         bedMap;
+    bedVector            bedList;
     masterBedMapNoBin    bedMapNoBin;
     
     BedLineStatus _status;

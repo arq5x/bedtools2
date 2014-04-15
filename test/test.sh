@@ -49,6 +49,9 @@ cd reldist; bash test-reldist.sh; cd ..
 echo " Testing bedtools slop:"
 cd slop; bash test-slop.sh; cd ..
 
+echo " Testing bedtools shuffle:"
+cd shuffle; bash test-shuffle.sh; cd ..
+
 echo " Testing bedtools subtract:"
 cd subtract; bash test-subtract.sh; cd ..
 

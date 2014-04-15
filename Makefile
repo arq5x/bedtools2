@@ -138,7 +138,7 @@ clean:
 .PHONY: clean
 
 test: all
-	@cd test; sh test.sh
+	@cd test; bash test.sh
 
 .PHONY: test
 

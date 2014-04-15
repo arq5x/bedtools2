@@ -74,15 +74,24 @@ BedShuffle::BedShuffle(string &bedFile, string &genomeFile,
     
     if (_haveInclude) {
         _include = new BedFile(includeFile);
-        _include->loadBedFileIntoMapNoBin();
-        
-        _numIncludeChroms = 0;
-        masterBedMapNoBin::const_iterator it  = _include->bedMapNoBin.begin(); 
-        masterBedMapNoBin::const_iterator itEnd = _include->bedMapNoBin.end();
-        for(; it != itEnd; ++it) {
-            _includeChroms.push_back(it->first);
-            _numIncludeChroms++;
+
+        // the user wants to choose the chromosome randomly first
+        if (_chooseChrom) {
+            _include->loadBedFileIntoMapNoBin();
+            _numIncludeChroms = 0;
+            masterBedMapNoBin::const_iterator it  = _include->bedMapNoBin.begin(); 
+            masterBedMapNoBin::const_iterator itEnd = _include->bedMapNoBin.end();
+            for(; it != itEnd; ++it) {
+                _includeChroms.push_back(it->first);
+                _numIncludeChroms++;
+            }
         }
+        // thue user wants the intervals shuffled accordingly to the 
+        // chrom distribution in the -incl file.
+        else
+        {
+            _include->loadBedFileIntoVector();
+        }   
     }
 
     if (_haveExclude == true && _haveInclude == false)
@@ -449,8 +458,14 @@ void BedShuffle::ChooseLocusFromInclusionFile(BED &bedEntry) {
     CHRPOS randomStart;
     BED includeInterval;
     
-    if (_sameChrom == false) {
-
+    // choose an -incl interval randomly.
+    if (_chooseChrom == false) {
+        includeInterval = _include->bedList[rand() % _include->bedList.size()];
+        bedEntry.chrom = includeInterval.chrom;
+    }
+    // choose a chromosome randomly from the -incl file. then choose an 
+    // interval from that chrom randomly.
+    else {
         // grab a random chromosome from the inclusion file.
         randomChrom            = _includeChroms[rand() % _numIncludeChroms];
         // get the number of inclusion intervals for that chrom
@@ -461,22 +476,6 @@ void BedShuffle::ChooseLocusFromInclusionFile(BED &bedEntry) {
         includeInterval        = _include->bedMapNoBin[randomChrom][interval];
 
         bedEntry.chrom = randomChrom;
-    }
-    else {
-        if ( _include->bedMapNoBin.find(chrom) != _include->bedMapNoBin.end() ) 
-        {
-            // get the number of inclusion intervals for the original chrom
-            size_t size =  _include->bedMapNoBin[chrom].size();
-            // grab a random interval on the chosen chromosome.
-            includeInterval = _include->bedMapNoBin[chrom][rand() % size];
-        }
-        else {
-            cerr << "Error, line " << _bed->_lineNum 
-                 << ": the requested chromosome ("
-                 << chrom
-                 << ") cannot "
-                 << "be found in the -incl file " << endl;
-        }
     }
     randomStart    = includeInterval.start + rand() % (includeInterval.size());
     bedEntry.start = randomStart;

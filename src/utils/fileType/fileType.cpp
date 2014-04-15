@@ -48,24 +48,31 @@ bool isGzipFile(istream *file) {
        without triggering the "fail" bit.  This was necessary to support
        FIFOs, per version 2.13.0
     */
-    struct  {
-        unsigned char id1;
+//    struct  {
+//        unsigned char id1;
 //      unsigned char id2;
 //      unsigned char cm;
-    } gzip_header;
+//    } gzip_header;
 
-    if (!file->read((char*)&gzip_header, sizeof(gzip_header))) {
-        return false;
-    }
-
-    if ( gzip_header.id1 == 0x1f )
+//   if (!file->read((char*)&gzip_header, sizeof(gzip_header))) {
+//       return false;
+//   }
+//  if ( gzip_header.id1 == 0x1f )
 //       &&
 //       gzip_header.id2 == 0x8b
 //       &&
 //       gzip_header.cm == 8 )
+
+/*
+        26-Dec-2012 and again 20-Mar-2014:
+        Just peek at the first byte instead of reading it so that we don't
+        affect the istream's failbit.  This modification was wisely proposed
+        by John Marshall in response to Issue 30:
+        https://github.com/arq5x/bedtools/issues/30
+ */
+    if (file->peek() == 0x1f)
     {
         return true;
     }
-    file->putback(gzip_header.id1);
     return false;
 }
