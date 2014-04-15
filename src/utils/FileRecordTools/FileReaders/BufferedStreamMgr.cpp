@@ -73,7 +73,18 @@ bool BufferedStreamMgr::getTypeData()
 		if (!_typeChecker.scanBuffer(_currScanBuffer.c_str(), _currScanBuffer.size()) && !_typeChecker.needsMoreData()) {
 			return false;
 		} else if (_typeChecker.needsMoreData()) {
-			_inputStreamMgr->populateScanBuffer();
+			if (!_inputStreamMgr->populateScanBuffer()) {
+				// We have found a file with just a header. If the file and record type are known,
+				//break here. Otherwise, assign those types to empty file and record type, then break.
+				if ((_typeChecker.getFileType() != FileRecordTypeChecker::UNKNOWN_FILE_TYPE) &&
+					(_typeChecker.getRecordType() != FileRecordTypeChecker::UNKNOWN_RECORD_TYPE)) {
+					break;
+				} else {
+					_typeChecker.setFileType(FileRecordTypeChecker::EMPTY_FILE_TYPE);
+					_typeChecker.setRecordType(FileRecordTypeChecker::EMPTY_RECORD_TYPE);
+					break;
+				}
+			}
 			_currScanBuffer.append(_inputStreamMgr->getSavedData());
 		}
 	} while (_typeChecker.needsMoreData());

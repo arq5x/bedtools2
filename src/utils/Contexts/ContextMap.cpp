@@ -47,13 +47,3 @@ bool ContextMap::parseCmdArgs(int argc, char **argv, int skipFirstArgs) {
 	}
 	return ContextIntersect::parseCmdArgs(argc, argv, _skipFirstArgs);
 }
-//
-//
-//bool ContextMap::isValidState()
-//{
-//	if (!ContextIntersect::isValidState()) {
-//		return false;
-//	}
-//}
-//
-//

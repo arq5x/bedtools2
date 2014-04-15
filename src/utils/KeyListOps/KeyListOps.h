@@ -18,9 +18,23 @@ public:
 	KeyListOps();
 
 	void setColumns(const QuickString &columns) { _columns = columns; }
+	void addColumns(const QuickString &newCols) {
+		if (!_columns.empty()) _columns += ",";
+		_columns += newCols;
+	}
 	void setOperations(const QuickString & operation) { _operations = operation; }
+	void addOperations(const QuickString &newOps) {
+		if (!_operations.empty()) _operations += ",";
+		_operations += newOps;
+	}
+
 	void setNullValue(const QuickString & nullValue) { _methods.setNullValue(nullValue); }
 	void setDelimStr(const QuickString & delimStr) { _methods.setDelimStr(delimStr); }
+
+	const QuickString &getColumns() { return _columns; }
+	const QuickString &getOperations() { return _operations; }
+	const QuickString &getNullValue() { return _methods.getNullValue(); }
+	const QuickString &getDelimStr() { return _methods.getDelimStr(); }
 
 	void setKeyList(RecordKeyList *keyList) { _methods.setKeyList(keyList); }
 

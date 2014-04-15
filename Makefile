@@ -47,7 +47,7 @@ SUBDIRS = $(SRC_DIR)/annotateBed \
 		  $(SRC_DIR)/linksBed \
 		  $(SRC_DIR)/maskFastaFromBed \
 		  $(SRC_DIR)/mapFile \
-		  $(SRC_DIR)/mergeBed \
+		  $(SRC_DIR)/mergeFile \
 		  $(SRC_DIR)/multiBamCov \
 		  $(SRC_DIR)/multiIntersectBed \
 		   $(SRC_DIR)/nekSandbox1 \

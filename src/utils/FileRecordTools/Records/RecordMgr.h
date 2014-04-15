@@ -10,6 +10,7 @@
 
 //include headers for all Records and derivative classes
 #include "Record.h"
+#include "EmptyRecord.h"
 #include "Bed3Interval.h"
 #include "Bed4Interval.h"
 #include "Bed5Interval.h"
