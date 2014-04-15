@@ -37,6 +37,10 @@ RecordOutputMgr::RecordOutputMgr()
 
 RecordOutputMgr::~RecordOutputMgr()
 {
+	// In the rare case when a file had a header but was otherwise empty,
+	// we'll need to make a last check to see if the header still needs to be printed.
+	checkForHeader();
+
 	if (_outBuf.size() > 0) {
 		flush();
 	}
@@ -122,7 +126,10 @@ void RecordOutputMgr::printRecord(const Record *record, const QuickString & valu
 {	
 	_afterVal = value;
 	printRecord(record);
-	_outBuf.append(value);
+	if (!value.empty()) {
+		tab();
+		_outBuf.append(value);
+	}
 	newline();
 
 	if (needsFlush()) {
@@ -152,9 +159,8 @@ void RecordOutputMgr::printRecord(RecordKeyList &keyList, RecordKeyList *blockLi
 	}
 	//The first time we print a record is when we print any header, because the header
 	//hasn't been read from the query file until after the first record has also been read.
-	if (_context->getPrintHeader()) {
-		checkForHeader();
-	}
+	checkForHeader();
+
 	const_cast<Record *>(keyList.getKey())->undoZeroLength();
 	_currBamBlockList = blockList;
 
@@ -208,9 +214,11 @@ void RecordOutputMgr::printRecord(RecordKeyList &keyList, RecordKeyList *blockLi
 		_currBamBlockList = NULL;
 		return;
 	} else if (_context->getProgram() == ContextBase::MAP) {
-		if (!printKeyAndTerminate(keyList)) {
-			tab();
-		}
+		printKeyAndTerminate(keyList);
+		_currBamBlockList = NULL;
+		return;
+	} else if (_context->getProgram() == ContextBase::MERGE) {
+		printKeyAndTerminate(keyList);
 		_currBamBlockList = NULL;
 		return;
 	} else if (_context->getProgram() == ContextBase::MERGE) {
@@ -228,6 +236,9 @@ void RecordOutputMgr::printRecord(RecordKeyList &keyList, RecordKeyList *blockLi
 }
 
 void RecordOutputMgr::checkForHeader() {
+	// Do we need to print a header?
+	if (!_context->getPrintHeader()) return;
+
 	//if the program is based on intersection, we want the header from the query file.
 	if (_context->hasIntersectMethods()) {
 		int queryIdx = (static_cast<ContextIntersect *>(_context))->getQueryFileIdx();

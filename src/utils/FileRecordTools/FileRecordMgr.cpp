@@ -208,6 +208,7 @@ void FileRecordMgr::deleteRecord(RecordKeyList *keyList) {
 void FileRecordMgr::allocateFileReader()
 {
 	switch (_fileType) {
+	case FileRecordTypeChecker::EMPTY_FILE_TYPE:
 	case FileRecordTypeChecker::SINGLE_LINE_DELIM_TEXT_FILE_TYPE:
 	case FileRecordTypeChecker::VCF_FILE_TYPE:
 		_fileReader = new SingleLineDelimTextFileReader(_bufStreamMgr->getTypeChecker().getNumFields(), _bufStreamMgr->getTypeChecker().getDelimChar());

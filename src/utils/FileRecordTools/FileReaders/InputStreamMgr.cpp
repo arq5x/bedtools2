@@ -125,7 +125,7 @@ int InputStreamMgr::read(char *data, size_t dataSize)
 	return origRead + _finalInputStream->gcount();
 }
 
-void InputStreamMgr::populateScanBuffer()
+bool InputStreamMgr::populateScanBuffer()
 {
 	_scanBuffer.clear();
 	_saveDataStr.clear();
@@ -133,8 +133,7 @@ void InputStreamMgr::populateScanBuffer()
 	int currChar = 0;
 	while (1) {
 		if (_isGzipped && _bamRuledOut) {
-			readZipChunk();
-			return;
+			return readZipChunk();
 		}
 		currChar = _pushBackStreamBuf->sbumpc();
 		//Stop when EOF hit.
@@ -145,7 +144,8 @@ void InputStreamMgr::populateScanBuffer()
 		_scanBuffer.push_back(currChar);
 		if (_isGzipped) {
 			if (!_bamRuledOut && detectBamOrBgzip(numChars, currChar)) {
-				return;
+				//we now know the file is in bgzipped format
+				return true;
 			}
 			if (numChars == 0) {
 				continue; //this will only happen when we've just discovered that this
@@ -163,6 +163,9 @@ void InputStreamMgr::populateScanBuffer()
 
 	//append it to the savedDataStr.
 	_scanBuffer.toStr(_saveDataStr, true);
+	if (_numBytesInBuffer == 0) return false;
+	return true;
+
 }
 
 bool InputStreamMgr::detectBamOrBgzip(int &numChars, int currChar)
@@ -239,7 +242,7 @@ bool InputStreamMgr::detectBamOrBgzip(int &numChars, int currChar)
 	return false;
 }
 
-void InputStreamMgr::readZipChunk()
+bool InputStreamMgr::readZipChunk()
 {
 	if (_tmpZipBuf == NULL) {
 		_tmpZipBuf = new char[SCAN_BUFFER_SIZE +1];
@@ -251,7 +254,8 @@ void InputStreamMgr::readZipChunk()
 	if ((int)numCharsRead < SCAN_BUFFER_SIZE) {
 		_streamFinished = true;
 	}
-	return;
+	if (numCharsRead == 0) return false;
+	return true;
 }
 
 bool InputStreamMgr::resetStream()

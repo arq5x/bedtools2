@@ -233,6 +233,13 @@ bool ContextBase::openFiles() {
 	if (_allFilesOpened) {
 		return true;
 	}
+
+	if (_fileNames.size() == 0) {
+		//No input was specified. Error and exit.
+		_errorMsg += "\n***** ERROR: No input file given. Exiting. *****";
+		return false;
+	}
+
 	_files.resize(_fileNames.size());
 
 	for (int i = 0; i < (int)_fileNames.size(); i++) {

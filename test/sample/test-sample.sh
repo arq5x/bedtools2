@@ -40,20 +40,18 @@ rm obs
 ############################################################
 echo "    sample.new.t02...\c"
 echo "***** ERROR: Unrecognized parameter: -wrongArg *****" > exp
-$BT sample -wrongArg 2>&1 > /dev/null | head -2 | tail -1 > obs
+$BT sample -i mainFile.bed -wrongArg 2>&1 > /dev/null | head -2 | tail -1 > obs
 check obs exp
 rm obs exp
 
-
 ###########################################################
-#  Test that we throw an error when no input file is given
+#  Test that we throw an error when no input file was given.
 ############################################################
 echo "    sample.new.t03...\c"
-echo "***** ERROR: input file not specified. *****" > exp
+echo "***** ERROR: No input file given. Exiting. *****" > exp;
 $BT sample -n 10 2>&1 > /dev/null | head -2 | tail -1 > obs
 check obs exp
 rm obs exp
-
 
 ###########################################################
 #  Test that we throw an error for -i without input file
@@ -115,6 +113,9 @@ echo "#This is the mainFile from which samples will be taken." > exp
 $BT sample -i mainFile.bed -n 10 -header | head -1 > obs
 check obs exp
 rm obs exp
+
+
+
 
 rm mainFile.bed
 

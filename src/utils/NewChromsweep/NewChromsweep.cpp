@@ -41,9 +41,9 @@ bool NewChromSweep::init() {
     _databaseFRM = _context->getFile(_context->getDatabaseFileIdx());
     
     nextRecord(false);
-    if (_currDatabaseRec == NULL) {
-    	return false;
-    }
+//    if (_currDatabaseRec == NULL) {
+//    	return false;
+//    }
 
     //determine whether to stop when the database end is hit, or keep going until the
     //end of the query file is hit as well.

@@ -82,7 +82,30 @@ bool ContextMerge::isValidState()
 	}
 	if (_files.size() != 1) {
 		_errorMsg = "\n***** ERROR: input file not specified. *****";
-		// Allow one and only input file for now
+		// Allow only one input file for now
+		return false;
+	}
+
+	//
+	// Tests for stranded merge
+	//
+	if (_desiredStrand != FileRecordMergeMgr::ANY_STRAND) { // requested stranded merge
+		// make sure file has strand.
+		if (!getFile(0)->recordsHaveStrand()) {
+			_errorMsg = "\n***** ERROR: stranded merge requested, but input file records do not have strand. *****";
+			return false;
+		}
+		//make sure file is not VCF.
+		if (!getFile(0)->getFileType() == FileRecordTypeChecker::VCF_FILE_TYPE) {
+			_errorMsg = "\n***** ERROR: stranded merge not supported for VCF files. *****";
+			return false;
+		}
+	}
+
+	//column operations not allowed with BAM input
+	if ((!_keyListOps->getColumns().empty() || !_keyListOps->getOperations().empty()) &&
+			getFile(0)->getFileType() == FileRecordTypeChecker::BAM_FILE_TYPE) {
+		_errorMsg = "\n***** ERROR: stranded merge not supported for VCF files. *****";
 		return false;
 	}
 	return true;
@@ -108,36 +131,25 @@ bool ContextMerge::handle_d() {
 
 bool ContextMerge::handle_n()
 {
-	//This is the same as telling map "-c any -o count"
-	_keyListOps->addColumns("1"); //doesn't really matter which column, but the default column
-	//for keyListOps is score, which not every record necessarily has.
-	_keyListOps->addOperations("count");
 	markUsed(_i - _skipFirstArgs);
-    return true;
+	_errorMsg = "\n***** ERROR: -n option is deprecated. Please see the documentation for the -c and -o column operation options. *****";
+    return false;
 }
 
 bool ContextMerge::handle_nms()
 {
-	//This is the same as telling map "-c 4 -o collapse"
-	_keyListOps->addColumns("4");
-	_keyListOps->addOperations("collapse");
 	markUsed(_i - _skipFirstArgs);
-    return true;
+	_errorMsg = "\n***** ERROR: -nms option is deprecated. Please see the documentation for the -c and -o column operation options. *****";
+    return false;
+
 }
 
 
 bool ContextMerge::handle_scores()
 {
-    if ((_i+1) < _argc) {
-    	_keyListOps->addColumns("5");
-    	_keyListOps->addOperations(_argv[_i+1]);
-    	markUsed(_i - _skipFirstArgs);
-        _i++;
-        markUsed(_i - _skipFirstArgs);
-        return true;
-    }
-	_errorMsg = "\n***** ERROR: -scores option given, but no operation specified. *****";
-
+	// No longer supporting this deprecated option.
+	markUsed(_i - _skipFirstArgs);
+	_errorMsg = "\n***** ERROR: -scores option is deprecated. Please see the documentation for the -c and -o column operation options. *****";
     return false;
 }
 
@@ -149,15 +161,20 @@ bool ContextMerge::handle_s() {
 
 bool ContextMerge::handle_S() {
     if ((_i+1) < _argc) {
+    	bool validChar = false;
     	if (_argv[_i+1][0] == '+') {
 			_desiredStrand = FileRecordMergeMgr::SAME_STRAND_FORWARD;
+			validChar = true;
     	} else if (_argv[_i+1][0] == '-') {
+    		validChar = true;
 			_desiredStrand = FileRecordMergeMgr::SAME_STRAND_REVERSE;
     	}
-    	markUsed(_i - _skipFirstArgs);
-        _i++;
-        markUsed(_i - _skipFirstArgs);
-        return true;
+    	if (validChar) {
+			markUsed(_i - _skipFirstArgs);
+			_i++;
+			markUsed(_i - _skipFirstArgs);
+			return true;
+    	}
     }
 	_errorMsg = "\n***** ERROR: -S option must be followed by + or -. *****";
 	return false;

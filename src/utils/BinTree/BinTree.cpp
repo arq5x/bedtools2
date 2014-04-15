@@ -86,13 +86,6 @@ void BinTree::loadDB()
 			exit(1);
 		}
 	}
-	_databaseFile->close();
-
-	//TBD: give ERROR and return false if tree is empty.
-	if (_mainMap.empty()) {
-		fprintf(stderr, "ERROR: Tree is empty, no records added.\n");
-		exit(1);
-	}
 }
 
 void BinTree::getHits(Record *record, RecordKeyList &hitSet)

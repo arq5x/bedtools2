@@ -609,12 +609,12 @@ check obs exp
 rm obs exp
 
 ###########################################################
-#  Test that we throw an error for empty files
+#  Test that we allow empty query files
 ############################################################
 echo "    intersect.new.t51...\c"
-echo "is an empty file." > exp
+touch exp
 touch dummy.txt
-$BT intersect -a dummy.txt -b b.bed 2>&1 > /dev/null | cut -f3-6 -d ' ' > obs
+$BT intersect -a dummy.txt -b b.bed 2>&1 > /dev/null | cat - > obs
 check obs exp
 rm obs exp dummy.txt
 
@@ -663,6 +663,87 @@ chr2L	.	gene	50	100	0	+	.	ID=g2;" > exp
 $BT intersect -a gdc.gff -b gdc_one.bed > obs
 check obs exp
 rm obs exp
+
+###########################################################
+#  Test that we allow empty database files, unsorted
+############################################################
+echo "    intersect.new.t56...\c"
+touch exp
+touch dummy.txt
+$BT intersect -a a.bed -b dummy.txt 2>&1 > /dev/null | cat - > obs
+check obs exp
+rm obs exp dummy.txt
+
+###########################################################
+#  Test that we allow empty database files, sorted
+############################################################
+echo "    intersect.new.t57...\c"
+touch exp
+touch dummy.txt
+$BT intersect -a a.bed -b dummy.txt -sorted 2>&1 > /dev/null | cat - > obs
+check obs exp
+rm obs exp dummy.txt
+
+
+###########################################################
+#  Test that we allow empty database files, unsorted, with
+# -v (noHit) option
+############################################################
+echo "    intersect.new.t58...\c"
+touch dummy.txt
+$BT intersect -a a.bed -b dummy.txt -v > obs
+check obs a.bed
+rm obs dummy.txt
+
+
+###########################################################
+#  Test that an empty query with header run with -header
+# option will print header
+############################################################
+echo "    intersect.new.t59...\c"
+echo "#Random Header" >dummy.txt
+$BT intersect -a dummy.txt -b a.bed -header > obs
+check obs dummy.txt
+rm obs dummy.txt
+
+
+###########################################################
+#  Test that an empty query with header, gzipped, that
+#  runs with -header option will print header
+############################################################
+echo "    intersect.new.t60...\c"
+echo "#Random Header" >dummy.txt
+gzip dummy.txt
+echo "#Random Header" >exp
+$BT intersect -a dummy.txt.gz -b a.bed -header > obs
+check obs exp
+rm obs dummy.txt.gz exp
+
+###########################################################
+#  Test that an empty query with header, bgzipped, that
+#  runs with -header option will print header
+############################################################
+echo "    intersect.new.t61...\c"
+echo "#Random Header" >dummy.txt
+bgzip dummy.txt
+echo "#Random Header" >exp
+$BT intersect -a dummy.txt.gz -b a.bed -header > obs
+check obs exp
+rm obs dummy.txt.gz exp
+
+
+###########################################################
+#  Test that an empty VCF query with header that
+#  runs with -header option will print header
+############################################################
+echo "    intersect.new.t62...\c"
+$BT intersect -a headerOnly.vcf -b a.bed -header > obs
+check obs headerOnly.vcf
+rm obs
+
+
+
+
 
 
 

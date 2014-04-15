@@ -97,7 +97,6 @@ bool FileIntersect::processUnsortedFiles()
     	}
 		queryFRM->deleteRecord(queryRecord);
 	}
-	queryFRM->close();
 
 	//clean up.
 	delete binTree;

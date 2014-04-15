@@ -30,7 +30,7 @@ public:
 //	istream *getFinalStream() { return _finalInputStream; }
 	const BTlist<int> &getScanBuffer() const { return _scanBuffer; }
 	int getBufferLength() const { return _numBytesInBuffer; }
-	void populateScanBuffer();
+	bool populateScanBuffer();
 	const QuickString &getSavedData() const { return _saveDataStr; }
 	bool isGzipped() const { return _isGzipped; }
 	PushBackStreamBuf *getPushBackStreamBuf() const {return _pushBackStreamBuf; }
@@ -65,7 +65,7 @@ private:
 	BamTools::Internal::BgzfStream *_bgStream;
 
 	static const char *FIFO_STRING_LITERAL;
-	void readZipChunk();
+	bool readZipChunk();
 	bool detectBamOrBgzip(int &numChars, int currChar);
 //	void decompressBuffer();
 

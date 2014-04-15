@@ -12,7 +12,7 @@ FileRecordTypeChecker::FileRecordTypeChecker()
 	_isText = false;
 	_isBed = false;
 	_isDelimited = false;
-	_delimChar = '\0';
+	_delimChar = '\t'; //tab by default
 	_lines.clear();
 	_firstValidDataLineIdx = -1;
 	_isVCF = false;
@@ -21,8 +21,10 @@ FileRecordTypeChecker::FileRecordTypeChecker()
 	_isGzipped = false;
 	_insufficientData = false;
 	_fourthFieldNumeric = false;
+	_givenEmptyBuffer = false;
 
 	_hasName[UNKNOWN_RECORD_TYPE] = false;
+	_hasName[EMPTY_RECORD_TYPE] = false;
 	_hasName[BED3_RECORD_TYPE] = false;
 	_hasName[BED6_RECORD_TYPE] = true;
 	_hasName[BED12_RECORD_TYPE] = true;
@@ -32,6 +34,7 @@ FileRecordTypeChecker::FileRecordTypeChecker()
 	_hasName[GFF_RECORD_TYPE] = true;
 
 	_hasScore[UNKNOWN_RECORD_TYPE] = false;
+	_hasScore[EMPTY_RECORD_TYPE] = false;
 	_hasScore[BED3_RECORD_TYPE] = false;
 	_hasScore[BED6_RECORD_TYPE] = true;
 	_hasScore[BED12_RECORD_TYPE] = true;
@@ -41,6 +44,7 @@ FileRecordTypeChecker::FileRecordTypeChecker()
 	_hasScore[GFF_RECORD_TYPE] = true;
 
 	_hasStrand[UNKNOWN_RECORD_TYPE] = false;
+	_hasStrand[EMPTY_RECORD_TYPE] = false;
 	_hasStrand[BED3_RECORD_TYPE] = false;
 	_hasStrand[BED6_RECORD_TYPE] = true;
 	_hasStrand[BED12_RECORD_TYPE] = true;
@@ -50,6 +54,7 @@ FileRecordTypeChecker::FileRecordTypeChecker()
 	_hasStrand[GFF_RECORD_TYPE] = true;
 
 	_recordTypeNames[UNKNOWN_RECORD_TYPE] = "Unknown record type";
+	_recordTypeNames[EMPTY_RECORD_TYPE] = "Empty record type";
 	_recordTypeNames[BED3_RECORD_TYPE] = "Bed3 record type";
 	_recordTypeNames[BED6_RECORD_TYPE] = "Bed6 record type";
 	_recordTypeNames[BED12_RECORD_TYPE] = "Bed12 record type";
@@ -58,11 +63,8 @@ FileRecordTypeChecker::FileRecordTypeChecker()
 	_recordTypeNames[VCF_RECORD_TYPE] = "VCF record type";
 	_recordTypeNames[GFF_RECORD_TYPE] = "GFF record type";
 
-//	UNKNOWN_FILE_TYPE, SINGLE_LINE_DELIM_TEXT_FILE_TYPE,
-//				MULTI_LINE_ENTRY_TEXT_FILE_TYPE,
-//				GFF_FILE_TYPE, GZIP_FILE_TYPE, BAM_FILE_TYPE
-
 	_fileTypeNames[UNKNOWN_FILE_TYPE] = "Unknown file type";
+	_fileTypeNames[EMPTY_FILE_TYPE] = "Empty file type";
 	_fileTypeNames[SINGLE_LINE_DELIM_TEXT_FILE_TYPE] = "Delimited text file type";
 	_fileTypeNames[GZIP_FILE_TYPE] = "Gzip file type";
 	_fileTypeNames[BAM_FILE_TYPE] = "BAM file type";
@@ -77,8 +79,9 @@ bool FileRecordTypeChecker::scanBuffer(const char *buffer, size_t len)
 	}
 	_numBytesInBuffer = len;
 	if (_numBytesInBuffer == 0) {
-		cerr << "Error: " << _filename << " is an empty file."<< endl;
-		exit(1);
+		_fileType = EMPTY_FILE_TYPE;
+		_recordType = EMPTY_RECORD_TYPE;
+		return true;
 	}
 
 	//special: the first thing we do is look for a gzipped file.
