@@ -104,7 +104,11 @@ void SingleLineDelimTextFileReader::appendField(int fieldNum, QuickString &str) 
 
 bool SingleLineDelimTextFileReader::detectAndHandleHeader()
 {
-	if (!isHeaderLine(_sLine)) {
+	//not sure why the linker is giving me a hard time about
+	//passing a non-const QuickString to isHeaderLine, but
+	//this const ref is a workaround.
+	const QuickString &sLine2 = _sLine;
+	if (!isHeaderLine(sLine2)) {
 		return false;
 	}
 	if (!_fullHeaderFound) {

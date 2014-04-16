@@ -86,7 +86,7 @@ void int2str(int number, T& buffer, bool appendToBuf = false)
 
 }
 
-bool isHeaderLine(QuickString &line);
+bool isHeaderLine(const QuickString &line);
 
 string vectorIntToStr(const vector<int> &vec);
 

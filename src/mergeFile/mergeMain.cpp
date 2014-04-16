@@ -56,29 +56,13 @@ void merge_help(void) {
     cerr                                 << "\t\tthat are the same strand." << endl;
     cerr                                 << "\t\t- By default, merging is done without respect to strand." << endl << endl;
 
-    cerr << "\t-n\t"                     << "Report the number of BED entries that were merged." << endl;
-    cerr                                 << "\t\t- Note: \"1\" is reported if no merging occurred." << endl << endl;
-
 
     cerr << "\t-d\t"                     << "Maximum distance between features allowed for features" << endl;
     cerr                                 << "\t\tto be merged." << endl;
     cerr                                 << "\t\t- Def. 0. That is, overlapping & book-ended features are merged." << endl;
     cerr                                 << "\t\t- (INTEGER)" << endl << endl;
 
-    cerr << "\t-nms\t"                   << "Report the names of the merged features separated by commas." << endl;
-    cerr                                 << "\t\tChange delim. with -delim." << endl << endl;
-    
-    cerr << "\t-scores\t"                << "Report the scores of the merged features. Specify one of " << endl;
-    cerr                                 << "\t\tthe following options for reporting scores:" << endl;
-    cerr                                 << "\t\t  sum, min, max," << endl;
-    cerr                                 << "\t\t  mean, median, mode, antimode," << endl;
-    cerr                                 << "\t\t  collapse (i.e., print a semicolon-separated list)," << endl;
-    cerr                                 << "\t\t- (INTEGER)" << endl << endl;
-    
-    cerr << "\t-delim\t"                 << "Specify a custom delimiter for the -nms and -scores concat options" << endl;
-    cerr                                 << "\t\t- Example: -delim \"|\"" << endl;
-    cerr                                 << "\t\t- Default: \",\"." << endl << endl;
-    
+    KeyListOpsHelp();
     
     cerr << "Notes: " << endl;
     cerr << "\t(1) All output, regardless of input type (e.g., GFF or VCF)" << endl;

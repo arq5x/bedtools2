@@ -18,6 +18,7 @@ using namespace std;
 #include <vector>
 #include <map>
 #include "PushBackStreamBuf.h"
+#include "Tokenizer.h"
 
 class FileRecordTypeChecker {
 public:
@@ -87,8 +88,8 @@ private:
 	RECORD_TYPE _recordType;
 
 	QuickString _filename; //useful for reporting errors with file.
-	vector<QuickString> _lines;
-	vector<QuickString> _currLineElems;
+	Tokenizer _tokenizer;
+
 	int _firstValidDataLineIdx;
 	int _numBytesInBuffer; //this will hold the length of the buffer after the scan.
 

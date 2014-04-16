@@ -52,6 +52,7 @@ ContextBase::ContextBase()
   _forwardOnly(false),
   _reverseOnly(false),
   _hasColumnOpsMethods(false),
+  _keyListOps(NULL),
   _desiredStrand(FileRecordMergeMgr::ANY_STRAND),
   _maxDistance(0),
   _useMergedIntervals(false)
@@ -459,10 +460,11 @@ bool ContextBase::handle_delim()
 
 void ContextBase::setColumnOpsMethods(bool val)
 {
-	_hasColumnOpsMethods = val;
-	if (val) {
+	if (val && !_hasColumnOpsMethods) {
+		//was off, but we're turning it on.
 		_keyListOps = new KeyListOps();
 	}
+	_hasColumnOpsMethods = val;
 }
 
 const QuickString &ContextBase::getColumnOpsVal(RecordKeyList &keyList) const {

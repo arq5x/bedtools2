@@ -12,6 +12,9 @@
 
 class FileRecordMgr;
 
+//print help message
+void KeyListOpsHelp();
+
 class KeyListOps {
 public:
 

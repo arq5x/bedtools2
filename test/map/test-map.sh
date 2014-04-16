@@ -691,10 +691,13 @@ rm obs exp
 ############################################################
 echo "    map.t46...\c"
 echo \
-"
-*****
-***** ERROR: There are 1 columns given, but there are 2 operations."  > exp
-$BT map -a ivls.bed -b values.bed -o count,sum 2>&1 > /dev/null | head -3 > obs
+"chr1	0	100	3	30
+chr1	100	200	1	1
+chr2	0	100	0	.
+chr2	100	200	0	.
+chr3	0	100	3	6
+chr3	100	200	1	4" > exp
+$BT map -a ivls.bed -b values.bed -o count,sum  > obs
 check obs exp
 rm obs exp
 

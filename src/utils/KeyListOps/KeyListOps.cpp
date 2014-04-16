@@ -98,25 +98,28 @@ bool KeyListOps::isValidColumnOps(FileRecordMgr *dbFile) {
 	//member of each pair is a column number, and the second member is the code for the
 	//operation to perform on that column.
 
-	vector<QuickString> columnsVec;
-	vector<QuickString> opsVec;
-	int numCols = Tokenize(_columns, columnsVec, ',');
-	int numOps = Tokenize(_operations, opsVec, ',');
+    Tokenizer colTokens;
+    Tokenizer opsTokens;
+
+    int numCols = colTokens.tokenize(_columns, ',');
+	int numOps = opsTokens.tokenize(_operations, ',');
 
 	if (numOps < 1 || numCols < 1) {
 		 cerr << endl << "*****" << endl
 		             << "***** ERROR: There must be at least one column and at least one operation named." << endl;
 		 return false;
 	}
-	if (numOps > 1 && numCols != numOps) {
+	if (numOps > 1 && numCols > 1 && numCols != numOps) {
 		 cerr << endl << "*****" << endl
 		             << "***** ERROR: There are " << numCols <<" columns given, but there are " << numOps << " operations." << endl;
 		cerr << "\tPlease provide either a single operation that will be applied to all listed columns, " << endl;
+		cerr << "\ta single column to which all operations will be applied," << endl;
 		cerr << "\tor an operation for each column." << endl;
 		return false;
 	}
-	for (int i=0; i < (int)columnsVec.size(); i++) {
-		int col = str2chrPos(columnsVec[i]);
+	int loop = max(numCols, numOps);
+	for (int i=0; i < loop; i++) {
+		int col = str2chrPos(colTokens.getElem(numCols > 1 ? i : 0));
 
 		//check that the column number is valid
 		if (col < 1 || col > dbFile->getNumFields()) {
@@ -124,7 +127,7 @@ bool KeyListOps::isValidColumnOps(FileRecordMgr *dbFile) {
 					 << dbFile->getFileName() << " only has fields 1 - " << dbFile->getNumFields() << "." << endl;
 			 return false;
 		}
-		const QuickString &operation = opsVec.size() > 1 ? opsVec[i] : opsVec[0];
+		const QuickString &operation = opsTokens.getElem(numOps > 1 ? i : 0);
 		OP_TYPES opCode = getOpCode(operation);
 		if (opCode == INVALID) {
 			cerr << endl << "*****" << endl
@@ -361,4 +364,33 @@ const QuickString & KeyListOps::getOpVals(RecordKeyList &hits)
 	return _outVals;
 }
 
+void KeyListOpsHelp() {
+    cerr << "\t-c\t"             << "Specify columns from the B file to map onto intervals in A." << endl;
+    cerr                         << "\t\tDefault: 5." << endl;
+    cerr						<<  "\t\tMultiple columns can be specified in a comma-delimited list." << endl << endl;
 
+    cerr << "\t-o\t"             << "Specify the operation that should be applied to -c." << endl;
+    cerr                         << "\t\tValid operations:" << endl;
+    cerr                         << "\t\t    sum, min, max, absmin, absmax," << endl;
+    cerr                         << "\t\t    mean, median," << endl;
+    cerr                         << "\t\t    collapse (i.e., print a delimited list (duplicates allowed)), " << endl;
+    cerr                         << "\t\t    distinct (i.e., print a delimited list (NO duplicates allowed)), " << endl;
+    cerr                         << "\t\t    count" << endl;
+    cerr                         << "\t\t    count_distinct (i.e., a count of the unique values in the column), " << endl;
+    cerr                         << "\t\tDefault: sum" << endl;
+    cerr						 << "\t\tMultiple operations can be specified in a comma-delimited list." << endl << endl;
+
+    cerr						<< "\t\tIf there is only column, but multiple operations, all operations will be" << endl;
+    cerr						<< "\t\tapplied on that column. Likewise, if there is only one operation, but" << endl;
+    cerr						<< "multiple columns, that operation will be applied to all columns." << endl;
+    cerr						<< "\t\tOtherwise, the number of columns must match the the number of operations," << endl;
+    cerr						<< "and will be applied in respective order." << endl;
+    cerr						<< "\t\tE.g., \"-c 5,4,6 -o sum,mean,count\" will give the sum of column 5," << endl;
+    cerr						<< "the mean of column 4, and the count of column 6." << endl;
+    cerr						<< "\t\tThe order of output columns will match the ordering given in the command." << endl << endl<<endl;
+
+    cerr << "\t-delim\t"                 << "Specify a custom delimiter for the collapse operations." << endl;
+    cerr                                 << "\t\t- Example: -delim \"|\"" << endl;
+    cerr                                 << "\t\t- Default: \",\"." << endl << endl;
+
+}
