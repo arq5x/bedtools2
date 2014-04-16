@@ -48,29 +48,8 @@ void map_help(void) {
 
     cerr << "Options: " << endl;
 
-    cerr << "\t-c\t"             << "Specify columns from the B file to map onto intervals in A." << endl;
-    cerr                         << "\t\tDefault: 5." << endl;
-    cerr						<<  "\t\tMultiple columns can be specified in a comma-delimited list." << endl << endl;
+    KeyListOpsHelp();
 
-    cerr << "\t-o\t"             << "Specify the operation that should be applied to -c." << endl;
-    cerr                         << "\t\tValid operations:" << endl;
-    cerr                         << "\t\t    sum, min, max, absmin, absmax," << endl;
-    cerr                         << "\t\t    mean, median," << endl;
-    cerr                         << "\t\t    collapse (i.e., print a comma separated list (duplicates allowed)), " << endl;
-    cerr                         << "\t\t    distinct (i.e., print a comma separated list (NO duplicates allowed)), " << endl;
-    cerr                         << "\t\t    count" << endl;
-    cerr                         << "\t\t    count_distinct (i.e., a count of the unique values in the column), " << endl;
-    cerr                         << "\t\tDefault: sum" << endl;
-    cerr						 << "\t\tMultiple operations can be specified in a comma-delimited list." << endl << endl;
-
-    cerr						<< "\t\tIf there is only column, but multiple operations, all operations will be" << endl;
-    cerr						<< "\t\tapplied on that column. Likewise, if there is only one operation, but" << endl;
-    cerr						<< "multiple columns, that operation will be applied to all columns." << endl;
-    cerr						<< "\t\tOtherwise, the number of columns must match the the number of operations," << endl;
-    cerr						<< "and will be applied in respective order." << endl;
-    cerr						<< "\t\tE.g., \"-c 5,4,6 -o sum,mean,count\" will give the sum of column 5," << endl;
-    cerr						<< "the mean of column 4, and the count of column 6." << endl;
-    cerr						<< "\t\tThe order of output columns will match the ordering given in the command." << endl << endl<<endl;
 
     cerr << "\t-f\t"             << "Minimum overlap required as a fraction of A." << endl;
     cerr                         << "\t\t- Default is 1E-9 (i.e., 1bp)." << endl;
