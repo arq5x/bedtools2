@@ -141,3 +141,102 @@ chr1	30	100	a2|a3|a4" > exp
 $BT merge -i a.names.bed -delim "|" -c 4 -o collapse > obs
 check obs exp
 rm obs exp
+
+###########################################################
+#  Test that stranded merge not allowed with VCF
+###########################################################
+echo "    merge.t11...\c"
+echo "***** ERROR: stranded merge not supported for VCF files. *****" >exp
+$BT merge -i testA.vcf -s 2>&1 > /dev/null | head -2 | tail -1 > obs
+check exp obs
+rm obs exp
+
+###########################################################
+#  Test that column ops not allowed with BAM
+###########################################################
+echo "    merge.t12...\c"
+echo "***** ERROR: BAM database file not currently supported for column operations." > exp
+$BT merge -i a.full.bam -c 1 -o count 2>&1 > /dev/null | head -3 | tail -1 > obs
+check exp obs
+rm obs exp
+
+
+###########################################################
+#  Test that VCF input gives BED3 output
+###########################################################
+echo "    merge.t13...\c"
+echo \
+"chr1	30859	30860
+chr1	69269	69270
+chr1	69510	69511
+chr1	874815	874816
+chr1	879675	879676
+chr1	935491	935492
+chr1	1334051	1334057
+chr1	31896607	31896608" > exp
+$BT merge -i testA.vcf > obs
+check exp obs
+rm obs exp
+
+###########################################################
+#  Test that GFF input gives BED3 output
+###########################################################
+echo "    merge.t14...\c"
+echo \
+"chr22	9999999	10001000
+chr22	10009999	10010100
+chr22	10019999	10025000" > exp
+$BT merge -i a.gff > obs
+check exp obs
+rm obs exp
+
+###########################################################
+#  Test that stranded merge with unknown records works
+#  correctly
+###########################################################
+echo "    merge.t15...\c"
+echo \
+"chr1	10	80	+
+chr1	20	90	-
+chr2	20	60	+
+chr2	25	80	-" > exp
+$BT merge -i mixedStrands.bed -s -c 6 -o distinct > obs
+check exp obs
+rm obs exp
+
+###########################################################
+#  Test that stranded merge with unknown records works
+#  correctly, forward strand only
+###########################################################
+echo "    merge.t16...\c"
+echo \
+"chr1	10	80	+
+chr2	20	60	+" > exp
+$BT merge -i mixedStrands.bed -S + -c 6 -o distinct > obs
+check exp obs
+rm obs exp
+
+###########################################################
+#  Test that stranded merge with unknown records works
+#  correctly, reverse strand only
+###########################################################
+echo "    merge.t17...\c"
+echo \
+"chr1	20	90	-
+chr2	25	80	-" > exp
+$BT merge -i mixedStrands.bed -S - -c 6 -o distinct > obs
+check exp obs
+rm obs exp
+
+###########################################################
+#  Test that merge with specified strand does not allowed
+#  other characters besides + or -.
+###########################################################
+echo "    merge.t18...\c"
+echo "***** ERROR: -S option must be followed by + or -. *****" > exp
+$BT merge -i mixedStrands.bed -S . -c 6 -o distinct 2>&1 > /dev/null | head -2 | tail -1 >obs
+check exp obs
+rm obs exp
+
+
+

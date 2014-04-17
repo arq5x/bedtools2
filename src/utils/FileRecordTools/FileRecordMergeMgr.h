@@ -30,6 +30,9 @@ public:
 	Record *getNextRecord(RecordKeyList *keyList = NULL);
 	void deleteMergedRecord(RecordKeyList &recList); // MUST use this method for cleanup!
 
+	bool eof();
+
+
 	typedef enum { SAME_STRAND_FORWARD, //must all be forward strand
 			SAME_STRAND_REVERSE, //must all be reverse strand
 			SAME_STRAND_EITHER, //must be same strand, but can be either forward or reverse
