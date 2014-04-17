@@ -382,11 +382,11 @@ void KeyListOpsHelp() {
 
     cerr						<< "\t\tIf there is only column, but multiple operations, all operations will be" << endl;
     cerr						<< "\t\tapplied on that column. Likewise, if there is only one operation, but" << endl;
-    cerr						<< "multiple columns, that operation will be applied to all columns." << endl;
+    cerr						<< "\t\tmultiple columns, that operation will be applied to all columns." << endl;
     cerr						<< "\t\tOtherwise, the number of columns must match the the number of operations," << endl;
-    cerr						<< "and will be applied in respective order." << endl;
+    cerr						<< "\t\tand will be applied in respective order." << endl;
     cerr						<< "\t\tE.g., \"-c 5,4,6 -o sum,mean,count\" will give the sum of column 5," << endl;
-    cerr						<< "the mean of column 4, and the count of column 6." << endl;
+    cerr						<< "\t\tthe mean of column 4, and the count of column 6." << endl;
     cerr						<< "\t\tThe order of output columns will match the ordering given in the command." << endl << endl<<endl;
 
     cerr << "\t-delim\t"                 << "Specify a custom delimiter for the collapse operations." << endl;
