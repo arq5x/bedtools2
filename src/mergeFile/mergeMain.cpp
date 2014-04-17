@@ -52,19 +52,22 @@ void merge_help(void) {
     cerr << "Usage:   " << PROGRAM_NAME << " [OPTIONS] -i <bed/gff/vcf>" << endl << endl;
 
     cerr << "Options: " << endl;
-    cerr << "\t-s\t"                     << "Force strandedness.  That is, only merge features" << endl;
-    cerr                                 << "\t\tthat are the same strand." << endl;
-    cerr                                 << "\t\t- By default, merging is done without respect to strand." << endl << endl;
+    cerr << "\t-s\t"           << "Force strandedness.  That is, only merge features" << endl;
+    cerr                       << "\t\tthat are the same strand." << endl;
+    cerr                       << "\t\t- By default, merging is done without respect to strand." << endl << endl;
 
+    cerr << "\t-S\t"           << "Force mergeing for a _specific_ strand.  That is, only merge features" << endl;
+    cerr                       << "\t\tthat from a specific strabd." << endl;
+    cerr                       << "\t\t- For example, -S + will or -S -" << endl;
+    cerr                       << "\t\t- By default, merging is done without respect to strand." << endl << endl;
 
-    cerr << "\t-d\t"                     << "Maximum distance between features allowed for features" << endl;
-    cerr                                 << "\t\tto be merged." << endl;
-    cerr                                 << "\t\t- Def. 0. That is, overlapping & book-ended features are merged." << endl;
-    cerr                                 << "\t\t- (INTEGER)" << endl << endl;
+    cerr << "\t-d\t"           << "Maximum distance between features allowed for features" << endl;    cerr                       << "\t\tto be merged." << endl;    cerr                       << "\t\t- Def. 0. That is, overlapping & book-ended features are merged." << endl;
+    cerr                       << "\t\t- (INTEGER)" << endl;
+    cerr                       << "\t\t- Note: negative values enforce the number of b.p. required for overlap." << endl << endl;
+    cerr << "\t-header\t"      << "Print the header from the A file prior to results." << endl << endl;
 
     KeyListOpsHelp();
-    
-    cerr << "Notes: " << endl;
+        cerr << "Notes: " << endl;
     cerr << "\t(1) All output, regardless of input type (e.g., GFF or VCF)" << endl;
     cerr << "\t    will in BED format with zero-based starts" << endl << endl;
 
