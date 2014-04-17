@@ -18,7 +18,6 @@ check()
 # chr1	45	100
 
 ###########################################################
-# Test #1
 #  Test a basic merge; one interval should be un-merged, 
 #  the other two should be merged.
 ###########################################################
@@ -30,70 +29,50 @@ $BT merge -i a.bed > obs
 check obs exp
 rm obs exp
 
-
 ###########################################################
-# Test #2
-#  Enforce coordinate sorted input.
+#  Test that -n option is shown as deperecated
 ###########################################################
 echo "    merge.t2...\c"
-command -v tac 2>/dev/null || alias tac="sed '1!G;h;\$!d'"
-tac a.bed | $BT merge -i - 2> obs
-echo "ERROR: input file: (-) is not sorted by chrom then start.
-       The start coordinate at line 3 is less than the start at line 2" > exp
+echo "***** ERROR: -n option is deprecated. Please see the documentation for the -c and -o column operation options. *****" > exp
+$BT merge -i a.bed -n 2>&1 > /dev/null | head -2 | tail -1 > obs
 check obs exp
 rm obs exp
 
 
 ###########################################################
-# Test #3
 #  Test the counting of merged intervals. (-n)
 ###########################################################
 echo "    merge.t3...\c"
 echo \
 "chr1	10	20	1
 chr1	30	100	3" > exp
-$BT merge -i a.bed -n > obs
+$BT merge -i a.bed -c 1 -o count > obs
 check obs exp
 rm obs exp
 
 
 ###########################################################
-# Test #4
-#  Test the listing of names from merged intervals. (-nms)
-#  a.bed should fail, as there is no name field
+#  Test that -nms option is deprecated
 ###########################################################
 echo "    merge.t4...\c"
-echo \
-"chr1	10	20
-*****
-*****ERROR: No names found to report for the -names option. Exiting.
-*****" > exp
-$BT merge -i a.bed -nms > obs 2>&1
+echo "***** ERROR: -nms option is deprecated. Please see the documentation for the -c and -o column operation options. *****" > exp
+$BT merge -i a.bed -nms 2>&1 > /dev/null | head -2 | tail -1 > obs
 check obs exp
 rm obs exp
 
-
 ###########################################################
-# Test #5
-#  Test the listing of names from merged intervals. (-nms)
-#  a.named.bed should work, as there are name fields
-#  
-# cat a.names.bed
-# chr1	10	20	a1
-# chr1	30	40	a2
-# chr1	40	50	a3
-# chr1	45	100	a4
+#  Test the listing of names from merged intervals.
 ###########################################################
 echo "    merge.t5...\c"
 echo \
 "chr1	10	20	a1
 chr1	30	100	a2,a3,a4" > exp
-$BT merge -i a.names.bed -nms > obs
+$BT merge -i a.names.bed -c 4 -o collapse > obs
 check obs exp
 rm obs exp
 
 ###########################################################
-# -nms and -scores sum
+# collapsed list of the names, and sum of the scores
 ###########################################################
 echo "    merge.t6...\c"
 echo \
@@ -102,12 +81,12 @@ chr1	30	100	a2,a3,a4	9
 chr2	10	20	a1	5
 chr2	30	40	a2	6
 chr2	42	100	a3,a4	15" > exp
-$BT merge -i a.full.bed -nms -scores sum> obs
+$BT merge -i a.full.bed -c 4,5  -o collapse,sum > obs
 check obs exp
 rm obs exp
 
 ###########################################################
-# -n and -scores sum
+# count intervals and sum of scores
 ###########################################################
 echo "    merge.t7...\c"
 echo \
@@ -116,12 +95,12 @@ chr1	30	100	3	9
 chr2	10	20	1	5
 chr2	30	40	1	6
 chr2	42	100	2	15" > exp
-$BT merge -i a.full.bed -n -scores sum> obs
+$BT merge -i a.full.bed -c 5 -o count,sum> obs
 check obs exp
 rm obs exp
 
 ###########################################################
-# -n, -nms, and -scores sum
+# count, collapsed names, and sum of scores
 ###########################################################
 echo "    merge.t8...\c"
 echo \
@@ -130,41 +109,134 @@ chr1	30	100	a2,a3,a4	9	3
 chr2	10	20	a1	5	1
 chr2	30	40	a2	6	1
 chr2	42	100	a3,a4	15	2" > exp
-$BT merge -i a.full.bed -nms -n -scores sum> obs
+$BT merge -i a.full.bed -c 4,5,4 -o collapse,sum,count > obs
 check obs exp
 rm obs exp
 
 ###########################################################
-# -s, -n, -nms, and -scores sum
+# stranded merge, show sign, collapsed names, sum of
+# scores, and count
 ###########################################################
 echo "    merge.t9...\c"
 echo \
-"chr1	10	20	a1	1	+	1
-chr1	30	40	a2	2	+	1
-chr1	45	100	a4	4	+	1
-chr1	40	50	a3	3	-	1
-chr2	10	20	a1	5	+	1
-chr2	30	40	a2	6	+	1
-chr2	42	50	a3	7	+	1
-chr2	45	100	a4	8	-	1" > exp
-$BT merge -i a.full.bed -s -nms -n -scores sum> obs
+"chr1	10	20	+	a1	1	1
+chr1	30	40	+	a2	2	1
+chr1	40	50	-	a3	3	1
+chr1	45	100	+	a4	4	1
+chr2	10	20	+	a1	5	1
+chr2	30	40	+	a2	6	1
+chr2	42	50	+	a3	7	1
+chr2	45	100	-	a4	8	1" > exp
+$BT merge -i a.full.bed -s -c 6,4,5,6 -o distinct,collapse,sum,count > obs
 check obs exp
 rm obs exp
 
 ###########################################################
-# Test #10
 #  Test the use of a custom delimiter for -nms
-#  
-# cat a.names.bed
-# chr1	10	20	a1
-# chr1	30	40	a2
-# chr1	40	50	a3
-# chr1	45	100	a4
 ###########################################################
 echo "    merge.t10...\c"
 echo \
 "chr1	10	20	a1
 chr1	30	100	a2|a3|a4" > exp
-$BT merge -i a.names.bed -nms -delim "|" > obs
+$BT merge -i a.names.bed -delim "|" -c 4 -o collapse > obs
 check obs exp
 rm obs exp
+
+###########################################################
+#  Test that stranded merge not allowed with VCF
+###########################################################
+echo "    merge.t11...\c"
+echo "***** ERROR: stranded merge not supported for VCF files. *****" >exp
+$BT merge -i testA.vcf -s 2>&1 > /dev/null | head -2 | tail -1 > obs
+check exp obs
+rm obs exp
+
+###########################################################
+#  Test that column ops not allowed with BAM
+###########################################################
+echo "    merge.t12...\c"
+echo "***** ERROR: BAM database file not currently supported for column operations." > exp
+$BT merge -i a.full.bam -c 1 -o count 2>&1 > /dev/null | head -3 | tail -1 > obs
+check exp obs
+rm obs exp
+
+
+###########################################################
+#  Test that VCF input gives BED3 output
+###########################################################
+echo "    merge.t13...\c"
+echo \
+"chr1	30859	30860
+chr1	69269	69270
+chr1	69510	69511
+chr1	874815	874816
+chr1	879675	879676
+chr1	935491	935492
+chr1	1334051	1334057
+chr1	31896607	31896608" > exp
+$BT merge -i testA.vcf > obs
+check exp obs
+rm obs exp
+
+###########################################################
+#  Test that GFF input gives BED3 output
+###########################################################
+echo "    merge.t14...\c"
+echo \
+"chr22	9999999	10001000
+chr22	10009999	10010100
+chr22	10019999	10025000" > exp
+$BT merge -i a.gff > obs
+check exp obs
+rm obs exp
+
+###########################################################
+#  Test that stranded merge with unknown records works
+#  correctly
+###########################################################
+echo "    merge.t15...\c"
+echo \
+"chr1	10	80	+
+chr1	20	90	-
+chr2	20	60	+
+chr2	25	80	-" > exp
+$BT merge -i mixedStrands.bed -s -c 6 -o distinct > obs
+check exp obs
+rm obs exp
+
+###########################################################
+#  Test that stranded merge with unknown records works
+#  correctly, forward strand only
+###########################################################
+echo "    merge.t16...\c"
+echo \
+"chr1	10	80	+
+chr2	20	60	+" > exp
+$BT merge -i mixedStrands.bed -S + -c 6 -o distinct > obs
+check exp obs
+rm obs exp
+
+###########################################################
+#  Test that stranded merge with unknown records works
+#  correctly, reverse strand only
+###########################################################
+echo "    merge.t17...\c"
+echo \
+"chr1	20	90	-
+chr2	25	80	-" > exp
+$BT merge -i mixedStrands.bed -S - -c 6 -o distinct > obs
+check exp obs
+rm obs exp
+
+###########################################################
+#  Test that merge with specified strand does not allowed
+#  other characters besides + or -.
+###########################################################
+echo "    merge.t18...\c"
+echo "***** ERROR: -S option must be followed by + or -. *****" > exp
+$BT merge -i mixedStrands.bed -S . -c 6 -o distinct 2>&1 > /dev/null | head -2 | tail -1 >obs
+check exp obs
+rm obs exp
+
+
+

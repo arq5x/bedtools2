@@ -18,6 +18,7 @@ using namespace std;
 #include <vector>
 #include <map>
 #include "PushBackStreamBuf.h"
+#include "Tokenizer.h"
 
 class FileRecordTypeChecker {
 public:
@@ -25,11 +26,11 @@ public:
 	FileRecordTypeChecker();
 	~FileRecordTypeChecker() {}
 
-	typedef enum  { UNKNOWN_FILE_TYPE, SINGLE_LINE_DELIM_TEXT_FILE_TYPE,
+	typedef enum  { UNKNOWN_FILE_TYPE, EMPTY_FILE_TYPE, SINGLE_LINE_DELIM_TEXT_FILE_TYPE,
 			MULTI_LINE_ENTRY_TEXT_FILE_TYPE,
 			GFF_FILE_TYPE, GZIP_FILE_TYPE, BAM_FILE_TYPE, VCF_FILE_TYPE} FILE_TYPE;
 
-	typedef enum  { UNKNOWN_RECORD_TYPE, BED3_RECORD_TYPE, BED4_RECORD_TYPE, BEDGRAPH_RECORD_TYPE, BED5_RECORD_TYPE,
+	typedef enum  { UNKNOWN_RECORD_TYPE, EMPTY_RECORD_TYPE, BED3_RECORD_TYPE, BED4_RECORD_TYPE, BEDGRAPH_RECORD_TYPE, BED5_RECORD_TYPE,
 		BED6_RECORD_TYPE, BED12_RECORD_TYPE, BED_PLUS_RECORD_TYPE, BAM_RECORD_TYPE, VCF_RECORD_TYPE, GFF_RECORD_TYPE} RECORD_TYPE;
 
 	void setFilename(const QuickString & filename) { _filename = filename; }
@@ -41,7 +42,12 @@ public:
 	bool recordTypeHasStrand(RECORD_TYPE type) const { return _hasStrand.find(type) != _hasStrand.end(); }
 
 	FILE_TYPE getFileType() const { return _fileType; }
+	void setFileType(FILE_TYPE type) { _fileType = type; }
+
+
 	RECORD_TYPE getRecordType() const { return _recordType; }
+	void setRecordType(RECORD_TYPE type) { _recordType = type; }
+
 	const string &getFileTypeName() const {
 		return _fileTypeNames.find(_fileType)->second;
 	}
@@ -82,8 +88,8 @@ private:
 	RECORD_TYPE _recordType;
 
 	QuickString _filename; //useful for reporting errors with file.
-	vector<QuickString> _lines;
-	vector<QuickString> _currLineElems;
+	Tokenizer _tokenizer;
+
 	int _firstValidDataLineIdx;
 	int _numBytesInBuffer; //this will hold the length of the buffer after the scan.
 
@@ -99,6 +105,7 @@ private:
 	bool _isGzipped;
 	bool _insufficientData; //set to true if scan buffer had only header lines.
 	bool _fourthFieldNumeric; //this is just to distinguish between Bed4 and BedGraph files.
+	bool _givenEmptyBuffer;
 
 	map<RECORD_TYPE, string> _recordTypeNames;
 	map<FILE_TYPE, string> _fileTypeNames;

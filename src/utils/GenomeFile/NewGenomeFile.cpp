@@ -11,6 +11,7 @@
 ******************************************************************************/
 #include "NewGenomeFile.h"
 #include "ParseTools.h"
+#include "Tokenizer.h"
 
 NewGenomeFile::NewGenomeFile(const QuickString &genomeFilename)
 : _maxId(-1)
@@ -44,21 +45,20 @@ void NewGenomeFile::loadGenomeFileIntoMap() {
 		exit(1);
 	}
 	string sLine;
-	vector<QuickString> fields;
+	Tokenizer fieldTokens;
 	CHRPOS chrSize = 0;
 	QuickString chrName;
 	while (!genFile.eof()) {
 		sLine.clear();
-		fields.clear();
 		chrSize = 0;
 		chrName.clear();
 		getline(genFile, sLine);
-		Tokenize(sLine.c_str(), fields);
-		if (fields.size() != 2) {
+		int numFields = fieldTokens.tokenize(sLine.c_str());
+		if (numFields != 2) {
 			continue;
 		}
-		chrName = fields[0];
-		chrSize = str2chrPos(fields[1]);
+		chrName = fieldTokens.getElem(0);
+		chrSize = str2chrPos(fieldTokens.getElem(1));
 		_maxId++;
 		_chromSizeIds[chrName] = pair<CHRPOS, int>(chrSize, _maxId);
 		_startOffsets.push_back(_genomeLength);

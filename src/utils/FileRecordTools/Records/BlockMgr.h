@@ -16,6 +16,7 @@ using namespace std;
 #include "FileRecordTypeChecker.h"
 #include "RecordKeyList.h"
 
+
 class RecordMgr;
 
 class BlockMgr {
@@ -50,6 +51,8 @@ private:
 
 	float _overlapFraction;
 	bool _hasReciprocal;
+	Tokenizer _blockSizeTokens;
+	Tokenizer _blockStartTokens;
 
 	// For now, all records will be split into Bed6 records.
 	const static FileRecordTypeChecker::RECORD_TYPE _blockRecordsType = FileRecordTypeChecker::BED6_RECORD_TYPE;

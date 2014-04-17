@@ -20,7 +20,7 @@
 #include "version.h"
 #include "BedtoolsTypes.h"
 #include "FileRecordTypeChecker.h"
-#include "FileRecordMgr.h"
+#include "FileRecordMergeMgr.h"
 #include "NewGenomeFile.h"
 #include "api/BamReader.h"
 #include "api/BamAux.h"
@@ -59,6 +59,7 @@ public:
 
 	bool getUseMergedIntervals() const { return _useMergedIntervals; }
 	void setUseMergedIntervals(bool val) { _useMergedIntervals = val; }
+	FileRecordMergeMgr::WANTED_STRAND_TYPE getDesiredStrand() const { return _desiredStrand; }
 
 	void openGenomeFile(const QuickString &genomeFilename);
 	void openGenomeFile(const BamTools::RefVector &refVector);
@@ -106,23 +107,23 @@ public:
     virtual bool getUseFullBamTags() const { return _useFullBamTags; }
     virtual void setUseFullBamTags(bool val) { _useFullBamTags = val; }
 
-	//
-	// MERGE METHODS
-	//
-    virtual bool getReportCount() const { return _reportCount; }
-    virtual void setReportCount(bool val) { _reportCount = val; }
-
-    virtual int getMaxDistance() const { return _maxDistance; }
-    virtual void setMaxDistance(int distance) { _maxDistance = distance; }
-
-    virtual bool getReportNames() const { return _reportNames; }
-    virtual void setReportNames(bool val) { _reportNames = val; }
-
-    virtual bool getReportScores() const { return _reportScores; }
-    virtual void setReportScores(bool val) { _reportScores = val; }
-
-    virtual const QuickString &getScoreOp() const { return _scoreOp; }
-    virtual void setScoreOp(const QuickString &op) { _scoreOp = op; }
+//	//
+//	// MERGE METHODS
+//	//
+//    virtual bool getReportCount() const { return _reportCount; }
+//    virtual void setReportCount(bool val) { _reportCount = val; }
+//
+//    virtual int getMaxDistance() const { return _maxDistance; }
+//    virtual void setMaxDistance(int distance) { _maxDistance = distance; }
+//
+//    virtual bool getReportNames() const { return _reportNames; }
+//    virtual void setReportNames(bool val) { _reportNames = val; }
+//
+//    virtual bool getReportScores() const { return _reportScores; }
+//    virtual void setReportScores(bool val) { _reportScores = val; }
+//
+//    virtual const QuickString &getScoreOp() const { return _scoreOp; }
+//    virtual void setScoreOp(const QuickString &op) { _scoreOp = op; }
 
 
 	// METHODS FOR PROGRAMS WITH USER_SPECIFIED NUMBER
@@ -160,7 +161,6 @@ protected:
 	bool _allFilesOpened;
 	map<QuickString, PROGRAM_TYPE> _programNames;
 
-	bool _useMergedIntervals;
 	NewGenomeFile *_genomeFile;
 
 	ContextFileType _outputFileType;
@@ -200,7 +200,6 @@ protected:
     int _maxNumDatabaseFields;
     bool _useFullBamTags;
 	bool _reportCount;
-	int _maxDistance;
 	bool _reportNames;
 	bool _reportScores;
 	QuickString _scoreOp;
@@ -212,14 +211,22 @@ protected:
 	bool _forwardOnly;
 	bool _reverseOnly;
 
+	//Members for column operations
 	bool _hasColumnOpsMethods;
 	KeyListOps *_keyListOps;
 	QuickString _nullStr; //placeholder return value when col ops aren't valid.
+
+	//Members for merged records
+	FileRecordMergeMgr::WANTED_STRAND_TYPE _desiredStrand;
+	int _maxDistance;
+	bool _useMergedIntervals;
+
 
 	void markUsed(int i) { _argsProcessed[i] = true; }
 	bool isUsed(int i) const { return _argsProcessed[i]; }
 	bool cmdArgsValid();
 	bool openFiles();
+	virtual FileRecordMgr *getNewFRM(const QuickString &filename);
 
 	//set cmd line params and counter, i, as members so code
 	//is more readable (as opposed to passing all 3 everywhere).

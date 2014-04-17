@@ -37,6 +37,10 @@ RecordOutputMgr::RecordOutputMgr()
 
 RecordOutputMgr::~RecordOutputMgr()
 {
+	// In the rare case when a file had a header but was otherwise empty,
+	// we'll need to make a last check to see if the header still needs to be printed.
+	checkForHeader();
+
 	if (_outBuf.size() > 0) {
 		flush();
 	}
@@ -76,9 +80,15 @@ bool RecordOutputMgr::printKeyAndTerminate(RecordKeyList &keyList) {
 	if (bamCode == BAM_AS_BAM) {
 		return true;
 	} else if (bamCode == NOT_BAM) {
-		keyList.getKey()->print(_outBuf);
+		if (_context->getProgram() == ContextBase::MERGE) {
+			//when printing merged records, we want to force the printing into
+			//bed3 format, which is surprisingly difficult to do. Had to use the following:
+			const Bed3Interval *bed3 = static_cast<const Bed3Interval *>(keyList.getKey());
+			bed3->Bed3Interval::print(_outBuf);
+		} else {
+			keyList.getKey()->print(_outBuf);
+		}
 		return false;
-
 	}
 	//otherwise, it was BAM_AS_BED, and the key was printed.
 	return false;
@@ -114,8 +124,12 @@ void RecordOutputMgr::printRecord(const Record *record)
 
 void RecordOutputMgr::printRecord(const Record *record, const QuickString & value)
 {	
+	_afterVal = value;
 	printRecord(record);
-	_outBuf.append(value);
+	if (!value.empty()) {
+		tab();
+		_outBuf.append(value);
+	}
 	newline();
 
 	if (needsFlush()) {
@@ -145,9 +159,8 @@ void RecordOutputMgr::printRecord(RecordKeyList &keyList, RecordKeyList *blockLi
 	}
 	//The first time we print a record is when we print any header, because the header
 	//hasn't been read from the query file until after the first record has also been read.
-	if (_context->getPrintHeader()) {
-		checkForHeader();
-	}
+	checkForHeader();
+
 	const_cast<Record *>(keyList.getKey())->undoZeroLength();
 	_currBamBlockList = blockList;
 
@@ -201,8 +214,21 @@ void RecordOutputMgr::printRecord(RecordKeyList &keyList, RecordKeyList *blockLi
 		_currBamBlockList = NULL;
 		return;
 	} else if (_context->getProgram() == ContextBase::MAP) {
+		printKeyAndTerminate(keyList);
+		_currBamBlockList = NULL;
+		return;
+	} else if (_context->getProgram() == ContextBase::MERGE) {
+		printKeyAndTerminate(keyList);
+		_currBamBlockList = NULL;
+		return;
+	} else if (_context->getProgram() == ContextBase::MERGE) {
 		if (!printKeyAndTerminate(keyList)) {
-			tab();
+			if (_context->getDesiredStrand() != FileRecordMergeMgr::ANY_STRAND) {
+				//add the sign of the record
+				tab();
+				_outBuf.append(keyList.getKey()->getStrand());
+			}
+			if (!_afterVal.empty()) tab();
 		}
 		_currBamBlockList = NULL;
 		return;
@@ -210,6 +236,9 @@ void RecordOutputMgr::printRecord(RecordKeyList &keyList, RecordKeyList *blockLi
 }
 
 void RecordOutputMgr::checkForHeader() {
+	// Do we need to print a header?
+	if (!_context->getPrintHeader()) return;
+
 	//if the program is based on intersection, we want the header from the query file.
 	if (_context->hasIntersectMethods()) {
 		int queryIdx = (static_cast<ContextIntersect *>(_context))->getQueryFileIdx();

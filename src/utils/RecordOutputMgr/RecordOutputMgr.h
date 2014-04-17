@@ -44,6 +44,7 @@ private:
 	//
 	BlockMgr *_bamBlockMgr;
 	const BlockMgr *_splitInfo;
+	QuickString _afterVal; //to store values to be printed after record, such as column operations.
 	//some helper functions to neaten the code.
 	void tab() { _outBuf.append('\t'); }
 	void newline() { _outBuf.append('\n'); }

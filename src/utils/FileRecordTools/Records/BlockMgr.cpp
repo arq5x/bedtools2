@@ -60,11 +60,8 @@ void BlockMgr::getBlocksFromBed12(RecordKeyList &keyList, bool &mustDelete)
     	return;
     }
 
-    vector<QuickString> sizes;
-    vector<QuickString> starts;
-
-    int sizeCount = Tokenize(keyRecord->getBlockSizes(), sizes, ',', blockCount);
-    int startCount = Tokenize(keyRecord->getBlockStarts(), starts, ',', blockCount);
+    int sizeCount = _blockSizeTokens.tokenize(keyRecord->getBlockSizes(), ',');
+    int startCount = _blockStartTokens.tokenize(keyRecord->getBlockStarts(), ',');
 
     if (blockCount != sizeCount || sizeCount != startCount) {
     	fprintf(stderr, "Error: found wrong block counts while splitting entry.\n");
@@ -72,8 +69,8 @@ void BlockMgr::getBlocksFromBed12(RecordKeyList &keyList, bool &mustDelete)
     }
 
     for (int i=0; i < blockCount; i++) {
-    	int startPos = keyRecord->getStartPos() + str2chrPos(starts[i].c_str());
-    	int endPos = startPos + str2chrPos(sizes[i].c_str());
+    	int startPos = keyRecord->getStartPos() + str2chrPos(_blockStartTokens.getElem(i).c_str());
+    	int endPos = startPos + str2chrPos(_blockSizeTokens.getElem(i).c_str());
 
     	const Record *record = allocateAndAssignRecord(keyRecord, startPos, endPos);
     	keyList.push_back(record);

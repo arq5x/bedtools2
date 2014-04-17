@@ -8,6 +8,13 @@ RecordMgr::RecordMgr(FileRecordTypeChecker::RECORD_TYPE recType, int blockSize)
   _freeListBlockSize(blockSize)
 {
 	switch(_recordType) {
+		case FileRecordTypeChecker::EMPTY_RECORD_TYPE:
+		{
+			_freeList = new FreeList<EmptyRecord>(0);
+			break;
+		}
+
+
 		case FileRecordTypeChecker::BED3_RECORD_TYPE:
 		{
 			_freeList = new FreeList<Bed3Interval>(_freeListBlockSize);
@@ -72,6 +79,11 @@ RecordMgr::RecordMgr(FileRecordTypeChecker::RECORD_TYPE recType, int blockSize)
 RecordMgr::~RecordMgr()
 {
 	switch(_recordType) {
+		case FileRecordTypeChecker::EMPTY_RECORD_TYPE:
+		{
+			delete (FreeList<EmptyRecord> *)_freeList;
+			break;
+		}
 		case FileRecordTypeChecker::BED3_RECORD_TYPE:
 		{
 			delete (FreeList<Bed3Interval> *)_freeList;
@@ -138,6 +150,12 @@ Record *RecordMgr::allocateRecord()
 {
 	Record *record = NULL;
 	switch(_recordType) {
+		case FileRecordTypeChecker::EMPTY_RECORD_TYPE:
+		{
+			EmptyRecord *er = ((FreeList<EmptyRecord> *)_freeList)->newObj();
+			record = er;
+			break;
+		}
 		case FileRecordTypeChecker::BED3_RECORD_TYPE:
 		{
 			Bed3Interval *b3i = ((FreeList<Bed3Interval> *)_freeList)->newObj();
@@ -215,6 +233,12 @@ Record *RecordMgr::allocateRecord()
 void RecordMgr::deleteRecord(const Record *record)
 {
 	switch(_recordType) {
+		case FileRecordTypeChecker::EMPTY_RECORD_TYPE:
+		{
+			((FreeList<EmptyRecord> *)_freeList)->deleteObj(static_cast<const EmptyRecord *>(record));
+			break;
+		}
+
 		case FileRecordTypeChecker::BED3_RECORD_TYPE:
 		{
 			((FreeList<Bed3Interval> *)_freeList)->deleteObj(static_cast<const Bed3Interval *>(record));

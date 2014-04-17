@@ -12,8 +12,7 @@ FileRecordTypeChecker::FileRecordTypeChecker()
 	_isText = false;
 	_isBed = false;
 	_isDelimited = false;
-	_delimChar = '\0';
-	_lines.clear();
+	_delimChar = '\t'; //tab by default
 	_firstValidDataLineIdx = -1;
 	_isVCF = false;
 	_isBAM = false;
@@ -21,8 +20,10 @@ FileRecordTypeChecker::FileRecordTypeChecker()
 	_isGzipped = false;
 	_insufficientData = false;
 	_fourthFieldNumeric = false;
+	_givenEmptyBuffer = false;
 
 	_hasName[UNKNOWN_RECORD_TYPE] = false;
+	_hasName[EMPTY_RECORD_TYPE] = false;
 	_hasName[BED3_RECORD_TYPE] = false;
 	_hasName[BED6_RECORD_TYPE] = true;
 	_hasName[BED12_RECORD_TYPE] = true;
@@ -32,6 +33,7 @@ FileRecordTypeChecker::FileRecordTypeChecker()
 	_hasName[GFF_RECORD_TYPE] = true;
 
 	_hasScore[UNKNOWN_RECORD_TYPE] = false;
+	_hasScore[EMPTY_RECORD_TYPE] = false;
 	_hasScore[BED3_RECORD_TYPE] = false;
 	_hasScore[BED6_RECORD_TYPE] = true;
 	_hasScore[BED12_RECORD_TYPE] = true;
@@ -41,6 +43,7 @@ FileRecordTypeChecker::FileRecordTypeChecker()
 	_hasScore[GFF_RECORD_TYPE] = true;
 
 	_hasStrand[UNKNOWN_RECORD_TYPE] = false;
+	_hasStrand[EMPTY_RECORD_TYPE] = false;
 	_hasStrand[BED3_RECORD_TYPE] = false;
 	_hasStrand[BED6_RECORD_TYPE] = true;
 	_hasStrand[BED12_RECORD_TYPE] = true;
@@ -50,6 +53,7 @@ FileRecordTypeChecker::FileRecordTypeChecker()
 	_hasStrand[GFF_RECORD_TYPE] = true;
 
 	_recordTypeNames[UNKNOWN_RECORD_TYPE] = "Unknown record type";
+	_recordTypeNames[EMPTY_RECORD_TYPE] = "Empty record type";
 	_recordTypeNames[BED3_RECORD_TYPE] = "Bed3 record type";
 	_recordTypeNames[BED6_RECORD_TYPE] = "Bed6 record type";
 	_recordTypeNames[BED12_RECORD_TYPE] = "Bed12 record type";
@@ -58,11 +62,8 @@ FileRecordTypeChecker::FileRecordTypeChecker()
 	_recordTypeNames[VCF_RECORD_TYPE] = "VCF record type";
 	_recordTypeNames[GFF_RECORD_TYPE] = "GFF record type";
 
-//	UNKNOWN_FILE_TYPE, SINGLE_LINE_DELIM_TEXT_FILE_TYPE,
-//				MULTI_LINE_ENTRY_TEXT_FILE_TYPE,
-//				GFF_FILE_TYPE, GZIP_FILE_TYPE, BAM_FILE_TYPE
-
 	_fileTypeNames[UNKNOWN_FILE_TYPE] = "Unknown file type";
+	_fileTypeNames[EMPTY_FILE_TYPE] = "Empty file type";
 	_fileTypeNames[SINGLE_LINE_DELIM_TEXT_FILE_TYPE] = "Delimited text file type";
 	_fileTypeNames[GZIP_FILE_TYPE] = "Gzip file type";
 	_fileTypeNames[BAM_FILE_TYPE] = "BAM file type";
@@ -77,8 +78,9 @@ bool FileRecordTypeChecker::scanBuffer(const char *buffer, size_t len)
 	}
 	_numBytesInBuffer = len;
 	if (_numBytesInBuffer == 0) {
-		cerr << "Error: " << _filename << " is an empty file."<< endl;
-		exit(1);
+		_fileType = EMPTY_FILE_TYPE;
+		_recordType = EMPTY_RECORD_TYPE;
+		return true;
 	}
 
 	//special: the first thing we do is look for a gzipped file.
@@ -158,9 +160,14 @@ bool FileRecordTypeChecker::handleTextFormat(const char *buffer, size_t len)
 		_fileType = SINGLE_LINE_DELIM_TEXT_FILE_TYPE;
 
 		//Tokenize the first line of valid data into fields.
-		const QuickString &line = _lines[_firstValidDataLineIdx];
-		_currLineElems.clear();
-		if (Tokenize(line, _currLineElems, _delimChar, _numFields) != _numFields) {
+		//Need to make a copy so next call to tokenizer doesn't overwrite the line.
+
+		QuickString line(_tokenizer.getElem(_firstValidDataLineIdx));
+
+		_tokenizer.setKeepFinalIncompleteElem(Tokenizer::USE_NOW);
+		_tokenizer.setNumExpectedItems(_numFields);
+
+		if (_tokenizer.tokenize(line, _delimChar) != _numFields) {
 			cerr << "Error: Type checker found wrong number of fields while tokenizing data line." << endl;
 			exit(1);
 		}
@@ -170,7 +177,7 @@ bool FileRecordTypeChecker::handleTextFormat(const char *buffer, size_t len)
 			if (_numFields == 3) {
 				_recordType = BED3_RECORD_TYPE;
 			} else if (_numFields == 4) {
-				if (isNumeric(_currLineElems[3])) {
+				if (isNumeric(_tokenizer.getElem(3))) {
 					_recordType = BEDGRAPH_RECORD_TYPE;
 					_fourthFieldNumeric = true;
 				} else {
@@ -220,12 +227,12 @@ bool FileRecordTypeChecker::isBedFormat() {
 		return false;
 	}
 	//the 2nd and 3rd fields must be numeric.
-	if (!isNumeric(_currLineElems[1]) || !isNumeric(_currLineElems[2])) {
+	if (!isNumeric(_tokenizer.getElem(1)) || !isNumeric(_tokenizer.getElem(2))) {
 		return false;
 	}
 
-	int start = str2chrPos(_currLineElems[1]);
-	int end = str2chrPos(_currLineElems[2]);
+	int start = str2chrPos(_tokenizer.getElem(1));
+	int end = str2chrPos(_tokenizer.getElem(2));
 	if (end < start) {
 		return false;
 	}
@@ -239,11 +246,11 @@ bool FileRecordTypeChecker::isGFFformat()
 		return false;
 	}
 	//the 4th and 5th fields must be numeric.
-	if (!isNumeric(_currLineElems[3]) || !isNumeric(_currLineElems[4])) {
+	if (!isNumeric(_tokenizer.getElem(3)) || !isNumeric(_tokenizer.getElem(4))) {
 		return false;
 	}
-	int start = str2chrPos(_currLineElems[3]);
-	int end = str2chrPos(_currLineElems[4]);
+	int start = str2chrPos(_tokenizer.getElem(3));
+	int end = str2chrPos(_tokenizer.getElem(4));
 	if (end < start) {
 		return false;
 	}
@@ -253,8 +260,8 @@ bool FileRecordTypeChecker::isGFFformat()
 bool FileRecordTypeChecker::isTextDelimtedFormat(const char *buffer, size_t len)
 {
 	//Break single string buffer into vector of QuickStrings. Delimiter is newline.
-	_lines.clear();
-	int numLines = Tokenize(buffer, _lines, '\n', len);
+	_tokenizer.setKeepFinalIncompleteElem(Tokenizer::IGNORE);
+	int numLines = _tokenizer.tokenize(buffer, '\n');
 
 	//anticipated delimiter characters are tab, comma, and semi-colon.
 	//If we need new ones, they must be added in this method.
@@ -280,7 +287,7 @@ bool FileRecordTypeChecker::isTextDelimtedFormat(const char *buffer, size_t len)
 		if (validLinesFound >=4) {
 			break; //really only need to look at like 4 lines of data, max.
 		}
-		QuickString &line = _lines[i];
+		const QuickString &line = _tokenizer.getElem(i);
 		int len =line.size();
 		//skip over any empty line
 		if (len == 0) {

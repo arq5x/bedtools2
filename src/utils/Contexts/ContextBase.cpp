@@ -13,7 +13,6 @@ ContextBase::ContextBase()
 :
   _program(UNSPECIFIED_PROGRAM),
   _allFilesOpened(false),
-  _useMergedIntervals(false),
   _genomeFile(NULL),
   _outputFileType(FileRecordTypeChecker::UNKNOWN_FILE_TYPE),
   _outputTypeDetermined(false),
@@ -45,7 +44,6 @@ ContextBase::ContextBase()
   _maxNumDatabaseFields(0),
   _useFullBamTags(false),
   _reportCount(false),
-  _maxDistance(0),
   _reportNames(false),
   _reportScores(false),
   _numOutputRecords(0),
@@ -53,11 +51,17 @@ ContextBase::ContextBase()
   _seed(0),
   _forwardOnly(false),
   _reverseOnly(false),
-  _hasColumnOpsMethods(false)
+  _hasColumnOpsMethods(false),
+  _keyListOps(NULL),
+  _desiredStrand(FileRecordMergeMgr::ANY_STRAND),
+  _maxDistance(0),
+  _useMergedIntervals(false)
+
 {
 	_programNames["intersect"] = INTERSECT;
 	_programNames["sample"] = SAMPLE;
 	_programNames["map"] = MAP;
+	_programNames["merge"] = MERGE;
 
 	if (hasColumnOpsMethods()) {
 		_keyListOps = new KeyListOps();
@@ -230,14 +234,22 @@ bool ContextBase::openFiles() {
 	if (_allFilesOpened) {
 		return true;
 	}
+
+	if (_fileNames.size() == 0) {
+		//No input was specified. Error and exit.
+		_errorMsg += "\n***** ERROR: No input file given. Exiting. *****";
+		return false;
+	}
+
 	_files.resize(_fileNames.size());
 
 	for (int i = 0; i < (int)_fileNames.size(); i++) {
-		FileRecordMgr *frm = new FileRecordMgr(_fileNames[i], _sortedInput);
+		FileRecordMgr *frm = getNewFRM(_fileNames[i]);
 		if (hasGenomeFile()) {
 			frm->setGenomeFile(_genomeFile);
 		}
 		frm->setFullBamFlags(_useFullBamTags);
+		frm->setIsSorted(_sortedInput);
 		if (!frm->open()) {
 			return false;
 		}
@@ -391,8 +403,9 @@ bool ContextBase::handle_c()
         markUsed(_i - _skipFirstArgs);
         _i++;
         markUsed(_i - _skipFirstArgs);
+        return true;
     }
-    return true;
+    return false;
 }
 
 
@@ -412,7 +425,7 @@ bool ContextBase::handle_o()
 }
 
 
-// for col ops, -null is a NULL vakue assigned
+// for col ops, -null is a NULL value assigned
 // when no overlaps are detected.
 bool ContextBase::handle_null()
 {
@@ -424,8 +437,9 @@ bool ContextBase::handle_null()
         markUsed(_i - _skipFirstArgs);
         _i++;
         markUsed(_i - _skipFirstArgs);
+        return true;
     }
-    return true;
+    return false;
 }
 
 //for col ops, delimStr will appear between each item in
@@ -446,10 +460,11 @@ bool ContextBase::handle_delim()
 
 void ContextBase::setColumnOpsMethods(bool val)
 {
-	_hasColumnOpsMethods = val;
-	if (val) {
+	if (val && !_hasColumnOpsMethods) {
+		//was off, but we're turning it on.
 		_keyListOps = new KeyListOps();
 	}
+	_hasColumnOpsMethods = val;
 }
 
 const QuickString &ContextBase::getColumnOpsVal(RecordKeyList &keyList) const {
@@ -459,3 +474,13 @@ const QuickString &ContextBase::getColumnOpsVal(RecordKeyList &keyList) const {
 	return _keyListOps->getOpVals(keyList);
 }
 
+FileRecordMgr *ContextBase::getNewFRM(const QuickString &filename) {
+	if (!_useMergedIntervals) {
+		return new FileRecordMgr(filename);
+	} else {
+		FileRecordMergeMgr *frm = new FileRecordMergeMgr(filename);
+		frm->setStrandType(_desiredStrand);
+		frm->setMaxDistance(_maxDistance);
+		return frm;
+	}
+}

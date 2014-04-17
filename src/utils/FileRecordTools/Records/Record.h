@@ -152,6 +152,9 @@ protected:
 	bool _isMateUnmapped;
 };
 
-
+class RecordPtrSortFunctor {
+public:
+	bool operator()(const Record *rec1, const Record *rec2) const { return *rec1 > *rec2; }
+};
 
 #endif /* RECORD_H_ */

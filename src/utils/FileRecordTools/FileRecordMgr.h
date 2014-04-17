@@ -32,11 +32,19 @@ class NewGenomeFile;
 
 class FileRecordMgr {
 public:
-	FileRecordMgr(const QuickString & filename, bool isSorted = false);
-	~FileRecordMgr();
+	FileRecordMgr(const QuickString & filename);
+	virtual ~FileRecordMgr();
 	bool open();
 	void close();
-	bool eof();
+	virtual bool eof();
+
+	//This is an all-in-one method to give the user a new record that is initialized with
+	//the next entry in the data file.
+	//NOTE!! User MUST pass back the returned pointer to deleteRecord method for cleanup!
+	//Also Note! User must check for NULL returned, meaning we failed to get the next record.
+	virtual Record *getNextRecord(RecordKeyList *keyList = NULL);
+	void deleteRecord(const Record *);
+	virtual void deleteRecord(RecordKeyList *keyList);
 
 	const QuickString &getFileName() const { return _filename;}
 	bool hasHeader() const { return _fileReader->hasHeader(); }
@@ -69,55 +77,6 @@ public:
 	const BamTools::RefVector &getBamReferences();
 
 	int getNumFields() const { return _fileReader->getNumFields(); }
-	//This is an all-in-one method to give the user a new record that is initialized with
-	//the next entry in the data file.
-	//NOTE!! User MUST pass back the returned pointer to deleteRecord method for cleanup!
-	//Also Note! User must check for NULL returned, meaning we failed to get the next record.
-	Record *allocateAndGetNextRecord();
-	void deleteRecord(const Record *);
-
-#ifdef false
-	//////////////////////////////////////////////////////////////////////////////////
-	//
-	// 			MERGED RECORDS
-	//
-	//this will give a single "meta" record containing "flattened" or merged records.
-	//
-	// 1st ARG: Pass an empty RecordKeyList. When done, will have a pair: 1st is the final merged record,
-	//			second is list of constituent Records merged.
-	//			** NOTE ** If the RecordKeyList is not empty, this method will empty it for you and delete all contents!
-	//
-	// 2nd ARG: Choose from WANT_STRAND_TYPE, defined below below
-	//
-	// 3rd ARG: allows for nearby records, i.e. maxDistance 100 will merge records <= 100 bases apart. Default 0 means only
-	//			merge records that actually intersect.
-	//
-	// Return value: true if any records found. False if eof hit before records matching requested parameters found.
-
-	typedef enum { SAME_STRAND_FORWARD, //must all be forward strand
-			SAME_STRAND_REVERSE, //must all be reverse strand
-			SAME_STRAND_EITHER, //must be same strand, but can be either forward or reverse
-			ANY_STRAND } //do no care about strand (Default value)
-	WANT_STRAND_TYPE;
-
-	//
-	// WARNING!! Specifying a strand will keep all records on the other strand in memory!!
-	// This is done so that requests for records on that other strand can still be met.
-	// For now, use this method at any time to purge the kept records from memory, such as
-	// when changing chromosomes, for example.
-	void purgeKeepList();
-	bool allocateAndGetNextMergedRecord(RecordKeyList & recList, WANT_STRAND_TYPE desiredStrand = ANY_STRAND, int maxDistance = 0);
-	void deleteMergedRecord(RecordKeyList &recList); // MUST use this method for cleanup!
-
-	//this method will allocate a new record of merged records, but the returned record should only be passed to the deleteRecord method
-	//for cleanup, not to the delete mmerged record.
-	Record *allocateAndGetNextMergedRecord(WANT_STRAND_TYPE desiredStrand = ANY_STRAND, int maxDistance = 0);
-
-	//
-	// 				END MERGED RECORDS
-	//
-	//////////////////////////////////////////////////////////////////////////////////
-#endif
 
 	//File statistics
 	unsigned long getTotalRecordLength() const { return _totalRecordLength; } //sum of length of all returned records
@@ -140,7 +99,9 @@ public:
 		_hasGenomeFile = true;
 	}
 
-private:
+	void setIsSorted(bool val) { _isSortedInput = val; }
+
+protected:
 	QuickString _filename;
 	BufferedStreamMgr *_bufStreamMgr;
 
@@ -158,8 +119,6 @@ private:
 	int _prevStart;
 	int _prevChromId;
 
-	//members for handling merged records
-//	DualQueue<Record *, DualQueueAscending > _storedRecords;
 
 	bool _mustBeForward;
 	bool _mustBeReverse;
@@ -177,16 +136,6 @@ private:
 	void testInputSortOrder(Record *record);
 	void assignChromId(Record *);
 	void sortError(const Record *record, bool genomeFileError);
-
-
-#ifdef false
-	void deleteAllMergedItemsButKey(RecordKeyList &recList);
-	void addToStorage(Record *record);
-	Record *tryToTakeFromStorage();
-	Record *tryToTakeFromStorage(bool strand);
-#endif
-
-
 };
 
 

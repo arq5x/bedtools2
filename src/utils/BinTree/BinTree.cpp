@@ -74,7 +74,7 @@ void BinTree::loadDB()
 
 	Record *record = NULL;
 	while (!_databaseFile->eof()) {
-		record = _databaseFile->allocateAndGetNextRecord();
+		record = _databaseFile->getNextRecord();
 		//In addition to NULL records, we also don't want to add unmapped reads.
 		if (record == NULL || record->isUnmapped()) {
 			continue;
@@ -85,13 +85,6 @@ void BinTree::loadDB()
 			_databaseFile->close();
 			exit(1);
 		}
-	}
-	_databaseFile->close();
-
-	//TBD: give ERROR and return false if tree is empty.
-	if (_mainMap.empty()) {
-		fprintf(stderr, "ERROR: Tree is empty, no records added.\n");
-		exit(1);
 	}
 }
 

@@ -19,6 +19,9 @@ int str2chrPos(const QuickString &str) {
 }
 
 int str2chrPos(const char *str, size_t ulen) {
+	if (ulen == 0) {
+		ulen = strlen(str);
+	}
 	int len=(int)ulen;
 	if (len < 1 || len > 10) {
 		return INT_MIN; //can't do more than 9 digits and a minus sign
@@ -90,35 +93,7 @@ string vectorIntToStr(const vector<int> &vec) {
 	return str;
 }
 
-// TBD: Could be better optimized. I'm allocating 8KB for every call, then destroying it.
-// That memory needs to stay in scope.
-// Also, is this handling subsequent delimiters?
-int Tokenize(const QuickString &str, vector<QuickString> &elems, char delimiter, int numExpectedItems) {
-
-	elems.reserve(numExpectedItems);
-	int strLen = (int)str.size();
-
-	int startPos = 0;
-	int currPos = 0;
-
-	char elemBuf[8192];
-
-	while (startPos < strLen) {
-		memset(elemBuf, 0, 8192);
-		while (str[currPos] != delimiter && currPos < strLen) {
-			currPos++;
-		}
-		if (currPos > startPos) {
-			memcpy(elemBuf, str.c_str() + startPos, min(currPos, strLen) - startPos);
-			elems.push_back(elemBuf);
-		}
-		startPos = currPos +1;
-		currPos = startPos;
-	}
-	return (int)elems.size();
-}
-
-bool isHeaderLine(QuickString &line) {
+bool isHeaderLine(const QuickString &line) {
 	if (line[0] == '>') {
 		return true;
 	}
@@ -140,4 +115,3 @@ bool isHeaderLine(QuickString &line) {
 	}
 	return false;
 }
-
