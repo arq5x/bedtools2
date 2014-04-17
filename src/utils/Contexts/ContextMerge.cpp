@@ -116,13 +116,12 @@ bool ContextMerge::handle_d() {
     if ((_i+1) < _argc) {
     	if (isNumeric(_argv[_i+1])) {
 			int dist = str2chrPos(_argv[_i+1]);
-			if (dist >=0 ) {
-				_maxDistance = dist;
-		    	markUsed(_i - _skipFirstArgs);
-		        _i++;
-		        markUsed(_i - _skipFirstArgs);
-				return true;
-			}
+			
+			_maxDistance = dist;
+	    	markUsed(_i - _skipFirstArgs);
+	        _i++;
+	        markUsed(_i - _skipFirstArgs);
+			return true;
     	}
     }
 	_errorMsg = "\n***** ERROR: -d option must be followed by an integer value *****";
