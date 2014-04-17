@@ -36,7 +36,7 @@ public:
 	virtual ~FileRecordMgr();
 	bool open();
 	void close();
-	bool eof();
+	virtual bool eof();
 
 	//This is an all-in-one method to give the user a new record that is initialized with
 	//the next entry in the data file.

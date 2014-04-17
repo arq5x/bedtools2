@@ -47,6 +47,7 @@ Record *FileRecordMergeMgr::getNextRecord(RecordKeyList *recList)
 			//record is reverse, only want forward, OR record is forward, wanted reverse
 			deleteRecord(startRecord);
 			startRecord = NULL;
+			continue;
 		}
 		if (startRecord->getStrandVal() == Record::UNKNOWN && _desiredStrand != ANY_STRAND) {
 			//there is an unknown strand, but the user specified strandedness.
@@ -189,6 +190,11 @@ void FileRecordMergeMgr::deleteMergedRecord(RecordKeyList &recList)
 	deleteRecord(recList.getKey());
 	recList.setKey(NULL);
 }
+
+bool FileRecordMergeMgr::eof(){
+	return (_fileReader->eof() && _storedRecords.empty());
+}
+
 
 void FileRecordMergeMgr::deleteAllMergedItemsButKey(RecordKeyList &recList) {
 	//if the key is also in the list, this method won't delete it.

@@ -96,7 +96,7 @@ bool ContextMerge::isValidState()
 			return false;
 		}
 		//make sure file is not VCF.
-		if (!getFile(0)->getFileType() == FileRecordTypeChecker::VCF_FILE_TYPE) {
+		if (getFile(0)->getFileType() == FileRecordTypeChecker::VCF_FILE_TYPE) {
 			_errorMsg = "\n***** ERROR: stranded merge not supported for VCF files. *****";
 			return false;
 		}
