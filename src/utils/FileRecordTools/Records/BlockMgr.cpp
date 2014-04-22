@@ -96,7 +96,7 @@ void BlockMgr::getBlocksFromBam(RecordKeyList &keyList, bool &mustDelete)
 		case 'P':
 		case 'H':
 			break;
-		case 'M':
+		case 'M': case 'X': case '=':
 			blockLength += opLen;
 			break;
 		case 'D':
