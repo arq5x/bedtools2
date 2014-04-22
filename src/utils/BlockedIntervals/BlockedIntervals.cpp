@@ -33,7 +33,7 @@ void GetBamBlocks(const BamAlignment &bam,
     vector<CigarOp>::const_iterator cigEnd = bam.CigarData.end();
     for (; cigItr != cigEnd; ++cigItr) {
         switch (cigItr->Type) {
-            case ('M') :
+            case ('M') :case ('X'): case ('='):
                 blockLength += cigItr->Length;
             case ('I') : break;
             case ('S') : break;
@@ -58,7 +58,7 @@ void GetBamBlocks(const BamAlignment &bam,
                 }
             case ('H') : break;                             // for 'H' - do nothing, move to next op
             default    :
-                printf("ERROR: Invalid Cigar op type\n");   // shouldn't get here
+                fprintf(stderr,"ERROR: Invalid Cigar op type \'%c\'.\n",cigItr->Type);   // shouldn't get here
                 exit(1);
         }
     }
