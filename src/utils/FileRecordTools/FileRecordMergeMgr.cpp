@@ -95,16 +95,14 @@ Record *FileRecordMergeMgr::getNextRecord(RecordKeyList *recList)
 		//check that we are still on the same chromosome.
 		const QuickString &newChrom = nextRecord->getChrName();
 		if (newChrom != currChrom) { //hit a different chromosome.
-			if (_foundChroms.find(newChrom) == _foundChroms.end() || takenFromStorage) {
-				//haven't seen this chromosome before, sort order is already enforced in the base class method.
-				if (!mustDelete) {
-					addToStorage(nextRecord);
-				} else {
-					deleteRecord(nextRecord);
-				}
-				nextRecord = NULL;
-				break;
+			//haven't seen this chromosome before, sort order is already enforced in the base class method.
+			if (!mustDelete) {
+				addToStorage(nextRecord);
+			} else {
+				deleteRecord(nextRecord);
 			}
+			nextRecord = NULL;
+			break;
 		}
 
 		//check whether it's in range
