@@ -10,6 +10,7 @@
 
 ContextMerge::ContextMerge()
 {
+	setSortedInput(true);
 	setUseMergedIntervals(true);
 	setColumnOpsMethods(true);
 
