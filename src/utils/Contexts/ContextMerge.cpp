@@ -13,6 +13,7 @@ ContextMerge::ContextMerge()
 	setSortedInput(true);
 	setUseMergedIntervals(true);
 	setColumnOpsMethods(true);
+	setExplicitBedOutput(true);
 
 	//merge has no default columnOps the way map does, so we'll need to clear those.
 	_keyListOps->setColumns("");

@@ -261,3 +261,18 @@ chr2	11	20" > exp
 $BT merge -i b.bed > obs
 check exp obs
 rm exp obs
+
+###########################################################
+#  Test that a merged BAM file only gives BED3 output
+###########################################################
+echo "    merge.t21...\c"
+echo \
+"chr1	10	20
+chr1	30	100
+chr2	10	20
+chr2	30	40
+chr2	42	100" > exp
+$BT merge -i a.full.bed > obs
+check exp obs
+rm exp obs
+

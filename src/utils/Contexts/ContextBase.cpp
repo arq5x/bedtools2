@@ -101,6 +101,7 @@ bool ContextBase::determineOutputType() {
 	//Otherwise, if the input is BAM, then the output is BAM
 	if (getFile(0)->getFileType() == FileRecordTypeChecker::BAM_FILE_TYPE) {
 		setOutputFileType(FileRecordTypeChecker::BAM_FILE_TYPE);
+		return true;
 	}
 
 	//Okay, it's bed.
@@ -264,11 +265,19 @@ int ContextBase::getBamHeaderAndRefIdx() {
 		//already found which BAM file to use for the header
 		return _bamHeaderAndRefIdx;
 	}
-	if (_files[_queryFileIdx]->getFileType() == FileRecordTypeChecker::BAM_FILE_TYPE) {
-		_bamHeaderAndRefIdx = _queryFileIdx;
-	} else {
-		_bamHeaderAndRefIdx = _databaseFileIdx;
+	if (hasIntersectMethods()) {
+		if (_files[_queryFileIdx]->getFileType() == FileRecordTypeChecker::BAM_FILE_TYPE) {
+			_bamHeaderAndRefIdx = _queryFileIdx;
+		} else {
+			_bamHeaderAndRefIdx = _databaseFileIdx;
+		}
+		return _bamHeaderAndRefIdx;
 	}
+	if (_files[0]->getFileType() == FileRecordTypeChecker::BAM_FILE_TYPE) {
+		_bamHeaderAndRefIdx = 0;
+		return _bamHeaderAndRefIdx;
+	}
+
 	return _bamHeaderAndRefIdx;
 }
 
