@@ -239,4 +239,40 @@ check exp obs
 rm obs exp
 
 
+###########################################################
+#  Test that sort order is enforced
+###########################################################
+echo "    merge.t19...\c"
+echo \
+"Error: Sorted input specified, but the file unsorted.bed has the following out of order record
+chr1	9	30	2" > exp
+$BT merge -i unsorted.bed 2>&1 > /dev/null | head -2  >obs
+check exp obs
+rm obs exp
+
+###########################################################
+#  Test that chrom change is handled correctly
+###########################################################
+echo "    merge.t20...\c"
+echo \
+"chr1	9	30
+chr1	100	110
+chr2	11	20" > exp
+$BT merge -i b.bed > obs
+check exp obs
+rm exp obs
+
+###########################################################
+#  Test that a merged BAM file only gives BED3 output
+###########################################################
+echo "    merge.t21...\c"
+echo \
+"chr1	10	20
+chr1	30	100
+chr2	10	20
+chr2	30	40
+chr2	42	100" > exp
+$BT merge -i a.full.bed > obs
+check exp obs
+rm exp obs
 
