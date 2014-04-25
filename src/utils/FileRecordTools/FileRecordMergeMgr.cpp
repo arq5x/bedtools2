@@ -26,7 +26,9 @@ FileRecordMergeMgr::FileRecordMergeMgr(const QuickString & filename)
 
 Record *FileRecordMergeMgr::getNextRecord(RecordKeyList *recList)
 {
-	if (!recList->allClear()) {
+	//clear the recList if there is one, and if it has records
+	// in it.
+	if (recList != NULL && !recList->allClear()) {
 		deleteMergedRecord(*recList);
 	}
 
@@ -66,8 +68,10 @@ Record *FileRecordMergeMgr::getNextRecord(RecordKeyList *recList)
 	_foundChroms.insert(currChrom);
 
 	bool madeComposite = false;
-	recList->push_back(startRecord);
-	recList->setKey(startRecord); //key of recList will just be the startRecord unless we're able to merge more.
+	if (recList != NULL) {
+		recList->push_back(startRecord);
+		recList->setKey(startRecord); //key of recList will just be the startRecord unless we're able to merge more.
+	}
 
 	Record::strandType currStrand = startRecord->getStrandVal();
 	bool mustMatchStrand = _desiredStrand != ANY_STRAND;
@@ -135,7 +139,7 @@ Record *FileRecordMergeMgr::getNextRecord(RecordKeyList *recList)
 			continue; //get the next record
 		}
 		//ok, they're on the same chrom and in range, and the strand is good. Do a merge.
-		recList->push_back(nextRecord);
+		if (recList != NULL) recList->push_back(nextRecord);
 		madeComposite = true;
 		int nextEnd = nextRecord->getEndPos();
 		if (nextEnd > currEnd) {
@@ -147,10 +151,15 @@ Record *FileRecordMergeMgr::getNextRecord(RecordKeyList *recList)
 		Record *newKey = _recordMgr->allocateRecord();
 		(*newKey) = (*startRecord);
 		newKey->setEndPos(currEnd);
-		recList->setKey(newKey);
+		if (recList != NULL) recList->setKey(newKey);
+		_totalMergedRecordLength += currEnd - newKey->getStartPos();
+		return newKey;
+	} else {
+		_totalMergedRecordLength += currEnd - startRecord->getStartPos();
+		return startRecord;
 	}
-	_totalMergedRecordLength += (unsigned long)(recList->getKey()->getEndPos() - recList->getKey()->getStartPos());
-	return const_cast<Record *>(recList->getKey());
+//	_totalMergedRecordLength += (unsigned long)(recList->getKey()->getEndPos() - recList->getKey()->getStartPos());
+//	return const_cast<Record *>(recList->getKey());
 }
 
 void FileRecordMergeMgr::addToStorage(Record *record) {
