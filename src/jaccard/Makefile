@@ -5,24 +5,33 @@ BIN_DIR = ../../bin/
 # -------------------
 # define our includes
 # -------------------
-INCLUDES = -I$(UTILITIES_DIR)/bedFile/ \
-           -I$(UTILITIES_DIR)/gzstream/ \
-           -I$(UTILITIES_DIR)/genomeFile/ \
-           -I$(UTILITIES_DIR)/lineFileUtilities/ \
-           -I$(UTILITIES_DIR)/fileType/ \
+
+INCLUDES = -I$(UTILITIES_DIR)/Contexts/ \
+			-I$(UTILITIES_DIR)/general/ \
+			-I$(UTILITIES_DIR)/fileType/ \
+			-I$(UTILITIES_DIR)/gzstream/ \
+           -I$(UTILITIES_DIR)/GenomeFile/ \
            -I$(UTILITIES_DIR)/BamTools/include \
+           -I$(UTILITIES_DIR)/BamTools/src \
            -I$(UTILITIES_DIR)/BlockedIntervals \
            -I$(UTILITIES_DIR)/BamTools-Ancillary \
-           -I$(UTILITIES_DIR)/chromsweep \
+           -I$(UTILITIES_DIR)/FileRecordTools/ \
+           -I$(UTILITIES_DIR)/FileRecordTools/FileReaders/ \
+           -I$(UTILITIES_DIR)/FileRecordTools/Records/ \
+           -I$(UTILITIES_DIR)/RecordOutputMgr/ \
+			-I$(UTILITIES_DIR)/KeyListOps/ \
+           -I$(UTILITIES_DIR)/NewChromsweep \
+           -I$(UTILITIES_DIR)/VectorOps \
+           -I$(UTILITIES_DIR)/BinTree \
            -I$(UTILITIES_DIR)/version/
 
 # ----------------------------------
 # define our source and object files
 # ----------------------------------
-SOURCES= jaccardMain.cpp jaccard.cpp jaccard.h
-OBJECTS= jaccardMain.o jaccard.o
+SOURCES= jaccardMain.cpp Jaccard.cpp Jaccard.h
+OBJECTS= jaccardMain.o Jaccard.o
 BUILT_OBJECTS= $(patsubst %,$(OBJ_DIR)/%,$(OBJECTS))
-PROGRAM= jaccard
+PROGRAM= Jaccard
 
 all: $(BUILT_OBJECTS)
 
@@ -34,6 +43,6 @@ $(BUILT_OBJECTS): $(SOURCES)
 	
 clean:
 	@echo "Cleaning up."
-	@rm -f $(OBJ_DIR)/jaccardMain.o $(OBJ_DIR)/jaccard.o
+	@rm -f $(OBJ_DIR)/jaccardMain.o $(OBJ_DIR)/Jaccard.o
 
 .PHONY: clean

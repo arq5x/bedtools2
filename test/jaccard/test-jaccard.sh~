@@ -90,13 +90,5 @@ $BT jaccard -a three_blocks_match.bed -b e.bed -split > obs
 check obs exp
 rm obs exp
 
-###########################################################
-#  Test jaccard of Bam with Bam
-###########################################################
-echo "    jaccard.t09...\c"
-echo \
-"intersection	union-intersection	jaccard	n_intersections
-10	150	0.0666667	1" > exp
-$BT jaccard -a a.bam -b three_blocks_match.bam > obs
-check exp obs
-rm exp obs
+intersection	union-intersection	jaccard	n_intersections
+10	150	0.0666667	1
