@@ -33,9 +33,9 @@ Usage:
 ==========================================================================
 Default behavior
 ==========================================================================
-Figure:
 
 ::
+
   cat 1.bg
   chr1 1000 1500 10
   chr1 2000 2100 20
@@ -65,9 +65,9 @@ Figure:
 ==========================================================================
 ``-header`` Add a header line to the output
 ==========================================================================
-Figure:
 
 ::
+
   unionBedGraphs -i 1.bg 2.bg 3.bg -header
   chrom  start  end  1  2  3
   chr1   900    1000 0  60 0
@@ -84,9 +84,9 @@ Figure:
 ==========================================================================
 ``-names`` Add a header line with custom file names to the output
 ==========================================================================
-Figure:
 
 ::
+
   unionBedGraphs -i 1.bg 2.bg 3.bg -header -names WT-1 WT-2 KO-1
   chrom  start  end   WT-1  WT-2  KO-1
   chr1   900    1000  0     60    0
@@ -105,9 +105,9 @@ Figure:
 ==========================================================================
 ``-empty`` Include regions that have zero coverage in all BEDGRAPH files.
 ==========================================================================
-Figure:
 
 ::
+
   unionBedGraphs -i 1.bg 2.bg 3.bg -empty -g sizes.txt -header
   chrom  start  end  WT-1  WT-2  KO-1
   chrom  start  end  1     2     3
@@ -128,9 +128,9 @@ Figure:
 ==========================================================================
 ``-filler`` Use a custom value for missing values.
 ==========================================================================
-Figure:
 
 ::
+
   unionBedGraphs -i 1.bg 2.bg 3.bg -empty -g sizes.txt -header -filler N/A
   chrom start end  WT-1  WT-2  KO-1
   chrom start end  1     2     3
@@ -151,9 +151,9 @@ Figure:
 ==========================================================================
 Use BEDGRAPH files with non-numeric values.
 ==========================================================================
-Figure:
 
 ::
+
   cat 1.snp.bg
   chr1 0 1 A/G
   chr1 5 6 C/T
