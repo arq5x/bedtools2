@@ -1,0 +1,12 @@
+chr1	10	50	a1f	2	+
+chr1	20	60	b1r	4	-
+chr1	25	70	c1q	8	.
+chr1	30	75	d1q	16	.
+chr1	40	80	e1f	32	+
+chr1	45	90	f1r	64	-
+chr2	10	50	a2q	2	.
+chr2	20	40	b2f	4	+
+chr2	25	50	c2r	8	-
+chr2	30	60	d2f	16	+
+chr2	35	65	e2q	32	.
+chr2	39	80	f2r	64	-

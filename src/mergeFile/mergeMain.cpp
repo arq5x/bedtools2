@@ -53,13 +53,13 @@ void merge_help(void) {
 
     cerr << "Options: " << endl;
     cerr << "\t-s\t"           << "Force strandedness.  That is, only merge features" << endl;
-    cerr                       << "\t\tthat are the same strand." << endl;
+    cerr                       << "\t\tthat are on the same strand." << endl;
     cerr                       << "\t\t- By default, merging is done without respect to strand." << endl << endl;
 
-    cerr << "\t-S\t"           << "Force mergeing for a _specific_ strand.  That is, only merge features" << endl;
-    cerr                       << "\t\tthat from a specific strabd." << endl;
-    cerr                       << "\t\t- For example, -S + will or -S -" << endl;
-    cerr                       << "\t\t- By default, merging is done without respect to strand." << endl << endl;
+    cerr << "\t-S\t"		   << "Force merge for one specific strand only." << endl;
+    cerr << "\t\t"             << "Follow with + or - to force merge from only" << endl;
+    cerr << "\t\t"			   << "the forward or reverse strand, respectively." << endl;
+    cerr << "\t\t"			   << "- By default, merging is done without respect to strand." << endl << endl;
 
     cerr << "\t-d\t"           << "Maximum distance between features allowed for features" << endl;    cerr                       << "\t\tto be merged." << endl;    cerr                       << "\t\t- Def. 0. That is, overlapping & book-ended features are merged." << endl;
     cerr                       << "\t\t- (INTEGER)" << endl;

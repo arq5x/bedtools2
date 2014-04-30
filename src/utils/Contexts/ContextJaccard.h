@@ -14,10 +14,12 @@ class ContextJaccard : public ContextIntersect {
 public:
   ContextJaccard();
   ~ContextJaccard();
+	virtual bool parseCmdArgs(int argc, char **argv, int skipFirstArgs);
+	virtual bool isValidState();
 
 private:
-
-
+	bool handle_s();
+	bool handle_S();
 };
 
 #endif /* CONTEXTJACCARD_H_ */
