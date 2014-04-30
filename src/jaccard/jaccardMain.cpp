@@ -64,6 +64,15 @@ void jaccard_help(void) {
 
     cerr << "\t-split\t"        << "Treat \"split\" BAM or BED12 entries as distinct BED intervals." << endl << endl;
 
+    cerr << "\t-s\t"           << "Force strandedness.  That is, only merge features" << endl;
+    cerr                       << "\t\tthat are on the same strand." << endl;
+    cerr                       << "\t\t- By default, merging is done without respect to strand." << endl << endl;
+
+    cerr << "\t-S\t"		   << "Force merge for one specific strand only." << endl;
+    cerr << "\t\t"             << "Follow with + or - to force merge from only" << endl;
+    cerr << "\t\t"			   << "the forward or reverse strand, respectively." << endl;
+    cerr << "\t\t"			   << "- By default, merging is done without respect to strand." << endl << endl;
+
     cerr << "Notes: " << endl;
     cerr << "\t(1) Input files must be sorted by chrom, then start position."
          << endl << endl;

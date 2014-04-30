@@ -100,3 +100,50 @@ echo \
 $BT jaccard -a a.bam -b three_blocks_match.bam > obs
 check exp obs
 rm exp obs
+
+###########################################################
+#  Test jaccard with mixed strand files
+###########################################################
+echo "    jaccard.t10...\c"
+echo \
+"intersection	union-intersection	jaccard	n_intersections
+145	180	0.805556	2" >exp
+$BT jaccard -a aMixedStrands.bed -b bMixedStrands.bed > obs
+check obs exp
+rm obs exp
+
+###########################################################
+#  Test jaccard with mixed strand files, -s option
+#  (match strand, either forward or reverse)
+###########################################################
+echo "    jaccard.t11...\c"
+echo \
+"intersection	union-intersection	jaccard	n_intersections
+120	290	0.413793	4" >exp
+$BT jaccard -a aMixedStrands.bed -b bMixedStrands.bed -s > obs
+check obs exp
+rm obs exp
+
+###########################################################
+#  Test jaccard with mixed strand files, -S + option
+#  (match strand, forward only)
+###########################################################
+echo "    jaccard.t12...\c"
+echo \
+"intersection	union-intersection	jaccard	n_intersections
+40	135	0.296296	2" >exp
+$BT jaccard -a aMixedStrands.bed -b bMixedStrands.bed -S + > obs
+check obs exp
+rm obs exp
+
+###########################################################
+#  Test jaccard with mixed strand files, -S - option
+#  (match strand, reverse only)
+###########################################################
+echo "    jaccard.t13...\c"
+echo \
+"intersection	union-intersection	jaccard	n_intersections
+80	155	0.516129	2" > exp
+$BT jaccard -a aMixedStrands.bed -b bMixedStrands.bed -S - > obs
+check obs exp
+rm obs exp
