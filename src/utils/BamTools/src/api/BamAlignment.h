@@ -29,7 +29,7 @@ namespace Internal {
 //! \endcond
 
 // BamAlignment data structure
-struct API_EXPORT BamAlignment {
+class API_EXPORT BamAlignment {
 
     // constructors & destructor
     public:

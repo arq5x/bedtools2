@@ -27,8 +27,8 @@
 namespace BamTools {
 
 class SamHeader;
-class SamReadGroup;
-class SamSequence;
+struct SamReadGroup;
+struct SamSequence;
 
 namespace Internal {
 

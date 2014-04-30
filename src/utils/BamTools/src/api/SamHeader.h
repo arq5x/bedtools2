@@ -19,8 +19,8 @@
 
 namespace BamTools {
 
-struct API_EXPORT SamHeader {
-
+class API_EXPORT SamHeader {
+public:
     // ctor & dtor
     SamHeader(const std::string& headerText = "");
     SamHeader(const SamHeader& other);

@@ -23,9 +23,25 @@ public:
 
 	BamRecord();
 	virtual const BamRecord &operator=(const BamRecord &);
+
+
+	// This using statement is only being added to supress warning from the CLANG compiler regarding
+	// hidden overriden methods. Though it makes the base class methods available, developers should
+	// not actually call them on a BamRecord object.
+	using Bed6Interval::initFromFile;
+
+
 	bool initFromFile(FileReader *);
 	virtual bool initFromFile(BamFileReader *);
 	virtual void clear();
+
+
+	// As above, this using statement is only being added to supress warning from the CLANG compiler
+	// regarding hidden overriden methods. Though it makes the base class methods available, developers
+	// should not actually call them on a BamRecord object.
+	using Bed6Interval::print;
+
+
 	virtual void print(QuickString &outBuf, int start, int end, RecordKeyList *keyList) const;
 	virtual void print(QuickString &outBuf, RecordKeyList *keyList) const;
 	virtual void print(QuickString &outBuf, const QuickString & start, const QuickString & end, RecordKeyList *keyList) const;
