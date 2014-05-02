@@ -276,3 +276,20 @@ $BT merge -i a.full.bed > obs
 check exp obs
 rm exp obs
 
+###########################################################
+#  Test that precision is correct
+###########################################################
+echo "    merge.t22...\c"
+echo \
+"chr2L	1	54	0.05
+chr2L	65	128	0.33
+chr2L	129	180	0.04
+chr2L	193	317	-0.125
+chr2L	321	375	-0.07
+chr2L	385	448	-0.11
+chr2L	449	502	0.4
+chr2L	513	570	0.48
+chr2L	577	635	-0.24" > exp
+$BT merge -i precisionTest.bed -c 5 -o mean > obs
+check obs exp
+rm obs exp
