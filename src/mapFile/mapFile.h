@@ -18,7 +18,6 @@ using namespace std;
 #include <iomanip>
 #include "VectorOps.h"
 #include "RecordKeyList.h"
-#include "KeyListOps.h"
 #include "ContextMap.h"
 
 using namespace std;
