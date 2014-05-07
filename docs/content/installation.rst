@@ -95,7 +95,7 @@ follows and then compile the source code as describe above:
 
 .. code-block:: bash
 
-    git clone https://github.com/arq5x/bedtools.git
+    git clone https://github.com/arq5x/bedtools2.git
 
 
 or, one can download the source code as a ``.zip`` file using the Github 
