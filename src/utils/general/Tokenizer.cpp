@@ -6,7 +6,7 @@
  */
 #include "Tokenizer.h"
 #include <cstring>
-
+#include <cstdio>
 Tokenizer::Tokenizer()
 : _numExpectedElems(0),
   _keepFinalIncElem(USE_NOW),
@@ -49,6 +49,14 @@ int Tokenizer::tokenize(const QuickString &str, char delimiter) {
 			} else {
 				QuickString *newStr = fetchElem(currIdx);
 				newStr->assign(str.c_str() + startPos, min(currPos, strLen) - startPos);
+
+				// If splitting lines, strip any white space from the end of the line
+				// including DOS newline characters and excess tabs.
+				if (delimiter == '\n') {
+					int lastPos = newStr->size();
+					while (isspace(newStr->at(lastPos-1))) lastPos--;
+					newStr->resize(lastPos);
+				}
 			}
 		}
 		startPos = currPos +1;
