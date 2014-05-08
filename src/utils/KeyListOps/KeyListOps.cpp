@@ -376,9 +376,6 @@ const QuickString & KeyListOps::getOpVals(RecordKeyList &hits)
 }
 
 void KeyListOpsHelp() {
-    cerr << "\t-c\t"             << "Specify columns from the B file to map onto intervals in A." << endl;
-    cerr                         << "\t\tDefault: 5." << endl;
-    cerr						<<  "\t\tMultiple columns can be specified in a comma-delimited list." << endl << endl;
 
     cerr << "\t-o\t"             << "Specify the operation that should be applied to -c." << endl;
     cerr                         << "\t\tValid operations:" << endl;
