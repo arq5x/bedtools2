@@ -58,6 +58,7 @@ public:
 	const string str() const { return _buffer; }
 	const char &operator [] (int pos) const { return _buffer[pos]; }
 	char &operator [] (int pos) { return _buffer[pos]; }
+	char &at(size_t pos) { return _buffer[pos]; }
 
 	void append(const QuickString &str) { append(str.c_str(), str.size()); }
 	void append(const char *buf, size_t bufLen);

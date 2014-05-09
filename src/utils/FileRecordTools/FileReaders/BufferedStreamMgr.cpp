@@ -104,6 +104,7 @@ bool BufferedStreamMgr::getLine(QuickString &line)
 			return false;
 		}
 	}
+	bool retVal = true;
 	while (1) {
 		int searchPos = _mainBufCurrStartPos;
 		while (searchPos < _mainBufCurrLen && _mainBuf[searchPos] != '\n') {
@@ -111,15 +112,25 @@ bool BufferedStreamMgr::getLine(QuickString &line)
 		}
 
 		line.append((char *)_mainBuf + _mainBufCurrStartPos, searchPos - _mainBufCurrStartPos);
+
 		_mainBufCurrStartPos = searchPos +1;
 		if (searchPos == _mainBufCurrLen) { //hit end of buffer, but no newline yet
 			if (!readFileChunk()) { //hit eof
-				return true;
+				retVal = true;
+				break;
 			}
 		} else if (_mainBuf[searchPos] == '\n') {
-			return true;
+			retVal = true;
+			break;
 		}
 	}
+	//strip any whitespace characters, such as DOS newline characters or extra tabs,
+	//from the end of the line
+	int lastPos = line.size();
+	while (isspace(line[lastPos-1])) lastPos--;
+	line.resize(lastPos);
+
+	return retVal;
 }
 
 bool BufferedStreamMgr::readFileChunk()

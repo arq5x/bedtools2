@@ -48,6 +48,10 @@ void map_help(void) {
 
     cerr << "Options: " << endl;
 
+    cerr << "\t-c\t"             << "Specify columns from the B file to map onto intervals in A." << endl;
+    cerr                         << "\t\tDefault: 5." << endl;
+    cerr						<<  "\t\tMultiple columns can be specified in a comma-delimited list." << endl << endl;
+
     KeyListOpsHelp();
 
 

@@ -66,6 +66,9 @@ void merge_help(void) {
     cerr                       << "\t\t- Note: negative values enforce the number of b.p. required for overlap." << endl << endl;
     cerr << "\t-header\t"      << "Print the header from the A file prior to results." << endl << endl;
 
+    cerr << "\t-c\t"             << "Specify columns from the input file to operate upon (see -o option, below)." << endl;
+    cerr						<<  "\t\tMultiple columns can be specified in a comma-delimited list." << endl << endl;
+
     KeyListOpsHelp();
         cerr << "Notes: " << endl;
     cerr << "\t(1) All output, regardless of input type (e.g., GFF or VCF)" << endl;

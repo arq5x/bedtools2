@@ -742,8 +742,16 @@ check obs headerOnly.vcf
 rm obs
 
 
-
-
-
-
+###########################################################
+#  Test that files with DOS newline characters, '\r',
+#  and/or extra tabs at end of line are handled
+############################################################
+echo "    intersect.new.t63...\c"
+echo \
+"chr1	11323785	11617177
+chr1	12645605	13926923
+chr1	14750216	15119039" >exp
+~/mergeBugSpace/bt2-merge-debug/bin/bedtools intersect -a dosLineChar_a.bed -b dosLineCharWithExtraTab_b.bed -v > obs
+check exp obs
+rm exp obs
 
