@@ -249,6 +249,11 @@ bool ContextBase::openFiles() {
 		if (hasGenomeFile()) {
 			frm->setGenomeFile(_genomeFile);
 		}
+		//If we're going to do column operations, and an input file
+		// is BAM, we'll need the full flags.
+		if (hasColumnOpsMethods()) {
+			setUseFullBamTags(true);
+		}
 		frm->setFullBamFlags(_useFullBamTags);
 		frm->setIsSorted(_sortedInput);
 		if (!frm->open()) {

@@ -152,11 +152,12 @@ check exp obs
 rm obs exp
 
 ###########################################################
-#  Test that column ops not allowed with BAM
+#  Test that column ops not allowed with BAM if col greater
+#  than 11.
 ###########################################################
 echo "    merge.t12...\c"
-echo "***** ERROR: BAM database file not currently supported for column operations." > exp
-$BT merge -i a.full.bam -c 1 -o count 2>&1 > /dev/null | head -3 | tail -1 > obs
+echo "***** ERROR: Requested column 12, but database file fullFields.bam only has fields 1 - 11." > exp
+$BT merge -i fullFields.bam -c 12 -o sum 2>&1 > /dev/null | head -3 | tail -1 > obs
 check exp obs
 rm obs exp
 
@@ -293,3 +294,12 @@ chr2L	577	635	-0.24" > exp
 $BT merge -i precisionTest.bed -c 5 -o mean > obs
 check obs exp
 rm obs exp
+
+###########################################################
+#  Test that we can get fields from a BAM file
+###########################################################
+echo "    merge.t23...\c"
+$BT merge -i fullFields.bam -c 5 -o mean > obs
+check obs bamColMean.bed
+rm obs
+

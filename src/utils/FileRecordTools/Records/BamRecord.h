@@ -50,6 +50,8 @@ public:
 	virtual void printUnmapped(QuickString &outBuf) const;
 
 	virtual FileRecordTypeChecker::RECORD_TYPE getType() const { return FileRecordTypeChecker::BAM_RECORD_TYPE; }
+	const QuickString &getCigarStr() const { return _cigarStr; }
+	const vector<BamTools::CigarOp> &getCigarData() const { return _bamAlignment.CigarData; }
 
 	const BamTools::BamAlignment &getAlignment() const { return _bamAlignment; }
 	int getBamChromId() const { return _bamChromId; }
@@ -57,14 +59,21 @@ public:
 	virtual const QuickString &getField(int fieldNum) const;
 	virtual int getNumFields() const  { return 12; }
 	static bool isNumericField(int fieldNum);
-
 protected:
 	BamTools::BamAlignment _bamAlignment;
 	int _bamChromId; //different from chromId, because BAM file may be in different order
 	//than the genomeFile.
 
+	QuickString _cigarStr; //stored for fast retrieval in column ops
+	QuickString _mateChrName;
+	QuickString _matePos;
+	QuickString _insertSize;
+	QuickString _queryBases;
+	QuickString _qualities;
+
 	virtual ~BamRecord();
 	void printRemainingBamFields();
+	void buildCigarStr();
 
 };
 

@@ -83,15 +83,6 @@ KeyListOps::OP_TYPES KeyListOps::getOpCode(const QuickString &operation) const {
 
 bool KeyListOps::isValidColumnOps(FileRecordMgr *dbFile) {
 
-    if (dbFile->getFileType() == FileRecordTypeChecker::BAM_FILE_TYPE) {
-         //throw Error
-        cerr << endl << "*****" << endl
-             << "***** ERROR: BAM database file not currently supported for column operations."
-             << endl;
-        exit(1);
-    }
-
-
 	//get the strings from context containing the comma-delimited lists of columns
 	//and operations. Split both of these into vectors. Get the operation code
 	//for each operation string. Finally, make a vector of pairs, where the first
