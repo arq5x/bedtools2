@@ -132,7 +132,7 @@ check obs exp
 rm obs exp
 
 ###########################################################
-#  Test the use of a custom delimiter for -nms
+#  Test the use of a custom delimiter for -delim option
 ###########################################################
 echo "    merge.t10...\c"
 echo \
@@ -192,8 +192,8 @@ check exp obs
 rm obs exp
 
 ###########################################################
-#  Test that stranded merge with unknown records works
-#  correctly
+#  Test that stranded merge where some records have
+#  unknown strand works correctly
 ###########################################################
 echo "    merge.t15...\c"
 echo \
@@ -302,4 +302,29 @@ echo "    merge.t23...\c"
 $BT merge -i fullFields.bam -c 5 -o mean > obs
 check obs bamColMean.bed
 rm obs
+
+###########################################################
+#  Test that numeric ops on non-numeric columns
+#  are allowed, but produce a warning and null
+#  value result. 
+###########################################################
+echo "    merge.t24a...\c"
+echo \
+"chr1	10	20	.
+chr1	30	100	." > expOut
+$BT merge -i a.names.bed -c 4 -o sum 2>&1 > obsOut | cat - > obsErr
+check obsOut expOut
+rm expOut obsOut
+
+
+###########################################################
+#  Just check that the warning message from the previous
+#  test was correct.
+###########################################################
+echo "    merge.t24b...\c"
+echo \
+" ***** WARNING: Non numeric value a1 in 4.
+ ***** WARNING: Non numeric value a4 in 4." > expErr
+check obsErr expErr
+rm obsErr expErr
 

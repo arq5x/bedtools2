@@ -720,14 +720,16 @@ rm obs exp
 
 
 ###########################################################
-#  Test that numeric ops for non-numeric columns aren't allowed
+#  Test that numeric ops for non-numeric columns are
+# allowed, but give a warning
 ############################################################
 echo "    map.t48...\c"
 echo \
-"
-*****
-***** ERROR: Column 1 is not a numeric field for database file values.bed."  > exp
-$BT map -a ivls.bed -b values.bed -c 1 -o sum 2>&1 > /dev/null | head -3 > obs
+" ***** WARNING: Non numeric value chr1 in 1.
+ ***** WARNING: Non numeric value chr1 in 1.
+ ***** WARNING: Non numeric value chr3 in 1.
+ ***** WARNING: Non numeric value chr3 in 1." > exp
+$BT map -a ivls.bed -b values.bed -c 1 -o sum 2>&1 > /dev/null | cat - > obs
 check obs exp
 rm obs exp
 
@@ -806,4 +808,3 @@ chr1	15000	20000	11.4444" > exp
 $BT map -a d.bed -b fullFields.bam -c 5 -o mean > obs
 check exp obs
 rm exp obs
-

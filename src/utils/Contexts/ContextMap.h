@@ -9,7 +9,6 @@
 #define CONTEXTMAP_H_
 
 #include "ContextIntersect.h"
-#include "KeyListOps.h"
 
 class ContextMap : public ContextIntersect {
 public:

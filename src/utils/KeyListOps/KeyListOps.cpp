@@ -109,6 +109,12 @@ bool KeyListOps::isValidColumnOps(FileRecordMgr *dbFile) {
 		return false;
 	}
 	int loop = max(numCols, numOps);
+
+	// If there is only one column, all ops are performed on it.
+	// Otherwise, if there is only op, it is performed on all columns.
+	// Besides that, ops are performed on columns in their respective
+	// ordering.
+
 	for (int i=0; i < loop; i++) {
 		int col = str2chrPos(colTokens.getElem(numCols > 1 ? i : 0));
 
@@ -128,71 +134,6 @@ bool KeyListOps::isValidColumnOps(FileRecordMgr *dbFile) {
 		_colOps.push_back(pair<int, OP_TYPES>(col, opCode));
 	}
 
-
-	//The final step we need to do is check that for each column/operation pair,
-	//if the operation is numeric, see if the database's record type supports
-	//numeric operations for that column. For instance, we can allow the mean
-	//of column 4 for a BedGraph file, because that's numeric, but not for Bed4,
-	//because that isn't.
-
-	for (int i = 0; i < (int)_colOps.size(); i++) {
-		int col = _colOps[i].first;
-		OP_TYPES opCode = _colOps[i].second;
-		FileRecordTypeChecker::RECORD_TYPE recordType = dbFile->getRecordType();
-
-		if (isNumericOp(opCode)) {
-			bool isValidNumOp = false;
-			switch(recordType) {
-				case FileRecordTypeChecker::BED3_RECORD_TYPE:
-					isValidNumOp = Bed3Interval::isNumericField(col);
-					break;
-
-				case FileRecordTypeChecker::BED4_RECORD_TYPE:
-					isValidNumOp = Bed4Interval::isNumericField(col);
-					break;
-
-				case FileRecordTypeChecker::BED5_RECORD_TYPE:
-					isValidNumOp = Bed5Interval::isNumericField(col);
-					break;
-
-				case FileRecordTypeChecker::BEDGRAPH_RECORD_TYPE:
-					isValidNumOp = BedGraphInterval::isNumericField(col);
-					break;
-
-				case FileRecordTypeChecker::BED6_RECORD_TYPE:
-					isValidNumOp = Bed6Interval::isNumericField(col);
-					break;
-
-				case FileRecordTypeChecker::BED_PLUS_RECORD_TYPE:
-					isValidNumOp = BedPlusInterval::isNumericField(col);
-					break;
-
-				case FileRecordTypeChecker::BED12_RECORD_TYPE:
-					isValidNumOp = Bed12Interval::isNumericField(col);
-					break;
-
-				case FileRecordTypeChecker::BAM_RECORD_TYPE:
-					isValidNumOp = BamRecord::isNumericField(col);
-					break;
-
-				case FileRecordTypeChecker::VCF_RECORD_TYPE:
-					isValidNumOp = VcfRecord::isNumericField(col);
-					break;
-
-				case FileRecordTypeChecker::GFF_RECORD_TYPE:
-					isValidNumOp = GffRecord::isNumericField(col);
-					break;
-
-				default:
-					break;
-			}
-			if (!isValidNumOp) {
-				 cerr << endl << "*****" << endl  << "***** ERROR: Column " << col << " is not a numeric field for database file "
-						 << dbFile->getFileName() << "." << endl;
-				 return false;
-			}
-		}
-	}
 
     return true;
 }
@@ -352,13 +293,15 @@ const QuickString & KeyListOps::getOpVals(RecordKeyList &hits)
 			_outVals.append('\t');
 		}
 	}
+	if (_methods.nonNumErrFlagSet()) {
+		//asked for a numeric op on a column in which a non numeric value was found.
+		cerr << _methods.getErrMsg() << endl;
+		_methods.resetNonNumErrFlag();
+	}
 	return _outVals;
 }
 
 void KeyListOpsHelp() {
-    cerr << "\t-c\t"             << "Specify columns from the B file to map onto intervals in A." << endl;
-    cerr                         << "\t\tDefault: 5." << endl;
-    cerr						<<  "\t\tMultiple columns can be specified in a comma-delimited list." << endl << endl;
 
     cerr << "\t-o\t"             << "Specify the operation that should be applied to -c." << endl;
     cerr                         << "\t\tValid operations:" << endl;

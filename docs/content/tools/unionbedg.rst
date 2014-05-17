@@ -3,7 +3,7 @@
 ###############
 *unionbedg*
 ###############
-**unionBedGraphs** combines multiple BEDGRAPH files into a single file such that one can directly
+**bedtools unionbedg** combines multiple BEDGRAPH files into a single file such that one can directly
 compare coverage (and other text-values such as genotypes) across multiple sample
 
 
@@ -13,7 +13,7 @@ Usage and option summary
 Usage:
 
 ::
-  unionBedGraphs [OPTIONS] -i FILE1 FILE2 FILE3 ... FILEn
+  bedtools unionbedg [OPTIONS] -i FILE1 FILE2 FILE3 ... FILEn
   
 ===========================      ===============================================================================================================================================================================================================
  Option                           Description
@@ -33,9 +33,9 @@ Usage:
 ==========================================================================
 Default behavior
 ==========================================================================
-Figure:
 
 ::
+
   cat 1.bg
   chr1 1000 1500 10
   chr1 2000 2100 20
@@ -51,7 +51,7 @@ Figure:
   cat sizes.txt
   chr1 5000
 
-  unionBedGraphs -i 1.bg 2.bg 3.bg
+  bedtools unionbedg -i 1.bg 2.bg 3.bg
   chr1 900  1000 0  60 0
   chr1 1000 1500 10 60 0
   chr1 1500 1600 0  60 0
@@ -65,10 +65,10 @@ Figure:
 ==========================================================================
 ``-header`` Add a header line to the output
 ==========================================================================
-Figure:
 
 ::
-  unionBedGraphs -i 1.bg 2.bg 3.bg -header
+
+  bedtools unionbedg -i 1.bg 2.bg 3.bg -header
   chrom  start  end  1  2  3
   chr1   900    1000 0  60 0
   chr1   1000   1500 10 60 0
@@ -84,10 +84,10 @@ Figure:
 ==========================================================================
 ``-names`` Add a header line with custom file names to the output
 ==========================================================================
-Figure:
 
 ::
-  unionBedGraphs -i 1.bg 2.bg 3.bg -header -names WT-1 WT-2 KO-1
+
+  bedtools unionbedg -i 1.bg 2.bg 3.bg -header -names WT-1 WT-2 KO-1
   chrom  start  end   WT-1  WT-2  KO-1
   chr1   900    1000  0     60    0
   chr1   1000   1500  10    60    0
@@ -105,10 +105,10 @@ Figure:
 ==========================================================================
 ``-empty`` Include regions that have zero coverage in all BEDGRAPH files.
 ==========================================================================
-Figure:
 
 ::
-  unionBedGraphs -i 1.bg 2.bg 3.bg -empty -g sizes.txt -header
+
+  bedtools unionbedg -i 1.bg 2.bg 3.bg -empty -g sizes.txt -header
   chrom  start  end  WT-1  WT-2  KO-1
   chrom  start  end  1     2     3
   chr1   0      900  0     0     0
@@ -128,10 +128,10 @@ Figure:
 ==========================================================================
 ``-filler`` Use a custom value for missing values.
 ==========================================================================
-Figure:
 
 ::
-  unionBedGraphs -i 1.bg 2.bg 3.bg -empty -g sizes.txt -header -filler N/A
+
+  bedtools unionbedg -i 1.bg 2.bg 3.bg -empty -g sizes.txt -header -filler N/A
   chrom start end  WT-1  WT-2  KO-1
   chrom start end  1     2     3
   chr1  0     900  N/A   N/A   N/A
@@ -151,9 +151,9 @@ Figure:
 ==========================================================================
 Use BEDGRAPH files with non-numeric values.
 ==========================================================================
-Figure:
 
 ::
+
   cat 1.snp.bg
   chr1 0 1 A/G
   chr1 5 6 C/T
@@ -166,7 +166,7 @@ Figure:
   chr1 0 1 A/G
   chr1 5 6 C/T
 
-  unionBedGraphs -i 1.snp.bg 2.snp.bg 3.snp.bg -filler -/-
+  bedtools unionbedg -i 1.snp.bg 2.snp.bg 3.snp.bg -filler -/-
   chr1 0 1 A/G C/C A/G
   chr1 5 6 C/T -/- C/T
   chr1 7 8 -/- T/T -/-
