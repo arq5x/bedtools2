@@ -9,6 +9,7 @@
 #define KEYLISTOPS_H_
 
 #include "KeyListOpsMethods.h"
+#include "FileRecordTypeChecker.h"
 
 class FileRecordMgr;
 
@@ -44,12 +45,14 @@ public:
 	typedef enum { SUM, MEAN, STDDEV, SAMPLE_STDDEV, MEDIAN, MODE, ANTIMODE, MIN, MAX, ABSMIN, ABSMAX, COUNT, DISTINCT, COUNT_DISTINCT,
     	DISTINCT_ONLY, COLLAPSE, CONCAT, FREQ_ASC, FREQ_DESC, FIRST, LAST, INVALID } OP_TYPES;
 
+	void setDBfileType(FileRecordTypeChecker::FILE_TYPE type) { _dbFileType = type; }
 	bool isValidColumnOps(FileRecordMgr *dbFile);
 
 	const QuickString &getOpVals(RecordKeyList &hits);
 
 private:
     void init();
+    FileRecordTypeChecker::FILE_TYPE _dbFileType;
 
     QuickString _operations;
     QuickString _columns;

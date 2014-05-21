@@ -206,6 +206,7 @@ bool ContextBase::isValidState()
 	}
 	if (hasColumnOpsMethods()) {
 		FileRecordMgr *dbFile = getFile(hasIntersectMethods() ? _databaseFileIdx : 0);
+		_keyListOps->setDBfileType(dbFile->getFileType());
 		if (!_keyListOps->isValidColumnOps(dbFile)) {
 			return false;
 		}

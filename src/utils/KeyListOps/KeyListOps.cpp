@@ -8,7 +8,9 @@
 #include "FileRecordMgr.h"
 #include <cmath> //for isnan
 
-KeyListOps::KeyListOps() {
+KeyListOps::KeyListOps():
+_dbFileType(FileRecordTypeChecker::UNKNOWN_FILE_TYPE)
+{
 	_opCodes["sum"] = SUM;
 	_opCodes["mean"] = MEAN;
 	_opCodes["stddev"] = STDDEV;
@@ -134,6 +136,20 @@ bool KeyListOps::isValidColumnOps(FileRecordMgr *dbFile) {
 		_colOps.push_back(pair<int, OP_TYPES>(col, opCode));
 	}
 
+	//lastly, if the file is BAM, and they asked for column 2, which is the
+	//flags field, then for now we have to throw an error, as the flag field
+	//is currently not supported.
+	if (_dbFileType == FileRecordTypeChecker::BAM_FILE_TYPE) {
+		//also, tell the methods class we're dealing with BAM.
+		_methods.setIsBam(true);
+		for (size_t i = 0; i < _colOps.size(); i++) {
+			if (_colOps[i].first == 2) {
+				cerr << endl << "*****" << endl << "***** ERROR: Requested column 2 of a BAM file, which is the Flags field." << endl;
+				cerr << "             We currently do not support this, but may in future versions." << endl;
+				return false;
+			}
+		}
+	}
 
     return true;
 }
