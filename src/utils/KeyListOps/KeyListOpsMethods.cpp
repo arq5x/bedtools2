@@ -17,7 +17,8 @@ KeyListOpsMethods::KeyListOpsMethods()
   _nullVal("."),
   _delimStr(","),
   _iter(_nullKeyList.begin()),
-  _nonNumErrFlag(false)
+  _nonNumErrFlag(false),
+  _isBam(false)
 {
 }
 
@@ -312,7 +313,9 @@ const QuickString &KeyListOpsMethods::getLast() {
 }
 
 const QuickString &KeyListOpsMethods::getColVal() {
-	return _iter->value()->getField(_column);
+	const QuickString &retVal = _iter->value()->getField(_column);
+	if (_isBam && retVal.empty()) return _nullVal;
+	return retVal;
 }
 
 double KeyListOpsMethods::getColValNum() {

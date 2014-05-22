@@ -22,9 +22,18 @@ BamRecord::~BamRecord()
 
 const BamRecord &BamRecord::operator=(const BamRecord &other)
 {
-        Bed6Interval::operator=(other);
-        _bamAlignment = other._bamAlignment;
-        return *this;
+	Bed6Interval::operator=(other);
+	_bamAlignment = other._bamAlignment;
+	_bamChromId = other._bamChromId;
+
+	_mateChrName = other._mateChrName;
+	_matePos = other._matePos;
+	_cigarStr = other._cigarStr;
+	_insertSize = other._insertSize;
+	_queryBases = other._queryBases;
+	_qualities = other._qualities;
+
+	return *this;
 }
 
 
@@ -32,63 +41,78 @@ bool BamRecord::initFromFile(FileReader *fileReader)
 {
         BamFileReader *bamFileReader = static_cast<BamFileReader*>(fileReader);
         return initFromFile(bamFileReader);
-
 }
 
 bool BamRecord::initFromFile(BamFileReader *bamFileReader)
 {
-        bamFileReader->getChrName(_chrName);
+	_bamAlignment = bamFileReader->getAlignment();
+	bamFileReader->getChrName(_chrName);
 
-        _bamChromId = bamFileReader->getCurrChromdId();
-        _startPos = bamFileReader->getStartPos();
-        int2str(_startPos, _startPosStr);
-        _endPos = bamFileReader->getEndPos();
-        int2str(_endPos, _endPosStr);
-        bamFileReader->getName(_name);
-        bamFileReader->getScore(_score);
-        char strandChar = bamFileReader->getStrand();
-        setStrand(strandChar);
+	_bamChromId = bamFileReader->getCurrChromdId();
+	_startPos = bamFileReader->getStartPos();
+	int2str(_startPos, _startPosStr);
+	_endPos = bamFileReader->getEndPos();
+	int2str(_endPos, _endPosStr);
+	bamFileReader->getName(_name);
+	bamFileReader->getScore(_score);
+	char strandChar = bamFileReader->getStrand();
+	setStrand(strandChar);
 
-        _bamAlignment = bamFileReader->getAlignment();
-        _isUnmapped = !_bamAlignment.IsMapped();
-        _isMateUnmapped = !_bamAlignment.IsMateMapped();
-        return true;
+	 _isUnmapped = !bamFileReader->getAlignment().IsMapped();
+	_isMateUnmapped = !bamFileReader->getAlignment().IsMateMapped();
+
+
+	// Get the cigar data into a string.
+	buildCigarStr();
+
+	bamFileReader->getMateChrName(_mateChrName);
+	int2str(_bamAlignment.MatePosition, _matePos);
+	int2str(_bamAlignment.InsertSize, _insertSize);
+	_queryBases = _bamAlignment.QueryBases;
+	_qualities = _bamAlignment.Qualities;
+
+	return true;
 }
 
 void BamRecord::clear()
 {
-        Bed6Interval::clear();
-        _bamChromId = -1;
+	Bed6Interval::clear();
+	_bamChromId = -1;
 
+	_cigarStr.clear();
+	_mateChrName.clear();
+	_matePos.clear();
+	_insertSize.clear();
+	_queryBases.clear();
+	_qualities.clear();
 
-        //Clear the BamAlignment object. Sadly, it does not have a clear() method,
-        //so we have to do each member manually.
-        _bamAlignment.Name.clear();
-        _bamAlignment.Length = 0;
-        _bamAlignment.QueryBases.clear();
-        _bamAlignment.AlignedBases.clear();
-        _bamAlignment.Qualities.clear();
-        _bamAlignment.TagData.clear();
-        _bamAlignment.RefID = -1;
-        _bamAlignment.Position = -1;
-        _bamAlignment.Bin = 0;
-        _bamAlignment.MapQuality = 0;
-        _bamAlignment.AlignmentFlag = 0;
-        _bamAlignment.CigarData.clear();
-        _bamAlignment.MateRefID = -1;
-        _bamAlignment.MatePosition = -1;
-        _bamAlignment.InsertSize = -1;
-        _bamAlignment.Filename.clear();
+    //Clear the BamAlignment object. Sadly, it does not have a clear() method,
+    //so we have to do each member manually.
+    _bamAlignment.Name.clear();
+    _bamAlignment.Length = 0;
+    _bamAlignment.QueryBases.clear();
+    _bamAlignment.AlignedBases.clear();
+    _bamAlignment.Qualities.clear();
+    _bamAlignment.TagData.clear();
+    _bamAlignment.RefID = -1;
+    _bamAlignment.Position = -1;
+    _bamAlignment.Bin = 0;
+    _bamAlignment.MapQuality = 0;
+    _bamAlignment.AlignmentFlag = 0;
+    _bamAlignment.CigarData.clear();
+    _bamAlignment.MateRefID = -1;
+    _bamAlignment.MatePosition = -1;
+    _bamAlignment.InsertSize = -1;
+    _bamAlignment.Filename.clear();
 
-        _bamAlignment.SupportData.AllCharData.clear();
-        _bamAlignment.SupportData.BlockLength = 0;
-        _bamAlignment.SupportData.NumCigarOperations = 0;
-        _bamAlignment.SupportData.QueryNameLength = 0;
-        _bamAlignment.SupportData.QuerySequenceLength = 0;
-        _bamAlignment.SupportData.HasCoreOnly = false;
+    _bamAlignment.SupportData.AllCharData.clear();
+    _bamAlignment.SupportData.BlockLength = 0;
+    _bamAlignment.SupportData.NumCigarOperations = 0;
+    _bamAlignment.SupportData.QueryNameLength = 0;
+    _bamAlignment.SupportData.QuerySequenceLength = 0;
+    _bamAlignment.SupportData.HasCoreOnly = false;
 
-        _bamAlignment.ErrorString.clear();
-
+    _bamAlignment.ErrorString.clear();
 
 }
 
@@ -119,7 +143,7 @@ void BamRecord::printNull(QuickString &outBuf) const
 void BamRecord::printRemainingBamFields(QuickString &outBuf, RecordKeyList *keyList) const
 {
         outBuf.append('\t');
-        outBuf.append(_bamAlignment.Position);
+        outBuf.append(_startPosStr);
         outBuf.append('\t');
         outBuf.append(_endPos);
         outBuf.append("\t0,0,0", 6);
@@ -135,7 +159,7 @@ void BamRecord::printRemainingBamFields(QuickString &outBuf, RecordKeyList *keyL
                 for (RecordKeyList::const_iterator_type iter = keyList->begin(); iter != keyList->end(); iter = keyList->next()) {
                         const Record *block = iter->value();
                         blockLengths.push_back(block->getEndPos() - block->getStartPos());
-                        blockStarts.push_back(block->getStartPos() - _bamAlignment.Position);
+                        blockStarts.push_back(block->getStartPos() - _startPos);
                 }
 
                 outBuf.append('\t');
@@ -165,12 +189,67 @@ void BamRecord::printUnmapped(QuickString &outBuf) const {
 
 const QuickString &BamRecord::getField(int fieldNum) const
 {
-	//TBD: Determine what correct behavior should be.
-	//I.e. if users requests field 2, do they want Flag
-	//for Bam Records, or startPos for all records? -NEK 1/14/14.
+	// Unlike other records, Bam records should return the fields specified in
+	// in the BAM spec. In order, they are:
+//	1 - QNAME 	Query template NAME
+//	2 - FLAG	bitwise Flag
+//	3 - RNAME	Reference sequence NAME
+//	4 - POS		1-based left most mapping POSition
+//	5 - MAPQ	MAPping Quality
+//	6 - CIGAR	CIGAR String
+//	7 - RNEXT	Ref name of the mate/NEXT read
+//	8 - PNEXT	Position of the mate/NEXT read
+//	9 - TLEN	observed Template LENgth
+//	10 - SEQ	segement SEQuence
+//	11 - QUAL	ASCII of Phred-scaled base QUALity+33
 
-	return Bed6Interval::getField(fieldNum);
+	switch (fieldNum) {
+	case 1:
+		return _name;
+		break;
+	case 2:
+		// TBD - right now, there isn't a direct way to get the flag field.
+		// Context will have to error out if they try.
+		break;
+	case 3:
+		return _chrName;
+		break;
+	case 4:
+		return _startPosStr;
+		break;
+	case 5:
+		return _score;
+		break;
+	case 6:
+		return getCigarStr();
+		break;
+	case 7:
+		return _mateChrName;
+		break;
+	case 8:
+		return _matePos;
+		break;
+	case 9:
+		return _insertSize;
+		break;
+	case 10:
+		return _queryBases;
+		break;
+	case 11:
+		return _qualities;
+		break;
+	default:
+		cerr << "***** Error: requested invalid field number " << fieldNum << " from BAM file." << endl;
+		exit(1);
+		break;
+	}
+
+	// control can never reach here, but compiler is complaining about
+	// reaching end of non-void function, so this dummy statement will
+	// keep it happy.
+	return _name;
 }
+
 
 bool BamRecord::isNumericField(int fieldNum) {
 
@@ -178,4 +257,16 @@ bool BamRecord::isNumericField(int fieldNum) {
 	return (fieldNum > 6 ? false : Bed6Interval::isNumericField(fieldNum));
 }
 
+void BamRecord::buildCigarStr() {
+
+	const vector<BamTools::CigarOp> &cigarData = _bamAlignment.CigarData;
+	size_t cigarVecLen = cigarData.size();
+	_cigarStr.clear();
+	_cigarStr.reserve(2 * cigarVecLen);
+
+	for (size_t i=0; i < cigarVecLen; i++) {
+		_cigarStr.append(cigarData[i].Type);
+		_cigarStr.append(cigarData[i].Length);
+	}
+}
 

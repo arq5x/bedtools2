@@ -8,7 +8,9 @@
 #include "FileRecordMgr.h"
 #include <cmath> //for isnan
 
-KeyListOps::KeyListOps() {
+KeyListOps::KeyListOps():
+_dbFileType(FileRecordTypeChecker::UNKNOWN_FILE_TYPE)
+{
 	_opCodes["sum"] = SUM;
 	_opCodes["mean"] = MEAN;
 	_opCodes["stddev"] = STDDEV;
@@ -83,15 +85,6 @@ KeyListOps::OP_TYPES KeyListOps::getOpCode(const QuickString &operation) const {
 
 bool KeyListOps::isValidColumnOps(FileRecordMgr *dbFile) {
 
-    if (dbFile->getFileType() == FileRecordTypeChecker::BAM_FILE_TYPE) {
-         //throw Error
-        cerr << endl << "*****" << endl
-             << "***** ERROR: BAM database file not currently supported for column operations."
-             << endl;
-        exit(1);
-    }
-
-
 	//get the strings from context containing the comma-delimited lists of columns
 	//and operations. Split both of these into vectors. Get the operation code
 	//for each operation string. Finally, make a vector of pairs, where the first
@@ -143,71 +136,20 @@ bool KeyListOps::isValidColumnOps(FileRecordMgr *dbFile) {
 		_colOps.push_back(pair<int, OP_TYPES>(col, opCode));
 	}
 
-
-//	//The final step we need to do is check that for each column/operation pair,
-//	//if the operation is numeric, see if the database's record type supports
-//	//numeric operations for that column. For instance, we can allow the mean
-//	//of column 4 for a BedGraph file, because that's numeric, but not for Bed4,
-//	//because that isn't.
-//
-//	for (int i = 0; i < (int)_colOps.size(); i++) {
-//		int col = _colOps[i].first;
-//		OP_TYPES opCode = _colOps[i].second;
-//		FileRecordTypeChecker::RECORD_TYPE recordType = dbFile->getRecordType();
-//
-//		if (isNumericOp(opCode)) {
-//			bool isValidNumOp = false;
-//			switch(recordType) {
-//				case FileRecordTypeChecker::BED3_RECORD_TYPE:
-//					isValidNumOp = Bed3Interval::isNumericField(col);
-//					break;
-//
-//				case FileRecordTypeChecker::BED4_RECORD_TYPE:
-//					isValidNumOp = Bed4Interval::isNumericField(col);
-//					break;
-//
-//				case FileRecordTypeChecker::BED5_RECORD_TYPE:
-//					isValidNumOp = Bed5Interval::isNumericField(col);
-//					break;
-//
-//				case FileRecordTypeChecker::BEDGRAPH_RECORD_TYPE:
-//					isValidNumOp = BedGraphInterval::isNumericField(col);
-//					break;
-//
-//				case FileRecordTypeChecker::BED6_RECORD_TYPE:
-//					isValidNumOp = Bed6Interval::isNumericField(col);
-//					break;
-//
-//				case FileRecordTypeChecker::BED_PLUS_RECORD_TYPE:
-//					isValidNumOp = BedPlusInterval::isNumericField(col);
-//					break;
-//
-//				case FileRecordTypeChecker::BED12_RECORD_TYPE:
-//					isValidNumOp = Bed12Interval::isNumericField(col);
-//					break;
-//
-//				case FileRecordTypeChecker::BAM_RECORD_TYPE:
-//					isValidNumOp = BamRecord::isNumericField(col);
-//					break;
-//
-//				case FileRecordTypeChecker::VCF_RECORD_TYPE:
-//					isValidNumOp = VcfRecord::isNumericField(col);
-//					break;
-//
-//				case FileRecordTypeChecker::GFF_RECORD_TYPE:
-//					isValidNumOp = GffRecord::isNumericField(col);
-//					break;
-//
-//				default:
-//					break;
-//			}
-//			if (!isValidNumOp) {
-//				 cerr << endl << "*****" << endl  << "***** ERROR: Column " << col << " is not a numeric field for database file "
-//						 << dbFile->getFileName() << "." << endl;
-//				 return false;
-//			}
-//		}
-//	}
+	//lastly, if the file is BAM, and they asked for column 2, which is the
+	//flags field, then for now we have to throw an error, as the flag field
+	//is currently not supported.
+	if (_dbFileType == FileRecordTypeChecker::BAM_FILE_TYPE) {
+		//also, tell the methods class we're dealing with BAM.
+		_methods.setIsBam(true);
+		for (size_t i = 0; i < _colOps.size(); i++) {
+			if (_colOps[i].first == 2) {
+				cerr << endl << "*****" << endl << "***** ERROR: Requested column 2 of a BAM file, which is the Flags field." << endl;
+				cerr << "             We currently do not support this, but may in future versions." << endl;
+				return false;
+			}
+		}
+	}
 
     return true;
 }

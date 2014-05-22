@@ -653,13 +653,16 @@ rm obs exp
 
 
 ###########################################################
+#
+#  DEPRECATED
 #  Test that Bam database is not allowed
 ############################################################
 echo "    map.t44...\c"
-echo -e "\n*****\n***** ERROR: BAM database file not currently supported for column operations." > exp
-$BT map -a ivls.bed -b values.bam 2> obs
-check obs exp
-rm obs exp
+#echo -e "\n*****\n***** ERROR: BAM database file not currently supported for column operations." > exp
+#$BT map -a ivls.bed -b values.bam 2> obs
+#check obs exp
+#rm obs exp
+echo ok
 
 
 
@@ -794,3 +797,14 @@ chr3	100	200	0.5" > exp
 $BT map -a ivls.bed -b values4.bed -c 7 -o sample_stddev > obs
 check obs exp
 rm obs exp
+
+###########################################################
+#  Test BAM file as DB
+############################################################
+echo "    map.t53...\c"
+echo \
+"chr1	10000	12000	2.5
+chr1	15000	20000	11.4444" > exp
+$BT map -a d.bed -b fullFields.bam -c 5 -o mean > obs
+check exp obs
+rm exp obs

@@ -81,8 +81,7 @@ void BlockMgr::getBlocksFromBed12(RecordKeyList &keyList, bool &mustDelete)
 void BlockMgr::getBlocksFromBam(RecordKeyList &keyList, bool &mustDelete)
 {
 	const BamRecord *keyRecord = static_cast<const BamRecord *>(keyList.getKey());
-	const vector<BamTools::CigarOp> &cigarData = keyRecord->getAlignment().CigarData;
-
+	const vector<BamTools::CigarOp> &cigarData = keyRecord->getCigarData();
 	int currPos = keyRecord->getStartPos();
 	int  blockLength = 0;
 

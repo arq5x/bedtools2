@@ -48,7 +48,8 @@ public:
 	void getName(QuickString &) const;
 	void getScore(QuickString &) const;
 	char getStrand() const;
-	virtual int getNumFields() const { return MINIMUM_PRINTABLE_BAM_FIELDS; }
+	void getMateChrName(QuickString &str) const;
+	virtual int getNumFields() const { return MINIMUM_VALID_BAM_FIELDS; }
 
 protected:
 
@@ -60,6 +61,7 @@ protected:
 	bool _useTags;
 
 	static const int MINIMUM_PRINTABLE_BAM_FIELDS = 6;
+	static const int  MINIMUM_VALID_BAM_FIELDS = 11;
 	void extractNameFromCore();
 };
 

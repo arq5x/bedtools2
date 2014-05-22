@@ -206,6 +206,7 @@ bool ContextBase::isValidState()
 	}
 	if (hasColumnOpsMethods()) {
 		FileRecordMgr *dbFile = getFile(hasIntersectMethods() ? _databaseFileIdx : 0);
+		_keyListOps->setDBfileType(dbFile->getFileType());
 		if (!_keyListOps->isValidColumnOps(dbFile)) {
 			return false;
 		}
@@ -248,6 +249,11 @@ bool ContextBase::openFiles() {
 		FileRecordMgr *frm = getNewFRM(_fileNames[i]);
 		if (hasGenomeFile()) {
 			frm->setGenomeFile(_genomeFile);
+		}
+		//If we're going to do column operations, and an input file
+		// is BAM, we'll need the full flags.
+		if (hasColumnOpsMethods()) {
+			setUseFullBamTags(true);
 		}
 		frm->setFullBamFlags(_useFullBamTags);
 		frm->setIsSorted(_sortedInput);

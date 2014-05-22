@@ -152,14 +152,18 @@ check exp obs
 rm obs exp
 
 ###########################################################
-#  Test that column ops not allowed with BAM
+#  Test that column ops not allowed with BAM if col greater
+#  than 11.
+#  
+# EDIT: This test has been moved to test #35, after the 
+# other bam column tests. 
 ###########################################################
 echo "    merge.t12...\c"
-echo "***** ERROR: BAM database file not currently supported for column operations." > exp
-$BT merge -i a.full.bam -c 1 -o count 2>&1 > /dev/null | head -3 | tail -1 > obs
-check exp obs
-rm obs exp
-
+#echo "***** ERROR: Requested column 12, but database file fullFields.bam only has fields 1 - 11." > exp
+#$BT merge -i fullFields.bam -c 12 -o sum 2>&1 > /dev/null | head -3 | tail -1 > obs
+#check exp obs
+#rm obs exp
+echo ok
 
 ###########################################################
 #  Test that VCF input gives BED3 output
@@ -318,4 +322,130 @@ echo \
  ***** WARNING: Non numeric value a4 in 4." > expErr
 check obsErr expErr
 rm obsErr expErr
+
+
+###########################################################
+#
+#  Test that we can get fields from a BAM file
+#
+###########################################################
+
+###########################################################
+#  Test bam column 1
+###########################################################
+echo "    merge.t24...\c"
+$BT merge -i fullFields.bam -c 1 -o collapse > obs
+check obs bamCol1Collapse.txt
+rm obs
+
+###########################################################
+#  Test bam column 2 gives an error
+###########################################################
+echo "    merge.t25...\c"
+echo \
+"***** ERROR: Requested column 2 of a BAM file, which is the Flags field." > exp
+$BT merge -i fullFields.bam -c 2 -o collapse 2>&1 > /dev/null | head -3 | tail -1 > obs
+check exp obs
+rm obs exp
+
+###########################################################
+#  Test bam column 3
+###########################################################
+echo "    merge.t26...\c"
+$BT merge -i fullFields.bam -c 3 -o collapse > obs
+check obs bamCol3Collapse.txt
+rm obs
+
+###########################################################
+#  Test bam column 4
+###########################################################
+echo "    merge.t27...\c"
+$BT merge -i fullFields.bam -c 4 -o mean > obs
+check obs bamCol4Mean.txt
+rm obs
+
+
+
+###########################################################
+#  Test bam column 5
+###########################################################
+echo "    merge.t28...\c"
+$BT merge -i fullFields.bam -c 5 -o mean > obs
+check obs bamCol5Mean.txt
+rm obs
+
+###########################################################
+#  Test bam column 6
+###########################################################
+echo "    merge.t29...\c"
+$BT merge -i fullFields.bam -c 6 -o collapse > obs
+check obs bamCol6Collapse.txt
+rm obs
+
+###########################################################
+#  Test bam column 7
+###########################################################
+echo "    merge.t30...\c"
+$BT merge -i fullFields.bam -c 7 -o collapse > obs
+check obs bamCol7Collapse.txt
+rm obs
+
+###########################################################
+#  Test bam column 8
+###########################################################
+echo "    merge.t31...\c"
+$BT merge -i fullFields.bam -c 8 -o mean > obs
+check obs bamCol8Mean.txt
+rm obs
+
+###########################################################
+#  Test bam column 9
+###########################################################
+echo "    merge.t32...\c"
+$BT merge -i fullFields.bam -c 9 -o mean > obs
+check obs bamCol9Mean.txt
+rm obs
+
+###########################################################
+#  Test bam column 10
+###########################################################
+echo "    merge.t33...\c"
+$BT merge -i fullFields.bam -c 10 -o collapse > obs
+check obs bamCol10Collapse.txt
+rm obs
+
+###########################################################
+#  Test bam column 11
+###########################################################
+echo "    merge.t34...\c"
+$BT merge -i fullFields.bam -c 11 -o collapse > obs
+check obs bamCol11Collapse.txt
+rm obs
+
+###########################################################
+#  Test that column ops not allowed with BAM if col greater
+#  than 11.
+###########################################################
+echo "    merge.t35...\c"
+echo "***** ERROR: Requested column 12, but database file fullFields.bam only has fields 1 - 11." > exp
+$BT merge -i fullFields.bam -c 12 -o sum 2>&1 > /dev/null | head -3 | tail -1 > obs
+check exp obs
+rm obs exp
+
+###########################################################
+#  Test col ops behavior on bam file for missing values,
+#  i.e, getting the mate reference when there is no mate.
+#  Be sure null value is printed
+###########################################################
+echo "    merge.t36...\c"
+echo \
+"chr1	10	20	.
+chr1	30	100	.,.,.
+chr2	10	20	.
+chr2	30	40	.
+chr2	42	100	.,." >exp
+../../bin/bedtools merge -i a.full.bam  -c 7 -o collapse > obs
+check exp obs
+rm obs exp
+
 

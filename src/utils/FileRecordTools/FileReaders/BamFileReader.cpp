@@ -98,3 +98,13 @@ char BamFileReader::getStrand() const
 	}
 	return '+';
 }
+
+void BamFileReader::getMateChrName(QuickString &str) const
+{
+	int refId = _bamAlignment.MateRefID;
+	if (refId < 0) {
+		return;
+	}
+	str =  _references[refId].RefName;
+}
+

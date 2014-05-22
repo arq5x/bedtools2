@@ -22,7 +22,7 @@ public:
 	KeyListOpsMethods(RecordKeyList *keyList, int column = 1);
 	~KeyListOpsMethods();
 
-
+	void setIsBam(bool isBam) { _isBam = isBam; }
 	void setKeyList(RecordKeyList *keyList) { _keyList = keyList; }
 	void setColumn(int col) { _column = col; }
 	void setNullValue(const QuickString & nullVal) { _nullVal = nullVal; }
@@ -102,6 +102,7 @@ private:
 
 	bool _nonNumErrFlag;
 	QuickString _errMsg;
+	bool _isBam;
 
 	typedef multimap<int, QuickString, less<int> > histAscType;
 	typedef multimap<int, QuickString, greater<int> > histDescType;

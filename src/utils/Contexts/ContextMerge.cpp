@@ -104,12 +104,6 @@ bool ContextMerge::isValidState()
 		}
 	}
 
-	//column operations not allowed with BAM input
-	if (hasColumnOpsMethods() &&
-			getFile(0)->getFileType() == FileRecordTypeChecker::BAM_FILE_TYPE) {
-		_errorMsg = "\n***** ERROR: stranded merge not supported for VCF files. *****";
-		return false;
-	}
 	return true;
 }
 
