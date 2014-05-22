@@ -751,7 +751,7 @@ echo \
 "chr1	11323785	11617177
 chr1	12645605	13926923
 chr1	14750216	15119039" >exp
-~/mergeBugSpace/bt2-merge-debug/bin/bedtools intersect -a dosLineChar_a.bed -b dosLineCharWithExtraTab_b.bed -v > obs
+$BT intersect -a dosLineChar_a.bed -b dosLineCharWithExtraTab_b.bed -v > obs
 check exp obs
 rm exp obs
 
