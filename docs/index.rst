@@ -32,12 +32,12 @@ Table of contents
 =================
 .. toctree::
    :maxdepth: 1
-   :numbered:
 
    content/overview
    content/installation
    content/quick-start
    content/general-usage
+   content/history
    content/bedtools-suite
    content/example-usage
    content/advanced-usage
