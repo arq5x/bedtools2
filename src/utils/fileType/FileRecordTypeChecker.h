@@ -34,7 +34,7 @@ public:
 		BED6_RECORD_TYPE, BED12_RECORD_TYPE, BED_PLUS_RECORD_TYPE, BAM_RECORD_TYPE, VCF_RECORD_TYPE, GFF_RECORD_TYPE} RECORD_TYPE;
 
 	void setFilename(const QuickString & filename) { _filename = filename; }
-	bool scanBuffer(const char *buf, size_t len=0);
+	bool scanBuffer(const char *buf, size_t len, bool eofHit);
 	bool needsMoreData() const { return _insufficientData; }
 
 	bool recordTypeHasName(RECORD_TYPE type) const { return _hasName.find(type) != _hasName.end(); }
@@ -113,6 +113,8 @@ private:
 	map<RECORD_TYPE, bool> _hasName;
 	map<RECORD_TYPE, bool> _hasScore;
 	map<RECORD_TYPE, bool> _hasStrand;
+
+	bool _eofHit;
 
 	//this will be used in determining whether we are looking at a binary or text file.
 	static const float PERCENTAGE_PRINTABLE = .9;

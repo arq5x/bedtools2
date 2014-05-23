@@ -28,7 +28,8 @@ InputStreamMgr::InputStreamMgr(const QuickString &filename, bool buildScanBuffer
  _streamFinished(false),
  _numBytesInBuffer(0),
  _bamReader(NULL),
- _bgStream(NULL)
+ _bgStream(NULL),
+ _eofHit(false)
 {
 	_possibleBamCode.resize(4, 0);
 }
@@ -138,6 +139,7 @@ bool InputStreamMgr::populateScanBuffer()
 		currChar = _pushBackStreamBuf->sbumpc();
 		//Stop when EOF hit.
 		if (currChar == EOF) {
+			_eofHit = true;
 			break;
 		}
 		numChars++;
@@ -185,6 +187,7 @@ bool InputStreamMgr::detectBamOrBgzip(int &numChars, int currChar)
 				currChar = _pushBackStreamBuf->sbumpc();
 				//Stop when EOF hit.
 				if (currChar == EOF) {
+					_eofHit = true;
 					break;
 				}
 				_scanBuffer.push_back(currChar);

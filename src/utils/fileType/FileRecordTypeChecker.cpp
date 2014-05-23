@@ -4,6 +4,7 @@
 #include "ParseTools.h"
 
 FileRecordTypeChecker::FileRecordTypeChecker()
+: _eofHit(false)
 {
 	_fileType = UNKNOWN_FILE_TYPE;
 	_recordType = UNKNOWN_RECORD_TYPE;
@@ -71,11 +72,9 @@ FileRecordTypeChecker::FileRecordTypeChecker()
 }
 
 
-bool FileRecordTypeChecker::scanBuffer(const char *buffer, size_t len)
+bool FileRecordTypeChecker::scanBuffer(const char *buffer, size_t len, bool eofHit)
 {
-	if (len == 0) {
-		len = strlen(buffer);
-	}
+	_eofHit = eofHit;
 	_numBytesInBuffer = len;
 	if (_numBytesInBuffer == 0) {
 		_fileType = EMPTY_FILE_TYPE;
@@ -261,7 +260,7 @@ bool FileRecordTypeChecker::isTextDelimtedFormat(const char *buffer, size_t len)
 {
 	//Break single string buffer into vector of QuickStrings. Delimiter is newline.
 	_tokenizer.setKeepFinalIncompleteElem(Tokenizer::IGNORE);
-	int numLines = _tokenizer.tokenize(buffer, '\n');
+	int numLines = _tokenizer.tokenize(buffer, '\n', _eofHit);
 
 	//anticipated delimiter characters are tab, comma, and semi-colon.
 	//If we need new ones, they must be added in this method.

@@ -38,7 +38,7 @@ public:
 	bool isBam() const { return _isBam; }
 	BamTools::BamReader *getBamReader() { return _bamReader; }
 	bool resetStream();
-
+	bool getEofHit() { return _eofHit; }
 
 private:
 	QuickString _filename;
@@ -63,6 +63,7 @@ private:
 	int _numBytesInBuffer; //this will hold the length of the buffer after the scan.
 	BamTools::BamReader *_bamReader;
 	BamTools::Internal::BgzfStream *_bgStream;
+	bool _eofHit;
 
 	static const char *FIFO_STRING_LITERAL;
 	bool readZipChunk();

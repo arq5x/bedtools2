@@ -22,7 +22,7 @@ public:
 	// If not, don't worry about it.
 	void setNumExpectedItems(int val);
 
-	int tokenize(const QuickString &str, char delimiter = '\t');
+	int tokenize(const QuickString &str, char delimiter = '\t', bool eofHit = false);
 
 	// If the final element ends before a delim char, that means
 	// the buffer passed in ends mid-element. The last, incomplete
