@@ -147,3 +147,24 @@ $BT slop -i a.bed -b 3000000000 -s -g tiny.genome > obs
 check obs exp
 rm obs exp
 
+###########################################################
+# test that old floating-point issues are solved
+###########################################################
+echo "    slop.t13...\c"
+echo \
+"chr1	16778071	16778771" > exp
+echo -e "chr1\t16778271\t16778571"| $BT slop -l 200 -r 200 -i - -g ../../genomes/human.hg19.genome > obs
+check obs exp
+rm obs exp
+
+###########################################################
+# test that old floating-point issues are solved
+###########################################################
+echo "    slop.t14...\c"
+echo \
+"chr1	16778072	16778772" > exp
+echo -e "chr1\t16778272\t16778572"| $BT slop -l 200 -r 200 -i - -g ../../genomes/human.hg19.genome > obs
+check obs exp
+rm obs exp
+
+

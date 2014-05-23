@@ -68,25 +68,29 @@ void BedSlop::AddSlop(BED &bed) {
 
     // special handling if the BED entry is on the negative
     // strand and the user cares about strandedness.
-    float chromSize = (float)_genome->getChromSize(bed.chrom);
+    CHRPOS chromSize = (CHRPOS)_genome->getChromSize(bed.chrom);
 
     if ( (_forceStrand) && (bed.strand == "-") ) {
-        // inspect the start
-    	float newStart = (float)bed.start - _rightSlop;
-    	bed.start = (newStart > 0 ) ? (CHRPOS)newStart : 0;
+        if ( ((int)bed.start - (int)_rightSlop) >= 0 )
+            bed.start = bed.start - (int)_rightSlop;
+        else
+            bed.start = 0;
 
-        // inspect the end
-    	float newEnd = (float)bed.end + _leftSlop;
-    	bed.end = (newEnd < chromSize ) ? (CHRPOS)newEnd : (CHRPOS)chromSize;
+        if ( ((CHRPOS)bed.end + (CHRPOS)_leftSlop) <= chromSize )
+            bed.end = bed.end + (int)_leftSlop;
+        else
+            bed.end = chromSize;
     }
     else {
-        // inspect the start
-    	float newStart = (float)bed.start - _leftSlop;
-    	bed.start = (newStart > 0 ) ? (CHRPOS)newStart : 0;
+    	if ( ((int)bed.start - (int)_leftSlop) >= 0 )
+            bed.start = bed.start - (int)_leftSlop;
+        else
+            bed.start = 0;
 
-        // inspect the end
-    	float newEnd = (float)bed.end + _rightSlop;
-    	bed.end = (newEnd < chromSize ) ? (CHRPOS)newEnd : (CHRPOS)chromSize;
+        if ( ((CHRPOS)bed.end + (CHRPOS)_rightSlop) <= chromSize )
+            bed.end = bed.end + (int)_rightSlop;
+        else
+            bed.end = chromSize;
     }
 }
 
