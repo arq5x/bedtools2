@@ -4,15 +4,16 @@ Release History
 
 Version 2.20.0 (22-May-2014)
 ============================
+
 1. The ``merge`` tool now supports BAM input.
-- The ``-n``, ``-nms``, and ``-scores`` options are deprecated in favor of the new, substantially more flexible, ``-c`` and ``-o`` options. See the `docs <http://bedtools.readthedocs.org/en/latest/content/tools/merge.html>`_.
-- It now supports the ``-header`` option.
-- It now supports the ``-S`` option.
+  - The ``-n``, ``-nms``, and ``-scores`` options are deprecated in favor of the new, substantially more flexible, ``-c`` and ``-o`` options. See the `docs <http://bedtools.readthedocs.org/en/latest/content/tools/merge.html>`_.
+  - It now supports the ``-header`` option.
+  - It now supports the ``-S`` option.
 2. The ``map`` tool now supports BAM input.
 3. The ``jaccard`` tool is now ~3 times faster.
-- It now supports the ``-split`` option.
-- It now supports the ``-s`` option.
-- It now supports the ``-S`` option.
+  - It now supports the ``-split`` option.
+  - It now supports the ``-s`` option.
+  - It now supports the ``-S`` option.
 4. We have fixed several CLANG compiler issues/ Thanks to John Marshall for the thorough report.
 5. We added support for "X" and "=" CIGAR operators. Thanks to Pierre Lindenbaum.
 6. Fixed bugs for empty files.
