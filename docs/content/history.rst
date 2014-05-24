@@ -2,6 +2,12 @@
 Release History
 ###############
 
+Version 2.20.1 (23-May-2014)
+============================
+1. Fixed a float rounding bug causing occassional off-by-one issues in the slop added by the ``slop`` tool.  Thanks to @slw287r.
+2. Fixed a bug injected in 2.19 arising when files have a single line not ending in a newline. Thanks to @cwarden45.
+
+
 Version 2.20.0 (22-May-2014)
 ============================
 
