@@ -27,7 +27,7 @@ void Tokenizer::setNumExpectedItems(int newSize) {
 	resize(newSize);
 }
 
-int Tokenizer::tokenize(const QuickString &str, char delimiter) {
+int Tokenizer::tokenize(const QuickString &str, char delimiter, bool eofHit) {
 
 	int strLen = (int)str.size();
 
@@ -41,7 +41,8 @@ int Tokenizer::tokenize(const QuickString &str, char delimiter) {
 			currPos++;
 		}
 		if (currPos > startPos) {
-			if (currPos == strLen && _keepFinalIncElem != USE_NOW) {
+			if ((currPos == strLen && _keepFinalIncElem != USE_NOW) &&
+					(!(delimiter == '\n' && eofHit))) {
 				//we found an incomplete final element.
 				// if we're ignoring incomplete elems, do nothing with it.
 				currIdx--; //make sure it's not included in the final count of valid elems.

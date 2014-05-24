@@ -755,3 +755,12 @@ $BT intersect -a dosLineChar_a.bed -b dosLineCharWithExtraTab_b.bed -v > obs
 check exp obs
 rm exp obs
 
+###########################################################
+#  Test that files with no newlines at all are handled
+############################################################
+echo "    intersect.new.t64...\c"
+echo "chr17	7577068	7577157" > exp
+$BT intersect -a oneRecordNoNewline.bed -b oneRecordNoNewline.bed > obs
+check obs exp
+rm obs exp
+
