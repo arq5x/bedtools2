@@ -17,7 +17,7 @@ BufferedStreamMgr::BufferedStreamMgr(const QuickString &filename)
   	_mainBufCurrStartPos(0),
   	_mainBufCurrLen(0),
   	_eof(false),
-  	_useBufSize(0),
+  	_useBufSize(DEFAULT_MAIN_BUF_READ_SIZE),
   	_streamFinished(false)
 {
 
@@ -51,8 +51,6 @@ bool BufferedStreamMgr::init()
 	}
 	if (_inputStreamMgr->isGzipped()) {
 		_useBufSize = GZIP_LINE_BUF_SIZE;
-	} else {
-		_useBufSize =  MAIN_BUF_READ_SIZE;
 	}
 
 	size_t trueBufSize = max(_useBufSize, (int)_currScanBuffer.size());

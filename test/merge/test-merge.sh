@@ -449,3 +449,72 @@ check exp obs
 rm obs exp
 
 
+
+
+###########################################################
+#
+#  Test new -iobuf option
+#  
+###########################################################
+
+
+###########################################################
+#  Test -iobuf expects an argument
+###########################################################
+echo "    merge.t37...\c"
+echo "***** ERROR: -iobuf option given, but size of input buffer not specified. *****" >exp
+$BT merge -i a.bed -iobuf 2>&1 > /dev/null | head -2 | tail -1 > obs
+check obs exp
+rm obs exp
+
+###########################################################
+#  Test -iobuf allows only suffixes K/M/G
+###########################################################
+echo "    merge.t38...\c"
+echo \
+"***** ERROR: Unrecognized memory buffer size suffix 'L' given. *****" > exp
+$BT merge -i a.bed -iobuf 20L 2>&1 > /dev/null | head -2 | tail -1 > obs
+check obs exp
+rm obs exp
+
+###########################################################
+#  Test -iobuf doesn't allow a buffer size below 8 bytes.
+###########################################################
+echo "    merge.t39...\c"
+echo \
+"***** ERROR: specified buffer size is too small. *****" > exp
+$BT merge -i a.bed -iobuf 7 2>&1 > /dev/null | head -2 | tail -1 > obs
+check exp obs
+rm exp obs
+
+###########################################################
+#  Test -iobuf doesn't allow non-numeric arguments
+###########################################################
+echo "    merge.t40...\c"
+echo \
+"***** ERROR: argument passed to -iobuf is not numeric. *****" > exp
+$BT merge -i a.bed -iobuf beerM 2>&1 > /dev/null | head -2 | tail -1 > obs
+check exp obs
+rm exp obs
+
+###########################################################
+#  Test -iobuf allows correct argument with suffix
+###########################################################
+echo "    merge.t41...\c"
+echo \
+"chr1	10	20
+chr1	30	100" > exp
+$BT merge -i a.bed -iobuf 128M > obs
+check exp obs
+rm exp obs
+
+###########################################################
+#  Test -iobuf allows correct argument without suffix
+###########################################################
+echo "    merge.t42...\c"
+echo \
+"chr1	10	20
+chr1	30	100" > exp
+$BT merge -i a.bed -iobuf 8192 > obs
+check exp obs
+rm exp obs

@@ -27,7 +27,8 @@ public:
 	bool eof() const { return _eof; }
 	bool getLine(QuickString &line);
 	BamTools::BamReader *getBamReader() { return _inputStreamMgr->getBamReader(); }
-
+	static const int DEFAULT_MAIN_BUF_READ_SIZE = 1023;
+	void setIoBufSize(int val) { _useBufSize = val; }
 private:
 	InputStreamMgr *_inputStreamMgr;
 	typedef unsigned char bufType;
@@ -42,8 +43,8 @@ private:
 	int _useBufSize;
 	bool _streamFinished;
 	QuickString _currScanBuffer;
+
 	//The minus ones in these constants are for leaving room for a null terminator after reading into buffers.
-	static const int MAIN_BUF_READ_SIZE = 1023; // 2 Kb minus 1
 	static const int GZIP_LINE_BUF_SIZE = 8191; // 8K
 	bool readFileChunk();
 	bool getTypeData();

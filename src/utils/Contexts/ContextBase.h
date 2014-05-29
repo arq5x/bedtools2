@@ -176,6 +176,7 @@ protected:
     bool _obeySplits;
     bool _uncompressedBam;
     bool _useBufferedOutput;
+    int _ioBufSize;
 
 	bool _anyHit;
     bool _noHit;
@@ -234,6 +235,8 @@ protected:
 	char **_argv;
 	int _i;
 
+	static const int MIN_ALLOWED_BUF_SIZE = 8;
+
 	virtual bool handle_bed();
 	virtual bool handle_fbam();
 	virtual bool handle_g();
@@ -242,6 +245,8 @@ protected:
 	virtual bool handle_i();
 	virtual bool handle_n();
 	virtual bool handle_nobuf();
+	virtual bool handle_iobuf();
+
 	virtual bool handle_seed();
 	virtual bool handle_split();
 	virtual bool handle_sorted();
@@ -251,6 +256,9 @@ protected:
 	virtual bool handle_o();
 	virtual bool handle_null();
 	virtual bool handle_delim();
+
+	bool parseIoBufSize(QuickString bufStr);
+
 };
 
 #endif /* CONTEXTBASE_H_ */
