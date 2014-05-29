@@ -24,7 +24,8 @@ FileRecordMgr::FileRecordMgr(const QuickString &filename)
   _blockMgr(NULL),
   _bamReader(NULL),
   _hasGenomeFile(false),
-  _genomeFile(NULL)
+  _genomeFile(NULL),
+  _ioBufSize(0)
 {
 }
 
@@ -43,6 +44,7 @@ FileRecordMgr::~FileRecordMgr(){
 
 bool FileRecordMgr::open(){
 	_bufStreamMgr = new BufferedStreamMgr(_filename);
+	if (_ioBufSize > 0) _bufStreamMgr->setIoBufSize(_ioBufSize);
 	if (!_bufStreamMgr->init()) {
 		cerr << "Error: unable to open file or unable to determine types for file " << _filename << endl;
 		delete _bufStreamMgr;

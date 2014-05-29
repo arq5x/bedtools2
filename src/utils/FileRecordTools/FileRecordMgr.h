@@ -100,6 +100,7 @@ public:
 	}
 
 	void setIsSorted(bool val) { _isSortedInput = val; }
+	void setIoBufSize(int val) { _ioBufSize = val; }
 
 protected:
 	QuickString _filename;
@@ -131,6 +132,7 @@ protected:
 	BamTools::BamReader *_bamReader;
 	bool _hasGenomeFile;
 	NewGenomeFile *_genomeFile;
+	int _ioBufSize;
 
 	void allocateFileReader();
 	void testInputSortOrder(Record *record);
