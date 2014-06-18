@@ -22,17 +22,17 @@ public:
 	//NOTE: Query and database files will only be marked as such by either the
 	//parseCmdArgs method, or by explicitly setting them.
 	FileRecordMgr *getQueryFile() { return getFile(_queryFileIdx); }
-	FileRecordMgr *getDatabaseFile() { return getFile(_databaseFileIdx); }
+	FileRecordMgr *getDatabaseFile(int idx) { return getFile(_dbFileIdxs[idx]); }
     int getQueryFileIdx() const { return _queryFileIdx; }
 	void setQueryFileIdx(int idx) { _queryFileIdx = idx; }
-	int getDatabaseFileIdx() const { return _databaseFileIdx; }
-	void setDatabaseFileIdx(int idx) { _databaseFileIdx = idx; }
+	int getNumDatabaseFiles() { return (int)_dbFileIdxs.size(); }
+	const vector<int> &getDbFileIdxs() const { return _dbFileIdxs; }
 	const QuickString &getQueryFileName() const { return _files[_queryFileIdx]->getFileName(); }
-	const QuickString &getDatabaseFileName() const { return _files[_databaseFileIdx]->getFileName(); }
+	const QuickString &getDatabaseFileName(int idx) const { return _files[_dbFileIdxs[idx]]->getFileName(); }
 	ContextFileType getQueryFileType() const { return _files[_queryFileIdx]->getFileType(); }
-	ContextFileType getDatabaseFileType() const { return _files[_databaseFileIdx]->getFileType(); }
+	ContextFileType getDatabaseFileType(int idx) const { return _files[_dbFileIdxs[idx]]->getFileType(); }
 	ContextRecordType getQueryRecordType() const { return _files[_queryFileIdx]->getRecordType(); }
-	ContextRecordType getDatabaseRecordType() const { return _files[_databaseFileIdx]->getRecordType(); }
+	ContextRecordType getDatabaseRecordType(int idx) const { return _files[_dbFileIdxs[idx]]->getRecordType(); }
 	int getMaxNumDatabaseFields() const { return _maxNumDatabaseFields; }
 	void setMaxNumDatabaseFields(int val) { _maxNumDatabaseFields = val; }
 

@@ -3,7 +3,8 @@
 #include <cstdio>
 
 Record::Record()
-: _chrId(-1),
+: _fileIdx(-1),
+  _chrId(-1),
   _startPos(-1),
   _endPos(-1),
   _strandVal(UNKNOWN),
@@ -18,6 +19,7 @@ Record::~Record() {
 
 const Record &Record::operator=(const Record &other)
 {
+	_fileIdx = other._fileIdx;
 	_chrName = other._chrName;
 	_chrId = other._chrId;
 	_startPos = other._startPos;
@@ -29,6 +31,7 @@ const Record &Record::operator=(const Record &other)
 }
 
 void Record::clear() {
+	_fileIdx = -1;
 	_chrName.clear();
 	_chrId = -1;
 	_startPos = -1;

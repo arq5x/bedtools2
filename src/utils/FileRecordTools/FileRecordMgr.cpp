@@ -5,7 +5,7 @@
 #include "NewGenomeFile.h"
 
 FileRecordMgr::FileRecordMgr(const QuickString &filename)
-:
+: _fileIdx(-1),
   _filename(filename),
   _bufStreamMgr(NULL),
   _fileReader(NULL),
@@ -224,6 +224,7 @@ void FileRecordMgr::allocateFileReader()
 	default:
 		break;
 	}
+	_fileReader->setFileIdx(_fileIdx);
 }
 
 const BamTools::RefVector & FileRecordMgr::getBamReferences() {

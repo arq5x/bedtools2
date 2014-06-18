@@ -23,6 +23,7 @@ bool Bed3Interval::initFromFile(FileReader *fileReader)
 
 bool Bed3Interval::initFromFile(SingleLineDelimTextFileReader *fileReader)
 {
+	setFileIdx(fileReader->getFileIdx());
 	fileReader->getField(0, _chrName);
 	fileReader->getField(1, _startPosStr);
 	fileReader->getField(2, _endPosStr);

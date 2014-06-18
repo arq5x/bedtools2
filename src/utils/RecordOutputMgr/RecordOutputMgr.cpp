@@ -306,6 +306,7 @@ void RecordOutputMgr::reportOverlapDetail(const Record *keyRecord, const Record 
 			(static_cast<ContextIntersect *>(_context))->getWriteB()) || (static_cast<ContextIntersect *>(_context))->getLeftJoin()) {
 		printKey(keyRecord);
 		tab();
+		addDbFileId(hitRecord->getFileIdx());
 		hitRecord->print(_outBuf);
 		newline();
 		if (needsFlush()) flush();
@@ -318,6 +319,7 @@ void RecordOutputMgr::reportOverlapDetail(const Record *keyRecord, const Record 
 	else if ((static_cast<ContextIntersect *>(_context))->getWriteB()) {
 		printKey(keyRecord, *startStr, *endStr);
 		tab();
+		addDbFileId(hitRecord->getFileIdx());
 		hitRecord->print(_outBuf);
 		newline();
 		if (needsFlush()) flush();
@@ -331,6 +333,7 @@ void RecordOutputMgr::reportOverlapDetail(const Record *keyRecord, const Record 
 		}
 		printKey(keyRecord);
 		tab();
+		addDbFileId(hitRecord->getFileIdx());
 		hitRecord->print(_outBuf);
 		tab();
 		int2str(printOverlapBases, _outBuf, true);
@@ -365,6 +368,11 @@ void RecordOutputMgr::reportOverlapSummary(RecordKeyList &keyList)
 	}
 }
 
+void RecordOutputMgr::addDbFileId(int fileId) {
+	if ((static_cast<ContextIntersect *>(_context))->getNumDatabaseFiles()  == 1) return;
+	_outBuf.append(fileId);
+	tab();
+}
 
 void RecordOutputMgr::null(bool queryType, bool dbType)
 {
@@ -373,7 +381,7 @@ void RecordOutputMgr::null(bool queryType, bool dbType)
 		if (queryType) {
 			recordType = (static_cast<ContextIntersect *>(_context))->getQueryRecordType();
 		} else if (dbType) {
-			recordType = (static_cast<ContextIntersect *>(_context))->getDatabaseRecordType();
+			recordType = (static_cast<ContextIntersect *>(_context))->getDatabaseRecordType(0);
 		}
 	} else  {
 		recordType = _context->getFile(0)->getRecordType();

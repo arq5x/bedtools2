@@ -10,6 +10,7 @@
 
 bool VcfRecord::initFromFile(SingleLineDelimTextFileReader *fileReader)
 {
+	setFileIdx(fileReader->getFileIdx());
 	fileReader->getField(0, _chrName);
 	_chrId = fileReader->getCurrChromdId();
 	fileReader->getField(1, _startPosStr);

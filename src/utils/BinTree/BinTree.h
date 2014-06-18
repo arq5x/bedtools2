@@ -32,7 +32,6 @@ public:
 
 private:
 
-	FileRecordMgr *_databaseFile;
 	ContextIntersect *_context;
 
     //

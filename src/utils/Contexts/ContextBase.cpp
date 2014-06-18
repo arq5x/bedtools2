@@ -41,7 +41,6 @@ ContextBase::ContextBase()
   _printable(true),
    _explicitBedOutput(false),
   _queryFileIdx(-1),
-  _databaseFileIdx(-1),
   _bamHeaderAndRefIdx(-1),
   _maxNumDatabaseFields(0),
   _useFullBamTags(false),
@@ -210,7 +209,11 @@ bool ContextBase::isValidState()
 		return false;
 	}
 	if (hasColumnOpsMethods()) {
-		FileRecordMgr *dbFile = getFile(hasIntersectMethods() ? _databaseFileIdx : 0);
+
+		//TBD: Adjust column ops for multiple databases.
+		//For now, use last file.
+//		FileRecordMgr *dbFile = getFile(hasIntersectMethods() ? _databaseFileIdx : 0);
+		FileRecordMgr *dbFile = getFile(getNumInputFiles()-1);
 		_keyListOps->setDBfileType(dbFile->getFileType());
 		if (!_keyListOps->isValidColumnOps(dbFile)) {
 			return false;
@@ -251,7 +254,7 @@ bool ContextBase::openFiles() {
 	_files.resize(_fileNames.size());
 
 	for (int i = 0; i < (int)_fileNames.size(); i++) {
-		FileRecordMgr *frm = getNewFRM(_fileNames[i]);
+		FileRecordMgr *frm = getNewFRM(_fileNames[i], i);
 		if (hasGenomeFile()) {
 			frm->setGenomeFile(_genomeFile);
 		}
@@ -281,7 +284,7 @@ int ContextBase::getBamHeaderAndRefIdx() {
 		if (_files[_queryFileIdx]->getFileType() == FileRecordTypeChecker::BAM_FILE_TYPE) {
 			_bamHeaderAndRefIdx = _queryFileIdx;
 		} else {
-			_bamHeaderAndRefIdx = _databaseFileIdx;
+			_bamHeaderAndRefIdx = _dbFileIdxs[0];
 		}
 		return _bamHeaderAndRefIdx;
 	}
@@ -508,13 +511,17 @@ const QuickString &ContextBase::getColumnOpsVal(RecordKeyList &keyList) const {
 	return _keyListOps->getOpVals(keyList);
 }
 
-FileRecordMgr *ContextBase::getNewFRM(const QuickString &filename) {
-	if (!_useMergedIntervals) {
-		return new FileRecordMgr(filename);
-	} else {
+FileRecordMgr *ContextBase::getNewFRM(const QuickString &filename, int fileIdx) {
+
+	if (_useMergedIntervals) {
 		FileRecordMergeMgr *frm = new FileRecordMergeMgr(filename);
 		frm->setStrandType(_desiredStrand);
 		frm->setMaxDistance(_maxDistance);
+		frm->setFileIdx(fileIdx);
+		return frm;
+	} else {
+		FileRecordMgr *frm = new FileRecordMgr(filename);
+		frm->setFileIdx(fileIdx);
 		return frm;
 	}
 }

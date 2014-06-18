@@ -92,7 +92,7 @@ bool ContextIntersect::isValidState()
 		return false;
 	}
 
-	if (_queryFileIdx == -1 || _databaseFileIdx == -1) {
+	if (_queryFileIdx == -1 || _dbFileIdxs.size() == -0) {
 		_errorMsg = "\n***** ERROR: query and database files not specified. *****";
 		return false;
 	}
@@ -149,7 +149,7 @@ bool ContextIntersect::isValidState()
 	if (getAnyHit() || getNoHit() || getWriteCount()) {
 		setPrintable(false);
 	}
-	if (_files.size() != 2 ) {
+	if (_files.size()  < 2 ) {
 		return false;
 	}
 	return true;
@@ -161,8 +161,8 @@ bool ContextIntersect::determineOutputType() {
 	}
 
 	//determine the maximum number of database fields.
-	for (int i=0; i < (int)_files.size(); i++) {
-		int numFields = _files[i]->getNumFields();
+	for (int i=0; i < getNumDatabaseFiles(); i++) {
+		int numFields = getDatabaseFile(i)->getNumFields();
 		if ( numFields > _maxNumDatabaseFields) {
 			_maxNumDatabaseFields = numFields;
 		}
@@ -215,11 +215,14 @@ bool ContextIntersect::handle_b()
 		return false;
 	}
 
-	addInputFile(_argv[_i+1]);
-	_databaseFileIdx = getNumInputFiles() -1;
-	markUsed(_i - _skipFirstArgs);
-	_i++;
-	markUsed(_i - _skipFirstArgs);
+	do {
+		addInputFile(_argv[_i+1]);
+		int dbFileIdx = getNumInputFiles() -1;
+		_dbFileIdxs.push_back(dbFileIdx);
+		markUsed(_i - _skipFirstArgs);
+		_i++;
+		markUsed(_i - _skipFirstArgs);
+	} while (_argc > _i+1 && _argv[_i+1][0] != '-');
 	return true;
 }
 

@@ -196,7 +196,7 @@ protected:
     bool _printable;
     bool _explicitBedOutput;
     int _queryFileIdx;
-    int _databaseFileIdx;
+    vector<int> _dbFileIdxs;
     int _bamHeaderAndRefIdx;
     int _maxNumDatabaseFields;
     bool _useFullBamTags;
@@ -227,7 +227,7 @@ protected:
 	bool isUsed(int i) const { return _argsProcessed[i]; }
 	bool cmdArgsValid();
 	bool openFiles();
-	virtual FileRecordMgr *getNewFRM(const QuickString &filename);
+	virtual FileRecordMgr *getNewFRM(const QuickString &filename, int fileIdx);
 
 	//set cmd line params and counter, i, as members so code
 	//is more readable (as opposed to passing all 3 everywhere).
