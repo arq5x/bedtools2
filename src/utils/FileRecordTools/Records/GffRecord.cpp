@@ -23,6 +23,7 @@ void GffRecord::clear()
 
 bool GffRecord::initFromFile(SingleLineDelimTextFileReader *fileReader)
 {
+	setFileIdx(fileReader->getFileIdx());
 	fileReader->getField(0, _chrName);
 	fileReader->getField(3, _startPosStr);
 	_startPos = str2chrPos(_startPosStr);

@@ -42,6 +42,8 @@ public:
 	virtual void setChrName(const string &chr) { _chrName = chr; }
 	virtual void setChrName(const char *chr) { _chrName = chr; }
 
+	virtual int getFileIdx() const { return _fileIdx; }
+	virtual void setFileIdx(int fileIdx) { _fileIdx = fileIdx; }
 
 	virtual int getChromId() const { return _chrId; }
 	virtual void setChromId(int id) { _chrId = id; }
@@ -109,7 +111,8 @@ public:
 
 	virtual bool operator < (const Record &other) const;
 	virtual bool operator > (const Record &other) const;
-
+	virtual bool lessThan(const Record *other) const;
+	virtual bool greaterThan(const Record *other) const;
 
 	//is this on the same chromosome as another record?
 	bool sameChrom(const Record *other) const;
@@ -135,6 +138,7 @@ public:
 protected:
 	virtual ~Record(); //by making the destructor protected, only the friend class(es) can actually delete Record objects, or objects derived from Record.
 
+	int _fileIdx; //associated file the record came from
 	QuickString _chrName;
 	int _chrId;
 	int _startPos;

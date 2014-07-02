@@ -32,7 +32,6 @@ public:
 
 private:
 
-	FileRecordMgr *_databaseFile;
 	ContextIntersect *_context;
 
     //
@@ -52,8 +51,8 @@ private:
 	static const uint32_t _binFirstShift = 14;       /* How much to shift to get to finest bin. */
 	static const uint32_t _binNextShift  = 3;        /* How much to shift to get to next larger bin. */
 
-	typedef BTlist<const Record *> innerListType;
-	typedef const BTlistNode<const Record *> * innerListIterType;
+	typedef RecordList innerListType;
+	typedef const RecordListNode * innerListIterType;
 	typedef innerListType * binType;
 	typedef binType * allBinsType;
 	typedef QuickString mainKeyType;

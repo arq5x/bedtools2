@@ -45,6 +45,7 @@ bool BamRecord::initFromFile(FileReader *fileReader)
 
 bool BamRecord::initFromFile(BamFileReader *bamFileReader)
 {
+	setFileIdx(bamFileReader->getFileIdx());
 	_bamAlignment = bamFileReader->getAlignment();
 	bamFileReader->getChrName(_chrName);
 

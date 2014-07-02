@@ -53,6 +53,7 @@ private:
 	void printRecord(RecordKeyList &keyList, RecordKeyList *blockList);
 	void printKey(const Record *key);
 	void printKey(const Record *key, const QuickString & start, const QuickString & end);
+	void addDbFileId(int fileId);
 	bool printKeyAndTerminate(RecordKeyList &keyList);
 	printBamType printBamRecord(RecordKeyList &keyList, bool bamOutputOnly = false);
 	void checkForHeader();

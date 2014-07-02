@@ -37,6 +37,9 @@ public:
 	bool open();
 	void close();
 	virtual bool eof();
+	void setFileIdx(int fileIdx) { _fileIdx = fileIdx; }
+	int getFileIdx() const { return _fileIdx; }
+
 
 	//This is an all-in-one method to give the user a new record that is initialized with
 	//the next entry in the data file.
@@ -45,6 +48,7 @@ public:
 	virtual Record *getNextRecord(RecordKeyList *keyList = NULL);
 	void deleteRecord(const Record *);
 	virtual void deleteRecord(RecordKeyList *keyList);
+
 
 	const QuickString &getFileName() const { return _filename;}
 	bool hasHeader() const { return _fileReader->hasHeader(); }
@@ -103,6 +107,7 @@ public:
 	void setIoBufSize(int val) { _ioBufSize = val; }
 
 protected:
+	int _fileIdx;
 	QuickString _filename;
 	BufferedStreamMgr *_bufStreamMgr;
 

@@ -67,6 +67,11 @@ void QuickString::clear() {
 	_currSize = 0;
 }
 
+void QuickString::release() {
+	free(_buffer);
+	_currCapacity = DEFAULT_CAPACITY;
+	build();
+}
 
 QuickString &QuickString::operator = (const char *inBuf){
 	set(inBuf, strlen(inBuf));

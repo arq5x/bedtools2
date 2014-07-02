@@ -459,3 +459,8 @@ $BT intersect -a a.bed -b a.bam > obs
 
 
 rm one_block.bam two_blocks.bam three_blocks.bam
+
+
+cd multi_intersect
+bash test-multi_intersect.sh
+cd ..
