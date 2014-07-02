@@ -231,6 +231,8 @@ bool ContextIntersect::handle_b()
 		int fileId = getNumInputFiles() -1;
 		_dbFileIdxs.push_back(fileId);
 		_fileIdsToDbIdxs[fileId] = _dbFileIdxs.size() -1;
+		int dbFileIdx = getNumInputFiles() -1;
+		_dbFileIdxs.push_back(dbFileIdx);
 		markUsed(_i - _skipFirstArgs);
 		_i++;
 		markUsed(_i - _skipFirstArgs);

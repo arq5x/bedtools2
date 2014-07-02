@@ -377,6 +377,7 @@ void RecordOutputMgr::addDbFileId(int fileId) {
 	} else {
 		_outBuf.append(_context->getInputFileName(fileId));
 	}
+	_outBuf.append(fileId);
 	tab();
 }
 
