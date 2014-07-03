@@ -42,6 +42,7 @@ SUBDIRS = $(SRC_DIR)/annotateBed \
 		  $(SRC_DIR)/getOverlap \
 		  $(SRC_DIR)/groupBy \
 		  $(SRC_DIR)/intersectFile \
+		  $(SRC_DIR)/fisher \
 		  $(SRC_DIR)/jaccard \
 		  $(SRC_DIR)/linksBed \
 		  $(SRC_DIR)/maskFastaFromBed \

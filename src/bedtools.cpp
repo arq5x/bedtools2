@@ -54,6 +54,7 @@ int getoverlap_main(int argc, char* argv[]);//
 int groupby_main(int argc, char* argv[]);//
 int intersect_main(int argc, char* argv[]); //
 int jaccard_main(int argc, char* argv[]); //
+int fisher_main(int argc, char* argv[]); //
 int links_main(int argc, char* argv[]);//
 int maskfastafrombed_main(int argc, char* argv[]);//
 int map_main(int argc, char* argv[]); //
@@ -131,6 +132,7 @@ int main(int argc, char *argv[])
     // statistics tools
     else if (sub_cmd == "jaccard")     return jaccard_main(argc-1, argv+1);
     else if (sub_cmd == "reldist")     return reldist_main(argc-1, argv+1);
+    else if (sub_cmd == "fisher")     return fisher_main(argc-1, argv+1);
 
     // misc. tools
     else if (sub_cmd == "overlap")     return getoverlap_main(argc-1, argv+1);
