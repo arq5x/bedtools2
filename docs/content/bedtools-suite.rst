@@ -28,6 +28,7 @@ The full list of `bedtools` sub-commands.
    tools/coverage   
    tools/expand     
    tools/flank      
+   tools/fisher
    tools/genomecov  
    tools/getfasta    
    tools/groupby    
