@@ -123,7 +123,7 @@ void BedSubtract::FindAndSubtractOverlaps(BED &a, vector<BED> &hits) {
 
         vector<bool> aKeep(a.end - a.start, true);
 
-        if ((numConsumedByB == 0)) {
+        if (numConsumedByB == 0) {
             if(_removeAll){ return; }
             
             // if there's any overlap, then we don't report.

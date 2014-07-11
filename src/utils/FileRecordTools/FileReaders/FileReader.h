@@ -1,8 +1,6 @@
 #ifndef FILEREADER_H_
 #define FILEREADER_H_
 
-using namespace std;
-
 #include <string>
 #include <fstream>
 #include <map>
@@ -10,6 +8,8 @@ using namespace std;
 //#include "ContextBase.h"
 
 #include "BufferedStreamMgr.h"
+
+using namespace std;
 
 class FileReader {
 public:

@@ -8,12 +8,13 @@
 #ifndef REGRESSTEST_H_
 #define REGRESSTEST_H_
 
-using namespace std;
-
 #include <string>
 #include <cstdio>
 #include <vector>
 #include <fstream>
+
+using namespace std;
+
 class SingleLineDelimTextFileReader;
 class BufferedStreamMgr;
 

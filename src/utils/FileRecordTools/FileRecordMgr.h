@@ -8,8 +8,6 @@
 #ifndef FILERECORDMGR_H_
 #define FILERECORDMGR_H_
 
-using namespace std;
-
 #include <string>
 #include "QuickString.h"
 #include <set>
@@ -26,6 +24,8 @@ using namespace std;
 
 #include "RecordKeyList.h"
 #include "BlockMgr.h"
+
+using namespace std;
 
 class Record;
 class NewGenomeFile;

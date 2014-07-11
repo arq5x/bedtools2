@@ -26,11 +26,11 @@ FastaIndexEntry::~FastaIndexEntry(void)
 void FastaIndexEntry::clear(void)
 {
     name = "";
-    length = NULL;
+    length = 0;
     offset = -1;  // no real offset will ever be below 0, so this allows us to
                   // check if we have already recorded a real offset
-    line_blen = NULL;
-    line_len  = NULL;
+    line_blen = 0;
+    line_len  = 0;
     useFullHeader = false;
 }
 
