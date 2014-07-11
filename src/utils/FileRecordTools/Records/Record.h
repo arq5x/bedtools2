@@ -5,14 +5,15 @@
  *      Author: nek3d
  */
 
-using namespace std;
-
 #ifndef RECORD_H_
 #define RECORD_H_
 
+#include <string>
 #include "FreeList.h"
 #include "QuickString.h"
 #include "FileRecordTypeChecker.h"
+
+using namespace std;
 
 class FileRecordMgr;
 class FileReader;

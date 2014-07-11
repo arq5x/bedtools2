@@ -4,6 +4,8 @@
 #include <cstdio>
 #include <cstdlib>
 
+using namespace std;
+
 SingleLineDelimTransferBuffer::SingleLineDelimTransferBuffer(int numFields, char delimChar)
 : _numFields(numFields),
   _delimChar(delimChar)

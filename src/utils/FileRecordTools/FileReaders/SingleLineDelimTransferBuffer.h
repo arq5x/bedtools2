@@ -8,8 +8,6 @@
 #ifndef SINGLELINEDELIMTRANSFERBUFFER_H_
 #define SINGLELINEDELIMTRANSFERBUFFER_H_
 
-using namespace std;
-
 class SingleLineDelimTransferBuffer {
 public:
 	SingleLineDelimTransferBuffer(int numFields, char delim='\t');

@@ -8,8 +8,6 @@
 #ifndef BAMFILEREADER_H_
 #define BAMFILEREADER_H_
 
-using namespace std;
-
 #include "FileReader.h"
 #include "QuickString.h"
 #include "api/BamReader.h"

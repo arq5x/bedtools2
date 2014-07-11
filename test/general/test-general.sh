@@ -84,7 +84,7 @@ rm obs exp
 #  Don't fail on existent, yet empty files.
 ###########################################################
 echo "    general.t07...\c"
-$BT merge -i empty.bed > obs
+$BT merge -i empty.bed 2> obs
 touch exp
 check obs exp
 rm obs exp

@@ -110,6 +110,7 @@ bool FileRecordTypeChecker::isBinaryBuffer(const char *buffer, size_t len)
 
 	//Let's say that in a text file, at least 90% of the characters
 	//should be alphanumeric, whitespace, or punctuation.
+	static const float PERCENTAGE_PRINTABLE = .9;
 
 	int alphaNumCount = 0;
 	int whiteSpaceCount = 0;

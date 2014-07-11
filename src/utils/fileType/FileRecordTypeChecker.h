@@ -8,8 +8,6 @@
 #ifndef FILERECORDTYPECHECKER_H_
 #define FILERECORDTYPECHECKER_H_
 
-using namespace std;
-
 #include <string>
 #include <cstring>
 #include <cstdio>
@@ -19,6 +17,8 @@ using namespace std;
 #include <map>
 #include "PushBackStreamBuf.h"
 #include "Tokenizer.h"
+
+using namespace std;
 
 class FileRecordTypeChecker {
 public:
@@ -116,8 +116,6 @@ private:
 
 	bool _eofHit;
 
-	//this will be used in determining whether we are looking at a binary or text file.
-	static const float PERCENTAGE_PRINTABLE = .9;
 	bool isBinaryBuffer(const char *buffer, size_t len);
 	bool isBAM(const char *buffer);
 	bool handleTextFormat(const char *buffer, size_t len);

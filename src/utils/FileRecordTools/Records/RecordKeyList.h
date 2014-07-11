@@ -8,11 +8,6 @@
 #ifndef KEYLIST_H_
 #define KEYLIST_H_
 
-
-
-
-using namespace std;
-
 #include "Record.h"
 #include "BTlist.h"
 
