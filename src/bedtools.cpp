@@ -241,6 +241,7 @@ int bedtools_help(void)
     cout  << "[ Statistical relationships ]" << endl;
     cout  << "    jaccard       "  << "Calculate the Jaccard statistic b/w two sets of intervals.\n";
     cout  << "    reldist       "  << "Calculate the distribution of relative distances b/w two files.\n";
+    cout  << "    fisher        "  << "Calculate Fisher statistic b/w two feature files.\n";
 
     cout  << endl;
     cout  << "[ Miscellaneous tools ]" << endl;
