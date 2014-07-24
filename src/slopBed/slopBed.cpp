@@ -41,6 +41,7 @@ BedSlop::~BedSlop(void) {
 void BedSlop::SlopBed() {
 
     BED bedEntry;     // used to store the current BED line from the BED file.
+    float l, r;
 
     _bed->Open();
     // report header first if asked.
@@ -53,9 +54,13 @@ void BedSlop::SlopBed() {
                 AddSlop(bedEntry);
             }
             else {
-                _leftSlop  = _leftSlop  * (float)bedEntry.size();
+	        l = _leftSlop;	
+                _leftSlop  = _leftSlop * (float)bedEntry.size();
+	        r = _rightSlop;	
                 _rightSlop = _rightSlop * (float)bedEntry.size();
                 AddSlop(bedEntry);
+	        _rightSlop = r;
+	        _leftSlop = l;
             }
             _bed->reportBedNewLine(bedEntry);
         }
@@ -86,7 +91,6 @@ void BedSlop::AddSlop(BED &bed) {
             bed.start = bed.start - (int)_leftSlop;
         else
             bed.start = 0;
-
         if ( ((CHRPOS)bed.end + (CHRPOS)_rightSlop) <= chromSize )
             bed.end = bed.end + (int)_rightSlop;
         else

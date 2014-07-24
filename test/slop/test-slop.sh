@@ -167,4 +167,9 @@ echo -e "chr1\t16778272\t16778572"| $BT slop -l 200 -r 200 -i - -g ../../genomes
 check obs exp
 rm obs exp
 
-
+echo "    slop.t15...\c"
+echo \
+"chr1	159	171" > exp
+echo -e "chr1\t160\t170"| $BT slop -b 0.1 -pct -i - -g ../../genomes/human.hg19.genome > obs
+check obs exp
+rm obs exp
