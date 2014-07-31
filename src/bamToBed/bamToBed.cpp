@@ -333,7 +333,13 @@ void ConvertBamToBedpe(const string &bamFile,
     BamAlignment bam1, bam2;
     while (reader.GetNextAlignment(bam1)) {
         
-        reader.GetNextAlignment(bam2);        
+        if (!reader.GetNextAlignment(bam2))
+        {
+            cerr << "*****WARNING: Query " << bam1.Name
+                 << " is the last read and has no mate next to it."
+                 << " Skip and exit" << endl;
+            break;
+        }        
         if (bam1.Name != bam2.Name) {
             while (bam1.Name != bam2.Name)
             {
@@ -344,7 +350,15 @@ void ConvertBamToBedpe(const string &bamFile,
                          << " next to it in your BAM file.  Skipping. " << endl;
                 }
                 bam1 = bam2;
-                reader.GetNextAlignment(bam2);
+                
+                if (!reader.GetNextAlignment(bam2))
+                {
+                    cerr << "*****WARNING: Query " << bam1.Name
+                         << " is the last read and has no mate next to it."
+                         << " Skip and exit" << endl;
+                     
+                    exit(1);
+                }
             }
             PrintBedPE(bam1, bam2, refs, useEditDistance, mate1First);
         }
