@@ -329,42 +329,42 @@ void ConvertBamToBedpe(const string &bamFile,
     string header = reader.GetHeaderText();
     RefVector refs = reader.GetReferenceData();
 
+    bool lastReadHadMate;
+    
     // rip through the BAM file and convert each mapped entry to BEDPE
     BamAlignment bam1, bam2;
     while (reader.GetNextAlignment(bam1)) {
+        lastReadHadMate = false;
         
-        if (!reader.GetNextAlignment(bam2))
+        while (reader.GetNextAlignment(bam2)) 
         {
-            cerr << "*****WARNING: Query " << bam1.Name
-                 << " is the last read and has no mate next to it."
-                 << " Skip and exit" << endl;
-            break;
-        }        
-        if (bam1.Name != bam2.Name) {
-            while (bam1.Name != bam2.Name)
+            lastReadHadMate = true;
+            
+            if (bam1.Name != bam2.Name) 
             {
-                if (bam1.IsPaired()) 
-                {
+                if (bam1.IsPaired()){
                     cerr << "*****WARNING: Query " << bam1.Name
                          << " is marked as paired, but its mate does not occur"
                          << " next to it in your BAM file.  Skipping. " << endl;
                 }
+                lastReadHadMate = false;
                 bam1 = bam2;
-                
-                if (!reader.GetNextAlignment(bam2))
-                {
-                    cerr << "*****WARNING: Query " << bam1.Name
-                         << " is the last read and has no mate next to it."
-                         << " Skip and exit" << endl;
-                     
-                    exit(1);
-                }
+                continue;
             }
-            PrintBedPE(bam1, bam2, refs, useEditDistance, mate1First);
-        }
-        else if (bam1.IsPaired() && bam2.IsPaired()) {
-            PrintBedPE(bam1, bam2, refs, useEditDistance, mate1First);
-        }
+            
+            if (bam1.IsPaired() && bam2.IsPaired()){
+                PrintBedPE(bam1, bam2, refs, useEditDistance, mate1First);
+                break;
+            }
+            
+        }        
+
+    }
+    
+    if (!lastReadHadMate && bam1.IsPaired()){
+        cerr << "*****WARNING: Query " << bam1.Name
+             << " is marked as paired, but its mate does not occur"
+             << " next to it in your BAM file.  Skipping. " << endl;        
     }
     reader.Close();
 }
