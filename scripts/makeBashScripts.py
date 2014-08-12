@@ -34,6 +34,7 @@ def main():
                  'multiinter': 'multiIntersectBed', 
                  'nuc': 'nucBed',
                  'overlap': 'getOverlap', 
+                 'pairedbamtobed12': 'pairedBamToBed12',
                  'pairtobed': 'pairToBed', 
                  'pairtopair': 'pairToPair', 
                  'random': 'randomBed', 

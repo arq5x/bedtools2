@@ -44,6 +44,7 @@ The full list of `bedtools` sub-commands.
    tools/multiinter  
    tools/nuc         
    tools/overlap    
+   tools/pairedbamtobed12
    tools/pairtobed   
    tools/pairtopair  
    tools/random     

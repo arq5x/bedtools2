@@ -54,7 +54,6 @@ int getoverlap_main(int argc, char* argv[]);//
 int groupby_main(int argc, char* argv[]);//
 int intersect_main(int argc, char* argv[]); //
 int jaccard_main(int argc, char* argv[]); //
-int fisher_main(int argc, char* argv[]); //
 int links_main(int argc, char* argv[]);//
 int maskfastafrombed_main(int argc, char* argv[]);//
 int map_main(int argc, char* argv[]); //
@@ -63,6 +62,7 @@ int multibamcov_main(int argc, char* argv[]);//
 int multiintersect_main(int argc, char* argv[]);//
 int nek_sandbox1_main(int argc, char* argv[]);//
 int nuc_main(int argc, char* argv[]);//
+int pairedbamtobed12_main(int argc, char* argv[]); //
 int pairtobed_main(int argc, char* argv[]);//
 int pairtopair_main(int argc, char* argv[]);//
 int random_main(int argc, char* argv[]); //
@@ -119,6 +119,7 @@ int main(int argc, char *argv[])
     else if (sub_cmd == "bamtofastq")  return bamtofastq_main(argc-1, argv+1);
     else if (sub_cmd == "bedpetobam")  return bedpetobam_main(argc-1, argv+1);
     else if (sub_cmd == "bed12tobed6") return bed12tobed6_main(argc-1, argv+1);
+    else if (sub_cmd == "pairedbamtobed12")    return pairedbamtobed12_main(argc-1, argv+1);
 
     // BAM-specific tools
     else if (sub_cmd == "multicov")    return multibamcov_main(argc-1, argv+1);
@@ -132,7 +133,6 @@ int main(int argc, char *argv[])
     // statistics tools
     else if (sub_cmd == "jaccard")     return jaccard_main(argc-1, argv+1);
     else if (sub_cmd == "reldist")     return reldist_main(argc-1, argv+1);
-    else if (sub_cmd == "fisher")     return fisher_main(argc-1, argv+1);
 
     // misc. tools
     else if (sub_cmd == "overlap")     return getoverlap_main(argc-1, argv+1);
@@ -222,6 +222,7 @@ int bedtools_help(void)
     cout  << "[ Format conversion ]" << endl;
     cout  << "    bamtobed      "  << "Convert BAM alignments to BED (& other) formats.\n";
     cout  << "    bedtobam      "  << "Convert intervals to BAM records.\n";
+    cout  << "    pairedbamtobed12 "<< "Converts 'properly paired' BAM alignments to BED12 format.\n";
     cout  << "    bamtofastq    "  << "Convert BAM records to FASTQ records.\n";
     cout  << "    bedpetobam    "  << "Convert BEDPE intervals to BAM records.\n";    
     cout  << "    bed12tobed6   "  << "Breaks BED12 intervals into discrete BED6 intervals.\n";
@@ -241,7 +242,6 @@ int bedtools_help(void)
     cout  << "[ Statistical relationships ]" << endl;
     cout  << "    jaccard       "  << "Calculate the Jaccard statistic b/w two sets of intervals.\n";
     cout  << "    reldist       "  << "Calculate the distribution of relative distances b/w two files.\n";
-    cout  << "    fisher        "  << "Calculate Fisher statistic b/w two feature files.\n";
 
     cout  << endl;
     cout  << "[ Miscellaneous tools ]" << endl;
