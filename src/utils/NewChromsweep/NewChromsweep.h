@@ -90,6 +90,12 @@ private:
     void scanCache(int dbIdx, RecordKeyVector &retList);
     void clearCache(int dbIdx);
     bool chromChange(int dbIdx, RecordKeyVector &retList);
+
+    bool nextRecord(bool query, int dbIdx = -1); //true fetches next query record, false fetches next db record.
+    
+    void scanCache(int dbIdx);
+    void clearCache(int dbIdx);
+    bool chromChange(int dbIdx);
     bool dbFinished(int dbIdx);
 
     bool intersects(const Record *rec1, const Record *rec2) const;

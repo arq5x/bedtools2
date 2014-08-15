@@ -91,7 +91,11 @@ NewChromSweep::~NewChromSweep(void) {
 }
 
 
+<<<<<<< HEAD
 void NewChromSweep::scanCache(int dbIdx, RecordKeyVector &retList) {
+=======
+void NewChromSweep::scanCache(int dbIdx) {
+>>>>>>> 57ed945c121a6e7d1ea803f19bca10c25b5eff4d
 	recListIterType cacheIter = _caches[dbIdx].begin();
     while (cacheIter != _caches[dbIdx].end())
     {
@@ -115,6 +119,7 @@ void NewChromSweep::clearCache(int dbIdx)
 	recListType &cache = _caches[dbIdx];
 	for (recListIterType iter = cache.begin(); iter != cache.end(); iter = cache.next()) {
 		_dbFRMs[dbIdx]->deleteRecord(iter->value());
+<<<<<<< HEAD
 	}
 	cache.clear();
 }
@@ -149,6 +154,41 @@ void NewChromSweep::masterScan(RecordKeyVector &retList) {
 }
 
 bool NewChromSweep::chromChange(int dbIdx, RecordKeyVector &retList)
+=======
+	}
+	cache.clear();
+}
+
+void NewChromSweep::masterScan() {
+	for (int i=0; i < _numDBs; i++) {
+		if (dbFinished(i) || chromChange(i)) {
+			continue;
+		} else {
+
+			// scan the database cache for hits
+			scanCache(i);
+			//skip if we hit the end of the DB
+			// advance the db until we are ahead of the query. update hits and cache as necessary
+			while (_currDbRecs[i] != NULL &&
+					_currQueryRec->sameChrom(_currDbRecs[i]) &&
+					!(_currDbRecs[i]->after(_currQueryRec))) {
+				if (intersects(_currQueryRec, _currDbRecs[i])) {
+					_hits.push_back(_currDbRecs[i]);
+				}
+				if (_currQueryRec->after(_currDbRecs[i])) {
+					_dbFRMs[i]->deleteRecord(_currDbRecs[i]);
+					_currDbRecs[i] = NULL;
+				} else {
+					_caches[i].push_back(_currDbRecs[i]);
+					_currDbRecs[i] = NULL;
+				}
+				nextRecord(false, i);
+			}
+		}
+	}
+}
+
+bool NewChromSweep::chromChange(int dbIdx)
 {
     // the files are on the same chrom
 	if (_currDbRecs[dbIdx] == NULL || _currQueryRec->sameChrom(_currDbRecs[dbIdx])) {
@@ -176,7 +216,6 @@ bool NewChromSweep::chromChange(int dbIdx, RecordKeyVector &retList)
 	//control can't reach here, but compiler still wants a return statement.
 	return true;
 }
-
 
 bool NewChromSweep::next(RecordKeyVector &retList) {
 	retList.clearVector();

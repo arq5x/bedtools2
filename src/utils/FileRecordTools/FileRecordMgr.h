@@ -50,6 +50,7 @@ public:
 	virtual void deleteRecord(RecordKeyVector *keyList);
 
 
+
 	const QuickString &getFileName() const { return _filename;}
 	bool hasHeader() const { return _fileReader->hasHeader(); }
 	const QuickString &getHeader() const { return _fileReader->getHeader(); }
