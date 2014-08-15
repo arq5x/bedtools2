@@ -28,7 +28,7 @@ MergeFile::~MergeFile()
 
 bool MergeFile::merge()
 {
-    RecordKeyList hitSet;
+    RecordKeyVector hitSet;
     FileRecordMgr *frm = _context->getFile(0);
     while (!frm->eof()) {
     	Record *key = frm->getNextRecord(&hitSet);

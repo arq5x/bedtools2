@@ -5,7 +5,7 @@
 #include "NewGenomeFile.h"
 
 FileRecordMgr::FileRecordMgr(const QuickString &filename)
-:
+: _fileIdx(-1),
   _filename(filename),
   _bufStreamMgr(NULL),
   _fileReader(NULL),
@@ -90,7 +90,7 @@ bool FileRecordMgr::eof(){
 	return _fileReader->eof();
 }
 
-Record *FileRecordMgr::getNextRecord(RecordKeyList *keyList)
+Record *FileRecordMgr::getNextRecord(RecordKeyVector *keyList)
 {
 	if (!_fileReader->isOpen()) {
 		return NULL;
@@ -203,7 +203,7 @@ void FileRecordMgr::deleteRecord(const Record *record) {
 	_recordMgr->deleteRecord(record);
 }
 
-void FileRecordMgr::deleteRecord(RecordKeyList *keyList) {
+void FileRecordMgr::deleteRecord(RecordKeyVector *keyList) {
 	_recordMgr->deleteRecord(keyList->getKey());
 }
 
@@ -224,6 +224,7 @@ void FileRecordMgr::allocateFileReader()
 	default:
 		break;
 	}
+	_fileReader->setFileIdx(_fileIdx);
 }
 
 const BamTools::RefVector & FileRecordMgr::getBamReferences() {

@@ -30,7 +30,7 @@ public:
 
 private:
 //	static RecordPtrSortFunctor _recSortFunctor;
-	typedef priority_queue<Record *, vector<const Record *>, RecordPtrSortFunctor > queueType;
+	typedef priority_queue<Record *, vector<const Record *>, RecordPtrSortDescFunctor > queueType;
 	vector<queueType *> _queues;
 	static const int NUM_QUEUES = 3;
 

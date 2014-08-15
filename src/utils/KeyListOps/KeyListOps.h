@@ -40,7 +40,7 @@ public:
 	const QuickString &getNullValue() { return _methods.getNullValue(); }
 	const QuickString &getDelimStr() { return _methods.getDelimStr(); }
 
-	void setKeyList(RecordKeyList *keyList) { _methods.setKeyList(keyList); }
+	void setKeyList(RecordKeyVector *keyList) { _methods.setKeyList(keyList); }
 
 	typedef enum { SUM, MEAN, STDDEV, SAMPLE_STDDEV, MEDIAN, MODE, ANTIMODE, MIN, MAX, ABSMIN, ABSMAX, COUNT, DISTINCT, COUNT_DISTINCT,
     	DISTINCT_ONLY, COLLAPSE, CONCAT, FREQ_ASC, FREQ_DESC, FIRST, LAST, INVALID } OP_TYPES;
@@ -48,7 +48,7 @@ public:
 	void setDBfileType(FileRecordTypeChecker::FILE_TYPE type) { _dbFileType = type; }
 	bool isValidColumnOps(FileRecordMgr *dbFile);
 
-	const QuickString &getOpVals(RecordKeyList &hits);
+	const QuickString &getOpVals(RecordKeyVector &hits);
 
 private:
     void init();

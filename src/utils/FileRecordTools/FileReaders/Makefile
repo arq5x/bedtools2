@@ -17,10 +17,10 @@ INCLUDES = -I$(UTILITIES_DIR)/BamTools/include/ \
 # ----------------------------------
 # define our source and object files
 # ----------------------------------
-SOURCES= FileReader.h FileReader.cpp SingleLineDelimTransferBuffer.h SingleLineDelimTransferBuffer.cpp \
+SOURCES= FileReader.h FileReader.cpp  \
 		SingleLineDelimTextFileReader.h SingleLineDelimTextFileReader.cpp BamFileReader.h BamFileReader.cpp \
 		BufferedStreamMgr.h BufferedStreamMgr.cpp InputStreamMgr.h InputStreamMgr.cpp
-OBJECTS= FileReader.o SingleLineDelimTransferBuffer.o SingleLineDelimTextFileReader.o BamFileReader.o BufferedStreamMgr.o InputStreamMgr.o 
+OBJECTS= FileReader.o SingleLineDelimTextFileReader.o BamFileReader.o BufferedStreamMgr.o InputStreamMgr.o 
 _EXT_OBJECTS=ParseTools.o QuickString.o CompressionTools.o
 EXT_OBJECTS=$(patsubst %,$(OBJ_DIR)/%,$(_EXT_OBJECTS))
 BUILT_OBJECTS= $(patsubst %,$(OBJ_DIR)/%,$(OBJECTS))
@@ -35,7 +35,7 @@ $(BUILT_OBJECTS): $(SOURCES)
 
 clean:
 	@echo "Cleaning up."
-	@rm -f $(OBJ_DIR)/FileReader.o $(OBJ_DIR)SingleLineDelimTransferBuffer $(OBJ_DIR)/SingleLineDelimTextFileReader.o \
+	@rm -f $(OBJ_DIR)/FileReader.o $(OBJ_DIR)/SingleLineDelimTextFileReader.o \
 			$(OBJ_DIR)/BinaryFileReader.o $(OBJ_DIR)/BamFileReader.o $(OBJ_DIR)/BufferedStreamMgr.o $(OBJ_DIR)/InputStreamMgr.o $(OBJ_DIR)/PushBackGzStream.o
 
 .PHONY: clean

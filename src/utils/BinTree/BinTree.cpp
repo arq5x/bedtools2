@@ -3,8 +3,7 @@
 
 
 BinTree::BinTree(ContextIntersect *context)
-: _databaseFile(NULL),
-  _context(context),
+:  _context(context),
   _binOffsetsExtended(NULL),
   _showBinMetrics(false),
   _maxBinNumFound(0)
@@ -36,7 +35,7 @@ BinTree::~BinTree() {
 				}
 				for (innerListIterType listIter = bin->begin(); listIter != bin->end(); listIter = bin->next()) {
 					const Record *record = listIter->value();
-					_databaseFile->deleteRecord(record);
+					_context->getFile(record->getFileIdx())->deleteRecord(record);
 				}
 				delete bin;
 				bin = NULL;
@@ -70,25 +69,27 @@ BinTree::~BinTree() {
 
 void BinTree::loadDB()
 {
-	_databaseFile = _context->getFile(_context->getDatabaseFileIdx());
+	for (int i=0; i < _context->getNumDatabaseFiles(); i++) {
+		FileRecordMgr *databaseFile = _context->getDatabaseFile(i);
 
-	Record *record = NULL;
-	while (!_databaseFile->eof()) {
-		record = _databaseFile->getNextRecord();
-		//In addition to NULL records, we also don't want to add unmapped reads.
-		if (record == NULL || record->isUnmapped()) {
-			continue;
-		}
+		Record *record = NULL;
+		while (!databaseFile->eof()) {
+			record = databaseFile->getNextRecord();
+			//In addition to NULL records, we also don't want to add unmapped reads.
+			if (record == NULL || record->isUnmapped()) {
+				continue;
+			}
 
-		if (!addRecordToTree(record)) {
-			fprintf(stderr, "ERROR: Unable to add record to tree.\n");
-			_databaseFile->close();
-			exit(1);
+			if (!addRecordToTree(record)) {
+				fprintf(stderr, "ERROR: Unable to add record to tree.\n");
+				databaseFile->close();
+				exit(1);
+			}
 		}
 	}
 }
 
-void BinTree::getHits(Record *record, RecordKeyList &hitSet)
+void BinTree::getHits(Record *record, RecordKeyVector &hitSet)
 {
 	if (_showBinMetrics) {
 		return; //don't care about query entries just yet.
@@ -149,6 +150,9 @@ void BinTree::getHits(Record *record, RecordKeyList &hitSet)
         startBin >>= _binNextShift;
         endBin >>= _binNextShift;
     }
+	if (_context->getSortOutput()) {
+		hitSet.sortVector();
+	}
 }
 
 bool BinTree::addRecordToTree(const Record *record)

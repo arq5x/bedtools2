@@ -154,7 +154,7 @@ bool KeyListOps::isValidColumnOps(FileRecordMgr *dbFile) {
     return true;
 }
 
-const QuickString & KeyListOps::getOpVals(RecordKeyList &hits)
+const QuickString & KeyListOps::getOpVals(RecordKeyVector &hits)
 {
 	//loop through all requested columns, and for each one, call the method needed
 	//for the operation specified.

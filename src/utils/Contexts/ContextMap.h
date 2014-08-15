@@ -16,6 +16,8 @@ public:
 	virtual ~ContextMap();
 	virtual bool parseCmdArgs(int argc, char **argv, int skipFirstArgs);
     virtual bool hasIntersectMethods() const { return true; }
+    virtual bool isValidState();
+
 
 private:
 

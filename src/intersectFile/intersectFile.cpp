@@ -37,7 +37,7 @@ FileIntersect::~FileIntersect(void) {
 	delete _recordOutputMgr;
 }
 
-void FileIntersect::processHits(RecordKeyList &hits) {
+void FileIntersect::processHits(RecordKeyVector &hits) {
     _recordOutputMgr->printRecord(hits);
 }
 
@@ -58,11 +58,11 @@ bool FileIntersect::processSortedFiles()
     	return false;
     }
 
-    RecordKeyList hitSet;
+    RecordKeyVector hitSet;
     while (sweep.next(hitSet)) {
     	if (_context->getObeySplits()) {
-    		RecordKeyList keySet(hitSet.getKey());
-    		RecordKeyList resultSet(hitSet.getKey());
+    		RecordKeyVector keySet(hitSet.getKey());
+    		RecordKeyVector resultSet(hitSet.getKey());
     		_blockMgr->findBlockedOverlaps(keySet, hitSet, resultSet);
     		processHits(resultSet);
     	} else {
@@ -85,11 +85,11 @@ bool FileIntersect::processUnsortedFiles()
 		if (queryRecord == NULL) {
 			continue;
 		}
-		RecordKeyList hitSet(queryRecord);
+		RecordKeyVector hitSet(queryRecord);
 		binTree->getHits(queryRecord, hitSet);
     	if (_context->getObeySplits()) {
-    		RecordKeyList keySet(hitSet.getKey());
-    		RecordKeyList resultSet;
+    		RecordKeyVector keySet(hitSet.getKey());
+    		RecordKeyVector resultSet;
     		_blockMgr->findBlockedOverlaps(keySet, hitSet, resultSet);
     		processHits(resultSet);
     	} else {

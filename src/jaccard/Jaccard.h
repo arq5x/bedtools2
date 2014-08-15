@@ -33,7 +33,7 @@ private:
     int _numIntersections;
 
     bool getIntersectionAndUnion();
-    unsigned long getTotalIntersection(RecordKeyList *hits);
+    unsigned long getTotalIntersection(RecordKeyVector *hits);
 };
 
 #endif /* JACCARD_H */

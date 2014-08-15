@@ -22,7 +22,7 @@ KeyListOpsMethods::KeyListOpsMethods()
 {
 }
 
-KeyListOpsMethods::KeyListOpsMethods(RecordKeyList *keyList, int column)
+KeyListOpsMethods::KeyListOpsMethods(RecordKeyVector *keyList, int column)
 : _keyList(keyList),
   _column(column),
   _nullVal("."),
@@ -313,13 +313,13 @@ const QuickString &KeyListOpsMethods::getLast() {
 }
 
 const QuickString &KeyListOpsMethods::getColVal() {
-	const QuickString &retVal = _iter->value()->getField(_column);
+	const QuickString &retVal = (*_iter)->getField(_column);
 	if (_isBam && retVal.empty()) return _nullVal;
 	return retVal;
 }
 
 double KeyListOpsMethods::getColValNum() {
-	const QuickString &strVal = _iter->value()->getField(_column);
+	const QuickString &strVal = (*_iter)->getField(_column);
 	if (!isNumeric(strVal)) {
 		_nonNumErrFlag = true;
 		_errMsg = " ***** WARNING: Non numeric value ";

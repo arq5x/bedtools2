@@ -98,6 +98,15 @@ public:
     virtual bool getSortedInput() const {return _sortedInput; }
     virtual void setSortedInput(bool val) { _sortedInput = val; }
 
+    virtual bool getSortOutput() const {return _sortOutput; }
+    virtual void setSortOutput(bool val) { _sortOutput = val; }
+
+    virtual bool getUseDBnameTags() const { return _reportDBnameTags; }
+    virtual void setUseDBnameTags(bool val) { _reportDBnameTags = val; }
+
+    virtual bool getUseDBfileNames() const { return _reportDBfileNames; }
+    virtual void setUseDBfileNames(bool val) { _reportDBfileNames = val; }
+
     virtual bool getPrintHeader() const {return _printHeader; }
     virtual void setPrintHeader(bool val) { _printHeader = val; }
 
@@ -106,24 +115,6 @@ public:
 
     virtual bool getUseFullBamTags() const { return _useFullBamTags; }
     virtual void setUseFullBamTags(bool val) { _useFullBamTags = val; }
-
-//	//
-//	// MERGE METHODS
-//	//
-//    virtual bool getReportCount() const { return _reportCount; }
-//    virtual void setReportCount(bool val) { _reportCount = val; }
-//
-//    virtual int getMaxDistance() const { return _maxDistance; }
-//    virtual void setMaxDistance(int distance) { _maxDistance = distance; }
-//
-//    virtual bool getReportNames() const { return _reportNames; }
-//    virtual void setReportNames(bool val) { _reportNames = val; }
-//
-//    virtual bool getReportScores() const { return _reportScores; }
-//    virtual void setReportScores(bool val) { _reportScores = val; }
-//
-//    virtual const QuickString &getScoreOp() const { return _scoreOp; }
-//    virtual void setScoreOp(const QuickString &op) { _scoreOp = op; }
 
 
 	// METHODS FOR PROGRAMS WITH USER_SPECIFIED NUMBER
@@ -150,7 +141,7 @@ public:
     // are available.
     void setColumnOpsMethods(bool val);
     virtual bool hasColumnOpsMethods() const { return _hasColumnOpsMethods; }
-    const QuickString &getColumnOpsVal(RecordKeyList &keyList) const;
+    const QuickString &getColumnOpsVal(RecordKeyVector &keyList) const;
     //methods applicable only to column operations.
 
 protected:
@@ -192,18 +183,19 @@ protected:
     bool _sameStrand;
     bool _diffStrand;
     bool _sortedInput;
+    bool _sortOutput;
+    bool _reportDBnameTags;
+    bool _reportDBfileNames;
     bool _printHeader;
     bool _printable;
     bool _explicitBedOutput;
     int _queryFileIdx;
-    int _databaseFileIdx;
+    vector<int> _dbFileIdxs;
+    vector<QuickString> _dbNameTags;
+    map<int, int> _fileIdsToDbIdxs;
     int _bamHeaderAndRefIdx;
     int _maxNumDatabaseFields;
     bool _useFullBamTags;
-	bool _reportCount;
-	bool _reportNames;
-	bool _reportScores;
-	QuickString _scoreOp;
 
 	int _numOutputRecords;
 
@@ -227,7 +219,7 @@ protected:
 	bool isUsed(int i) const { return _argsProcessed[i]; }
 	bool cmdArgsValid();
 	bool openFiles();
-	virtual FileRecordMgr *getNewFRM(const QuickString &filename);
+	virtual FileRecordMgr *getNewFRM(const QuickString &filename, int fileIdx);
 
 	//set cmd line params and counter, i, as members so code
 	//is more readable (as opposed to passing all 3 everywhere).
@@ -256,6 +248,7 @@ protected:
 	virtual bool handle_o();
 	virtual bool handle_null();
 	virtual bool handle_delim();
+	virtual bool handle_sortout();
 
 	bool parseIoBufSize(QuickString bufStr);
 

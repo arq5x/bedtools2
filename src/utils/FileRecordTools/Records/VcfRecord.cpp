@@ -10,6 +10,7 @@
 
 bool VcfRecord::initFromFile(SingleLineDelimTextFileReader *fileReader)
 {
+	setFileIdx(fileReader->getFileIdx());
 	fileReader->getField(0, _chrName);
 	_chrId = fileReader->getCurrChromdId();
 	fileReader->getField(1, _startPosStr);
@@ -32,8 +33,8 @@ bool VcfRecord::initFromFile(SingleLineDelimTextFileReader *fileReader)
 void VcfRecord::clear()
 {
 	BedPlusInterval::clear();
-	_varAlt.clear();
-	_varRef.clear();
+	_varAlt.release();
+	_varRef.release();
 }
 
 void VcfRecord::print(QuickString &outBuf) const {

@@ -75,7 +75,7 @@ void RecordOutputMgr::init(ContextBase *context) {
 	}
 }
 
-bool RecordOutputMgr::printKeyAndTerminate(RecordKeyList &keyList) {
+bool RecordOutputMgr::printKeyAndTerminate(RecordKeyVector &keyList) {
 	if (_context->getProgram() == ContextBase::MERGE) {
 		//when printing merged records, we want to force the printing into
 		//bed3 format, which is surprisingly difficult to do. Had to use the following:
@@ -95,7 +95,7 @@ bool RecordOutputMgr::printKeyAndTerminate(RecordKeyList &keyList) {
 
 }
 
-RecordOutputMgr::printBamType RecordOutputMgr::printBamRecord(RecordKeyList &keyList, bool bamOutputOnly)
+RecordOutputMgr::printBamType RecordOutputMgr::printBamRecord(RecordKeyVector &keyList, bool bamOutputOnly)
 {
 	const Record *record = keyList.getKey();
 	if (record->getType() == FileRecordTypeChecker::BAM_RECORD_TYPE) {
@@ -118,7 +118,7 @@ RecordOutputMgr::printBamType RecordOutputMgr::printBamRecord(RecordKeyList &key
 
 void RecordOutputMgr::printRecord(const Record *record)
 {
-	RecordKeyList keyList(record);
+	RecordKeyVector keyList(record);
 	printRecord(keyList);
 }
 
@@ -137,9 +137,9 @@ void RecordOutputMgr::printRecord(const Record *record, const QuickString & valu
 	}
 }
 
-void RecordOutputMgr::printRecord(RecordKeyList &keyList) {
+void RecordOutputMgr::printRecord(RecordKeyVector &keyList) {
 	if (keyList.getKey()->getType() == FileRecordTypeChecker::BAM_RECORD_TYPE) {
-		RecordKeyList blockList(keyList.getKey());
+		RecordKeyVector blockList(keyList.getKey());
 		bool deleteBlocks = false;
 		_bamBlockMgr->getBlocks(blockList, deleteBlocks);
 		printRecord(keyList, &blockList);
@@ -152,7 +152,7 @@ void RecordOutputMgr::printRecord(RecordKeyList &keyList) {
 
 }
 
-void RecordOutputMgr::printRecord(RecordKeyList &keyList, RecordKeyList *blockList)
+void RecordOutputMgr::printRecord(RecordKeyVector &keyList, RecordKeyVector *blockList)
 {
 	if (needsFlush()) {
 		flush();
@@ -198,8 +198,8 @@ void RecordOutputMgr::printRecord(RecordKeyList &keyList, RecordKeyList *blockLi
 					return;
 				}
 				int hitIdx = 0;
-				for (RecordKeyList::const_iterator_type iter = keyList.begin(); iter != keyList.end(); iter = keyList.next()) {
-					reportOverlapDetail(keyList.getKey(), iter->value(), hitIdx);
+				for (RecordKeyVector::const_iterator_type iter = keyList.begin(); iter != keyList.end(); iter = keyList.next()) {
+					reportOverlapDetail(keyList.getKey(), *iter, hitIdx);
 					hitIdx++;
 				}
 			}
@@ -306,6 +306,7 @@ void RecordOutputMgr::reportOverlapDetail(const Record *keyRecord, const Record 
 			(static_cast<ContextIntersect *>(_context))->getWriteB()) || (static_cast<ContextIntersect *>(_context))->getLeftJoin()) {
 		printKey(keyRecord);
 		tab();
+		addDbFileId(hitRecord->getFileIdx());
 		hitRecord->print(_outBuf);
 		newline();
 		if (needsFlush()) flush();
@@ -318,6 +319,7 @@ void RecordOutputMgr::reportOverlapDetail(const Record *keyRecord, const Record 
 	else if ((static_cast<ContextIntersect *>(_context))->getWriteB()) {
 		printKey(keyRecord, *startStr, *endStr);
 		tab();
+		addDbFileId(hitRecord->getFileIdx());
 		hitRecord->print(_outBuf);
 		newline();
 		if (needsFlush()) flush();
@@ -331,6 +333,7 @@ void RecordOutputMgr::reportOverlapDetail(const Record *keyRecord, const Record 
 		}
 		printKey(keyRecord);
 		tab();
+		addDbFileId(hitRecord->getFileIdx());
 		hitRecord->print(_outBuf);
 		tab();
 		int2str(printOverlapBases, _outBuf, true);
@@ -339,7 +342,7 @@ void RecordOutputMgr::reportOverlapDetail(const Record *keyRecord, const Record 
 	}
 }
 
-void RecordOutputMgr::reportOverlapSummary(RecordKeyList &keyList)
+void RecordOutputMgr::reportOverlapSummary(RecordKeyVector &keyList)
 {
 	int numOverlapsFound = (int)keyList.size();
 	if ((static_cast<ContextIntersect *>(_context))->getAnyHit() && numOverlapsFound > 0) {
@@ -365,6 +368,17 @@ void RecordOutputMgr::reportOverlapSummary(RecordKeyList &keyList)
 	}
 }
 
+void RecordOutputMgr::addDbFileId(int fileId) {
+	if ((static_cast<ContextIntersect *>(_context))->getNumDatabaseFiles()  == 1) return;
+	if (!_context->getUseDBnameTags() && (!_context->getUseDBfileNames())) {
+		_outBuf.append(fileId);
+	} else if (_context->getUseDBnameTags()){
+		_outBuf.append((static_cast<ContextIntersect *>(_context))->getDatabaseNameTag((static_cast<ContextIntersect *>(_context))->getDbIdx(fileId)));
+	} else {
+		_outBuf.append(_context->getInputFileName(fileId));
+	}
+	tab();
+}
 
 void RecordOutputMgr::null(bool queryType, bool dbType)
 {
@@ -373,7 +387,7 @@ void RecordOutputMgr::null(bool queryType, bool dbType)
 		if (queryType) {
 			recordType = (static_cast<ContextIntersect *>(_context))->getQueryRecordType();
 		} else if (dbType) {
-			recordType = (static_cast<ContextIntersect *>(_context))->getDatabaseRecordType();
+			recordType = (static_cast<ContextIntersect *>(_context))->getDatabaseRecordType(0);
 		}
 	} else  {
 		recordType = _context->getFile(0)->getRecordType();

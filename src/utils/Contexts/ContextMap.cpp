@@ -47,3 +47,17 @@ bool ContextMap::parseCmdArgs(int argc, char **argv, int skipFirstArgs) {
 	}
 	return ContextIntersect::parseCmdArgs(argc, argv, _skipFirstArgs);
 }
+
+bool ContextMap::isValidState()
+{
+	if (!ContextIntersect::isValidState()) {
+		return false;
+	}
+
+	// Multiple databases are currently not supported
+	if (getNumDatabaseFiles() > 1) {
+		_errorMsg = "\n***** ERROR: multiple database files currently not supported for map. *****";
+		return false;
+	}
+	return true;
+}

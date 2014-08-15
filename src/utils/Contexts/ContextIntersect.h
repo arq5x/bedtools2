@@ -22,19 +22,22 @@ public:
 	//NOTE: Query and database files will only be marked as such by either the
 	//parseCmdArgs method, or by explicitly setting them.
 	FileRecordMgr *getQueryFile() { return getFile(_queryFileIdx); }
-	FileRecordMgr *getDatabaseFile() { return getFile(_databaseFileIdx); }
+	FileRecordMgr *getDatabaseFile(int idx) { return getFile(_dbFileIdxs[idx]); }
     int getQueryFileIdx() const { return _queryFileIdx; }
 	void setQueryFileIdx(int idx) { _queryFileIdx = idx; }
-	int getDatabaseFileIdx() const { return _databaseFileIdx; }
-	void setDatabaseFileIdx(int idx) { _databaseFileIdx = idx; }
+	int getNumDatabaseFiles() { return (int)_dbFileIdxs.size(); }
+	const vector<int> &getDbFileIdxs() const { return _dbFileIdxs; }
 	const QuickString &getQueryFileName() const { return _files[_queryFileIdx]->getFileName(); }
-	const QuickString &getDatabaseFileName() const { return _files[_databaseFileIdx]->getFileName(); }
+	const QuickString &getDatabaseFileName(int idx) const { return _files[_dbFileIdxs[idx]]->getFileName(); }
 	ContextFileType getQueryFileType() const { return _files[_queryFileIdx]->getFileType(); }
-	ContextFileType getDatabaseFileType() const { return _files[_databaseFileIdx]->getFileType(); }
+	ContextFileType getDatabaseFileType(int idx) const { return _files[_dbFileIdxs[idx]]->getFileType(); }
 	ContextRecordType getQueryRecordType() const { return _files[_queryFileIdx]->getRecordType(); }
-	ContextRecordType getDatabaseRecordType() const { return _files[_databaseFileIdx]->getRecordType(); }
+	ContextRecordType getDatabaseRecordType(int idx) const { return _files[_dbFileIdxs[idx]]->getRecordType(); }
 	int getMaxNumDatabaseFields() const { return _maxNumDatabaseFields; }
 	void setMaxNumDatabaseFields(int val) { _maxNumDatabaseFields = val; }
+	int getDbIdx(int fileId) { return _fileIdsToDbIdxs.find(fileId)->second; }
+	void addDatabaseNameTag(const QuickString &tag) { _dbNameTags.push_back(tag); }
+	const QuickString &getDatabaseNameTag(int dbIdx) const { return _dbNameTags[dbIdx]; }
 
 	bool getAnyHit() const {return _anyHit; }
 	void setAnyHit(bool val) { _anyHit = val; }
@@ -83,6 +86,9 @@ private:
 	virtual bool handle_a();
 	virtual bool handle_abam();
 	virtual bool handle_b();
+	virtual bool handle_names();
+	virtual bool handle_filenames();
+
 	virtual bool handle_c();
 	virtual bool handle_f();
 	virtual bool handle_loj();

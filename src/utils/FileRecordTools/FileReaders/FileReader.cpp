@@ -4,7 +4,7 @@
 #include "BufferedStreamMgr.h"
 
 FileReader::FileReader()
-:
+: _fileIdx(-1),
   _bufStreamMgr(NULL),
   _isFileOpen(false),
   _currChromId(-1)

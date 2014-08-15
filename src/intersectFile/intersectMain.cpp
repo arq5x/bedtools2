@@ -13,6 +13,7 @@ using namespace std;
 
 #include "intersectFile.h"
 #include "ContextIntersect.h"
+#include "CommonHelp.h"
 
 // define our program name
 #define PROGRAM_NAME "bedtools intersect"
@@ -45,6 +46,9 @@ void intersect_help(void) {
     cerr << "Summary: Report overlaps between two feature files." << endl << endl;
 
     cerr << "Usage:   " << PROGRAM_NAME << " [OPTIONS] -a <bed/gff/vcf> -b <bed/gff/vcf>" << endl << endl;
+
+    cerr << "\t\t"				<< "Note: -b may be followed with multiple databases and/or " << endl;
+    cerr << "\t\t"					"wildcard (*) character(s). " << endl;
 
     cerr << "Options: " << endl;
 
@@ -118,6 +122,17 @@ void intersect_help(void) {
     cerr 						<<"\t\tnoticeably slower, but can be useful in conjunction with" << endl;
     cerr 						<<"\t\tother software tools and scripts that need to process one" << endl;
     cerr 						<<"\t\tline of bedtools output at a time." << endl << endl;
+
+    cerr << "\t-names\t"       << "When using multiple databases, provide an alias for each that" << endl;
+    cerr						<<"\t\twill appear instead of a fileId when also printing the DB record." << endl << endl;
+
+    cerr << "\t-filenames"       << "\tWhen using multiple databases, show each complete filename" << endl;
+    cerr						<<"\t\t\tinstead of a fileId when also printing the DB record." << endl << endl;
+
+    cerr << "\t-sortout\t"       << "When using multiple databases, sort the output DB hits" << endl;
+    cerr						<< "\t\t\tfor each record." << endl << endl;
+
+    CommonHelp();
 
     cerr << "Notes: " << endl;
     cerr << "\t(1) When a BAM file is used for the A file, the alignment is retained if overlaps exist," << endl;

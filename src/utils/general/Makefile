@@ -9,8 +9,9 @@ INCLUDES = -I$(UTILITIES_DIR)/lineFileUtilities/
 # ----------------------------------
 # define our source and object files
 # ----------------------------------
-SOURCES= QuickString.h QuickString.cpp ParseTools.h ParseTools.cpp PushBackStreamBuf.cpp PushBackStreamBuf.h CompressionTools.h CompressionTools.cpp Tokenizer.h Tokenizer.h
-OBJECTS= QuickString.o ParseTools.o PushBackStreamBuf.o CompressionTools.o Tokenizer.o
+SOURCES= QuickString.h QuickString.cpp ParseTools.h ParseTools.cpp PushBackStreamBuf.cpp PushBackStreamBuf.h CompressionTools.h CompressionTools.cpp \
+		 Tokenizer.h Tokenizer.h CommonHelp.h CommonHelp.cpp
+OBJECTS= QuickString.o ParseTools.o PushBackStreamBuf.o CompressionTools.o Tokenizer.o CommonHelp.o
 BUILT_OBJECTS= $(patsubst %,$(OBJ_DIR)/%,$(OBJECTS))
 
 all: $(BUILT_OBJECTS)
@@ -23,6 +24,6 @@ $(BUILT_OBJECTS): $(SOURCES)
 
 clean:
 	@echo "Cleaning up."
-	@rm -f $(OBJ_DIR)/QuickString.o $(OBJ_DIR)/ParseTools.o $(OBJ_DIR)/PushBackStreamBuf.o $(OBJ_DIR)/Tokenizer.o
+	@rm -f $(OBJ_DIR)/QuickString.o $(OBJ_DIR)/ParseTools.o $(OBJ_DIR)/PushBackStreamBuf.o $(OBJ_DIR)/Tokenizer.o $(OBJ_DIR)/CommonHelp.o
 
 .PHONY: clean

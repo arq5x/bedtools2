@@ -15,7 +15,7 @@
 
 class FileReader;
 class BamFileReader;
-class RecordKeyList;
+class RecordKeyVector;
 
 class BamRecord : public Bed6Interval {
 public:
@@ -42,11 +42,11 @@ public:
 	using Bed6Interval::print;
 
 
-	virtual void print(QuickString &outBuf, int start, int end, RecordKeyList *keyList) const;
-	virtual void print(QuickString &outBuf, RecordKeyList *keyList) const;
-	virtual void print(QuickString &outBuf, const QuickString & start, const QuickString & end, RecordKeyList *keyList) const;
+	virtual void print(QuickString &outBuf, int start, int end, RecordKeyVector *keyList) const;
+	virtual void print(QuickString &outBuf, RecordKeyVector *keyList) const;
+	virtual void print(QuickString &outBuf, const QuickString & start, const QuickString & end, RecordKeyVector *keyList) const;
 	virtual void printNull(QuickString &outBuf) const;
-	virtual void printRemainingBamFields(QuickString &outBuf, RecordKeyList *keyList) const;
+	virtual void printRemainingBamFields(QuickString &outBuf, RecordKeyVector *keyList) const;
 	virtual void printUnmapped(QuickString &outBuf) const;
 
 	virtual FileRecordTypeChecker::RECORD_TYPE getType() const { return FileRecordTypeChecker::BAM_RECORD_TYPE; }

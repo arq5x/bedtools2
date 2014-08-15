@@ -49,11 +49,11 @@ bool Jaccard::getIntersectionAndUnion() {
 	if (!sweep.init()) {
 		return false;
 	}
-	RecordKeyList hitSet;
+	RecordKeyVector hitSet;
 	while (sweep.next(hitSet)) {
 		if (_context->getObeySplits()) {
-			RecordKeyList keySet(hitSet.getKey());
-			RecordKeyList resultSet(hitSet.getKey());
+			RecordKeyVector keySet(hitSet.getKey());
+			RecordKeyVector resultSet(hitSet.getKey());
 			_blockMgr->findBlockedOverlaps(keySet, hitSet, resultSet);
 			_intersectionVal += getTotalIntersection(&resultSet);
 		} else {
@@ -69,7 +69,7 @@ bool Jaccard::getIntersectionAndUnion() {
 	return true;
 }
 
-unsigned long Jaccard::getTotalIntersection(RecordKeyList *recList)
+unsigned long Jaccard::getTotalIntersection(RecordKeyVector *recList)
 {
 	unsigned long intersection = 0;
 	const Record *key = recList->getKey();
@@ -77,8 +77,8 @@ unsigned long Jaccard::getTotalIntersection(RecordKeyList *recList)
 	int keyEnd = key->getEndPos();
 
 	int hitIdx = 0;
-	for (RecordKeyList::const_iterator_type iter = recList->begin(); iter != recList->end(); iter = recList->next()) {
-		const Record *currRec = iter->value();
+	for (RecordKeyVector::const_iterator_type iter = recList->begin(); iter != recList->end(); iter = recList->next()) {
+		const Record *currRec = *iter;
 		int maxStart = max(currRec->getStartPos(), keyStart);
 		int minEnd = min(currRec->getEndPos(), keyEnd);
 		if (_context->getObeySplits()) {
