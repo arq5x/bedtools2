@@ -19,7 +19,7 @@ export CXX		= g++
 #ifeq ($(DEBUG),1)
 #export CXXFLAGS = -Wall -O0 -g -fno-inline -fkeep-inline-functions -D_FILE_OFFSET_BITS=64 -fPIC -DDEBUG -D_DEBUG
 #else
-export CXXFLAGS = -Wall -O2 -D_FILE_OFFSET_BITS=64 -fPIC $(INCLUDES)
+export CXXFLAGS = -Wall -O2 -D_FILE_OFFSET_BITS=64 -fPIC $(INCLUDE)
 #endif
 export LIBS		= -lz
 export BT_ROOT  = src/utils/BamTools/
@@ -42,7 +42,6 @@ SUBDIRS = $(SRC_DIR)/annotateBed \
 		  $(SRC_DIR)/getOverlap \
 		  $(SRC_DIR)/groupBy \
 		  $(SRC_DIR)/intersectFile \
-		  $(SRC_DIR)/fisher \
 		  $(SRC_DIR)/jaccard \
 		  $(SRC_DIR)/linksBed \
 		  $(SRC_DIR)/maskFastaFromBed \
@@ -54,6 +53,7 @@ SUBDIRS = $(SRC_DIR)/annotateBed \
 		  $(SRC_DIR)/nucBed \
 		  $(SRC_DIR)/pairToBed \
 		  $(SRC_DIR)/pairToPair \
+		  $(SRC_DIR)/pairedBamToBed12 \
 		  $(SRC_DIR)/randomBed \
 		  $(SRC_DIR)/regressTest \
 		  $(SRC_DIR)/reldist \
