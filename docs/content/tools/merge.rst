@@ -113,9 +113,9 @@ The ``-s`` option will only merge intervals that are overlapping/bookended
   chr1  501  1000  a4  4 +
 
   $ bedtools merge -i A.bed -s
-  chr1  100  250    +
-  chr1  501  1000   +
-  chr1  250  500    -
+  chr1  100  250
+  chr1  501  1000
+  chr1  250  500
 
 ==========================================================================
 ``-S`` Reporting merged intervals on a specific strand. 
