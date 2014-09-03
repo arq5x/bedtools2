@@ -69,7 +69,7 @@ Utility	                         Description
 **pairtopair**                   Find pairs that overlap other pairs in various ways.
 **random**                       Generate random intervals in a genome.
 **reldist**                      Calculate the distribution of relative distances b/w two files.
-**shuffle**                      Randomly redistrubute intervals in a genome.
+**shuffle**                      Randomly redistribute intervals in a genome.
 **slop**                         Adjust the size of intervals.
 **sort**                         Order the intervals in a file.
 **subtract**                     Remove intervals based on overlaps b/w two files.
