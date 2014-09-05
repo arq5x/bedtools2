@@ -10,13 +10,15 @@ offers is that it not only *counts* the number of features that overlap an inter
 computes the fraction of bases in B interval that were overlapped by one or more features. Thus,
 **coverageBed** also computes the *breadth* of coverage for each interval in B.
 
+
 ==========================================================================
 Usage and option summary
 ==========================================================================
 Usage:
 
 ::
-  coverageBed [OPTIONS] -a <BED/GFF/VCF> -b <BED/GFF/VCF>
+
+     coverageBed [OPTIONS] -a <BED/GFF/VCF> -b <BED/GFF/VCF>
   
 ===========================      ===============================================================================================================================================================================================================
 Option                           Description
@@ -56,6 +58,7 @@ After each interval in B, **coverageBed** will report:
 Below are the number of features in A (N=...) overlapping B and fraction of bases in B with coverage.
 
 ::
+
   Chromosome  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   
   BED FILE B  ***************     ***************     ******    **************   
@@ -69,6 +72,7 @@ Below are the number of features in A (N=...) overlapping B and fraction of base
 For example:
 
 ::
+
   cat A.bed
   chr1  10  20
   chr1  20  30
@@ -96,6 +100,7 @@ feature / window in B. This is especially useful for RNA-seq experiments.
 For example (note the difference in coverage with and without **-s**:
 
 ::
+
   cat A.bed
   chr1  10  20  a1  1  -
   chr1  20  30  a2  1  -
@@ -128,6 +133,7 @@ bases at that depth, the size of the feature, and the fraction covered. After al
 been reported, a histogram summarizing the coverage among all features in B will be reported.
 
 ::
+
   cat A.bed
   chr1  10  20  a1  1  -
   chr1  20  30  a2  1  -
@@ -159,6 +165,7 @@ The output will consist of a line for each one-based position in each B feature,
 detected at that position.
 
 ::
+
   cat A.bed
   chr1  0  5
   chr1  3  8
