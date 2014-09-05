@@ -262,8 +262,8 @@ For example, without ``-u``:
     chr1  17  22
 
     $ bedtools intersect -a A.bed -b B.bed
-    chr1  10   20
-    chr1  10   20
+    chr1  15   20
+    chr1  17   20
     
 Now with ``-u``:
 
