@@ -92,6 +92,10 @@ int pairedbamtobed12_main(int argc, char* argv[]) {
         (PARAMETER_CHECK("--help", 5, parameterLength))) {
             showHelp = true;
         }
+        // option kept for retro-compatibility purpose
+        else if(PARAMETER_CHECK("-quiet", 6, parameterLength)) {
+            continue;
+        }
         else if(PARAMETER_CHECK("-dblock", 7, parameterLength)) {
             delAsBlock = true;
         }
