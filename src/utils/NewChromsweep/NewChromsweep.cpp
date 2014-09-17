@@ -99,7 +99,7 @@ void NewChromSweep::scanCache(int dbIdx, RecordKeyVector &retList) {
         if (_currQueryRec->sameChrom(cacheRec) && !(_currQueryRec->after(cacheRec))) {
             if (intersects(_currQueryRec, cacheRec)) {
                 retList.push_back(cacheRec);
-            }
+            } else break; // cacheRec is after the query rec, stop scanning.
             cacheIter = _caches[dbIdx].next();
         }
         else {
