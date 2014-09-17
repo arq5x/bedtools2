@@ -6,7 +6,9 @@
 // ---------------------------------------------------------------------------
 // Provides low-level implementation of TCP I/O for all UNIX-like systems
 // ***************************************************************************
-
+#ifdef __FreeBSD__
+#include <netinet/in.h>
+#endif
 #include "api/internal/io/TcpSocketEngine_p.h"
 #include "api/internal/io/NetUnix_p.h"
 using namespace BamTools;

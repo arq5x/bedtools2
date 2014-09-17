@@ -7,6 +7,9 @@
 // Provides DNS lookup functionality for hostname & its discovered addresses
 // ***************************************************************************
 
+#ifdef __FreeBSD__
+#include <netinet/in.h>
+#endif
 #include "api/internal/io/HostInfo_p.h"
 using namespace BamTools;
 using namespace BamTools::Internal;
