@@ -23,12 +23,20 @@ NewGenomeFile::NewGenomeFile(const QuickString &genomeFilename)
 NewGenomeFile::NewGenomeFile(const BamTools::RefVector &refVector)
 : _maxId(-1)
 {
-    for (size_t i = 0; i < refVector.size(); ++i) {
+	size_t i = 0;
+    for (; i < refVector.size(); ++i) {
         QuickString chrom = refVector[i].RefName;
         CHRPOS length = refVector[i].RefLength;
         _maxId++;
         _chromSizeIds[chrom] = pair<CHRPOS, CHRPOS>(length, _maxId);
+		_chromList.push_back(chrom);
     }
+	// Special: BAM files can have unmapped reads, which show as no chromosome, or an empty chrom string.
+	// Add in an empty chrom so these don't error.
+	_maxId++;
+	_chromSizeIds[""] = pair<CHRPOS, int>(0, _maxId);
+	_chromList.push_back("");
+
 }
 
 // Destructor
@@ -69,6 +77,13 @@ void NewGenomeFile::loadGenomeFileIntoMap() {
 		cerr << "Error: The genome file " << _genomeFileName << " has no valid entries. Exiting." << endl;
 		exit(1);
 	}
+	// Special: BAM files can have unmapped reads, which show as no chromosome, or an empty chrom string.
+	// Add in an empty chrom so these don't error.
+	_maxId++;
+	_chromSizeIds[""] = pair<CHRPOS, int>(0, _maxId);
+	_chromList.push_back("");
+
+
 	_startOffsets.push_back(_genomeLength); //insert the final length as the last element
 	//to help with the lower_bound call in the projectOnGenome method.
 	genFile.close();

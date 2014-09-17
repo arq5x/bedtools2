@@ -22,13 +22,13 @@ public:
 	//
 	// This will give a single "meta" record containing "flattened" or merged records.
 	//
-	// Pass an empty RecordKeyList. When done, will have a pair: 1st is the final merged record,
+	// Pass an empty RecordKeyVector. When done, will have a pair: 1st is the final merged record,
 	//			second is list of constituent Records merged.
 	//
 	///////////////////////////////////////////////////////////////////////////////////
 
-	Record *getNextRecord(RecordKeyList *keyList = NULL);
-	void deleteMergedRecord(RecordKeyList &recList); // MUST use this method for cleanup!
+	Record *getNextRecord(RecordKeyVector *keyList = NULL);
+	void deleteMergedRecord(RecordKeyVector &recList); // MUST use this method for cleanup!
 
 	bool eof();
 
@@ -48,7 +48,7 @@ private:
 	int _maxDistance;
 	StrandQueue _storedRecords;
 
-	void deleteAllMergedItemsButKey(RecordKeyList &recList);
+	void deleteAllMergedItemsButKey(RecordKeyVector &recList);
 	void addToStorage(Record *record);
 	Record *tryToTakeFromStorage();
 	Record *tryToTakeFromStorage(Record::strandType strand);

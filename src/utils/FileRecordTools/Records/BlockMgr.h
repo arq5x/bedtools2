@@ -14,7 +14,7 @@
 //Produce and manage seperate records for the sub-intervals inside the
 
 #include "FileRecordTypeChecker.h"
-#include "RecordKeyList.h"
+#include "RecordKeyVector.h"
 
 using namespace std;
 
@@ -26,18 +26,18 @@ public:
 	~BlockMgr();
 
 	// Return value is the number of blocks this main record has been split into.
-	void getBlocks(RecordKeyList &keyList, bool &mustDelete);
-	void deleteBlocks(RecordKeyList &keyList);
+	void getBlocks(RecordKeyVector &keyList, bool &mustDelete);
+	void deleteBlocks(RecordKeyVector &keyList);
 
 	// Get the sum of the lengths of all blocks for a record.
-	int getTotalBlockLength(RecordKeyList &keyList);
+	int getTotalBlockLength(RecordKeyVector &keyList);
 
 	// Determine which hits in the hitList intersect the hits in the keyList by comparing all blocks in each
 	// and checking that their total intersection meets any overlapFraction and reciprocal criteria compared to
 	// the total block lengths of the hitList and keyList. All hits that pass will be in the resultList.
 	// Return value is the number of hits in the result set.
 
-	int findBlockedOverlaps(RecordKeyList &keyList, RecordKeyList &hitList, RecordKeyList &resultList);
+	int findBlockedOverlaps(RecordKeyVector &keyList, RecordKeyVector &hitList, RecordKeyVector &resultList);
 
 	//these are setting options for splitting BAM records
 	void setBreakOnDeletionOps(bool val) { _breakOnDeletionOps = val; }
@@ -57,8 +57,8 @@ private:
 
 	// For now, all records will be split into Bed6 records.
 	const static FileRecordTypeChecker::RECORD_TYPE _blockRecordsType = FileRecordTypeChecker::BED6_RECORD_TYPE;
-	void getBlocksFromBed12(RecordKeyList &keyList, bool &mustDelete);
-	void getBlocksFromBam(RecordKeyList &keyList, bool &mustDelete);
+	void getBlocksFromBed12(RecordKeyVector &keyList, bool &mustDelete);
+	void getBlocksFromBam(RecordKeyVector &keyList, bool &mustDelete);
 
 	Record *allocateAndAssignRecord(const Record *keyRecord, int startPos, int endPos);
 

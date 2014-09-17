@@ -9,13 +9,13 @@
 #define KEYLIST_H_
 
 #include "Record.h"
-#include "BTlist.h"
+#include "RecordList.h"
 
 class RecordKeyList {
 public:
 	typedef const Record * elemType;
-	typedef BTlist<elemType> listType;
-	typedef const BTlistNode<elemType> *const_iterator_type;
+	typedef RecordList listType;
+	typedef const RecordListNode *const_iterator_type;
 	RecordKeyList();
     RecordKeyList(elemType item);
     RecordKeyList(elemType item, const listType &list);
@@ -44,6 +44,8 @@ public:
     	clearList();
     }
     bool allClear() { return (_key == NULL && empty()); }
+
+    void sort() { _list.sort(); }
 
 
 private:

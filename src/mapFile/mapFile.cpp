@@ -41,11 +41,11 @@ bool FileMap::mapFiles()
     if (!sweep.init()) {
       return false;
     }
-    RecordKeyList hitSet;
+    RecordKeyVector hitSet;
     while (sweep.next(hitSet)) {
     	if (_context->getObeySplits()) {
-			RecordKeyList keySet(hitSet.getKey());
-			RecordKeyList resultSet(hitSet.getKey());
+			RecordKeyVector keySet(hitSet.getKey());
+			RecordKeyVector resultSet(hitSet.getKey());
 			_blockMgr->findBlockedOverlaps(keySet, hitSet, resultSet);
 			_recordOutputMgr->printRecord(resultSet.getKey(), _context->getColumnOpsVal(resultSet));
     	} else {

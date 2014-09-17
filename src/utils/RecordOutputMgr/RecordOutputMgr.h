@@ -9,7 +9,7 @@
 #define RECORDOUTPUTMGR_H_
 
 #include "ContextBase.h"
-#include "RecordKeyList.h"
+#include "RecordKeyVector.h"
 #include "api/BamWriter.h"
 
 class BlockMgr;
@@ -23,7 +23,7 @@ public:
 	void init(ContextBase *context);
 
 	void printRecord(const Record *record);
-	void printRecord(RecordKeyList &keyList);
+	void printRecord(RecordKeyVector &keyList);
 	void printRecord(const Record *record, const QuickString & value);
 
 	//where necessary, pass additional information about splits through the blockMgr.
@@ -35,7 +35,7 @@ private:
 	ContextBase *_context;
 	bool _printable;
 	BamTools::BamWriter *_bamWriter;
-	RecordKeyList *_currBamBlockList;
+	RecordKeyVector *_currBamBlockList;
 
 	QuickString _outBuf;
 
@@ -48,14 +48,15 @@ private:
 	void newline() { _outBuf.append('\n'); }
 	void null(bool queryType, bool dbType);
 
-	void printRecord(RecordKeyList &keyList, RecordKeyList *blockList);
+	void printRecord(RecordKeyVector &keyList, RecordKeyVector *blockList);
 	void printKey(const Record *key);
 	void printKey(const Record *key, const QuickString & start, const QuickString & end);
-	bool printKeyAndTerminate(RecordKeyList &keyList);
-	printBamType printBamRecord(RecordKeyList &keyList, bool bamOutputOnly = false);
+	void addDbFileId(int fileId);
+	bool printKeyAndTerminate(RecordKeyVector &keyList);
+	printBamType printBamRecord(RecordKeyVector &keyList, bool bamOutputOnly = false);
 	void checkForHeader();
 	void reportOverlapDetail(const Record *keyRecord, const Record *hitRecord, int hitIdx = 0);
-	void reportOverlapSummary(RecordKeyList &keyList);
+	void reportOverlapSummary(RecordKeyVector &keyList);
 
 	static const unsigned int MAX_OUTBUF_SIZE = 16384; //16 K
 

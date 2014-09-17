@@ -3,7 +3,8 @@
 #include <cstdio>
 
 Record::Record()
-: _chrId(-1),
+: _fileIdx(-1),
+  _chrId(-1),
   _startPos(-1),
   _endPos(-1),
   _strandVal(UNKNOWN),
@@ -18,6 +19,7 @@ Record::~Record() {
 
 const Record &Record::operator=(const Record &other)
 {
+	_fileIdx = other._fileIdx;
 	_chrName = other._chrName;
 	_chrId = other._chrId;
 	_startPos = other._startPos;
@@ -29,6 +31,7 @@ const Record &Record::operator=(const Record &other)
 }
 
 void Record::clear() {
+	_fileIdx = -1;
 	_chrName.clear();
 	_chrId = -1;
 	_startPos = -1;
@@ -70,6 +73,35 @@ bool Record::operator > (const Record &other) const {
 		return _endPos > other._endPos;
 	}
 	return false;
+}
+
+bool Record::lessThan(const Record *other) const
+{
+	if (!sameChrom(other)) {
+		return chromBefore(other);
+	}
+	if (_startPos != other->_startPos) {
+		return _startPos < other->_startPos;
+	}
+	if (_endPos != other->_endPos) {
+		return _endPos < other->_endPos;
+	}
+	return false;
+}
+
+bool Record::greaterThan(const Record *other) const
+{
+	if (!sameChrom(other)) {
+		return chromAfter(other);
+	}
+	if (_startPos != other->_startPos) {
+		return _startPos > other->_startPos;
+	}
+	if (_endPos != other->_endPos) {
+		return _endPos > other->_endPos;
+	}
+	return false;
+
 }
 
 bool Record::sameChrom(const Record *other) const {

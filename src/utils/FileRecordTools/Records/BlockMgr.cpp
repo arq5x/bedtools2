@@ -30,7 +30,7 @@ BlockMgr::~BlockMgr()
 	delete _blockRecordsMgr;
 }
 
-void BlockMgr::getBlocks(RecordKeyList &keyList, bool &mustDelete)
+void BlockMgr::getBlocks(RecordKeyVector &keyList, bool &mustDelete)
 {
 	switch (keyList.getKey()->getType()) {
 	case FileRecordTypeChecker::BED12_RECORD_TYPE:
@@ -50,7 +50,7 @@ void BlockMgr::getBlocks(RecordKeyList &keyList, bool &mustDelete)
 
 
 
-void BlockMgr::getBlocksFromBed12(RecordKeyList &keyList, bool &mustDelete)
+void BlockMgr::getBlocksFromBed12(RecordKeyVector &keyList, bool &mustDelete)
 {
 	const Bed12Interval *keyRecord = static_cast<const Bed12Interval *>(keyList.getKey());
 	int blockCount = keyRecord->getBlockCount();
@@ -78,7 +78,7 @@ void BlockMgr::getBlocksFromBed12(RecordKeyList &keyList, bool &mustDelete)
     mustDelete = true;
 }
 
-void BlockMgr::getBlocksFromBam(RecordKeyList &keyList, bool &mustDelete)
+void BlockMgr::getBlocksFromBam(RecordKeyVector &keyList, bool &mustDelete)
 {
 	const BamRecord *keyRecord = static_cast<const BamRecord *>(keyList.getKey());
 	const vector<BamTools::CigarOp> &cigarData = keyRecord->getCigarData();
@@ -135,26 +135,26 @@ Record *BlockMgr::allocateAndAssignRecord(const Record *keyRecord, int startPos,
 	return record;
 }
 
-int BlockMgr::getTotalBlockLength(RecordKeyList &keyList) {
+int BlockMgr::getTotalBlockLength(RecordKeyVector &keyList) {
 	int sum = 0;
-	for (RecordKeyList::const_iterator_type iter = keyList.begin(); iter != keyList.end(); iter = keyList.next()) {
-		const Record *record = iter->value();
+	for (RecordKeyVector::const_iterator_type iter = keyList.begin(); iter != keyList.end(); iter = keyList.next()) {
+		const Record *record = *iter;
 		sum += record->getEndPos() - record->getStartPos();
 	}
 	return sum;
 }
 
-void BlockMgr::deleteBlocks(RecordKeyList &keyList)
+void BlockMgr::deleteBlocks(RecordKeyVector &keyList)
 {
-	for (RecordKeyList::const_iterator_type iter = keyList.begin(); iter != keyList.end(); iter = keyList.next()) {
-		_blockRecordsMgr->deleteRecord(iter->value());
+	for (RecordKeyVector::const_iterator_type iter = keyList.begin(); iter != keyList.end(); iter = keyList.next()) {
+		_blockRecordsMgr->deleteRecord(*iter);
 	}
-	keyList.clearList();
+	keyList.clearVector();
 
 }
 
 
-int BlockMgr::findBlockedOverlaps(RecordKeyList &keyList, RecordKeyList &hitList, RecordKeyList &resultList)
+int BlockMgr::findBlockedOverlaps(RecordKeyVector &keyList, RecordKeyVector &hitList, RecordKeyVector &resultList)
 {
 	bool deleteKeyBlocks = false;
 	if (keyList.empty()) {
@@ -164,8 +164,8 @@ int BlockMgr::findBlockedOverlaps(RecordKeyList &keyList, RecordKeyList &hitList
 	_overlapBases.clear();
 	int keyBlocksSumLength = getTotalBlockLength(keyList);
 	//Loop through every database record the query intersected with
-	for (RecordKeyList::const_iterator_type hitListIter = hitList.begin(); hitListIter != hitList.end(); hitListIter = hitList.next()) {
-		RecordKeyList hitBlocks(hitListIter->value());
+	for (RecordKeyVector::const_iterator_type hitListIter = hitList.begin(); hitListIter != hitList.end(); hitListIter = hitList.next()) {
+		RecordKeyVector hitBlocks(*hitListIter);
 		bool deleteHitBlocks = false;
 		getBlocks(hitBlocks, deleteHitBlocks); //get all blocks for the hit record.
 		int hitBlockSumLength = getTotalBlockLength(hitBlocks); //get total lentgh of the bocks for the hitRecord.
@@ -173,11 +173,11 @@ int BlockMgr::findBlockedOverlaps(RecordKeyList &keyList, RecordKeyList &hitList
 		bool hitHasOverlap = false;
 
 		//loop through every block of the database record.
-		for (RecordKeyList::const_iterator_type hitBlockIter = hitBlocks.begin(); hitBlockIter != hitBlocks.end(); hitBlockIter = hitBlocks.next()) {
+		for (RecordKeyVector::const_iterator_type hitBlockIter = hitBlocks.begin(); hitBlockIter != hitBlocks.end(); hitBlockIter = hitBlocks.next()) {
 			//loop through every block of the query record.
-			for (RecordKeyList::const_iterator_type keyListIter = keyList.begin(); keyListIter != keyList.end(); keyListIter = keyList.next()) {
-				const Record *keyBlock = keyListIter->value();
-				const Record *hitBlock = hitBlockIter->value();
+			for (RecordKeyVector::const_iterator_type keyListIter = keyList.begin(); keyListIter != keyList.end(); keyListIter = keyList.next()) {
+				const Record *keyBlock = *keyListIter;
+				const Record *hitBlock = *hitBlockIter;
 
 				int maxStart = max(keyBlock->getStartPos(), hitBlock->getStartPos());
 				int minEnd = min(keyBlock->getEndPos(), hitBlock->getEndPos());
@@ -194,9 +194,9 @@ int BlockMgr::findBlockedOverlaps(RecordKeyList &keyList, RecordKeyList &hitList
 			if ((float) totalHitOverlap / (float)keyBlocksSumLength > _overlapFraction) {
 				if (_hasReciprocal &&
 						((float)totalHitOverlap / (float)hitBlockSumLength > _overlapFraction)) {
-					resultList.push_back(hitListIter->value());
+					resultList.push_back(*hitListIter);
 				} else if (!_hasReciprocal) {
-					resultList.push_back(hitListIter->value());
+					resultList.push_back(*hitListIter);
 				}
 			}
 		}

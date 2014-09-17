@@ -16,7 +16,7 @@ FileRecordMergeMgr::FileRecordMergeMgr(const QuickString & filename)
 }
 
 //Record *FileRecordMergeMgr::allocateAndGetNextMergedRecord(WANT_STRAND_TYPE desiredStrand, int maxDistance) {
-//	RecordKeyList recList;
+//	RecordKeyVector recList;
 //	if (!allocateAndGetNextMergedRecord(recList, desiredStrand, maxDistance)) {
 //		return NULL;
 //	}
@@ -24,7 +24,7 @@ FileRecordMergeMgr::FileRecordMergeMgr(const QuickString & filename)
 //	return const_cast<Record *>(recList.getKey()); //want key to be non-const
 //}
 
-Record *FileRecordMergeMgr::getNextRecord(RecordKeyList *recList)
+Record *FileRecordMergeMgr::getNextRecord(RecordKeyVector *recList)
 {
 	//clear the recList if there is one, and if it has records
 	// in it.
@@ -191,7 +191,7 @@ Record *FileRecordMergeMgr::tryToTakeFromStorage(Record::strandType strand) {
 	return record;
 }
 
-void FileRecordMergeMgr::deleteMergedRecord(RecordKeyList &recList)
+void FileRecordMergeMgr::deleteMergedRecord(RecordKeyVector &recList)
 {
 	deleteAllMergedItemsButKey(recList);
 	deleteRecord(recList.getKey());
@@ -203,15 +203,15 @@ bool FileRecordMergeMgr::eof(){
 }
 
 
-void FileRecordMergeMgr::deleteAllMergedItemsButKey(RecordKeyList &recList) {
+void FileRecordMergeMgr::deleteAllMergedItemsButKey(RecordKeyVector &recList) {
 	//if the key is also in the list, this method won't delete it.
-	for (RecordKeyList::const_iterator_type iter = recList.begin(); iter != recList.end(); iter = recList.next()) {
-		if (iter->value() == recList.getKey()) {
+	for (RecordKeyVector::const_iterator_type iter = recList.begin(); iter != recList.end(); iter = recList.next()) {
+		if (*iter == recList.getKey()) {
 			continue;
 		}
-		deleteRecord(iter->value());
+		deleteRecord(*iter);
 	}
-	recList.clearList();
+	recList.clearVector();
 }
 
 

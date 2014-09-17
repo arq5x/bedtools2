@@ -7,7 +7,7 @@
 
 #include "BamRecord.h"
 #include "BamFileReader.h"
-#include "RecordKeyList.h"
+#include "RecordKeyVector.h"
 
 BamRecord::BamRecord()
 : _bamChromId(-1)
@@ -45,6 +45,7 @@ bool BamRecord::initFromFile(FileReader *fileReader)
 
 bool BamRecord::initFromFile(BamFileReader *bamFileReader)
 {
+	setFileIdx(bamFileReader->getFileIdx());
 	_bamAlignment = bamFileReader->getAlignment();
 	bamFileReader->getChrName(_chrName);
 
@@ -116,19 +117,19 @@ void BamRecord::clear()
 
 }
 
-void BamRecord::print(QuickString &outBuf, RecordKeyList *keyList) const
+void BamRecord::print(QuickString &outBuf, RecordKeyVector *keyList) const
 {
         Bed6Interval::print(outBuf);
     printRemainingBamFields(outBuf, keyList);
 }
 
-void BamRecord::print(QuickString &outBuf, int start, int end, RecordKeyList *keyList) const
+void BamRecord::print(QuickString &outBuf, int start, int end, RecordKeyVector *keyList) const
 {
         Bed6Interval::print(outBuf, start, end);
     printRemainingBamFields(outBuf, keyList);
 }
 
-void BamRecord::print(QuickString &outBuf, const QuickString & start, const QuickString & end, RecordKeyList *keyList) const
+void BamRecord::print(QuickString &outBuf, const QuickString & start, const QuickString & end, RecordKeyVector *keyList) const
 {
         Bed6Interval::print(outBuf, start, end);
     printRemainingBamFields(outBuf, keyList);
@@ -140,7 +141,7 @@ void BamRecord::printNull(QuickString &outBuf) const
         outBuf.append("\t.\t.\t.\t.\t.\t.", 12);
 }
 
-void BamRecord::printRemainingBamFields(QuickString &outBuf, RecordKeyList *keyList) const
+void BamRecord::printRemainingBamFields(QuickString &outBuf, RecordKeyVector *keyList) const
 {
         outBuf.append('\t');
         outBuf.append(_startPosStr);
@@ -156,8 +157,8 @@ void BamRecord::printRemainingBamFields(QuickString &outBuf, RecordKeyList *keyL
 
                 vector<int> blockLengths;
                 vector<int> blockStarts;
-                for (RecordKeyList::const_iterator_type iter = keyList->begin(); iter != keyList->end(); iter = keyList->next()) {
-                        const Record *block = iter->value();
+                for (RecordKeyVector::const_iterator_type iter = keyList->begin(); iter != keyList->end(); iter = keyList->next()) {
+                        const Record *block = *iter;
                         blockLengths.push_back(block->getEndPos() - block->getStartPos());
                         blockStarts.push_back(block->getStartPos() - _startPos);
                 }

@@ -44,6 +44,12 @@ bool ContextIntersect::parseCmdArgs(int argc, char **argv, int skipFirstArgs) {
         else if (strcmp(_argv[_i], "-b") == 0) {
 			if (!handle_b()) return false;
 		}
+        else if (strcmp(_argv[_i], "-names") == 0) {
+			if (!handle_names()) return false;
+		}
+        else if (strcmp(_argv[_i], "-filenames") == 0) {
+			if (!handle_filenames()) return false;
+		}
         else if (strcmp(_argv[_i], "-u") == 0) {
 			if (!handle_u()) return false;
         }
@@ -92,7 +98,7 @@ bool ContextIntersect::isValidState()
 		return false;
 	}
 
-	if (_queryFileIdx == -1 || _databaseFileIdx == -1) {
+	if (_queryFileIdx == -1 || _dbFileIdxs.size() == -0) {
 		_errorMsg = "\n***** ERROR: query and database files not specified. *****";
 		return false;
 	}
@@ -112,6 +118,11 @@ bool ContextIntersect::isValidState()
 			_errorMsg = "\n***** ERROR: writeCount option is not valid with BAM query input, unless bed output is specified with -bed option. *****";
 			return false;
 		}
+	}
+	if (getUseDBnameTags() && _dbNameTags.size() != _dbFileIdxs.size()) {
+		_errorMsg = "\n***** ERROR: Number of database name tags given does not match number of databases. *****";
+		return false;
+
 	}
 	if (getWriteOverlap()) {
 
@@ -149,7 +160,7 @@ bool ContextIntersect::isValidState()
 	if (getAnyHit() || getNoHit() || getWriteCount()) {
 		setPrintable(false);
 	}
-	if (_files.size() != 2 ) {
+	if (_files.size()  < 2 ) {
 		return false;
 	}
 	return true;
@@ -161,8 +172,8 @@ bool ContextIntersect::determineOutputType() {
 	}
 
 	//determine the maximum number of database fields.
-	for (int i=0; i < (int)_files.size(); i++) {
-		int numFields = _files[i]->getNumFields();
+	for (int i=0; i < getNumDatabaseFiles(); i++) {
+		int numFields = getDatabaseFile(i)->getNumFields();
 		if ( numFields > _maxNumDatabaseFields) {
 			_maxNumDatabaseFields = numFields;
 		}
@@ -211,19 +222,46 @@ bool ContextIntersect::handle_abam()
 bool ContextIntersect::handle_b()
 {
 	if (_argc <= _i+1) {
-		_errorMsg = "\n***** ERROR: -b option given, but no query file specified. *****";
+		_errorMsg = "\n***** ERROR: -b option given, but no database file specified. *****";
 		return false;
 	}
 
-	addInputFile(_argv[_i+1]);
-	_databaseFileIdx = getNumInputFiles() -1;
-	markUsed(_i - _skipFirstArgs);
-	_i++;
-	markUsed(_i - _skipFirstArgs);
+	do {
+		addInputFile(_argv[_i+1]);
+		int fileId = getNumInputFiles() -1;
+		_dbFileIdxs.push_back(fileId);
+		_fileIdsToDbIdxs[fileId] = _dbFileIdxs.size() -1;
+		markUsed(_i - _skipFirstArgs);
+		_i++;
+		markUsed(_i - _skipFirstArgs);
+	} while (_argc > _i+1 && _argv[_i+1][0] != '-');
 	return true;
 }
 
 
+bool ContextIntersect::handle_names()
+{
+	if (_argc <= _i+1) {
+		_errorMsg = "\n***** ERROR: -b option given, but no database names specified. *****";
+		return false;
+	}
+
+	do {
+		addDatabaseNameTag(_argv[_i+1]);
+		markUsed(_i - _skipFirstArgs);
+		_i++;
+		markUsed(_i - _skipFirstArgs);
+	} while (_argc > _i+1 && _argv[_i+1][0] != '-');
+	setUseDBnameTags(true);
+	return true;
+}
+
+bool ContextIntersect::handle_filenames()
+{
+	markUsed(_i - _skipFirstArgs);
+	setUseDBfileNames(true);
+	return true;
+}
 
 bool ContextIntersect::handle_c()
 {

@@ -12,18 +12,18 @@
 #include <utility> //for pair
 #include "QuickString.h"
 #include <stdint.h>
-#include "RecordKeyList.h"
+#include "RecordKeyVector.h"
 
 using namespace std;
 
 class KeyListOpsMethods {
 public:
 	KeyListOpsMethods();
-	KeyListOpsMethods(RecordKeyList *keyList, int column = 1);
+	KeyListOpsMethods(RecordKeyVector *keyList, int column = 1);
 	~KeyListOpsMethods();
 
 	void setIsBam(bool isBam) { _isBam = isBam; }
-	void setKeyList(RecordKeyList *keyList) { _keyList = keyList; }
+	void setKeyList(RecordKeyVector *keyList) { _keyList = keyList; }
 	void setColumn(int col) { _column = col; }
 	void setNullValue(const QuickString & nullVal) { _nullVal = nullVal; }
 	const QuickString &getNullValue() const { return _nullVal; }
@@ -81,14 +81,14 @@ public:
     }
 
 private:
-	RecordKeyList *_keyList;
+	RecordKeyVector *_keyList;
 	int _column;
 	QuickString _nullVal;
 	QuickString _delimStr;
 	QuickString _retStr;
 
-	RecordKeyList _nullKeyList; //this has to exist just so we can initialize _iter, below.
-	RecordKeyList::const_iterator_type _iter;
+	RecordKeyVector _nullKeyList; //this has to exist just so we can initialize _iter, below.
+	RecordKeyVector::const_iterator_type _iter;
 
 	// Some methods need to put values into a vector, mostly for sorting.
 	vector<double> _numArray;

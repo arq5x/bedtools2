@@ -36,18 +36,17 @@ ContextBase::ContextBase()
   _reciprocal(false),
   _sameStrand(false),
   _diffStrand(false),
-   _sortedInput(false),
+  _sortedInput(false),
+  _sortOutput(false),
+  _reportDBnameTags(false),
+  _reportDBfileNames(false),
   _printHeader(false),
   _printable(true),
    _explicitBedOutput(false),
   _queryFileIdx(-1),
-  _databaseFileIdx(-1),
   _bamHeaderAndRefIdx(-1),
   _maxNumDatabaseFields(0),
   _useFullBamTags(false),
-  _reportCount(false),
-  _reportNames(false),
-  _reportScores(false),
   _numOutputRecords(0),
   _hasConstantSeed(false),
   _seed(0),
@@ -193,6 +192,9 @@ bool ContextBase::parseCmdArgs(int argc, char **argv, int skipFirstArgs) {
         else if (strcmp(_argv[_i], "-delim") == 0) {
 			if (!handle_delim()) return false;
         }
+        else if (strcmp(_argv[_i], "-sortout") == 0) {
+			if (!handle_sortout()) return false;
+        }
 
 	}
 	return true;
@@ -210,7 +212,11 @@ bool ContextBase::isValidState()
 		return false;
 	}
 	if (hasColumnOpsMethods()) {
-		FileRecordMgr *dbFile = getFile(hasIntersectMethods() ? _databaseFileIdx : 0);
+
+		//TBD: Adjust column ops for multiple databases.
+		//For now, use last file.
+//		FileRecordMgr *dbFile = getFile(hasIntersectMethods() ? _databaseFileIdx : 0);
+		FileRecordMgr *dbFile = getFile(getNumInputFiles()-1);
 		_keyListOps->setDBfileType(dbFile->getFileType());
 		if (!_keyListOps->isValidColumnOps(dbFile)) {
 			return false;
@@ -251,7 +257,7 @@ bool ContextBase::openFiles() {
 	_files.resize(_fileNames.size());
 
 	for (int i = 0; i < (int)_fileNames.size(); i++) {
-		FileRecordMgr *frm = getNewFRM(_fileNames[i]);
+		FileRecordMgr *frm = getNewFRM(_fileNames[i], i);
 		if (hasGenomeFile()) {
 			frm->setGenomeFile(_genomeFile);
 		}
@@ -281,7 +287,7 @@ int ContextBase::getBamHeaderAndRefIdx() {
 		if (_files[_queryFileIdx]->getFileType() == FileRecordTypeChecker::BAM_FILE_TYPE) {
 			_bamHeaderAndRefIdx = _queryFileIdx;
 		} else {
-			_bamHeaderAndRefIdx = _databaseFileIdx;
+			_bamHeaderAndRefIdx = _dbFileIdxs[0];
 		}
 		return _bamHeaderAndRefIdx;
 	}
@@ -492,6 +498,13 @@ bool ContextBase::handle_delim()
     return true;
 }
 
+bool ContextBase::handle_sortout()
+{
+	setSortOutput(true);
+	markUsed(_i - _skipFirstArgs);
+	return true;
+}
+
 void ContextBase::setColumnOpsMethods(bool val)
 {
 	if (val && !_hasColumnOpsMethods) {
@@ -501,20 +514,24 @@ void ContextBase::setColumnOpsMethods(bool val)
 	_hasColumnOpsMethods = val;
 }
 
-const QuickString &ContextBase::getColumnOpsVal(RecordKeyList &keyList) const {
+const QuickString &ContextBase::getColumnOpsVal(RecordKeyVector &keyList) const {
 	if (!hasColumnOpsMethods()) {
 		return _nullStr;
 	}
 	return _keyListOps->getOpVals(keyList);
 }
 
-FileRecordMgr *ContextBase::getNewFRM(const QuickString &filename) {
-	if (!_useMergedIntervals) {
-		return new FileRecordMgr(filename);
-	} else {
+FileRecordMgr *ContextBase::getNewFRM(const QuickString &filename, int fileIdx) {
+
+	if (_useMergedIntervals) {
 		FileRecordMergeMgr *frm = new FileRecordMergeMgr(filename);
 		frm->setStrandType(_desiredStrand);
 		frm->setMaxDistance(_maxDistance);
+		frm->setFileIdx(fileIdx);
+		return frm;
+	} else {
+		FileRecordMgr *frm = new FileRecordMgr(filename);
+		frm->setFileIdx(fileIdx);
 		return frm;
 	}
 }

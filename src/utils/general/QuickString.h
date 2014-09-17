@@ -31,6 +31,7 @@ public:
 	bool empty() const { return _currSize == 0; }
 
 	void clear(); //only clears buffer, doesn't delete it.
+	void release(); //will deallocate current buffer, reallocate it at default size.
 	QuickString &operator = (const string &);
 	QuickString &operator = (const char *);
 	QuickString &operator = (const QuickString &);

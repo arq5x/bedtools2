@@ -23,7 +23,7 @@ if true; then
   echo "generating data..."
   mkdir perfData
   cd perfData
-  ../$BT random -l 1000 -n 20000000 -g ../human.hg19.genome | sort -k1,1 -k2,2n > a10M.bed 
+  ../$BT random -l 1000 -n 10000000 -g ../human.hg19.genome | sort -k1,1 -k2,2n > a10M.bed 
   ../$BT random -l 1000 -n 10000000 -g ../human.hg19.genome | sort -k1,1 -k2,2n > b10M.bed 
   cp a10M.bed a10M_gzipped.bed
   gzip a10M_gzipped.bed

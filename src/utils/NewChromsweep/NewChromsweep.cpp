@@ -18,32 +18,35 @@ NewChromSweep::NewChromSweep(ContextIntersect *context,
                        bool useMergedIntervals)
 :	_context(context),
  	_queryFRM(NULL),
- 	_databaseFRM(NULL),
- 	_useMergedIntervals(false),
+ 	_numDBs(_context->getNumDatabaseFiles()),
+  	_useMergedIntervals(false),
  	_queryRecordsTotalLength(0),
  	_databaseRecordsTotalLength(0),
  	_wasInitialized(false),
  	_currQueryRec(NULL),
- 	_currDatabaseRec(NULL),
  	_runToQueryEnd(false)
-
 {
 }
 
 
 bool NewChromSweep::init() {
     
-	//Create new FileRecordMgrs for the two input files.
+	//Create new FileRecordMgrs for the input files.
 	//Open them, and get the first record from each.
-	//if any of that goes wrong, return false;
 	//otherwise, return true.
     _queryFRM = _context->getFile(_context->getQueryFileIdx());
-    _databaseFRM = _context->getFile(_context->getDatabaseFileIdx());
     
-    nextRecord(false);
-//    if (_currDatabaseRec == NULL) {
-//    	return false;
-//    }
+    _dbFRMs.resize(_numDBs, NULL);
+    for (int i=0; i < _numDBs; i++) {
+    	_dbFRMs[i] = _context->getDatabaseFile(i);
+    }
+
+    _currDbRecs.resize(_numDBs, NULL);
+    for (int i=0; i < _numDBs; i++) {
+    	nextRecord(false, i);
+    }
+
+    _caches.resize(_numDBs);
 
     //determine whether to stop when the database end is hit, or keep going until the
     //end of the query file is hit as well.
@@ -59,9 +62,12 @@ void NewChromSweep::closeOut() {
 	while (!_queryFRM->eof()) {
 		nextRecord(true);
 	}
-	while (!_databaseFRM->eof()) {
-		nextRecord(false);
-	}
+
+    for (int i=0; i < _numDBs; i++) {
+    	while (!_dbFRMs[i]->eof()) {
+    		nextRecord(false, i);
+    	}
+    }
 }
 
 NewChromSweep::~NewChromSweep(void) {
@@ -71,136 +77,147 @@ NewChromSweep::~NewChromSweep(void) {
 	_queryFRM->deleteRecord(_currQueryRec);
 	_currQueryRec = NULL;
 
-	_databaseFRM->deleteRecord(_currDatabaseRec);
-	_currDatabaseRec = NULL;
+
+    for (int i=0; i < _numDBs; i++) {
+    	_dbFRMs[i]->deleteRecord(_currDbRecs[i]);
+    	_currDbRecs[i] = NULL;
+    }
 
 	_queryFRM->close();
-	_databaseFRM->close();
+
+   for (int i=0; i < _numDBs; i++) {
+	   _dbFRMs[i]->close();
+   }
 }
 
 
-void NewChromSweep::scanCache() {
-	recListIterType cacheIter = _cache.begin();
-    while (cacheIter != _cache.end())
+void NewChromSweep::scanCache(int dbIdx, RecordKeyVector &retList) {
+	recListIterType cacheIter = _caches[dbIdx].begin();
+    while (cacheIter != _caches[dbIdx].end())
     {
     	const Record *cacheRec = cacheIter->value();
         if (_currQueryRec->sameChrom(cacheRec) && !(_currQueryRec->after(cacheRec))) {
             if (intersects(_currQueryRec, cacheRec)) {
-                _hits.push_back(cacheRec);
-            }
-            cacheIter = _cache.next();
+                retList.push_back(cacheRec);
+            } else break; // cacheRec is after the query rec, stop scanning.
+            cacheIter = _caches[dbIdx].next();
         }
         else {
-            cacheIter = _cache.deleteCurrent();
-    		_databaseFRM->deleteRecord(cacheRec);
+            cacheIter = _caches[dbIdx].deleteCurrent();
+    		_dbFRMs[dbIdx]->deleteRecord(cacheRec);
         }
     }
 }
 
-void NewChromSweep::clearCache()
+void NewChromSweep::clearCache(int dbIdx)
 {
 	//delete all objects pointed to by cache
-	for (recListIterType iter = _cache.begin(); iter != _cache.end(); iter = _cache.next()) {
-		_databaseFRM->deleteRecord(iter->value());
+	recListType &cache = _caches[dbIdx];
+	for (recListIterType iter = cache.begin(); iter != cache.end(); iter = cache.next()) {
+		_dbFRMs[dbIdx]->deleteRecord(iter->value());
 	}
-	_cache.clear();
+	cache.clear();
 }
 
-bool NewChromSweep::chromChange()
+void NewChromSweep::masterScan(RecordKeyVector &retList) {
+	for (int i=0; i < _numDBs; i++) {
+		if (dbFinished(i) || chromChange(i, retList)) {
+			continue;
+		} else {
+
+			// scan the database cache for hits
+			scanCache(i, retList);
+			//skip if we hit the end of the DB
+			// advance the db until we are ahead of the query. update hits and cache as necessary
+			while (_currDbRecs[i] != NULL &&
+					_currQueryRec->sameChrom(_currDbRecs[i]) &&
+					!(_currDbRecs[i]->after(_currQueryRec))) {
+				if (intersects(_currQueryRec, _currDbRecs[i])) {
+					retList.push_back(_currDbRecs[i]);
+				}
+				if (_currQueryRec->after(_currDbRecs[i])) {
+					_dbFRMs[i]->deleteRecord(_currDbRecs[i]);
+					_currDbRecs[i] = NULL;
+				} else {
+					_caches[i].push_back(_currDbRecs[i]);
+					_currDbRecs[i] = NULL;
+				}
+				nextRecord(false, i);
+			}
+		}
+	}
+}
+
+bool NewChromSweep::chromChange(int dbIdx, RecordKeyVector &retList)
 {
     // the files are on the same chrom
-	if (_currDatabaseRec == NULL || _currQueryRec->sameChrom(_currDatabaseRec)) {
+	if (_currDbRecs[dbIdx] == NULL || _currQueryRec->sameChrom(_currDbRecs[dbIdx])) {
 		return false;
 	}
 	// the query is ahead of the database. fast-forward the database to catch-up.
-	if (_currQueryRec->chromAfter(_currDatabaseRec)) {
+	if (_currQueryRec->chromAfter(_currDbRecs[dbIdx])) {
 
-		while (_currDatabaseRec != NULL &&
-				_currQueryRec->chromAfter(_currDatabaseRec)) {
-			_databaseFRM->deleteRecord(_currDatabaseRec);
-			nextRecord(false);
+		while (_currDbRecs[dbIdx] != NULL &&
+				_currQueryRec->chromAfter(_currDbRecs[dbIdx])) {
+			_dbFRMs[dbIdx]->deleteRecord(_currDbRecs[dbIdx]);
+			nextRecord(false, dbIdx);
 		}
-		clearCache();
+		clearCache(dbIdx);
         return false;
     }
     // the database is ahead of the query.
     else {
         // 1. scan the cache for remaining hits on the query's current chrom.
-        if (_currQueryRec->getChrName() == _currChromName)
-        {
-            scanCache();
-        }
-        // 2. fast-forward until we catch up and report 0 hits until we do.
-        else if (_currQueryRec->chromBefore(_currDatabaseRec))
-        {
-            clearCache();
-        }
+		scanCache(dbIdx, retList);
 
         return true;
     }
-}
 
-
-bool NewChromSweep::next(RecordKeyList &next) {
-	if (_currQueryRec != NULL) {
-		_queryFRM->deleteRecord(_currQueryRec);
-	}
-	nextRecord(true);
-	if (_currQueryRec == NULL) { //eof hit!
-		return false;
-	}
-
-	if (_currDatabaseRec == NULL && _cache.empty() && !_runToQueryEnd) {
-		return false;
-	}
-	_hits.clear();
-	_currChromName = _currQueryRec->getChrName();
-	// have we changed chromosomes?
-	if (!chromChange()) {
-		// scan the database cache for hits
-		scanCache();
-		//skip if we hit the end of the DB
-		// advance the db until we are ahead of the query. update hits and cache as necessary
-		while (_currDatabaseRec != NULL &&
-				_currQueryRec->sameChrom(_currDatabaseRec) &&
-				!(_currDatabaseRec->after(_currQueryRec))) {
-			if (intersects(_currQueryRec, _currDatabaseRec)) {
-				_hits.push_back(_currDatabaseRec);
-			}
-			if (_currQueryRec->after(_currDatabaseRec)) {
-				_databaseFRM->deleteRecord(_currDatabaseRec);
-				_currDatabaseRec = NULL;
-			} else {
-				_cache.push_back(_currDatabaseRec);
-				_currDatabaseRec = NULL;
-			}
-			nextRecord(false);
-		}
-	}
-	next.setKey(_currQueryRec);
-	next.setListNoCopy(_hits);
+	//control can't reach here, but compiler still wants a return statement.
 	return true;
 }
 
-void NewChromSweep::nextRecord(bool query) {
+
+bool NewChromSweep::next(RecordKeyVector &retList) {
+	retList.clearVector();
+	if (_currQueryRec != NULL) {
+		_queryFRM->deleteRecord(_currQueryRec);
+	}
+
+	if (!nextRecord(true)) return false; // query EOF hit
+
+
+	if (allCurrDBrecsNull() && allCachesEmpty() && !_runToQueryEnd) {
+		return false;
+	}
+	_currChromName = _currQueryRec->getChrName();
+
+	masterScan(retList);
+
+	if (_context->getSortOutput()) {
+		retList.sortVector();
+	}
+
+	retList.setKey(_currQueryRec);
+	return true;
+}
+
+bool NewChromSweep::nextRecord(bool query, int dbIdx) {
 	if (query) {
-//		if (!_context->getUseMergedIntervals()) {
-			_currQueryRec = _queryFRM->getNextRecord();
-//		} else {
-//			_currQueryRec = _queryFRM->allocateAndGetNextMergedRecord(_context->getSameStrand() ? FileRecordMgr::SAME_STRAND_EITHER : FileRecordMgr::ANY_STRAND);
-//		}
+		_currQueryRec = _queryFRM->getNextRecord();
 		if (_currQueryRec != NULL) {
 			_queryRecordsTotalLength += (unsigned long)(_currQueryRec->getEndPos() - _currQueryRec->getStartPos());
+			return true;
 		}
+		return false;
 	} else { //database
-//		if (!_context->getUseMergedIntervals()) {
-			_currDatabaseRec = _databaseFRM->getNextRecord();
-//		} else {
-//			_currDatabaseRec = _databaseFRM->allocateAndGetNextMergedRecord(_context->getSameStrand() ? FileRecordMgr::SAME_STRAND_EITHER : FileRecordMgr::ANY_STRAND);
-//		}
-		if (_currDatabaseRec != NULL) {
-			_databaseRecordsTotalLength += (unsigned long)(_currDatabaseRec->getEndPos() - _currDatabaseRec->getStartPos());
+		Record *rec = _dbFRMs[dbIdx]->getNextRecord();
+		_currDbRecs[dbIdx] = rec;
+		if (rec != NULL) {
+			_databaseRecordsTotalLength += (unsigned long)(rec->getEndPos() - rec->getStartPos());
+			return true;
 		}
+		return false;
 	}
 }
 
@@ -208,4 +225,30 @@ bool NewChromSweep::intersects(const Record *rec1, const Record *rec2) const
 {
 	return rec1->sameChromIntersects(rec2, _context->getSameStrand(), _context->getDiffStrand(),
 			_context->getOverlapFraction(), _context->getReciprocal());
+}
+
+
+bool NewChromSweep::allCachesEmpty() {
+	for (int i=0; i < _numDBs; i++) {
+		if (!_caches[i].empty()) {
+			return false;
+		}
+	}
+	return true;
+}
+
+bool NewChromSweep::allCurrDBrecsNull() {
+	for (int i=0; i < _numDBs; i++) {
+		if (_currDbRecs[i] != NULL) {
+			return false;
+		}
+	}
+	return true;
+}
+
+bool NewChromSweep::dbFinished(int dbIdx) {
+	if (_currDbRecs[dbIdx] == NULL && _caches[dbIdx].empty()) {
+		return true;
+	}
+	return false;
 }
