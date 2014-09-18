@@ -24,7 +24,7 @@ private:
     unsigned long _dbLen;
     bool getFisher();
 
-    unsigned long getTotalIntersection(RecordKeyList *hits);
+    unsigned long getTotalIntersection(RecordKeyVector &hits);
 };
 
 #endif /* FISHER_H */

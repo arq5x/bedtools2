@@ -9,12 +9,11 @@
 #define KEYVECTOR_H_
 
 
-
+#include "Record.h"
+#include <vector>
 
 using namespace std;
 
-#include "Record.h"
-#include <vector>
 
 class RecordKeyVector {
 public:

@@ -12,7 +12,7 @@
 #ifndef INTERSECTFILE_H
 #define INTERSECTFILE_H
 
-#include "RecordKeyList.h"
+#include "RecordKeyVector.h"
 
 using namespace std;
 

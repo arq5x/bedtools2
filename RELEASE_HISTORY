@@ -1,4 +1,88 @@
-Version 2.18.2 (16-Dec-2013)
+Version 2.19.1 (6-Mar-2014)
+Bug fix to intersect causing BAM footers to be erroneously written when -b is BAM
+
+Speedup for the map tool.
+http://bedtools.readthedocs.org/en/latest/_images/map-speed-comparo.png
+
+Map tool now allows multiple columns and operations in a single run.
+http://bedtools.readthedocs.org/en/latest/content/tools/map.html#multiple-operations-and-columns-at-the-same-time
+
+
+Version 2.19.0 (8-Feb-2014)
+Bug Fixes
+=========
+
+1. Fixed a long standing bug in which the number of base pairs of overlap was incorrectly calculated when using the -wo option with the -split option. Thanks to many for reporting this.
+
+2. Fixed a bug in which certain flavors of unmapped BAM alignments were incorrectly rejected in the latest 2.18.* series.  Thanks very much to 
+Gabriel Pratt.
+
+
+Enhancements
+============
+
+1. Substantially reduced memory usage, especially when dealing with unsorted data. Memory usage ballooned in the 2.18.* series owing to default buffer sizes we were using in a custom string class.  We have adjusted this and the memory usage has returned to 2.17.* levels while maintaining speed increases.  Thanks so much to Ian Sudberry rightfully complaining about this!
+
+
+New features
+============
+
+1. The latest version of the "map" function is ~3X faster than the one available in version 2.17 and 2.18
+
+# bedtools 2.17
+$ time bedtools map \
+                -a hg19.gerp.elements.bed.gz \
+                -b hg19.rmsk.bed.gz \
+                -c 4 \
+                -o collapse > /dev/null
+real	0m15.865s
+user	0m15.815s
+sys	0m0.040s
+
+
+# bedtools 2.19
+$ time bedtools map \
+                -a hg19.gerp.elements.bed.gz \
+                -b hg19.rmsk.bed.gz \
+                -c 4 \
+                -o collapse > /dev/null
+real	0m5.367s
+user	0m5.314s
+sys	0m0.050s
+
+2. The map function now supports the "-split" option, as well as "absmin" and "absmax" operations.
+
+3. In addition, it supports multiple chromosome sorting criterion by supplying a genome file that defines the expected chromosome order. Here is an example of how to run map with datasets having chromosomes sorted in "version" order, as opposed to the lexicographical chrom order that is the norm. 
+
+# version sort the BED files (e.g. chr1, chr2, etc., not chr1, chr10, chr11, etc.)
+$ zcat hg19.gerp.elements.bed.gz | sort -k1,1V -k2,2n > hg19.gerp.versionsorted.bed
+$ zcat hg19.rmsk.bed.gz | sort -k1,1V -k2,2n > hg19.rmsk.versionsorted.bed
+
+# make a toy genome file
+$ cut -f 1 hg19.rmsk.versionsorted.bed | uniq | awk '{print $1"\t"1}' > hg19.versionsorted.genome
+
+$ head hg19.versionsorted.genome
+chr1	1
+chr1_gl000191_random	1
+chr1_gl000192_random	1
+chr2	1
+chr3	1
+chr4	1
+chr4_ctg9_hap1	1
+chr4_gl000193_random	1
+chr4_gl000194_random	1
+chr5	1
+
+# tell map to expect a different chrom order.
+$ bedtools map \
+         -a hg19.gerp.versionsorted.bed \
+         -b hg19.rmsk.versionsorted.bed \
+         -c 4 \
+         -o collapse \
+         -g hg19.versionsorted.genome
+
+
+Version 2.18.2 (8-Jan-2014)
 
 bedtools. The changes to bedtools reflect fixes to compilation errors, performance enhancements for smaller files, and a bug fix for BAM files that lack a formal header. Our current focus for the 2.19.* release is is on addressing some standing bug/enhancements and also in updating some of the other more widely used tools (e.g., coverage, map, and substract) to use the new API. We will also continue to look into ways to improve performance while hopefully reducing memory usage for algorithms that work with unsorted data (thanks to Ian Sudberry for the ping!).
 

@@ -1,4 +1,3 @@
-
 #include "Fisher.h"
 #include "BlockMgr.h"
 #include "NewChromsweep.h"
@@ -69,15 +68,15 @@ bool Fisher::getFisher() {
 	if (!sweep.init()) {
 		return false;
 	}
-	RecordKeyList hitSet;
+	RecordKeyVector hitSet;
 	while (sweep.next(hitSet)) {
 		if (_context->getObeySplits()) {
-			RecordKeyList keySet(hitSet.getKey());
-			RecordKeyList resultSet(hitSet.getKey());
+			RecordKeyVector keySet(hitSet.getKey());
+			RecordKeyVector resultSet(hitSet.getKey());
 			_blockMgr->findBlockedOverlaps(keySet, hitSet, resultSet);
-			_intersectionVal += getTotalIntersection(&resultSet);
+			_intersectionVal += getTotalIntersection(resultSet);
 		} else {
-			_intersectionVal += getTotalIntersection(&hitSet);
+			_intersectionVal += getTotalIntersection(hitSet);
 		}
 	}
 
@@ -89,18 +88,17 @@ bool Fisher::getFisher() {
 	return true;
 }
 
-unsigned long Fisher::getTotalIntersection(RecordKeyList *recList)
+unsigned long Fisher::getTotalIntersection(RecordKeyVector &recList)
 {
 	unsigned long intersection = 0;
-	const Record *key = recList->getKey();
+	const Record *key = recList.getKey();
 	int keyStart = key->getStartPos();
 	int keyEnd = key->getEndPos();
 
 	int hitIdx = 0;
-	for (RecordKeyList::const_iterator_type iter = recList->begin(); iter != recList->end(); iter = recList->next()) {
-		const Record *currRec = iter->value();
-		int maxStart = max(currRec->getStartPos(), keyStart);
-		int minEnd = min(currRec->getEndPos(), keyEnd);
+	for (RecordKeyVector::const_iterator_type iter = recList.begin(); iter != recList.end(); iter = recList.next()) {
+		int maxStart = max((*iter)->getStartPos(), keyStart);
+		int minEnd = min((*iter)->getEndPos(), keyEnd);
 		if (_context->getObeySplits()) {
 			intersection += _blockMgr->getOverlapBases(hitIdx);
 			hitIdx++;
@@ -108,7 +106,7 @@ unsigned long Fisher::getTotalIntersection(RecordKeyList *recList)
 			intersection += (unsigned long)(minEnd - maxStart);
 		}
 	}
-	_numIntersections += (int)recList->size();
+	_numIntersections += (int)recList.size();
 	return intersection;
 }
 
