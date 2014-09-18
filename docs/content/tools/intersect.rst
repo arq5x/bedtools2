@@ -751,7 +751,7 @@ We can now compare query.bed to all three database files at once.:
   chr3  110 120
   chr3  105 115
 
-Clearly this is completely informative because we cannot tell from which file each intersection came. However, if we use `-wa` and `-wb`, this becomes abundantly clear. When these options are used, the first column after the complete `-a` record lists the file number from which the overlap came. The number corresponds to the order in which the files were given on the command line. 
+Clearly this is not completely informative because we cannot tell from which file each intersection came. However, if we use `-wa` and `-wb`, this becomes abundantly clear. When these options are used, the first column after the complete `-a` record lists the file number from which the overlap came. The number corresponds to the order in which the files were given on the command line. 
 
 .. code-block:: bash
 
