@@ -2,6 +2,18 @@
 Release History
 ###############
 
+Version 2.21.0 (18-Sep-2014)
+============================
+1. Added ability to intersect against multiple `-b` files in the `intersect` tool.
+2. Fixed a bug causing slowdowns in the `-sorted` option when using `-split` with very large split alignments.
+3. Added a new `fisher` tool to report a P-value associated with the significance of the overlaps between two interval sets. Thanks to @brentp!
+4. Added a "genome" file for GRCh38. Thanks @martijnvermaat!
+5. Fixed a bug in the `-pct` option of the `slop` tool.  Thanks to @brentp!
+6. Tweak to the Makefile to accomodate Intel compilers. Thanks to @jmarshall.
+7. Many updates to the docs from the community.  Thank you!
+
+
+
 Version 2.20.1 (23-May-2014)
 ============================
 1. Fixed a float rounding bug causing occassional off-by-one issues in the slop added by the ``slop`` tool.  Thanks to @slw287r.
