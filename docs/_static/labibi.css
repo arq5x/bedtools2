@@ -40,15 +40,6 @@
     padding: 0 0 0 2em;
 }
 
-/* Hide trick */
 
-#editor-trap.toggled > * {
-    display: none;
-}
-
-
-#editor-trap.toggled > h3 {
-    display: block;
-}
 
 
