@@ -122,6 +122,9 @@ void BedGenomeCoverage::StartNewChrom(const string& newChrom) {
 void BedGenomeCoverage::AddCoverage(int start, int end) {
     // process the first line for this chromosome.
     // make sure the coordinates fit within the chrom
+    if (start < 0){
+        start = 0;
+    }
     if (start < _currChromSize)
         _currChromCoverage[start].starts++;
     if (end < _currChromSize)
