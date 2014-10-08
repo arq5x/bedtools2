@@ -38,10 +38,10 @@ bool Fisher::calculate() {
     long long genomeSize = _context->getGenomeFile()->getGenomeSize();
     // bases covered by neither a nor b
     long long n11 = genomeSize - _queryLen - _dbLen + _intersectionVal;
-    // bases covered only by -a
-    long long n12 = _queryLen - _intersectionVal;
     // bases covered only by -b
-    long long n21 = _dbLen - _intersectionVal;
+    long long n12 = _dbLen - _intersectionVal;
+    // bases covered only by -a
+    long long n21 = _queryLen - _intersectionVal;
     // bases covered by both
     long long n22 = _intersectionVal;
 
