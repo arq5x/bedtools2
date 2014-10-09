@@ -28,6 +28,8 @@ public:
 	void printRecord(RecordKeyVector &keyList);
 	void printRecord(const Record *record, const QuickString & value);
 
+	void printClosest(RecordKeyVector &keyList, const vector<int> *dists = NULL);
+
 	//where necessary, pass additional information about splits through the blockMgr.
 	void setSplitInfo(const BlockMgr *blockMgr) { _splitInfo = blockMgr; }
 

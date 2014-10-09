@@ -8,6 +8,7 @@
 #include "RecordOutputMgr.h"
 #include "ContextBase.h"
 #include "ContextIntersect.h"
+#include "ContextClosest.h"
 #include "BlockMgr.h"
 #include "Bed3Interval.h"
 #include "Bed4Interval.h"
@@ -132,10 +133,48 @@ void RecordOutputMgr::printRecord(const Record *record, const QuickString & valu
 	}
 	newline();
 
-	if (needsFlush()) {
-		flush();
-	}
+	if (needsFlush()) flush();
 }
+
+void RecordOutputMgr::printClosest(RecordKeyVector &keyList, const vector<int> *dists) {
+	bool deleteBlocks = false;
+	RecordKeyVector blockList(keyList.getKey());
+	if (keyList.getKey()->getType() == FileRecordTypeChecker::BAM_RECORD_TYPE) {
+		_bamBlockMgr->getBlocks(blockList, deleteBlocks);
+		_currBamBlockList = &blockList;
+	}
+	if (!keyList.empty()) {
+		int distCount = 0;
+		for (RecordKeyVector::const_iterator_type iter = keyList.begin(); iter != keyList.end(); iter = keyList.next()) {
+			printKey(keyList.getKey());
+			tab();
+			(*iter)->print(_outBuf);
+			if (dists != NULL) {
+				tab();
+				_outBuf.append((*dists)[distCount]);
+				distCount++;
+			}
+			newline();
+			if (needsFlush()) flush();
+		}
+	} else {
+		printKey(keyList.getKey());
+		tab();
+		null(true, false);
+		if ((static_cast<ContextClosest *>(_context))->reportDistance()) {
+			tab();
+			_outBuf.append(-1);
+		}
+		newline();
+	}
+	if (deleteBlocks) {
+		_bamBlockMgr->deleteBlocks(blockList);
+		_currBamBlockList = NULL;
+	}
+	return;
+
+}
+
 
 void RecordOutputMgr::printRecord(RecordKeyVector &keyList) {
 	if (keyList.getKey()->getType() == FileRecordTypeChecker::BAM_RECORD_TYPE) {
