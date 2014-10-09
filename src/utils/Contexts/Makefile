@@ -20,8 +20,9 @@ INCLUDES =  -I$(UTILITIES_DIR)/general/ \
 # define our source and object files
 # ----------------------------------
 SOURCES= ContextBase.cpp ContextBase.h ContextIntersect.cpp ContextIntersect.h ContextMap.cpp \
-	ContextMap.h ContextSample.cpp ContextSample.h ContextMerge.h ContextMerge.cpp ContextJaccard.h ContextJaccard.cpp
-OBJECTS= ContextBase.o ContextIntersect.o ContextMap.o ContextSample.o ContextMerge.o ContextJaccard.o
+	ContextMap.h ContextSample.cpp ContextSample.h ContextMerge.h ContextMerge.cpp ContextJaccard.h ContextJaccard.cpp \
+	ContextClosest.cpp ContextClosest.h
+OBJECTS= ContextBase.o ContextIntersect.o ContextMap.o ContextSample.o ContextMerge.o ContextJaccard.o ContextClosest.o
 _EXT_OBJECTS=ParseTools.o QuickString.o
 EXT_OBJECTS=$(patsubst %,$(OBJ_DIR)/%,$(_EXT_OBJECTS))
 BUILT_OBJECTS= $(patsubst %,$(OBJ_DIR)/%,$(OBJECTS))
@@ -42,5 +43,6 @@ clean:
 	       $(OBJ_DIR)/ContextSample.o \
 	       $(OBJ_DIR)/ContextMerge.o \
 	       $(OBJ_DIR)/ContextJaccard.o \
+	       $(OBJ_DIR)/ContextClosest.o \
 
 .PHONY: clean
