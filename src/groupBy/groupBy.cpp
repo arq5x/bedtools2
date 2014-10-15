@@ -31,9 +31,6 @@ Licenced under the MIT license.
 using namespace std;
 
 
-const int PRECISION = 21;
-
-
 // define our program name
 #define PROGRAM_NAME "bedtools groupby"
 // define our parameter checking macro
@@ -45,7 +42,7 @@ void groupby_help(void);
 void GroupBy(const string &inFile, const vector<int> &groupColumns, 
              const vector<int> &opColumns, const vector<string> &ops, 
              const bool printOriginalLine, const bool printHeaderLine,
-             const bool InputHaveHeaderLine, const bool ignoreCase);
+             const bool InputHaveHeaderLine, const bool ignoreCase, int precision);
 
 void PrintHeaderLine(const vector<string> &InputFields, 
                      const vector<int> &groupColumns, 
@@ -56,7 +53,8 @@ void PrintHeaderLine(const vector<string> &InputFields,
 
 void ReportSummary(const vector<string> &group, 
                    const vector<vector<string> > &data, 
-                   const vector<string> &ops);
+                   const vector<string> &ops,
+                   int precision);
 
 void addValue (const vector<string> &fromList, 
                vector<string> &toList, 
@@ -84,6 +82,7 @@ int groupby_main(int argc, char* argv[]) {
     bool printHeaderLine   = false;
     bool InputHaveHeaderLine = false;
     bool ignoreCase    = false;
+    int precision = 5;
 
     // check to see if we should print out some help
     if(argc <= 1) showHelp = true;
@@ -172,6 +171,20 @@ int groupby_main(int argc, char* argv[]) {
         }
         else if(PARAMETER_CHECK("-ignorecase", 11, parameterLength)) {
             ignoreCase = true;
+        }
+        else if (PARAMETER_CHECK("-prec", 5, parameterLength))
+        {
+            if ((i+1) >= argc || LOOKS_LIKE_A_PARAM(argv[i+1])) {
+                cerr << endl 
+                     << "*****ERROR: -prec parameter requires a value." 
+                     << endl << endl;
+                groupby_help();
+                break;
+            }
+            else {
+                precision     = atoi(argv[i + 1]);
+                i++;
+            }
         }
         else {
             cerr << endl 
@@ -270,7 +283,7 @@ int groupby_main(int argc, char* argv[]) {
         }
         GroupBy(inFile, groupColumnsInt, opColumnsInt, ops,
             printOriginalLine, printHeaderLine, InputHaveHeaderLine,
-            ignoreCase);
+            ignoreCase, precision);
     }
     else {
         groupby_help();
@@ -328,6 +341,8 @@ void groupby_help(void) {
 
     cerr << "\t-ignorecase\t"   << "Group values regardless of upper/lower case." << endl << endl;
 
+    cerr << "\t-prec\t"   << "Sets the decimal precision for output (Default: 5)" << endl << endl;
+
     cerr << "Examples: " << endl;
     cerr << "\t$ cat ex1.out" << endl;
     cerr << "\tchr1 10  20  A   chr1    15  25  B.1 1000    ATAT" << endl;
@@ -361,7 +376,8 @@ void GroupBy (const string &inFile,
     const bool printOriginalLine,
     const bool printHeaderLine,
     const bool InputHaveHeaderLine,
-    const bool ignoreCase) {
+    const bool ignoreCase,
+    int precision) {
 
     // current line number
     int lineNum = 0;
@@ -424,7 +440,7 @@ void GroupBy (const string &inFile,
             if ((currGroup != prevGroup) && (prevGroup.size() > 0)) {
                 // Summarize this group
                 ReportSummary(printOriginalLine?inFieldsFirstLineInGroup:prevGroup, 
-                          values, ops);
+                          values, ops, precision);
                 // reset and add the first value for the next group.
                 values.clear();
                 for( size_t i = 0; i < opColumns.size(); i++ ) {
@@ -449,14 +465,15 @@ void GroupBy (const string &inFile,
     }
     // report the last group
     ReportSummary(printOriginalLine?inFieldsFirstLineInGroup:currGroup, 
-                  values, ops);
+                  values, ops, precision);
     _tab->Close();
 }
 
 
 void ReportSummary(const vector<string> &group, 
                    const vector<vector<string> > &data, 
-                   const vector<string> &ops) 
+                   const vector<string> &ops,
+                   int precision) 
 {
 
     vector<string> result;
@@ -471,7 +488,7 @@ void ReportSummary(const vector<string> &group,
         VectorOps vo(data[i]);
 
         if (op == "sum") {
-            buffer << setprecision (PRECISION) << vo.GetSum();
+            buffer << setprecision (precision) << vo.GetSum();
             result.push_back(buffer.str());
         }
         else if (op == "collapse") {
@@ -484,27 +501,27 @@ void ReportSummary(const vector<string> &group,
             result.push_back(vo.GetConcat());
         }
         else if (op == "min") {
-            buffer << setprecision (PRECISION) << vo.GetMin();
+            buffer << setprecision (precision) << vo.GetMin();
             result.push_back(buffer.str());
         }
         else if (op == "max") {
-            buffer << setprecision (PRECISION) << vo.GetMax();
+            buffer << setprecision (precision) << vo.GetMax();
             result.push_back(buffer.str());
         }
         else if (op == "mean") {
-            buffer << setprecision (PRECISION) << vo.GetMean();
+            buffer << setprecision (precision) << vo.GetMean();
             result.push_back(buffer.str());
         }
         else if (op == "median") {
-            buffer << setprecision (PRECISION) << vo.GetMedian();
+            buffer << setprecision (precision) << vo.GetMedian();
             result.push_back(buffer.str());
         }
         else if (op == "count") {
-            buffer << setprecision (PRECISION) << data[i].size();
+            buffer << setprecision (precision) << data[i].size();
             result.push_back(buffer.str());
         }
         else if (op == "count_distinct") {
-            buffer << setprecision (PRECISION) << vo.GetCountDistinct();
+            buffer << setprecision (precision) << vo.GetCountDistinct();
             result.push_back(buffer.str());
         }
         else if (op == "mode") {
@@ -520,11 +537,11 @@ void ReportSummary(const vector<string> &group,
             result.push_back(vo.GetFreqAsc());
         }
         else if (op == "stdev") {
-            buffer << setprecision (PRECISION) << vo.GetStddev();
+            buffer << setprecision (precision) << vo.GetStddev();
             result.push_back(buffer.str());
         }
         else if (op == "sstdev") {
-            buffer << setprecision (PRECISION) << vo.GetSstddev();
+            buffer << setprecision (precision) << vo.GetSstddev();
             result.push_back(buffer.str());
         }
         else if (op == "first") {
