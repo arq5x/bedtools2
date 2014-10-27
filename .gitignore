@@ -7,3 +7,4 @@ docs/_build/
 src/utils/version/version_git.h
 .project
 .cproject
+nbproject
