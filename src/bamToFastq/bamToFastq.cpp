@@ -88,7 +88,7 @@ void BamToFastq::PairedFastq() {
                 if (bam1.IsPaired()) 
                 {
                     cerr << "*****WARNING: Query " << bam1.Name
-                         << " is marked as paired, but it's mate does not occur"
+                         << " is marked as paired, but its mate does not occur"
                          << " next to it in your BAM file.  Skipping. " << endl;
                 }
                 bam1 = bam2;
