@@ -79,9 +79,14 @@ void BamToFastq::PairedFastq() {
     reader.Open(_bamFile);
     // rip through the BAM file and convert each mapped entry to BEDPE
     BamAlignment bam1, bam2;
-    while (reader.GetNextAlignment(bam1)) {
+    bool shouldConsumeReads = true;
+    while (true) {
         
-        reader.GetNextAlignment(bam2);        
+        if (shouldConsumeReads) {
+            if (!reader.GetNextAlignment(bam1) || !reader.GetNextAlignment(bam2)) break;
+        } else {
+            shouldConsumeReads = true;
+        }
         if (bam1.Name != bam2.Name) {
             while (bam1.Name != bam2.Name)
             {
@@ -92,7 +97,8 @@ void BamToFastq::PairedFastq() {
                          << " next to it in your BAM file.  Skipping. " << endl;
                 }
                 bam1 = bam2;
-                reader.GetNextAlignment(bam2);
+                if (!reader.GetNextAlignment(bam2)) break;
+                shouldConsumeReads = false;
             }
         }
         else if (bam1.IsPaired() && bam2.IsPaired()) {
