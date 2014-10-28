@@ -11,27 +11,27 @@ Fisher::Fisher(ContextFisher *context)
   _queryLen(0),
   _dbLen(0)
 {
-	_blockMgr = new BlockMgr(_context->getOverlapFraction(), _context->getReciprocal());
+    _blockMgr = new BlockMgr(_context->getOverlapFraction(), _context->getReciprocal());
 }
 
 Fisher::~Fisher(void) {
-	delete _blockMgr;
-	_blockMgr = NULL;
+    delete _blockMgr;
+    _blockMgr = NULL;
 }
 
 bool Fisher::calculate() {
 
-	if (!getFisher()) {
-		return false;
-	}
+    if (!getFisher()) {
+        return false;
+    }
 
-	// header
-	cout << "# Contingency Table" << endl;
+    // header
+    cout << "# Contingency Table" << endl;
 
     // for fisher's exact test, we need the contingency table
-    // XXXXXXXX | not in A        | in A
+    // XXXXXXXX | not in A      | in A
     // not in B | n11: in neither | n12: only in A
-    // in B     | n21: only in B  | n22: in A & B
+    // in B    | n21: only in B  | n22: in A & B
     //
     double left, right, two;
 
@@ -46,9 +46,9 @@ bool Fisher::calculate() {
     long long n22 = _intersectionVal;
 
     printf("#_________________________________________\n");
-    printf("#           | %-12s | %-12s |\n", "not in -b", "in -b");
+    printf("#        | %-12s | %-12s |\n", "not in -b", "in -b");
     printf("# not in -a | %-12lld | %-12lld |\n", n11, n12);
-    printf("#     in -a | %-12lld | %-12lld |\n", n21, n22);
+    printf("#      in -a | %-12lld | %-12lld |\n", n21, n22);
     printf("#_________________________________________\n");
 
     kt_fisher_exact(n11, n12, n21, n22, &left, &right, &two);
@@ -62,49 +62,49 @@ bool Fisher::calculate() {
 }
 
 bool Fisher::getFisher() {
-	NewChromSweep sweep(_context);
-	if (!sweep.init()) {
-		return false;
-	}
-	RecordKeyVector hitSet;
-	while (sweep.next(hitSet)) {
-		if (_context->getObeySplits()) {
-			RecordKeyVector keySet(hitSet.getKey());
-			RecordKeyVector resultSet(hitSet.getKey());
-			_blockMgr->findBlockedOverlaps(keySet, hitSet, resultSet);
-			_intersectionVal += getTotalIntersection(resultSet);
-		} else {
-			_intersectionVal += getTotalIntersection(hitSet);
-		}
-	}
+    NewChromSweep sweep(_context);
+    if (!sweep.init()) {
+        return false;
+    }
+    RecordKeyVector hitSet;
+    while (sweep.next(hitSet)) {
+        if (_context->getObeySplits()) {
+            RecordKeyVector keySet(hitSet.getKey());
+            RecordKeyVector resultSet(hitSet.getKey());
+            _blockMgr->findBlockedOverlaps(keySet, hitSet, resultSet);
+            _intersectionVal += getTotalIntersection(resultSet);
+        } else {
+            _intersectionVal += getTotalIntersection(hitSet);
+        }
+    }
 
-	sweep.closeOut();
-	_queryLen = sweep.getQueryTotalRecordLength();
-	_dbLen = sweep.getDatabaseTotalRecordLength();
+    sweep.closeOut();
+    _queryLen = sweep.getQueryTotalRecordLength();
+    _dbLen = sweep.getDatabaseTotalRecordLength();
 
-	_unionVal = _queryLen + _dbLen;
-	return true;
+    _unionVal = _queryLen + _dbLen;
+    return true;
 }
 
 unsigned long Fisher::getTotalIntersection(RecordKeyVector &recList)
 {
-	unsigned long intersection = 0;
-	const Record *key = recList.getKey();
-	int keyStart = key->getStartPos();
-	int keyEnd = key->getEndPos();
+    unsigned long intersection = 0;
+    const Record *key = recList.getKey();
+    int keyStart = key->getStartPos();
+    int keyEnd = key->getEndPos();
 
-	int hitIdx = 0;
-	for (RecordKeyVector::const_iterator_type iter = recList.begin(); iter != recList.end(); iter = recList.next()) {
-		int maxStart = max((*iter)->getStartPos(), keyStart);
-		int minEnd = min((*iter)->getEndPos(), keyEnd);
-		if (_context->getObeySplits()) {
-			intersection += _blockMgr->getOverlapBases(hitIdx);
-			hitIdx++;
-		} else {
-			intersection += (unsigned long)(minEnd - maxStart);
-		}
-	}
-	_numIntersections += (int)recList.size();
-	return intersection;
+    int hitIdx = 0;
+    for (RecordKeyVector::const_iterator_type iter = recList.begin(); iter != recList.end(); iter = recList.next()) {
+        int maxStart = max((*iter)->getStartPos(), keyStart);
+        int minEnd = min((*iter)->getEndPos(), keyEnd);
+        if (_context->getObeySplits()) {
+            intersection += _blockMgr->getOverlapBases(hitIdx);
+            hitIdx++;
+        } else {
+            intersection += (unsigned long)(minEnd - maxStart);
+        }
+    }
+    _numIntersections += (int)recList.size();
+    return intersection;
 }
 
