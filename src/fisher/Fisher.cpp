@@ -56,11 +56,9 @@ bool Fisher::calculate() {
 
     printf("# p-values for fisher's exact test\n");
     printf("left\tright\ttwo-tail\tratio\n");
-    printf("%.5f\t%.5f\t%.5f\t%.3f\n", left, right, two, ratio);
+    printf("%.5g\t%.5g\t%.5g\t%.3f\n", left, right, two, ratio);
     
-    //kt_fisher_exact(50010000, 10000000, 15000000, 3000000, &left, &right, &two);
-
-	return true;
+    return true;
 }
 
 bool Fisher::getFisher() {

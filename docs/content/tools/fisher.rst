@@ -48,7 +48,7 @@ can do this with ``fisher`` as:
     #_________________________________________
     # p-values for fisher's exact test
     left    right   two-tail    ratio
-    1.00000 0.00001 0.00001 31.667
+    1       1.3466e-05      1.3466e-05      31.667
 
 
 Where we can see the constructed contingency table and the pvalues for left, right
