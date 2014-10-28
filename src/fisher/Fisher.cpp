@@ -12,6 +12,14 @@ Fisher::Fisher(ContextFisher *context)
   _dbLen(0)
 {
     _blockMgr = new BlockMgr(_context->getOverlapFraction(), _context->getReciprocal());
+    _haveExclude = false;
+
+    if(!(_context->getExcludeFile().empty())){
+        string ex = _context->getExcludeFile();
+        exclude = new BedFile(ex);
+        exclude->loadBedFileIntoMergedMap();
+        _haveExclude = true;
+    }
 }
 
 Fisher::~Fisher(void) {
@@ -36,6 +44,9 @@ bool Fisher::calculate() {
     double left, right, two;
 
     long long genomeSize = _context->getGenomeFile()->getGenomeSize();
+    if(_haveExclude){
+        genomeSize -= exclude->getTotalFlattenedLength();
+    }
     // bases covered by neither a nor b
     long long n11 = genomeSize - _queryLen - _dbLen + _intersectionVal;
     // bases covered only by -b
@@ -46,9 +57,9 @@ bool Fisher::calculate() {
     long long n22 = _intersectionVal;
 
     printf("#_________________________________________\n");
-    printf("#        | %-12s | %-12s |\n", "not in -b", "in -b");
+    printf("#           | %-12s | %-12s |\n", "not in -b", "in -b");
     printf("# not in -a | %-12lld | %-12lld |\n", n11, n12);
-    printf("#      in -a | %-12lld | %-12lld |\n", n21, n22);
+    printf("#     in -a | %-12lld | %-12lld |\n", n21, n22);
     printf("#_________________________________________\n");
 
     kt_fisher_exact(n11, n12, n21, n22, &left, &right, &two);
@@ -66,6 +77,7 @@ bool Fisher::getFisher() {
     if (!sweep.init()) {
         return false;
     }
+
     RecordKeyVector hitSet;
     while (sweep.next(hitSet)) {
         if (_context->getObeySplits()) {
