@@ -135,6 +135,10 @@ int windowmaker_main(int argc, char* argv[]) {
         cerr << endl << "*****" << endl << "*****ERROR: Can't combine -w (window size) and -n (number of windows). Please use one or the other. " << endl << "*****" << endl;
         showHelp = true;
     }
+    if (step <= 0) {
+        cerr << endl << "*****" << endl << "*****ERROR: The step (-s) option must be greater than zero. " << endl << "*****" << endl;
+        showHelp = true;
+    }
     if (!showHelp) {
         WindowMaker *wm = NULL;
         if (haveCount)
