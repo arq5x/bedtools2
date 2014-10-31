@@ -152,18 +152,66 @@ $BT closest -a close-a.bed -b close-b.bed -t last > obs
 check obs exp
 rm obs exp
 
+
+
 ###########################################################
-# test reproting of no overlapping feature
+#
+# TEST MULTIPLE DATABASES
+#
 ###########################################################
-echo "    closest.t12...\c"
+
+
+###########################################################
+# test 3 dbs, -each mode, which is the default
+###########################################################
+echo "    closest.t13...\c"
 echo \
-"chr1	100	101	chr1	150	201
-chr1	200	201	chr1	100	101
-chr1	300	301	chr1	150	201
-chr1	100000	100010	chr1	175	375
-chr1	100020	100040	chr1	175	375
-chr2	1	10	.	-1	-1
-chr2	20	30	.	-1	-1" > exp
-$BT closest -a close-a.bed -b close-b.bed -io > obs
+"chr1	80	100	chr1	20	60
+chr1	80	100	chr1	120	170
+chr1	80	100	chr1	70	90" > exp
+$BT closest -a mq1.bed -b mdb1.bed mdb2.bed mdb3.bed > obs
 check obs exp
 rm obs exp
+
+###########################################################
+# test 3 dbs, -all mode
+###########################################################
+echo "    closest.t13...\c"
+echo \
+"chr1	80	100	chr1	70	90" > exp
+$BT closest -a mq1.bed -b mdb1.bed mdb2.bed mdb3.bed -mdb all > obs
+check obs exp
+rm obs exp
+
+
+###########################################################
+# test 2 dbs, tie mode = all
+###########################################################
+echo "    closest.t14...\c"
+echo \
+"chr1	80	100	chr1	20	60
+chr1	80	100	chr1	120	170" > exp
+$BT closest -a mq1.bed -b mdb1.bed mdb2.bed -t all > obs
+check obs exp
+rm obs exp
+
+###########################################################
+# test 2 dbs, tie mode = first
+###########################################################
+echo "    closest.t15...\c"
+echo \
+"chr1	80	100	chr1	20	60" > exp
+$BT closest -a mq1.bed -b mdb1.bed mdb2.bed -mdb all -t first > obs
+check obs exp
+rm obs exp
+
+###########################################################
+# test 2 dbs, tie mode = last
+###########################################################
+echo "    closest.t16...\c"
+echo \
+"chr1	80	100	chr1	120	170" > exp
+$BT closest -a mq1.bed -b mdb1.bed mdb2.bed -mdb all -t last > obs
+check obs exp
+rm obs exp
+

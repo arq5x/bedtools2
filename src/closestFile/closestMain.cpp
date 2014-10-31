@@ -87,6 +87,11 @@ void closest_help(void) {
     cerr                        << "\t\t- \"first\"  Report the first tie that occurred in the B file." << endl;
     cerr                        << "\t\t- \"last\"   Report the last tie that occurred in the B file." << endl << endl;
 
+    cerr << "\t-mdb\t"          << "How multiple databases are resolved." << endl;
+    cerr                        << "\t\t- \"each\"    Report closest records for each database (default)." << endl;
+    cerr                        << "\t\t- \"all\"  Report closest records among all databases." << endl << endl;
+
+
     cerr << "\t-N\t"            << "Require that the query and the closest hit have different names." << endl;
     cerr                        << "\t\tFor BED, the 4th column is compared." << endl << endl;
 

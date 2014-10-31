@@ -34,6 +34,8 @@ public:
     typedef enum { REF_DIST, A_DIST, B_DIST} strandedDistanceModeType;
     strandedDistanceModeType getStrandedDistMode() const { return _strandedDistMode; }
 
+    typedef enum { EACH_DB, ALL_DBS } multiDbModeType;
+    multiDbModeType getMultiDbMode() const { return _multiDbMode; }
 
 private:
     bool _haveTieMode;
@@ -46,6 +48,7 @@ private:
     bool _diffNames;
     tieModeType _tieMode;
     strandedDistanceModeType _strandedDistMode;
+    multiDbModeType _multiDbMode;
 
     bool handle_d();
     bool handle_D();
@@ -54,6 +57,8 @@ private:
     bool handle_id();
     bool handle_N();
     bool handle_t();
+    bool handle_mdb();
+
 };
 
 

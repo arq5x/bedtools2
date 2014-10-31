@@ -10,19 +10,22 @@
 
 CloseSweep::CloseSweep(ContextClosest *context)
 :	NewChromSweep(context),
- 	_context(context) {
+ 	_context(context)
+ 	{
 
 	_minUpstreamRecs.resize(_numDBs, NULL);
 	_minDownstreamRecs.resize(_numDBs, NULL);
 	_overlapRecs.resize(_numDBs, NULL);
 	_minUpstreamDist.resize(_numDBs, INT_MAX);
 	_minDownstreamDist.resize(_numDBs,INT_MAX);
+	_maxPrevLeftClosestEndPos.resize(_numDBs, 0       );
 
 	for (int i=0; i < _numDBs; i++) {
 		_minUpstreamRecs[i] = new distRecVecType();
 		_minDownstreamRecs[i] = new distRecVecType();
 		_overlapRecs[i] = new vector<const Record *>();
 	}
+
 }
 
 CloseSweep::~CloseSweep(void) {
@@ -40,7 +43,7 @@ void CloseSweep::masterScan(RecordKeyVector &retList) {
 	}
 
 	//initialize distances
-	for (size_t i=0; i < _numDBs; i++) {
+	for (int i=0; i < _numDBs; i++) {
 		_minUpstreamDist[i] = INT_MAX;
 		_minDownstreamDist[i] = INT_MAX;
 	}
@@ -57,7 +60,8 @@ void CloseSweep::masterScan(RecordKeyVector &retList) {
 
 			// scan the database cache for hits
 			scanCache(i, retList);
-			//skip if we hit the end of the DB
+
+			// skip if we hit the end of the DB
 			// advance the db until we are ahead of the query. update hits and cache as necessary
 			bool stopScanning = false;
 			while (_currDbRecs[i] != NULL &&
@@ -75,6 +79,7 @@ void CloseSweep::masterScan(RecordKeyVector &retList) {
 		}
 		finalizeSelections(i, retList);
 	}
+	checkMultiDbs(retList);
 }
 
 void CloseSweep::scanCache(int dbIdx, RecordKeyVector &retList) {
@@ -123,6 +128,7 @@ CloseSweep::rateOvlpType CloseSweep::considerRecord(const Record *cacheRec, int 
 		// HIT INTERSECTS QUERY
 		if (!_context->ignoreOverlaps()) {
 			_overlapRecs[dbIdx]->push_back(cacheRec);
+			_maxPrevLeftClosestEndPos[dbIdx] = cacheRec->getEndPos();
 		}
 		return IGNORE;
 	} else if (cacheRec->after(_currQueryRec)) {
@@ -177,6 +183,9 @@ CloseSweep::rateOvlpType CloseSweep::considerRecord(const Record *cacheRec, int 
 	 } else if (_currQueryRec->after(cacheRec)){
 		 // HIT IS TO THE LEFT OF THE QUERY.
 
+		// First see if we can purge this record from the cache. If it's further left than the last record that was left, delete it.
+		if (cacheRec->getEndPos() < _maxPrevLeftClosestEndPos[dbIdx]) return DELETE;
+
 		 currDist = (_currQueryRec->getStartPos() - cacheRec->getEndPos()) + 1;
 		 if (_context->signDistance()) {
 			 if ((_context->getStrandedDistMode() != ContextClosest::REF_DIST) &&
@@ -198,6 +207,7 @@ CloseSweep::rateOvlpType CloseSweep::considerRecord(const Record *cacheRec, int 
 						 _minDownstreamRecs[dbIdx]->clear();
 					 }
 					 _minDownstreamRecs[dbIdx]->push_back(cacheRec);
+					 _maxPrevLeftClosestEndPos[dbIdx] = cacheRec->getEndPos();
 					 return IGNORE;
 				 }
 			 }
@@ -212,9 +222,12 @@ CloseSweep::rateOvlpType CloseSweep::considerRecord(const Record *cacheRec, int 
 				 _minUpstreamRecs[dbIdx]->clear();
 			 }
 			 _minUpstreamRecs[dbIdx]->push_back(cacheRec);
+			 _maxPrevLeftClosestEndPos[dbIdx] = cacheRec->getEndPos();
+
 			 return IGNORE;
 		 } else if (currDist == _minUpstreamDist[dbIdx]) {
 			 _minUpstreamRecs[dbIdx]->push_back(cacheRec);
+			 _maxPrevLeftClosestEndPos[dbIdx] = cacheRec->getEndPos();
 			 return IGNORE;
 		 } else {
 			 return DELETE;
@@ -304,18 +317,76 @@ void CloseSweep::finalizeSelections(int dbIdx, RecordKeyVector &retList) {
 		}
 		return;
 	}
+
+}
+
+void CloseSweep::checkMultiDbs(RecordKeyVector &retList) {
+	ContextClosest::tieModeType tieMode = _context->getTieMode();
+
+	if (_context->getMultiDbMode() == ContextClosest::ALL_DBS && _numDBs > 1) {
+		_copyDists.clear();
+		_copyRetList.clearAll();
+		_copyRetList.setKey(retList.getKey());
+		//loop through retList, find min dist
+		int minDist = INT_MAX;
+		int i = 0;
+		for (; i < (int)_finalDistances.size(); i++) {
+			if (_finalDistances[i] < minDist) {
+				minDist = _finalDistances[i];
+			}
+		}
+		i=0;
+		for (RecordKeyVector::const_iterator_type iter = retList.begin(); iter != retList.end(); iter++) {
+			int dist = _finalDistances[i];
+			if (dist == minDist || dist * -1 == minDist) {
+				_copyDists.push_back(dist);
+				_copyRetList.push_back(*iter);
+			}
+			i++;
+		}
+
+		retList.clearVector();
+		_finalDistances.clear();
+
+		if (_copyRetList.empty()) return;
+
+		if (tieMode == ContextClosest::FIRST_TIE) {
+			retList.push_back(*(_copyRetList.begin()));
+			_finalDistances.push_back(_copyDists[0]);
+		} else if (tieMode == ContextClosest::LAST_TIE) {
+			retList.push_back(*(_copyRetList.begin() + _copyRetList.size() -1));
+			_finalDistances.push_back(_copyDists[_copyDists.size()-1]);
+		} else {
+
+			retList = _copyRetList;
+			_finalDistances = _copyDists;
+		}
+	}
 }
 
 bool CloseSweep::chromChange(int dbIdx, RecordKeyVector &retList)
 {
+//	if (_currQueryRec->getChrName() == "chr1_gl000191_random" || (_currDbRecs[dbIdx] != NULL && _currDbRecs[dbIdx]->getChrName() == "chr1_gl000191_random")) {
+//		printf("Break point here.\n");
+//	}
+
     // the files are on the same chrom
 	if (_currDbRecs[dbIdx] == NULL || _currQueryRec->sameChrom(_currDbRecs[dbIdx])) {
+
+		//if this is the first time the query's chrom is ahead of the chrom that was in this cache,
+		//then we have to clear the cache.
+		if (!_caches[dbIdx].empty() && _currQueryRec->chromAfter(_caches[dbIdx].begin()->value())) {
+			clearCache(dbIdx);
+			_maxPrevLeftClosestEndPos[dbIdx] = 0;
+		}
 		return false;
 	}
 	if (_currDbRecs[dbIdx]->chromAfter(_currQueryRec) && (!_caches[dbIdx].empty() && (_caches[dbIdx].begin()->value()->sameChrom(_currQueryRec)))) {
 		//the newest DB record's chrom is ahead of the query, but the cache still
-		//has records on that chrom
-		return false;
+		//has old records on that query's chrom
+		scanCache(dbIdx, retList);
+		finalizeSelections(dbIdx, retList);
+		return true;
 	}
 	// the query is ahead of the database. fast-forward the database to catch-up.
 	if (_currQueryRec->chromAfter(_currDbRecs[dbIdx])) {
@@ -326,6 +397,7 @@ bool CloseSweep::chromChange(int dbIdx, RecordKeyVector &retList)
 			nextRecord(false, dbIdx);
 		}
 		clearCache(dbIdx);
+		_maxPrevLeftClosestEndPos[dbIdx] = 0;
         return false;
     }
     // the database is ahead of the query.
@@ -339,4 +411,3 @@ bool CloseSweep::chromChange(int dbIdx, RecordKeyVector &retList)
 	//control can't reach here, but compiler still wants a return statement.
 	return true;
 }
-

@@ -28,8 +28,14 @@ private:
 	vector<distRecVecType *> _minDownstreamRecs;
 	vector<int> _minDownstreamDist;
 	vector<distRecVecType *> _overlapRecs;
+	vector<int> _maxPrevLeftClosestEndPos;
 
 	vector<int> _finalDistances;
+
+
+	//structs to help with finding closest among all of multiple dbs.
+	RecordKeyVector _copyRetList;
+	vector<int> _copyDists;
 
 	//override these two methods from chromsweep
 	void masterScan(RecordKeyVector &retList);
@@ -40,8 +46,7 @@ private:
 	typedef enum { IGNORE, DELETE } rateOvlpType;
     rateOvlpType considerRecord(const Record *cacheRec, int dbIdx, bool &stopScanning);
     void finalizeSelections(int dbIdx, RecordKeyVector &retList);
-
-
+    void checkMultiDbs(RecordKeyVector &retList);
 };
 
 

@@ -17,7 +17,8 @@ ContextClosest::ContextClosest()
 	_haveStrandedDistMode(false),
 	_diffNames(false),
 	_tieMode(ALL_TIES),
-	_strandedDistMode(REF_DIST)
+	_strandedDistMode(REF_DIST),
+	_multiDbMode(EACH_DB)
 {
 
 }
@@ -69,6 +70,10 @@ bool ContextClosest::parseCmdArgs(int argc, char **argv, int skipFirstArgs){
         else if (strcmp(_argv[_i], "-t") == 0) {
         	if (!handle_t()) return false;
         }
+        else if (strcmp(_argv[_i], "-mdb") == 0) {
+        	if (!handle_mdb()) return false;
+        }
+
 	}
 	return ContextIntersect::parseCmdArgs(argc, argv, _skipFirstArgs);
 }
@@ -186,5 +191,30 @@ bool ContextClosest::handle_t()
         return true;
     }
 	_errorMsg = "*****ERROR: Request \"all\", \"first\", \"last\" for Tie Mode (-t)";
+	return false;
+}
+
+bool ContextClosest::handle_mdb()
+{
+	bool mdbError = false;
+    if ((_i+1) < _argc) {
+        QuickString mdbStr(_argv[_i+1]);
+        if (mdbStr == "each") {
+        	_multiDbMode = EACH_DB;
+        } else if (mdbStr == "all") {
+        	_multiDbMode = ALL_DBS;
+        } else {
+        	mdbError = true;
+        }
+    } else {
+    	mdbError = true;
+    }
+    if (!mdbError) {
+        markUsed(_i - _skipFirstArgs);
+        _i++;
+        markUsed(_i - _skipFirstArgs);
+        return true;
+    }
+	_errorMsg = "*****ERROR: Request \"each\" or \"last\" for Multiple Database Mode (-mdb)";
 	return false;
 }
