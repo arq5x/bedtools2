@@ -137,6 +137,7 @@ void RecordOutputMgr::printRecord(const Record *record, const QuickString & valu
 }
 
 void RecordOutputMgr::printClosest(RecordKeyVector &keyList, const vector<int> *dists) {
+	const ContextClosest *context = static_cast<const ContextClosest *>(_context);
 	bool deleteBlocks = false;
 	RecordKeyVector blockList(keyList.getKey());
 	if (keyList.getKey()->getType() == FileRecordTypeChecker::BAM_RECORD_TYPE) {
@@ -148,6 +149,7 @@ void RecordOutputMgr::printClosest(RecordKeyVector &keyList, const vector<int> *
 		for (RecordKeyVector::const_iterator_type iter = keyList.begin(); iter != keyList.end(); iter = keyList.next()) {
 			printKey(keyList.getKey());
 			tab();
+			addDbFileId((*iter)->getFileIdx());
 			(*iter)->print(_outBuf);
 			if (dists != NULL) {
 				tab();
@@ -161,7 +163,7 @@ void RecordOutputMgr::printClosest(RecordKeyVector &keyList, const vector<int> *
 		printKey(keyList.getKey());
 		tab();
 		null(true, false);
-		if ((static_cast<ContextClosest *>(_context))->reportDistance()) {
+		if (context->reportDistance()) {
 			tab();
 			_outBuf.append(-1);
 		}
@@ -172,7 +174,6 @@ void RecordOutputMgr::printClosest(RecordKeyVector &keyList, const vector<int> *
 		_currBamBlockList = NULL;
 	}
 	return;
-
 }
 
 

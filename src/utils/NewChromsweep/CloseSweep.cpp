@@ -121,6 +121,19 @@ CloseSweep::rateOvlpType CloseSweep::considerRecord(const Record *cacheRec, int 
 		return IGNORE;
 	}
 
+	// If strand is specified, and either record has an unknown strand, ignore
+	if ((_context->getSameStrand() || _context->getDiffStrand()) && ((_currQueryRec->getStrandVal() == Record::UNKNOWN) || cacheRec->getStrandVal() == Record::UNKNOWN)) {
+		return IGNORE;
+	}
+	// If want same strand, and aren't sure they're the same, ignore
+	if (_context->getSameStrand() &&  (_currQueryRec->getStrandVal() != cacheRec->getStrandVal())) {
+		return IGNORE;
+	}
+	// If we want diff strand, and aren't sure they're different, ignore.
+	if (_context->getDiffStrand() && (_currQueryRec->getStrandVal() == cacheRec->getStrandVal())) {
+		return IGNORE;
+	}
+
 	// Now determine whether the hit and query intersect, and if so, what to do about it.
 	int currDist = 0;
 

@@ -166,19 +166,45 @@ rm obs exp
 ###########################################################
 echo "    closest.t13...\c"
 echo \
-"chr1	80	100	chr1	20	60
-chr1	80	100	chr1	120	170
-chr1	80	100	chr1	70	90" > exp
+"chr1	80	100	q1	1	+	1	chr1	20	60	d1.2	2	-
+chr1	80	100	q1	1	+	2	chr1	120	170	db2.2	2	-
+chr1	80	100	q1	1	+	3	chr1	70	90	d3.1	3	-" > exp
 $BT closest -a mq1.bed -b mdb1.bed mdb2.bed mdb3.bed > obs
+check obs exp
+rm obs exp
+
+
+###########################################################
+# test 3 dbs with -names option
+###########################################################
+echo "    closest.t14...\c"
+echo \
+"chr1	80	100	q1	1	+	a	chr1	20	60	d1.2	2	-
+chr1	80	100	q1	1	+	b	chr1	120	170	db2.2	2	-
+chr1	80	100	q1	1	+	c	chr1	70	90	d3.1	3	-" > exp
+$BT closest -a mq1.bed -b mdb1.bed mdb2.bed mdb3.bed -names a b c > obs
+check obs exp
+rm obs exp
+
+
+###########################################################
+# test 3 dbs with -filenames option
+###########################################################
+echo "    closest.t15...\c"
+echo \
+"chr1	80	100	q1	1	+	mdb1.bed	chr1	20	60	d1.2	2	-
+chr1	80	100	q1	1	+	mdb2.bed	chr1	120	170	db2.2	2	-
+chr1	80	100	q1	1	+	mdb3.bed	chr1	70	90	d3.1	3	-" > exp
+$BT closest -a mq1.bed -b mdb1.bed mdb2.bed mdb3.bed -filenames > obs
 check obs exp
 rm obs exp
 
 ###########################################################
 # test 3 dbs, -all mode
 ###########################################################
-echo "    closest.t13...\c"
+echo "    closest.t16...\c"
 echo \
-"chr1	80	100	chr1	70	90" > exp
+"chr1	80	100	q1	1	+	3	chr1	70	90	d3.1	3	-" > exp
 $BT closest -a mq1.bed -b mdb1.bed mdb2.bed mdb3.bed -mdb all > obs
 check obs exp
 rm obs exp
@@ -187,10 +213,10 @@ rm obs exp
 ###########################################################
 # test 2 dbs, tie mode = all
 ###########################################################
-echo "    closest.t14...\c"
+echo "    closest.t17...\c"
 echo \
-"chr1	80	100	chr1	20	60
-chr1	80	100	chr1	120	170" > exp
+"chr1	80	100	q1	1	+	1	chr1	20	60	d1.2	2	-
+chr1	80	100	q1	1	+	2	chr1	120	170	db2.2	2	-" > exp
 $BT closest -a mq1.bed -b mdb1.bed mdb2.bed -t all > obs
 check obs exp
 rm obs exp
@@ -198,9 +224,9 @@ rm obs exp
 ###########################################################
 # test 2 dbs, tie mode = first
 ###########################################################
-echo "    closest.t15...\c"
+echo "    closest.t18...\c"
 echo \
-"chr1	80	100	chr1	20	60" > exp
+"chr1	80	100	q1	1	+	1	chr1	20	60	d1.2	2	-" > exp
 $BT closest -a mq1.bed -b mdb1.bed mdb2.bed -mdb all -t first > obs
 check obs exp
 rm obs exp
@@ -208,10 +234,53 @@ rm obs exp
 ###########################################################
 # test 2 dbs, tie mode = last
 ###########################################################
-echo "    closest.t16...\c"
+echo "    closest.t19...\c"
 echo \
-"chr1	80	100	chr1	120	170" > exp
+"chr1	80	100	q1	1	+	2	chr1	120	170	db2.2	2	-" > exp
 $BT closest -a mq1.bed -b mdb1.bed mdb2.bed -mdb all -t last > obs
+check obs exp
+rm obs exp
+
+###########################################################
+# test same strand 
+###########################################################
+echo "    closest.t20...\c"
+echo \
+"chr1	80	100	q1	1	+	chr1	5	15	d1.1	1	+" > exp
+$BT closest -a mq1.bed -b mdb1.bed -s> obs
+check obs exp
+rm obs exp
+
+###########################################################
+# test diff strand 
+###########################################################
+echo "    closest.t21...\c"
+echo \
+"chr1	80	100	q1	1	+	chr1	20	60	d1.2	2	-" > exp
+$BT closest -a mq1.bed -b mdb1.bed -S> obs
+check obs exp
+rm obs exp
+
+
+###########################################################
+# test 2 dbs, tie mode = all, same strand
+###########################################################
+echo "    closest.t22...\c"
+echo \
+"chr1	80	100	q1	1	+	1	chr1	5	15	d1.1	1	+" > exp
+$BT closest -a mq1.bed -b mdb1.bed mdb2.bed -t all -mdb all -s > obs
+check obs exp
+rm obs exp
+
+
+###########################################################
+# test 2 dbs, tie mode = all, diff strand
+###########################################################
+echo "    closest.t23...\c"
+echo \
+"chr1	80	100	q1	1	+	1	chr1	20	60	d1.2	2	-
+chr1	80	100	q1	1	+	2	chr1	120	170	db2.2	2	-" > exp
+$BT closest -a mq1.bed -b mdb1.bed mdb2.bed -t all -mdb all -S > obs
 check obs exp
 rm obs exp
 
