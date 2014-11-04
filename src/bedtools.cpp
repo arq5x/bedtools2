@@ -166,11 +166,11 @@ int main(int argc, char *argv[])
         cout << "  email the bedtools mailing list: " << endl;
         cout << "     bedtools-discuss@googlegroups.com" << endl << endl;
 
-        cout << "- Stable releases of bedtools can be found at: " << endl;
-        cout << "     http://bedtools.googlecode.com" << endl << endl;
-
         cout << "- The development repository can be found at: " << endl;
         cout << "     https://github.com/arq5x/bedtools" << endl << endl;
+
+        cout << "- Stable releases of bedtools can be found at: " << endl;
+        cout << "     https://github.com/arq5x/bedtools2/releases" << endl << endl;
     }
     // unknown
     else {
