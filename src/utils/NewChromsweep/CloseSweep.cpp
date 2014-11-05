@@ -202,8 +202,8 @@ CloseSweep::rateOvlpType CloseSweep::considerRecord(const Record *cacheRec, int 
 		 currDist = (_currQueryRec->getStartPos() - cacheRec->getEndPos()) + 1;
 		 if (_context->signDistance()) {
 			 if ((_context->getStrandedDistMode() == ContextClosest::REF_DIST) ||
-				 ((_context->getStrandedDistMode() == ContextClosest::A_DIST && _currQueryRec->getStrandVal() != Record::REVERSE)) ||
-				 ((_context->getStrandedDistMode() == ContextClosest::B_DIST && cacheRec->getStrandVal() != Record::REVERSE)))
+				 (_context->getStrandedDistMode() == ContextClosest::A_DIST && _currQueryRec->getStrandVal() != Record::REVERSE) ||
+				 (_context->getStrandedDistMode() == ContextClosest::B_DIST && cacheRec->getStrandVal() != Record::REVERSE))
 			 {
 				 // HIT IS DOWNSTREAM.
 				 // MUST FIRST DETERMINE WHETHER TO STOP SCANNING.
@@ -344,14 +344,14 @@ void CloseSweep::checkMultiDbs(RecordKeyVector &retList) {
 		int minDist = INT_MAX;
 		int i = 0;
 		for (; i < (int)_finalDistances.size(); i++) {
-			if (_finalDistances[i] < minDist) {
-				minDist = _finalDistances[i];
+			if (abs(_finalDistances[i]) < minDist) {
+				minDist = abs(_finalDistances[i]);
 			}
 		}
 		i=0;
 		for (RecordKeyVector::const_iterator_type iter = retList.begin(); iter != retList.end(); iter++) {
 			int dist = _finalDistances[i];
-			if (dist == minDist || dist * -1 == minDist) {
+			if (abs(dist) == minDist) {
 				_copyDists.push_back(dist);
 				_copyRetList.push_back(*iter);
 			}
