@@ -152,21 +152,21 @@ CloseSweep::rateOvlpType CloseSweep::considerRecord(const Record *cacheRec, int 
 		 currDist = (cacheRec->getStartPos() - _currQueryRec->getEndPos()) + 1;
 		 if (_context->signDistance()) {
 			 if ((_context->getStrandedDistMode() == ContextClosest::A_DIST && _currQueryRec->getStrandVal() == Record::REVERSE) ||
-				 (_context->getStrandedDistMode() == ContextClosest::B_DIST && cacheRec->getStrandVal() != Record::REVERSE))
+				 (_context->getStrandedDistMode() == ContextClosest::B_DIST && cacheRec->getStrandVal() == Record::REVERSE))
 			 {
 				 // hit is "upstream" of A
 				 if (_context->ignoreUpstream()) {
 					 return IGNORE;
 				 }
 				 else {
-					 if (currDist <= _minUpstreamDist[dbIdx]) {
-						 if (currDist < _minUpstreamDist[dbIdx]) {
-							 _minUpstreamDist[dbIdx] = currDist;
+					 if (currDist <= abs(_minUpstreamDist[dbIdx])) {
+						 if (currDist < abs(_minUpstreamDist[dbIdx])) {
+							 _minUpstreamDist[dbIdx] = currDist * -1;
 							 _minUpstreamRecs[dbIdx]->clear();
 						 }
 						 _minUpstreamRecs[dbIdx]->push_back(cacheRec);
 						 return IGNORE;
-					 } else if (currDist == _minUpstreamDist[dbIdx]) {
+					 } else if (currDist == abs(_minUpstreamDist[dbIdx])) {
 						 _minUpstreamRecs[dbIdx]->push_back(cacheRec);
 						 return IGNORE;
 					 } else {
@@ -177,7 +177,7 @@ CloseSweep::rateOvlpType CloseSweep::considerRecord(const Record *cacheRec, int 
 		 }
 		 // HIT IS DOWNSTREAM.
 		 // MUST FIRST DETERMINE WHETHER TO STOP SCANNING.
-		 if (currDist > _minDownstreamDist[dbIdx]) {
+		 if (currDist > abs(_minDownstreamDist[dbIdx])) {
 			 stopScanning = true;
 			 return IGNORE;
 		 }
@@ -185,8 +185,8 @@ CloseSweep::rateOvlpType CloseSweep::considerRecord(const Record *cacheRec, int 
 			 return IGNORE;
 		 }
 		 //Still here? Valid hit.
-		 if (currDist <= _minDownstreamDist[dbIdx]) {
-			 if (currDist < _minDownstreamDist[dbIdx]) {
+		 if (currDist <= abs(_minDownstreamDist[dbIdx])) {
+			 if (currDist < abs(_minDownstreamDist[dbIdx])) {
 				 _minDownstreamDist[dbIdx] = currDist;
 				 _minDownstreamRecs[dbIdx]->clear();
 			 }
@@ -201,22 +201,22 @@ CloseSweep::rateOvlpType CloseSweep::considerRecord(const Record *cacheRec, int 
 
 		 currDist = (_currQueryRec->getStartPos() - cacheRec->getEndPos()) + 1;
 		 if (_context->signDistance()) {
-			 if ((_context->getStrandedDistMode() != ContextClosest::REF_DIST) &&
-				 (!(_context->getStrandedDistMode() == ContextClosest::A_DIST && _currQueryRec->getStrandVal() != Record::REVERSE)) &&
-				 (!(_context->getStrandedDistMode() == ContextClosest::B_DIST && cacheRec->getStrandVal() == Record::REVERSE)))
+			 if ((_context->getStrandedDistMode() == ContextClosest::REF_DIST) ||
+				 ((_context->getStrandedDistMode() == ContextClosest::A_DIST && _currQueryRec->getStrandVal() != Record::REVERSE)) ||
+				 ((_context->getStrandedDistMode() == ContextClosest::B_DIST && cacheRec->getStrandVal() != Record::REVERSE)))
 			 {
 				 // HIT IS DOWNSTREAM.
 				 // MUST FIRST DETERMINE WHETHER TO STOP SCANNING.
-				 if (currDist > _minDownstreamDist[dbIdx]) {
+				 if (currDist > abs(_minDownstreamDist[dbIdx])) {
 					 return DELETE;
 				 }
 				 if (_context->ignoreDownstream()) {
 					 return IGNORE;
 				 }
 				 //Still here? Valid hit.
-				 if (currDist <= _minDownstreamDist[dbIdx]) {
-					 if (currDist < _minDownstreamDist[dbIdx]) {
-						 _minDownstreamDist[dbIdx] = currDist;
+				 if (currDist <= abs(_minDownstreamDist[dbIdx])) {
+					 if (currDist < abs(_minDownstreamDist[dbIdx])) {
+						 _minDownstreamDist[dbIdx] = currDist * -1;
 						 _minDownstreamRecs[dbIdx]->clear();
 					 }
 					 _minDownstreamRecs[dbIdx]->push_back(cacheRec);
@@ -229,8 +229,8 @@ CloseSweep::rateOvlpType CloseSweep::considerRecord(const Record *cacheRec, int 
 		 if (_context->ignoreUpstream()) {
 			 return IGNORE;
 		 }
-		 if (currDist <= _minUpstreamDist[dbIdx]) {
-			 if (currDist < _minUpstreamDist[dbIdx]) {
+		 if (currDist <= abs(_minUpstreamDist[dbIdx])) {
+			 if (currDist < abs(_minUpstreamDist[dbIdx])) {
 				 _minUpstreamDist[dbIdx] = currDist;
 				 _minUpstreamRecs[dbIdx]->clear();
 			 }
@@ -238,7 +238,7 @@ CloseSweep::rateOvlpType CloseSweep::considerRecord(const Record *cacheRec, int 
 			 _maxPrevLeftClosestEndPos[dbIdx] = cacheRec->getEndPos();
 
 			 return IGNORE;
-		 } else if (currDist == _minUpstreamDist[dbIdx]) {
+		 } else if (currDist == abs(_minUpstreamDist[dbIdx])) {
 			 _minUpstreamRecs[dbIdx]->push_back(cacheRec);
 			 _maxPrevLeftClosestEndPos[dbIdx] = cacheRec->getEndPos();
 			 return IGNORE;
@@ -275,7 +275,7 @@ void CloseSweep::finalizeSelections(int dbIdx, RecordKeyVector &retList) {
 	const vector<const Record *>  & upRecs = (*(_minUpstreamRecs[dbIdx]));
 	const vector<const Record *>  & downRecs = (*(_minDownstreamRecs[dbIdx]));
 
-	if (upStreamDist < downStreamDist) {
+	if (abs(upStreamDist) < abs(downStreamDist)) {
 		if (tieMode == ContextClosest::FIRST_TIE) {
 			retList.push_back(upRecs[0]);
 			_finalDistances.push_back(upStreamDist);
@@ -292,7 +292,7 @@ void CloseSweep::finalizeSelections(int dbIdx, RecordKeyVector &retList) {
 		return;
 	}
 
-	if (downStreamDist < upStreamDist) {
+	if (abs(downStreamDist) < abs(upStreamDist)) {
 		if (tieMode == ContextClosest::FIRST_TIE) {
 			retList.push_back(downRecs[0]);
 			_finalDistances.push_back(downStreamDist);

@@ -284,3 +284,266 @@ $BT closest -a mq1.bed -b mdb1.bed mdb2.bed -t all -mdb all -S > obs
 check obs exp
 rm obs exp
 
+
+
+
+
+
+###########################################################
+#
+# TEST -D OPTION
+#
+###########################################################
+
+
+###########################################################
+# hit on left, forward query, forward hit, ref mode
+###########################################################
+echo "    closest.t24...\c"
+echo \
+"chr1	80	100	d_q1.1	5	+	chr1	40	60	d1F.1	10	+	-21" > exp
+$BT closest -a d_q1.bed -b d_d1F.bed -D ref > obs
+check obs exp
+rm obs exp
+
+
+###########################################################
+# hit on left, forward query, forward hit, a mode
+###########################################################
+echo "    closest.t25...\c"
+echo \
+"chr1	80	100	d_q1.1	5	+	chr1	40	60	d1F.1	10	+	-21" > exp
+$BT closest -a d_q1.bed -b d_d1F.bed -D a > obs
+check obs exp
+rm obs exp
+
+###########################################################
+# hit on left, forward query, forward hit, b mode
+###########################################################
+echo "    closest.t26...\c"
+echo \
+"chr1	80	100	d_q1.1	5	+	chr1	40	60	d1F.1	10	+	-21" > exp
+$BT closest -a d_q1.bed -b d_d1F.bed -D b > obs
+check obs exp
+rm obs exp
+
+###########################################################
+# hit on left, forward query, reverse hit, ref mode
+###########################################################
+echo "    closest.t27...\c"
+echo \
+"chr1	80	100	d_q1.1	5	+	chr1	40	60	d1R.1	10	-	-21" > exp
+$BT closest -a d_q1.bed -b d_d1R.bed -D ref > obs
+check obs exp
+rm obs exp
+
+
+###########################################################
+# hit on left, forward query, reverse hit, a mode
+###########################################################
+echo "    closest.t28...\c"
+echo \
+"chr1	80	100	d_q1.1	5	+	chr1	40	60	d1R.1	10	-	-21" > exp
+$BT closest -a d_q1.bed -b d_d1R.bed -D a > obs
+check obs exp
+rm obs exp
+
+###########################################################
+# hit on left, forward query, reverse hit, b mode
+###########################################################
+echo "    closest.t29...\c"
+echo \
+"chr1	80	100	d_q1.1	5	+	chr1	40	60	d1R.1	10	-	21" > exp
+$BT closest -a d_q1.bed -b d_d1R.bed -D b > obs
+check obs exp
+rm obs exp
+
+###########################################################
+# hit on left, reverse query, forward hit, ref mode
+###########################################################
+echo "    closest.t30...\c"
+echo \
+"chr1	80	100	d_q2.1	5	-	chr1	40	60	d1F.1	10	+	-21" > exp
+$BT closest -a d_q2.bed -b d_d1F.bed -D ref > obs
+check obs exp
+rm obs exp
+
+###########################################################
+# hit on left, reverse query, forward hit, a mode
+###########################################################
+echo "    closest.t31...\c"
+echo \
+"chr1	80	100	d_q2.1	5	-	chr1	40	60	d1F.1	10	+	21" > exp
+$BT closest -a d_q2.bed -b d_d1F.bed -D a > obs
+check obs exp
+rm obs exp
+
+
+###########################################################
+# hit on left, reverse query, forward hit, b mode
+###########################################################
+echo "    closest.t32...\c"
+echo \
+"chr1	80	100	d_q2.1	5	-	chr1	40	60	d1F.1	10	+	-21" > exp
+$BT closest -a d_q2.bed -b d_d1F.bed -D b > obs
+check obs exp
+rm obs exp
+
+
+
+
+###########################################################
+# hit on left, reverse query, reverse hit, ref mode
+###########################################################
+echo "    closest.t33...\c"
+echo \
+"chr1	80	100	d_q2.1	5	-	chr1	40	60	d1R.1	10	-	-21" > exp
+$BT closest -a d_q2.bed -b d_d1R.bed -D ref > obs
+check obs exp
+rm obs exp
+
+###########################################################
+# hit on left, reverse query, reverse hit, a mode
+###########################################################
+echo "    closest.t34...\c"
+echo \
+"chr1	80	100	d_q2.1	5	-	chr1	40	60	d1R.1	10	-	21" > exp
+$BT closest -a d_q2.bed -b d_d1R.bed -D a > obs
+check obs exp
+rm obs exp
+
+
+###########################################################
+# hit on left, reverse query, reverse hit, b mode
+###########################################################
+echo "    closest.t35...\c"
+echo \
+"chr1	80	100	d_q2.1	5	-	chr1	40	60	d1R.1	10	-	21" > exp
+$BT closest -a d_q2.bed -b d_d1R.bed -D b > obs
+check obs exp
+rm obs exp
+
+
+
+###########################################################
+# hit on right, forward query, forward hit, ref mode
+###########################################################
+echo "    closest.t36...\c"
+echo \
+"chr1	80	100	d_q1.1	5	+	chr1	140	160	d2F.1	10	+	41" > exp
+$BT closest -a d_q1.bed -b d_d2F.bed -D ref > obs
+check obs exp
+rm obs exp
+
+###########################################################
+# hit on right, forward query, forward hit, a mode
+###########################################################
+echo "    closest.t37...\c"
+echo \
+"chr1	80	100	d_q1.1	5	+	chr1	140	160	d2F.1	10	+	41" > exp
+$BT closest -a d_q1.bed -b d_d2F.bed -D a > obs
+check obs exp
+rm obs exp
+
+###########################################################
+# hit on right, forward query, forward hit, b mode
+###########################################################
+echo "    closest.t38...\c"
+echo \
+"chr1	80	100	d_q1.1	5	+	chr1	140	160	d2F.1	10	+	41" > exp
+$BT closest -a d_q1.bed -b d_d2F.bed -D b > obs
+check obs exp
+rm obs exp
+
+
+###########################################################
+# hit on right, forward query, reverse hit, ref mode
+###########################################################
+echo "    closest.t39...\c"
+echo \
+"chr1	80	100	d_q1.1	5	+	chr1	140	160	d2R.1	10	-	41" > exp
+$BT closest -a d_q1.bed -b d_d2R.bed -D ref > obs
+check obs exp
+rm obs exp
+
+###########################################################
+# hit on right, forward query, reverse hit, a mode
+###########################################################
+echo "    closest.t40...\c"
+echo \
+"chr1	80	100	d_q1.1	5	+	chr1	140	160	d2R.1	10	-	41" > exp
+$BT closest -a d_q1.bed -b d_d2R.bed -D a > obs
+check obs exp
+rm obs exp
+
+###########################################################
+# hit on right, forward query, reverse hit, b mode
+###########################################################
+echo "    closest.t41...\c"
+echo \
+"chr1	80	100	d_q1.1	5	+	chr1	140	160	d2R.1	10	-	-41" > exp
+$BT closest -a d_q1.bed -b d_d2R.bed -D b > obs
+check obs exp
+rm obs exp
+
+###########################################################
+# hit on right, reverse query, forward hit, ref mode
+###########################################################
+echo "    closest.t42...\c"
+echo \
+"chr1	80	100	d_q2.1	5	-	chr1	140	160	d2F.1	10	+	41" > exp
+$BT closest -a d_q2.bed -b d_d2F.bed -D ref > obs
+check obs exp
+rm obs exp
+
+###########################################################
+# hit on right, reverse query, forward hit, a mode
+###########################################################
+echo "    closest.t43...\c"
+echo \
+"chr1	80	100	d_q2.1	5	-	chr1	140	160	d2F.1	10	+	-41" > exp
+$BT closest -a d_q2.bed -b d_d2F.bed -D a > obs
+check obs exp
+rm obs exp
+
+###########################################################
+# hit on right, reverse query, forward hit, b mode
+###########################################################
+echo "    closest.t44...\c"
+echo \
+"chr1	80	100	d_q2.1	5	-	chr1	140	160	d2F.1	10	+	41" > exp
+$BT closest -a d_q2.bed -b d_d2F.bed -D b > obs
+check obs exp
+rm obs exp
+
+###########################################################
+# hit on right, reverse query, reverse hit, ref mode
+###########################################################
+echo "    closest.t45...\c"
+echo \
+"chr1	80	100	d_q2.1	5	-	chr1	140	160	d2R.1	10	-	41" > exp
+$BT closest -a d_q2.bed -b d_d2R.bed -D ref > obs
+check obs exp
+rm obs exp
+
+###########################################################
+# hit on right, reverse query, reverse hit, a mode
+###########################################################
+echo "    closest.t46...\c"
+echo \
+"chr1	80	100	d_q2.1	5	-	chr1	140	160	d2R.1	10	-	-41" > exp
+$BT closest -a d_q2.bed -b d_d2R.bed -D a > obs
+check obs exp
+rm obs exp
+
+###########################################################
+# hit on right, reverse query, reverse hit, b mode
+###########################################################
+echo "    closest.t47...\c"
+echo \
+"chr1	80	100	d_q2.1	5	-	chr1	140	160	d2R.1	10	-	-41" > exp
+$BT closest -a d_q2.bed -b d_d2R.bed -D b > obs
+check obs exp
+rm obs exp
+
+
