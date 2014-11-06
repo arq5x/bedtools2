@@ -14,12 +14,10 @@
 #include "ContextIntersect.h"
 #include "FileRecordMgr.h"
 
-NewChromSweep::NewChromSweep(ContextIntersect *context,
-                       bool useMergedIntervals)
+NewChromSweep::NewChromSweep(ContextIntersect *context)
 :	_context(context),
  	_queryFRM(NULL),
  	_numDBs(_context->getNumDatabaseFiles()),
-  	_useMergedIntervals(false),
  	_queryRecordsTotalLength(0),
  	_databaseRecordsTotalLength(0),
  	_wasInitialized(false),

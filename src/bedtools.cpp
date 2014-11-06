@@ -141,9 +141,9 @@ int main(int argc, char *argv[])
     else if (sub_cmd == "makewindows") return windowmaker_main(argc-1, argv+1);
     else if (sub_cmd == "groupby")     return groupby_main(argc-1, argv+1);
     else if (sub_cmd == "expand")      return expand_main(argc-1, argv+1);
-    else if (sub_cmd == "sample")		return sample_main(argc-1, argv+1);
-    else if (sub_cmd == "neksb1")	   	return nek_sandbox1_main(argc-1, argv+1);
-    else if (sub_cmd == "regresstest")	return regress_test_main(argc, argv); //this command does need all the orig args.
+    else if (sub_cmd == "sample")       return sample_main(argc-1, argv+1);
+    else if (sub_cmd == "neksb1")       return nek_sandbox1_main(argc-1, argv+1);
+    else if (sub_cmd == "regresstest")  return regress_test_main(argc, argv); //this command does need all the orig args.
     // help
     else if (sub_cmd == "-h" || sub_cmd == "--help" ||
              sub_cmd == "-help")

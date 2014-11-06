@@ -12,6 +12,8 @@
 #ifndef NEW_CHROMSWEEP_H
 #define NEW_CHROMSWEEP_H
 
+using namespace std;
+
 #include <string>
 #include "BTlist.h"
 #include "RecordKeyList.h"
@@ -29,7 +31,7 @@ class ContextIntersect;
 class NewChromSweep {
 public:
 
-    NewChromSweep(ContextIntersect *context, bool useMergedIntervals = false);
+    NewChromSweep(ContextIntersect *context);
     
     
     ~NewChromSweep(void);
@@ -37,8 +39,8 @@ public:
     
     typedef RecordList recListType;
     typedef const RecordListNode *recListIterType;
-    // loads next (a pair) with the current query and it's overlaps
-    bool next(RecordKeyVector &next);
+
+    virtual bool next(RecordKeyVector &next);
     
     // NOTE! You MUST call this method after sweep if you want the
     // getTotalRecordLength methods to return the whole length of the
@@ -49,15 +51,13 @@ public:
     unsigned long getQueryTotalRecordLength() { return _queryRecordsTotalLength; }
     unsigned long getDatabaseTotalRecordLength() { return _databaseRecordsTotalLength; }
 
-private:
+protected:
     ContextIntersect *_context;
     FileRecordMgr *_queryFRM;
     int _numDBs; //don't really need this stored, but here for code brevity.
     vector<FileRecordMgr *> _dbFRMs;
 
-    bool _useMergedIntervals;
-
-    unsigned long _queryRecordsTotalLength;
+     unsigned long _queryRecordsTotalLength;
     vector<unsigned long> _dbFileRecordsLength; //each value in this vector have the
     //length of all records in the corresponding db file.
 
@@ -81,13 +81,13 @@ private:
     QuickString _currChromName;
     bool _runToQueryEnd;
 
-    void masterScan(RecordKeyVector &retList);
+    virtual void masterScan(RecordKeyVector &retList);
 
     bool nextRecord(bool query, int dbIdx = -1); //true fetches next query record, false fetches next db record.
     
-    void scanCache(int dbIdx, RecordKeyVector &retList);
-    void clearCache(int dbIdx);
-    bool chromChange(int dbIdx, RecordKeyVector &retList);
+    virtual void scanCache(int dbIdx, RecordKeyVector &retList);
+    virtual void clearCache(int dbIdx);
+    virtual bool chromChange(int dbIdx, RecordKeyVector &retList);
 
     bool dbFinished(int dbIdx);
 

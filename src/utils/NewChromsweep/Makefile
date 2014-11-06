@@ -20,21 +20,23 @@ INCLUDES = -I$(UTILITIES_DIR)/general/ \
 # ----------------------------------
 # define our source and object files
 # ----------------------------------
-SOURCES= NewChromsweep.cpp NewChromsweep.h 
-OBJECTS= NewChromsweep.o
+SOURCES= NewChromsweep.cpp NewChromsweep.h CloseSweep.cpp CloseSweep.h
+OBJECTS= NewChromsweep.o CloseSweep.o
 _EXT_OBJECTS=
 EXT_OBJECTS=$(patsubst %,$(OBJ_DIR)/%,$(_EXT_OBJECTS))
 BUILT_OBJECTS= $(patsubst %,$(OBJ_DIR)/%,$(OBJECTS))
+
+
+all: $(BUILT_OBJECTS)
+
+.PHONY: all
 
 $(BUILT_OBJECTS): $(SOURCES)
 	@echo "  * compiling" $(*F).cpp
 	@$(CXX) -c -o $@ $(*F).cpp $(LDFLAGS) $(CXXFLAGS) $(INCLUDES)
 
-$(EXT_OBJECTS):
-	@$(MAKE) --no-print-directory -C $(INCLUDES)
-
 clean:
 	@echo "Cleaning up."
-	@rm -f $(OBJ_DIR)/NewChromsweep.o $(BIN_DIR)/NewChromsweep.o
+	@rm -f $(OBJ_DIR)/NewChromsweep.o $(BIN_DIR)/CloseSweep.o
 
 .PHONY: clean
