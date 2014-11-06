@@ -122,7 +122,7 @@ bool Record::chromAfter(const Record *other) const
 
 bool Record::after(const Record *other) const
 {
-	return (_chrId == other->_chrId && _startPos >= other->_endPos);
+	return (sameChrom(other) && _startPos >= other->_endPos);
 }
 
 bool Record::intersects(const Record *record,

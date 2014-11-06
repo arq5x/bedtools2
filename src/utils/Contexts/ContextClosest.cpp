@@ -20,6 +20,8 @@ ContextClosest::ContextClosest()
 	_strandedDistMode(REF_DIST),
 	_multiDbMode(EACH_DB)
 {
+	// closest requires sorted input
+	setSortedInput(true);
 
 }
 
