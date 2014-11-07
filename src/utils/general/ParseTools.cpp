@@ -2,6 +2,9 @@
 #include <climits>
 #include <cctype>
 #include <cstring>
+#include <cstdio>
+#include <cstdlib>
+#include <sstream>
 
 //This functions recognizes only numbers with digits, plus sign, minus sign, decimal point, e, or E. Hexadecimal and pointers not currently supported.
 bool isNumeric(const QuickString &str) {
@@ -19,12 +22,26 @@ int str2chrPos(const QuickString &str) {
 }
 
 int str2chrPos(const char *str, size_t ulen) {
+
 	if (ulen == 0) {
 		ulen = strlen(str);
 	}
+
+	//first test for exponents / scientific notation
+	bool hasExponent = false;
+	for (size_t i=0; i < ulen; i++) {
+		if (str[i] == 'e' || str[i] == 'E') {
+			std::istringstream ss(str);
+			double retVal;
+			ss >> retVal;
+			return (int)retVal;
+		}
+	}
+
 	int len=(int)ulen;
 	if (len < 1 || len > 10) {
-		return INT_MIN; //can't do more than 9 digits and a minus sign
+		fprintf(stderr, "***** ERROR: too many digits/characters for integer conversion in string %s. Exiting...\n", str);
+		exit(1);
 	}
 
 	register int sum=0;
@@ -39,9 +56,15 @@ int str2chrPos(const char *str, size_t ulen) {
 
 	for (int i=startPos; i < len; i++) {
 		char currChar = str[i];
-		if (!isdigit(currChar)) {
-			return INT_MIN;
+		if (currChar == 'e' || currChar == 'E') {
+			//default to atoi for scientific notation
+			return atoi(str);
 		}
+		if (!isdigit(currChar)) {
+			fprintf(stderr, "***** ERROR: illegal character '%c' found in integer conversion of string %s. Exiting...\n", currChar, str);
+			exit(1);
+		}
+
 		int dig = currChar - 48; //ascii code for zero.
 		int power = len -i -1;
 
@@ -77,7 +100,7 @@ int str2chrPos(const char *str, size_t ulen) {
 			sum += dig *1000000000;
 			break;
 		default:
-			return INT_MIN;
+			return 0;
 			break;
 		}
 	}

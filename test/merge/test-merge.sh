@@ -518,3 +518,13 @@ chr1	30	100" > exp
 $BT merge -i a.bed -iobuf 8192 > obs
 check exp obs
 rm exp obs
+
+###########################################################
+#  Test that scientific notation is allowed for coordinates
+###########################################################
+echo "    merge.t43...\c"
+echo \
+"chr1	800	830" > exp
+$BT merge -i expFormat.bed > obs
+check exp obs
+rm obs exp
