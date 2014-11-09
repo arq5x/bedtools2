@@ -764,3 +764,24 @@ $BT intersect -a oneRecordNoNewline.bed -b oneRecordNoNewline.bed > obs
 check obs exp
 rm obs exp
 
+###########################################################
+#  Test zero length intersections in non-bam files.
+############################################################
+echo "    intersect.new.t65...\c"
+echo \
+"chr1	5	15	r1	chr1	9	9	m3	0
+chr1	7	12	r3	chr1	9	9	m3	0" > exp
+$BT intersect -a a_testZeroLen.bed -b b_testZeroLen.bed -wo > obs
+check exp obs
+rm exp obs
+
+###########################################################
+#  Test zero length intersections in non-bam files, -sorted
+############################################################
+echo "    intersect.new.t66...\c"
+echo \
+"chr1	5	15	r1	chr1	9	9	m3	0
+chr1	7	12	r3	chr1	9	9	m3	0" > exp
+$BT intersect -a a_testZeroLen.bed -b b_testZeroLen.bed -wo -sorted> obs
+check exp obs
+rm exp obs

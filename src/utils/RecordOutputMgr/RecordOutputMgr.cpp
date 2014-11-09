@@ -210,6 +210,7 @@ void RecordOutputMgr::printRecord(RecordKeyVector &keyList, RecordKeyVector *blo
 				if ((static_cast<ContextIntersect *>(_context))->getWriteAllOverlap()) {
 					// -wao the user wants to force the reporting of 0 overlap
 					if (printKeyAndTerminate(keyList)) {
+
 						_currBamBlockList = NULL;
 						return;
 					}
@@ -223,6 +224,7 @@ void RecordOutputMgr::printRecord(RecordKeyVector &keyList, RecordKeyVector *blo
 				else if ((static_cast<ContextIntersect *>(_context))->getLeftJoin()) {
 					if (printKeyAndTerminate(keyList)) {
 						_currBamBlockList = NULL;
+
 						return;
 					}
 					tab();
@@ -230,11 +232,13 @@ void RecordOutputMgr::printRecord(RecordKeyVector &keyList, RecordKeyVector *blo
 					newline();
 					if (needsFlush()) flush();
 					_currBamBlockList = NULL;
+
 					return;
 				}
 			} else {
 				if (printBamRecord(keyList, true) == BAM_AS_BAM) {
 					_currBamBlockList = NULL;
+
 					return;
 				}
 				int hitIdx = 0;
@@ -252,14 +256,17 @@ void RecordOutputMgr::printRecord(RecordKeyVector &keyList, RecordKeyVector *blo
 			newline();
 		}
 		_currBamBlockList = NULL;
+
 		return;
 	} else if (_context->getProgram() == ContextBase::MAP) {
 		printKeyAndTerminate(keyList);
 		_currBamBlockList = NULL;
+
 		return;
 	} else if (_context->getProgram() == ContextBase::MERGE) {
 		printKeyAndTerminate(keyList);
 		_currBamBlockList = NULL;
+
 		return;
 	}
 }
@@ -380,6 +387,7 @@ void RecordOutputMgr::reportOverlapDetail(const Record *keyRecord, const Record 
 		newline();
 		if (needsFlush()) flush();
 	}
+	const_cast<Record *>(keyRecord)->adjustZeroLength();
 }
 
 void RecordOutputMgr::reportOverlapSummary(RecordKeyVector &keyList)
