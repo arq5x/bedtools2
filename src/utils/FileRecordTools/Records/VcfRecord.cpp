@@ -18,13 +18,17 @@ bool VcfRecord::initFromFile(SingleLineDelimTextFileReader *fileReader)
 	_startPos--; // VCF is one-based. Here we intentionally don't decrement the string version,
 	//because we'll still want to output the one-based number in the print methods, even though
 	//internally we decrement the integer to comply with the 0-based format common to other records.
-	fileReader->getField(3, _varAlt);
-	//endPos is just the startPos plus the length of the variant
-	_endPos = _startPos + _varAlt.size();
-	int2str(_endPos, _endPosStr);
-
-	fileReader->getField(2, _name);
 	fileReader->getField(4, _varRef);
+	fileReader->getField(3, _varAlt);
+	if (_varRef[0] == '<') {
+		//this is a structural variant. Need to parse the tags to find the endpos.
+		_endPos = _startPos + fileReader->getVcfSVlen();
+	} else {
+		//endPos is just the startPos plus the length of the variant
+		_endPos = _startPos + _varAlt.size();
+	}
+	int2str(_endPos, _endPosStr);
+	fileReader->getField(2, _name);
 	fileReader->getField(5, _score);
 
 	return initOtherFieldsFromFile(fileReader);

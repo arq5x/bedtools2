@@ -137,3 +137,20 @@ bool SingleLineDelimTextFileReader::findDelimiters() {
 	}
 	return true;
 }
+
+int SingleLineDelimTextFileReader::getVcfSVlen() {
+	int startPos = _delimPositions[VCF_TAG_FIELD] +1;
+	const char *startPtr = strstr(_sLine.c_str() + startPos, "SVLEN=") +6;
+	const char *endPtr = strchr(startPtr, ';');
+	const char *midPtr = strchr(startPtr, ',');
+	int endCoord = -1;
+	if (midPtr != NULL && midPtr < endPtr) {
+		//comma found in the number, that means there are two numbers
+		int num1 = str2chrPos(startPtr, midPtr - startPtr);
+		int num2 = str2chrPos(midPtr +1, endPtr - (midPtr +1));
+		endCoord = max(abs(num1), abs(num2));
+	} else {
+		endCoord = abs(str2chrPos(startPtr, endPtr - startPtr));
+	}
+	return endCoord;
+}
