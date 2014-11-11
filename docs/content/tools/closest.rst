@@ -9,6 +9,15 @@ genomic distance from the start or end of A) feature in B. For example, one migh
 is the closest gene to a significant GWAS polymorphism. Note that **closestBed** will report an
 overlapping feature as the closest---that is, it does not restrict to closest *non-overlapping* feature.
 
+.. important::
+
+    As of version 2.22.0, the `closest` tool can accept multiple files for
+    the `-b` option. This allows one to identify the closest intervals between a single
+    query (`-a`) file and multiple database files (`-b`) at once! This functionality
+    now requires that all input files be sorted by chromosome and start coordinate
+    in an identical manner (e.g., `sort -k1,1 -k2,2n`).
+
+
 ==========================================================================
 5.6.1 Usage and option summary
 ==========================================================================
