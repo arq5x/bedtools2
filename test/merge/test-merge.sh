@@ -518,3 +518,27 @@ chr1	30	100" > exp
 $BT merge -i a.bed -iobuf 8192 > obs
 check exp obs
 rm exp obs
+
+###########################################################
+#  Test that scientific notation is allowed for coordinates
+###########################################################
+echo "    merge.t43...\c"
+echo \
+"chr1	800	830" > exp
+$BT merge -i expFormat.bed > obs
+check exp obs
+rm obs exp
+
+
+###########################################################
+#  Test that struct vars in VCF get correct length
+###########################################################
+echo "    merge.t44...\c"
+echo \
+"19	252805	257416
+19	260364	261044
+19	265133	265691
+19	265985	266386" > exp
+$BT merge -i vcfSVtest.vcf > obs
+check exp obs
+rm obs exp

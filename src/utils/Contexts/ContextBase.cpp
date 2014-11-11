@@ -32,7 +32,7 @@ ContextBase::ContextBase()
   _writeOverlap(false),
   _writeAllOverlap(false),
   _haveFraction(false),
-  _overlapFraction(1E-9),
+  _overlapFraction(0.0),
   _reciprocal(false),
   _sameStrand(false),
   _diffStrand(false),

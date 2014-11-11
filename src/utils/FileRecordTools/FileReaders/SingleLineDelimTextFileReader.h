@@ -13,6 +13,10 @@
 
 class SingleLineDelimTextFileReader : public FileReader {
 public:
+	//Allow VCF records to access a specialized private method.
+	//See end of class declaration for details.
+	friend class VcfRecord;
+
 	SingleLineDelimTextFileReader(int numFields, char delimChar = '\t');
 	~SingleLineDelimTextFileReader();
 
@@ -24,6 +28,8 @@ public:
 	virtual void appendField(int fieldNum, QuickString &str) const;
 	virtual const QuickString &getHeader() const { return _header; }
 	virtual bool hasHeader() const { return _fullHeaderFound; }
+
+
 protected:
 	int _numFields;
 	char _delimChar;
@@ -37,6 +43,12 @@ protected:
 	int _lineNum;
 	bool detectAndHandleHeader();
 	bool findDelimiters();
+
+	//This is actually a very specialized function strictly for VCF
+	//records to read and process extra information about Structural Variants.
+	static const int VCF_TAG_FIELD = 7;
+	int getVcfSVlen();
+
 
 };
 

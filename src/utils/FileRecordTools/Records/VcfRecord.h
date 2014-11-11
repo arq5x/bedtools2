@@ -32,8 +32,8 @@ public:
 	virtual const QuickString &getField(int fieldNum) const;
 
 protected:
-	QuickString _varAlt;
 	QuickString _varRef;
+	QuickString _varAlt;
 	void printOtherFields(QuickString &outBuf) const;
 };
 
