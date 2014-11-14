@@ -24,6 +24,8 @@ export CXXFLAGS = -Wall -O2 -D_FILE_OFFSET_BITS=64 -fPIC $(INCLUDES)
 export LIBS		= -lz
 export BT_ROOT  = src/utils/BamTools/
 
+prefix = /usr/local
+
 SUBDIRS = $(SRC_DIR)/annotateBed \
 		  $(SRC_DIR)/bamToBed \
 		  $(SRC_DIR)/bamToFastq \
@@ -106,6 +108,12 @@ all: print_banner $(OBJ_DIR) $(BIN_DIR) autoversion $(UTIL_SUBDIRS) $(SUBDIRS)
 	
 
 .PHONY: all
+
+install: all
+	mkdir -p $(DESTDIR)$(prefix)/bin
+	for file in bin/* ; do \
+		cp -f $$file $(DESTDIR)$(prefix)/bin; \
+	done
 
 print_banner:
 	@echo "Building BEDTools:"
