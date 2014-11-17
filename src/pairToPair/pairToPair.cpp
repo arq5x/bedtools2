@@ -136,7 +136,7 @@ void PairToPair::FindOverlaps(const BEDPE &a) {
 bool PairToPair::FindHitsOnBothEnds(const BEDPE &a, const vector<MATE> &qualityHitsEnd1,
                                     const vector<MATE> &qualityHitsEnd2) {
 
-    map<unsigned int, vector<MATE>, less<int> > hitsMap;
+    map<unsigned int, vector<MATE>, less<unsigned int> > hitsMap;
 
     for (vector<MATE>::const_iterator h = qualityHitsEnd1.begin(); h != qualityHitsEnd1.end(); ++h) {
         hitsMap[h->lineNum].push_back(*h);
@@ -174,7 +174,7 @@ bool PairToPair::FindHitsOnBothEnds(const BEDPE &a, const vector<MATE> &qualityH
 void PairToPair::FindHitsOnEitherEnd(const BEDPE &a, const vector<MATE> &qualityHitsEnd1,
                                     const vector<MATE> &qualityHitsEnd2) {
 
-    map<unsigned int, vector<MATE>, less<int> > hitsMap;
+    map<unsigned int, vector<MATE>, less<unsigned int> > hitsMap;
 
     for (vector<MATE>::const_iterator h = qualityHitsEnd1.begin(); h != qualityHitsEnd1.end(); ++h) {
         hitsMap[h->lineNum].push_back(*h);
