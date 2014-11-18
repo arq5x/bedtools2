@@ -11,6 +11,15 @@ check(){
     fi
 }
 
+checkfile()
+{
+	if diff $1 $2; then
+    	echo ok
+	else
+    	echo fail
+	fi
+}
+
 check $lines_a $lines_b
 check $lines_a $lines_c
 check $lines_a $lines_d
@@ -28,3 +37,23 @@ B=$($BT groupby -i values3.header.bed -g 1,2,3 -c 4 -o concat -header | head -n 
 if [ "$B" != $'#chrom\tstart\tend\tconcat(A)' ]; then
         echo "fail groupby"
 fi
+
+###########################################################
+#  Test precision
+############################################################
+echo "    groupby.t01...\c"
+echo \
+"chr1	11168000	11168003	CALLABLE" > exp
+$BT groupby -i test.bed -g 1,4 -c 1,2,3,4 -ops first,first,max,first | cut -f 3-6 > obs
+checkfile obs exp
+
+###########################################################
+#  Test precision
+############################################################
+echo "    groupby.t02...\c"
+echo \
+"chr1	11168000	1.1168e+07	CALLABLE" > exp
+$BT groupby -i test.bed -g 1,4 -c 1,2,3,4 -ops first,first,max,first -prec 5 | cut -f 3-6 > obs
+checkfile obs exp
+
+rm obs exp

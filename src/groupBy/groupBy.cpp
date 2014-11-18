@@ -82,7 +82,7 @@ int groupby_main(int argc, char* argv[]) {
     bool printHeaderLine   = false;
     bool InputHaveHeaderLine = false;
     bool ignoreCase    = false;
-    int precision = 5;
+    int precision = 21;
 
     // check to see if we should print out some help
     if(argc <= 1) showHelp = true;
