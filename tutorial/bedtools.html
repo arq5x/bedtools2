@@ -1,0 +1,542 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <meta name="author" content="Aaron Quinlan" />
+  <title>bedtools Tutorial</title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <link rel="stylesheet" href="bootstrap.css" type="text/css" />
+</head>
+<body>
+    <div class="navbar navbar-static-top">
+    <div class="navbar-inner">
+      <div class="container">
+        <span class="doc-title">bedtools Tutorial</span>
+        <ul class="nav pull-right doc-info">
+                    <li><p class="navbar-text">Aaron Quinlan</p></li>
+                            </ul>
+      </div>
+    </div>
+  </div>
+    <div class="container">
+    <div class="row">
+      <div class="span12">
+            <h1 id="synopsis">Synopsis</h1>
+<p>Our goal is to work through examples that demonstrate how to explore, process and manipulate genomic interval files (e.g., BED, VCF, BAM) with the <code>bedtools</code> software package.</p>
+<p>Some of our analysis will be based upon the Maurano et al exploration of DnaseI hypersensitivity sites in hundreds of primary tissue types.</p>
+<pre><code>Maurano et al. Systematic Localization of Common Disease-Associated Variation in Regulatory DNA. Science. 2012. Vol. 337 no. 6099 pp. 1190-1195.
+
+www.sciencemag.org/content/337/6099/1190.short</code></pre>
+<p>This tutorial is merely meant as an introduction to whet your appetite. There are many, many more tools and options than presented here. We therefore encourage you to read the bedtools <a href="http://bedtools.readthedocs.org/en/latest/">documentation</a>.</p>
+<div class="alert alert-info" role="alert">
+NOTE: We recommend making your browser window as large as possible because some of the examples yield “wide” results and more screen real estate will help make the results clearer.-
+</div>
+<p><br /></p>
+<h1 id="setup">Setup</h1>
+<p>From the Terminal, create a new directory on your Desktop called <code>bedtools-demo</code> (it doesn’t really matter where you create this directory).</p>
+<pre><code>cd ~/Desktop
+mkdir bedtools-demo</code></pre>
+<p>Navigate into that directory.</p>
+<pre><code>cd bedtools-demo</code></pre>
+<p>Download the sample BED files I have provided.</p>
+<pre><code>curl -O http://quinlanlab.cs.virginia.edu/cshl2013/maurano.dnaseI.tgz
+curl -O http://quinlanlab.cs.virginia.edu/cshl2013/cpg.bed
+curl -O http://quinlanlab.cs.virginia.edu/cshl2013/exons.bed
+curl -O http://quinlanlab.cs.virginia.edu/cshl2013/gwas.bed
+curl -O http://quinlanlab.cs.virginia.edu/cshl2013/genome.txt
+curl -O http://quinlanlab.cs.virginia.edu/cshl2013/hesc.chromHmm.bed</code></pre>
+<p>Now, we need to extract all of the 20 Dnase I hypersensitivity BED files from the “tarball” named <code>maurano.dnaseI.tgz</code>.</p>
+<pre><code>tar -zxvf maurano.dnaseI.tgz
+rm maurano.dnaseI.tgz</code></pre>
+<p>Let’s take a look at what files we now have.</p>
+<pre><code>ls -1</code></pre>
+<p><br /></p>
+<h1 id="what-are-these-files">What are these files?</h1>
+<p>Your directory should now contain 23 BED files and 1 genome file. Twenty of these files (those starting with “f” for “fetal tissue”) reflect Dnase I hypersensitivity sites measured in twenty different fetal tissue samples from the brain, heart, intestine, kidney, lung, muscle, skin, and stomach.</p>
+<p>In addition: <code>cpg.bed</code> represents CpG islands in the human genome; <code>exons.bed</code> represents RefSeq exons from human genes; <code>gwas.bed</code> represents human disease-associated SNPs that were identified in genome-wide association studies (GWAS); <code>hesc.chromHmm.bed</code> represents the predicted function (by chromHMM) of each interval in the genome of a human embryonic stem cell based upon ChIP-seq experiments from ENCODE.</p>
+<p>The latter 4 files were extracted from the UCSC Genome Browser’s <a href="http://genome.ucsc.edu/cgi-bin/hgTables?command=start">Table Browser</a>.</p>
+<p>In order to have a rough sense of the data, let’s load the <code>cpg.bed</code>, <code>exons.bed</code>, <code>gwas.bed</code>, and <code>hesc.chromHmm.bed</code> files into <a href="http://www.broadinstitute.org/igv/">IGV</a>. To do this, launch IGV, then click File-&gt;Load from File. Then select the four files. IGV will warn you that you need to create an index for a couple of the files. Just click OK, as these indices are created automatically and speed up the processing for IGV.</p>
+<p>Once loaded, navigate to <code>TP53</code> by typing <code>TP53</code> in the search bar. Change the track height to 200 for each track, set the font size to 16 for each track, and change the track colors to match the following image:</p>
+<div class="figure">
+<img src="http://quinlanlab.cs.virginia.edu/cshl2013/igv-tp53.png" />
+</div>
+<p>Visualization in IGV or other browsers such as UCSC is a tremendously useful way to make sure that your results make sense to your eye. Coveniently, a subset of bedtools is built-into IGV!</p>
+<p><br /></p>
+<h1 id="the-bedtools-help">The bedtools help</h1>
+<p>Bedtools is a command-line tool. To bring up the help, just type</p>
+<pre><code>bedtools</code></pre>
+<p>As you can see, there are multiple “subcommands” and for bedtools to work you must tell it which subcommand you want to use. Examples:</p>
+<pre><code>bedtools intersect
+bedtools merge
+bedtools subtract</code></pre>
+<p>What version am I using?</p>
+<pre><code>bedtools --version</code></pre>
+<p>How can I get more help?</p>
+<pre><code>bedtools --contact</code></pre>
+<h1 id="bedtools-intersect">bedtools “intersect”</h1>
+<p>The <code>intersect</code> command is the workhorse of the <code>bedtools</code> suite. It compares two or more BED/BAM/VCF/GFF files and identifies all the regions in the gemome where the features in the two files overlap (that is, share at least one base pair in common).</p>
+<div class="figure">
+<img src="http://bedtools.readthedocs.org/en/latest/_images/intersect-glyph.png" />
+</div>
+<h2 id="default-behavior">Default behavior</h2>
+<p>By default, <code>intersect</code> reports the intervals that represent overlaps between your two files. To demonstrate, let’s identify all of the CpG islands that overlap exons.</p>
+<pre><code>bedtools intersect -a cpg.bed -b exons.bed | head -5
+chr1    29320   29370   CpG:_116
+chr1    135124  135563  CpG:_30
+chr1    327790  328229  CpG:_29
+chr1    327790  328229  CpG:_29
+chr1    327790  328229  CpG:_29</code></pre>
+<div class="alert alert-info" role="alert">
+NOTE: In this case, the intervals reported are NOT the original CpG intervals, but rather a refined interval reflecting solely the portion of each original CpG interval that overlapped with the exon(s).
+</div>
+<h2 id="reporting-the-original-feature-in-each-file.">Reporting the original feature in each file.</h2>
+<p>The <code>-wa</code> (write A) and <code>-wb</code> (write B) options allow one to see the original records from the A and B files that overlapped. As such, instead of not only showing you <em>where</em> the intersections occurred, it shows you <em>what</em> intersected.</p>
+<pre><code>bedtools intersect -a cpg.bed -b exons.bed -wa -wb \
+| head -5
+chr1    28735   29810   CpG:_116    chr1    29320   29370   NR_024540_exon_10_0_chr1_29321_r        -
+chr1    135124  135563  CpG:_30 chr1    134772  139696  NR_039983_exon_0_0_chr1_134773_r    0   -
+chr1    327790  328229  CpG:_29 chr1    324438  328581  NR_028322_exon_2_0_chr1_324439_f    0   +
+chr1    327790  328229  CpG:_29 chr1    324438  328581  NR_028325_exon_2_0_chr1_324439_f    0   +
+chr1    327790  328229  CpG:_29 chr1    327035  328581  NR_028327_exon_3_0_chr1_327036_f    0   +</code></pre>
+<h2 id="how-many-base-pairs-of-overlap-were-there">How many base pairs of overlap were there?</h2>
+<p>The <code>-wo</code> (write overlap) option allows one to also report the <em>number</em> of base pairs of overlap between the features that overlap between each of the files.</p>
+<pre><code>bedtools intersect -a cpg.bed -b exons.bed -wo \
+| head -10
+chr1    28735   29810   CpG:_116    chr1    29320   29370   NR_024540_exon_10_0_chr1_29321_r        -   50
+chr1    135124  135563  CpG:_30 chr1    134772  139696  NR_039983_exon_0_0_chr1_134773_r    0       439
+chr1    327790  328229  CpG:_29 chr1    324438  328581  NR_028322_exon_2_0_chr1_324439_f    0       439
+chr1    327790  328229  CpG:_29 chr1    324438  328581  NR_028325_exon_2_0_chr1_324439_f    0       439
+chr1    327790  328229  CpG:_29 chr1    327035  328581  NR_028327_exon_3_0_chr1_327036_f    0       439
+chr1    713984  714547  CpG:_60 chr1    713663  714068  NR_033908_exon_6_0_chr1_713664_r    0       84
+chr1    762416  763445  CpG:_115    chr1    761585  762902  NR_024321_exon_0_0_chr1_761586_r        -   486
+chr1    762416  763445  CpG:_115    chr1    762970  763155  NR_015368_exon_0_0_chr1_762971_f        +   185
+chr1    762416  763445  CpG:_115    chr1    762970  763155  NR_047519_exon_0_0_chr1_762971_f        +   185
+chr1    762416  763445  CpG:_115    chr1    762970  763155  NR_047520_exon_0_0_chr1_762971_f        +   185</code></pre>
+<h2 id="counting-the-number-of-overlapping-features.">Counting the number of overlapping features.</h2>
+<p>We can also count, for each feature in the “A” file, the number of overlapping features in the “B” file. This is handled with the <code>-c</code> option.</p>
+<pre><code>bedtools intersect -a cpg.bed -b exons.bed -c \
+| head
+chr1    28735   29810   CpG:_116    1
+chr1    135124  135563  CpG:_30 1
+chr1    327790  328229  CpG:_29 3
+chr1    437151  438164  CpG:_84 0
+chr1    449273  450544  CpG:_99 0
+chr1    533219  534114  CpG:_94 0
+chr1    544738  546649  CpG:_171    0
+chr1    713984  714547  CpG:_60 1
+chr1    762416  763445  CpG:_115    10
+chr1    788863  789211  CpG:_28 9</code></pre>
+<p><br /></p>
+<h2 id="find-features-that-do-not-overlap">Find features that DO NOT overlap</h2>
+<p>Often we want to identify those features in our A file that <strong>do not</strong> overlap features in the B file. The <code>-v</code> option is your friend in this case.</p>
+<pre><code>bedtools intersect -a cpg.bed -b exons.bed -v \
+| head
+chr1    437151  438164  CpG:_84
+chr1    449273  450544  CpG:_99
+chr1    533219  534114  CpG:_94
+chr1    544738  546649  CpG:_171
+chr1    801975  802338  CpG:_24
+chr1    805198  805628  CpG:_50
+chr1    839694  840619  CpG:_83
+chr1    844299  845883  CpG:_153
+chr1    912869  913153  CpG:_28
+chr1    919726  919927  CpG:_15</code></pre>
+<h2 id="require-a-minimal-fraction-of-overlap.">Require a minimal fraction of overlap.</h2>
+<p>Recall that the default is to report overlaps between features in A and B so long as <em>at least one basepair</em> of overlap exists. However, the <code>-f</code> option allows you to specify what fraction of each feature in A should be overlapped by a feature in B before it is reported.</p>
+<p>Let’s be more strict and require 50% of overlap.</p>
+<pre><code>bedtools intersect -a cpg.bed -b exons.bed \
+-wo -f 0.50 \
+| head
+chr1    135124  135563  CpG:_30 chr1    134772  139696  NR_039983_exon_0_0_chr1_134773_r    0       439
+chr1    327790  328229  CpG:_29 chr1    324438  328581  NR_028322_exon_2_0_chr1_324439_f    0       439
+chr1    327790  328229  CpG:_29 chr1    324438  328581  NR_028325_exon_2_0_chr1_324439_f    0       439
+chr1    327790  328229  CpG:_29 chr1    327035  328581  NR_028327_exon_3_0_chr1_327036_f    0       439
+chr1    788863  789211  CpG:_28 chr1    788770  794826  NR_047519_exon_5_0_chr1_788771_f    0       348
+chr1    788863  789211  CpG:_28 chr1    788770  794826  NR_047521_exon_4_0_chr1_788771_f    0       348
+chr1    788863  789211  CpG:_28 chr1    788770  794826  NR_047523_exon_3_0_chr1_788771_f    0       348
+chr1    788863  789211  CpG:_28 chr1    788770  794826  NR_047524_exon_3_0_chr1_788771_f    0       348
+chr1    788863  789211  CpG:_28 chr1    788770  794826  NR_047525_exon_4_0_chr1_788771_f    0       348
+chr1    788863  789211  CpG:_28 chr1    788858  794826  NR_047520_exon_6_0_chr1_788859_f    0       348</code></pre>
+<h2 id="faster-analysis-via-sorted-data.">Faster analysis via sorted data.</h2>
+<p>So far the examples presented have used the traditional algorithm in bedtools for finding intersections. It turns out, however, that bedtools is much faster when using presorted data.</p>
+<p>For example, compare the difference in speed between the two approaches when finding intersections between <code>exons.bed</code> and <code>hesc.chromHmm.bed</code>:</p>
+<pre><code>time bedtools intersect -a gwas.bed -b hesc.chromHmm.bed &gt; /dev/null
+1.10s user 0.11s system 99% cpu 1.206 total
+
+time bedtools intersect -a gwas.bed -b hesc.chromHmm.bed -sorted &gt; /dev/null
+0.36s user 0.01s system 99% cpu 0.368 total</code></pre>
+<div class="alert alert-info" role="alert">
+NOTE: While the run times in this example are quite small, the performance gains from using the <code>-sorted</code> option groqw as datasets grow larger. For example, compare the runtimes of the sorted and unsorted approaches as a function of dataset size in the figure below. The important thing to remember is that each dataset must be sorted by chromosome and then by start position: <code>sort -k1,1 -k2,2n</code>.-
+</div>
+<div class="figure">
+<img src="http://bedtools.readthedocs.org/en/latest/_images/speed-comparo.png" />
+</div>
+<h2 id="intersecting-multiple-files-at-once.">Intersecting multiple files at once.</h2>
+<p>As of version 2.21.0, bedtools is able to intersect an “A” file against one or more “B” files. This greatly simplifies analyses involving multiple datasets relevant to a given experiment. For example, let’s intersect exons with CpG islands, GWAS SNPs, an the ChromHMM annotations.</p>
+<pre><code>bedtools intersect -a exons.bed -b cpg.bed gwas.bed hesc.chromHmm.bed -sorted | head
+chr1    11873   11937   NR_046018_exon_0_0_chr1_11874_f 0   +
+chr1    11937   12137   NR_046018_exon_0_0_chr1_11874_f 0   +
+chr1    12137   12227   NR_046018_exon_0_0_chr1_11874_f 0   +
+chr1    12612   12721   NR_046018_exon_1_0_chr1_12613_f 0   +
+chr1    13220   14137   NR_046018_exon_2_0_chr1_13221_f 0   +
+chr1    14137   14409   NR_046018_exon_2_0_chr1_13221_f 0   +
+chr1    14361   14829   NR_024540_exon_0_0_chr1_14362_r 0   -
+chr1    14969   15038   NR_024540_exon_1_0_chr1_14970_r 0   -
+chr1    15795   15947   NR_024540_exon_2_0_chr1_15796_r 0   -
+chr1    16606   16765   NR_024540_exon_3_0_chr1_16607_r 0   -</code></pre>
+<p>Now by default, this isn’t incredibly informative as we can’t tell which of the three “B” files yielded the intersection with each exon. However, if we use the <code>-wa</code> and <code>wb</code> options, we can see from which file number (following the order of the files given on the command line) the intersection came. In this case, the 7th column reflects this file number.</p>
+<pre><code>bedtools intersect -a exons.bed -b cpg.bed gwas.bed hesc.chromHmm.bed -sorted -wa -wb \
+  | head -10000 \
+  | tail -10
+chr1    27632676    27635124    NM_001276252_exon_15_0_chr1_27632677_f  0   +   3   chr1    27633213    27635013    5_Strong_Enhancer
+chr1    27632676    27635124    NM_001276252_exon_15_0_chr1_27632677_f  0   +   3   chr1    27635013    27635413    7_Weak_Enhancer
+chr1    27632676    27635124    NM_015023_exon_15_0_chr1_27632677_f 0   +   3   chr1    27632613    27632813    6_Weak_Enhancer
+chr1    27632676    27635124    NM_015023_exon_15_0_chr1_27632677_f 0   +   3   chr1    27632813    27633213    7_Weak_Enhancer
+chr1    27632676    27635124    NM_015023_exon_15_0_chr1_27632677_f 0   +   3   chr1    27633213    27635013    5_Strong_Enhancer
+chr1    27632676    27635124    NM_015023_exon_15_0_chr1_27632677_f 0   +   3   chr1    27635013    27635413    7_Weak_Enhancer
+chr1    27648635    27648882    NM_032125_exon_0_0_chr1_27648636_f  0   +   1   chr1    27648453    27649006    CpG:_63
+chr1    27648635    27648882    NM_032125_exon_0_0_chr1_27648636_f  0   +   3   chr1    27648613    27649413    1_Active_Promoter
+chr1    27648635    27648882    NR_037576_exon_0_0_chr1_27648636_f  0   +   1   chr1    27648453    27649006    CpG:_63
+chr1    27648635    27648882    NR_037576_exon_0_0_chr1_27648636_f  0   +   3   chr1    27648613    27649413    1_Active_Promoter</code></pre>
+<p>Additionally, one can use file “labels” instead of file numbers to facilitate interpretation, especially when there are <em>many</em> files involved.</p>
+<pre><code>bedtools intersect -a exons.bed -b cpg.bed gwas.bed hesc.chromHmm.bed -sorted -wa -wb -names cpg gwas chromhmm \
+  | head -10000 \
+  | tail -10
+chr1    27632676    27635124    NM_001276252_exon_15_0_chr1_27632677_f  0   +   chromhmm    chr1    27633213    27635013    5_Strong_Enhancer
+chr1    27632676    27635124    NM_001276252_exon_15_0_chr1_27632677_f  0   +   chromhmm    chr1    27635013    27635413    7_Weak_Enhancer
+chr1    27632676    27635124    NM_015023_exon_15_0_chr1_27632677_f 0   +   chromhmm    chr1    27632613    27632813    6_Weak_Enhancer
+chr1    27632676    27635124    NM_015023_exon_15_0_chr1_27632677_f 0   +   chromhmm    chr1    27632813    27633213    7_Weak_Enhancer
+chr1    27632676    27635124    NM_015023_exon_15_0_chr1_27632677_f 0   +   chromhmm    chr1    27633213    27635013    5_Strong_Enhancer
+chr1    27632676    27635124    NM_015023_exon_15_0_chr1_27632677_f 0   +   chromhmm    chr1    27635013    27635413    7_Weak_Enhancer
+chr1    27648635    27648882    NM_032125_exon_0_0_chr1_27648636_f  0   +   cpg chr1    27648453    27649006    CpG:_63
+chr1    27648635    27648882    NM_032125_exon_0_0_chr1_27648636_f  0   +   chromhmm    chr1    27648613    27649413    1_Active_Promoter
+chr1    27648635    27648882    NR_037576_exon_0_0_chr1_27648636_f  0   +   cpg chr1    27648453    27649006    CpG:_63
+chr1    27648635    27648882    NR_037576_exon_0_0_chr1_27648636_f  0   +   chromhmm    chr1    27648613    27649413    1_Active_Promoter</code></pre>
+<p><br /></p>
+<h1 id="bedtools-merge">bedtools “merge”</h1>
+<p>Many datasets of genomic features have many individual features that overlap one another (e.g. aligments from a ChiP seq experiment). It is often useful to just cobine the overlapping into a single, contiguous interval. The bedtools <code>merge</code> command will do this for you.</p>
+<div class="figure">
+<img src="http://bedtools.readthedocs.org/en/latest/_images/merge-glyph.png" />
+</div>
+<h2 id="input-must-be-sorted">Input must be sorted</h2>
+<p>The merge tool requires that the input file is sorted by chromosome, then by start position. This allows the merging algorithm to work very quickly without requiring any RAM.</p>
+<p>If your files are unsorted, the <code>merge</code> tool will raise an error. To correct this, you need to sort your BED using the UNIX <code>sort</code> utility. For example:</p>
+<pre><code>sort -k1,1 -k2,2n foo.bed &gt; foo.sort.bed</code></pre>
+<h2 id="merge-intervals.">Merge intervals.</h2>
+<pre><code>Merging results in a new set of intervals representing the merged set of intervals in the input. That is, if a base pair in the genome is covered by 10 features, it will now only be represented once in the output file.
+
+bedtools merge -i exons.bed | head -n 20
+chr1    11873   12227
+chr1    12612   12721
+chr1    13220   14829
+chr1    14969   15038
+chr1    15795   15947
+chr1    16606   16765
+chr1    16857   17055
+chr1    17232   17368
+chr1    17605   17742
+chr1    17914   18061
+chr1    18267   18366
+chr1    24737   24891
+chr1    29320   29370
+chr1    34610   35174
+chr1    35276   35481
+chr1    35720   36081
+chr1    69090   70008
+chr1    134772  139696
+chr1    139789  139847
+chr1    140074  140566</code></pre>
+<h2 id="count-the-number-of-overlapping-intervals.">Count the number of overlapping intervals.</h2>
+<p>A more sophisticated approach would be to not only merge overlapping intervals, but also report the <em>number</em> of intervals that were integrated into the new, merged interval. One does this with the <code>-c</code> and <code>-o</code> options. The <code>-c</code> option allows one to specify a column or columns in the input that you wish to summarize. The <code>-o</code> option defines the operation(s) that you wish to apply to each column listed for the <code>-c</code> option. For example, to count the number of overlapping intervals that led to each of the new “merged” intervals, one will “count” the first column (though the second, third, fourth, etc. would work just fine as well).</p>
+<pre><code>bedtools merge -i exons.bed -c 1 -o count | head -n 20
+chr1    11873   12227   1
+chr1    12612   12721   1
+chr1    13220   14829   2
+chr1    14969   15038   1
+chr1    15795   15947   1
+chr1    16606   16765   1
+chr1    16857   17055   1
+chr1    17232   17368   1
+chr1    17605   17742   1
+chr1    17914   18061   1
+chr1    18267   18366   1
+chr1    24737   24891   1
+chr1    29320   29370   1
+chr1    34610   35174   2
+chr1    35276   35481   2
+chr1    35720   36081   2
+chr1    69090   70008   1
+chr1    134772  139696  1
+chr1    139789  139847  1
+chr1    140074  140566  1</code></pre>
+<h2 id="merging-features-that-are-close-to-one-another.">Merging features that are close to one another.</h2>
+<p>With the <code>-d</code> (distance) option, one can also merge intervals that do not overlap, yet are close to one another. For example, to merge features that are no more than 1000bp apart, one would run:</p>
+<pre><code>bedtools merge -i exons.bed -d 1000 -c 1 -o count | head -20
+chr1    11873   18366   12
+chr1    24737   24891   1
+chr1    29320   29370   1
+chr1    34610   36081   6
+chr1    69090   70008   1
+chr1    134772  140566  3
+chr1    323891  328581  10
+chr1    367658  368597  3
+chr1    621095  622034  3
+chr1    661138  665731  3
+chr1    700244  700627  1
+chr1    701708  701767  1
+chr1    703927  705092  2
+chr1    708355  708487  1
+chr1    709550  709660  1
+chr1    713663  714068  1
+chr1    752750  755214  2
+chr1    761585  763229  10
+chr1    764382  764484  9
+chr1    776579  778984  1</code></pre>
+<h2 id="listing-the-name-of-each-of-the-exons-that-were-merged.">Listing the name of each of the exons that were merged.</h2>
+<p>Many times you want to keep track of the details of exactly which intervals were merged. One way to do this is to create a list of the names of each feature. We can do with with the <code>collapse</code> operation available via the <code>-o</code> argument. The name of the exon is in the fourth column, so we ask <code>merge</code> to create a list of the exon names with <code>-c 4 -o collapse</code>:</p>
+<pre><code>bedtools merge -i exons.bed -d 90 -c 1,4 -o count,collapse | head -20
+chr1    11873   12227   1   NR_046018_exon_0_0_chr1_11874_f
+chr1    12612   12721   1   NR_046018_exon_1_0_chr1_12613_f
+chr1    13220   14829   2   NR_046018_exon_2_0_chr1_13221_f,NR_024540_exon_0_0_chr1_14362_r
+chr1    14969   15038   1   NR_024540_exon_1_0_chr1_14970_r
+chr1    15795   15947   1   NR_024540_exon_2_0_chr1_15796_r
+chr1    16606   16765   1   NR_024540_exon_3_0_chr1_16607_r
+chr1    16857   17055   1   NR_024540_exon_4_0_chr1_16858_r
+chr1    17232   17368   1   NR_024540_exon_5_0_chr1_17233_r
+chr1    17605   17742   1   NR_024540_exon_6_0_chr1_17606_r
+chr1    17914   18061   1   NR_024540_exon_7_0_chr1_17915_r
+chr1    18267   18366   1   NR_024540_exon_8_0_chr1_18268_r
+chr1    24737   24891   1   NR_024540_exon_9_0_chr1_24738_r
+chr1    29320   29370   1   NR_024540_exon_10_0_chr1_29321_r
+chr1    34610   35174   2   NR_026818_exon_0_0_chr1_34611_r,NR_026820_exon_0_0_chr1_34611_r
+chr1    35276   35481   2   NR_026818_exon_1_0_chr1_35277_r,NR_026820_exon_1_0_chr1_35277_r
+chr1    35720   36081   2   NR_026818_exon_2_0_chr1_35721_r,NR_026820_exon_2_0_chr1_35721_r
+chr1    69090   70008   1   NM_001005484_exon_0_0_chr1_69091_f
+chr1    134772  139696  1   NR_039983_exon_0_0_chr1_134773_r
+chr1    139789  139847  1   NR_039983_exon_1_0_chr1_139790_r
+chr1    140074  140566  1   NR_039983_exon_2_0_chr1_140075_r</code></pre>
+<p><br /></p>
+<h1 id="bedtools-complement">bedtools “complement”</h1>
+<p>We often want to know which intervals of the genome are <strong>NOT</strong> “covered” by intervals in a given feature file. For example, if you have a set of ChIP-seq peaks, you may also want to know which regions of the genome are not bound by the factor you assayed. The <code>complement</code> addresses this task.</p>
+<div class="figure">
+<img src="http://bedtools.readthedocs.org/en/latest/_images/complement-glyph.png" />
+</div>
+<p>As an example, let’s find all of the non-exonic (i.e., intronic or intergenic) regions of the genome. Note, to do this you need a <a href="http://bedtools.readthedocs.org/en/latest/content/general-usage.html#genome-file-format">“genome”</a> file, which tells <code>bedtools</code> the length of each chromosome in your file. <em>Consider why the tool would need this information…</em></p>
+<pre><code>bedtools complement -i exons.bed -g genome.txt \
+&gt; non-exonic.bed
+head non-exonic.bed
+chr1    0   11873
+chr1    12227   12612
+chr1    12721   13220
+chr1    14829   14969
+chr1    15038   15795
+chr1    15947   16606
+chr1    16765   16857
+chr1    17055   17232
+chr1    17368   17605
+chr1    17742   17914</code></pre>
+<p><br /></p>
+<h1 id="bedtools-genomecov">bedtools “genomecov”</h1>
+<p>For many analyses, one wants to measure the genome wide coverage of a feature file. For example, we often want to know what fraction of the genome is covered by 1 feature, 2 features, 3 features, etc. This is frequently crucial when assessing the “uniformity” of coverage from whole-genome sequencing. This is done with the versatile <code>genomecov</code> tool.</p>
+<div class="figure">
+<img src="http://bedtools.readthedocs.org/en/latest/_images/genomecov-glyph.png" />
+</div>
+<p>As an example, let’s produce a histogram of coverage of the exons throughout the genome. Like the <code>merge</code> tool, <code>genomecov</code> requires pre-sorted data. It also needs a genome file as above.</p>
+<pre><code>bedtools genomecov -i exons.bed -g genome.txt</code></pre>
+<p>This should run for 3 minutes or so. At the end of your output, you should see something like:</p>
+<pre><code>genome  0   3062406951  3137161264  0.976171
+genome  1   44120515    3137161264  0.0140638
+genome  2   15076446    3137161264  0.00480576
+genome  3   7294047 3137161264  0.00232505
+genome  4   3650324 3137161264  0.00116358
+genome  5   1926397 3137161264  0.000614057
+genome  6   1182623 3137161264  0.000376972
+genome  7   574102  3137161264  0.000183
+genome  8   353352  3137161264  0.000112634
+genome  9   152653  3137161264  4.86596e-05
+genome  10  113362  3137161264  3.61352e-05
+genome  11  57361   3137161264  1.82844e-05
+genome  12  52000   3137161264  1.65755e-05
+genome  13  55368   3137161264  1.76491e-05
+genome  14  19218   3137161264  6.12592e-06
+genome  15  19369   3137161264  6.17405e-06
+genome  16  26651   3137161264  8.49526e-06
+genome  17  9942    3137161264  3.16911e-06
+genome  18  13442   3137161264  4.28477e-06
+genome  19  1030    3137161264  3.28322e-07
+genome  20  6329    3137161264  2.01743e-06
+...</code></pre>
+<p><br /></p>
+<h2 id="producing-bedgraph-output">Producing BEDGRAPH output</h2>
+<p>Using the <code>-bg</code> option, one can also produce BEDGRAPH output which represents the “depth” fo feature coverage for each base pair in the genome:</p>
+<pre><code>bedtools genomecov -i exons.bed -g genome.txt -bg | head -20
+chr1    11873   12227   1
+chr1    12612   12721   1
+chr1    13220   14361   1
+chr1    14361   14409   2
+chr1    14409   14829   1
+chr1    14969   15038   1
+chr1    15795   15947   1
+chr1    16606   16765   1
+chr1    16857   17055   1
+chr1    17232   17368   1
+chr1    17605   17742   1
+chr1    17914   18061   1
+chr1    18267   18366   1
+chr1    24737   24891   1
+chr1    29320   29370   1
+chr1    34610   35174   2
+chr1    35276   35481   2
+chr1    35720   36081   2
+chr1    69090   70008   1
+chr1    134772  139696  1</code></pre>
+<p><br /></p>
+<h1 id="sophistication-through-chaining-multiple-bedtools">Sophistication through chaining multiple bedtools</h1>
+<p>Analytical power in <code>bedtools</code> comes from the ability to “chain” together multiple tools in order to construct rather sophisicated analyses with very little programming - you just need <strong>genome arithmetic</strong>! Have a look at the examples <a href="http://bedtools.readthedocs.org/en/latest/content/advanced-usage.html">here</a>.</p>
+<p>Here are a few more examples.</p>
+<ol style="list-style-type: decimal">
+<li>Identify the portions of intended capture intervals that did not have any coverage:</li>
+</ol>
+<blockquote class="twitter-tweet" lang="en">
+<p>
+<a href="https://twitter.com/brent_p"><span class="citation">@brent_p</span></a> bedtools genomecov -ibam aln.bam -bga &amp;#10; | awk ‘$4==0’ |
+ | bedtools intersect -a regions -b - &gt; foo
+</p>
+— Aaron Quinlan (<span class="citation">@aaronquinlan</span>) <a href="https://twitter.com/aaronquinlan/status/421786507511205888">January 10, 2014</a>
+</blockquote>
+<script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
+<ol start="2" style="list-style-type: decimal">
+<li><a href="http://gettinggeneticsdone.blogspot.com/2014/03/visualize-coverage-exome-targeted-ngs-bedtools.html">Assessing the breadth and depth coverage of sequencing coverage in exome studies</a>.</li>
+</ol>
+<p><br /></p>
+<h1 id="principal-component-analysis">Principal component analysis</h1>
+<p>We will use the bedtools implementation of a Jaccard statistic to meaure the similarity of two datasets. Briefly, the Jaccard statistic measures the ratio of the number of <em>intersecting</em> base pairs to the <em>total</em> number of base pairs in the two sets. As such, the score ranges from 0.0 to 1. 0; lower values reflect lower similarity, whereas higher values reflect higher similarity.</p>
+<p>Let’s walk through an example: we would expect the Dnase hypersensivity sites to be rather similar between two samples of the <strong>same</strong> fetal tissue type. Let’s test:</p>
+<pre><code>bedtools jaccard \
+    -a fHeart-DS16621.hotspot.twopass.fdr0.05.merge.bed \
+    -b fHeart-DS15839.hotspot.twopass.fdr0.05.merge.bed
+intersection    union-intersection  jaccard n_intersections
+81269248    160493950   0.50637 130852</code></pre>
+<p>But what about the similarity of two <strong>different</strong> tissue types?</p>
+<pre><code>bedtools jaccard \
+    -a fHeart-DS16621.hotspot.twopass.fdr0.05.merge.bed \
+    -b fSkin_fibro_bicep_R-DS19745.hg19.hotspot.twopass.fdr0.05.merge.bed
+intersection    union-intersection  jaccard n_intersections
+28076951    164197278   0.170995    73261</code></pre>
+<p>Hopefully this demonstrates how the Jaccard statistic can be used as a simple statistic to reduce the dimensionality of the comparison between two large (e.g., often containing thousands or millions of intervals) feature sets.</p>
+<p><br /></p>
+<h2 id="a-jaccard-statistic-for-all-400-pairwise-comparisons.">A Jaccard statistic for all 400 pairwise comparisons.</h2>
+<p>We are going to take this a bit further and use the Jaccard statistic to measure the similarity of all 20 tissue samples against all other 20 samples. Once we have a 20x20 matrix of similarities, we can use dimensionality reduction techniques such as hierarchical clustering or principal component analysis to detect higher order similarities among <strong>all</strong> of the datasets.</p>
+<p>We will use GNU parallel to compute a Jaccard statistic for the 400 (20*20) pairwise comparisons among the fetal tissue samples.</p>
+<p>But first, we need to install <a href="http://www.gnu.org/software/parallel/">GNU parallel</a>.</p>
+<pre><code>brew install parallel</code></pre>
+<p>Next, we need to install a tiny script I wrote for this analysis.</p>
+<pre><code>curl -O http://quinlanlab.cs.virginia.edu/cshl2013/make-matrix.py</code></pre>
+<p>Now, we can use <code>parallel</code> to, you guessed it, compute the 400 pairwise Jaccard statistics in parallel using as many processors as you have available.</p>
+<pre><code>parallel &quot;bedtools jaccard -a {1} -b {2} \
+         | awk &#39;NR&gt;1&#39; \
+         | cut -f 3 \
+         &gt; {1}.{2}.jaccard&quot; \
+         ::: `ls *.merge.bed` ::: `ls *.merge.bed`</code></pre>
+<p>This command will create a single file containing the pairwise Jaccard measurements from all 400 tests.</p>
+<pre><code>find . \
+    | grep jaccard \
+    | xargs grep &quot;&quot; \
+    | sed -e s&quot;/\.\///&quot; \
+    | perl -pi -e &quot;s/.bed./.bed\t/&quot; \
+    | perl -pi -e &quot;s/.jaccard:/\t/&quot; \
+    &gt; pairwise.dnase.txt</code></pre>
+<p>A bit of cleanup to use more intelligible names for each of the samples.</p>
+<pre><code>cat pairwise.dnase.txt \
+| sed -e &#39;s/.hotspot.twopass.fdr0.05.merge.bed//g&#39; \
+| sed -e &#39;s/.hg19//g&#39; \
+&gt; pairwise.dnase.shortnames.txt</code></pre>
+<p>Now let’s make a 20x20 matrix of the Jaccard statistic. This will allow the data to play nicely with R.</p>
+<pre><code>awk &#39;NF==3&#39; pairwise.dnase.shortnames.txt \
+| awk &#39;$1 ~ /^f/ &amp;&amp; $2 ~ /^f/&#39; \
+| python make-matrix.py \
+&gt; dnase.shortnames.distance.matrix</code></pre>
+<p>Let’s also make a file of labels for each dataset so that we can label each dataset in our R plot.</p>
+<pre><code>cut -f 1 dnase.shortnames.distance.matrix | cut -f 1 -d &quot;-&quot; | cut -f 1 -d &quot;_&quot; &gt; labels.txt</code></pre>
+<p>Now start up R.</p>
+<pre><code>R</code></pre>
+<div class="alert alert-info" role="alert">
+NOTE: The following example assumes that you have both the <code>ggplot2</code> and <code>RColorBrewer</code> packages installed on your computer. If they are not installed, run both <code>install.packages(&quot;ggplot2&quot;)</code> and <code>install.packages(&quot;RColorBrewer&quot;)</code> from the R prompt and respond to the prompts that will follow.-
+</div>
+<p>You should see something very similar to this:</p>
+<pre><code>R version 2.15.1 (2012-06-22) -- &quot;Roasted Marshmallows&quot;
+Copyright (C) 2012 The R Foundation for Statistical Computing
+ISBN 3-900051-07-0
+Platform: x86_64-apple-darwin12.0.0 (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type &#39;license()&#39; or &#39;licence()&#39; for distribution details.
+
+  Natural language support but running in an English locale
+
+R is a collaborative project with many contributors.
+Type &#39;contributors()&#39; for more information and
+&#39;citation()&#39; on how to cite R or R packages in publications.
+
+Type &#39;demo()&#39; for some demos, &#39;help()&#39; for on-line help, or
+&#39;help.start()&#39; for an HTML browser interface to help.
+Type &#39;q()&#39; to quit R.
+
+&gt;</code></pre>
+<p>No paste these commands into the R console:</p>
+<pre><code>library(ggplot2)
+library(RColorBrewer)
+blues &lt;- colorRampPalette(c(&#39;dark blue&#39;, &#39;light blue&#39;))
+greens &lt;- colorRampPalette(c(&#39;dark green&#39;, &#39;light green&#39;))
+reds &lt;- colorRampPalette(c(&#39;pink&#39;, &#39;dark red&#39;))
+ 
+setwd(&quot;~/Desktop/bedtools-demo&quot;)
+x &lt;- read.table(&#39;dnase.shortnames.distance.matrix&#39;)
+labels &lt;- read.table(&#39;labels.txt&#39;)
+ngroups &lt;- length(unique(labels))
+pca &lt;- princomp(x)
+qplot(pca$scores[,1], pca$scores[,2], color=labels[,1],     geom=&quot;point&quot;, size=1) +
+  scale_color_manual(values = c(blues(4), greens(5), reds(5))) </code></pre>
+<p>You should see this:</p>
+<div class="figure">
+<img src="http://quinlanlab.cs.virginia.edu/cshl2013/pca.png" />
+</div>
+<p>Et voila.</p>
+<div class="alert alert-info" role="alert">
+Note that PCA was used in this case as a toy example of what PCA does for the CSHL Adv. Seq. course. Heatmaps are a more informative visualization in this case since Jaccard inherently returns a measure of distance.
+</div>
+<p>So let’s make a heatmap for giggles.</p>
+<div class="alert alert-info" role="alert">
+NOTE: The following example assumes that you have both the <code>gplots</code> package installed on your computer. If it are not installed, run <code>install.packages(&quot;gplots&quot;)</code> from the R prompt and respond to the prompts that will follow.-
+</div>
+<pre><code>library(gplots)
+jaccard_table &lt;- x[, -1]
+jaccard_matrix &lt;- as.matrix(jaccard_table)
+heatmap.2(jaccard_matrix, col = brewer.pal(9,&quot;Blues&quot;), margins = c(14, 14), density.info = &quot;none&quot;, lhei=c(2, 8), trace= &quot;none&quot;)</code></pre>
+<p>You should see this:</p>
+<div class="figure">
+<img src="http://quinlanlab.cs.virginia.edu/cshl2014/heatmap.png" />
+</div>
+<p><br /></p>
+<h1 id="puzzles-to-help-teach-you-more-bedtools.">Puzzles to help teach you more bedtools.</h1>
+<ol style="list-style-type: decimal">
+<li><p>Create a BED file representing all of the intervals in the genome that are NOT exonic.</p></li>
+<li><p>What is the average distance from GWAS SNPs to the closest exon? (Hint - have a look at the <a href="http://bedtools.readthedocs.org/en/latest/content/tools/closest.html">closest</a> tool.)</p></li>
+<li><p>Count how many exons occur in each 500kb interval (“window”) in the human genome. (Hint - have a look at the <code>makewindows</code> tool.)</p></li>
+<li><p>Are there any exons that are completely overlapped by an enhancer? If so, how many?</p></li>
+<li><p>What fraction of the GWAS SNPs are exonic?</p></li>
+<li><p>What fraction of the GWAS SNPs are lie in either enhancers or promoters in the hESC data we have?</p></li>
+<li><p>Create intervals representing the canonical 2bp splice sites on either side of each exon (don’t worry about excluding splice sites at the first or last exon). (Hint - have a look at the <a href="http://bedtools.readthedocs.org/en/latest/content/tools/flank.html">flank</a> tool.)</p></li>
+<li><p>What is the Jaccard statistic between CpG and hESC enhancers? Compare that to the Jaccard statistic between CpG and hESC promoters. Does the result make sense? (Hint - you will need <code>grep</code>).</p></li>
+<li><p>What would you expect the Jaccard statistic to look like if promoters were randomly distributed throughout the genome? (Hint - you will need the <a href="http://bedtools.readthedocs.org/en/latest/content/tools/shuffle.html">shuffle</a> tool.)</p></li>
+<li><p>Which hESC ChromHMM state (e.g., 11_Weak_Txn, 10_Txn_Elongation) represents the most number of base pairs in the genome? (Hint: you will need to use <code>awk</code> or <code>perl</code> here, as well as the <a href="http://bedtools.readthedocs.org/en/latest/content/tools/groupby.html">groupby</a> tool.)</p></li>
+</ol>
+<p><a href="http://quinlanlab.org/tutorials/cshl2014/answers.html">answers</a></p>
+            </div>
+    </div>
+  </div>
+</body>
+</html>

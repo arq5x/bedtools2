@@ -1,0 +1,144 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <meta name="author" content="Aaron Quinlan" />
+  <title>bedtools Tutorial</title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <link rel="stylesheet" href="bootstrap.css" type="text/css" />
+</head>
+<body>
+    <div class="navbar navbar-static-top">
+    <div class="navbar-inner">
+      <div class="container">
+        <span class="doc-title">bedtools Tutorial</span>
+        <ul class="nav pull-right doc-info">
+                    <li><p class="navbar-text">Aaron Quinlan</p></li>
+                            </ul>
+      </div>
+    </div>
+  </div>
+    <div class="container">
+    <div class="row">
+      <div class="span12">
+            <h1 id="puzzles-to-help-teach-you-more-bedtools.">Puzzles to help teach you more bedtools.</h1>
+<ol style="list-style-type: decimal">
+<li>Create a BED file representing all of the intervals in the genome that are NOT exonic.</li>
+</ol>
+<p>Answer:</p>
+<pre><code>bedtools complement -i exons.bed -g genome.txt &gt; notexons.bed</code></pre>
+<ol start="2" style="list-style-type: decimal">
+<li>What is the average distance from GWAS SNPs to the closest exon? (Hint - have a look at the <a href="http://bedtools.readthedocs.org/en/latest/content/tools/closest.html">closest</a> tool.)</li>
+</ol>
+<p>Answer:</p>
+<pre><code>bedtools closest -a gwas.bed -b exons.bed -d | head
+chr1    1005805 1005806 rs3934834   chr1    1007125 1007955 NM_001205252_exon_0_0_chr1_1007126_r    0   -   1320
+chr1    1079197 1079198 rs11260603  chr1    1078118 1079434 NR_038869_exon_2_0_chr1_1078119_f   0   +   0
+chr1    1247493 1247494 rs12103 chr1    1247397 1247527 NM_001256456_exon_1_0_chr1_1247398_r    0   -   0
+chr1    1247493 1247494 rs12103 chr1    1247397 1247527 NM_001256460_exon_1_0_chr1_1247398_r    0   -   0
+chr1    1247493 1247494 rs12103 chr1    1247397 1247527 NM_001256462_exon_1_0_chr1_1247398_r    0   -   0
+chr1    1247493 1247494 rs12103 chr1    1247397 1247527 NM_001256463_exon_1_0_chr1_1247398_r    0   -   0
+chr1    1247493 1247494 rs12103 chr1    1247397 1247527 NM_017871_exon_1_0_chr1_1247398_r   0   -   0
+chr1    2069171 2069172 rs425277    chr1    2066700 2066786 NM_001033581_exon_1_0_chr1_2066701_f    0   +   2386
+chr1    2069171 2069172 rs425277    chr1    2066700 2066786 NM_001033582_exon_1_0_chr1_2066701_f    0   +   2386
+chr1    2069171 2069172 rs425277    chr1    2066700 2066786 NM_001242874_exon_1_0_chr1_2066701_f    0   +   2386
+
+bedtools closest -a gwas.bed -b exons.bed -d \
+  | awk &#39;{ sum += $11 } END { if (NR &gt; 0) print sum / NR }&#39;
+46713.1</code></pre>
+<ol start="3" style="list-style-type: decimal">
+<li>Count how many exons occur in each 500kb interval (“window”) in the human genome. (Hint - have a look at the <code>makewindows</code> tool.)</li>
+</ol>
+<p>Answer:</p>
+<pre><code>bedtools makewindows -g genome.txt -w 500000 &gt; genome.windows.bed
+bedtools intersect -a genome.windows.bed -b exons.bed -c &gt; genome.windows.exoncount.bedg</code></pre>
+<p>or…</p>
+<pre><code>bedtools makewindows -g genome.txt -w 500000 \
+  | bedtools intersect -a - -b exons.bed -c \
+&gt; genome.windows.exoncount.bedg</code></pre>
+<ol start="4" style="list-style-type: decimal">
+<li>Are there any exons that are completely overlapped by an enhancer? If so, how many?</li>
+</ol>
+<p>Answer:</p>
+<pre><code>bedtools intersect -a exons.bed \
+                   -b &lt;(grep Enhancer hesc.chromHmm.bed) \
+                   -wa -wb -f 1.0 \
+| head
+chr1    948846  948956  NM_005101_exon_0_0_chr1_948847_f    0   +   chr1    948337  949337  4_Strong_Enhancer
+chr1    1051439 1051736 NM_017891_exon_9_0_chr1_1051440_r   0   -   chr1    1051337 1051737 6_Weak_Enhancer
+chr1    1109285 1109306 NM_001130045_exon_0_0_chr1_1109286_f    0   +   chr1    1108537 1109537 6_Weak_Enhancer
+chr1    1109803 1109869 NM_001130045_exon_2_0_chr1_1109804_f    0   +   chr1    1109737 1109937 6_Weak_Enhancer
+chr1    1219357 1219470 NM_001130413_exon_4_0_chr1_1219358_f    0   +   chr1    1219137 1220137 7_Weak_Enhancer
+chr1    1219357 1219470 NR_037668_exon_4_0_chr1_1219358_f   0   +   chr1    1219137 1220137 7_Weak_Enhancer
+chr1    1229202 1229313 NM_030649_exon_1_0_chr1_1229203_r   0   -   chr1    1228937 1229937 6_Weak_Enhancer
+chr1    1229469 1229579 NM_030649_exon_2_0_chr1_1229470_r   0   -   chr1    1228937 1229937 6_Weak_Enhancer
+chr1    1234724 1234736 NM_030649_exon_14_0_chr1_1234725_r  0   -   chr1    1234137 1234937 7_Weak_Enhancer
+chr1    1245060 1245231 NM_153339_exon_4_0_chr1_1245061_f   0   +   chr1    1244937 1245337 4_Strong_Enhancer
+
+bedtools intersect -a exons.bed \
+                   -b &lt;(grep Enhancer hesc.chromHmm.bed) \
+                   -wa -wb -f 1.0 -u \
+| wc -l
+13746</code></pre>
+<ol start="5" style="list-style-type: decimal">
+<li>What fraction of the GWAS SNPs are exonic?</li>
+</ol>
+<p>Answer:</p>
+<pre><code>wc -l gwas.bed
+17680 gwas.bed
+
+bedtools intersect -a gwas.bed -b exons.bed -u | wc -l
+1625
+
+echo &quot;foo&quot; | awk &#39;{print 1625/17680}&#39;
+0.0919118</code></pre>
+<ol start="6" style="list-style-type: decimal">
+<li>What fraction of the GWAS SNPs are lie in either enhancers or promoters in the hESC data we have?</li>
+</ol>
+<p>Answer:</p>
+<pre><code>bedtools intersect -a gwas.bed -b &lt;(egrep &quot;Enhancer|Promoter&quot; hesc.chromHmm.bed) -u \
+| wc -l
+1285
+
+echo &quot;foo&quot; | awk &#39;{print 1285/17680}&#39;
+0.072681</code></pre>
+<ol start="7" style="list-style-type: decimal">
+<li>Create intervals representing the canonical 2bp splice sites on either side of each exon (don’t worry about excluding splice sites at the first or last exon). (Hint - have a look at the <a href="http://bedtools.readthedocs.org/en/latest/content/tools/flank.html">flank</a> tool.)</li>
+</ol>
+<p>Answer:</p>
+<pre><code>bedtools flank -l 2 -r 2 -i exons.bed -g genome.txt &gt; splice-sites.bed</code></pre>
+<p>Or:</p>
+<pre><code>bedtools slop -b 2 -i exons.bed -g genome.txt &gt; exons.plus2.bed
+bedtools subtract -a exons.plus2.bed -b exons.bed &gt; splice-sites.bed</code></pre>
+<ol start="8" style="list-style-type: decimal">
+<li>What is the Jaccard statistic between CpG and hESC enhancers? Compare that to the Jaccard statistic between CpG and hESC promoters. Does the result make sense? (Hint - you will need <code>grep</code>).</li>
+</ol>
+<p>Answer:</p>
+<pre><code>bedtools jaccard -a cpg.bed -b &lt;(grep Enhancer hesc.chromHmm.bed)
+intersection    union-intersection  jaccard n_intersections
+1148180 132977386   0.0086344   4969
+
+bedtools jaccard -a cpg.bed -b &lt;(grep Promoter hesc.chromHmm.bed)
+intersection    union-intersection  jaccard n_intersections
+15661111    53551816    0.292448    20402</code></pre>
+<ol start="9" style="list-style-type: decimal">
+<li>What would you expect the Jaccard statistic to look like if promoters were randomly distributed throughout the genome? (Hint - you will need the <a href="http://bedtools.readthedocs.org/en/latest/content/tools/shuffle.html">shuffle</a> tool.)</li>
+</ol>
+<p>Answer:</p>
+<pre><code>bedtools shuffle -i &lt;(grep Promoter hesc.chromHmm.bed) -g genome.txt \
+  | sort -k1,1 -k2,2n \
+&gt; promoters.shuffled.bed
+
+bedtools jaccard -a cpg.bed -b promoters.shuffled.bed
+intersection    union-intersection  jaccard n_intersections
+294071  68556207    0.00428949  78</code></pre>
+<ol start="10" style="list-style-type: decimal">
+<li>Which hESC ChromHMM state (e.g., 11_Weak_Txn, 10_Txn_Elongation) represents the most number of base pairs in the genome? (Hint: you will need to use <code>awk</code> or <code>perl</code> here, as well as the <a href="http://bedtools.readthedocs.org/en/latest/content/tools/groupby.html">groupby</a> tool.)</li>
+</ol>
+            </div>
+    </div>
+  </div>
+</body>
+</html>
