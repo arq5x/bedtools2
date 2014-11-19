@@ -7,6 +7,8 @@
 #include "KeyListOps.h"
 #include "FileRecordMgr.h"
 #include <cmath> //for isnan
+#include <sstream>
+#include <iomanip>
 
 KeyListOps::KeyListOps():
 _dbFileType(FileRecordTypeChecker::UNKNOWN_FILE_TYPE)
@@ -60,6 +62,7 @@ _dbFileType(FileRecordTypeChecker::UNKNOWN_FILE_TYPE)
 	_columns = "5";
 	// default to "sum"
 	_operations = "sum";
+	_precision = DEFAULT_PRECISION;
 
 }
 
@@ -172,7 +175,7 @@ const QuickString & KeyListOps::getOpVals(RecordKeyVector &hits)
 			if (isnan(val)) {
 				_outVals.append(_methods.getNullValue());
 			} else {
-				_outVals.append(val);
+				_outVals.append(format(val));
 			}
 			break;
 
@@ -181,7 +184,7 @@ const QuickString & KeyListOps::getOpVals(RecordKeyVector &hits)
 			if (isnan(val)) {
 				_outVals.append(_methods.getNullValue());
 			} else {
-				_outVals.append(val);
+				_outVals.append(format(val));
 			}
 			break;
 
@@ -190,7 +193,7 @@ const QuickString & KeyListOps::getOpVals(RecordKeyVector &hits)
 			if (isnan(val)) {
 				_outVals.append(_methods.getNullValue());
 			} else {
-				_outVals.append(val);
+				_outVals.append(format(val));
 			}
 			break;
 
@@ -199,7 +202,7 @@ const QuickString & KeyListOps::getOpVals(RecordKeyVector &hits)
 			if (isnan(val)) {
 				_outVals.append(_methods.getNullValue());
 			} else {
-				_outVals.append(val);
+				_outVals.append(format(val));
 			}
 			break;
 
@@ -208,7 +211,7 @@ const QuickString & KeyListOps::getOpVals(RecordKeyVector &hits)
 			if (isnan(val)) {
 				_outVals.append(_methods.getNullValue());
 			} else {
-				_outVals.append(val);
+				_outVals.append(format(val));
 			}
 			break;
 
@@ -225,7 +228,7 @@ const QuickString & KeyListOps::getOpVals(RecordKeyVector &hits)
 			if (isnan(val)) {
 				_outVals.append(_methods.getNullValue());
 			} else {
-				_outVals.append(val);
+				_outVals.append(format(val));
 			}
 			break;
 
@@ -234,7 +237,7 @@ const QuickString & KeyListOps::getOpVals(RecordKeyVector &hits)
 			if (isnan(val)) {
 				_outVals.append(_methods.getNullValue());
 			} else {
-				_outVals.append(val);
+				_outVals.append(format(val));
 			}
 			break;
 
@@ -243,7 +246,7 @@ const QuickString & KeyListOps::getOpVals(RecordKeyVector &hits)
 			if (isnan(val)) {
 				_outVals.append(_methods.getNullValue());
 			} else {
-				_outVals.append(val);
+				_outVals.append(format(val));
 			}
 			break;
 
@@ -252,7 +255,7 @@ const QuickString & KeyListOps::getOpVals(RecordKeyVector &hits)
 			if (isnan(val)) {
 				_outVals.append(_methods.getNullValue());
 			} else {
-				_outVals.append(val);
+				_outVals.append(format(val));
 			}
 			break;
 
@@ -315,6 +318,14 @@ const QuickString & KeyListOps::getOpVals(RecordKeyVector &hits)
 		_methods.resetNonNumErrFlag();
 	}
 	return _outVals;
+}
+
+const QuickString &KeyListOps::format(double val)
+{
+   std::stringstream strmBuf;
+   strmBuf << std::setprecision (_precision) << val;
+   _formatStr = strmBuf.str();
+   return _formatStr;
 }
 
 void KeyListOpsHelp() {
