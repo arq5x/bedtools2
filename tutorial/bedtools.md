@@ -691,7 +691,7 @@ Puzzles to help teach you more bedtools.
 
 
 1. Create a BED file representing all of the intervals in the genome
-that are NOT exonic.
+that are NOT exonic and not Promoters (based on the promoters in the hESC file).
 
 2. What is the average distance from GWAS SNPs to the closest exon? (Hint - have a look at the [closest](http://bedtools.readthedocs.org/en/latest/content/tools/closest.html) tool.)
 

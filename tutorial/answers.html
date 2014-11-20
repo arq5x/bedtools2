@@ -25,10 +25,14 @@
       <div class="span12">
             <h1 id="puzzles-to-help-teach-you-more-bedtools.">Puzzles to help teach you more bedtools.</h1>
 <ol style="list-style-type: decimal">
-<li>Create a BED file representing all of the intervals in the genome that are NOT exonic.</li>
+<li>Create a BED file representing all of the intervals in the genome that are NOT exonic and are not Promoters (based on the promoters in the hESC file).</li>
 </ol>
 <p>Answer:</p>
-<pre><code>bedtools complement -i exons.bed -g genome.txt &gt; notexons.bed</code></pre>
+<pre><code>grep Promoter hesc.chromHmm.bed &gt; hesc.promoters.bed
+
+cat exons.bed hesc.promoters.bed | sort -k1,1 -k2,2n | exons.and.promoters.bed
+
+bedtools complement -i exons.and.promoters.bed -g genome.txt &gt; notexonsorpromoters.bed</code></pre>
 <ol start="2" style="list-style-type: decimal">
 <li>What is the average distance from GWAS SNPs to the closest exon? (Hint - have a look at the <a href="http://bedtools.readthedocs.org/en/latest/content/tools/closest.html">closest</a> tool.)</li>
 </ol>

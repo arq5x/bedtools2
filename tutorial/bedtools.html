@@ -22,7 +22,46 @@
   </div>
     <div class="container">
     <div class="row">
-            <div class="span12">
+            <div id="TOC" class="span3">
+        <div class="well toc">
+        <ul>
+          <li class="nav-header">Table of Contents</li>
+        </ul>
+        <ul>
+        <li><a href="#synopsis">Synopsis</a></li>
+        <li><a href="#setup">Setup</a></li>
+        <li><a href="#what-are-these-files">What are these files?</a></li>
+        <li><a href="#the-bedtools-help">The bedtools help</a></li>
+        <li><a href="#bedtools-intersect">bedtools “intersect”</a><ul>
+        <li><a href="#default-behavior">Default behavior</a></li>
+        <li><a href="#reporting-the-original-feature-in-each-file.">Reporting the original feature in each file.</a></li>
+        <li><a href="#how-many-base-pairs-of-overlap-were-there">How many base pairs of overlap were there?</a></li>
+        <li><a href="#counting-the-number-of-overlapping-features.">Counting the number of overlapping features.</a></li>
+        <li><a href="#find-features-that-do-not-overlap">Find features that DO NOT overlap</a></li>
+        <li><a href="#require-a-minimal-fraction-of-overlap.">Require a minimal fraction of overlap.</a></li>
+        <li><a href="#faster-analysis-via-sorted-data.">Faster analysis via sorted data.</a></li>
+        <li><a href="#intersecting-multiple-files-at-once.">Intersecting multiple files at once.</a></li>
+        </ul></li>
+        <li><a href="#bedtools-merge">bedtools “merge”</a><ul>
+        <li><a href="#input-must-be-sorted">Input must be sorted</a></li>
+        <li><a href="#merge-intervals.">Merge intervals.</a></li>
+        <li><a href="#count-the-number-of-overlapping-intervals.">Count the number of overlapping intervals.</a></li>
+        <li><a href="#merging-features-that-are-close-to-one-another.">Merging features that are close to one another.</a></li>
+        <li><a href="#listing-the-name-of-each-of-the-exons-that-were-merged.">Listing the name of each of the exons that were merged.</a></li>
+        </ul></li>
+        <li><a href="#bedtools-complement">bedtools “complement”</a></li>
+        <li><a href="#bedtools-genomecov">bedtools “genomecov”</a><ul>
+        <li><a href="#producing-bedgraph-output">Producing BEDGRAPH output</a></li>
+        </ul></li>
+        <li><a href="#sophistication-through-chaining-multiple-bedtools">Sophistication through chaining multiple bedtools</a></li>
+        <li><a href="#principal-component-analysis">Principal component analysis</a><ul>
+        <li><a href="#a-jaccard-statistic-for-all-400-pairwise-comparisons.">A Jaccard statistic for all 400 pairwise comparisons.</a></li>
+        </ul></li>
+        <li><a href="#puzzles-to-help-teach-you-more-bedtools.">Puzzles to help teach you more bedtools.</a></li>
+        </ul>
+        </div>
+      </div>
+            <div class="span9">
             <h1 id="synopsis">Synopsis</h1>
 <p>Our goal is to work through examples that demonstrate how to explore, process and manipulate genomic interval files (e.g., BED, VCF, BAM) with the <code>bedtools</code> software package.</p>
 <p>Some of our analysis will be based upon the Maurano et al exploration of DnaseI hypersensitivity sites in hundreds of primary tissue types.</p>
@@ -523,7 +562,7 @@ heatmap.2(jaccard_matrix, col = brewer.pal(9,&quot;Blues&quot;), margins = c(14,
 <p><br /></p>
 <h1 id="puzzles-to-help-teach-you-more-bedtools.">Puzzles to help teach you more bedtools.</h1>
 <ol style="list-style-type: decimal">
-<li><p>Create a BED file representing all of the intervals in the genome that are NOT exonic.</p></li>
+<li><p>Create a BED file representing all of the intervals in the genome that are NOT exonic and not Promoters (based on the promoters in the hESC file).</p></li>
 <li><p>What is the average distance from GWAS SNPs to the closest exon? (Hint - have a look at the <a href="http://bedtools.readthedocs.org/en/latest/content/tools/closest.html">closest</a> tool.)</p></li>
 <li><p>Count how many exons occur in each 500kb interval (“window”) in the human genome. (Hint - have a look at the <code>makewindows</code> tool.)</p></li>
 <li><p>Are there any exons that are completely overlapped by an enhancer? If so, how many?</p></li>
