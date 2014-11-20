@@ -56,7 +56,8 @@ ContextBase::ContextBase()
   _keyListOps(NULL),
   _desiredStrand(FileRecordMergeMgr::ANY_STRAND),
   _maxDistance(0),
-  _useMergedIntervals(false)
+  _useMergedIntervals(false),
+  _reportPrecision(-1)
 
 {
 	_programNames["intersect"] = INTERSECT;
@@ -127,10 +128,6 @@ bool ContextBase::parseCmdArgs(int argc, char **argv, int skipFirstArgs) {
 	_argc = argc;
 	_argv = argv;
 	_skipFirstArgs = skipFirstArgs;
-	if (_argc < 2) {
-		setShowHelp(true);
-		return false;
-	}
 
 	setProgram(_programNames[argv[0]]);
 
@@ -170,6 +167,9 @@ bool ContextBase::parseCmdArgs(int argc, char **argv, int skipFirstArgs) {
         }
         else if (strcmp(_argv[_i], "-iobuf") == 0) {
 			if (!handle_iobuf()) return false;
+        }
+        else if (strcmp(_argv[_i], "-prec") == 0) {
+			if (!handle_prec()) return false;
         }
         else if (strcmp(_argv[_i], "-header") == 0) {
 			if (!handle_header()) return false;
@@ -213,13 +213,17 @@ bool ContextBase::isValidState()
 	}
 	if (hasColumnOpsMethods()) {
 
-		//TBD: Adjust column ops for multiple databases.
-		//For now, use last file.
-//		FileRecordMgr *dbFile = getFile(hasIntersectMethods() ? _databaseFileIdx : 0);
+		// TBD: Adjust column ops for multiple databases.
+		// For now, use last file.
 		FileRecordMgr *dbFile = getFile(getNumInputFiles()-1);
 		_keyListOps->setDBfileType(dbFile->getFileType());
 		if (!_keyListOps->isValidColumnOps(dbFile)) {
 			return false;
+		}
+		//if user specified a precision, pass it to
+		//keyList ops
+		if (_reportPrecision != -1) {
+			_keyListOps->setPrecision(_reportPrecision);
 		}
 	}
 	return true;
@@ -460,9 +464,32 @@ bool ContextBase::handle_o()
         markUsed(_i - _skipFirstArgs);
         _i++;
         markUsed(_i - _skipFirstArgs);
+        return true;
     }
-    return true;
+    return false;
 }
+
+bool ContextBase::handle_prec()
+{
+	if (!hasColumnOpsMethods()) {
+		return false;
+	}
+    if ((_i+1) < _argc) {
+    	int prec = atoi(_argv[_i + 1]);
+    	if (prec < 1) {
+    		_errorMsg += "\n***** ERROR: -prec must be followed by a positive integer. Exiting. *****";
+    		return false;
+    	}
+    	 _reportPrecision = prec;
+        markUsed(_i - _skipFirstArgs);
+        _i++;
+        markUsed(_i - _skipFirstArgs);
+        return true;
+    }
+	_errorMsg += "\n***** ERROR: -prec must be followed by a positive integer. Exiting. *****";
+    return false;
+}
+
 
 
 // for col ops, -null is a NULL value assigned

@@ -49,6 +49,7 @@ public:
 	bool isValidColumnOps(FileRecordMgr *dbFile);
 
 	const QuickString &getOpVals(RecordKeyVector &hits);
+	void setPrecision(int val) { _precision = val; }
 
 private:
     void init();
@@ -65,9 +66,14 @@ private:
     colOpsType _colOps;
     QuickString _outVals;
 
+    QuickString _formatStr;
+    int _precision;
+
+    static const int DEFAULT_PRECISION = 10;
     OP_TYPES getOpCode(const QuickString &operation) const;
     bool isNumericOp(OP_TYPES op) const;
     bool isNumericOp(const QuickString &op) const;
+    const QuickString &format(double val);
 
 };
 
