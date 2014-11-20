@@ -32,10 +32,6 @@ bool ContextMerge::parseCmdArgs(int argc, char **argv, int skipFirstArgs)
 	_argc = argc;
 	_argv = argv;
 	_skipFirstArgs = skipFirstArgs;
-	if (_argc < 2) {
-		setShowHelp(true);
-		return false;
-	}
 
 	setProgram(_programNames[argv[0]]);
 
@@ -79,12 +75,12 @@ bool ContextMerge::isValidState()
 		delete _keyListOps;
 		_keyListOps = NULL;
 	}
-	if (!ContextBase::isValidState()) {
-		return false;
+
+	//default to stdin
+	if (getNumInputFiles() == 0) {
+		addInputFile("-");
 	}
-	if (_files.size() != 1) {
-		_errorMsg = "\n***** ERROR: input file not specified. *****";
-		// Allow only one input file for now
+	if (!ContextBase::isValidState()) {
 		return false;
 	}
 

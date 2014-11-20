@@ -143,6 +143,7 @@ public:
     virtual bool hasColumnOpsMethods() const { return _hasColumnOpsMethods; }
     const QuickString &getColumnOpsVal(RecordKeyVector &keyList) const;
     //methods applicable only to column operations.
+    int getReportPrecision() const { return _reportPrecision; }
 
 protected:
 	PROGRAM_TYPE _program;
@@ -214,6 +215,8 @@ protected:
 	int _maxDistance;
 	bool _useMergedIntervals;
 
+	int _reportPrecision; //used in fields reported from numeric ops from map and merge.
+
 
 	void markUsed(int i) { _argsProcessed[i] = true; }
 	bool isUsed(int i) const { return _argsProcessed[i]; }
@@ -249,7 +252,7 @@ protected:
 	virtual bool handle_null();
 	virtual bool handle_delim();
 	virtual bool handle_sortout();
-
+	bool handle_prec();
 	bool parseIoBufSize(QuickString bufStr);
 
 };
