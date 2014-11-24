@@ -15,7 +15,6 @@ scenarios using
 `Fisher's Exact Test`_ .
 
 
-
 Given a pair of input files `-a` and `-b` in the usual BedTools parlance:
 
 .. code-block:: bash
@@ -23,9 +22,11 @@ Given a pair of input files `-a` and `-b` in the usual BedTools parlance:
   $ cat a.bed
   chr1  10  20
   chr1  30  40
+  chr1	51	52
 
   $ cat b.bed
   chr1  15   25
+  chr1	51	52
 
 And a genome of 500 bases:
 
@@ -40,43 +41,55 @@ can do this with ``fisher`` as:
 .. code-block:: bash
 
     $ bedtools fisher -a a.bed -b b.bed -g t.genome
-    # Contingency Table
+    # Number of query intervals: 3
+    # Number of db intervals: 2
+    # Number of overlaps: 2
+    # Number of possible intervals (estimated): 37
+    # Contingency Table Of Counts
+    # phyper(2 - 1, 3, 37 - 3, 2, lower.tail=F)
     #_________________________________________
-    #           | not in -b    | in -b        |
-    # not in -a | 475          | 5           |
-    #     in -a | 15           | 5            |
+    #           |  in -b       | not in -b    |
+    #     in -a | 2            | 1            |
+    # not in -a | 0            | 34           |
     #_________________________________________
     # p-values for fisher's exact test
     left    right   two-tail    ratio
-    1       1.3466e-05      1.3466e-05      31.667
+    1   0.0045045   0.0045045   inf
+
+
 
 
 Where we can see the constructed contingency table and the pvalues for left, right
 and two-tail tests.
-From here, we can say that given **500 bases** of genome, it is unlikely that a region of
-20 bases total from `-a` and 10 bases total from `-b` would share 5 bases if the regions
-were randomly distributed. *Consult your statistician for a more precise definition*.
+From here, we can say that given **500 bases** of genome, it is unlikely that we
+would see **as many** overlaps as we do if the intervals from `a` and `b` were not
+related.
 
-The above was highly significant, but if our genome were only **50 bases**:
+The above had a fairly low p-value (0.0045), but if our genome were only **60 bases**:
 
 .. code-block:: bash
 
-    $ echo -e "chr1\t50" > t.genome
+    $ echo -e "chr1\t60" > t.genome
     $ bedtools fisher -a a.bed -b b.bed -g t.genome
-    # Contingency Table
+    # Number of query intervals: 3
+    # Number of db intervals: 2
+    # Number of overlaps: 2
+    # Number of possible intervals (estimated): 4
+    # Contingency Table Of Counts
+    # phyper(2 - 1, 3, 4 - 3, 2, lower.tail=F)
     #_________________________________________
-    #           | not in -b    | in -b        |
-    # not in -a | 25           | 15           |
-    #     in -a | 5            | 5            |
+    #           |  in -b       | not in -b    |
+    #     in -a | 2            | 1            |
+    # not in -a | 0            | 1            |
     #_________________________________________
     # p-values for fisher's exact test
     left    right   two-tail    ratio
-    0.86011 0.35497 0.49401 1.667
+    1   0.5 1   inf
 
 
 We can see that neither tail is significant. Intuitively, this makes sense; 
-if we randomly place 20 (from `-a`), and 10 (from `-b`) bases of intervals
-within 50 bases, it doesn't seem unlikely that we'd see 5 bases of overlap.
+if we randomly place 3 intervals (from `-a`), and 2 (from `-b`) intervals from
+within 60 bases, it doesn't seem unlikely that we'd see 2 overlaps.
 
 
 .. note::

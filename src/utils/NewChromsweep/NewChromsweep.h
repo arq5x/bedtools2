@@ -49,6 +49,9 @@ public:
     unsigned long getQueryTotalRecordLength() { return _queryRecordsTotalLength; }
     unsigned long getDatabaseTotalRecordLength() { return _databaseRecordsTotalLength; }
 
+    unsigned long getQueryTotalRecords() { return _queryTotalRecords; }
+    unsigned long getDatabaseTotalRecords() { return _databaseTotalRecords; }
+
 private:
     ContextIntersect *_context;
     FileRecordMgr *_queryFRM;
@@ -62,6 +65,9 @@ private:
     //length of all records in the corresponding db file.
 
     unsigned long _databaseRecordsTotalLength;
+
+    unsigned long _queryTotalRecords;
+    unsigned long _databaseTotalRecords;
 
     bool _wasInitialized;
 

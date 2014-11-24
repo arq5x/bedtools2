@@ -32,13 +32,9 @@ void fisher_help(void) {
     cerr << "\nTool:    bedtools fisher (aka fisher)" << endl;
     cerr << "Version: " << VERSION << "\n";
     cerr << "Summary: Calculate Fisher statistic b/w two feature files."
-         << endl
-         << "\t Fisher is the length of the intersection over the union."
-         << endl
-         << "\t Values range from 0 (no intersection) to 1 (self intersection)."
          << endl << endl;
 
-    cerr << "Usage:   " << PROGRAM_NAME << " [OPTIONS] -a <bed/gff/vcf> -b <bed/gff/vcf> -g <genome>" << endl << endl;
+    cerr << "Usage:   " << PROGRAM_NAME << " [OPTIONS] -a <bed/gff/vcf> -b <bed/gff/vcf> -c <possible counts>" << endl << endl;
 
     cerr << "Options: " << endl;
 

@@ -7,7 +7,7 @@
 
 ContextFisher::ContextFisher() {
 	setSortedInput(true);
-	setUseMergedIntervals(true);
+	setUseMergedIntervals(false);
 }
 
 ContextFisher::~ContextFisher() {

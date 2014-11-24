@@ -26,9 +26,13 @@ private:
     int _numIntersections;
     unsigned long _queryLen;
     unsigned long _dbLen;
+    unsigned long _queryCounts;
+    unsigned long _dbCounts;
+    unsigned long _overlapCounts;
     bool getFisher();
     BedFile *exclude;
 
+    vector<int> _qsizes;
     unsigned long getTotalIntersection(RecordKeyVector &hits);
 };
 
