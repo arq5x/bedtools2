@@ -36,30 +36,25 @@ bool Fisher::calculate() {
     // header
     cout << "# Contingency Table" << endl;
 
-    // for fisher's exact test, we need the contingency table
-    // XXXXXXXX | not in A      | in A
-    // not in B | n11: in neither | n12: only in A
-    // in B    | n21: only in B  | n22: in A & B
-    //
     double left, right, two;
 
     long long genomeSize = _context->getGenomeFile()->getGenomeSize();
     if(_haveExclude){
         genomeSize -= exclude->getTotalFlattenedLength();
     }
-    // bases covered by neither a nor b
-    long long n11 = genomeSize - _queryLen - _dbLen + _intersectionVal;
-    // bases covered only by -b
-    long long n12 = _dbLen - _intersectionVal;
-    // bases covered only by -a
-    long long n21 = _queryLen - _intersectionVal;
     // bases covered by both
-    long long n22 = _intersectionVal;
+    long long n22 = genomeSize - _queryLen - _dbLen + _intersectionVal;
+    // bases covered only by -a
+    long long n21 = _dbLen - _intersectionVal;
+    // bases covered only by -b
+    long long n12 = _queryLen - _intersectionVal;
+    // bases covered by neither a nor b
+    long long n11 = _intersectionVal;
 
     printf("#_________________________________________\n");
-    printf("#           | %-12s | %-12s |\n", "not in -b", "in -b");
-    printf("# not in -a | %-12lld | %-12lld |\n", n11, n12);
-    printf("#     in -a | %-12lld | %-12lld |\n", n21, n22);
+    printf("#           | %-12s | %-12s |\n", " in -b", "not in -b");
+    printf("#     in -a | %-12lld | %-12lld |\n", n11, n12);
+    printf("# not in -a | %-12lld | %-12lld |\n", n21, n22);
     printf("#_________________________________________\n");
 
     kt_fisher_exact(n11, n12, n21, n22, &left, &right, &two);
