@@ -3,11 +3,11 @@ from random import randint
 from subprocess import check_output
 
 genome_size = 25000000
-nA = 210
-nB = 3390
+nA = 12100
+nB = 2000
 
-minA, maxA = (20, 2000)
-minB, maxB = (20, 1250)
+minA, maxA = (20, 100)
+minB, maxB = (20, 2250)
 
 for f, imin, imax, n in (
         ('taa.bed', minA, maxA, nA),
@@ -24,4 +24,5 @@ for f, imin, imax, n in (
 
 print >> open('tgg.genome', 'w'), ("chr1\t%i" % genome_size)
 
-print check_output("../../bin/bedtools fisher -a taa.bed -b tbb.bed -g tgg.genome", shell=True)
+# NOTE: add -m here to make merged output
+print check_output("../../bin/bedtools fisher -a taa.bed -b tbb.bed -g tgg.genome", shell=True).strip()
