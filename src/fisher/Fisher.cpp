@@ -59,7 +59,7 @@ bool Fisher::calculate() {
     long long n11 = (long)_overlapCounts;
     // this could be < 0 because multiple overlaps
     long long n12 = (long)max(0L, (long)_queryCounts - (long)_overlapCounts);
-    long long n21 = (long)(_dbCounts - _overlapCounts);
+    long long n21 = max(0L, (long)(_dbCounts - _overlapCounts));
     long long n22_full = n22_full_bases / bMean;
     long long n22 = max(0L, (long)(n22_full - n12 - n21 - n11));
 
