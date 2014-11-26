@@ -2,7 +2,6 @@
 #include "BlockMgr.h"
 #include "NewChromsweep.h"
 #include "kfunc.c"
-#include <numeric>      // std::accumulate
 
 Fisher::Fisher(ContextFisher *context)
 : _context(context),
@@ -49,18 +48,18 @@ bool Fisher::calculate() {
     // bases covered by neither
     long long n22_full_bases = genomeSize;
     //long long n22_bases = genomeSize - _queryLen - _dbLen + _intersectionVal;
-    long double dMean = _dbLen / (long double)_dbCounts;
-    long double qMean = _queryLen / (long double)_queryCounts;
+    long double dMean = 1.0 + _dbLen / (long double)_dbCounts;
+    long double qMean = 1.0 + _queryLen / (long double)_queryCounts;
 
-    // mean interval size
-    long double bMean = (_dbLen + _queryLen) / (long double)(_dbCounts + _queryCounts);
-    bMean = 1 + (qMean + dMean); // / 2.0;
+    // heursitic, but seems to work quite well -- better than doing more intuitive sum then divide.
+    long double bMean = (qMean + dMean);
+    //bMean = (_unionVal + 2.0 * _intersectionVal) / (long double)(_dbCounts + _queryCounts);
 
     long long n11 = (long)_overlapCounts;
     // this could be < 0 because multiple overlaps
     long long n12 = (long)max(0L, (long)_queryCounts - (long)_overlapCounts);
     long long n21 = max(0L, (long)(_dbCounts - _overlapCounts));
-    long long n22_full = n22_full_bases / bMean;
+    long long n22_full = max(n21 + n21 + n11, (long long)(n22_full_bases / bMean));
     long long n22 = max(0L, (long)(n22_full - n12 - n21 - n11));
 
     printf("# Number of query intervals: %lu\n", _queryCounts);
@@ -68,8 +67,8 @@ bool Fisher::calculate() {
     printf("# Number of overlaps: %lu\n", _overlapCounts);
     printf("# Number of possible intervals (estimated): %lld\n", n22_full);
 
-    cout << "# Contingency Table Of Counts" << endl;
     printf("# phyper(%lld - 1, %lu, %lld - %lu, %lu, lower.tail=F)\n", n11, _queryCounts, n22_full, _queryCounts, _dbCounts);
+    cout << "# Contingency Table Of Counts" << endl;
     printf("#_________________________________________\n");
     printf("#           | %-12s | %-12s |\n", " in -b", "not in -b");
     printf("#     in -a | %-12lld | %-12lld |\n", n11, n12);
