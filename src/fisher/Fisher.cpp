@@ -45,11 +45,11 @@ bool Fisher::calculate() {
     // bases covered by both
     long long n22 = _intersectionVal;
 
-    printf("#_________________________________________\n");
-    printf("#        | %-12s | %-12s |\n", "not in -b", "in -b");
-    printf("# not in -a | %-12lld | %-12lld |\n", n11, n12);
+    printf("#__________________________________________\n");
+    printf("#            | %-12s | %-12s |\n", "not in -b", "in -b");
+    printf("#  not in -a | %-12lld | %-12lld |\n", n11, n12);
     printf("#      in -a | %-12lld | %-12lld |\n", n21, n22);
-    printf("#_________________________________________\n");
+    printf("#__________________________________________\n");
 
     kt_fisher_exact(n11, n12, n21, n22, &left, &right, &two);
     double ratio = ((double)n11 / (double)n12) / ((double)n21 / (double)n22);
@@ -57,7 +57,7 @@ bool Fisher::calculate() {
     printf("# p-values for fisher's exact test\n");
     printf("left\tright\ttwo-tail\tratio\n");
     printf("%.5g\t%.5g\t%.5g\t%.3f\n", left, right, two, ratio);
-    
+
     return true;
 }
 
