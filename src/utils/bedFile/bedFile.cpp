@@ -657,12 +657,24 @@ void BedFile::setBed12 (bool isBed12) { this->isBed12 = isBed12; }
 void BedFile::loadBedFileIntoMap() {
 
     BED bedEntry;
-    
+
     Open();
     while (GetNextBed(bedEntry)) {
         if (_status == BED_VALID) {
-            BIN bin = getBin(bedEntry.start, bedEntry.end);
-            bedMap[bedEntry.chrom][bin].push_back(bedEntry);
+            addBEDIntoMap(bedEntry);
+        }
+    }
+    Close();
+}
+
+void BedFile::loadBedFileIntoMergedMap() {
+
+    BED bedEntry;
+
+    Open();
+    while (GetNextMergedBed(bedEntry)) {
+        if (_status == BED_VALID) {
+            addBEDIntoMap(bedEntry);
         }
     }
     Close();

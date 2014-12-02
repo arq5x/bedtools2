@@ -17,10 +17,17 @@ public:
   ~ContextFisher();
 	virtual bool parseCmdArgs(int argc, char **argv, int skipFirstArgs);
 	virtual bool isValidState();
+	string getExcludeFile() { return _excludeFile; }
+	void setExcludeFile(string excludeFile) { _excludeFile = excludeFile; }
+
 
 private:
 	bool handle_s();
 	bool handle_S();
+	bool handle_exclude();
+	string _excludeFile;
+
+
 };
 
 #endif /* CONTEXTFISHER_H_ */
