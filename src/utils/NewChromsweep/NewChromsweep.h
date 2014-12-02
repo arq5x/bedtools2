@@ -12,8 +12,6 @@
 #ifndef NEW_CHROMSWEEP_H
 #define NEW_CHROMSWEEP_H
 
-using namespace std;
-
 #include <string>
 #include "BTlist.h"
 #include "RecordKeyList.h"
@@ -31,7 +29,7 @@ class ContextIntersect;
 class NewChromSweep {
 public:
 
-    NewChromSweep(ContextIntersect *context);
+    NewChromSweep(ContextIntersect *context, bool useMergedIntervals = false);
     
     
     ~NewChromSweep(void);
@@ -60,7 +58,9 @@ protected:
     int _numDBs; //don't really need this stored, but here for code brevity.
     vector<FileRecordMgr *> _dbFRMs;
 
-     unsigned long _queryRecordsTotalLength;
+    bool _useMergedIntervals;
+
+    unsigned long _queryRecordsTotalLength;
     vector<unsigned long> _dbFileRecordsLength; //each value in this vector have the
     //length of all records in the corresponding db file.
 
