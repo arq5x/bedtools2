@@ -418,6 +418,7 @@ public:
     // load a BED file into a map keyed by chrom, then bin. value is 
     // vector of BEDs
     void loadBedFileIntoMap();
+    void loadBedFileIntoMergedMap();
 
     // load a BED entry into and existing map
     void addBEDIntoMap(BED bedEntry);

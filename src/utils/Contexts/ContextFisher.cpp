@@ -7,8 +7,7 @@
 
 ContextFisher::ContextFisher() {
 	setSortedInput(true);
-	setUseMergedIntervals(true);
-
+	setUseMergedIntervals(false);
 }
 
 ContextFisher::~ContextFisher() {
@@ -38,8 +37,15 @@ bool ContextFisher::parseCmdArgs(int argc, char **argv, int skipFirstArgs)
 		else if (strcmp(_argv[_i], "-S") == 0) {
 			if (!handle_S()) return false;
 		}
+		else if (strcmp(_argv[_i], "-exclude") == 0) {
+			if (!handle_exclude()) return false;
+		}
         if (strcmp(_argv[_i], "-g") == 0) {
               if (!handle_g()) return false;
+        }
+        if(strcmp(_argv[_i], "-m") == 0) {
+            markUsed(_i - _skipFirstArgs);
+	        setUseMergedIntervals(true);
         }
 	}
 	return ContextIntersect::parseCmdArgs(argc, argv, _skipFirstArgs);
@@ -112,4 +118,19 @@ bool ContextFisher::handle_S() {
 	return false;
 }
 
+bool ContextFisher::handle_exclude()
+{
+    if (_argc <= _i+1) {
+        _errorMsg = "\n***** ERROR: -exclude option given, but no file specified. *****";
+        return false;
+    }
+
+    do {
+        markUsed(_i - _skipFirstArgs);
+        _i++;
+        markUsed(_i - _skipFirstArgs);
+    } while (_argc > _i+1 && _argv[_i+1][0] != '-');
+    setExcludeFile(string(_argv[_i]));
+    return true;
+}
 

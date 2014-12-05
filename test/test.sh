@@ -22,6 +22,9 @@ cd expand; bash test-expand.sh; cd ..
 echo " Testing bedtools flank:"
 cd flank; bash test-flank.sh; cd ..
 
+echo " Testing bedtools fisher:"
+cd fisher; bash test-fisher.sh; cd ..
+
 echo " Testing bedtools genomecov:"
 cd genomecov; bash test-genomecov.sh; cd ..
 
