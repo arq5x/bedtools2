@@ -35,7 +35,7 @@ public:
     
     
     ~NewChromSweep(void);
-    bool init();
+    virtual bool init();
     
     typedef RecordList recListType;
     typedef const RecordListNode *recListIterType;
@@ -45,16 +45,21 @@ public:
     // NOTE! You MUST call this method after sweep if you want the
     // getTotalRecordLength methods to return the whole length of the
     // record files, rather than just what was used by sweep.
-    void closeOut();
+    void closeOut(bool testChromOrder = false);
 
 
     unsigned long getQueryTotalRecordLength() { return _queryRecordsTotalLength; }
     unsigned long getDatabaseTotalRecordLength() { return _databaseRecordsTotalLength; }
 
+    unsigned long getQueryTotalRecords() { return _queryTotalRecords; }
+    unsigned long getDatabaseTotalRecords() { return _databaseTotalRecords; }
+
+
 protected:
     ContextIntersect *_context;
     FileRecordMgr *_queryFRM;
     int _numDBs; //don't really need this stored, but here for code brevity.
+    int _numFiles; //ditto. Just numDBs + num queries, which for now is always 1.
     vector<FileRecordMgr *> _dbFRMs;
 
      unsigned long _queryRecordsTotalLength;
@@ -62,6 +67,10 @@ protected:
     //length of all records in the corresponding db file.
 
     unsigned long _databaseRecordsTotalLength;
+
+    unsigned long _queryTotalRecords;
+    unsigned long _databaseTotalRecords;
+
 
     bool _wasInitialized;
 
@@ -78,8 +87,10 @@ protected:
     vector<const Record *> _currDbRecs;
 
     // a cache of the current chrom from the query. used to handle chrom changes.
-    QuickString _currChromName;
+    QuickString _currQueryChromName;
+    QuickString _prevQueryChromName;
     bool _runToQueryEnd;
+
 
     virtual void masterScan(RecordKeyVector &retList);
 
@@ -87,7 +98,7 @@ protected:
     
     virtual void scanCache(int dbIdx, RecordKeyVector &retList);
     virtual void clearCache(int dbIdx);
-    virtual bool chromChange(int dbIdx, RecordKeyVector &retList);
+    virtual bool chromChange(int dbIdx, RecordKeyVector &retList, bool wantScan);
 
     bool dbFinished(int dbIdx);
 
@@ -95,6 +106,22 @@ protected:
 
     bool allCachesEmpty();
     bool allCurrDBrecsNull();
+
+
+    //
+    // members and methods for detectnig differently
+    // sorted files without a genome file.
+    //
+
+    typedef map<QuickString, int> _orderTrackType;
+    vector<_orderTrackType *> _fileTracks;
+    map<int, QuickString> _filePrevChrom;
+
+    void testChromOrder(const Record *rec);
+    bool queryChromAfterDbRec(const Record *dbRec);
+    int findChromOrder(const Record *rec);
+    bool verifyChromOrderMismatch(const QuickString & chrom, const QuickString &prevChrom, int skipFile);
+    void testThatAllDbChromsExistInQuery();
 
 };
 

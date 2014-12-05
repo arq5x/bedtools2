@@ -546,4 +546,7 @@ $BT closest -a d_q2.bed -b d_d2R.bed -D b > obs
 check obs exp
 rm obs exp
 
+cd sortAndNaming
+bash test-sort-and-naming.sh
+cd ..
 

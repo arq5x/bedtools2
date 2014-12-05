@@ -16,7 +16,7 @@ class CloseSweep : public NewChromSweep {
 public:
 	CloseSweep(ContextClosest *context);
 	~CloseSweep(void);
-
+	bool init();
 	const vector<int> &getDistances() { return _finalDistances; }
 
 private:
@@ -37,11 +37,12 @@ private:
 	RecordKeyVector _copyRetList;
 	vector<int> _copyDists;
 
-	//override these two methods from chromsweep
+	//override these methods from chromsweep
 	void masterScan(RecordKeyVector &retList);
     void scanCache(int dbIdx, RecordKeyVector &retList);
-    bool chromChange(int dbIdx, RecordKeyVector &retList);
+    bool chromChange(int dbIdx, RecordKeyVector &retList, bool wantScan);
 
+    bool dbRecAfterQueryChrom(const Record *dbRec);
 
 	typedef enum { IGNORE, DELETE } rateOvlpType;
     rateOvlpType considerRecord(const Record *cacheRec, int dbIdx, bool &stopScanning);

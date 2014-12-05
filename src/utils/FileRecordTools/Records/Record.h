@@ -33,6 +33,7 @@ public:
 	virtual void print(QuickString &outBuf) const {}
 	virtual void print(QuickString &outBuf, int start, int end) const {}
 	virtual void print(QuickString &outBuf, const QuickString & start, const QuickString & end) const {}
+	virtual void print(FILE *fp, bool newline = false) const;
 	virtual void printNull(QuickString &outBuf) const {}
 	friend ostream &operator << (ostream &out, const Record &record);
 
@@ -134,6 +135,9 @@ public:
 			bool sameStrand, bool diffStrand, float overlapFraction, bool reciprocal) const;
 
 //	virtual static bool isNumericField(int fieldNum) const = 0;
+
+	bool hasChrInChromName() const;
+	bool hasLeadingZeroInChromName() const;
 
 
 protected:

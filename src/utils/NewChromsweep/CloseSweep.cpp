@@ -18,7 +18,7 @@ CloseSweep::CloseSweep(ContextClosest *context)
 	_overlapRecs.resize(_numDBs, NULL);
 	_minUpstreamDist.resize(_numDBs, INT_MAX);
 	_minDownstreamDist.resize(_numDBs,INT_MAX);
-	_maxPrevLeftClosestEndPos.resize(_numDBs, 0       );
+	_maxPrevLeftClosestEndPos.resize(_numDBs, 0);
 
 	for (int i=0; i < _numDBs; i++) {
 		_minUpstreamRecs[i] = new distRecVecType();
@@ -36,8 +36,14 @@ CloseSweep::~CloseSweep(void) {
 	}
 }
 
+bool CloseSweep::init() {
+
+    bool retVal =  NewChromSweep::init();
+    _runToQueryEnd = true;
+    return retVal;
+ }
+
 void CloseSweep::masterScan(RecordKeyVector &retList) {
-	//first clear out everything from the previous scan
 	if (_context->reportDistance()) {
 		_finalDistances.clear();
 	}
@@ -50,11 +56,12 @@ void CloseSweep::masterScan(RecordKeyVector &retList) {
 
 	for (int i=0; i < _numDBs; i++) {
 
+		//first clear out everything from the previous scan
 		_minUpstreamRecs[i]->clear();
 		_minDownstreamRecs[i]->clear();
 		_overlapRecs[i]->clear();
 
-		if (dbFinished(i) || chromChange(i, retList)) {
+		if (dbFinished(i) || chromChange(i, retList, true)) {
 			continue;
 		} else {
 
@@ -251,9 +258,21 @@ CloseSweep::rateOvlpType CloseSweep::considerRecord(const Record *cacheRec, int 
 
 
 void CloseSweep::finalizeSelections(int dbIdx, RecordKeyVector &retList) {
+
+	//check all actual overlaps, as well as upstream and downstream hits.
+	// if all of these are empty, return.
+
+	const vector<const Record *>  & overlapRecs = (*(_overlapRecs[dbIdx]));
+	const vector<const Record *>  & upRecs = (*(_minUpstreamRecs[dbIdx]));
+	const vector<const Record *>  & downRecs = (*(_minDownstreamRecs[dbIdx]));
+
+	if (overlapRecs.empty() && upRecs.empty() && downRecs.empty()) {
+		return;
+	}
+
+
 	// If there are actual overlaps, only report those, then stop.
 	ContextClosest::tieModeType tieMode = _context->getTieMode();
-	const vector<const Record *>  & overlapRecs = (*(_overlapRecs[dbIdx]));
 	if (!overlapRecs.empty()) {
 		if (tieMode == ContextClosest::FIRST_TIE) {
 			retList.push_back(overlapRecs[0]);
@@ -272,8 +291,6 @@ void CloseSweep::finalizeSelections(int dbIdx, RecordKeyVector &retList) {
 	}
 	int upStreamDist = _minUpstreamDist[dbIdx];
 	int downStreamDist = _minDownstreamDist[dbIdx];
-	const vector<const Record *>  & upRecs = (*(_minUpstreamRecs[dbIdx]));
-	const vector<const Record *>  & downRecs = (*(_minDownstreamRecs[dbIdx]));
 
 	if (abs(upStreamDist) < abs(downStreamDist)) {
 		if (tieMode == ContextClosest::FIRST_TIE) {
@@ -377,36 +394,51 @@ void CloseSweep::checkMultiDbs(RecordKeyVector &retList) {
 	}
 }
 
-bool CloseSweep::chromChange(int dbIdx, RecordKeyVector &retList)
+bool CloseSweep::chromChange(int dbIdx, RecordKeyVector &retList, bool wantScan)
 {
-//	if (_currQueryRec->getChrName() == "chr1_gl000191_random" || (_currDbRecs[dbIdx] != NULL && _currDbRecs[dbIdx]->getChrName() == "chr1_gl000191_random")) {
-//		printf("Break point here.\n");
-//	}
+	const Record *dbRec = _currDbRecs[dbIdx];
+
+	bool haveQuery = _currQueryRec != NULL;
+	bool haveDB = dbRec != NULL;
+	\
+	if (haveQuery && _currQueryChromName != _prevQueryChromName) {
+		_context->testNameConventions(_currQueryRec);
+		testChromOrder(_currQueryRec);
+	}
+
+	if (haveDB) {
+		_context->testNameConventions(dbRec);
+		testChromOrder(dbRec);
+	}
 
     // the files are on the same chrom
-	if (_currDbRecs[dbIdx] == NULL || _currQueryRec->sameChrom(_currDbRecs[dbIdx])) {
+	if (haveQuery && (!haveDB || _currQueryRec->sameChrom(dbRec))) {
 
 		//if this is the first time the query's chrom is ahead of the chrom that was in this cache,
 		//then we have to clear the cache.
-		if (!_caches[dbIdx].empty() && _currQueryRec->chromAfter(_caches[dbIdx].begin()->value())) {
+		if (!_caches[dbIdx].empty() && queryChromAfterDbRec(_caches[dbIdx].begin()->value())) {
 			clearCache(dbIdx);
 			_maxPrevLeftClosestEndPos[dbIdx] = 0;
 		}
 		return false;
 	}
-	if (_currDbRecs[dbIdx]->chromAfter(_currQueryRec) && (!_caches[dbIdx].empty() && (_caches[dbIdx].begin()->value()->sameChrom(_currQueryRec)))) {
+
+	if (haveDB && haveQuery && dbRecAfterQueryChrom(dbRec) && (!_caches[dbIdx].empty() && (_caches[dbIdx].begin()->value()->sameChrom(_currQueryRec)))) {
 		//the newest DB record's chrom is ahead of the query, but the cache still
 		//has old records on that query's chrom
 		scanCache(dbIdx, retList);
 		finalizeSelections(dbIdx, retList);
 		return true;
 	}
-	// the query is ahead of the database. fast-forward the database to catch-up.
-	if (_currQueryRec->chromAfter(_currDbRecs[dbIdx])) {
 
-		while (_currDbRecs[dbIdx] != NULL &&
-				_currQueryRec->chromAfter(_currDbRecs[dbIdx])) {
-			_dbFRMs[dbIdx]->deleteRecord(_currDbRecs[dbIdx]);
+	if (!haveQuery || !haveDB) return false;
+
+	// the query is ahead of the database. fast-forward the database to catch-up.
+	if (queryChromAfterDbRec(dbRec)) {
+
+		while (dbRec != NULL &&
+				queryChromAfterDbRec(dbRec)) {
+			_dbFRMs[dbIdx]->deleteRecord(dbRec);
 			nextRecord(false, dbIdx);
 		}
 		clearCache(dbIdx);
@@ -416,7 +448,7 @@ bool CloseSweep::chromChange(int dbIdx, RecordKeyVector &retList)
     // the database is ahead of the query.
     else {
         // 1. scan the cache for remaining hits on the query's current chrom.
-		scanCache(dbIdx, retList);
+		if (wantScan) scanCache(dbIdx, retList);
 
         return true;
     }
@@ -424,3 +456,24 @@ bool CloseSweep::chromChange(int dbIdx, RecordKeyVector &retList)
 	//control can't reach here, but compiler still wants a return statement.
 	return true;
 }
+
+
+bool CloseSweep::dbRecAfterQueryChrom(const Record *dbRec)
+{
+	//If using a genome file, compare chrom ids.
+	//Otherwise, compare global order, inserting as needed.
+	if (_context->hasGenomeFile()) {
+		return ( dbRec->getChromId() > _currQueryRec->getChromId() ) ;
+	}
+	//see if the db has both it's curr chrom and the query's curr chrom.
+	const _orderTrackType *track = _fileTracks[dbRec->getFileIdx()];
+	_orderTrackType::const_iterator iter = track->find(dbRec->getChrName());
+	if (iter == track->end()) return false; //db file does not contain the curr chrom
+	int dbOrder = iter->second;
+	iter = track->find(_currQueryRec->getChrName());
+	if (iter == track->end()) return false; //db file does not contain the query chrom.
+	int qOrder = iter->second;
+
+	return (dbOrder > qOrder);
+}
+
