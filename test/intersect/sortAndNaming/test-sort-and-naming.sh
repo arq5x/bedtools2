@@ -60,8 +60,8 @@ rm obs
 echo "    intersect.t04...\c"
 echo \
 "ERROR: Database file db1_num.bed contains chromosome chr3, but the query file does not.
-	 Please re-reun with the -g option for a genome file.
-	 See documentation for details." >exp
+       Please re-reun with the -g option for a genome file.
+       See documentation for details." >exp
 $BT intersect -a q1_num.bed -b db1_num.bed db2_num.bed -sorted 2>&1 > /dev/null | cat - > obs
 check obs exp
 rm obs
