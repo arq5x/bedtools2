@@ -29,7 +29,7 @@ int map_main(int argc, char* argv[]) {
         }
         map_help();
         delete context;
-        return 0;
+        return 1;
     }
     FileMap *fileMap = new FileMap(context);
 
