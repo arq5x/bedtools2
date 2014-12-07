@@ -317,6 +317,18 @@ rm obs exp
 
 
 
+###########################################################
+#  Added split test from bug150. See that overlap bases
+# with -split are correctly affected by overlap fraction
+############################################################
+echo "    intersect.t22.g...\c"
+echo \
+"chr2	1000	16385	A	0	-	0	0	0	2	1,1,	0,15384,	chr2	1000	16385	A	0	-	0	0	0	2	1,1,	0,15384,	2" > exp
+$BT intersect -a bug150_a.bed -b bug150_b.bed -s -split -wo > obs
+check exp obs
+rm exp obs
+
+
 ##################################################################
 #  Test that only the mapped read is is found as an intersection
 ##################################################################
