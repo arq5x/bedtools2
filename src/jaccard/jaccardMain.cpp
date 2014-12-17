@@ -27,7 +27,7 @@ int jaccard_main(int argc, char* argv[]) {
     	}
     	jaccard_help();
     	delete context;
-    	return 0;
+    	return 1;
     }
 	Jaccard *jaccard = new Jaccard(context);
 

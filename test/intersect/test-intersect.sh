@@ -468,6 +468,19 @@ echo \
 "chr1	10	20	a1	1	+
 chr1	100	200	a2	2	-" > exp
 $BT intersect -a a.bed -b a.bam > obs
+check obs exp
+rm obs exp
+
+##################################################################
+#  Test that -split works on identical records even if
+# -f 1 is ued (100% overlap)
+##################################################################
+echo "    intersect.t38...\c"
+echo \
+"chr1	1	100	A	0	+	1	100	0	2	10,10	0,90	chr1	1	100	B	0	+	1	100	0	2	10,10	0,90	20" > exp
+$BT intersect -wao  -f 1 -split -a splitBug155_a.bed -b splitBug155_b.bed > obs
+check obs exp
+rm obs exp
 
 
 rm one_block.bam two_blocks.bam three_blocks.bam

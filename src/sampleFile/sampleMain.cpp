@@ -22,7 +22,7 @@ int sample_main(int argc, char **argv)
     	}
     	sample_help();
     	delete context;
-    	return 0;
+    	return 1;
     }
     SampleFile *sampleFile = new SampleFile(context);
 

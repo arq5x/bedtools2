@@ -29,6 +29,7 @@ private:
 	vector<int> _minDownstreamDist;
 	vector<distRecVecType *> _overlapRecs;
 	vector<int> _maxPrevLeftClosestEndPos;
+	vector<int> _maxPrevLeftClosestEndPosReverse;
 
 	vector<int> _finalDistances;
 
@@ -48,6 +49,10 @@ private:
     rateOvlpType considerRecord(const Record *cacheRec, int dbIdx, bool &stopScanning);
     void finalizeSelections(int dbIdx, RecordKeyVector &retList);
     void checkMultiDbs(RecordKeyVector &retList);
+
+    void setLeftClosestEndPos(int dbIdx, const Record *rec);
+    bool beforeLeftClosestEndPos(int dbIdx, const Record *rec);
+    void clearClosestEndPos(int dbIdx);
 };
 
 

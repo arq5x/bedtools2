@@ -25,7 +25,10 @@ NewChromSweep::NewChromSweep(ContextIntersect *context)
     _databaseTotalRecords(0),
  	_wasInitialized(false),
  	_currQueryRec(NULL),
- 	_runToQueryEnd(false)
+ 	_runToQueryEnd(false),
+ 	_lexicoDisproven(false),
+ 	_lexicoAssumed(false),
+ 	_lexicoAssumedFileIdx(-1)
 {
 }
 
@@ -211,6 +214,7 @@ bool NewChromSweep::chromChange(int dbIdx, RecordKeyVector &retList, bool wantSc
 bool NewChromSweep::next(RecordKeyVector &retList) {
 	retList.clearVector();
 
+
 	//make sure the first read of the query file is tested for chrom sort order.
 	bool needTestSortOrder = false;
 	if (_currQueryRec != NULL) {
@@ -228,9 +232,6 @@ bool NewChromSweep::next(RecordKeyVector &retList) {
 		return false;
 	}
 	_currQueryChromName = _currQueryRec->getChrName();
-//	if (_currQueryChromName == "chrUn_gl000230"  && _currQueryRec->getStartPos() == 40971) {
-//		printf("Break point here.\n");
-//	}
 
 	masterScan(retList);
 
@@ -320,6 +321,17 @@ void NewChromSweep::testChromOrder(const Record *rec)
 		rec->print(stderr, true);
 		exit(1);
 	}
+
+	if (!_lexicoDisproven && chrom < prevChrom) {
+		if (_lexicoAssumed) {
+			// ERROR.
+			fprintf(stderr, "ERROR: Sort order was unspecified, and file %s is not sorted lexicographically.\n",
+					_context->getInputFileName(fileIdx).c_str());
+			fprintf(stderr, "       Please re-reun with the -g option for a genome file.\n       See documentation for details.\n");
+			exit(1);
+		}
+		_lexicoDisproven = true;
+	}
 }
 
 bool NewChromSweep::queryChromAfterDbRec(const Record *dbRec)
@@ -330,12 +342,19 @@ bool NewChromSweep::queryChromAfterDbRec(const Record *dbRec)
 		return (_currQueryRec->getChromId() > dbRec->getChromId()) ;
 	}
 	//see if query has both
+	const QuickString &qChrom = _currQueryRec->getChrName();
+	const QuickString &dbChrom = dbRec->getChrName();
 	const _orderTrackType *track = _fileTracks[_currQueryRec->getFileIdx()];
-	_orderTrackType::const_iterator iter = track->find(_currQueryRec->getChrName());
-	if (iter == track->end()) return false; //query file does not contain the curr chrom
+	_orderTrackType::const_iterator iter = track->find(qChrom);
+
+
 	int qOrder = iter->second;
-	iter = track->find(dbRec->getChrName());
-	if (iter == track->end()) return false; //db file does not contain the dbChrom.
+	iter = track->find(dbChrom);
+	if (iter == track->end()) {
+		//query file does not contain the dbChrom.
+		//try a lexicographical comparison, if possible.
+		return testLexicoQueryAfterDb(_currQueryRec, dbRec);
+	}
 	int dbOrder = iter->second;
 
 	return (qOrder > dbOrder);
@@ -382,7 +401,7 @@ bool NewChromSweep::verifyChromOrderMismatch(const QuickString & chrom, const Qu
 
 void NewChromSweep::testThatAllDbChromsExistInQuery()
 {
-	if (_context->hasGenomeFile()) return;
+	if (_context->hasGenomeFile() || !_lexicoDisproven) return;
 
 	int queryIdx = _context->getQueryFileIdx();
 	//get the query file track. Then check that every chrom in every db exists in it.
@@ -401,4 +420,18 @@ void NewChromSweep::testThatAllDbChromsExistInQuery()
 			}
 		}
 	}
+}
+
+
+bool NewChromSweep::testLexicoQueryAfterDb(const Record *queryRec, const Record *dbRec)
+{
+	if (_lexicoDisproven) return false;
+
+	bool queryGreater = queryRec->getChrName() > dbRec->getChrName();
+	if (!_lexicoAssumed && queryGreater) {
+		_lexicoAssumed = true;
+		_lexicoAssumedFileIdx = dbRec->getFileIdx();
+		_lexicoAssumedChromName = dbRec->getChrName();
+	}
+	return queryGreater;
 }

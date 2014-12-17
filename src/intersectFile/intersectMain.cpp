@@ -30,7 +30,7 @@ int intersect_main(int argc, char* argv[]) {
     	}
     	intersect_help();
     	delete context;
-    	return 0;
+    	return 1;
     }
 	FileIntersect *fileIntersect = new FileIntersect(context);
 

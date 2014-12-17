@@ -156,7 +156,10 @@ void RecordOutputMgr::printClosest(RecordKeyVector &keyList, const vector<int> *
 			printKey(hitRec, hitRec->getStartPosStr(), hitRec->getEndPosStr());
 			if (dists != NULL) {
 				tab();
-				_outBuf.append((*dists)[distCount]);
+				int dist = (*dists)[distCount];
+				//if not using sign distance, use absolute value instead.
+				dist = context->signDistance() ? dist : abs(dist);
+				_outBuf.append(dist);
 				distCount++;
 			}
 			newline();

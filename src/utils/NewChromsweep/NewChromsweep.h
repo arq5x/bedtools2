@@ -109,19 +109,25 @@ protected:
 
 
     //
-    // members and methods for detectnig differently
+    // members and methods for detecting differently
     // sorted files without a genome file.
     //
 
     typedef map<QuickString, int> _orderTrackType;
     vector<_orderTrackType *> _fileTracks;
     map<int, QuickString> _filePrevChrom;
+    bool _lexicoDisproven; //whether we've established that any file ISN'T in lexicographical order
+    bool _lexicoAssumed; //whether we've had to try to guess that any file might be in lexicographical order.
+    QuickString _lexicoAssumedChromName; //which chromosome we had to make that guess for. Used in error reporting.
+    int _lexicoAssumedFileIdx; //which file we had to make the guess for. Also for error reporting.
 
     void testChromOrder(const Record *rec);
     bool queryChromAfterDbRec(const Record *dbRec);
     int findChromOrder(const Record *rec);
     bool verifyChromOrderMismatch(const QuickString & chrom, const QuickString &prevChrom, int skipFile);
     void testThatAllDbChromsExistInQuery();
+    bool testLexicoQueryAfterDb(const Record *queryRec, const Record *dbRec);
+
 
 };
 

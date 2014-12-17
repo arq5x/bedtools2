@@ -22,8 +22,9 @@ check()
 ############################################################
 echo "    intersect.t01...\c"
 echo \
-"ERROR: chromomsome sort ordering for file sdb1.bed is inconsistent with other files. Record was:
-chr2	10	20" > exp
+"ERROR: Sort order was unspecified, and file sq1.bed is not sorted lexicographically.
+       Please re-reun with the -g option for a genome file.
+       See documentation for details." > exp
 $BT intersect -a sq1.bed -b sdb1.bed -sorted 2>&1 > /dev/null | cat - > obs
 check obs exp
 rm obs
@@ -34,8 +35,9 @@ rm obs
 ############################################################
 echo "    intersect.t02...\c"
 echo \
-"ERROR: chromomsome sort ordering for file db2_numBackwards.bed is inconsistent with other files. Record was:
-chr3	60	100" > exp
+"ERROR: Sort order was unspecified, and file db1_num.bed is not sorted lexicographically.
+       Please re-reun with the -g option for a genome file.
+       See documentation for details." > exp
 $BT intersect -a q1a_num.bed -b db1_num.bed db2_numBackwards.bed -sorted 2>&1 > /dev/null | cat - > obs
 check obs exp
 rm obs
@@ -46,8 +48,9 @@ rm obs
 ############################################################
 echo "    intersect.t03...\c"
 echo \
-"ERROR: chromomsome sort ordering for file db3_numBackwards.bed is inconsistent with other files. Record was:
-chr1	10	20" > exp
+"ERROR: Sort order was unspecified, and file db1_num.bed is not sorted lexicographically.
+       Please re-reun with the -g option for a genome file.
+       See documentation for details." > exp
 $BT intersect -a q1a_num.bed -b db1_num.bed db2_num.bed db3_numBackwards.bed -sorted 2>&1 > /dev/null | cat - > obs
 check obs exp
 rm obs
