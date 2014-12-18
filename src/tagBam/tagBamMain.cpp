@@ -176,6 +176,10 @@ int tagbam_main(int argc, char* argv[]) {
         cerr << endl << "*****" << endl << "*****ERROR: Custom tags should be at most two characters per the SAM specification. " << endl << "*****" << endl;
         showHelp = true;
     }
+    if (haveFraction && overlapFraction == 0.0) {
+        cerr << endl << "*****" << endl << "*****ERROR: -f must be > 0.0" << endl << "*****" << endl;
+        showHelp = true;
+    }
 
 
     if (!showHelp) {
