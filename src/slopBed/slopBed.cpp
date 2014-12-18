@@ -77,11 +77,13 @@ void BedSlop::AddSlop(BED &bed) {
 
     if ( (_forceStrand) && (bed.strand == "-") ) {
         if ( ((int)bed.start - (int)_rightSlop) >= 0 )
+        {
             bed.start = bed.start - (int)_rightSlop;
+        }
         else
             bed.start = 0;
 
-        if ( ((CHRPOS)bed.end + (CHRPOS)_leftSlop) <= chromSize )
+        if ( ((int)bed.end + (int)_leftSlop) <= chromSize )
             bed.end = bed.end + (int)_leftSlop;
         else
             bed.end = chromSize;
@@ -91,10 +93,14 @@ void BedSlop::AddSlop(BED &bed) {
             bed.start = bed.start - (int)_leftSlop;
         else
             bed.start = 0;
-        if ( ((CHRPOS)bed.end + (CHRPOS)_rightSlop) <= chromSize )
+        if ( ((int)bed.end + (int)_rightSlop) <= chromSize )
             bed.end = bed.end + (int)_rightSlop;
         else
-            bed.end = chromSize;
+            // if the _rightSlop is negative and pushes bed.end to be < 0, set to 1
+            if ( ((int)bed.end + (int)_rightSlop) <= 0 )
+                bed.end = 1;
+            else
+                bed.end = chromSize;
     }
 }
 
