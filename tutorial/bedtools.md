@@ -583,7 +583,7 @@ Now, we can use `parallel` to, you guessed it, compute the 400 pairwise Jaccard 
              | awk 'NR>1' \
              | cut -f 3 \
              > {1}.{2}.jaccard" \
-             ::: `ls *.merge.bed` ::: `ls *.merge.bed`
+             ::: *.merge.bed ::: *.merge.bed
 
 This command will create a single file containing the pairwise Jaccard measurements from all 400 tests.
 
@@ -675,7 +675,8 @@ So let's make a heatmap for giggles.
     are not installed, run `install.packages("gplots")` from the R prompt and respond to the prompts that will follow.-</div>
 
     library(gplots)
-    jaccard_table <- x[, -1]
+    # thanks for the fix, Stefanie Dukowic-Schulze
+    jaccard_table <- x
     jaccard_matrix <- as.matrix(jaccard_table)
     heatmap.2(jaccard_matrix, col = brewer.pal(9,"Blues"), margins = c(14, 14), density.info = "none", lhei=c(2, 8), trace= "none")
 
@@ -691,7 +692,7 @@ Puzzles to help teach you more bedtools.
 
 
 1. Create a BED file representing all of the intervals in the genome
-that are NOT exonic and not Promoters (based on the promoters in the hESC file).
+that are NOT exonic and are not Promoters (based on the promoters in the hESC file).
 
 2. What is the average distance from GWAS SNPs to the closest exon? (Hint - have a look at the [closest](http://bedtools.readthedocs.org/en/latest/content/tools/closest.html) tool.)
 
@@ -699,9 +700,9 @@ that are NOT exonic and not Promoters (based on the promoters in the hESC file).
 
 4. Are there any exons that are completely overlapped by an enhancer? If so, how many?
 
-5. What fraction of the GWAS SNPs are exonic?
+5. What fraction of the GWAS SNPs are exonic? Hint: should you worry about double counting?
 
-6. What fraction of the GWAS SNPs are lie in either enhancers or promoters in the hESC data we have?
+6. What fraction of the GWAS SNPs are lie in either enhancers or promoters in the hESC data we have? 
 
 7. Create intervals representing the canonical 2bp splice sites on either side of each exon (don't worry about excluding splice sites at the first or last exon). (Hint - have a look at the [flank](http://bedtools.readthedocs.org/en/latest/content/tools/flank.html) tool.)
 

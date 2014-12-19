@@ -78,7 +78,7 @@ Answer:
 
 5. What fraction of the GWAS SNPs are exonic?
 
-Answer:
+Answer (Any idea why  we need -u?):
 
     wc -l gwas.bed
     17680 gwas.bed
@@ -91,7 +91,7 @@ Answer:
 
 6. What fraction of the GWAS SNPs are lie in either enhancers or promoters in the hESC data we have?
 
-Answer:
+Answer (Any idea why  we need -u?):
 
     bedtools intersect -a gwas.bed -b <(egrep "Enhancer|Promoter" hesc.chromHmm.bed) -u \
     | wc -l

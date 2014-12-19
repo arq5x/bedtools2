@@ -89,7 +89,7 @@ bedtools intersect -a exons.bed \
 <ol start="5" style="list-style-type: decimal">
 <li>What fraction of the GWAS SNPs are exonic?</li>
 </ol>
-<p>Answer:</p>
+<p>Answer (Any idea why we need -u?):</p>
 <pre><code>wc -l gwas.bed
 17680 gwas.bed
 
@@ -101,7 +101,7 @@ echo &quot;foo&quot; | awk &#39;{print 1625/17680}&#39;
 <ol start="6" style="list-style-type: decimal">
 <li>What fraction of the GWAS SNPs are lie in either enhancers or promoters in the hESC data we have?</li>
 </ol>
-<p>Answer:</p>
+<p>Answer (Any idea why we need -u?):</p>
 <pre><code>bedtools intersect -a gwas.bed -b &lt;(egrep &quot;Enhancer|Promoter&quot; hesc.chromHmm.bed) -u \
 | wc -l
 1285

@@ -478,7 +478,7 @@ intersection    union-intersection  jaccard n_intersections
          | awk &#39;NR&gt;1&#39; \
          | cut -f 3 \
          &gt; {1}.{2}.jaccard&quot; \
-         ::: `ls *.merge.bed` ::: `ls *.merge.bed`</code></pre>
+         ::: *.merge.bed ::: *.merge.bed</code></pre>
 <p>This command will create a single file containing the pairwise Jaccard measurements from all 400 tests.</p>
 <pre><code>find . \
     | grep jaccard \
@@ -552,7 +552,8 @@ Note that PCA was used in this case as a toy example of what PCA does for the CS
 NOTE: The following example assumes that you have both the <code>gplots</code> package installed on your computer. If it are not installed, run <code>install.packages(&quot;gplots&quot;)</code> from the R prompt and respond to the prompts that will follow.-
 </div>
 <pre><code>library(gplots)
-jaccard_table &lt;- x[, -1]
+# thanks for the fix, Stefanie Dukowic-Schulze
+jaccard_table &lt;- x
 jaccard_matrix &lt;- as.matrix(jaccard_table)
 heatmap.2(jaccard_matrix, col = brewer.pal(9,&quot;Blues&quot;), margins = c(14, 14), density.info = &quot;none&quot;, lhei=c(2, 8), trace= &quot;none&quot;)</code></pre>
 <p>You should see this:</p>
@@ -562,11 +563,11 @@ heatmap.2(jaccard_matrix, col = brewer.pal(9,&quot;Blues&quot;), margins = c(14,
 <p><br /></p>
 <h1 id="puzzles-to-help-teach-you-more-bedtools.">Puzzles to help teach you more bedtools.</h1>
 <ol style="list-style-type: decimal">
-<li><p>Create a BED file representing all of the intervals in the genome that are NOT exonic and not Promoters (based on the promoters in the hESC file).</p></li>
+<li><p>Create a BED file representing all of the intervals in the genome that are NOT exonic and are not Promoters (based on the promoters in the hESC file).</p></li>
 <li><p>What is the average distance from GWAS SNPs to the closest exon? (Hint - have a look at the <a href="http://bedtools.readthedocs.org/en/latest/content/tools/closest.html">closest</a> tool.)</p></li>
 <li><p>Count how many exons occur in each 500kb interval (“window”) in the human genome. (Hint - have a look at the <code>makewindows</code> tool.)</p></li>
 <li><p>Are there any exons that are completely overlapped by an enhancer? If so, how many?</p></li>
-<li><p>What fraction of the GWAS SNPs are exonic?</p></li>
+<li><p>What fraction of the GWAS SNPs are exonic? Hint: should you worry about double counting?</p></li>
 <li><p>What fraction of the GWAS SNPs are lie in either enhancers or promoters in the hESC data we have?</p></li>
 <li><p>Create intervals representing the canonical 2bp splice sites on either side of each exon (don’t worry about excluding splice sites at the first or last exon). (Hint - have a look at the <a href="http://bedtools.readthedocs.org/en/latest/content/tools/flank.html">flank</a> tool.)</p></li>
 <li><p>What is the Jaccard statistic between CpG and hESC enhancers? Compare that to the Jaccard statistic between CpG and hESC promoters. Does the result make sense? (Hint - you will need <code>grep</code>).</p></li>
