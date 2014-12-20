@@ -43,9 +43,7 @@ private:
     void scanCache(int dbIdx, RecordKeyVector &retList);
     bool chromChange(int dbIdx, RecordKeyVector &retList, bool wantScan);
 
-    bool dbRecAfterQueryChrom(const Record *dbRec);
-
-	typedef enum { IGNORE, DELETE } rateOvlpType;
+ 	typedef enum { IGNORE, DELETE } rateOvlpType;
     rateOvlpType considerRecord(const Record *cacheRec, int dbIdx, bool &stopScanning);
     void finalizeSelections(int dbIdx, RecordKeyVector &retList);
     void checkMultiDbs(RecordKeyVector &retList);

@@ -119,6 +119,11 @@ bool ContextIntersect::isValidState()
 			return false;
 		}
 	}
+
+	if (_haveFraction && (_overlapFraction <= 0.0 || _overlapFraction > 1.0)) {
+		_errorMsg = "\n***** ERROR: _overlapFraction must be in the range (0.0, 1.0]. *****";
+		return false;
+	}
 	if (getUseDBnameTags() && _dbNameTags.size() != _dbFileIdxs.size()) {
 		_errorMsg = "\n***** ERROR: Number of database name tags given does not match number of databases. *****";
 		return false;

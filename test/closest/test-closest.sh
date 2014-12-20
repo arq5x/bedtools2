@@ -598,3 +598,8 @@ echo \
 $BT closest -a d.bed -b d_id.bed -D ref -id > obs
 check exp obs
 rm exp obs
+
+
+cd sortAndNaming
+bash test-sort-and-naming.sh
+cd ..

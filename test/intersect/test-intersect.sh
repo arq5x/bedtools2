@@ -482,6 +482,27 @@ $BT intersect -wao  -f 1 -split -a splitBug155_a.bed -b splitBug155_b.bed > obs
 check obs exp
 rm obs exp
 
+##################################################################
+#  Test that fractional overlap must be greater than 0.0
+##################################################################
+echo "    intersect.t39...\c"
+echo \
+"***** ERROR: _overlapFraction must be in the range (0.0, 1.0]. *****" > exp
+$BT intersect -a a.bed -b b.bed -f 0.0 2>&1 > /dev/null | cat - | head -2 | tail -1 > obs
+check exp obs
+rm exp obs
+
+##################################################################
+#  Test that fractional overlap must be <= than 1.0
+##################################################################
+echo "    intersect.t40...\c"
+echo \
+"***** ERROR: _overlapFraction must be in the range (0.0, 1.0]. *****" > exp
+$BT intersect -a a.bed -b b.bed -f 1.00001 2>&1 > /dev/null | cat - | head -2 | tail -1 > obs
+check exp obs
+rm exp obs
+
+
 
 rm one_block.bam two_blocks.bam three_blocks.bam
 

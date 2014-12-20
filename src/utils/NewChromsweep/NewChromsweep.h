@@ -120,6 +120,7 @@ protected:
     bool _lexicoAssumed; //whether we've had to try to guess that any file might be in lexicographical order.
     QuickString _lexicoAssumedChromName; //which chromosome we had to make that guess for. Used in error reporting.
     int _lexicoAssumedFileIdx; //which file we had to make the guess for. Also for error reporting.
+    bool _testLastQueryRec;
 
     void testChromOrder(const Record *rec);
     bool queryChromAfterDbRec(const Record *dbRec);

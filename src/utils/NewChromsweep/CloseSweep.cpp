@@ -45,6 +45,7 @@ bool CloseSweep::init() {
  }
 
 void CloseSweep::masterScan(RecordKeyVector &retList) {
+	if (_currQueryChromName != _prevQueryChromName) testChromOrder(_currQueryRec);
 	if (_context->reportDistance()) {
 		_finalDistances.clear();
 	}
@@ -439,12 +440,18 @@ bool CloseSweep::chromChange(int dbIdx, RecordKeyVector &retList, bool wantScan)
 
 	// the query is ahead of the database. fast-forward the database to catch-up.
 	if (queryChromAfterDbRec(dbRec)) {
+		QuickString oldDbChrom(dbRec->getChrName());
 
 		while (dbRec != NULL &&
 				queryChromAfterDbRec(dbRec)) {
 			_dbFRMs[dbIdx]->deleteRecord(dbRec);
-			nextRecord(false, dbIdx);
-			dbRec = _currDbRecs[dbIdx];
+			if (!nextRecord(false, dbIdx)) break;
+			dbRec =  _currDbRecs[dbIdx];
+			const QuickString &newDbChrom = dbRec->getChrName();
+			if (newDbChrom != oldDbChrom) {
+				testChromOrder(dbRec);
+				oldDbChrom = newDbChrom;
+			}
 		}
 		clearCache(dbIdx);
 		clearClosestEndPos(dbIdx);
@@ -462,24 +469,6 @@ bool CloseSweep::chromChange(int dbIdx, RecordKeyVector &retList, bool wantScan)
 	return true;
 }
 
-
-bool CloseSweep::dbRecAfterQueryChrom(const Record *dbRec)
-{
-	//If using a genome file, compare chrom ids.
-	//Otherwise, compare global order, inserting as needed.
-	if (_context->hasGenomeFile()) {
-		return ( dbRec->getChromId() > _currQueryRec->getChromId() ) ;
-	}
-	//see if the db has both it's curr chrom and the query's curr chrom.
-	const _orderTrackType *track = _fileTracks[dbRec->getFileIdx()];
-	_orderTrackType::const_iterator iter = track->find(dbRec->getChrName());
-	int dbOrder = iter->second;
-	iter = track->find(_currQueryRec->getChrName());
-	if (iter == track->end()) return false; // query file does not contain the db chrom.
-	int qOrder = iter->second;
-
-	return (dbOrder > qOrder);
-}
 
 void CloseSweep::setLeftClosestEndPos(int dbIdx, const Record *rec)
 {

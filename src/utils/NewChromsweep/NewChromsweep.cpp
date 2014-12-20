@@ -28,7 +28,8 @@ NewChromSweep::NewChromSweep(ContextIntersect *context)
  	_runToQueryEnd(false),
  	_lexicoDisproven(false),
  	_lexicoAssumed(false),
- 	_lexicoAssumedFileIdx(-1)
+ 	_lexicoAssumedFileIdx(-1),
+ 	_testLastQueryRec(false)
 {
 }
 
@@ -72,9 +73,14 @@ bool NewChromSweep::init() {
  }
 
 void NewChromSweep::closeOut(bool testChromOrderVal) {
+	if (_testLastQueryRec) {
+		testChromOrder(_currQueryRec);
+	}
 	while (!_queryFRM->eof()) {
 		nextRecord(true);
+		testChromOrder(_currQueryRec);
 	}
+	if (testChromOrderVal) testChromOrder(_currQueryRec);
 
     for (int i=0; i < _numDBs; i++) {
     	while (!_dbFRMs[i]->eof()) {
@@ -194,11 +200,17 @@ bool NewChromSweep::chromChange(int dbIdx, RecordKeyVector &retList, bool wantSc
 
 	if (queryChromAfterDbRec(dbRec)) {
 		// the query is ahead of the database. fast-forward the database to catch-up.
+		QuickString oldDbChrom(dbRec->getChrName());
 		while (dbRec != NULL &&
 				queryChromAfterDbRec(dbRec)) {
 				_dbFRMs[dbIdx]->deleteRecord(dbRec);
-			nextRecord(false, dbIdx);
+			if (!nextRecord(false, dbIdx)) break;
 			dbRec =  _currDbRecs[dbIdx];
+			const QuickString &newDbChrom = dbRec->getChrName();
+			if (newDbChrom != oldDbChrom) {
+				testChromOrder(dbRec);
+				oldDbChrom = newDbChrom;
+			}
 		}
 		clearCache(dbIdx);
         return false;
@@ -229,6 +241,7 @@ bool NewChromSweep::next(RecordKeyVector &retList) {
 	if (needTestSortOrder) testChromOrder(_currQueryRec);
 
 	if (allCurrDBrecsNull() && allCachesEmpty() && !_runToQueryEnd) {
+		_testLastQueryRec = true;
 		return false;
 	}
 	_currQueryChromName = _currQueryRec->getChrName();
@@ -314,9 +327,12 @@ void NewChromSweep::testChromOrder(const Record *rec)
 		_filePrevChrom[fileIdx] = chrom;
 		return; //no previously stored chrom for this file.
 	}
-	const QuickString &prevChrom = prevIter->second;
+	const QuickString prevChrom(prevIter->second);
+	_filePrevChrom[fileIdx] = chrom;
 
-	if (chrom != prevChrom && verifyChromOrderMismatch(chrom, prevChrom, fileIdx)) {
+	if (chrom == prevChrom) return;
+
+	if (verifyChromOrderMismatch(chrom, prevChrom, fileIdx)) {
 		fprintf(stderr, "ERROR: chromomsome sort ordering for file %s is inconsistent with other files. Record was:\n", _context->getInputFileName(fileIdx).c_str());
 		rec->print(stderr, true);
 		exit(1);

@@ -597,7 +597,7 @@ echo \
 "chr1	10	20	chr1
 chr2	10	20	chr2
 chr2	200	300	.
-chr10	10	20	.
+chr10	10	20	chr10
 chr10	20	30	." > exp
 $BT map -a a.vsorted.bed -b b.vsorted.bed -c 1 -o collapse > obs
 check obs exp
