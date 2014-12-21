@@ -80,6 +80,8 @@ void BinTree::loadDB()
 				continue;
 			}
 
+			_context->testNameConventions(record);
+
 			if (!addRecordToTree(record)) {
 				fprintf(stderr, "ERROR: Unable to add record to tree.\n");
 				databaseFile->close();

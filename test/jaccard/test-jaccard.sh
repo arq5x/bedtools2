@@ -37,14 +37,7 @@ $BT jaccard -a a.bed -b c.bed > obs
 check obs exp
 rm obs exp
 
-
-echo "    jaccard.t04...\c"
-echo \
-"intersection	union-intersection	jaccard	n_intersections
-0	210	0	0" > exp
-$BT jaccard -a a.bed -b d.bed > obs
-check obs exp
-rm obs exp
+# TEST #4 IS DEPRECATED
 
 ###########################################################
 #  Test stdin

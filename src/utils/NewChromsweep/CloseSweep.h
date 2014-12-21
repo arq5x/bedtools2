@@ -16,7 +16,7 @@ class CloseSweep : public NewChromSweep {
 public:
 	CloseSweep(ContextClosest *context);
 	~CloseSweep(void);
-
+	bool init();
 	const vector<int> &getDistances() { return _finalDistances; }
 
 private:
@@ -29,6 +29,7 @@ private:
 	vector<int> _minDownstreamDist;
 	vector<distRecVecType *> _overlapRecs;
 	vector<int> _maxPrevLeftClosestEndPos;
+	vector<int> _maxPrevLeftClosestEndPosReverse;
 
 	vector<int> _finalDistances;
 
@@ -37,16 +38,19 @@ private:
 	RecordKeyVector _copyRetList;
 	vector<int> _copyDists;
 
-	//override these two methods from chromsweep
+	//override these methods from chromsweep
 	void masterScan(RecordKeyVector &retList);
     void scanCache(int dbIdx, RecordKeyVector &retList);
-    bool chromChange(int dbIdx, RecordKeyVector &retList);
+    bool chromChange(int dbIdx, RecordKeyVector &retList, bool wantScan);
 
-
-	typedef enum { IGNORE, DELETE } rateOvlpType;
+ 	typedef enum { IGNORE, DELETE } rateOvlpType;
     rateOvlpType considerRecord(const Record *cacheRec, int dbIdx, bool &stopScanning);
     void finalizeSelections(int dbIdx, RecordKeyVector &retList);
     void checkMultiDbs(RecordKeyVector &retList);
+
+    void setLeftClosestEndPos(int dbIdx, const Record *rec);
+    bool beforeLeftClosestEndPos(int dbIdx, const Record *rec);
+    void clearClosestEndPos(int dbIdx);
 };
 
 

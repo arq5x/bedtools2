@@ -16,7 +16,7 @@ int fisher_main(int argc, char* argv[]) {
     	}
     	fisher_help();
     	delete context;
-    	return 0;
+    	return 1;
     }
 	Fisher *fisher = new Fisher(context);
 

@@ -145,6 +145,9 @@ public:
     //methods applicable only to column operations.
     int getReportPrecision() const { return _reportPrecision; }
 
+
+    void testNameConventions(const Record *);
+
 protected:
 	PROGRAM_TYPE _program;
 
@@ -230,6 +233,16 @@ protected:
 	char **_argv;
 	int _i;
 
+	//track whether each file has the letters chr in their chrom names.
+	//this is needed for enforcing consistent naming conventions across
+	//multiple files, and auto-detecting errors when they're not followed.
+	typedef enum { YES, NO, UNTESTED } testType;
+	typedef map<int, testType> conventionType;
+	conventionType _fileHasChrInChromNames;
+	// as above, but check whether first digit to appear in
+	// a chrom name is a zero.
+	conventionType _fileHasLeadingZeroInChromNames;
+
 	static const int MIN_ALLOWED_BUF_SIZE = 8;
 
 	virtual bool handle_bed();
@@ -255,6 +268,11 @@ protected:
 	bool handle_prec();
 	bool parseIoBufSize(QuickString bufStr);
 
+    testType fileHasChrInChromNames(int fileIdx);
+    testType fileHasLeadingZeroInChromNames(int fileIdx);
+
+    testType _allFilesHaveChrInChromNames;
+    testType _allFileHaveLeadingZeroInChromNames;
 };
 
 #endif /* CONTEXTBASE_H_ */

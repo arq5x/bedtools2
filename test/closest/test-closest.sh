@@ -322,7 +322,7 @@ rm obs exp
 ###########################################################
 echo "    closest.t26...\c"
 echo \
-"chr1	80	100	d_q1.1	5	+	chr1	40	60	d1F.1	10	+	-21" > exp
+"chr1	80	100	d_q1.1	5	+	chr1	40	60	d1F.1	10	+	21" > exp
 $BT closest -a d_q1.bed -b d_d1F.bed -D b > obs
 check obs exp
 rm obs exp
@@ -353,7 +353,7 @@ rm obs exp
 ###########################################################
 echo "    closest.t29...\c"
 echo \
-"chr1	80	100	d_q1.1	5	+	chr1	40	60	d1R.1	10	-	21" > exp
+"chr1	80	100	d_q1.1	5	+	chr1	40	60	d1R.1	10	-	-21" > exp
 $BT closest -a d_q1.bed -b d_d1R.bed -D b > obs
 check obs exp
 rm obs exp
@@ -384,7 +384,7 @@ rm obs exp
 ###########################################################
 echo "    closest.t32...\c"
 echo \
-"chr1	80	100	d_q2.1	5	-	chr1	40	60	d1F.1	10	+	-21" > exp
+"chr1	80	100	d_q2.1	5	-	chr1	40	60	d1F.1	10	+	21" > exp
 $BT closest -a d_q2.bed -b d_d1F.bed -D b > obs
 check obs exp
 rm obs exp
@@ -418,7 +418,7 @@ rm obs exp
 ###########################################################
 echo "    closest.t35...\c"
 echo \
-"chr1	80	100	d_q2.1	5	-	chr1	40	60	d1R.1	10	-	21" > exp
+"chr1	80	100	d_q2.1	5	-	chr1	40	60	d1R.1	10	-	-21" > exp
 $BT closest -a d_q2.bed -b d_d1R.bed -D b > obs
 check obs exp
 rm obs exp
@@ -450,7 +450,7 @@ rm obs exp
 ###########################################################
 echo "    closest.t38...\c"
 echo \
-"chr1	80	100	d_q1.1	5	+	chr1	140	160	d2F.1	10	+	41" > exp
+"chr1	80	100	d_q1.1	5	+	chr1	140	160	d2F.1	10	+	-41" > exp
 $BT closest -a d_q1.bed -b d_d2F.bed -D b > obs
 check obs exp
 rm obs exp
@@ -481,7 +481,7 @@ rm obs exp
 ###########################################################
 echo "    closest.t41...\c"
 echo \
-"chr1	80	100	d_q1.1	5	+	chr1	140	160	d2R.1	10	-	-41" > exp
+"chr1	80	100	d_q1.1	5	+	chr1	140	160	d2R.1	10	-	41" > exp
 $BT closest -a d_q1.bed -b d_d2R.bed -D b > obs
 check obs exp
 rm obs exp
@@ -511,7 +511,7 @@ rm obs exp
 ###########################################################
 echo "    closest.t44...\c"
 echo \
-"chr1	80	100	d_q2.1	5	-	chr1	140	160	d2F.1	10	+	41" > exp
+"chr1	80	100	d_q2.1	5	-	chr1	140	160	d2F.1	10	+	-41" > exp
 $BT closest -a d_q2.bed -b d_d2F.bed -D b > obs
 check obs exp
 rm obs exp
@@ -541,9 +541,65 @@ rm obs exp
 ###########################################################
 echo "    closest.t47...\c"
 echo \
-"chr1	80	100	d_q2.1	5	-	chr1	140	160	d2R.1	10	-	-41" > exp
+"chr1	80	100	d_q2.1	5	-	chr1	140	160	d2R.1	10	-	41" > exp
+$BT closest -a d_q2.bed -b d_d2R.bed -D b > obs
+check obs exp
+rm obs exp
+
+echo "    closest.t48...\c"
+echo \
+"chr1	80	100	d_q2.1	5	-	chr1	140	160	d2R.1	10	-	41" > exp
 $BT closest -a d_q2.bed -b d_d2R.bed -D b > obs
 check obs exp
 rm obs exp
 
 
+###########################################################
+# see that stranded sweep doesn't prematurely purge 
+# records from the cache
+###########################################################
+echo "    closest.t48...\c"
+echo \
+"chr1	80	100	c1	20	+	chr1	50	60	d2	20	+
+chr1	110	130	c2	20	-	chr1	20	40	d1	20	-" > exp
+$BT closest -a strand-test-c.bed -b strand-test-d.bed -s > obs
+check obs exp
+rm obs exp
+
+###########################################################
+# check oppostite stranded sweep 
+###########################################################
+echo "    closest.t49...\c"
+echo \
+"chr1	80	100	c1	20	+	chr1	20	40	d1	20	-
+chr1	110	130	c2	20	-	chr1	50	60	d2	20	+" > exp
+$BT closest -a strand-test-c.bed -b strand-test-d.bed -S > obs
+check exp obs
+rm obs exp
+
+
+###########################################################
+# check -iu
+###########################################################
+echo "    closest.t50...\c"
+echo \
+"chr1	100	120	chr1	200	210	81" > exp
+$BT closest -a d.bed -b d_iu.bed -D ref -iu > obs
+check exp obs
+rm exp obs
+
+
+##########################################################
+# check -id
+###########################################################
+echo "    closest.t51...\c"
+echo \
+"chr1	100	120	chr1	10	20	-81" > exp
+$BT closest -a d.bed -b d_id.bed -D ref -id > obs
+check exp obs
+rm exp obs
+
+
+cd sortAndNaming
+bash test-sort-and-naming.sh
+cd ..

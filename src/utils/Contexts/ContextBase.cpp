@@ -57,7 +57,9 @@ ContextBase::ContextBase()
   _desiredStrand(FileRecordMergeMgr::ANY_STRAND),
   _maxDistance(0),
   _useMergedIntervals(false),
-  _reportPrecision(-1)
+  _reportPrecision(-1),
+  _allFilesHaveChrInChromNames(UNTESTED),
+  _allFileHaveLeadingZeroInChromNames(UNTESTED)
 
 {
 	_programNames["intersect"] = INTERSECT;
@@ -599,3 +601,73 @@ bool ContextBase::parseIoBufSize(QuickString bufStr)
 	}
 	return true;
 }
+
+void ContextBase::testNameConventions(const Record *record) {
+	int fileIdx = record->getFileIdx();
+
+	//
+	// First test whether chr in chrom names match
+	//
+
+	bool hasChr = record->hasChrInChromName();
+	testType testChrVal = fileHasChrInChromNames(fileIdx);
+
+	if (testChrVal == UNTESTED) {
+		_fileHasChrInChromNames[fileIdx] = hasChr ? YES : NO;
+	} else if ((testChrVal == YES && !hasChr) || (testChrVal == NO && hasChr)) {
+		fprintf(stderr, "ERROR: File %s has inconsistent naming convention for record:\n", _fileNames[fileIdx].c_str());
+		record->print(stderr, true);
+		exit(1);
+	}
+	if ((_allFilesHaveChrInChromNames == YES && !hasChr) || (_allFilesHaveChrInChromNames == NO && hasChr)) {
+		fprintf(stderr, "ERROR: File %s has a record where naming convention is inconsistent with other files:\n", _fileNames[fileIdx].c_str());
+		record->print(stderr, true);
+		exit(1);
+	}
+
+	if (_allFilesHaveChrInChromNames == UNTESTED) {
+		_allFilesHaveChrInChromNames = hasChr ? YES : NO;
+	}
+
+
+	//
+	// Now test whether leading zero in chrom names match
+	//
+
+
+	bool zeroVal = record->hasLeadingZeroInChromName();
+	testChrVal = fileHasLeadingZeroInChromNames(fileIdx);
+	if (testChrVal == UNTESTED) {
+		_fileHasLeadingZeroInChromNames[fileIdx] = zeroVal ? YES : NO;
+	} else if ((testChrVal == YES && !zeroVal) || (testChrVal == NO && zeroVal)) {
+		fprintf(stderr, "ERROR: File %s has inconsistent naming convention (leading zero) for record:\n", _fileNames[fileIdx].c_str());
+		record->print(stderr, true);
+		exit(1);
+	}
+	if ((_allFileHaveLeadingZeroInChromNames == YES && !zeroVal) || (_allFileHaveLeadingZeroInChromNames == NO && zeroVal)) {
+		fprintf(stderr, "ERROR: File %s has a record where naming convention (leading zero) is inconsistent with other files:\n", _fileNames[fileIdx].c_str());
+		record->print(stderr, true);
+		exit(1);
+	}
+
+	if (_allFileHaveLeadingZeroInChromNames == UNTESTED) {
+		_allFileHaveLeadingZeroInChromNames = zeroVal ? YES : NO;
+	}
+}
+
+ContextBase::testType ContextBase::fileHasChrInChromNames(int fileIdx) {
+	conventionType::iterator iter = _fileHasChrInChromNames.find(fileIdx);
+	if (iter == _fileHasChrInChromNames.end()) {
+		return UNTESTED;
+	}
+	return iter->second;
+}
+
+ContextBase::testType ContextBase::fileHasLeadingZeroInChromNames(int fileIdx) {
+	conventionType::iterator iter = _fileHasLeadingZeroInChromNames.find(fileIdx);
+	if (iter == _fileHasLeadingZeroInChromNames.end()) {
+		return UNTESTED;
+	}
+	return iter->second;
+}
+

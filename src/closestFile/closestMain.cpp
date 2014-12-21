@@ -24,7 +24,7 @@ int closest_main(int argc, char* argv[]) {
         }
         closest_help();
         delete context;
-        return 0;
+        return 1;
     }
     ClosestFile *closestFile = new ClosestFile(context);
 
