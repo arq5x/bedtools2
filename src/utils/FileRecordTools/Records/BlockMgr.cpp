@@ -189,13 +189,14 @@ int BlockMgr::findBlockedOverlaps(RecordKeyVector &keyList, RecordKeyVector &hit
 
 			}
 		}
-		_overlapBases.push_back(totalHitOverlap);
 		if (hitHasOverlap) {
-			if ((float) totalHitOverlap / (float)keyBlocksSumLength > _overlapFraction) {
+			if ((float) totalHitOverlap / (float)keyBlocksSumLength >= _overlapFraction) {
 				if (_hasReciprocal &&
-						((float)totalHitOverlap / (float)hitBlockSumLength > _overlapFraction)) {
+						((float)totalHitOverlap / (float)hitBlockSumLength >= _overlapFraction)) {
+					_overlapBases.push_back(totalHitOverlap);
 					resultList.push_back(*hitListIter);
 				} else if (!_hasReciprocal) {
+					_overlapBases.push_back(totalHitOverlap);
 					resultList.push_back(*hitListIter);
 				}
 			}
