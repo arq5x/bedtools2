@@ -546,4 +546,33 @@ $BT closest -a d_q2.bed -b d_d2R.bed -D b > obs
 check obs exp
 rm obs exp
 
+############################################################
+# Make sure non-overlapping ties are reported 
+############################################################
+echo "    closest.t48...\c"
+echo \
+"chr1	10	20	a1	1	-	chr1	8	9	b1	1	+
+chr1	10	20	a1	1	-	chr1	21	22	b2	1	-" > exp
+$BT closest -a a2.bed -b b2.bed > obs
+check obs exp
+rm obs exp
 
+############################################################
+# Make sure non-overlapping ties are reported, but with -s
+############################################################
+echo "    closest.t49...\c"
+echo \
+"chr1	10	20	a1	1	-	chr1	21	22	b2	1	-" > exp
+$BT closest -a a2.bed -b b2.bed -s > obs
+check obs exp
+rm obs exp
+
+############################################################
+# Make sure non-overlapping ties are reported, but with -S
+############################################################
+echo "    closest.t50...\c"
+echo \
+"chr1	10	20	a1	1	-	chr1	8	9	b1	1	+" > exp
+$BT closest -a a2.bed -b b2.bed -S > obs
+check obs exp
+rm obs exp

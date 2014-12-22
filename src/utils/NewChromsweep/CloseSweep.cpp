@@ -310,7 +310,7 @@ void CloseSweep::finalizeSelections(int dbIdx, RecordKeyVector &retList) {
 	}
 
 
-	if (downStreamDist == upStreamDist) {
+	if (abs(upStreamDist) == abs(downStreamDist)) {
 		if (tieMode == ContextClosest::FIRST_TIE) {
 			retList.push_back(upRecs[0]);
 			_finalDistances.push_back(upStreamDist);
