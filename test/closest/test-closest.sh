@@ -599,6 +599,37 @@ $BT closest -a d.bed -b d_id.bed -D ref -id > obs
 check exp obs
 rm exp obs
 
+##########################################################
+# check ties, single db
+###########################################################
+echo "    closest.t52...\c"
+echo \
+"chr1	10	20	a1	1	-	chr1	8	9	b1	1	+
+chr1	10	20	a1	1	-	chr1	21	22	b2	1	-" > exp
+$BT closest -a bug157_a.bed -b bug157_b.bed > obs
+check exp obs
+rm exp obs
+
+
+##########################################################
+# check ties, single db, -iu
+###########################################################
+echo "    closest.t53...\c"
+echo \
+"chr1	10	20	a1	1	-	chr1	21	22	b2	1	-	2" > exp
+$BT closest -a bug157_a.bed -b bug157_b.bed -D ref -iu > obs
+check exp obs
+rm exp obs
+
+##########################################################
+# check ties, single db, -id
+###########################################################
+echo "    closest.t54...\c"
+echo \
+"chr1	10	20	a1	1	-	chr1	8	9	b1	1	+	-2" > exp
+$BT closest -a bug157_a.bed -b bug157_b.bed -D ref -id > obs 
+check exp obs
+rm exp obs
 
 cd sortAndNaming
 bash test-sort-and-naming.sh
