@@ -33,7 +33,7 @@ int merge_main(int argc, char* argv[]) {
         }
         merge_help();
         delete context;
-        return 0;
+        return 1;
     }
     MergeFile *mergeFile = new MergeFile(context);
 

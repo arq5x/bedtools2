@@ -36,6 +36,10 @@ bool ClosestFile::getClosest() {
 
     	}
     }
+    if (!_context->hasGenomeFile()) {
+    	sweep.closeOut(true);
+    }
+
     return true;
 
 }

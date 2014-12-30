@@ -245,3 +245,35 @@ const QuickString &Record::getField(int fieldNum) const
           << endl << "*****" << endl;
     exit(1);
 }
+
+
+bool Record::hasChrInChromName() const {
+	const char *str = _chrName.c_str();
+	//if the chrom name has at least 3 characters,
+	//and the first 3 are c, h, r, case-insensitive,
+	//return true. Otherwise, return false.
+	return ((_chrName.size() >= 3) &&
+			(str[0] == 'c' || str[0] == 'C') &&
+			(str[1] == 'h' || str[1] == 'H') &&
+			(str[2] == 'r' || str[2] == 'R'));
+}
+
+bool Record::hasLeadingZeroInChromName() const {
+	const char *str = _chrName.c_str();
+	size_t i=0;
+	while (i < _chrName.size() && !isdigit(str[i])) {
+		if (str[i] == '_') return false; //ignore
+		//leading zero after underscore, as some of the
+		//random and hap chroms are names that way.
+		i++;
+	}
+
+	return (i < _chrName.size() && str[i] == '0');
+}
+
+void Record::print(FILE *fp, bool newline) const {
+	QuickString buf;
+	print(buf);
+	fprintf(fp, "%s", buf.c_str());
+	if(newline) fprintf(fp, "\n");
+}

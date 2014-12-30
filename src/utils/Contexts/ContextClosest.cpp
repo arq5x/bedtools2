@@ -157,7 +157,7 @@ bool ContextClosest::handle_iu() {
 }
 
 bool ContextClosest::handle_id() {
-	_ignoreUpstream = true;
+	_ignoreDownstream = true;
     markUsed(_i - _skipFirstArgs);
     return true;
 }

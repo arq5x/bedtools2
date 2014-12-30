@@ -69,6 +69,9 @@ bool FileIntersect::processSortedFiles()
     		processHits(hitSet);
     	}
     }
+    if (!_context->hasGenomeFile()) {
+    	sweep.closeOut(true);
+    }
     return true;
 }
 

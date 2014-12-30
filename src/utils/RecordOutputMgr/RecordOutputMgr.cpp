@@ -137,32 +137,38 @@ void RecordOutputMgr::printRecord(const Record *record, const QuickString & valu
 }
 
 void RecordOutputMgr::printClosest(RecordKeyVector &keyList, const vector<int> *dists) {
+
 	const ContextClosest *context = static_cast<const ContextClosest *>(_context);
 	bool deleteBlocks = false;
-	RecordKeyVector blockList(keyList.getKey());
-	if (keyList.getKey()->getType() == FileRecordTypeChecker::BAM_RECORD_TYPE) {
+	const Record *keyRec = keyList.getKey();
+	RecordKeyVector blockList(keyRec);
+	if (keyRec->getType() == FileRecordTypeChecker::BAM_RECORD_TYPE) {
 		_bamBlockMgr->getBlocks(blockList, deleteBlocks);
 		_currBamBlockList = &blockList;
 	}
 	if (!keyList.empty()) {
 		int distCount = 0;
 		for (RecordKeyVector::const_iterator_type iter = keyList.begin(); iter != keyList.end(); iter = keyList.next()) {
-			printKey(keyList.getKey());
+			const Record *hitRec = *iter;
+			printKey(keyRec, keyRec->getStartPosStr(), keyRec->getEndPosStr());
 			tab();
-			addDbFileId((*iter)->getFileIdx());
-			(*iter)->print(_outBuf);
+			addDbFileId(hitRec->getFileIdx());
+			printKey(hitRec, hitRec->getStartPosStr(), hitRec->getEndPosStr());
 			if (dists != NULL) {
 				tab();
-				_outBuf.append((*dists)[distCount]);
+				int dist = (*dists)[distCount];
+				//if not using sign distance, use absolute value instead.
+				dist = context->signDistance() ? dist : abs(dist);
+				_outBuf.append(dist);
 				distCount++;
 			}
 			newline();
 			if (needsFlush()) flush();
 		}
 	} else {
-		printKey(keyList.getKey());
+		printKey(keyRec, keyRec->getStartPosStr(), keyRec->getEndPosStr());
 		tab();
-		null(true, false);
+		null(false, true);
 		if (context->reportDistance()) {
 			tab();
 			_outBuf.append(-1);

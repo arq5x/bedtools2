@@ -283,14 +283,17 @@ rm obs exp
 
 
 ###########################################################
-#  Test intersection with -sorted, see that hits are missed
-#  With no genome file
+#  Test intersection with -sorted, see that chrom order
+# change is ok as long as query and db have same order.
 ############################################################
 echo "    intersect.new.t22...\c"
 echo \
 "chr1	15	20	a1	100	+
 chr2	15	20	a2	100	+
-chrX	15	20	a5	100	+" > exp
+chr10	15	20	a3	100	+
+chr11	15	20	a4	100	+
+chrX	15	20	a5	100	+
+chrM	15	20	a6	100	+" > exp
 $BT intersect -a chromOrderA.bed -b chromOrderB.bed -sorted > obs
 check obs exp
 rm obs exp

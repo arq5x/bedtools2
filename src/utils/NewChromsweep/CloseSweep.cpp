@@ -18,7 +18,8 @@ CloseSweep::CloseSweep(ContextClosest *context)
 	_overlapRecs.resize(_numDBs, NULL);
 	_minUpstreamDist.resize(_numDBs, INT_MAX);
 	_minDownstreamDist.resize(_numDBs,INT_MAX);
-	_maxPrevLeftClosestEndPos.resize(_numDBs, 0       );
+	_maxPrevLeftClosestEndPos.resize(_numDBs, 0);
+	_maxPrevLeftClosestEndPosReverse.resize(_numDBs, 0);
 
 	for (int i=0; i < _numDBs; i++) {
 		_minUpstreamRecs[i] = new distRecVecType();
@@ -36,8 +37,15 @@ CloseSweep::~CloseSweep(void) {
 	}
 }
 
+bool CloseSweep::init() {
+
+    bool retVal =  NewChromSweep::init();
+    _runToQueryEnd = true;
+    return retVal;
+ }
+
 void CloseSweep::masterScan(RecordKeyVector &retList) {
-	//first clear out everything from the previous scan
+	if (_currQueryChromName != _prevQueryChromName) testChromOrder(_currQueryRec);
 	if (_context->reportDistance()) {
 		_finalDistances.clear();
 	}
@@ -50,11 +58,12 @@ void CloseSweep::masterScan(RecordKeyVector &retList) {
 
 	for (int i=0; i < _numDBs; i++) {
 
+		//first clear out everything from the previous scan
 		_minUpstreamRecs[i]->clear();
 		_minDownstreamRecs[i]->clear();
 		_overlapRecs[i]->clear();
 
-		if (dbFinished(i) || chromChange(i, retList)) {
+		if (dbFinished(i) || chromChange(i, retList, true)) {
 			continue;
 		} else {
 
@@ -63,19 +72,21 @@ void CloseSweep::masterScan(RecordKeyVector &retList) {
 
 			// skip if we hit the end of the DB
 			// advance the db until we are ahead of the query. update hits and cache as necessary
-			bool stopScanning = false;
-			while (_currDbRecs[i] != NULL &&
-					_currQueryRec->sameChrom(_currDbRecs[i]) &&
-					!stopScanning) {
-				if (considerRecord(_currDbRecs[i], i, stopScanning) == DELETE) {
-					_dbFRMs[i]->deleteRecord(_currDbRecs[i]);
-					_currDbRecs[i] = NULL;
-				} else {
-					_caches[i].push_back(_currDbRecs[i]);
-					_currDbRecs[i] = NULL;
+//			if (_currDbRecs[i] != NULL || nextRecord(false, i)) {
+				bool stopScanning = false;
+				while (_currDbRecs[i] != NULL &&
+						_currQueryRec->sameChrom(_currDbRecs[i]) &&
+						!stopScanning) {
+					if (considerRecord(_currDbRecs[i], i, stopScanning) == DELETE) {
+						_dbFRMs[i]->deleteRecord(_currDbRecs[i]);
+						_currDbRecs[i] = NULL;
+					} else {
+						_caches[i].push_back(_currDbRecs[i]);
+						_currDbRecs[i] = NULL;
+					}
+					nextRecord(false, i);
 				}
-				nextRecord(false, i);
-			}
+//			}
 		}
 		finalizeSelections(i, retList);
 	}
@@ -141,7 +152,7 @@ CloseSweep::rateOvlpType CloseSweep::considerRecord(const Record *cacheRec, int 
 		// HIT INTERSECTS QUERY
 		if (!_context->ignoreOverlaps()) {
 			_overlapRecs[dbIdx]->push_back(cacheRec);
-			_maxPrevLeftClosestEndPos[dbIdx] = cacheRec->getEndPos();
+			setLeftClosestEndPos(dbIdx, cacheRec);
 		}
 		return IGNORE;
 	} else if (cacheRec->after(_currQueryRec)) {
@@ -152,15 +163,15 @@ CloseSweep::rateOvlpType CloseSweep::considerRecord(const Record *cacheRec, int 
 		 currDist = (cacheRec->getStartPos() - _currQueryRec->getEndPos()) + 1;
 		 if (_context->signDistance()) {
 			 if ((_context->getStrandedDistMode() == ContextClosest::A_DIST && _currQueryRec->getStrandVal() == Record::REVERSE) ||
-				 (_context->getStrandedDistMode() == ContextClosest::B_DIST && cacheRec->getStrandVal() == Record::REVERSE))
+				 (_context->getStrandedDistMode() == ContextClosest::B_DIST && cacheRec->getStrandVal() == Record::FORWARD))
 			 {
 				 // hit is "upstream" of A
 				 if (_context->ignoreUpstream()) {
 					 return IGNORE;
 				 }
 				 else {
-					 if (currDist <= abs(_minUpstreamDist[dbIdx])) {
-						 if (currDist < abs(_minUpstreamDist[dbIdx])) {
+					 if (currDist<= abs(_minUpstreamDist[dbIdx])) {
+						 if (currDist< abs(_minUpstreamDist[dbIdx])) {
 							 _minUpstreamDist[dbIdx] = currDist * -1;
 							 _minUpstreamRecs[dbIdx]->clear();
 						 }
@@ -170,14 +181,15 @@ CloseSweep::rateOvlpType CloseSweep::considerRecord(const Record *cacheRec, int 
 						 _minUpstreamRecs[dbIdx]->push_back(cacheRec);
 						 return IGNORE;
 					 } else {
-						 return DELETE;
+						 stopScanning = true;
+						 return IGNORE;
 					 }
 				 }
 			 }
 		 }
 		 // HIT IS DOWNSTREAM.
 		 // MUST FIRST DETERMINE WHETHER TO STOP SCANNING.
-		 if (currDist > abs(_minDownstreamDist[dbIdx])) {
+		 if (currDist> abs(_minDownstreamDist[dbIdx])) {
 			 stopScanning = true;
 			 return IGNORE;
 		 }
@@ -186,7 +198,7 @@ CloseSweep::rateOvlpType CloseSweep::considerRecord(const Record *cacheRec, int 
 		 }
 		 //Still here? Valid hit.
 		 if (currDist <= abs(_minDownstreamDist[dbIdx])) {
-			 if (currDist < abs(_minDownstreamDist[dbIdx])) {
+			 if (currDist< abs(_minDownstreamDist[dbIdx])) {
 				 _minDownstreamDist[dbIdx] = currDist;
 				 _minDownstreamRecs[dbIdx]->clear();
 			 }
@@ -197,13 +209,12 @@ CloseSweep::rateOvlpType CloseSweep::considerRecord(const Record *cacheRec, int 
 		 // HIT IS TO THE LEFT OF THE QUERY.
 
 		// First see if we can purge this record from the cache. If it's further left than the last record that was left, delete it.
-		if (cacheRec->getEndPos() < _maxPrevLeftClosestEndPos[dbIdx]) return DELETE;
+		if (beforeLeftClosestEndPos(dbIdx, cacheRec)) return DELETE;
 
 		 currDist = (_currQueryRec->getStartPos() - cacheRec->getEndPos()) + 1;
 		 if (_context->signDistance()) {
-			 if ((_context->getStrandedDistMode() == ContextClosest::REF_DIST) ||
-				 (_context->getStrandedDistMode() == ContextClosest::A_DIST && _currQueryRec->getStrandVal() != Record::REVERSE) ||
-				 (_context->getStrandedDistMode() == ContextClosest::B_DIST && cacheRec->getStrandVal() != Record::REVERSE))
+			 if ((_context->getStrandedDistMode() == ContextClosest::A_DIST && _currQueryRec->getStrandVal() == Record::REVERSE) ||
+				 (_context->getStrandedDistMode() == ContextClosest::B_DIST && cacheRec->getStrandVal() == Record::FORWARD))
 			 {
 				 // HIT IS DOWNSTREAM.
 				 // MUST FIRST DETERMINE WHETHER TO STOP SCANNING.
@@ -216,31 +227,31 @@ CloseSweep::rateOvlpType CloseSweep::considerRecord(const Record *cacheRec, int 
 				 //Still here? Valid hit.
 				 if (currDist <= abs(_minDownstreamDist[dbIdx])) {
 					 if (currDist < abs(_minDownstreamDist[dbIdx])) {
-						 _minDownstreamDist[dbIdx] = currDist * -1;
+						 _minDownstreamDist[dbIdx] = currDist;
 						 _minDownstreamRecs[dbIdx]->clear();
 					 }
 					 _minDownstreamRecs[dbIdx]->push_back(cacheRec);
-					 _maxPrevLeftClosestEndPos[dbIdx] = cacheRec->getEndPos();
+					 setLeftClosestEndPos(dbIdx, cacheRec);
 					 return IGNORE;
 				 }
 			 }
 		 }
-		 // hit is "upstream" of A
+		 // hit is "UPSTREAM" of A
 		 if (_context->ignoreUpstream()) {
 			 return IGNORE;
 		 }
 		 if (currDist <= abs(_minUpstreamDist[dbIdx])) {
 			 if (currDist < abs(_minUpstreamDist[dbIdx])) {
-				 _minUpstreamDist[dbIdx] = currDist;
+				 _minUpstreamDist[dbIdx] = currDist * -1;
 				 _minUpstreamRecs[dbIdx]->clear();
 			 }
 			 _minUpstreamRecs[dbIdx]->push_back(cacheRec);
-			 _maxPrevLeftClosestEndPos[dbIdx] = cacheRec->getEndPos();
+			setLeftClosestEndPos(dbIdx, cacheRec);
 
 			 return IGNORE;
 		 } else if (currDist == abs(_minUpstreamDist[dbIdx])) {
 			 _minUpstreamRecs[dbIdx]->push_back(cacheRec);
-			 _maxPrevLeftClosestEndPos[dbIdx] = cacheRec->getEndPos();
+			setLeftClosestEndPos(dbIdx, cacheRec);
 			 return IGNORE;
 		 } else {
 			 return DELETE;
@@ -251,9 +262,21 @@ CloseSweep::rateOvlpType CloseSweep::considerRecord(const Record *cacheRec, int 
 
 
 void CloseSweep::finalizeSelections(int dbIdx, RecordKeyVector &retList) {
+
+	//check all actual overlaps, as well as upstream and downstream hits.
+	// if all of these are empty, return.
+
+	const vector<const Record *>  & overlapRecs = (*(_overlapRecs[dbIdx]));
+	const vector<const Record *>  & upRecs = (*(_minUpstreamRecs[dbIdx]));
+	const vector<const Record *>  & downRecs = (*(_minDownstreamRecs[dbIdx]));
+
+	if (overlapRecs.empty() && upRecs.empty() && downRecs.empty()) {
+		return;
+	}
+
+
 	// If there are actual overlaps, only report those, then stop.
 	ContextClosest::tieModeType tieMode = _context->getTieMode();
-	const vector<const Record *>  & overlapRecs = (*(_overlapRecs[dbIdx]));
 	if (!overlapRecs.empty()) {
 		if (tieMode == ContextClosest::FIRST_TIE) {
 			retList.push_back(overlapRecs[0]);
@@ -272,8 +295,6 @@ void CloseSweep::finalizeSelections(int dbIdx, RecordKeyVector &retList) {
 	}
 	int upStreamDist = _minUpstreamDist[dbIdx];
 	int downStreamDist = _minDownstreamDist[dbIdx];
-	const vector<const Record *>  & upRecs = (*(_minUpstreamRecs[dbIdx]));
-	const vector<const Record *>  & downRecs = (*(_minDownstreamRecs[dbIdx]));
 
 	if (abs(upStreamDist) < abs(downStreamDist)) {
 		if (tieMode == ContextClosest::FIRST_TIE) {
@@ -310,7 +331,7 @@ void CloseSweep::finalizeSelections(int dbIdx, RecordKeyVector &retList) {
 	}
 
 
-	if (abs(upStreamDist) == abs(downStreamDist)) {
+	if (abs(downStreamDist) == abs(upStreamDist)) {
 		if (tieMode == ContextClosest::FIRST_TIE) {
 			retList.push_back(upRecs[0]);
 			_finalDistances.push_back(upStreamDist);
@@ -377,46 +398,69 @@ void CloseSweep::checkMultiDbs(RecordKeyVector &retList) {
 	}
 }
 
-bool CloseSweep::chromChange(int dbIdx, RecordKeyVector &retList)
+bool CloseSweep::chromChange(int dbIdx, RecordKeyVector &retList, bool wantScan)
 {
-//	if (_currQueryRec->getChrName() == "chr1_gl000191_random" || (_currDbRecs[dbIdx] != NULL && _currDbRecs[dbIdx]->getChrName() == "chr1_gl000191_random")) {
-//		printf("Break point here.\n");
-//	}
+	const Record *dbRec = _currDbRecs[dbIdx];
+
+	bool haveQuery = _currQueryRec != NULL;
+	bool haveDB = dbRec != NULL;
+	\
+	if (haveQuery && _currQueryChromName != _prevQueryChromName) {
+		_context->testNameConventions(_currQueryRec);
+		testChromOrder(_currQueryRec);
+	}
+
+	if (haveDB) {
+		_context->testNameConventions(dbRec);
+		testChromOrder(dbRec);
+	}
 
     // the files are on the same chrom
-	if (_currDbRecs[dbIdx] == NULL || _currQueryRec->sameChrom(_currDbRecs[dbIdx])) {
+	if (haveQuery && (!haveDB || _currQueryRec->sameChrom(dbRec))) {
 
 		//if this is the first time the query's chrom is ahead of the chrom that was in this cache,
 		//then we have to clear the cache.
-		if (!_caches[dbIdx].empty() && _currQueryRec->chromAfter(_caches[dbIdx].begin()->value())) {
+		if (!_caches[dbIdx].empty() && queryChromAfterDbRec(_caches[dbIdx].begin()->value())) {
 			clearCache(dbIdx);
-			_maxPrevLeftClosestEndPos[dbIdx] = 0;
+			clearClosestEndPos(dbIdx);
 		}
 		return false;
 	}
-	if (_currDbRecs[dbIdx]->chromAfter(_currQueryRec) && (!_caches[dbIdx].empty() && (_caches[dbIdx].begin()->value()->sameChrom(_currQueryRec)))) {
+
+	if (!haveQuery || !haveDB) return false;
+
+	if (!_caches[dbIdx].empty() && (_caches[dbIdx].begin()->value()->sameChrom(_currQueryRec))) {
 		//the newest DB record's chrom is ahead of the query, but the cache still
 		//has old records on that query's chrom
 		scanCache(dbIdx, retList);
 		finalizeSelections(dbIdx, retList);
 		return true;
 	}
-	// the query is ahead of the database. fast-forward the database to catch-up.
-	if (_currQueryRec->chromAfter(_currDbRecs[dbIdx])) {
 
-		while (_currDbRecs[dbIdx] != NULL &&
-				_currQueryRec->chromAfter(_currDbRecs[dbIdx])) {
-			_dbFRMs[dbIdx]->deleteRecord(_currDbRecs[dbIdx]);
-			nextRecord(false, dbIdx);
+
+	// the query is ahead of the database. fast-forward the database to catch-up.
+	if (queryChromAfterDbRec(dbRec)) {
+		QuickString oldDbChrom(dbRec->getChrName());
+
+		while (dbRec != NULL &&
+				queryChromAfterDbRec(dbRec)) {
+			_dbFRMs[dbIdx]->deleteRecord(dbRec);
+			if (!nextRecord(false, dbIdx)) break;
+			dbRec =  _currDbRecs[dbIdx];
+			const QuickString &newDbChrom = dbRec->getChrName();
+			if (newDbChrom != oldDbChrom) {
+				testChromOrder(dbRec);
+				oldDbChrom = newDbChrom;
+			}
 		}
 		clearCache(dbIdx);
-		_maxPrevLeftClosestEndPos[dbIdx] = 0;
+		clearClosestEndPos(dbIdx);
         return false;
     }
     // the database is ahead of the query.
     else {
         // 1. scan the cache for remaining hits on the query's current chrom.
-		scanCache(dbIdx, retList);
+		if (wantScan) scanCache(dbIdx, retList);
 
         return true;
     }
@@ -424,3 +468,60 @@ bool CloseSweep::chromChange(int dbIdx, RecordKeyVector &retList)
 	//control can't reach here, but compiler still wants a return statement.
 	return true;
 }
+
+
+void CloseSweep::setLeftClosestEndPos(int dbIdx, const Record *rec)
+{
+	int recEndPos = rec->getEndPos();
+	if (!_context->getSameStrand() && !_context->getDiffStrand()) {
+		_maxPrevLeftClosestEndPos[dbIdx] = recEndPos;
+	} else {
+		if (_context->getSameStrand()) {
+			if (rec->getStrandVal() == Record::FORWARD) {
+				_maxPrevLeftClosestEndPos[dbIdx] = recEndPos;
+			} else {
+				_maxPrevLeftClosestEndPosReverse[dbIdx] = recEndPos;
+			}
+		} else {
+			//want diff strand
+			if (rec->getStrandVal() == Record::FORWARD) {
+				_maxPrevLeftClosestEndPosReverse[dbIdx] = recEndPos;
+			} else {
+				_maxPrevLeftClosestEndPos[dbIdx] = recEndPos;
+			}
+		}
+	}
+}
+
+bool CloseSweep::beforeLeftClosestEndPos(int dbIdx, const Record *rec)
+{
+	int recEndPos = rec->getEndPos();
+	int prevPos = _maxPrevLeftClosestEndPos[dbIdx];
+	int prevPosReverse = _maxPrevLeftClosestEndPosReverse[dbIdx];
+
+	if (!_context->getSameStrand() && !_context->getDiffStrand()) {
+		return recEndPos < prevPos;
+	} else {
+		if (_context->getSameStrand()) {
+			if (rec->getStrandVal() == Record::FORWARD) {
+				return recEndPos < prevPos;
+			} else {
+				return recEndPos < prevPosReverse;
+			}
+		} else {
+			//want diff strand
+			if (rec->getStrandVal() == Record::FORWARD) {
+				return recEndPos < prevPosReverse;
+			} else {
+				return recEndPos < prevPos;
+			}
+		}
+	}
+}
+
+void CloseSweep::clearClosestEndPos(int dbIdx)
+{
+	_maxPrevLeftClosestEndPos[dbIdx] = 0;
+	_maxPrevLeftClosestEndPosReverse[dbIdx] = 0;
+}
+
