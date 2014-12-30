@@ -3,11 +3,26 @@
 ###############
 *closest*
 ###############
-Similar to **intersectBed, closestBed** searches for overlapping features in A and B. In the event that
-no feature in B overlaps the current feature in A, **closestBed** will report the *closest* (that is, least
+
+
+|
+
+.. image:: ../images/tool-glyphs/closest-glyph.png 
+
+|
+
+
+Similar to :doc:`../tools/intersect`, `closest` searches for overlapping features in A and B. In the event that
+no feature in B overlaps the current feature in A, `closest` will report the nearest (that is, least
 genomic distance from the start or end of A) feature in B. For example, one might want to find which
-is the closest gene to a significant GWAS polymorphism. Note that **closestBed** will report an
+is the closest gene to a significant GWAS polymorphism. Note that `closest` will report an
 overlapping feature as the closest---that is, it does not restrict to closest *non-overlapping* feature.
+
+.. note::
+
+    ``bedtools closest`` requires that all input files are presorted data by chromosome and
+    then by start position (e.g., ``sort -k1,1 -k2,2n in.bed > in.sorted.bed``
+    for BED files).
 
 .. important::
 
@@ -18,29 +33,50 @@ overlapping feature as the closest---that is, it does not restrict to closest *n
     in an identical manner (e.g., `sort -k1,1 -k2,2n`).
 
 
-==========================================================================
-5.6.1 Usage and option summary
-==========================================================================
-**Usage:**
-
+===============================
+Usage and option summary
+===============================
+**Usage**:
 ::
-  closestBed [OPTIONS] -a <BED/GFF/VCF> -b <BED/GFF/VCF>
+
+  bedtools closest [OPTIONS] -a <FILE> \
+                               -b <FILE1, FILE2, ..., FILEN>
+
+**(or)**:
+::
   
+  closestBed [OPTIONS] -a <FILE> \
+                         -b <FILE1, FILE2, ..., FILEN>
+  
+
   
 ===========================      ===============================================================================================================================================================================================================
 Option                           Description
 ===========================      ===============================================================================================================================================================================================================
-**-s**				             Force strandedness. That is, find the closest feature in B overlaps A on the same strand. *By default, this is disabled*.
-**-d**					         In addition to the closest feature in B, report its distance to A as an extra column. The reported distance for overlapping features will be 0.
-**-t**					         How ties for closest feature should be handled. This occurs when two features in B have exactly the same overlap with a feature in A. *By default, all such features in B are reported*.
-                                 
-								 Here are the other choices controlling how ties are handled:
-								      				 
-								 *all-*   Report all ties (default).
-								 
-								 *first-*   Report the first tie that occurred in the B file.
-								 
-								 *last-*   Report the last tie that occurred in the B file.
+**-s**                           | Require same strandedness.  That is, find the closest feature in
+                                 | B that overlaps A on the _same_ strand.
+                                 | By default, overlaps are reported without respect to strand.
+
+**-S**                           | Require opposite strandedness.  That is, find the closest feature
+                                 | in B that overlaps A on the _opposite_ strand.
+                                 | By default, overlaps are reported without respect to strand.
+
+**-d**                           | In addition to the closest feature in B,
+                                 | report its distance to A as an extra column.
+                                 | The reported distance for overlapping features will be 0.
+
+**-D**                           | Like `-d`, report the closest feature in B, and its distance to A
+                                 | as an extra column. However unlike `-d`, use negative distances to 
+                                 | report upstream features.
+                                 | The options for defining which orientation is "upstream" are:
+                                 | - `ref`   Report distance with respect to the reference genome.
+                                 |           B features with a lower (start, stop) are upstream
+                                 | - `a`     Report distance with respect to A.
+                                 |           When A is on the - strand, "upstream" means B has a
+                                 |           higher (start,stop).
+                                 | - `b`     Report distance with respect to B.
+                                 |           When B is on the - strand, "upstream" means A has a
+                                 |           higher (start,stop).
 ===========================      ===============================================================================================================================================================================================================
 
 
