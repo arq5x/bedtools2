@@ -189,13 +189,11 @@ CloseSweep::rateOvlpType CloseSweep::considerRecord(const Record *cacheRec, int 
 		 }
 		 // HIT IS DOWNSTREAM.
 		 // MUST FIRST DETERMINE WHETHER TO STOP SCANNING.
-		 if (currDist> abs(_minDownstreamDist[dbIdx])) {
+		 if (_context->ignoreDownstream() || currDist> abs(_minDownstreamDist[dbIdx])) {
 			 stopScanning = true;
 			 return IGNORE;
 		 }
-		 if (_context->ignoreDownstream()) {
-			 return IGNORE;
-		 }
+
 		 //Still here? Valid hit.
 		 if (currDist <= abs(_minDownstreamDist[dbIdx])) {
 			 if (currDist< abs(_minDownstreamDist[dbIdx])) {
