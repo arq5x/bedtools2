@@ -91,6 +91,10 @@ Option                           Description
                                  | - `each`  Report closest records for each database (default).
                                  | - `all`   Report closest records among all databases.
 
+**-names**                       When using *multiple databases* (`-b`), provide an alias for each that will appear instead of a fileId when also printing the DB record.
+
+**-filenames**                   When using *multiple databases* (`-b`), show each complete filename instead of a fileId when also printing the DB record.
+
 **-N**                           Require that the query and the closest hit have different names. For BED, the 4th column is compared.
 
 **-header**                      Print the header from the A file prior to results.
@@ -143,74 +147,288 @@ But what if each interval in B is equally close to the interval in A? In this ca
 
   $ cat b.bed
   chr1  7   8   b1  1 -
-  chr1  22  22  b2  2 +
+  chr1  22  23  b2  2 +
 
   $ bedtools closest -a a.bed -b b.bed
   chr1  10  20  a1  1 - chr1  7   8   b1  1 -
   chr1  10  20  a1  1 - chr1  22  23  b2  2 +
 
 ==========================================================================
-``-s`` Enforcing "strandedness" 
+Using multiple `-b` files.
 ==========================================================================
-This option behaves the same as the -s option for intersectBed while scanning for the closest
-(overlapping or not) feature in B. See the discussion in the intersectBed section for details.
+As of version, 2.22.0, the `closest` tool allows one to find the closest
+intervals in multiple `-b` files. Consider the following examples. 
 
+.. note::
+
+   When using multiple `-b` files, an additional column describing the file number from which the closest B interval came will be added between the columns representing the full A interval and the columns representing the full A interval. This file number will refer to the order in which the files were provided on the command line.
+
+
+.. code-block:: bash
+
+  $ cat a.bed
+  chr1  10  20  a1  1 -
+
+  $ cat b1.bed
+  chr1  5   6   b1.1  1 -
+  chr1  30  40  b1.2  2 +
+
+  $ cat b2.bed
+  chr1  0   1   b2.1  1 -
+  chr1  21  22  b2.2  2 +
+
+  # In this example, the 7th column reflects the file number from 
+  # which the closest interval came.
+
+  $ bedtools closest -a a.bed -b b1.bed b2.bed
+  chr1  10  20  a1  1 - 1 chr1  5   6   b1.1  1 -
+  chr1  10  20  a1  1 - 2 chr1  21  22  b2.2  2 +
+
+Instead of using file numbers, you can also provide more informative labels via the `-names` option.
+
+.. code-block:: bash
+
+  $ bedtools closest -a a.bed -b b1.bed b2.bed -names b1 b2
+  chr1  10  20  a1  1 - b1  chr1  5   6   b1.1  1 -
+  chr1  10  20  a1  1 - b2  chr1  21  22  b2.2  2 +
+
+Or, you can use the full original filename via the `-filenames` option.
+
+.. code-block:: bash
+
+  $ bedtools closest -a a.bed -b b1.bed b2.bed -filenames
+  chr1  10  20  a1  1 - b1.bed  chr1  5   6   b1.1  1 -
+  chr1  10  20  a1  1 - b2.bed  chr1  21  22  b2.2  2 +
+
+
+=========================================================================================
+``-mdb`` Find thw closest interval in **each* or among **all** `-b` files.
+=========================================================================================
+By default, the closest interval from **each** file is reported when using multiple `-b` files.
+
+.. code-block:: bash
+
+  $ cat a.bed
+  chr1  10  20  a1  1 -
+
+  $ cat b1.bed
+  chr1  5   6   b1.1  1 -
+  chr1  30  40  b1.2  2 +
+
+  $ cat b2.bed
+  chr1  0   1   b2.1  1 -
+  chr1  21  22  b2.2  2 +
+
+  $ bedtools closest -a a.bed -b b1.bed b2.bed -d
+  chr1  10  20  a1  1 - 1 chr1  5   6   b1.1  1 - 5
+  chr1  10  20  a1  1 - 2 chr1  21  22  b2.2  2 + 2
+
+  $ bedtools closest -a a.bed -b b1.bed b2.bed -mdb each -d
+  chr1  10  20  a1  1 - 1 chr1  5   6   b1.1  1 - 5
+  chr1  10  20  a1  1 - 2 chr1  21  22  b2.2  2 + 2
+
+However, one can optionally choose to report only the closest interval(s) observed among **all** of the `-b` files. In this example, the second interval from b2.bed is only 2 base pairs away from the interval in A, whereas the first interval in b1.bed is 5 base pairs away. Therefore, when using `mdb all`, the the second interval from b2.bed wins.
+
+.. code-block:: bash
+
+  $ bedtools closest -a a.bed -b b1.bed b2.bed -mdb all -d
+  chr1  10  20  a1  1 - 2 chr1  21  22  b2.2  2 + 2
+
+==========================================================================
+``-io`` Ignoring overlapping intervals  
+==========================================================================
+This option prevents intervals in B that overlap the interval in A from being reported as "closest".
+
+Without `-ip` the second record in B will be reported as closest.
+
+.. code-block:: bash
+
+  $ cat a.bed
+  chr1  10  20  a1  1 -
+
+  $ cat b.bed
+  chr1  7   8   b1  1 -
+  chr1  15  25  b2  2 +
+
+  $ bedtools closest -a a.bed -b b.bed
+  chr1  10  20  a1  1 - chr1  15  25  b2  2 +
+
+Yet with `-io`, the overlapping interval is ignored in favor of the closest, non-overlapping interval.
+
+.. code-block:: bash
+
+  $ cat a.bed
+  chr1  10  20  a1  1 -
+
+  $ cat b.bed
+  chr1  7   8   b1  1 -
+  chr1  15  25  b2  2 +
+
+  $ bedtools closest -a a.bed -b b.bed -io
+  chr1  10  20  a1  1 - chr1  7 8 b1  1 -
+
+
+
+==========================================================================
+``-s`` Requiring closest intervals to have the *same* strand
+==========================================================================
+The `-s` option finds the closest interval that is also on the same strand as the interval in A.
+
+.. code-block:: bash
+
+  $ cat a.bed
+  chr1  10  20  a1  1 -
+
+  $ cat b.bed
+  chr1  2   3   b1  1 -
+  chr1  21  22  b2  2 +
+
+  $ bedtools closest -a a.bed -b b.bed -s
+  chr1  10  20  a1  1 - chr1  2 3 b1  1 -
+
+
+==========================================================================
+``-S`` Requiring closest intervals to have the *opposite* strand
+==========================================================================
+The `-s` option finds the closest interval that is also on the same strand as the interval in A.
+
+.. code-block:: bash
+
+  $ cat a.bed
+  chr1  10  20  a1  1 -
+
+  $ cat b.bed
+  chr1  15  16   b1  1 -
+  chr1  21  22  b2  2 +
+
+  $ bedtools closest -a a.bed -b b.bed -S
+  chr1  10  20  a1  1 - chr1  21  22  b2  2 +
 
 
 ==========================================================================
 ``-t`` Controlling how ties for "closest" are broken 
 ==========================================================================
-When there are two or more features in B that overlap the *same fraction* of A, **closestBed** will, by
-default, report both features in B. Imagine feature A is a SNP and file B contains genes. It can often
-occur that two gene annotations (e.g. opposite strands) in B will overlap the SNP. As mentioned, the
-default behavior is to report both such genes in B. However, the -t option allows one to optionally
-choose the just first or last feature (in terms of where it occurred in the input file, not chromosome
-position) that occurred in B.
+When there are two or more features in B are tied for proximity to the interval in A, `closest` will, by default, report all such intervals in B. 
+As shown in the examples below, this behavior can be changed via the `-t` option:
 
-For example (note the difference between -l 200 and -l 300):
+.. code-block:: bash
 
-::
-  cat A.bed
-  chr1  100  101  rs1234
+  $ cat a.bed
+  chr1  10  20  a1  1 -
 
-  cat B.bed
-  chr1  0  1000  geneA  100  +
-  chr1  0  1000  geneB  100  -
+  $ cat b.bed
+  chr1  30  40   b1  1 -
+  chr1  30  40   b2  2 +
 
-  closestBed -a A.bed -b B.bed
-  chr1  100  101  rs1234  chr1  0  1000  geneA  100  +
-  chr1  100  101  rs1234  chr1  0  1000  geneB  100  -
+  # default
+  $ bedtools closest -a a.bed -b b.bed
+  chr1  10  20  a1  1 - chr1  30  40  b1  1 -
+  chr1  10  20  a1  1 - chr1  30  40  b2  2 +
 
-  closestBed -a A.bed -b B.bed -t all
-  chr1  100  101  rs1234  chr1  0  1000  geneA  100  +
-  chr1  100  101  rs1234  chr1  0  1000  geneB  100  -
+  # -t all (default)
+  $ bedtools closest -a a.bed -b b.bed -t all
+  chr1  10  20  a1  1 - chr1  30  40  b1  1 -
+  chr1  10  20  a1  1 - chr1  30  40  b2  2 +
 
-  closestBed -a A.bed -b B.bed -t first
-  chr1  100  101  rs1234  chr1  0  1000  geneA  100  +
+  # -t first
+  $ bedtools closest -a a.bed -b b.bed -t first
+  chr1  10  20  a1  1 - chr1  30  40  b1  1 -
 
-  closestBed -a A.bed -b B.bed -t last
-  chr1  100  101  rs1234  chr1  0  1000  geneB  100  -
-
-
-
-
+  # -t last
+  $ bedtools closest -a a.bed -b b.bed -t last
+  chr1  10  20  a1  1 - chr1  30  40  b2  1 +
 
 
 ==========================================================================
 ``-d`` Reporting the distance to the closest feature in base pairs 
 ==========================================================================
-ClosestBed will optionally report the distance to the closest feature in the B file using the **-d** option.
+One often wants to also know the distance in base pairs between the interval in A and the closest interval(s) in B. `closest` will optionally report the distance to the closest feature in the B file using the `-d` option. The distance (in base pairs) will be reported as the last column in the output.
+
+.. note::
+
 When a feature in B overlaps a feature in A, a distance of 0 is reported.
 
-::
-  cat A.bed
-  chr1  100  200
-  chr1  500  600
+.. code-block:: bash
 
-  cat B.bed
-  chr1  500  1000
-  chr1  1300 2000
+  $ cat a.bed
+  chr1  10  20  a1  1 -
 
-  closestBed -a A.bed -b B.bed -d
-  chr1  100  200  chr1  500  1000  300
-  chr1  500  600  chr1  500  1000  0
+  $ cat b.bed
+  chr1  7   8   b1  1 -
+  chr1  22  23  b2  2 +
+
+  $ bedtools closest -a a.bed -b b.bed
+  chr1  10  20  a1  1 - chr1  7   8   b1  1 - 3
+  chr1  10  20  a1  1 - chr1  22  23  b2  2 + 3
+
+==========================================================================
+``-D`` Reporting **signed** distances to the closest feature in base pairs 
+==========================================================================
+Whereas the `-d` option always reports distances as positive integers, the
+`-D` option will use negative integers to report distances to "upstream" features. There are three options for dictating how "upstream" should be defined.
+
+1. `-D ref`: Report distance with respect to the reference genome. That is, B features with lower start/stop coordinates are considered to be upstream.
+
+2. `-D a`: Report distance with respect to the orientation of the interval in A. That is, when A is on the - strand, "upstream" means B has higher start/stop coordinates. When A is on the + strand, "upstream" means B has lower start/stop coordinates.
+
+3. `-D b`: Report distance with respect to the orientation of the interval in B. That is, when B is on the - strand, "upstream" means A has higher start/stop coordinates. When B is on the + strand, "upstream" means A has lower start/stop coordinates.
+
+This is best demonstrated through multiple examples.
+
+.. code-block:: bash
+
+  $ cat a.bed
+  chr1  10  20  a1  1 +
+
+  $ cat b.bed
+  chr1  7   8   b1  1 +
+  chr1  22  23  b2  2 -
+
+  $ bedtools closest -a a.bed -b b.bed -D ref
+  chr1  10  20  a1  1 + chr1  7   8   b1  1 + -3
+  chr1  10  20  a1  1 + chr1  22  23  b2  2 - 3
+
+Since the A record is on the "+" strand in this example, `-D ref` and `-D a` have the same effect.
+
+.. code-block:: bash
+
+  $ bedtools closest -a a.bed -b b.bed -D a
+  chr1  10  20  a1  1 + chr1  7   8   b1  1 + -3
+  chr1  10  20  a1  1 + chr1  22  23  b2  2 - 3
+
+However, the signs of the distances change if the A interval is on the "-" strand.
+
+.. code-block:: bash
+
+  $ cat a.bed
+  chr1  10  20  a1  1 -
+
+  $ bedtools closest -a a.bed -b b.bed -D a
+  chr1  10  20  a1  1 - chr1  7   8   b1  1 + 3
+  chr1  10  20  a1  1 - chr1  22  23  b2  2 - -3
+
+Let's switch the A interval back to the "+" strand and now report distances with respect to the orientation of the closest B records.
+
+.. code-block:: bash
+
+  $ cat a.bed
+  chr1  10  20  a1  1 +
+
+  $ bedtools closest -a a.bed -b b.bed -D b
+  chr1  10  20  a1  1 + chr1  7   8   b1  1 + 3
+  chr1  10  20  a1  1 + chr1  22  23  b2  2 - 3
+
+Let's flip the stand of the two B records and compare.
+
+.. code-block:: bash
+
+  $ cat b.bed
+  chr1  7   8   b1  1 -
+  chr1  22  23  b2  2 +
+
+  $ bedtools closest -a a.bed -b b.bed -D b
+  chr1  10  20  a1  1 + chr1  7   8   b1  1 - -3
+  chr1  10  20  a1  1 + chr1  22  23  b2  2 + -3
+
+
+  

@@ -109,6 +109,191 @@ overlapping features.
   chr1  15   20
 
 
+==========================================================================
+Intersecting against MULTIPLE -b files.
+==========================================================================
+As of version 2.21.0, the `intersect` tool can detect overlaps between
+a single `-a` file and multiple `-b` files (instead of just one previously).
+One simply provides multiple `-b` files on the command line.
+
+For example, consider the following query (`-a`) file and three distinct (`-b`) files:
+
+.. code-block:: bash
+  
+  $ cat query.bed
+  chr1  1   20
+  chr1  40  45
+  chr1  70  90
+  chr1  105 120
+  chr2  1   20
+  chr2  40  45
+  chr2  70  90
+  chr2  105 120
+  chr3  1   20
+  chr3  40  45
+  chr3  70  90
+  chr3  105 120
+  chr3  150 200
+  chr4  10  20
+
+  $ cat d1.bed
+  chr1  5   25
+  chr1  65  75
+  chr1  95  100
+  chr2  5   25
+  chr2  65  75
+  chr2  95  100
+  chr3  5   25
+  chr3  65  75
+  chr3  95  100
+  
+  $ cat d2.bed
+  chr1  40  50
+  chr1  110 125
+  chr2  40  50
+  chr2  110 125
+  chr3  40  50
+  chr3  110 125
+  
+  $ cat d3.bed
+  chr1  85  115
+  chr2  85  115
+  chr3  85  115
+
+We can now compare query.bed to all three database files at once.:
+
+.. code-block:: bash
+
+  $ bedtools intersect -a query.bed \
+      -b d1.bed d2.bed d3.bed
+  chr1  5   20
+  chr1  40  45
+  chr1  70  75
+  chr1  85  90
+  chr1  110 120
+  chr1  105 115
+  chr2  5   20
+  chr2  40  45
+  chr2  70  75
+  chr2  85  90
+  chr2  110 120
+  chr2  105 115
+  chr3  5   20
+  chr3  40  45
+  chr3  70  75
+  chr3  85  90
+  chr3  110 120
+  chr3  105 115
+
+Clearly this is not completely informative because we cannot tell from which file each intersection came. However, if we use `-wa` and `-wb`, this becomes abundantly clear. When these options are used, the first column after the complete `-a` record lists the file number from which the overlap came. The number corresponds to the order in which the files were given on the command line. 
+
+.. code-block:: bash
+
+  $ bedtools intersect -wa -wb \
+      -a query.bed \
+      -b d1.bed d2.bed d3.bed \
+      -sorted
+  chr1  1   20  1 chr1  5   25
+  chr1  40  45  2 chr1  40  50
+  chr1  70  90  1 chr1  65  75
+  chr1  70  90  3 chr1  85  115
+  chr1  105 120 2 chr1  110 125
+  chr1  105 120 3 chr1  85  115
+  chr2  1   20  1 chr2  5   25
+  chr2  40  45  2 chr2  40  50
+  chr2  70  90  1 chr2  65  75
+  chr2  70  90  3 chr2  85  115
+  chr2  105 120 2 chr2  110 125
+  chr2  105 120 3 chr2  85  115
+  chr3  1   20  1 chr3  5   25
+  chr3  40  45  2 chr3  40  50
+  chr3  70  90  1 chr3  65  75
+  chr3  70  90  3 chr3  85  115
+  chr3  105 120 2 chr3  110 125
+  chr3  105 120 3 chr3  85  115
+
+In many cases, it may be more useful to report an informative "label" for each file instead of a file number.  One can do this with the `-names` option.
+
+.. code-block:: bash
+
+  $ bedtools intersect -wa -wb \
+      -a query.bed \
+      -b d1.bed d2.bed d3.bed \
+      -names d1 d2 d3 \
+      -sorted
+  chr1  1   20  d1  chr1  5   25
+  chr1  40  45  d2  chr1  40  50
+  chr1  70  90  d1  chr1  65  75
+  chr1  70  90  d3  chr1  85  115
+  chr1  105 120 d2  chr1  110 125
+  chr1  105 120 d3  chr1  85  115
+  chr2  1   20  d1  chr2  5   25
+  chr2  40  45  d2  chr2  40  50
+  chr2  70  90  d1  chr2  65  75
+  chr2  70  90  d3  chr2  85  115
+  chr2  105 120 d2  chr2  110 125
+  chr2  105 120 d3  chr2  85  115
+  chr3  1   20  d1  chr3  5   25
+  chr3  40  45  d2  chr3  40  50
+  chr3  70  90  d1  chr3  65  75
+  chr3  70  90  d3  chr3  85  115
+  chr3  105 120 d2  chr3  110 125
+  chr3  105 120 d3  chr3  85  115
+
+Or perhaps it may be more useful to report the file name.  One can do this with the `-filenames` option.
+
+.. code-block:: bash
+
+  $ bedtools intersect -wa -wb \
+      -a query.bed \
+      -b d1.bed d2.bed d3.bed \
+      -sorted \
+      -filenames 
+  chr1  1   20  d1.bed  chr1  5   25
+  chr1  40  45  d2.bed  chr1  40  50
+  chr1  70  90  d1.bed  chr1  65  75
+  chr1  70  90  d3.bed  chr1  85  115
+  chr1  105 120 d2.bed  chr1  110 125
+  chr1  105 120 d3.bed  chr1  85  115
+  chr2  1   20  d1.bed  chr2  5   25
+  chr2  40  45  d2.bed  chr2  40  50
+  chr2  70  90  d1.bed  chr2  65  75
+  chr2  70  90  d3.bed  chr2  85  115
+  chr2  105 120 d2.bed  chr2  110 125
+  chr2  105 120 d3.bed  chr2  85  115
+  chr3  1   20  d1.bed  chr3  5   25
+  chr3  40  45  d2.bed  chr3  40  50
+  chr3  70  90  d1.bed  chr3  65  75
+  chr3  70  90  d3.bed  chr3  85  115
+  chr3  105 120 d2.bed  chr3  110 125
+  chr3  105 120 d3.bed  chr3  85  115
+
+Other options to `intersect` can be used as well.  For example, let's use `-v` to report those intervals in query.bed that do not overlap any of the intervals in the three database files:
+
+.. code-block:: bash
+
+  $ bedtools intersect -wa -wb \
+      -a query.bed \
+      -b d1.bed d2.bed d3.bed \
+      -sorted \
+      -v 
+  chr3  150 200
+  chr4  10  20
+
+Or, let's report only those intersections where 100% of the query record is overlapped by a database record:
+
+.. code-block:: bash
+
+  $ bedtools intersect -wa -wb \
+      -a query.bed \
+      -b d1.bed d2.bed d3.bed \
+      -sorted \
+      -names d1 d2 d3
+      -f 1.0
+  chr1  40  45  d2  chr1  40  50
+  chr2  40  45  d2  chr2  40  50
+  chr3  40  45  d2  chr3  40  50
+
 
 =============================================
 ``-wa`` Reporting the original A feature 
@@ -675,190 +860,6 @@ alphanumeric sorting order.
 Et voila.
 
 
-==========================================================================
-Intersecting against MULTIPLE -b files.
-==========================================================================
-As of version 2.21.0, the `intersect` tool can detect overlaps between
-a single `-a` file and multiple `-b` files (instead of just one previously).
-One simply provides multiple `-b` files on the command line.
-
-For example, consider the following query (`-a`) file and three distinct (`-b`) files:
-
-.. code-block:: bash
-  
-  $ cat query.bed
-  chr1  1 20
-  chr1  40  45
-  chr1  70  90
-  chr1  105 120
-  chr2  1 20
-  chr2  40  45
-  chr2  70  90
-  chr2  105 120
-  chr3  1 20
-  chr3  40  45
-  chr3  70  90
-  chr3  105 120
-  chr3  150 200
-  chr4  10  20
-
-  $ cat d1.bed
-  chr1  5 25
-  chr1  65  75
-  chr1  95  100
-  chr2  5 25
-  chr2  65  75
-  chr2  95  100
-  chr3  5 25
-  chr3  65  75
-  chr3  95  100
-  
-  $ cat d2.bed
-  chr1  40  50
-  chr1  110 125
-  chr2  40  50
-  chr2  110 125
-  chr3  40  50
-  chr3  110 125
-  
-  $ cat d3.bed
-  chr1  85  115
-  chr2  85  115
-  chr3  85  115
-
-We can now compare query.bed to all three database files at once.:
-
-.. code-block:: bash
-
-  $ bedtools intersect -a query.bed \
-      -b d1.bed d2.bed d3.bed
-  chr1  5 20
-  chr1  40  45
-  chr1  70  75
-  chr1  85  90
-  chr1  110 120
-  chr1  105 115
-  chr2  5 20
-  chr2  40  45
-  chr2  70  75
-  chr2  85  90
-  chr2  110 120
-  chr2  105 115
-  chr3  5 20
-  chr3  40  45
-  chr3  70  75
-  chr3  85  90
-  chr3  110 120
-  chr3  105 115
-
-Clearly this is not completely informative because we cannot tell from which file each intersection came. However, if we use `-wa` and `-wb`, this becomes abundantly clear. When these options are used, the first column after the complete `-a` record lists the file number from which the overlap came. The number corresponds to the order in which the files were given on the command line. 
-
-.. code-block:: bash
-
-  $ bedtools intersect -wa -wb \
-      -a query.bed \
-      -b d1.bed d2.bed d3.bed \
-      -sorted
-  chr1  1 20  1 chr1  5 25
-  chr1  40  45  2 chr1  40  50
-  chr1  70  90  1 chr1  65  75
-  chr1  70  90  3 chr1  85  115
-  chr1  105 120 2 chr1  110 125
-  chr1  105 120 3 chr1  85  115
-  chr2  1 20  1 chr2  5 25
-  chr2  40  45  2 chr2  40  50
-  chr2  70  90  1 chr2  65  75
-  chr2  70  90  3 chr2  85  115
-  chr2  105 120 2 chr2  110 125
-  chr2  105 120 3 chr2  85  115
-  chr3  1 20  1 chr3  5 25
-  chr3  40  45  2 chr3  40  50
-  chr3  70  90  1 chr3  65  75
-  chr3  70  90  3 chr3  85  115
-  chr3  105 120 2 chr3  110 125
-  chr3  105 120 3 chr3  85  115
-
-In many cases, it may be more useful to report an informative "label" for each file instead of a file number.  One can do this with the `-names` option.
-
-.. code-block:: bash
-
-  $ bedtools intersect -wa -wb \
-      -a query.bed \
-      -b d1.bed d2.bed d3.bed \
-      -names d1 d2 d3 \
-      -sorted
-  chr1  1 20  d1  chr1  5 25
-  chr1  40  45  d2  chr1  40  50
-  chr1  70  90  d1  chr1  65  75
-  chr1  70  90  d3  chr1  85  115
-  chr1  105 120 d2  chr1  110 125
-  chr1  105 120 d3  chr1  85  115
-  chr2  1 20  d1  chr2  5 25
-  chr2  40  45  d2  chr2  40  50
-  chr2  70  90  d1  chr2  65  75
-  chr2  70  90  d3  chr2  85  115
-  chr2  105 120 d2  chr2  110 125
-  chr2  105 120 d3  chr2  85  115
-  chr3  1 20  d1  chr3  5 25
-  chr3  40  45  d2  chr3  40  50
-  chr3  70  90  d1  chr3  65  75
-  chr3  70  90  d3  chr3  85  115
-  chr3  105 120 d2  chr3  110 125
-  chr3  105 120 d3  chr3  85  115
-
-Or perhaps it may be more useful to report the file name.  One can do this with the `-filenames` option.
-
-.. code-block:: bash
-
-  $ bedtools intersect -wa -wb \
-      -a query.bed \
-      -b d1.bed d2.bed d3.bed \
-      -sorted \
-      -filenames 
-  chr1  1 20  d1.bed  chr1  5 25
-  chr1  40  45  d2.bed  chr1  40  50
-  chr1  70  90  d1.bed  chr1  65  75
-  chr1  70  90  d3.bed  chr1  85  115
-  chr1  105 120 d2.bed  chr1  110 125
-  chr1  105 120 d3.bed  chr1  85  115
-  chr2  1 20  d1.bed  chr2  5 25
-  chr2  40  45  d2.bed  chr2  40  50
-  chr2  70  90  d1.bed  chr2  65  75
-  chr2  70  90  d3.bed  chr2  85  115
-  chr2  105 120 d2.bed  chr2  110 125
-  chr2  105 120 d3.bed  chr2  85  115
-  chr3  1 20  d1.bed  chr3  5 25
-  chr3  40  45  d2.bed  chr3  40  50
-  chr3  70  90  d1.bed  chr3  65  75
-  chr3  70  90  d3.bed  chr3  85  115
-  chr3  105 120 d2.bed  chr3  110 125
-  chr3  105 120 d3.bed  chr3  85  115
-
-Other options to `intersect` can be used as well.  For example, let's use `-v` to report those intervals in query.bed that do not overlap any of the intervals in the three database files:
-
-.. code-block:: bash
-
-  $ bedtools intersect -wa -wb \
-      -a query.bed \
-      -b d1.bed d2.bed d3.bed \
-      -sorted \
-      -v 
-  chr3  150 200
-  chr4  10  20
-
-Or, let's report only those intersections where 100% of the query record is overlapped by a database record:
-
-.. code-block:: bash
-
-  $ bedtools intersect -wa -wb \
-      -a query.bed \
-      -b d1.bed d2.bed d3.bed \
-      -sorted \
-      -names d1 d2 d3
-      -f 1.0
-  chr1  40  45  d2  chr1  40  50
-  chr2  40  45  d2  chr2  40  50
-  chr3  40  45  d2  chr3  40  50
 
 
 ==========================================================================
