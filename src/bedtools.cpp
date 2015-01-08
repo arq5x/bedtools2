@@ -65,6 +65,7 @@ int nek_sandbox1_main(int argc, char* argv[]);//
 int nuc_main(int argc, char* argv[]);//
 int pairtobed_main(int argc, char* argv[]);//
 int pairtopair_main(int argc, char* argv[]);//
+int pool_main(int argc, char* argv[]); //
 int random_main(int argc, char* argv[]); //
 int reldist_main(int argc, char* argv[]); //
 int sample_main(int argc, char* argv[]); //
@@ -99,6 +100,7 @@ int main(int argc, char *argv[])
     else if (sub_cmd == "complement")  return complement_main(argc-1, argv+1);
     else if (sub_cmd == "subtract")    return subtract_main(argc-1, argv+1);
     else if (sub_cmd == "slop")        return slop_main(argc-1, argv+1);
+    else if (sub_cmd == "pool")        return pool_main(argc-1, argv+1);
     else if (sub_cmd == "flank")       return flank_main(argc-1, argv+1);
     else if (sub_cmd == "sort")        return sort_main(argc-1, argv+1);
     else if (sub_cmd == "random")      return random_main(argc-1, argv+1);
