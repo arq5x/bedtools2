@@ -7,12 +7,15 @@
 
   Licenced under the GNU General Public License 2.0 license.
 ******************************************************************************/
-#include <math.h>
+#include <cmath>
+#include <climits>
 #include <inttypes.h>
 #include <getopt.h>
 #include "lineFileUtilities.h"
 #include "version.h"
 #include "splitBed.h"
+
+using namespace std;
 
 // define our program name
 #define PROGRAM_NAME "bedtools split"
@@ -200,9 +203,16 @@ int BedSplit::main(int argc,char** argv)
         }
     fflush(out);
     fclose(out);
-    cout << filename << "\t"
-    	<< bean->nbases << "\t"
-    	<< bean->items.size()
+    cout << filename << "\t";
+    if( bean->nbases >= LONG_MAX)
+    	{
+    	cout << bean->nbases << "\t";
+    	}
+    else
+    	{
+    	cout << (long)(bean->nbases) << "\t";
+    	}
+    cout << bean->items.size()
     	<< endl;
     }
 
