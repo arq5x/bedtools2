@@ -74,8 +74,8 @@ class BedSplitItems
 	{
 	public:
 		vector<BED*> items;
-		long nbases;
-		BedSplitItems():nbases(0L)
+		double nbases;
+		BedSplitItems():nbases(0.0)
 			{
 			}
 		~BedSplitItems()
@@ -84,7 +84,7 @@ class BedSplitItems
 		void add(BED* entry)
 		    {
 		    items.push_back(entry);
-		    nbases += entry->size();
+		    nbases += (double)entry->size();
 		    }
 		vector<BED*>::size_type size() const
 		    {
