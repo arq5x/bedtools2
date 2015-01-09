@@ -14,8 +14,8 @@ INCLUDES = -I$(UTILITIES_DIR)/bedFile/ \
 # ----------------------------------
 # define our source and object files
 # ----------------------------------
-SOURCES= poolBedMain.cpp poolBed.cpp poolBed.h
-OBJECTS= poolBed.o poolBedMain.o
+SOURCES= splitBedMain.cpp splitBed.cpp splitBed.h
+OBJECTS= splitBed.o splitBedMain.o
 BUILT_OBJECTS= $(patsubst %,$(OBJ_DIR)/%,$(OBJECTS))
 
 
@@ -29,6 +29,6 @@ $(BUILT_OBJECTS): $(SOURCES)
 
 clean:
 	@echo "Cleaning up."
-	@rm -f $(OBJ_DIR)/poolBedMain.o $(OBJ_DIR)/poolBed.o
+	@rm -f $(OBJ_DIR)/splitBedMain.o $(OBJ_DIR)/splitBed.o
 
 .PHONY: clean
