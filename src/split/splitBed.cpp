@@ -156,6 +156,7 @@ int BedSplit::main(int argc,char** argv)
     if(num_beans<=0)
         {
         cerr << "Error: num_beans==0.\n" << endl;
+        usage(cerr);
         return EXIT_FAILURE;
         }
     if(algorithm==NULL || strcmp(algorithm,"size")==0 )
