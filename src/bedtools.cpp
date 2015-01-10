@@ -70,6 +70,7 @@ int reldist_main(int argc, char* argv[]); //
 int sample_main(int argc, char* argv[]); //
 int shuffle_main(int argc, char* argv[]); //
 int slop_main(int argc, char* argv[]); //
+int split_main(int argc, char* argv[]); //
 int sort_main(int argc, char* argv[]); //
 int subtract_main(int argc, char* argv[]); //
 int tagbam_main(int argc, char* argv[]);//
@@ -99,6 +100,7 @@ int main(int argc, char *argv[])
     else if (sub_cmd == "complement")  return complement_main(argc-1, argv+1);
     else if (sub_cmd == "subtract")    return subtract_main(argc-1, argv+1);
     else if (sub_cmd == "slop")        return slop_main(argc-1, argv+1);
+    else if (sub_cmd == "split")       return split_main(argc-1, argv+1);
     else if (sub_cmd == "flank")       return flank_main(argc-1, argv+1);
     else if (sub_cmd == "sort")        return sort_main(argc-1, argv+1);
     else if (sub_cmd == "random")      return random_main(argc-1, argv+1);

@@ -10,6 +10,7 @@ VERSION_FILE=./src/utils/version/version_git.h
 RELEASED_VERSION_FILE=./src/utils/version/version_release.txt
 
 
+
 # define our object and binary directories
 export OBJ_DIR	= obj
 export BIN_DIR	= bin
@@ -63,6 +64,7 @@ SUBDIRS = $(SRC_DIR)/annotateBed \
 		  $(SRC_DIR)/shuffleBed \
 		  $(SRC_DIR)/slopBed \
 		  $(SRC_DIR)/sortBed \
+		  $(SRC_DIR)/split \
 		  $(SRC_DIR)/subtractBed \
 		  $(SRC_DIR)/tagBam \
 		  $(SRC_DIR)/unionBedGraphs \
