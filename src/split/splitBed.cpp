@@ -1,5 +1,5 @@
 /*****************************************************************************
-  splitBed.h
+  splitBed.cpp
 
   (c) 2015 - Pierre Lindenbaum PhD
   @yokofakun http://plindenbaum.blogspot.com
@@ -342,16 +342,17 @@ void BedSplit::usage(std::ostream& out)
     out << "Summary: Split a Bed file." << endl << endl;
     out << "Usage:   " << PROGRAM_NAME << " [OPTIONS] -i <bed> -n number-of-files" << endl << endl;
     out << "Options: " << endl;
-    out << "\t-i|--input (file) BED input." << endl;
-    out << "\t-n|--number (int)\tNumber of beans to create." << endl;
-    out << "\t-p|--prefix (string)\toutput BED file prefix." << endl;
-    out << "\t-a|--algorithm (string) algorithm used to split data." << endl;
-    out << "\t\t* size (default): uses a heuristic algorithm to group the items so\n";
-    out << "\t\t  all beans contain the ~ same number of bases\n";
-    out << "\t\t* simple : slit items as they come\n";
-    out << "\t-h|--help\tprint help (this screen)." << endl;
-    out << "\t-v|--version\tprint version." << endl;
-    out << "\n\nThis programs stores the BED items in memory." << endl;
+    out << "\t-i|--input (file)\tBED input file (req'd)." << endl;
+    out << "\t-n|--number (int)\tNumber of files to create (req'd)." << endl;
+    out << "\t-p|--prefix (string)\tOutput BED file prefix." << endl;
+    out << "\t-a|--algorithm (string) Algorithm used to split data." << endl;
+    out << "\t\t* size (default): uses a heuristic algorithm to group the items" << endl;
+    out << "\t\t  so all files contain the ~ same number of bases" << endl;
+    out << "\t\t* simple : route records such that each split file has" << endl;
+    out << "\t\t  approximately equal records (like Unix split)." << endl << endl;
+    out << "\t-h|--help\t\tPrint help (this screen)." << endl;
+    out << "\t-v|--version\t\tPrint version." << endl;
+    out << "\n\nNote: This programs stores the input BED records in memory." << endl;
     out << endl;
     }
 
