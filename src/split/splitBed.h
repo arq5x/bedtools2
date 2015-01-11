@@ -27,12 +27,13 @@ class BedSplit {
 private:
     std::string bedFileName;
     std::string outfileprefix;
-    unsigned int num_beans;
+    unsigned int num_chuncks;
     int bedType;
     std::vector<BED> items;
     
     void usage(std::ostream& out);
-    void saveBean(void* data,size_t file_index);
+    std::FILE* saveFileChunk(std::string& name,size_t file_index);
+    void saveBedItems(void* data,size_t file_index);
     void loadBed();
     int doSimpleSplit();
     int doEuristicSplitOnTotalSize();

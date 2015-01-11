@@ -20,58 +20,24 @@ using namespace std;
 // define our program name
 #define PROGRAM_NAME "bedtools split"
 
-#define SAVE_BEANS(splits) do {\
+#define SAVE_BEDITEMS(splits) do {\
     for(size_t _i = 0; _i < splits.size();++_i) {\
-            BedSplitItems* bean=splits[_i];\
-            saveBean(bean,_i);\
-            delete bean;\
+            BedSplitItems* bedItems=splits[_i];\
+            saveBedItems(bedItems,_i);\
+            delete bedItems;\
             } } while(0)
 
-class Random
-    {
-    private:
-         unsigned int seedp;
-    public:
-        Random():seedp(0)
-            {
-            }
-        Random(unsigned int seed):seedp(seed)
-            {
-            }
-        
-         int nextInt()
-            {
-            return rand_r(&seedp);
-            }
-         int nextInt(int max)
-            {
-            return nextInt()%max;
-            }
-         int nextInt(int beg,int end)
-            {
-            return beg+nextInt(end-beg);
-            }
-         uint64_t nextULong()
-            {
-            uint64_t num;
-            num = nextInt();
-            num = (num << 32) | nextInt();
-            return num;
-            }
-         uint64_t nextULong(uint64_t max)
-            {
-             return nextULong()%max;
-            }
-         uint64_t nextULong(uint64_t beg,uint64_t end)
-            {
-            return beg+nextULong(end-beg);
-            }
-         double nextDouble()
-            {
-            return nextInt()/(double)RAND_MAX;
-            }
-    };
-
+#define  REPORT_CHUNK(FILENAME,NBASES,COUNT) \
+    cout << FILENAME << "\t";\
+    if( NBASES >= LONG_MAX) \
+    	{\
+    	cout << NBASES << "\t";\
+    	}\
+    else\
+    	{\
+    	cout << (long)(NBASES) << "\t";\
+    	}\
+    cout << COUNT << endl
 
 class BedSplitItems
 	{
@@ -97,7 +63,7 @@ class BedSplitItems
 
 
 
-BedSplit::BedSplit():outfileprefix("_split"),num_beans(0)
+BedSplit::BedSplit():outfileprefix("_split"),num_chuncks(0)
     {
     }
 
@@ -133,7 +99,7 @@ int BedSplit::main(int argc,char** argv)
             case 'p': outfileprefix.assign(optarg); break;
             case 'i': bedFileName.assign(optarg); break;
             case 'a': algorithm = optarg ; break;
-            case 'n': num_beans = (unsigned int)atoi(optarg); break;
+            case 'n': num_chuncks = (unsigned int)atoi(optarg); break;
             case '?': cerr << "Unknown option -"<< (char)optopt<< ".\n"; return EXIT_FAILURE;
             default: cerr << "Bad input" << endl; return EXIT_FAILURE;
             }
@@ -156,9 +122,9 @@ int BedSplit::main(int argc,char** argv)
         cerr << "Error: output file prefix is empty.\n" << endl;
         return EXIT_FAILURE;
         }
-    if(num_beans<=0)
+    if(num_chuncks<=0)
         {
-        cerr << "Error: num_beans==0.\n" << endl;
+        cerr << "Error: num_chuncks==0.\n" << endl;
         usage(cerr);
         return EXIT_FAILURE;
         }
@@ -177,12 +143,11 @@ int BedSplit::main(int argc,char** argv)
         }
     }
 
-
- void BedSplit::saveBean(void* data,size_t file_index)
-    {
-    BedSplitItems* bean=(BedSplitItems*)data;
-    string filename(this->outfileprefix);
+std::FILE* BedSplit::saveFileChunk(std::string& filename,size_t file_index)
+   {
+    
     char tmp[10];
+    filename.assign(this->outfileprefix);
     sprintf(tmp,"%05d",(file_index+1));
     filename.append(".").append(tmp).append(".bed");
     FILE* out = fopen(filename.c_str(),"w");
@@ -194,26 +159,24 @@ int BedSplit::main(int argc,char** argv)
             );
         exit(EXIT_FAILURE);
         }
+    return out;
+    }
+
+ void BedSplit::saveBedItems(void* data,size_t file_index)
+    {
+    BedSplitItems* bedItems=(BedSplitItems*)data;
+    string filename;
+    FILE* out = saveFileChunk(filename,file_index);
     BedFile bf;
     bf.bedType = this->bedType;
     
-    for(size_t j=0;j< bean->items.size();++j)
+    for(size_t j=0;j< bedItems->items.size();++j)
         {
-        bf.reportToFileBedNewLine(out,*(bean->items[j]));
+        bf.reportToFileBedNewLine(out,*(bedItems->items[j]));
         }
     fflush(out);
     fclose(out);
-    cout << filename << "\t";
-    if( bean->nbases >= LONG_MAX)
-    	{
-    	cout << bean->nbases << "\t";
-    	}
-    else
-    	{
-    	cout << (long)(bean->nbases) << "\t";
-    	}
-    cout << bean->items.size()
-    	<< endl;
+    REPORT_CHUNK(filename, bedItems->nbases,bedItems->items.size());
     }
 
     
@@ -236,26 +199,77 @@ void BedSplit::loadBed()
     }
   }
 
+class SimpleSplitInfo
+    {
+    public:
+        FILE* out;
+        std::string filename;
+        size_t count;
+        double nbases;
+        SimpleSplitInfo():out(0),count(0),nbases(0)
+         {
+         }
+    };
 
 int BedSplit::doSimpleSplit()
     {
-    vector<BedSplitItems*> splits;
-    loadBed();
-    for(size_t i = 0; i< this->items.size();++i)
+    if( this->num_chuncks + 3 < FOPEN_MAX)//3 for security ?, not too much...
+    	{
+    	size_t i=0,count=0;
+    	vector<SimpleSplitInfo*> outputs;
+    	
+    	
+    	BED bedEntry;
+        BedFile bed(this->bedFileName);
+        bed.Open();
+        while(bed.GetNextBed(bedEntry))
+            {
+            if (bed._status != BED_VALID) continue;
+            if(count==0) this->bedType = bed.bedType;
+            size_t file_index= count % this->num_chuncks;
+            if(file_index == outputs.size())
+                {
+                SimpleSplitInfo* newinfo = new SimpleSplitInfo;
+                outputs.push_back(newinfo);
+                newinfo->out = saveFileChunk(newinfo->filename,file_index);
+                } 
+            SimpleSplitInfo* info = outputs[file_index];
+            info->nbases += bedEntry.size();
+            info->count++;
+            bed.reportToFileBedNewLine(info->out,bedEntry);
+            ++count;
+            }
+        
+        
+        for(i=0;i< outputs.size();++i)
+            {
+            SimpleSplitInfo* info = outputs[i];
+            fflush(info->out);
+            fclose(info->out);
+            REPORT_CHUNK(info->filename, info->nbases,info->count);
+            delete info;
+            }
+        bed.Close();
+    	}
+    else  {
+        vector<BedSplitItems*> splits;
+        loadBed();
+        for(size_t i = 0; i< this->items.size();++i)
             {
             BED* bedEntry = &(this->items[i]);
-            if( splits.size() < num_beans )
+            if( splits.size() < this->num_chuncks )
            		{
-           		BedSplitItems* bean=new BedSplitItems;
-           		splits.push_back(bean);
-           		bean->add(bedEntry);
+           		BedSplitItems* bedItems=new BedSplitItems;
+           		splits.push_back(bedItems);
+           		bedItems->add(bedEntry);
            		}
            	else 
            	    {
-           	    splits[ i % this->num_beans]->add(bedEntry);
+           	    splits[ i % this->num_chuncks]->add(bedEntry);
            	    }
             }
-    SAVE_BEANS(splits);
+        SAVE_BEDITEMS(splits);
+	    }
     return 0;
     }
 
@@ -273,14 +287,14 @@ int BedSplit::doEuristicSplitOnTotalSize()
     for(size_t item_index = 0; item_index< this->items.size();++item_index)
         {
         BED* bedEntry = &(this->items[item_index]);
-        if( splits.size() < num_beans )
+        if( splits.size() < num_chuncks )
        		{
-       		BedSplitItems* bean=new BedSplitItems;
-       		splits.push_back(bean);
-       		bean->add(bedEntry);
+       		BedSplitItems* bedItems=new BedSplitItems;
+       		splits.push_back(bedItems);
+       		bedItems->add(bedEntry);
        		total_bases += bedEntry->size();
        		}
-       	else if( num_beans == 1 )
+       	else if( num_chuncks == 1 )
        	    {
        	    splits.front()->add(bedEntry);
        	    total_bases += bedEntry->size();
@@ -290,8 +304,8 @@ int BedSplit::doEuristicSplitOnTotalSize()
        	    size_t index_insert = 0UL;
        	    vector<double> stdevs;
        	    double lowest_stddev=-1;
-       	    /* expected mean number of bases in each bean */
-       	    double mean = (total_bases + bedEntry->size() )/ (double)num_beans;
+       	    /* expected mean number of bases in each bedItems */
+       	    double mean = (total_bases + bedEntry->size() )/ (double)num_chuncks;
        	    
        	    /** try to insert the bedEntry in any of the split */
        	    for(size_t  try_index_insert = 0;
@@ -317,7 +331,7 @@ int BedSplit::doEuristicSplitOnTotalSize()
        	    total_bases += bedEntry->size();
        	    }
         }
-    SAVE_BEANS(splits);
+    SAVE_BEDITEMS(splits);
     return 0;
     }
 
@@ -335,7 +349,6 @@ void BedSplit::usage(std::ostream& out)
     out << "\t\t* size (default): uses a heuristic algorithm to group the items so\n";
     out << "\t\t  all beans contain the ~ same number of bases\n";
     out << "\t\t* simple : slit items as they come\n";
-    out << "\t\t  all beans contain the ~ same number of bases\n";
     out << "\t-h|--help\tprint help (this screen)." << endl;
     out << "\t-v|--version\tprint version." << endl;
     out << "\n\nThis programs stores the BED items in memory." << endl;
