@@ -72,6 +72,7 @@ int shuffle_main(int argc, char* argv[]); //
 int slop_main(int argc, char* argv[]); //
 int split_main(int argc, char* argv[]); //
 int sort_main(int argc, char* argv[]); //
+int spacing_main(int argc, char* argv[]); //
 int subtract_main(int argc, char* argv[]); //
 int tagbam_main(int argc, char* argv[]);//
 int unionbedgraphs_main(int argc, char* argv[]);//
@@ -105,6 +106,7 @@ int main(int argc, char *argv[])
     else if (sub_cmd == "sort")        return sort_main(argc-1, argv+1);
     else if (sub_cmd == "random")      return random_main(argc-1, argv+1);
     else if (sub_cmd == "shuffle")     return shuffle_main(argc-1, argv+1);
+    else if (sub_cmd == "spacing")     return spacing_main(argc-1, argv+1);
     else if (sub_cmd == "annotate")    return annotate_main(argc-1, argv+1);
 
     // Multi-way file comparisonstools
@@ -207,7 +209,8 @@ int bedtools_help(void)
     cout  << "    sort          "  << "Order the intervals in a file.\n";
     cout  << "    random        "  << "Generate random intervals in a genome.\n";
     cout  << "    shuffle       "  << "Randomly redistrubute intervals in a genome.\n";
-    cout  << "    sample        "  << "Sample random records from file using reservoir sampling.\n";    
+    cout  << "    sample        "  << "Sample random records from file using reservoir sampling.\n";   
+    cout  << "    spacing       "  << "Report the spacing between intervals in a file.\n";     
     cout  << "    annotate      "  << "Annotate coverage of features from multiple files.\n";
     
     cout  << endl;
@@ -253,6 +256,7 @@ int bedtools_help(void)
     cout  << "    makewindows   "  << "Make interval \"windows\" across a genome.\n";
     cout  << "    groupby       "  << "Group by common cols. & summarize oth. cols. (~ SQL \"groupBy\")\n";
     cout  << "    expand        "  << "Replicate lines based on lists of values in columns.\n";
+    cout  << "    split         "  << "Split a file into multiple files with equal records or base pairs.\n"; 
 
     cout  << endl;
     cout  << "[ General help ]" << endl;

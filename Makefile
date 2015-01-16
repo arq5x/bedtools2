@@ -53,7 +53,7 @@ SUBDIRS = $(SRC_DIR)/annotateBed \
 		  $(SRC_DIR)/mergeFile \
 		  $(SRC_DIR)/multiBamCov \
 		  $(SRC_DIR)/multiIntersectBed \
-		   $(SRC_DIR)/nekSandbox1 \
+		  $(SRC_DIR)/nekSandbox1 \
 		  $(SRC_DIR)/nucBed \
 		  $(SRC_DIR)/pairToBed \
 		  $(SRC_DIR)/pairToPair \
@@ -64,6 +64,7 @@ SUBDIRS = $(SRC_DIR)/annotateBed \
 		  $(SRC_DIR)/shuffleBed \
 		  $(SRC_DIR)/slopBed \
 		  $(SRC_DIR)/sortBed \
+		  $(SRC_DIR)/spacingFile \
 		  $(SRC_DIR)/split \
 		  $(SRC_DIR)/subtractBed \
 		  $(SRC_DIR)/tagBam \

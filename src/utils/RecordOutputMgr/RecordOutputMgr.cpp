@@ -274,6 +274,10 @@ void RecordOutputMgr::printRecord(RecordKeyVector &keyList, RecordKeyVector *blo
 		_currBamBlockList = NULL;
 
 		return;
+	} else if (_context->getProgram() == ContextBase::SPACING) {
+		keyList.getKey()->print(_outBuf);
+		_currBamBlockList = NULL;
+		return;
 	}
 }
 
