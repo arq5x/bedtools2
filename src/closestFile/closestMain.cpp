@@ -100,11 +100,11 @@ void closest_help(void) {
     cerr                        << "\t\t- \"each\"    Report closest records for each database (default)." << endl;
     cerr                        << "\t\t- \"all\"  Report closest records among all databases." << endl << endl;
 
-    cerr << "\t-names\t"        << "When using multiple databases (-b), provide an alias for each that" << endl;
-    cerr                        <<"\t\twill appear instead of a fileId when also printing the DB record." << endl << endl;
+	cerr << "\t-names\t" 		<< "When using multiple databases (-b), provide an alias for each that" << endl;
+	cerr 						<<"\t\twill appear instead of a fileId when also printing the DB record." << endl << endl;
 
-    cerr << "\t-filenames"      << "\tWhen using multiple databases (-b), show each complete filename" << endl;
-    cerr                        <<"\t\t\tinstead of a fileId when also printing the DB record." << endl << endl;
+	cerr << "\t-filenames" 		<< "\tWhen using multiple databases (-b), show each complete filename" << endl;
+	cerr 						<<"\t\t\tinstead of a fileId when also printing the DB record." << endl << endl;
 
     cerr << "\t-k\t"            << "Report the k closest hits. Default is 1. If tieMode = \"all\", " << endl;
     cerr                        << "\t\t- all ties will still be reported." << endl << endl;

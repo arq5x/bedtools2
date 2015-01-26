@@ -65,6 +65,7 @@ ContextBase::ContextBase()
 {
 	_programNames["intersect"] = INTERSECT;
 	_programNames["sample"] = SAMPLE;
+	_programNames["spacing"] = SPACING;
 	_programNames["map"] = MAP;
 	_programNames["merge"] = MERGE;
 
