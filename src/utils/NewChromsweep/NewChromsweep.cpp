@@ -129,7 +129,7 @@ void NewChromSweep::scanCache(int dbIdx, RecordKeyVector &retList) {
         if (_currQueryRec->sameChrom(cacheRec) && !_currQueryRec->after(cacheRec)) {
             if (intersects(_currQueryRec, cacheRec)) {
                 retList.push_back(cacheRec);
-            } else break; // cacheRec is after the query rec, stop scanning.
+            } else if (cacheRec->after(_currQueryRec)) break; // cacheRec is after the query rec, stop scanning.
             cacheIter = _caches[dbIdx].next();
         }
         else {
@@ -150,6 +150,7 @@ void NewChromSweep::clearCache(int dbIdx)
 }
 
 void NewChromSweep::masterScan(RecordKeyVector &retList) {
+
 	for (int i=0; i < _numDBs; i++) {
 		if (dbFinished(i) || chromChange(i, retList, true)) {
 			continue;

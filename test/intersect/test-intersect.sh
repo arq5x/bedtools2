@@ -502,7 +502,25 @@ $BT intersect -a a.bed -b b.bed -f 1.00001 2>&1 > /dev/null | cat - | head -2 | 
 check exp obs
 rm exp obs
 
+##################################################################bug167_strandSweep.bed
+#  Test that -s works with chromsweep
+##################################################################
+echo "    intersect.t41...\c"
+echo \
+"22" > exp
+$BT intersect -a bug167_strandSweep.bed -b bug167_strandSweep.bed -sorted -s -wa -wb | wc -l > obs
+check exp obs
+rm exp obs
 
+##################################################################bug167_strandSweep.bed
+#  Test that -S works with chromsweep
+##################################################################
+echo "    intersect.t42...\c"
+echo \
+"20" > exp
+$BT intersect -a bug167_strandSweep.bed -b bug167_strandSweep.bed -sorted -S -wa -wb | wc -l > obs
+check exp obs
+rm exp obs
 
 rm one_block.bam two_blocks.bam three_blocks.bam
 

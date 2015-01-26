@@ -18,7 +18,8 @@ ContextClosest::ContextClosest()
 	_diffNames(false),
 	_tieMode(ALL_TIES),
 	_strandedDistMode(REF_DIST),
-	_multiDbMode(EACH_DB)
+	_multiDbMode(EACH_DB),
+	_numClosestHitsWanted(1)
 {
 	// closest requires sorted input
 	setSortedInput(true);
@@ -74,6 +75,9 @@ bool ContextClosest::parseCmdArgs(int argc, char **argv, int skipFirstArgs){
         }
         else if (strcmp(_argv[_i], "-mdb") == 0) {
         	if (!handle_mdb()) return false;
+        }
+        else if (strcmp(_argv[_i], "-k") == 0) {
+        	if (!handle_k()) return false;
         }
 
 	}
@@ -220,3 +224,21 @@ bool ContextClosest::handle_mdb()
 	_errorMsg = "*****ERROR: Request \"each\" or \"last\" for Multiple Database Mode (-mdb)";
 	return false;
 }
+
+bool ContextClosest::handle_k()
+{
+    if ((_i+1) < _argc) {
+    	if (isNumeric(_argv[_i+1])) {
+			_numClosestHitsWanted = atoi(_argv[_i+1]);
+			if (_numClosestHitsWanted > 0) {
+				markUsed(_i - _skipFirstArgs);
+				_i++;
+				markUsed(_i - _skipFirstArgs);
+				return true;
+			}
+    	}
+    }
+	_errorMsg = "\n***** ERROR: -k option must be followed by a postive integer value *****";
+	return false;
+}
+

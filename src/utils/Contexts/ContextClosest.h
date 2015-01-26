@@ -27,6 +27,7 @@ public:
     bool signDistance() const { return _signDistance; }
     bool hasStrandedDistMode() const { return _haveStrandedDistMode; }
     bool diffNames() const { return _diffNames; }
+    int getNumClosestHitsWanted() const { return _numClosestHitsWanted; }
 
     typedef enum { FIRST_TIE, LAST_TIE, ALL_TIES} tieModeType;
     tieModeType getTieMode() const { return _tieMode; }
@@ -49,6 +50,7 @@ private:
     tieModeType _tieMode;
     strandedDistanceModeType _strandedDistMode;
     multiDbModeType _multiDbMode;
+    int _numClosestHitsWanted;
 
     bool handle_d();
     bool handle_D();
@@ -58,7 +60,7 @@ private:
     bool handle_N();
     bool handle_t();
     bool handle_mdb();
-
+    bool handle_k();
 };
 
 
