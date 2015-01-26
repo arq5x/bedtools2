@@ -61,3 +61,6 @@ cd subtract; bash test-subtract.sh; cd ..
 echo " Testing bedtools sample:"
 cd sample; bash test-sample.sh; cd ..
 
+echo " Testing bedtools split:"
+cd split; bash test-split.sh; cd ..
+

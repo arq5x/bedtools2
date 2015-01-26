@@ -163,7 +163,7 @@ public:
       zeroLength(false)
     {}
     
-    int size() {
+    int size() const {
         return end-start;
     }
 
@@ -998,14 +998,14 @@ public:
 
 
     /*
-        reportBedNewLine
+        reportToFileBedNewLine
 
         Writes the _original_ BED entry with a NEWLINE
         at the end of the line.
         Works for BED3 - BED6.
     */
     template <typename T>
-    inline void reportBedNewLine(const T &bed) {
+    inline void reportToFileBedNewLine(FILE* out,const T &bed) {
         
         // if it is azeroLength feature, we need to
         // correct the start and end coords to what they were
@@ -1020,24 +1020,24 @@ public:
         //BED
         if (_isGff == false && _isVcf == false) {
             if (this->bedType == 3) {
-                printf ("%s\t%d\t%d\n", bed.chrom.c_str(), start, end);
+                fprintf(out,"%s\t%d\t%d\n", bed.chrom.c_str(), start, end);
             }
             else if (this->bedType == 4) {
-                printf ("%s\t%d\t%d\t%s\n", 
+                fprintf(out,"%s\t%d\t%d\t%s\n", 
                     bed.chrom.c_str(), start, end, bed.name.c_str());
             }
             else if (this->bedType == 5) {
-                printf ("%s\t%d\t%d\t%s\t%s\n", 
+                fprintf(out,"%s\t%d\t%d\t%s\t%s\n", 
                     bed.chrom.c_str(), start, end, 
                     bed.name.c_str(), bed.score.c_str());
             }
             else if (this->bedType == 6) {
-                printf ("%s\t%d\t%d\t%s\t%s\t%s\n", 
+                fprintf(out,"%s\t%d\t%d\t%s\t%s\t%s\n", 
                     bed.chrom.c_str(), start, end, bed.name.c_str(),
                     bed.score.c_str(), bed.strand.c_str());
             }
             else if (this->bedType > 6) {
-                printf ("%s\t%d\t%d\t%s\t%s\t%s", 
+                fprintf(out,"%s\t%d\t%d\t%s\t%s\t%s", 
                     bed.chrom.c_str(), start, end, bed.name.c_str(),
                     bed.score.c_str(), bed.strand.c_str());
 
@@ -1046,27 +1046,27 @@ public:
                 vector<uint16_t>::const_iterator 
                     othEnd = bed.other_idxs.end();
                 for ( ; othIt != othEnd; ++othIt) {
-                    printf("\t%s", bed.fields[*othIt].c_str());
+                    fprintf(out,"\t%s", bed.fields[*othIt].c_str());
                 }
-                printf("\n");
+                fprintf(out,"\n");
             }
         }
         // VCF
         else if (_isGff == false && _isVcf == true) {
-            printf ("%s\t%d", bed.chrom.c_str(), start+1);
+            fprintf(out,"%s\t%d", bed.chrom.c_str(), start+1);
 
             vector<uint16_t>::const_iterator othIt  = bed.other_idxs.begin();
             vector<uint16_t>::const_iterator othEnd = bed.other_idxs.end();
             for ( ; othIt != othEnd; ++othIt) {
-                printf("\t%s", bed.fields[*othIt].c_str());
+                fprintf(out,"\t%s", bed.fields[*othIt].c_str());
             }
-            printf("\n");
+            fprintf(out,"\n");
         }
         // GFF
         else if (_isGff == true) {
             // "GFF-8"
             if (this->bedType == 8) {
-                printf ("%s\t%s\t%s\t%d\t%d\t%s\t%s\t%s\n", 
+                fprintf (out,"%s\t%s\t%s\t%d\t%d\t%s\t%s\t%s\n", 
                     bed.chrom.c_str(), bed.fields[bed.other_idxs[0]].c_str(),
                     bed.name.c_str(), start+1, end,
                     bed.score.c_str(), bed.strand.c_str(),
@@ -1074,7 +1074,7 @@ public:
             }
             // "GFF-9"
             else if (this->bedType == 9) {
-                printf ("%s\t%s\t%s\t%d\t%d\t%s\t%s\t%s\t%s\n", 
+                fprintf (out,"%s\t%s\t%s\t%d\t%d\t%s\t%s\t%s\t%s\n", 
                     bed.chrom.c_str(), bed.fields[bed.other_idxs[0]].c_str(),
                     bed.name.c_str(), start+1, end,
                     bed.score.c_str(), bed.strand.c_str(),
@@ -1083,6 +1083,12 @@ public:
             }
         }
     }
+
+    /* specialized version of reportBedNewLine printing to stdout */
+     template <typename T>
+     inline void reportBedNewLine(const T &bed) {
+     reportToFileBedNewLine(stdout,bed);
+     }
 
     /*
         reportBedRangeNewLine
