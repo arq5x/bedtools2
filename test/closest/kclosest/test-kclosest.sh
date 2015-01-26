@@ -467,14 +467,10 @@ $BT closest -a q2.bed -b d3.bed -k 15 -D b -S -id > obs
 check obs exp
 rm obs exp
 
-<<<<<<< HEAD
 ###########################################################
 # Test multiple databases and mdb = all mode
 ###########################################################
 
-
-=======
->>>>>>> 24cdf1f2202ac2197d5717e65edb806a215ca8f3
 echo "    kclosest.t30...\c"
 echo \
 "chr1	100	110	q2.1	20	+	1	chr1	98	108	2.2	20	+	0
