@@ -548,7 +548,6 @@ chr1	105	110	q2.2	20	-	2	chr1	30	40	3.2	20	+	-66" > exp
 $BT closest -a q2.bed -b d2.bed d3.bed -mdb all -k 10  -D ref -t last > obs
 check obs exp
 rm obs exp
-<<<<<<< HEAD
 
 ###########################################################
 # Test new -fu and -fd features
