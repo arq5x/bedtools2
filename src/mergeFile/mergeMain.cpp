@@ -69,6 +69,8 @@ void merge_help(void) {
     cerr << "\t-c\t"             << "Specify columns from the input file to operate upon (see -o option, below)." << endl;
     cerr						<<  "\t\tMultiple columns can be specified in a comma-delimited list." << endl << endl;
 
+    cerr << "\t-prec\t"   		<< "Sets the decimal precision for output (Default: 5)" << endl << endl;
+
     KeyListOpsHelp();
     cerr << "Notes: " << endl;
  

@@ -9,6 +9,7 @@
 #include <sstream>
 #include <iomanip>
 //#include "FormatGuess.h"
+#include <map>
 
 #include "PushBackStreamBuf.h"
 #include "InflateStreamBuf.h"
@@ -29,14 +30,29 @@ int nek_sandbox1_main2(int argc,char** argv);
 int nek_sandbox1_main(int argc,char** argv)
 {
 
+	multimap<int, char> myMap;
+	myMap.insert(pair<int, char>(1, 'a'));
+	myMap.insert(pair<int, char>(2, 'b'));
+	myMap.insert(pair<int, char>(3, 'c'));
+	myMap.insert(pair<int, char>(3, 'x'));
+	myMap.insert(pair<int, char>(3, 'y'));
+	myMap.insert(pair<int, char>(3, 'z'));
+	myMap.insert(pair<int, char>(4, 'd'));
+
+	cout << "Multimap contains:" << endl;
+	for (multimap<int, char>::iterator iter = myMap.begin(); iter != myMap.end(); iter++) {
+		cout << iter-> first << ":" << iter->second << endl;
+	}
+	cout << "Size is " << myMap.size() << "." << endl;
+
 //	for (int i=0; i < 4000; i++) {
 //		cout << "# This is line " << i << " of a file with a large header." << endl;
 //	}
 //	return 0;
 
-	if (argc < 2) {
-		cerr << "Error: Need one input file. Use \"-\" for stdin." << endl;
-	}
+//	if (argc < 2) {
+//		cerr << "Error: Need one input file. Use \"-\" for stdin." << endl;
+//	}
 //	ifstream inFileStream(argv[1]);
 //	static const int BUF_SIZE = 8192;
 //	BamTools::Internal::BgzfStream bgStream;

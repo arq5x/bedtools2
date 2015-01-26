@@ -116,6 +116,8 @@ public:
     virtual bool getUseFullBamTags() const { return _useFullBamTags; }
     virtual void setUseFullBamTags(bool val) { _useFullBamTags = val; }
 
+    virtual bool getNameCheckDisabled() const { return _nameCheckDisabled; }
+    virtual void setNameCheckDisabled(bool val) { _nameCheckDisabled = val; }
 
 	// METHODS FOR PROGRAMS WITH USER_SPECIFIED NUMBER
 	// OF OUTPUT RECORDS.
@@ -207,6 +209,7 @@ protected:
 	int _seed;
 	bool _forwardOnly;
 	bool _reverseOnly;
+	bool _nameCheckDisabled;
 
 	//Members for column operations
 	bool _hasColumnOpsMethods;
@@ -265,6 +268,7 @@ protected:
 	virtual bool handle_null();
 	virtual bool handle_delim();
 	virtual bool handle_sortout();
+	virtual bool handle_nonamecheck();
 	bool handle_prec();
 	bool parseIoBufSize(QuickString bufStr);
 

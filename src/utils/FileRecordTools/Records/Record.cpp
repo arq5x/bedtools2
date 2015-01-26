@@ -258,17 +258,11 @@ bool Record::hasChrInChromName() const {
 			(str[2] == 'r' || str[2] == 'R'));
 }
 
-bool Record::hasLeadingZeroInChromName() const {
+bool Record::hasLeadingZeroInChromName(bool chrKnown) const {
 	const char *str = _chrName.c_str();
-	size_t i=0;
-	while (i < _chrName.size() && !isdigit(str[i])) {
-		if (str[i] == '_') return false; //ignore
-		//leading zero after underscore, as some of the
-		//random and hap chroms are names that way.
-		i++;
-	}
-
-	return (i < _chrName.size() && str[i] == '0');
+	// only check to see if the digit zero follows the occurance of
+	// "chr", case insensitive.
+	return (_chrName.size() >= 4 && str[3] == '0' && (chrKnown || hasChrInChromName()));
 }
 
 void Record::print(FILE *fp, bool newline) const {
