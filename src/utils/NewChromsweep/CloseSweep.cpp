@@ -8,62 +8,185 @@
 #include "CloseSweep.h"
 #include "ContextClosest.h"
 
+RecDistList::RecDistList(int maxSize)
+:  _kVal(maxSize),
+   _empty(true),
+   _currNumIdxs(0),
+   _totalRecs(0) {
+
+	_allRecs.resize(_kVal);
+	for (int i=0; i < _kVal; i++) {
+		_allRecs[i] = new elemsType();
+	}
+	_distIndex = new indexType[_kVal];
+
+	clear();
+}
+
+RecDistList::~RecDistList() {
+	for (int i=0; i < _kVal; i++) {
+		delete _allRecs[i];
+	}
+	delete _distIndex;
+	_distIndex = NULL;
+
+}
 
 void RecDistList::clear() {
-	for (distRecsType::iterator iter = _recs.begin(); iter != _recs.end(); iter++) {
-		delete iter->second;
+	for (int i=0; i < _kVal; i++) {
+		_allRecs[i]->clear();
+		_allRecs[i]->reserve(16);
 	}
-	_recs.clear();
+	for (int i=0; i < _kVal; i++) {
+		_distIndex[i].first = -1;
+		_distIndex[i].second = -1;
+	}
+	_currNumIdxs = 0;
+	_empty = true;
+	_totalRecs = 0;
 }
 
 bool RecDistList::addRec(int dist, const Record *record, chromDirType chromDir) {
-	//if unique size is >= maxRecNum, that means the collection is
-	//full. In that case, if the new rec has greater distance than
-	// any in the collection, ignore it. If the distance isn't
-	// greater, add it, removing the previously greater one
-	// if need be.
-	// If the collection isn't full, just the new.
+	int newPos = 0;
+	bool mustAppend = false;
+	int useElemIdx = 0;
 
-	if (uniqueSize() < _maxUniqueAllowed || exists(dist)) {
-		insert(dist, record, chromDir);
-		return true;
-	} else {
-		//find previous greatest distance
-		revIterType rIter = _recs.rbegin();
-		int currMaxDist = rIter->first;
-		if (dist > currMaxDist) {
+	if (dist > getMaxDist()) {
+		//dist is bigger than any currently contained.
+		if (_currNumIdxs == _kVal) {
+			//already full with smaller distances
 			return false;
 		}
-		//Now we know dist is less than currMax.
-		//new dist is smaller. Erase old max.
-		delete rIter->second;
-
-		//apparently you can't erase a reverse iterator, so we'll
-		//make a normal one pointing at the end, then back it  up.
-		iterType delIter = _recs.end();
-		delIter--;
-		_recs.erase(delIter);
-		insert(dist, record, chromDir);
+		mustAppend = true;
+		useElemIdx = _currNumIdxs;
+		newPos = _currNumIdxs;
+	}
+	if (find(dist, newPos)) {
+		_allRecs[_distIndex[newPos].second]->push_back(elemPairType(chromDir, record));
+		_totalRecs++;
 		return true;
 	}
-
-}
-
-void RecDistList::insert(int dist, const Record *record, chromDirType chromDir) {
-	elemsType *elems = NULL;
-	distRecsType::iterator iter = _recs.find(dist);
-	if (iter == _recs.end()) {
-		//dist didn't exist before. Add it by
-		// creating new elems container, then
-		//putting this in the map.
-		elems = new elemsType();
-		_recs[dist] = elems;
+	if (!mustAppend) {
+		//smaller than maxDist, and doesn't currently exist. must insert
+		//newPos now is the insertion point.
+		int startShiftPos = 0;
+		if (_currNumIdxs == _kVal) {
+			//already full. must remove oldest max.
+			//determine which vector it was using
+			//so we can re-use it.
+			startShiftPos = _kVal-1;
+			useElemIdx = _distIndex[startShiftPos].second;
+		} else {
+			//can add a new element
+			startShiftPos = _currNumIdxs;
+			useElemIdx = _currNumIdxs;
+			_currNumIdxs++;
+		}
+		for (int i=startShiftPos; i > newPos; i--) {
+			_distIndex[i].first = _distIndex[i-1].first;
+			_distIndex[i].second = _distIndex[i-1].second;
+		}
 	} else {
-		elems = iter->second;
+		_currNumIdxs++;
 	}
-	elems->push_back(pair<chromDirType, const Record *>(chromDir, record));
+	_allRecs[useElemIdx]->clear();
+	_allRecs[useElemIdx]->reserve(16);
+	_allRecs[useElemIdx]->push_back(elemPairType(chromDir, record));
+
+	_distIndex[newPos].first = dist;
+	_distIndex[newPos].second = useElemIdx;
+	_empty = false;
 	_totalRecs++;
+	return true;
 }
+
+//bool RecDistList::addRec(int dist, const Record *record, chromDirType chromDir) {
+//	//if unique size is >= maxRecNum, that means the collection is
+//	//full. In that case, if the new rec has greater distance than
+//	// any in the collection, ignore it. If the distance isn't
+//	// greater, add it, removing the previously greater one
+//	// if need be.
+//	// If the collection isn't full, just the new.
+//
+//	if (uniqueSize() < _kVal || exists(dist)) {
+//		insert(dist, record, chromDir);
+//		return true;
+//	} else {
+//		//find previous greatest distance
+//		revIterType rIter = _recs.rbegin();
+//		int currMaxDist = rIter->first;
+//		if (dist > currMaxDist) {
+//			return false;
+//		}
+//		//Now we know dist is less than currMax.
+//		//new dist is smaller. Erase old max.
+//		delete rIter->second;
+//
+//		//apparently you can't erase a reverse iterator, so we'll
+//		//make a normal one pointing at the end, then back it  up.
+//		iterType delIter = _recs.end();
+//		delIter--;
+//		_recs.erase(delIter);
+//		insert(dist, record, chromDir);
+//		return true;
+//	}
+//
+//}
+
+//void RecDistList::insert(int dist, const Record *record, chromDirType chromDir) {
+//	if ()
+//	elemsType *elems = NULL;
+//	distRecsType::iterator iter = _recs.find(dist);
+//	if (iter == _recs.end()) {
+//		//dist didn't exist before. Add it by
+//		// creating new elems container, then
+//		//putting this in the map.
+//		elems = new elemsType();
+//		_recs[dist] = elems;
+//	} else {
+//		elems = iter->second;
+//	}
+//	elems->push_back(pair<chromDirType, const Record *>(chromDir, record));
+//	_totalRecs++;
+//}
+
+//if true, pos will be the idx the distance is at.
+//if false, pos will be the idx to insert at.
+bool RecDistList::find(int dist, int &pos) const {
+	int lbound=0, ubound=_currNumIdxs-1, currVal =0;
+	pos = 0;
+	while(lbound <= ubound)
+	{
+		pos = (lbound + ubound) / 2;
+		currVal = _distIndex[pos].first;
+		if (currVal == dist) {
+			return true;
+		}
+		if (dist > currVal) {
+			lbound = pos + 1;
+		} else {
+			ubound = pos -1;
+		}
+	}
+	pos = (ubound == -1 ) ? 0 : (lbound == _currNumIdxs ? _currNumIdxs : lbound);
+	return false;
+}
+
+int RecDistList::getMaxLeftEndPos() const {
+
+	if (_empty) return -1;
+
+	int maxDist =_distIndex[_currNumIdxs-1].first;
+	const elemsType *elems = _allRecs[_distIndex[_currNumIdxs-1].second];
+	for (int i=0; i < (int)elems->size(); i++) {
+		if ((*elems)[i].first == LEFT) {
+			return maxDist;
+		}
+	}
+	return -1;
+
+}
+
 
 CloseSweep::CloseSweep(ContextClosest *context)
 :	NewChromSweep(context),
@@ -82,21 +205,6 @@ CloseSweep::CloseSweep(ContextClosest *context)
 		_minDownstreamRecs[i] = new RecDistList(_kClosest);
 		_overlapRecs[i] = new RecDistList(_kClosest);
 	}
-
-}
-
-int RecDistList::getMaxLeftEndPos() const {
-
-	if (_recs.empty()) return -1;
-
-	int maxDist = _recs.rbegin()->first;
-	const elemsType *elems = _recs.rbegin()->second;
-	for (int i=0; i < (int)elems->size(); i++) {
-		if ((*elems)[i].first == LEFT) {
-			return maxDist;
-		}
-	}
-	return -1;
 
 }
 

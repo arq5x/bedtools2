@@ -34,39 +34,47 @@ public:
 class RecDistList {
 public:
     typedef enum { LEFT, OVERLAP, RIGHT } chromDirType;
-	RecDistList(int maxSize) : _maxUniqueAllowed(maxSize) {}
-	~RecDistList() { clear(); }
-	bool empty() const { return _recs.empty(); }
+	RecDistList(int maxSize);
+	~RecDistList();
+	bool empty() const { return _empty; }
 	void clear();
-	int uniqueSize() const { return _recs.size(); }
+	int uniqueSize() const { return _currNumIdxs; }
 	size_t totalSize() const { return _totalRecs; }
 	bool addRec(int dist, const Record *, chromDirType chromDir);
-	bool exists(int dist) const { return (_recs.find(dist) != _recs.end()); }
-	int furtherestDistance() const { return _recs.rbegin()->first; }
+	bool exists(int dist) const {
+		int dummyVal = 0;
+		return find(dist, dummyVal);
+	}
+	typedef pair<chromDirType, const Record *> elemPairType;
+	typedef vector<elemPairType>elemsType;
+	typedef pair<int, int> indexType;
 
-	typedef vector<pair<chromDirType, const Record *> >elemsType;
-	typedef map<int, elemsType *> distRecsType;
-	typedef distRecsType::iterator iterType;
-	typedef distRecsType::reverse_iterator revIterType;
-	typedef distRecsType::const_iterator constIterType;
-	typedef distRecsType::const_reverse_iterator constRevIterType;
-
-	int getMaxDist() const { return _recs.empty() ? 0 : _recs.rbegin()->first; }
-	constIterType begin() const { return _recs.begin(); }
-	constIterType end() const { return _recs.end(); }
-	int currDist(constIterType iter) const { return iter->first; }
-	size_t currNumElems(constIterType iter) const { return iter->second->size(); }
-	const Record *firstElem(constIterType iter) const { return (iter->second->at(0)).second; }
-	const Record *lastElem(constIterType iter) const { return (iter->second->at(iter->second->size()-1)).second; }
-	const elemsType *allElems(constIterType iter) const { return iter->second; }
+	int getMaxDist() const { return _empty ? 0 : _distIndex[_currNumIdxs-1].first; }
+	typedef int constIterType; //used to be a map iter, trying not to change interface too much.
+	constIterType begin() const { return 0; }
+	constIterType end() const { return _currNumIdxs; }
+	int currDist(constIterType iter) const { return _distIndex[iter].first; }
+	size_t currNumElems(constIterType iter) const { return allElems(iter)->size(); }
+	const elemsType *allElems(constIterType iter) const { return _allRecs[_distIndex[iter].second]; }
 	int getMaxLeftEndPos() const;
 
 private:
+
 	void insert(int dist, const Record *, chromDirType chromDir);
-	distRecsType _recs;
-	int _maxUniqueAllowed;
+
+
+	//if true, pos will be the idx the distance is at.
+	//if false, pos will be the idx to insert at.
+	bool find(int dist, int &pos) const;
+
+
+	int _kVal; //max unique allowed
+	bool _empty;
+	int _currNumIdxs;
 	int _totalRecs;
 
+	vector<elemsType *> _allRecs;
+	indexType * _distIndex;
 };
 
 class CloseSweep : public NewChromSweep {
