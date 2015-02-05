@@ -48,8 +48,8 @@ void intersect_help(void) {
 
     cerr << "Usage:   " << PROGRAM_NAME << " [OPTIONS] -a <bed/gff/vcf/bam> -b <bed/gff/vcf/bam>" << endl << endl;
 
-    cerr << "\t\t"				<< "Note: -b may be followed with multiple databases and/or " << endl;
-    cerr << "\t\t"					"wildcard (*) character(s). " << endl;
+    cerr << "\t"				<< "Note: -b may be followed with multiple databases and/or " << endl;
+    cerr << "\t"					"wildcard (*) character(s). " << endl;
 
     cerr << "Options: " << endl;
 
