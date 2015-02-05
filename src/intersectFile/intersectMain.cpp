@@ -46,14 +46,15 @@ void intersect_help(void) {
     cerr << "Version: " << VERSION << "\n";    
     cerr << "Summary: Report overlaps between two feature files." << endl << endl;
 
-    cerr << "Usage:   " << PROGRAM_NAME << " [OPTIONS] -a <bed/gff/vcf> -b <bed/gff/vcf>" << endl << endl;
+    cerr << "Usage:   " << PROGRAM_NAME << " [OPTIONS] -a <bed/gff/vcf/bam> -b <bed/gff/vcf/bam>" << endl << endl;
 
     cerr << "\t\t"				<< "Note: -b may be followed with multiple databases and/or " << endl;
     cerr << "\t\t"					"wildcard (*) character(s). " << endl;
 
     cerr << "Options: " << endl;
 
-    cerr << "\t-abam\t"         << "The A input file is in BAM format.  Output will be BAM as well." << endl << endl;
+    // -abam is obsolete.
+    // cerr << "\t-abam\t"         << "The A input file is in BAM format.  Output will be BAM as well." << endl << endl;
 
     cerr << "\t-ubam\t"         << "Write uncompressed BAM output. Default writes compressed BAM." << endl << endl;
 
