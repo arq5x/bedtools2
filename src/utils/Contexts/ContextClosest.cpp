@@ -18,7 +18,8 @@ ContextClosest::ContextClosest()
 	_diffNames(false),
 	_tieMode(ALL_TIES),
 	_strandedDistMode(REF_DIST),
-	_multiDbMode(EACH_DB)
+	_multiDbMode(EACH_DB),
+	_numClosestHitsWanted(1)
 {
 	// closest requires sorted input
 	setSortedInput(true);
@@ -66,7 +67,13 @@ bool ContextClosest::parseCmdArgs(int argc, char **argv, int skipFirstArgs){
         else if (strcmp(_argv[_i], "-id") == 0) {
         	if (!handle_id()) return false;
         }
-        else if (strcmp(_argv[_i], "-N") == 0) {
+        else if (strcmp(_argv[_i], "-fu") == 0) {
+        	if (!handle_fu()) return false;
+        }
+        else if (strcmp(_argv[_i], "-fd") == 0) {
+        	if (!handle_fd()) return false;
+        }
+       else if (strcmp(_argv[_i], "-N") == 0) {
         	if (!handle_N()) return false;
         }
         else if (strcmp(_argv[_i], "-t") == 0) {
@@ -74,6 +81,9 @@ bool ContextClosest::parseCmdArgs(int argc, char **argv, int skipFirstArgs){
         }
         else if (strcmp(_argv[_i], "-mdb") == 0) {
         	if (!handle_mdb()) return false;
+        }
+        else if (strcmp(_argv[_i], "-k") == 0) {
+        	if (!handle_k()) return false;
         }
 
 	}
@@ -106,6 +116,25 @@ bool ContextClosest::isValidState(){
 		return false;
 	}
 
+	if ((_forceUpstream || _forceDownstream) && ! _haveStrandedDistMode) {
+		_errorMsg  = "\n*****\n*****ERROR: When requesting -fu or -fd, you also need to specify -D.\n*****\n";
+		return false;
+	}
+
+	if (_ignoreUpstream && _forceUpstream) {
+		_errorMsg  = "\n*****\n*****ERROR: Can't both ignore upstream and force upstream.\n*****\n";
+		return false;
+	}
+
+	if (_ignoreDownstream && _forceDownstream) {
+		_errorMsg  = "\n*****\n*****ERROR: Can't both ignore downstream and force downstream.\n*****\n";
+		return false;
+	}
+
+	if (_sortOutput && _reportDistance) {
+		_errorMsg  = "\n*****\n*****ERROR: -sortout (sorted output) is not valid with distance reporting.\n*****\n";
+		return false;
+	}
 	return true;
 }
 
@@ -158,6 +187,18 @@ bool ContextClosest::handle_iu() {
 
 bool ContextClosest::handle_id() {
 	_ignoreDownstream = true;
+    markUsed(_i - _skipFirstArgs);
+    return true;
+}
+
+bool ContextClosest::handle_fu() {
+	_forceUpstream = true;
+    markUsed(_i - _skipFirstArgs);
+    return true;
+}
+
+bool ContextClosest::handle_fd() {
+	_forceDownstream = true;
     markUsed(_i - _skipFirstArgs);
     return true;
 }
@@ -220,3 +261,21 @@ bool ContextClosest::handle_mdb()
 	_errorMsg = "*****ERROR: Request \"each\" or \"last\" for Multiple Database Mode (-mdb)";
 	return false;
 }
+
+bool ContextClosest::handle_k()
+{
+    if ((_i+1) < _argc) {
+    	if (isNumeric(_argv[_i+1])) {
+			_numClosestHitsWanted = atoi(_argv[_i+1]);
+			if (_numClosestHitsWanted > 0) {
+				markUsed(_i - _skipFirstArgs);
+				_i++;
+				markUsed(_i - _skipFirstArgs);
+				return true;
+			}
+    	}
+    }
+	_errorMsg = "\n***** ERROR: -k option must be followed by a postive integer value *****";
+	return false;
+}
+

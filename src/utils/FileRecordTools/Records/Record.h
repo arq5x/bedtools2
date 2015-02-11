@@ -137,7 +137,7 @@ public:
 //	virtual static bool isNumericField(int fieldNum) const = 0;
 
 	bool hasChrInChromName() const;
-	bool hasLeadingZeroInChromName() const;
+	bool hasLeadingZeroInChromName(bool chrKnown = false) const;
 
 
 protected:

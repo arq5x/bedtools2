@@ -666,3 +666,8 @@ rm exp obs
 cd sortAndNaming
 bash test-sort-and-naming.sh
 cd ..
+
+cd kclosest
+bash test-kclosest.sh
+cd ..
+

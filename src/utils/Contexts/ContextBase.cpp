@@ -52,6 +52,7 @@ ContextBase::ContextBase()
   _seed(0),
   _forwardOnly(false),
   _reverseOnly(false),
+  _nameCheckDisabled(false),
   _hasColumnOpsMethods(false),
   _keyListOps(NULL),
   _desiredStrand(FileRecordMergeMgr::ANY_STRAND),
@@ -196,6 +197,9 @@ bool ContextBase::parseCmdArgs(int argc, char **argv, int skipFirstArgs) {
 			if (!handle_delim()) return false;
         }
         else if (strcmp(_argv[_i], "-sortout") == 0) {
+			if (!handle_sortout()) return false;
+        }
+        else if (strcmp(_argv[_i], "-nonamecheck") == 0) {
 			if (!handle_sortout()) return false;
         }
 
@@ -535,6 +539,13 @@ bool ContextBase::handle_sortout()
 	return true;
 }
 
+bool ContextBase::handle_nonamecheck()
+{
+	setNameCheckDisabled(true);
+	markUsed(_i - _skipFirstArgs);
+	return true;
+}
+
 void ContextBase::setColumnOpsMethods(bool val)
 {
 	if (val && !_hasColumnOpsMethods) {
@@ -604,6 +615,8 @@ bool ContextBase::parseIoBufSize(QuickString bufStr)
 }
 
 void ContextBase::testNameConventions(const Record *record) {
+	if (getNameCheckDisabled()) return;
+
 	int fileIdx = record->getFileIdx();
 
 	//
@@ -636,7 +649,7 @@ void ContextBase::testNameConventions(const Record *record) {
 	//
 
 
-	bool zeroVal = record->hasLeadingZeroInChromName();
+	bool zeroVal = record->hasLeadingZeroInChromName(hasChr);
 	testChrVal = fileHasLeadingZeroInChromNames(fileIdx);
 	if (testChrVal == UNTESTED) {
 		_fileHasLeadingZeroInChromNames[fileIdx] = zeroVal ? YES : NO;

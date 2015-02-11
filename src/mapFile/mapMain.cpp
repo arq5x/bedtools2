@@ -82,6 +82,9 @@ void map_help(void) {
 
     cerr << "\t-header\t"        << "Print the header from the A file prior to results." << endl << endl;
 
+    cerr << "\t-prec\t"   		 << "Sets the decimal precision for output (Default: 5)" << endl << endl;
+
+
     cerr << "Notes: " << endl;
     cerr << "\t(1) Both input files must be sorted by chrom, then start." << endl << endl;
     
