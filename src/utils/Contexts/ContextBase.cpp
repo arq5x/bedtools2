@@ -65,7 +65,6 @@ ContextBase::ContextBase()
 {
 	_programNames["intersect"] = INTERSECT;
 	_programNames["sample"] = SAMPLE;
-	_programNames["spacing"] = SPACING;
 	_programNames["map"] = MAP;
 	_programNames["merge"] = MERGE;
 
@@ -220,12 +219,12 @@ bool ContextBase::isValidState()
 	}
 	if (hasColumnOpsMethods()) {
 
-		// TBD: Adjust column ops for multiple databases.
-		// For now, use last file.
-		FileRecordMgr *dbFile = getFile(getNumInputFiles()-1);
-		_keyListOps->setDBfileType(dbFile->getFileType());
-		if (!_keyListOps->isValidColumnOps(dbFile)) {
-			return false;
+		for (int i=0; i < (int)_dbFileIdxs.size(); i++) {
+			FileRecordMgr *dbFile = getFile(_dbFileIdxs[i]);
+			_keyListOps->setDBfileType(dbFile->getFileType());
+			if (!_keyListOps->isValidColumnOps(dbFile)) {
+				return false;
+			}
 		}
 		//if user specified a precision, pass it to
 		//keyList ops
@@ -521,6 +520,7 @@ bool ContextBase::handle_null()
 bool ContextBase::handle_delim()
 {
 	if (!hasColumnOpsMethods()) {
+		_errorMsg = "\n***** ERROR: Can't set delimiter for tools without column operations. Exiting. *****";
 		return false;
 	}
     if ((_i+1) < _argc) {
