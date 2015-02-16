@@ -219,8 +219,16 @@ bool ContextBase::isValidState()
 	}
 	if (hasColumnOpsMethods()) {
 
-		for (int i=0; i < (int)_dbFileIdxs.size(); i++) {
-			FileRecordMgr *dbFile = getFile(_dbFileIdxs[i]);
+		if (hasIntersectMethods()) {
+			for (int i=0; i < (int)_dbFileIdxs.size(); i++) {
+				FileRecordMgr *dbFile = getFile(_dbFileIdxs[i]);
+				_keyListOps->setDBfileType(dbFile->getFileType());
+				if (!_keyListOps->isValidColumnOps(dbFile)) {
+					return false;
+				}
+			}
+		} else {
+			FileRecordMgr *dbFile = getFile(0);
 			_keyListOps->setDBfileType(dbFile->getFileType());
 			if (!_keyListOps->isValidColumnOps(dbFile)) {
 				return false;
