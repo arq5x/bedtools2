@@ -27,7 +27,18 @@ public:
 class DistanceTupleSortAscFunctor {
 public:
 	bool operator()(const distanceTuple & d1, const distanceTuple & d2) const {
-		return ((d1._dist < d2._dist) ? true : (d1._dist == d2._dist ? (d1._isNeg && !d2._isNeg) : false)) ; }
+//		return ((d1._dist < d2._dist) ? true : (d1._dist == d2._dist ? (d1._rec->lessThan(d2._rec)) :  false)); }
+
+		return (d1._dist < d2._dist ? true : (d1._dist == d2._dist ? d1._rec->lessThan(d2._rec) : false));
+//		if (d1._dist < d2._dist) {
+//			return true;
+//		} else if (d1._dist == d2._dist) {
+//			if () {
+//				return true;
+//			}
+//		}
+//		return false;
+	}
 };
 
 

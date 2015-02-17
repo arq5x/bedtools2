@@ -502,8 +502,8 @@ $BT intersect -a a.bed -b b.bed -f 1.00001 2>&1 > /dev/null | cat - | head -2 | 
 check exp obs
 rm exp obs
 
-##################################################################bug167_strandSweep.bed
-#  Test that -s works with chromsweep
+##################################################################
+#  bug167_strandSweep.bed
 ##################################################################
 echo "    intersect.t41...\c"
 echo \
@@ -512,8 +512,8 @@ $BT intersect -a bug167_strandSweep.bed -b bug167_strandSweep.bed -sorted -s -wa
 check exp obs
 rm exp obs
 
-##################################################################bug167_strandSweep.bed
-#  Test that -S works with chromsweep
+##################################################################
+#  bug167_strandSweep.bed
 ##################################################################
 echo "    intersect.t42...\c"
 echo \
@@ -523,6 +523,19 @@ check exp obs
 rm exp obs
 
 rm one_block.bam two_blocks.bam three_blocks.bam
+
+
+##################################################################
+# Bug 187 0 length records
+##################################################################
+echo "    intersect.t43...\c"
+echo \
+"chr7	33059403	33059403	chr7	33059336	33060883	NT5C3A	intron	0
+chr7	33059403	33059403	chr7	32599076	33069221	NAq	intron	0" > exp
+$BT intersect -a bug187_a.bed -b bug187_b.bed -wao > obs
+check exp obs
+rm exp obs
+
 
 
 cd multi_intersect

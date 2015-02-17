@@ -218,6 +218,8 @@ void RecordOutputMgr::printRecord(RecordKeyVector &keyList, RecordKeyVector *blo
 					if (printKeyAndTerminate(keyList)) {
 
 						_currBamBlockList = NULL;
+						const_cast<Record *>(keyList.getKey())->adjustZeroLength();
+
 						return;
 					}
 					tab();
@@ -231,6 +233,7 @@ void RecordOutputMgr::printRecord(RecordKeyVector &keyList, RecordKeyVector *blo
 					if (printKeyAndTerminate(keyList)) {
 						_currBamBlockList = NULL;
 
+						const_cast<Record *>(keyList.getKey())->adjustZeroLength();
 						return;
 					}
 					tab();
@@ -245,6 +248,7 @@ void RecordOutputMgr::printRecord(RecordKeyVector &keyList, RecordKeyVector *blo
 				if (printBamRecord(keyList, true) == BAM_AS_BAM) {
 					_currBamBlockList = NULL;
 
+					const_cast<Record *>(keyList.getKey())->adjustZeroLength();
 					return;
 				}
 				int hitIdx = 0;
@@ -261,24 +265,12 @@ void RecordOutputMgr::printRecord(RecordKeyVector &keyList, RecordKeyVector *blo
 		if (!printKeyAndTerminate(keyList)) {
 			newline();
 		}
-		_currBamBlockList = NULL;
-
-		return;
-	} else if (_context->getProgram() == ContextBase::MAP) {
+	} else if (_context->getProgram() == ContextBase::MAP || _context->getProgram() == ContextBase::MERGE) {
 		printKeyAndTerminate(keyList);
-		_currBamBlockList = NULL;
-
-		return;
-	} else if (_context->getProgram() == ContextBase::MERGE) {
-		printKeyAndTerminate(keyList);
-		_currBamBlockList = NULL;
-
-		return;
-	} else if (_context->getProgram() == ContextBase::SPACING) {
-		keyList.getKey()->print(_outBuf);
-		_currBamBlockList = NULL;
-		return;
 	}
+	_currBamBlockList = NULL;
+	const_cast<Record *>(keyList.getKey())->adjustZeroLength();
+
 }
 
 void RecordOutputMgr::checkForHeader() {
@@ -397,7 +389,7 @@ void RecordOutputMgr::reportOverlapDetail(const Record *keyRecord, const Record 
 		newline();
 		if (needsFlush()) flush();
 	}
-	const_cast<Record *>(keyRecord)->adjustZeroLength();
+	const_cast<Record *>(hitRecord)->adjustZeroLength();
 }
 
 void RecordOutputMgr::reportOverlapSummary(RecordKeyVector &keyList)
