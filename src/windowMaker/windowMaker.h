@@ -58,6 +58,7 @@ private:
 
     void MakeFixedSizeWindow(const BED& interval);
     void MakeFixedCountWindow(const BED& interval);
+    uint32_t CalculateWindows(const BED& interval);
 
     string GenerateID(const BED& interval, uint32_t window_index, uint32_t num_windows, bool _reverse) const;
 };
