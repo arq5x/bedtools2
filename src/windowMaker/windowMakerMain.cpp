@@ -98,9 +98,6 @@ int windowmaker_main(int argc, char* argv[]) {
                 i++;
             }
         }
-        else if(PARAMETER_CHECK("-reverse", 8, parameterLength)) {
-            reverse = true;
-        }
         else if(PARAMETER_CHECK("-i", 2, parameterLength)) {
             if ((i+1) < argc) {
                 if (strcmp(argv[i+1],"winnum")==0)
@@ -115,6 +112,9 @@ int windowmaker_main(int argc, char* argv[]) {
                 }
                 i++;
             }
+        }
+        else if(PARAMETER_CHECK("-reverse", 8, parameterLength)) {
+            reverse = true;
         }
         else {
             cerr << endl << "*****ERROR: Unrecognized parameter: " << argv[i] << " *****" << endl << endl;
