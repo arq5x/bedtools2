@@ -98,10 +98,8 @@ int windowmaker_main(int argc, char* argv[]) {
                 i++;
             }
         }
-        else if(PARAMETER_CHECK("-reverse", 1, parameterLength)) {
-            if ((i+1) < argc) {
-                reverse = true;
-            }
+        else if(PARAMETER_CHECK("-reverse", 8, parameterLength)) {
+            reverse = true;
         }
         else if(PARAMETER_CHECK("-i", 2, parameterLength)) {
             if ((i+1) < argc) {
@@ -197,6 +195,10 @@ void windowmaker_help(void) {
     cerr << "\t\tto fixed number of windows (i.e. same number of windows, with" << endl;
     cerr << "\t\tvarying window sizes)." << endl << endl;
 
+    cerr << "\t-reverse" << endl;
+    cerr << "\t\t Reverse numbering of windows in the output, i.e. report " << endl;
+    cerr << "\t\t windows in decreasing order" << endl << endl;
+
     cerr << "ID Naming Options: " << endl;
     cerr << "\t-i src|winnum|srcwinnum" << endl;
     cerr << "\t\tThe default output is 3 columns: chrom, start, end ." << endl;
@@ -205,10 +207,6 @@ void windowmaker_help(void) {
     cerr << "\t\t \"-i winnum\" - use the window number as the ID (e.g. 1,2,3,4...)." << endl;
     cerr << "\t\t \"-i srcwinnum\" - use the source interval's name with the window number." << endl;
     cerr << "\t\tSee below for usage examples." << endl << endl;
-
-    cerr << "\t-reverse" << endl;
-    cerr << "\t\t Reverse numbering of windows in the output, i.e. report " << endl;
-    cerr << "\t\t windows in decreasing order" << endl << endl;
 
     cerr << "Notes: " << endl;
     cerr << "\t(1) The genome file should tab delimited and structured as follows:" << endl;

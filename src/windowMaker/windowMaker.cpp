@@ -115,14 +115,14 @@ string WindowMaker::GenerateID(const BED& interval, uint32_t window_index, uint3
          break;
     case ID_WINDOW_NUMBER:
          if (_reverse == true) {
-            s << "\t" << num_windows - window_index;
+            s << "\t" << num_windows - window_index + 1;
          } else {
             s << "\t" << window_index;
          }
          break;
     case ID_SOURCE_ID_WINDOW_NUMBER:
          if (_reverse == true) {
-            s << "\t" << interval.name << "_" << num_windows - window_index;
+            s << "\t" << interval.name << "_" << num_windows - window_index + 1;
          } else {
             s << "\t" << interval.name << "_" << window_index;
          }
