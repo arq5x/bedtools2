@@ -104,14 +104,13 @@ void WindowMaker::MakeFixedSizeWindow(const BED& interval) {
 void WindowMaker::MakeFixedCountWindow(const BED& interval) {
     uint32_t interval_size = interval.end - interval.start ;
     uint32_t window_size = (interval_size-1)/_count + 1; // integer version of ceil(interval_size/_count)
-    uint32_t num_windows = CalculateWindows(interval);
 
     if (window_size==0 || interval_size==0)
         return;
 
     uint32_t i=1;
     for (uint32_t start = interval.start; start < interval.end; start += window_size, ++i) {
-        string name = GenerateID(interval, i, num_windows, _reverse);
+        string name = GenerateID(interval, i, _count, _reverse);
         uint32_t end = min(start + window_size,interval.end);
         cout << interval.chrom << "\t" << start << "\t" << end << name << endl;
     }
