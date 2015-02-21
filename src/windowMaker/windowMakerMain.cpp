@@ -43,6 +43,7 @@ int windowmaker_main(int argc, char* argv[]) {
     bool haveBed = false;
     bool haveSize = false;
     bool haveCount = false;
+    bool reverse = false;
 
     for(int i = 1; i < argc; i++) {
         int parameterLength = (int)strlen(argv[i]);
@@ -97,6 +98,11 @@ int windowmaker_main(int argc, char* argv[]) {
                 i++;
             }
         }
+        else if(PARAMETER_CHECK("-reverse", 1, parameterLength)) {
+            if ((i+1) < argc) {
+                reverse = true;
+            }
+        }
         else if(PARAMETER_CHECK("-i", 2, parameterLength)) {
             if ((i+1) < argc) {
                 if (strcmp(argv[i+1],"winnum")==0)
@@ -142,9 +148,11 @@ int windowmaker_main(int argc, char* argv[]) {
     if (!showHelp) {
         WindowMaker *wm = NULL;
         if (haveCount)
-            wm = new WindowMaker(inputFile, idMethod, inputFileType, count);
+            wm = new WindowMaker(inputFile, idMethod,
+                                 inputFileType, count, reverse);
         if (haveSize)
-            wm = new WindowMaker(inputFile, idMethod, inputFileType, size, step);
+            wm = new WindowMaker(inputFile, idMethod,
+                                 inputFileType, size, step, reverse);
         delete wm;
     }
     else {
@@ -197,6 +205,10 @@ void windowmaker_help(void) {
     cerr << "\t\t \"-i winnum\" - use the window number as the ID (e.g. 1,2,3,4...)." << endl;
     cerr << "\t\t \"-i srcwinnum\" - use the source interval's name with the window number." << endl;
     cerr << "\t\tSee below for usage examples." << endl << endl;
+
+    cerr << "\t-reverse" << endl;
+    cerr << "\t\t Reverse numbering of windows in the output, i.e. report " << endl;
+    cerr << "\t\t windows in decreasing order" << endl << endl;
 
     cerr << "Notes: " << endl;
     cerr << "\t(1) The genome file should tab delimited and structured as follows:" << endl;
@@ -275,6 +287,25 @@ void windowmaker_help(void) {
     cerr << " chr5        100668  101000  3" << endl;
     cerr << " ..." << endl;
     cerr << endl;
+
+    cerr << " # Reverse window numbers: "<< endl;
+    cerr << " $ cat input.bed" << endl;
+    cerr << " chr5  60000  70000 AAA" << endl;
+    cerr << " chr5  73000  90000 BBB" << endl;
+    cerr << " chr5 100000 101000 CCC" << endl;
+    cerr << " $ " << PROGRAM_NAME << " -b input.bed -n 3 -i winnum -reverse" << endl;
+    cerr << " chr5        60000   63334   3" << endl;
+    cerr << " chr5        63334   66668   2" << endl;
+    cerr << " chr5        66668   70000   1" << endl;
+    cerr << " chr5        73000   78667   3" << endl;
+    cerr << " chr5        78667   84334   2" << endl;
+    cerr << " chr5        84334   90000   1" << endl;
+    cerr << " chr5        100000  100334  3" << endl;
+    cerr << " chr5        100334  100668  2" << endl;
+    cerr << " chr5        100668  101000  1" << endl;
+    cerr << " ..." << endl;
+    cerr << endl;
+
 
     cerr << " # Add a name column, based on the source ID + window number: "<< endl;
     cerr << " $ cat input.bed" << endl;
