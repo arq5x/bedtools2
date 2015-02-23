@@ -81,6 +81,12 @@ Option                           Description
 
 **-id**                          Ignore features in B that are downstream of features in A. This option requires -D and follows its orientation rules for determining what is "downstream".
 
+**-fu**                          Choose first from features in B that are upstream of features in A.
+                                 This option requires -D and follows its orientation rules for determining what is "upstream".
+
+**-fd**                          Choose first from features in B that are downstream of features in A.
+                                 This option requires -D and follows its orientation rules for determining what is "downstream".
+
 **-t**                           | Specify how ties for closest feature should be handled.  This occurs when two features in B have exactly the same "closeness" with A. By default, all such features in B are reported.
                                  | Here are all the options:
                                  | - `all`    Report all ties (default).
@@ -90,6 +96,8 @@ Option                           Description
 **-mdb**                         | Specifiy how multiple databases should be resolved.
                                  | - `each`  Report closest records for each database (default).
                                  | - `all`   Report closest records among all databases.
+
+**-k**                           Report the k closest hits. Default is 1. If tieMode = "all", all ties will still be reported.
 
 **-names**                       When using *multiple databases* (`-b`), provide an alias for each that will appear instead of a fileId when also printing the DB record.
 

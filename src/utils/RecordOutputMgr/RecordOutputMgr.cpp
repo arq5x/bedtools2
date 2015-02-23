@@ -138,6 +138,10 @@ void RecordOutputMgr::printRecord(const Record *record, const QuickString & valu
 
 void RecordOutputMgr::printClosest(RecordKeyVector &keyList, const vector<int> *dists) {
 
+	//The first time we print a record is when we print any header, because the header
+	//hasn't been read from the query file until after the first record has also been read.
+	checkForHeader();
+
 	const ContextClosest *context = static_cast<const ContextClosest *>(_context);
 	bool deleteBlocks = false;
 	const Record *keyRec = keyList.getKey();
@@ -203,6 +207,7 @@ void RecordOutputMgr::printRecord(RecordKeyVector &keyList, RecordKeyVector *blo
 	if (needsFlush()) {
 		flush();
 	}
+
 	//The first time we print a record is when we print any header, because the header
 	//hasn't been read from the query file until after the first record has also been read.
 	checkForHeader();
