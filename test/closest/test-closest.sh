@@ -663,6 +663,17 @@ $BT closest -a bug157_a.bed -b bug157_b.bed -D ref -id > obs
 check exp obs
 rm exp obs
 
+##########################################################
+# check -header
+###########################################################
+echo "    closest.t59...\c"
+echo \
+"#Header for file a.bed
+chr1	10	20	chr1	20	21" > exp
+$BT closest -a a.bed -b b.bed -header > obs
+check exp obs
+rm exp obs
+
 cd sortAndNaming
 bash test-sort-and-naming.sh
 cd ..
