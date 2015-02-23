@@ -199,7 +199,7 @@ bool ContextBase::parseCmdArgs(int argc, char **argv, int skipFirstArgs) {
 			if (!handle_sortout()) return false;
         }
         else if (strcmp(_argv[_i], "-nonamecheck") == 0) {
-			if (!handle_sortout()) return false;
+			if (!handle_nonamecheck()) return false;
         }
 
 	}

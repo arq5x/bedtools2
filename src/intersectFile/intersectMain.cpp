@@ -134,6 +134,9 @@ void intersect_help(void) {
     cerr << "\t-sortout\t"       << "When using multiple databases, sort the output DB hits" << endl;
     cerr						<< "\t\t\tfor each record." << endl << endl;
 
+    cerr << "\t-nonamecheck\t"       << "For sorted data, don't throw an error if the file has different naming conventions" << endl;
+    cerr							<< "\t\t\tfor the same chromosome. ex. \"chr1\" vs \"chr01\"." << endl << endl;
+
     CommonHelp();
 
     cerr << "Notes: " << endl;

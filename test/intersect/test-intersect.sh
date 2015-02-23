@@ -536,6 +536,36 @@ $BT intersect -a bug187_a.bed -b bug187_b.bed -wao > obs
 check exp obs
 rm exp obs
 
+##################################################################
+# see that -nonamecheck only works for sorted data
+##################################################################
+echo "    intersect.t44...\c"
+echo \
+"***** ERROR: -nonamecheck option is only valid for sorted input. *****" > exp
+$BT intersect -a nonamecheck_a.bed -b nonamecheck_b.bed -nonamecheck 2>&1 > /dev/null | cat - | head -2 | tail -1 > obs
+check exp obs
+rm exp obs
+
+##################################################################
+# see that differently named chroms don't work with -sorted
+##################################################################
+echo "    intersect.t45...\c"
+echo \
+"ERROR: File nonamecheck_b.bed has a record where naming convention (leading zero) is inconsistent with other files:
+chr01	15	25" > exp
+$BT intersect -a nonamecheck_a.bed -b nonamecheck_b.bed -sorted 2>&1 > /dev/null | cat - > obs
+check exp obs
+rm exp obs
+
+##################################################################
+# see that differently named chroms  -sorted and -nonamecheck
+# don't complain
+##################################################################
+echo "    intersect.t46...\c"
+touch exp
+$BT intersect -a nonamecheck_a.bed -b nonamecheck_b.bed -sorted -nonamecheck 2>&1 > /dev/null | cat - > obs
+check exp obs
+rm exp obs
 
 
 cd multi_intersect
