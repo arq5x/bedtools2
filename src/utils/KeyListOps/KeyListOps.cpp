@@ -338,6 +338,8 @@ void KeyListOpsHelp() {
     cerr                         << "\t\t    distinct (i.e., print a delimited list (NO duplicates allowed)), " << endl;
     cerr                         << "\t\t    count" << endl;
     cerr                         << "\t\t    count_distinct (i.e., a count of the unique values in the column), " << endl;
+    cerr                         << "\t\t    first (i.e., just the first value in the column), " << endl;
+    cerr                         << "\t\t    last (i.e., just the last value in the column), " << endl;
     cerr                         << "\t\tDefault: sum" << endl;
     cerr						 << "\t\tMultiple operations can be specified in a comma-delimited list." << endl << endl;
 
