@@ -67,6 +67,9 @@ ContextBase::ContextBase()
 	_programNames["sample"] = SAMPLE;
 	_programNames["map"] = MAP;
 	_programNames["merge"] = MERGE;
+	_programNames["closest"] = CLOSEST;
+	_programNames["subtract"] = SUBTRACT;
+	_programNames["jaccard"] = JACCARD;
 
 	if (hasColumnOpsMethods()) {
 		_keyListOps = new KeyListOps();
