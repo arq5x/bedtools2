@@ -64,6 +64,14 @@ void subtract_help(void) {
     cerr << "\t-N\t"            << "Same as -A except when used with -f, the amount is the sum" << endl;
     cerr                        << "\t\tof all features (not any single feature)." << endl << endl;
 
+    cerr << "\t-wb\t"           << "Write the original entry in B for each overlap." << endl;
+    cerr                        << "\t\t- Useful for knowing _what_ A overlaps. Restricted by -f and -r." << endl << endl;
+
+    cerr << "\t-wo\t"           << "Write the original A and B entries plus the number of base" << endl;
+    cerr                        << "\t\tpairs of overlap between the two features." << endl;
+    cerr                        << "\t\t- Overlaps restricted by -f and -r." << endl;
+    cerr                        << "\t\t  Only A features with overlap are reported." << endl << endl;
+
 
     cerr << "\t-split\t"        << "Treat \"split\" BAM or BED12 entries as distinct BED intervals." << endl << endl;
 
