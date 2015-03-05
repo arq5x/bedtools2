@@ -61,7 +61,7 @@ $(LIBRARY): $(OBJECTS)
 
 $(OBJECTS): $(SOURCES)
 	@echo " * compiling" $(*F).cpp
-	@$(CXX) -c $(*D)/$(*F).cpp $(LDFLAGS) $(CXXFLAGS) $(INCLUDES) -o $(*D)/$(*F).o
+	@$(CXX) -c $(*D)/$(*F).cpp $(LDFLAGS) $(CXXFLAGS) $(CPPFLAGS) $(INCLUDES) -o $(*D)/$(*F).o
 
 .PHONY: api
 api:

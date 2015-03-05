@@ -23,7 +23,7 @@ all: $(BUILT_OBJECTS)
 
 $(BUILT_OBJECTS): $(SOURCES)
 	@echo "  * compiling" $(*F).cpp
-	@$(CXX) -c -o $@ $(*F).cpp $(LDFLAGS) $(CXXFLAGS) $(INCLUDES) -L$(BT_ROOT)/lib
+	@$(CXX) -c -o $@ $(*F).cpp $(LDFLAGS) $(CXXFLAGS) $(CPPFLAGS) $(INCLUDES) -L$(BT_ROOT)/lib
 
 $(EXT_OBJECTS):
 	@$(MAKE) --no-print-directory -C $(INCLUDES)
