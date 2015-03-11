@@ -140,7 +140,11 @@ bool SingleLineDelimTextFileReader::findDelimiters() {
 
 int SingleLineDelimTextFileReader::getVcfSVlen() {
 	int startPos = _delimPositions[VCF_TAG_FIELD] +1;
-	const char *startPtr = strstr(_sLine.c_str() + startPos, "SVLEN=") +6;
+	const char *startPtr = strstr(_sLine.c_str() + startPos, "SVLEN=");
+	if (startPtr == NULL) {
+		cerr << "WARNING: line number " << _lineNum << " of file " << _filename << " has an imprecise variant, but no SVLEN specified. Defaulting to length 1." << endl;
+		return 1;
+	}
 	const char *endPtr = strchr(startPtr, ';');
 	const char *midPtr = strchr(startPtr, ',');
 	int endCoord = -1;
