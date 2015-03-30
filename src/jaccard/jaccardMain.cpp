@@ -73,6 +73,11 @@ void jaccard_help(void) {
     cerr << "\t\t"			   << "the forward or reverse strand, respectively." << endl;
     cerr << "\t\t"			   << "- By default, merging is done without respect to strand." << endl << endl;
 
+    cerr << "\t-nonamecheck\t"       << "For sorted data, don't throw an error if the file has different naming conventions" << endl;
+    cerr							<< "\t\t\tfor the same chromosome. ex. \"chr1\" vs \"chr01\"." << endl << endl;
+
+
+
     cerr << "Notes: " << endl;
     cerr << "\t(1) Input files must be sorted by chrom, then start position."
          << endl << endl;

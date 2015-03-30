@@ -84,6 +84,10 @@ void map_help(void) {
 
     cerr << "\t-prec\t"   		 << "Sets the decimal precision for output (Default: 5)" << endl << endl;
 
+    cerr << "\t-nonamecheck\t"       << "For sorted data, don't throw an error if the file has different naming conventions" << endl;
+    cerr							<< "\t\t\tfor the same chromosome. ex. \"chr1\" vs \"chr01\"." << endl << endl;
+
+
 
     cerr << "Notes: " << endl;
     cerr << "\t(1) Both input files must be sorted by chrom, then start." << endl << endl;

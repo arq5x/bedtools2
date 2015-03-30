@@ -66,7 +66,7 @@ SUBDIRS = $(SRC_DIR)/annotateBed \
 		  $(SRC_DIR)/sortBed \
 		  $(SRC_DIR)/spacingFile \
 		  $(SRC_DIR)/split \
-		  $(SRC_DIR)/subtractBed \
+		  $(SRC_DIR)/subtractFile \
 		  $(SRC_DIR)/tagBam \
 		  $(SRC_DIR)/unionBedGraphs \
 		  $(SRC_DIR)/windowBed \
