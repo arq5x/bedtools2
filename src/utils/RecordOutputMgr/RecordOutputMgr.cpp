@@ -215,7 +215,7 @@ void RecordOutputMgr::printRecord(RecordKeyVector &keyList, RecordKeyVector *blo
 	const_cast<Record *>(keyList.getKey())->undoZeroLength();
 	_currBamBlockList = blockList;
 
-	if (_context->getProgram() == ContextBase::INTERSECT) {
+	if (_context->getProgram() == ContextBase::INTERSECT || _context->getProgram() == ContextBase::SUBTRACT) {
 		if (_printable) {
 			if (keyList.empty()) {
 				if ((static_cast<ContextIntersect *>(_context))->getWriteAllOverlap()) {

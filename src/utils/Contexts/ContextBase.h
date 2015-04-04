@@ -277,6 +277,12 @@ protected:
 
     testType _allFilesHaveChrInChromNames;
     testType _allFileHaveLeadingZeroInChromNames;
+
+    //Warning messages.
+    bool _nameConventionWarningTripped;
+    QuickString _nameConventionWarningMsg;
+    void nameConventionWarning(const Record *record, const QuickString &filename, const QuickString &message);
+
 };
 
 #endif /* CONTEXTBASE_H_ */

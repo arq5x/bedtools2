@@ -128,6 +128,12 @@ Record *BlockMgr::allocateAndAssignRecord(const Record *keyRecord, int startPos,
 	record->setChromId(keyRecord->getChromId());
 	record->setStartPos(startPos);
 	record->setEndPos(endPos);
+	QuickString startPosStr;
+	QuickString endPosStr;
+	startPosStr.append(startPos);
+	endPosStr.append(endPos);
+	record->setStartPosStr(startPosStr);
+	record->setEndPosStr(endPosStr);
 	record->setName(keyRecord->getName());
 	record->setScore(keyRecord->getScore());
 	record->setStrand(keyRecord->getStrand());

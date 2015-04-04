@@ -60,13 +60,17 @@ ContextBase::ContextBase()
   _useMergedIntervals(false),
   _reportPrecision(-1),
   _allFilesHaveChrInChromNames(UNTESTED),
-  _allFileHaveLeadingZeroInChromNames(UNTESTED)
+  _allFileHaveLeadingZeroInChromNames(UNTESTED),
+  _nameConventionWarningTripped(false)
 
 {
 	_programNames["intersect"] = INTERSECT;
 	_programNames["sample"] = SAMPLE;
 	_programNames["map"] = MAP;
 	_programNames["merge"] = MERGE;
+	_programNames["closest"] = CLOSEST;
+	_programNames["subtract"] = SUBTRACT;
+	_programNames["jaccard"] = JACCARD;
 
 	if (hasColumnOpsMethods()) {
 		_keyListOps = new KeyListOps();
@@ -87,6 +91,12 @@ ContextBase::~ContextBase()
 	if (hasColumnOpsMethods()) {
 		delete _keyListOps;
 		_keyListOps = NULL;
+	}
+
+	// if there was a warning about file name conventions,
+	// print it again so it's not lost amid large output.
+	if (_nameConventionWarningTripped) {
+		cerr << _nameConventionWarningMsg << endl;
 	}
 
 }
@@ -199,7 +209,7 @@ bool ContextBase::parseCmdArgs(int argc, char **argv, int skipFirstArgs) {
 			if (!handle_sortout()) return false;
         }
         else if (strcmp(_argv[_i], "-nonamecheck") == 0) {
-			if (!handle_sortout()) return false;
+			if (!handle_nonamecheck()) return false;
         }
 
 	}
@@ -623,7 +633,7 @@ bool ContextBase::parseIoBufSize(QuickString bufStr)
 }
 
 void ContextBase::testNameConventions(const Record *record) {
-	if (getNameCheckDisabled()) return;
+	if (getNameCheckDisabled() || _nameConventionWarningTripped) return;
 
 	int fileIdx = record->getFileIdx();
 
@@ -637,14 +647,10 @@ void ContextBase::testNameConventions(const Record *record) {
 	if (testChrVal == UNTESTED) {
 		_fileHasChrInChromNames[fileIdx] = hasChr ? YES : NO;
 	} else if ((testChrVal == YES && !hasChr) || (testChrVal == NO && hasChr)) {
-		fprintf(stderr, "ERROR: File %s has inconsistent naming convention for record:\n", _fileNames[fileIdx].c_str());
-		record->print(stderr, true);
-		exit(1);
+		nameConventionWarning(record, _fileNames[fileIdx], " has inconsistent naming convention for record:\n");
 	}
 	if ((_allFilesHaveChrInChromNames == YES && !hasChr) || (_allFilesHaveChrInChromNames == NO && hasChr)) {
-		fprintf(stderr, "ERROR: File %s has a record where naming convention is inconsistent with other files:\n", _fileNames[fileIdx].c_str());
-		record->print(stderr, true);
-		exit(1);
+		nameConventionWarning(record, _fileNames[fileIdx], " has a record where naming convention is inconsistent with other files:\n");
 	}
 
 	if (_allFilesHaveChrInChromNames == UNTESTED) {
@@ -662,14 +668,10 @@ void ContextBase::testNameConventions(const Record *record) {
 	if (testChrVal == UNTESTED) {
 		_fileHasLeadingZeroInChromNames[fileIdx] = zeroVal ? YES : NO;
 	} else if ((testChrVal == YES && !zeroVal) || (testChrVal == NO && zeroVal)) {
-		fprintf(stderr, "ERROR: File %s has inconsistent naming convention (leading zero) for record:\n", _fileNames[fileIdx].c_str());
-		record->print(stderr, true);
-		exit(1);
+		nameConventionWarning(record, _fileNames[fileIdx], " has inconsistent naming convention (leading zero) for record:\n");
 	}
 	if ((_allFileHaveLeadingZeroInChromNames == YES && !zeroVal) || (_allFileHaveLeadingZeroInChromNames == NO && zeroVal)) {
-		fprintf(stderr, "ERROR: File %s has a record where naming convention (leading zero) is inconsistent with other files:\n", _fileNames[fileIdx].c_str());
-		record->print(stderr, true);
-		exit(1);
+		nameConventionWarning(record, _fileNames[fileIdx], " has a record where naming convention (leading zero) is inconsistent with other files:\n");
 	}
 
 	if (_allFileHaveLeadingZeroInChromNames == UNTESTED) {
@@ -691,5 +693,17 @@ ContextBase::testType ContextBase::fileHasLeadingZeroInChromNames(int fileIdx) {
 		return UNTESTED;
 	}
 	return iter->second;
+}
+
+void ContextBase::nameConventionWarning(const Record *record, const QuickString &filename, const QuickString &message)
+{
+	_nameConventionWarningMsg = "***** WARNING: File ";
+	_nameConventionWarningMsg.append(filename);
+	_nameConventionWarningMsg.append(message);
+	record->print(_nameConventionWarningMsg);
+	_nameConventionWarningMsg.append("\n");
+	_nameConventionWarningTripped = true;
+
+	cerr << _nameConventionWarningMsg << endl;
 }
 

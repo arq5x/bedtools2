@@ -44,6 +44,9 @@ public:
 	void setBreakOnSkipOps(bool val) { _breakOnSkipOps = val; }
 	int getOverlapBases(int hitIdx) const { return _overlapBases[hitIdx]; }
 
+	Record *allocateAndAssignRecord(const Record *keyRecord, int startPos, int endPos);
+
+
 private:
 	RecordMgr *_blockRecordsMgr;
 	bool _breakOnDeletionOps;
@@ -59,9 +62,6 @@ private:
 	const static FileRecordTypeChecker::RECORD_TYPE _blockRecordsType = FileRecordTypeChecker::BED6_RECORD_TYPE;
 	void getBlocksFromBed12(RecordKeyVector &keyList, bool &mustDelete);
 	void getBlocksFromBam(RecordKeyVector &keyList, bool &mustDelete);
-
-	Record *allocateAndAssignRecord(const Record *keyRecord, int startPos, int endPos);
-
 
 };
 
