@@ -26,6 +26,7 @@ void reverseComplement(string &seq) {
     // swap the bases
     for(unsigned int i = 0; i < seq.length(); i++) {
         switch(seq[i]) {
+            // nucleotides
             case 'A':
                 seq[i] = 'T';
                 break;
@@ -50,6 +51,94 @@ void reverseComplement(string &seq) {
             case 't':
                 seq[i] = 'a';
                 break;
+
+            // unknown (N)
+            case 'N':
+                seq[i] = 'N';
+                break;
+            case 'n':
+                seq[i] = 'n';
+                break;
+
+            // unknown (X)
+            case 'X':
+                seq[i] = 'X';
+                break;
+            case 'x':
+                seq[i] = 'x';
+                break;
+
+            // IUPAC
+            case 'Y':
+                seq[i] = 'R';
+                break;
+            case 'y':
+                seq[i] = 'r';
+                break;
+
+            case 'R':
+                seq[i] = 'Y';
+                break;
+            case 'r':
+                seq[i] = 'y';
+                break;
+
+            case 'S':
+                seq[i] = 'S';
+                break;
+            case 's':
+                seq[i] = 's';
+                break;
+
+            case 'W':
+                seq[i] = 'W';
+                break;
+            case 'w':
+                seq[i] = 'w';
+                break;
+
+            case 'K':
+                seq[i] = 'M';
+                break;
+            case 'k':
+                seq[i] = 'm';
+                break;
+
+            case 'M':
+                seq[i] = 'K';
+                break;
+            case 'm':
+                seq[i] = 'k';
+                break;
+
+            case 'B':
+                seq[i] = 'V';
+                break;
+            case 'b':
+                seq[i] = 'v';
+                break;
+
+            case 'V':
+                seq[i] = 'B';
+                break;
+            case 'v':
+                seq[i] = 'b';
+                break;
+
+            case 'D':
+                seq[i] = 'H';
+                break;
+            case 'd':
+                seq[i] = 'h';
+                break;
+
+            case 'H':
+                seq[i] = 'D';
+                break;
+            case 'h':
+                seq[i] = 'd';
+                break;
+
             default:
                 break;
         }
