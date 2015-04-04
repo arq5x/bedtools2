@@ -77,3 +77,27 @@ echo $'chr1 assembled by consortium X\t1\t10' | $BT getfasta -fi t_fH.fa -bed - 
 check obs exp
 
 rm obs exp
+
+
+# test IUPAC
+echo "    getfasta.t08...\c"
+echo \
+">1:0-16
+AGCTYRWSKMDVHBXN
+>2:0-16
+agctyrwskmdvhbxn" > exp
+$BT getfasta  -fi test.iupac.fa -bed test.iupac.bed -fo - > obs
+check obs exp
+rm obs exp
+
+
+# test IUPAC revcomp
+echo "    getfasta.t09...\c"
+echo \
+">1:0-16(-)
+NXVDBHKMSWYRAGCT
+>2:0-16(-)
+nxvdbhkmswyragct" > exp
+$BT getfasta  -fi test.iupac.fa -bed test.iupac.bed -s -fo - > obs
+check obs exp
+rm obs exp
