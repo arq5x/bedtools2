@@ -646,9 +646,10 @@ void ContextBase::testNameConventions(const Record *record) {
 
 	if (testChrVal == UNTESTED) {
 		_fileHasChrInChromNames[fileIdx] = hasChr ? YES : NO;
-	} else if ((testChrVal == YES && !hasChr) || (testChrVal == NO && hasChr)) {
-		nameConventionWarning(record, _fileNames[fileIdx], " has inconsistent naming convention for record:\n");
 	}
+//	else if ((testChrVal == YES && !hasChr) || (testChrVal == NO && hasChr)) {
+//		nameConventionWarning(record, _fileNames[fileIdx], " has inconsistent naming convention for record:\n");
+//	}
 	if ((_allFilesHaveChrInChromNames == YES && !hasChr) || (_allFilesHaveChrInChromNames == NO && hasChr)) {
 		nameConventionWarning(record, _fileNames[fileIdx], " has a record where naming convention is inconsistent with other files:\n");
 	}
@@ -667,9 +668,10 @@ void ContextBase::testNameConventions(const Record *record) {
 	testChrVal = fileHasLeadingZeroInChromNames(fileIdx);
 	if (testChrVal == UNTESTED) {
 		_fileHasLeadingZeroInChromNames[fileIdx] = zeroVal ? YES : NO;
-	} else if ((testChrVal == YES && !zeroVal) || (testChrVal == NO && zeroVal)) {
-		nameConventionWarning(record, _fileNames[fileIdx], " has inconsistent naming convention (leading zero) for record:\n");
 	}
+//	else if ((testChrVal == YES && !zeroVal) || (testChrVal == NO && zeroVal)) {
+//		nameConventionWarning(record, _fileNames[fileIdx], " has inconsistent naming convention (leading zero) for record:\n");
+//	}
 	if ((_allFileHaveLeadingZeroInChromNames == YES && !zeroVal) || (_allFileHaveLeadingZeroInChromNames == NO && zeroVal)) {
 		nameConventionWarning(record, _fileNames[fileIdx], " has a record where naming convention (leading zero) is inconsistent with other files:\n");
 	}

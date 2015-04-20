@@ -168,10 +168,6 @@ bool ContextIntersect::isValidState()
 	if (_files.size()  < 2 ) {
 		return false;
 	}
-	if (!getSortedInput() && getNameCheckDisabled()) {
-		_errorMsg = "\n***** ERROR: -nonamecheck option is only valid for sorted input. *****";
-		return false;
-	}
 	return true;
 }
 
