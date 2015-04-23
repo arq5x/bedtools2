@@ -114,6 +114,11 @@ void closest_help(void) {
 
     cerr << "\t-header\t"       << "Print the header from the A file prior to results." << endl << endl;
 
+    cerr << "\t-nonamecheck\t"       << "For sorted data, don't throw an error if the file has different naming conventions" << endl;
+    cerr							<< "\t\t\tfor the same chromosome. ex. \"chr1\" vs \"chr01\"." << endl << endl;
+
+
+
     cerr << "Notes: " << endl;
     cerr << "\tReports \"none\" for chrom and \"-1\" for all other fields when a feature" << endl;
     cerr << "\tis not found in B on the same chromosome as the feature in A." << endl;

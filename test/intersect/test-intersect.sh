@@ -554,9 +554,9 @@ echo ok
 ##################################################################
 echo "    intersect.t45...\c"
 echo \
-"ERROR: File nonamecheck_b.bed has a record where naming convention (leading zero) is inconsistent with other files:
+"***** WARNING: File nonamecheck_b.bed has a record where naming convention (leading zero) is inconsistent with other files:
 chr01	15	25" > exp
-$BT intersect -a nonamecheck_a.bed -b nonamecheck_b.bed -sorted 2>&1 > /dev/null | cat - > obs
+$BT intersect -a nonamecheck_a.bed -b nonamecheck_b.bed -sorted 2>&1 > /dev/null | cat - | head -2 > obs
 check exp obs
 rm exp obs
 
