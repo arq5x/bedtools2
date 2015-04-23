@@ -145,6 +145,7 @@ int SingleLineDelimTextFileReader::getVcfSVlen() {
 		cerr << "WARNING: line number " << _lineNum << " of file " << _filename << " has an imprecise variant, but no SVLEN specified. Defaulting to length 1." << endl;
 		return 1;
 	}
+	startPtr +=6; // length of label "SVLEN="
 	const char *endPtr = strchr(startPtr, ';');
 	const char *midPtr = strchr(startPtr, ',');
 	int endCoord = -1;
