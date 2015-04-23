@@ -538,13 +538,16 @@ rm exp obs
 
 ##################################################################
 # see that -nonamecheck only works for sorted data
+# NOTE: This test is now deprecated, as the -nonamecheck option
+# must also now work with unsorted data
 ##################################################################
 echo "    intersect.t44...\c"
-echo \
-"***** ERROR: -nonamecheck option is only valid for sorted input. *****" > exp
-$BT intersect -a nonamecheck_a.bed -b nonamecheck_b.bed -nonamecheck 2>&1 > /dev/null | cat - | head -2 | tail -1 > obs
-check exp obs
-rm exp obs
+echo ok
+#"***** ERROR: -nonamecheck option is only valid for sorted input. *****" > exp
+#$BT intersect -a nonamecheck_a.bed -b nonamecheck_b.bed -nonamecheck 2>&1 > /dev/null | cat - | head -2 | tail -1 > obs
+#check exp obs
+#rm exp obs
+
 
 ##################################################################
 # see that differently named chroms don't work with -sorted
@@ -559,11 +562,24 @@ rm exp obs
 
 ##################################################################
 # see that differently named chroms  -sorted and -nonamecheck
-# don't complain
+# don't complain with -nonamecheck
 ##################################################################
 echo "    intersect.t46...\c"
 touch exp
 $BT intersect -a nonamecheck_a.bed -b nonamecheck_b.bed -sorted -nonamecheck 2>&1 > /dev/null | cat - > obs
+check exp obs
+rm exp obs
+
+##################################################################
+# see that SVLEN in VCF files is treated as zero length 
+# records when the SV type is an insertion
+##################################################################
+echo "    intersect.t47...\c"
+echo \
+"chr1	1	a	G	<DEL>	70.90
+chr1	1	a	G	<DEL>	70.90
+chr1	4	a	G	<INS>	70.90" > exp
+$BT intersect -a bug223_sv1_a.vcf -b bug223_sv1_b.vcf | cut -f1-6 > obs
 check exp obs
 rm exp obs
 
