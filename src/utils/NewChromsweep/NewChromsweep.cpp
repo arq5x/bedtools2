@@ -88,7 +88,6 @@ void NewChromSweep::closeOut(bool testChromOrderVal) {
     		nextRecord(false, i);
     	}
    		if (testChromOrderVal) testChromOrder(_currDbRecs[i]);
-
     }
 }
 
@@ -252,6 +251,7 @@ bool NewChromSweep::next(RecordKeyVector &retList) {
 	if (_context->getSortOutput()) {
 		retList.sortVector();
 	}
+
 
 	_prevQueryChromName = _currQueryChromName;
 	return true;

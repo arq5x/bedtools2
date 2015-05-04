@@ -83,6 +83,9 @@ public:
     virtual bool hasIntersectMethods() const { return true; }
 
 private:
+
+	BlockMgr *_splitBlockMgr;
+
 	virtual bool handle_a();
 	virtual bool handle_abam();
 	virtual bool handle_b();

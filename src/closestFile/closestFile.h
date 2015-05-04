@@ -1,31 +1,32 @@
 /*
- * newClosestFile.h
+ * closestHeader.h
  *
- *  Created on: Sep 25, 2014
+ *  Created on: Apr 22, 2015
  *      Author: nek3d
  */
 
-#ifndef NEWCLOSESTFILE_H_
-#define NEWCLOSESTFILE_H_
+#ifndef CLOSESTHEADER_H_
+#define CLOSESTHEADER_H_
 
+#include "intersectFile.h"
 #include "ContextClosest.h"
+#include "CloseSweep.h"
 
-using namespace std;
-
-class RecordOutputMgr;
-
-class ClosestFile {
+class ClosestFile : public IntersectFile {
 
 public:
     ClosestFile(ContextClosest *context);
-    ~ClosestFile(void);
+  	bool findNext(RecordKeyVector &hits);
+	virtual void processHits(RecordOutputMgr *outputMgr, RecordKeyVector &hits);
 
-    bool getClosest();
+protected:
+	virtual ContextClosest *upCast(ContextBase *context) { return static_cast<ContextClosest *>(context); }
+	virtual CloseSweep *upCastSweep() { return static_cast<CloseSweep *>(_sweep); }
+	virtual void makeSweep();
 
-private:
-    ContextClosest *_context;
-    RecordOutputMgr *_recordOutputMgr;
 };
 
 
-#endif /* NEWCLOSESTFILE_H_ */
+
+
+#endif /* CLOSESTHEADER_H_ */

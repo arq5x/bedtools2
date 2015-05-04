@@ -1,6 +1,7 @@
 UTILITIES_DIR = ../utils/
 OBJ_DIR = ../../obj/
 BIN_DIR = ../../bin/
+TOOL_DIR = ../../src/
 
 # -------------------
 # define our includes
@@ -33,13 +34,15 @@ INCLUDES = -I$(UTILITIES_DIR)/Contexts/ \
            -I$(UTILITIES_DIR)/NewChromsweep \
            -I$(UTILITIES_DIR)/VectorOps \
            -I$(UTILITIES_DIR)/BinTree \
-           -I$(UTILITIES_DIR)/version/
+           -I$(UTILITIES_DIR)/version/ \
+           -I$(UTILITIES_DIR)/ToolBase/ \
+           -I$(TOOL_DIR)/intersectFile/
 
 # ----------------------------------
 # define our source and object files
 # ----------------------------------
-SOURCES= mapMain.cpp mapFile.cpp mapFile.h
-OBJECTS= mapMain.o mapFile.o
+SOURCES= mapHelp.cpp mapFile.cpp mapFile.h
+OBJECTS= mapHelp.o mapFile.o
 BUILT_OBJECTS= $(patsubst %,$(OBJ_DIR)/%,$(OBJECTS))
 
 all: $(BUILT_OBJECTS)
@@ -52,6 +55,6 @@ $(BUILT_OBJECTS): $(SOURCES)
 
 clean:
 	@echo "Cleaning up."
-	@rm -f $(OBJ_DIR)/mapMain.o $(OBJ_DIR)/mapFile.o
+	@rm -f $(OBJ_DIR)/mapHelp.o $(OBJ_DIR)/mapFile.o
 
 .PHONY: clean

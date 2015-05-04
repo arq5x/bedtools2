@@ -1,6 +1,7 @@
 UTILITIES_DIR = ../utils/
 OBJ_DIR = ../../obj/
 BIN_DIR = ../../bin/
+TOOL_DIR = ../../src/
 
 # -------------------
 # define our includes
@@ -23,13 +24,15 @@ INCLUDES = -I$(UTILITIES_DIR)/Contexts/ \
            -I$(UTILITIES_DIR)/NewChromsweep \
            -I$(UTILITIES_DIR)/VectorOps \
            -I$(UTILITIES_DIR)/BinTree \
-           -I$(UTILITIES_DIR)/version/
+           -I$(UTILITIES_DIR)/version/ \
+           -I$(UTILITIES_DIR)/ToolBase/ \
+           -I$(TOOL_DIR)/intersectFile/
 
 # ----------------------------------
 # define our source and object files
 # ----------------------------------
-SOURCES= jaccardMain.cpp Jaccard.cpp Jaccard.h
-OBJECTS= jaccardMain.o Jaccard.o
+SOURCES= jaccardHelp.cpp jaccard.cpp jaccard.h
+OBJECTS= jaccardHelp.o jaccard.o
 BUILT_OBJECTS= $(patsubst %,$(OBJ_DIR)/%,$(OBJECTS))
 PROGRAM= Jaccard
 
@@ -43,6 +46,6 @@ $(BUILT_OBJECTS): $(SOURCES)
 	
 clean:
 	@echo "Cleaning up."
-	@rm -f $(OBJ_DIR)/jaccardMain.o $(OBJ_DIR)/Jaccard.o
+	@rm -f $(OBJ_DIR)/jaccardHelp.o $(OBJ_DIR)/jaccard.o
 
 .PHONY: clean

@@ -1,55 +1,60 @@
-#include "Fisher.h"
-#include "BlockMgr.h"
-#include "NewChromsweep.h"
-#include "kfunc.c"
+/*
+ * fisher.cpp
+ *
+ *  Created on: Apr 30, 2015
+ *      Author: nek3d
+ */
+
+#include "fisher.h"
 
 Fisher::Fisher(ContextFisher *context)
-: _context(context),
-  _intersectionVal(0),
-  _unionVal(0),
-  _numIntersections(0),
-  _queryLen(0),
-  _dbLen(0),
+: Jaccard(context),
+  _haveExclude(false),
   _queryCounts(0),
   _dbCounts(0),
-  _overlapCounts(0)
+  _overlapCounts(0),
+  _excludeFile(NULL)
 
 {
-    _blockMgr = new BlockMgr(_context->getOverlapFraction(), _context->getReciprocal());
-    _haveExclude = false;
-
-    if(!(_context->getExcludeFile().empty())){
-        string ex = _context->getExcludeFile();
-        exclude = new BedFile(ex);
-        exclude->loadBedFileIntoMergedMap();
-        _haveExclude = true;
-    }
 }
 
-Fisher::~Fisher(void) {
-    delete _blockMgr;
-    _blockMgr = NULL;
+bool Fisher::init(void)
+{
+	if(!(upCast(_context)->getExcludeFile().empty())){
+		string ex = upCast(_context)->getExcludeFile();
+		_excludeFile = new BedFile(ex);
+		_excludeFile->loadBedFileIntoMergedMap();
+		_haveExclude = true;
+	}
+	return Jaccard::init();
 }
 
-bool Fisher::calculate() {
+bool Fisher::finalizeCalculations()
+{
+    _sweep->closeOut();
+    _queryUnion = _sweep->getQueryTotalRecordLength();
+    _dbUnion = _sweep->getDatabaseTotalRecordLength();
 
-    if (!getFisher()) {
-        return false;
-    }
+    _queryCounts = _sweep->getQueryTotalRecords();
+    _dbCounts = _sweep->getDatabaseTotalRecords();
 
-    // header
+    _unionVal = _queryUnion + _dbUnion;
+    return true;
+}
 
+void Fisher::giveFinalReport(RecordOutputMgr *outputMgr)
+{
     double left, right, two;
 
     long long genomeSize = _context->getGenomeFile()->getGenomeSize();
     if(_haveExclude){
-        genomeSize -= exclude->getTotalFlattenedLength();
+        genomeSize -= _excludeFile->getTotalFlattenedLength();
     }
     // bases covered by neither
     long long n22_full_bases = genomeSize;
-    //long long n22_bases = genomeSize - _queryLen - _dbLen + _intersectionVal;
-    long double dMean = 1.0 + _dbLen / (long double)_dbCounts;
-    long double qMean = 1.0 + _queryLen / (long double)_queryCounts;
+    //long long n22_bases = genomeSize - _queryUnion - _dbUnion + _intersectionVal;
+    long double dMean = 1.0 + _dbUnion / (long double)_dbCounts;
+    long double qMean = 1.0 + _queryUnion / (long double)_queryCounts;
 
     // heursitic, but seems to work quite well -- better than doing more intuitive sum then divide.
     long double bMean = (qMean + dMean);
@@ -81,37 +86,6 @@ bool Fisher::calculate() {
     printf("# p-values for fisher's exact test\n");
     printf("left\tright\ttwo-tail\tratio\n");
     printf("%.5g\t%.5g\t%.5g\t%.3f\n", left, right, two, ratio);
-    
-    return true;
-}
-
-bool Fisher::getFisher() {
-    NewChromSweep sweep(_context);
-    if (!sweep.init()) {
-        return false;
-    }
-
-    RecordKeyVector hitSet;
-    while (sweep.next(hitSet)) {
-        if (_context->getObeySplits()) {
-            RecordKeyVector keySet(hitSet.getKey());
-            RecordKeyVector resultSet(hitSet.getKey());
-            _blockMgr->findBlockedOverlaps(keySet, hitSet, resultSet);
-            _intersectionVal += getTotalIntersection(resultSet);
-        } else {
-            _intersectionVal += getTotalIntersection(hitSet);
-        }
-    }
-
-    sweep.closeOut();
-    _queryLen = sweep.getQueryTotalRecordLength();
-    _dbLen = sweep.getDatabaseTotalRecordLength();
-
-    _queryCounts = sweep.getQueryTotalRecords();
-    _dbCounts = sweep.getDatabaseTotalRecords();
-
-    _unionVal = _queryLen + _dbLen;
-    return true;
 }
 
 unsigned long Fisher::getTotalIntersection(RecordKeyVector &recList)
@@ -130,7 +104,7 @@ unsigned long Fisher::getTotalIntersection(RecordKeyVector &recList)
         int minEnd = min((*iter)->getEndPos(), keyEnd);
         _qsizes.push_back((int)(minEnd - maxStart));
         if (_context->getObeySplits()) {
-            intersection += _blockMgr->getOverlapBases(hitIdx);
+            intersection += upCast(_context)->getSplitBlockInfo()->getOverlapBases(hitIdx);
             hitIdx++;
         } else {
             intersection += (unsigned long)(minEnd - maxStart);

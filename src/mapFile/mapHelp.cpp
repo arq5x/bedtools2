@@ -1,51 +1,20 @@
-/*****************************************************************************
-  mapMain.cpp
+/*
+ * mapHelp.cpp
+ *
+ *  Created on: Apr 22, 2015
+ *      Author: nek3d
+ */
 
-  (c) 2009 - Aaron Quinlan
-  Hall Laboratory
-  Department of Biochemistry and Molecular Genetics
-  University of Virginia
-  aaronquinlan@gmail.com
-
-  Licenced under the GNU General Public License 2.0 license.
-******************************************************************************/
-
-#include "mapFile.h"
-#include "ContextMap.h"
-
-using namespace std;
-
-// define our program name
-#define PROGRAM_NAME "bedtools map"
-
-void map_help(void);
-
-int map_main(int argc, char* argv[]) {
-
-    ContextMap *context = new ContextMap();
-    if (!context->parseCmdArgs(argc, argv, 1) || context->getShowHelp() || !context->isValidState()) {
-        if (!context->getErrorMsg().empty()) {
-            cerr << context->getErrorMsg() << endl;
-        }
-        map_help();
-        delete context;
-        return 1;
-    }
-    FileMap *fileMap = new FileMap(context);
-
-    bool retVal = fileMap->mapFiles();
-    delete fileMap;
-    delete context;
-    return retVal ? 0 : 1;
-}
+#include "CommonHelp.h"
+#include "KeyListOps.h"
 
 void map_help(void) {
 
     cerr << "\nTool:    bedtools map (aka mapBed)" << endl;
-    cerr << "Version: " << VERSION << "\n";    
+    cerr << "Version: " << VERSION << "\n";
     cerr << "Summary: Apply a function to a column from B intervals that overlap A." << endl << endl;
 
-    cerr << "Usage:   " << PROGRAM_NAME << " [OPTIONS] -a <bed/gff/vcf> -b <bed/gff/vcf>" << endl << endl;
+    cerr << "Usage:   " << "bedtools map" << " [OPTIONS] -a <bed/gff/vcf> -b <bed/gff/vcf>" << endl << endl;
 
     cerr << "Options: " << endl;
 
@@ -59,15 +28,15 @@ void map_help(void) {
     cerr << "\t-f\t"             << "Minimum overlap required as a fraction of A." << endl;
     cerr                         << "\t\t- Default is 1E-9 (i.e., 1bp)." << endl;
     cerr                         << "\t\t- FLOAT (e.g. 0.50)" << endl << endl;
-                                 
+
     cerr << "\t-r\t"             << "Require that the fraction overlap be reciprocal for A and B." << endl;
     cerr                         << "\t\t- In other words, if -f is 0.90 and -r is used, this requires" << endl;
     cerr                         << "\t\t  that B overlap 90% of A and A _also_ overlaps 90% of B." << endl << endl;
-                                 
+
     cerr << "\t-s\t"             << "Require same strandedness.  That is, only report hits in B" << endl;
     cerr                         << "\t\tthat overlap A on the _same_ strand." << endl;
     cerr                         << "\t\t- By default, overlaps are reported without respect to strand." << endl << endl;
-                                 
+
     cerr << "\t-S\t"             << "Require different strandedness.  That is, only report hits in B" << endl;
     cerr                         << "\t\tthat overlap A on the _opposite_ strand." << endl;
     cerr                         << "\t\t- By default, overlaps are reported without respect to strand." << endl << endl;
@@ -88,11 +57,13 @@ void map_help(void) {
     cerr							<< "\t\t\tfor the same chromosome. ex. \"chr1\" vs \"chr01\"." << endl << endl;
 
 
-
     cerr << "Notes: " << endl;
     cerr << "\t(1) Both input files must be sorted by chrom, then start." << endl << endl;
-    
+
     // end the program here
     exit(1);
 
 }
+
+
+

@@ -1,5 +1,5 @@
 /*****************************************************************************
-  intersectMain.cpp
+  intersectHelp.cpp
 
   (c) 2009 - Aaron Quinlan
   Hall Laboratory
@@ -10,35 +10,7 @@
   Licenced under the GNU General Public License 2.0 license.
 ******************************************************************************/
 
-#include "intersectFile.h"
-#include "ContextIntersect.h"
 #include "CommonHelp.h"
-
-using namespace std;
-
-// define our program name
-#define PROGRAM_NAME "bedtools intersect"
-
-void intersect_help(void);
-
-int intersect_main(int argc, char* argv[]) {
-
-    ContextIntersect *context = new ContextIntersect();
-    if (!context->parseCmdArgs(argc, argv, 1) || context->getShowHelp() || !context->isValidState()) {
-    	if (!context->getErrorMsg().empty()) {
-    		cerr << context->getErrorMsg() << endl;
-    	}
-    	intersect_help();
-    	delete context;
-    	return 1;
-    }
-	FileIntersect *fileIntersect = new FileIntersect(context);
-
-	bool retVal = fileIntersect->intersectFiles();
-	delete fileIntersect;
-	delete context;
-	return retVal ? 0 : 1;
-}
 
 void intersect_help(void) {
 
@@ -46,7 +18,7 @@ void intersect_help(void) {
     cerr << "Version: " << VERSION << "\n";    
     cerr << "Summary: Report overlaps between two feature files." << endl << endl;
 
-    cerr << "Usage:   " << PROGRAM_NAME << " [OPTIONS] -a <bed/gff/vcf/bam> -b <bed/gff/vcf/bam>" << endl << endl;
+    cerr << "Usage:   " << "bedtools intersect" << " [OPTIONS] -a <bed/gff/vcf/bam> -b <bed/gff/vcf/bam>" << endl << endl;
 
     cerr << "\t"				<< "Note: -b may be followed with multiple databases and/or " << endl;
     cerr << "\t"					"wildcard (*) character(s). " << endl;
