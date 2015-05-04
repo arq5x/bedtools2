@@ -98,6 +98,7 @@ bool IntersectFile::nextUnsortedFind(RecordKeyVector &hits)
 		if (queryRecord == NULL) {
 			continue;
 		} else {
+			_context->testNameConventions(queryRecord);
 			hits.setKey(queryRecord);
 			 _binTree->getHits(queryRecord, hits);
 			return true;
