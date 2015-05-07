@@ -8,11 +8,11 @@
 #ifndef RECORDOUTPUTMGR_H_
 #define RECORDOUTPUTMGR_H_
 
-using namespace std;
-
 #include "ContextBase.h"
 #include "RecordKeyVector.h"
 #include "api/BamWriter.h"
+
+using namespace std;
 
 class BlockMgr;
 

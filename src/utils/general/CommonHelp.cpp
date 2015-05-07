@@ -6,6 +6,8 @@
  */
 #include "CommonHelp.h"
 
+using namespace std;
+
 void CommonHelp() {
     cerr << "\t-iobuf\t"            << "Follow with desired integer size of read buffer." << endl;
     cerr << "\t\t" <<					"Optional suffixes K/M/G supported." << endl;
