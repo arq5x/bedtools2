@@ -47,7 +47,7 @@ int bedpetobam_main(int argc, char* argv[]);//
 void closest_help();
 int cluster_main(int argc, char* argv[]); //
 int complement_main(int argc, char* argv[]);//
-int coverage_main(int argc, char* argv[]); //
+void coverage_help();
 int regress_test_main(int argc, char **argv); //
 int expand_main(int argc, char* argv[]);//
 int fastafrombed_main(int argc, char* argv[]);//
@@ -104,7 +104,6 @@ int main(int argc, char *argv[])
 
     // genome arithmetic tools
     else if (subCmd == "window")      return window_main(argc-1, argv+1);
-    else if (subCmd == "coverage")    return coverage_main(argc-1, argv+1);
     else if (subCmd == "genomecov")   return genomecoverage_main(argc-1, argv+1);
     else if (subCmd == "cluster")     return cluster_main(argc-1, argv+1);
     else if (subCmd == "complement")  return complement_main(argc-1, argv+1);
@@ -306,5 +305,8 @@ void showHelp(const QuickString &subCmd) {
 		spacing_help();
 	} else if (subCmd == "fisher") {
 		fisher_help();
+	} else if (subCmd == "coverage") {
+		coverage_help();
 	}
+
 }

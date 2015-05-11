@@ -126,9 +126,13 @@ void RecordOutputMgr::printRecord(const Record *record)
 void RecordOutputMgr::printRecord(const Record *record, const QuickString & value)
 {	
 	_afterVal = value;
-	printRecord(record);
+	bool recordPrinted = false;
+	if (record != NULL) {
+		printRecord(record);
+		recordPrinted = true;
+	}
 	if (!value.empty()) {
-		tab();
+		if (recordPrinted) tab();
 		_outBuf.append(value);
 	}
 	newline();

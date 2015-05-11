@@ -10,7 +10,7 @@
 #include "ContextClosest.h"
 #include "ContextSubtract.h"
 #include "ContextSpacing.h"
-//#include "ContextCoverage.h"
+#include "ContextCoverage.h"
 
 //tools
 #include "intersectFile.h"
@@ -22,6 +22,7 @@
 #include "sampleFile.h"
 #include "spacingFile.h"
 #include "fisher.h"
+#include "coverageFile.h"
 
 BedtoolsDriver::BedtoolsDriver() {
 	_supported.insert("intersect");
@@ -33,6 +34,7 @@ BedtoolsDriver::BedtoolsDriver() {
 	_supported.insert("sample");
 	_supported.insert("spacing");
 	_supported.insert("fisher");
+	_supported.insert("coverage");
 }
 
 
@@ -100,6 +102,8 @@ ContextBase *BedtoolsDriver::getContext()
 		context = new ContextSpacing();
 	} else if (_subCmd == "fisher") {
 		context = new ContextFisher();
+	} else if (_subCmd == "coverage") {
+		context = new ContextCoverage();
 	} else {
 		cerr << "Error: Tool " << _subCmd << " is not supported. Exiting..." << endl;
 		exit(1);
@@ -128,6 +132,8 @@ ToolBase *BedtoolsDriver::getTool(ContextBase *context)
 		tool = new SpacingFile(static_cast<ContextSpacing *>(context));
 	} else if (_subCmd == "fisher") {
 		tool = new Fisher(static_cast<ContextFisher *>(context));
+	} else if (_subCmd == "coverage") {
+		tool = new CoverageFile(static_cast<ContextCoverage *>(context));
 	}
 
 	else {

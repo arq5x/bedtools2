@@ -21,13 +21,6 @@ bool ContextFisher::parseCmdArgs(int argc, char **argv, int skipFirstArgs)
 		else if (strcmp(_argv[_i], "-exclude") == 0) {
 			if (!handle_exclude()) return false;
 		}
-//        if (strcmp(_argv[_i], "-g") == 0) {
-//              if (!handle_g()) return false;
-//        }
-//        if(strcmp(_argv[_i], "-m") == 0) {
-//            markUsed(_i - _skipFirstArgs);
-//	        setUseMergedIntervals(true);
-//        }
 	}
 	return ContextIntersect::parseCmdArgs(argc, argv, _skipFirstArgs);
 }

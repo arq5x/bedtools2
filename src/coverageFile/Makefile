@@ -27,8 +27,8 @@ INCLUDES = -I$(UTILITIES_DIR)/Contexts/ \
 # ----------------------------------
 # define our source and object files
 # ----------------------------------
-SOURCES= mapHelp.cpp mapFile.cpp mapFile.h
-OBJECTS= mapHelp.o mapFile.o
+SOURCES= coverageHelp.cpp coverageFile.cpp coverageFile.h
+OBJECTS= coverageHelp.o coverageFile.o
 BUILT_OBJECTS= $(patsubst %,$(OBJ_DIR)/%,$(OBJECTS))
 
 all: $(BUILT_OBJECTS)
@@ -41,6 +41,6 @@ $(BUILT_OBJECTS): $(SOURCES)
 
 clean:
 	@echo "Cleaning up."
-	@rm -f $(OBJ_DIR)/mapHelp.o $(OBJ_DIR)/mapFile.o
+	@rm -f $(OBJ_DIR)/coverageHelp.o $(OBJ_DIR)/coverageFile.o
 
 .PHONY: clean

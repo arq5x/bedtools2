@@ -23,18 +23,6 @@ ContextSubtract::~ContextSubtract()
 
 
 bool ContextSubtract::parseCmdArgs(int argc, char **argv, int skipFirstArgs) {
-	_argc = argc;
-	_argv = argv;
-	_skipFirstArgs = skipFirstArgs;
-	if (_argc < 2) {
-		setShowHelp(true);
-		return false;
-	}
-
-	setProgram(_programNames[argv[0]]);
-
-	_argsProcessed.resize(_argc - _skipFirstArgs, false);
-
 	for (_i=_skipFirstArgs; _i < argc; _i++) {
 		if (isUsed(_i - _skipFirstArgs)) {
 			continue;
@@ -48,7 +36,6 @@ bool ContextSubtract::parseCmdArgs(int argc, char **argv, int skipFirstArgs) {
 		if (strcmp(_argv[_i], "-N") == 0) {
 			if (!handle_N()) return false;
 		}
-
 	}
 	return ContextIntersect::parseCmdArgs(argc, argv, _skipFirstArgs);
 }

@@ -37,7 +37,7 @@ SUBDIRS = $(SRC_DIR)/annotateBed \
 		  $(SRC_DIR)/closestFile \
 		  $(SRC_DIR)/clusterBed \
 		  $(SRC_DIR)/complementBed \
-		  $(SRC_DIR)/coverageBed \
+		  $(SRC_DIR)/coverageFile \
 		  $(SRC_DIR)/expand \
 		  $(SRC_DIR)/fastaFromBed \
 		  $(SRC_DIR)/flankBed \

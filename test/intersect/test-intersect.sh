@@ -537,16 +537,15 @@ check exp obs
 rm exp obs
 
 ##################################################################
-# see that -nonamecheck only works for sorted data
-# NOTE: This test is now deprecated, as the -nonamecheck option
-# must also now work with unsorted data
+# see that naming conventions are tested with unsorted data.
 ##################################################################
 echo "    intersect.t44...\c"
-echo ok
-#"***** ERROR: -nonamecheck option is only valid for sorted input. *****" > exp
-#$BT intersect -a nonamecheck_a.bed -b nonamecheck_b.bed -nonamecheck 2>&1 > /dev/null | cat - | head -2 | tail -1 > obs
-#check exp obs
-#rm exp obs
+echo \
+"***** WARNING: File nonamecheck_a.bed has a record where naming convention (leading zero) is inconsistent with other files:
+chr1	10	20" > exp
+$BT intersect -a nonamecheck_a.bed -b nonamecheck_b.bed 2>&1 > /dev/null | cat - | head -2 > obs
+check exp obs
+rm exp obs
 
 
 ##################################################################

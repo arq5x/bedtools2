@@ -82,7 +82,7 @@ public:
 
     virtual bool hasIntersectMethods() const { return true; }
 
-private:
+protected:
 
 	BlockMgr *_splitBlockMgr;
 

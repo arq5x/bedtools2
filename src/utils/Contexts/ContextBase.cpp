@@ -650,7 +650,9 @@ bool ContextBase::parseIoBufSize(QuickString bufStr)
 }
 
 void ContextBase::testNameConventions(const Record *record) {
-	if (getNameCheckDisabled() || _nameConventionWarningTripped) return;
+	//Do nothing if using the -nonamecheck option,
+	//warning already given, or record is unmapped BAM record
+	if (getNameCheckDisabled() || _nameConventionWarningTripped || record->isUnmapped()) return;
 
 	int fileIdx = record->getFileIdx();
 
