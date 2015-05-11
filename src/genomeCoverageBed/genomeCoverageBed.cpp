@@ -124,7 +124,7 @@ void BedGenomeCoverage::AddCoverage(int start, int end) {
     // make sure the coordinates fit within the chrom
     if (start < _currChromSize)
         _currChromCoverage[start].starts++;
-    if (end < _currChromSize)
+    if (end >= 0 && end < _currChromSize)
         _currChromCoverage[end].ends++;
     else
         _currChromCoverage[_currChromSize-1].ends++;
