@@ -14,6 +14,7 @@
 #include "QuickString.h"
 #include <cstdio>
 #include <cstdlib>
+#include <limits>
 
 using namespace std;
 
@@ -37,7 +38,7 @@ int str2chrPos(const QuickString &str);
 template<class T>
 void int2str(int number, T& buffer, bool appendToBuf = false)
 {
-	int maxVal = (1 << 31) -1;
+	int maxVal = std::numeric_limits<int>::max(); 
 	if (((int)(abs(number))) > maxVal) {
 		fprintf(stderr, "ERROR: number out of bounds.\n");
 		exit(1);
