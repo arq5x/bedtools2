@@ -263,7 +263,7 @@ bool HostAddress::operator<(const HostAddress& other) const {
     // if self is IPv4
     if ( m_protocol == HostAddress::IPv4Protocol ) {
         if ( other.m_protocol == HostAddress::IPv4Protocol )
-            return m_ip4Address < m_ip4Address;
+            return m_ip4Address < other.m_ip4Address;
     }
 
     // if self is IPv6
