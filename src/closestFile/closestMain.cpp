@@ -5,10 +5,10 @@
  *      Author: nek3d
  */
 
-using namespace std;
-
-#include "closestFile.h"
 #include "ContextClosest.h"
+#include "closestFile.h"
+
+using namespace std;
 
 // define our program name
 #define PROGRAM_NAME "bedtools closest"
