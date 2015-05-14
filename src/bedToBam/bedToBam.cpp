@@ -53,7 +53,7 @@ int bedtobam_main(int argc, char* argv[]) {
     string bedFile = "stdin";
     string genomeFile;
 
-    unsigned int mapQual = 255;
+    int mapQual = 255;
 
     bool haveBed         = true;
     bool haveGenome      = false;
