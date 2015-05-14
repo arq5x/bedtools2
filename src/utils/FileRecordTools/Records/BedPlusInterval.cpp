@@ -14,7 +14,7 @@ BedPlusInterval::~BedPlusInterval()
 }
 
 const BedPlusInterval &BedPlusInterval::operator=(const BedPlusInterval &other) {
-	Bed6Interval::operator=(other);
+	Bed3Interval::operator=(other);
 
 	int otherSize = other._otherIdxs.size();
 	int mySize = _otherIdxs.size();
@@ -40,7 +40,7 @@ const BedPlusInterval &BedPlusInterval::operator=(const BedPlusInterval &other) 
 
 bool BedPlusInterval::initFromFile(SingleLineDelimTextFileReader *fileReader)
 {
-	return (Bed6Interval::initFromFile(fileReader) && initOtherFieldsFromFile(fileReader));
+	return (Bed3Interval::initFromFile(fileReader) && initOtherFieldsFromFile(fileReader));
 }
 
 bool BedPlusInterval::initOtherFieldsFromFile(SingleLineDelimTextFileReader *fileReader)
@@ -63,7 +63,7 @@ bool BedPlusInterval::initOtherFieldsFromFile(SingleLineDelimTextFileReader *fil
 }
 
 void BedPlusInterval::clear() {
-	Bed6Interval::clear();
+	Bed3Interval::clear();
 	_numPrintFields = 0;
 	for (int i=0; i < (int)_otherIdxs.size(); i++) {
 		_otherIdxs[i]->clear();
@@ -72,36 +72,26 @@ void BedPlusInterval::clear() {
 
 void BedPlusInterval::print(QuickString &outBuf) const
 {
-	Bed6Interval::print(outBuf);
-
-	for (int i=0; i < (int)_otherIdxs.size(); i++) {
-		outBuf.append('\t');
-		outBuf.append(*(_otherIdxs[i]));
-	}
+	Bed3Interval::print(outBuf);
+	printOtherFields(outBuf);
 }
 
 void BedPlusInterval::print(QuickString &outBuf, int start, int end) const
 {
-	Bed6Interval::print(outBuf, start, end);
-	for (int i=0; i < (int)_otherIdxs.size(); i++) {
-		outBuf.append('\t');
-		outBuf.append(*(_otherIdxs[i]));
-	}
+	Bed3Interval::print(outBuf, start, end);
+	printOtherFields(outBuf);
 }
 
 void BedPlusInterval::print(QuickString &outBuf, const QuickString & start, const QuickString & end) const
 {
-	Bed6Interval::print(outBuf, start, end);
-	for (int i=0; i < (int)_otherIdxs.size(); i++) {
-		outBuf.append('\t');
-		outBuf.append(*(_otherIdxs[i]));
-	}
+	Bed3Interval::print(outBuf, start, end);
+	printOtherFields(outBuf);
 }
 
 
 void BedPlusInterval::printNull(QuickString &outBuf) const
 {
-	Bed6Interval::printNull(outBuf);
+	Bed3Interval::printNull(outBuf);
 	for (int i=startOtherIdx; i < _numPrintFields; i++) {
 		outBuf.append("\t.");
 	}
@@ -109,13 +99,13 @@ void BedPlusInterval::printNull(QuickString &outBuf) const
 
 const QuickString &BedPlusInterval::getField(int fieldNum) const
 {
-	//a request for any of the first six fields will retrieve
-	//chrom, start, end, name, score, and strand, in that order.
-	//A request for field 6+ will go to the otherIdxs.
+	//a request for any of the first three fields will retrieve
+	//chrom, start, end, in that order.
+	//A request for field 3+ will go to the otherIdxs.
 	if (fieldNum > startOtherIdx && fieldNum <= startOtherIdx + (int)_otherIdxs.size()) {
 		return (*(_otherIdxs[fieldNum - startOtherIdx - 1]));
 	}
-	return Bed6Interval::getField(fieldNum);
+	return Bed3Interval::getField(fieldNum);
 }
 
 bool BedPlusInterval::isNumericField(int fieldNum) {
@@ -128,7 +118,14 @@ bool BedPlusInterval::isNumericField(int fieldNum) {
 	if (fieldNum > startOtherIdx) {
 		return true;
 	} else {
-		return Bed6Interval::isNumericField(fieldNum);
+		return Bed3Interval::isNumericField(fieldNum);
 	}
 }
 
+void BedPlusInterval::printOtherFields(QuickString &outBuf) const {
+	for (int i=0; i < (int)_otherIdxs.size(); i++) {
+		outBuf.append('\t');
+		outBuf.append(*(_otherIdxs[i]));
+	}
+
+}
