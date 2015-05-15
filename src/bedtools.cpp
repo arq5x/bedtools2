@@ -63,6 +63,7 @@ int multibamcov_main(int argc, char* argv[]);//
 int multiintersect_main(int argc, char* argv[]);//
 int nek_sandbox1_main(int argc, char* argv[]);//
 int nuc_main(int argc, char* argv[]);//
+int pairedbamtobed12_main(int argc, char* argv[]); //
 int pairtobed_main(int argc, char* argv[]);//
 int pairtopair_main(int argc, char* argv[]);//
 int random_main(int argc, char* argv[]); //
@@ -123,6 +124,7 @@ int main(int argc, char *argv[])
     else if (sub_cmd == "bamtofastq")  return bamtofastq_main(argc-1, argv+1);
     else if (sub_cmd == "bedpetobam")  return bedpetobam_main(argc-1, argv+1);
     else if (sub_cmd == "bed12tobed6") return bed12tobed6_main(argc-1, argv+1);
+    else if (sub_cmd == "pairedbamtobed12")    return pairedbamtobed12_main(argc-1, argv+1);
 
     // BAM-specific tools
     else if (sub_cmd == "multicov")    return multibamcov_main(argc-1, argv+1);
@@ -227,6 +229,7 @@ int bedtools_help(void)
     cout  << "[ Format conversion ]" << endl;
     cout  << "    bamtobed      "  << "Convert BAM alignments to BED (& other) formats.\n";
     cout  << "    bedtobam      "  << "Convert intervals to BAM records.\n";
+    cout  << "    pairedbamtobed12 "<< "Converts 'properly paired' BAM alignments to BED12 format.\n";
     cout  << "    bamtofastq    "  << "Convert BAM records to FASTQ records.\n";
     cout  << "    bedpetobam    "  << "Convert BEDPE intervals to BAM records.\n";    
     cout  << "    bed12tobed6   "  << "Breaks BED12 intervals into discrete BED6 intervals.\n";

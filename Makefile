@@ -57,6 +57,7 @@ SUBDIRS = $(SRC_DIR)/annotateBed \
 		  $(SRC_DIR)/nucBed \
 		  $(SRC_DIR)/pairToBed \
 		  $(SRC_DIR)/pairToPair \
+		  $(SRC_DIR)/pairedBamToBed12 \
 		  $(SRC_DIR)/randomBed \
 		  $(SRC_DIR)/regressTest \
 		  $(SRC_DIR)/reldist \
@@ -225,3 +226,4 @@ autoversion:
 		echo "#define VERSION_GIT \"$${DETECTED_VERSION}\"" >> $(VERSION_FILE) ; \
 		echo "#endif /* VERSION_GIT_H */" >> $(VERSION_FILE) ; \
 	fi )
+
