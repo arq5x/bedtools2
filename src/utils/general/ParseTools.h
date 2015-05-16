@@ -9,6 +9,7 @@
 #define PARSETOOLS_H_
 
 #include <cstring> //for memset
+#include <limits>
 #include <string>
 #include <vector>
 #include "QuickString.h"
@@ -37,8 +38,7 @@ int str2chrPos(const QuickString &str);
 template<class T>
 void int2str(int number, T& buffer, bool appendToBuf = false)
 {
-	register int useNum = number;
-	if (useNum == 0) {
+	if (number == 0) {
 		if (appendToBuf) {
 			buffer.append("0");
 		} else {
@@ -47,42 +47,29 @@ void int2str(int number, T& buffer, bool appendToBuf = false)
 		return;
 	}
 	//check for negative numbers.
-	bool isNegative = useNum < 0;
+	bool isNegative = number < 0;
+	register unsigned useNum = number;
 	if (isNegative) {
 		useNum = 0 - useNum; //convert to positive.
 	}
 
-	//figure out how many digits we have
-	register int power = 10;
-	int numChars = 2 + (isNegative ? 1: 0);
-	while (power  <= useNum) {
-		power *= 10;
-		numChars++;
+	char tmpBuffer[numeric_limits<int>::digits10 + 3];
+	char *tmpBuf = &tmpBuffer[sizeof tmpBuffer];
+	*--tmpBuf = '\0';
+
+	while (useNum > 0) {
+		*--tmpBuf = (useNum % 10) + '0';
+		useNum /= 10;
 	}
 
-	char tmpBuf[numChars];
-	memset(tmpBuf, 0, numChars);
-
-	int bufIdx=0;
 	if (isNegative) {
-		tmpBuf[0] = '-';
-		bufIdx = 1;
+		*--tmpBuf = '-';
 	}
-	register int currDig=0;
 
-	power /= 10;
-	while (power) {
-
-		currDig = useNum / power;
-		useNum -= currDig * power;
-		tmpBuf[bufIdx] = currDig + 48; //48 is ascii for zero.
-		bufIdx++;
-		power /= 10;
-	}
 	if (!appendToBuf) {
 		buffer = tmpBuf;
 	} else {
-		buffer.append(tmpBuf, numChars-1);
+		buffer.append(tmpBuf);
 	}
 
 }

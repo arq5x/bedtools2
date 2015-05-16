@@ -28,7 +28,10 @@ _EXT_OBJECTS=SingleLineDelimTextFileReader.o BamFileReader.o Bed3Interval.o Bed6
 EXT_OBJECTS=$(patsubst %,$(OBJ_DIR)/%,$(_EXT_OBJECTS))
 BUILT_OBJECTS= $(patsubst %,$(OBJ_DIR)/%,$(OBJECTS))
 
-$(BUILT_OBJECTS): $(SOURCES) $(SUBDIRS)
+all: $(BUILT_OBJECTS) $(SUBDIRS)
+.PHONY: all
+
+$(BUILT_OBJECTS): $(SOURCES)
 	@echo "  * compiling FileRecordMgr.cpp"
 	@$(CXX) -c -o $(OBJ_DIR)/FileRecordMgr.o FileRecordMgr.cpp $(LDFLAGS) $(CXXFLAGS) $(INCLUDES)
 	@echo "  * compiling FileRecordMergeMgr.cpp"
