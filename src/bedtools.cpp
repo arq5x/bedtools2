@@ -210,7 +210,7 @@ int bedtools_help(void)
     cout  << "    random        "  << "Generate random intervals in a genome.\n";
     cout  << "    shuffle       "  << "Randomly redistrubute intervals in a genome.\n";
     cout  << "    sample        "  << "Sample random records from file using reservoir sampling.\n";   
-    cout  << "    spacing       "  << "Report the spacing between intervals in a file.\n";     
+    cout  << "    spacing       "  << "Report the gap lengths between intervals in a file.\n";     
     cout  << "    annotate      "  << "Annotate coverage of features from multiple files.\n";
     
     cout  << endl;

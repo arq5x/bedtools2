@@ -52,7 +52,7 @@ bool SpacingFile::getSpacing()
 			{
 				// do curr and prev overlap?
 				if (curr->sameChromIntersects(prev, false, false, 1E-9, false))
-					distance.append(0);
+					distance.append(-1);
 				else
 					distance.append(curr->getStartPos() - prev->getEndPos());
 			}
