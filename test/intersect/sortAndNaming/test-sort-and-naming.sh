@@ -88,7 +88,7 @@ echo "    intersect.t06...\c"
 echo \
 "***** WARNING: File db1_leadingZero.txt has a record where naming convention (leading zero) is inconsistent with other files:
 chr01	10	20" > exp
-$BT intersect -a q1_num.bed -b db1_leadingZero.txt -sorted 2>&1 > /dev/null | head -2 > obs
+$BT intersect -a q1_num.bed -b db1_leadingZero.txt -sorted 2>&1 > /dev/null | cat - | head -2 > obs
 check obs exp
 rm obs
 

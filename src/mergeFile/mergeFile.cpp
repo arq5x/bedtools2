@@ -1,39 +1,46 @@
-/*****************************************************************************
-  mergeFile.cpp
+/*
+ * mergeFile.cpp
+ *
+ *  Created on: Apr 22, 2015
+ *      Author: nek3d
+ */
 
-  (c) 2009 - Aaron Quinlan
-  Hall Laboratory
-  Department of Biochemistry and Molecular Genetics
-  University of Virginia
-  aaronquinlan@gmail.com
-
-  Licenced under the GNU General Public License 2.0 license.
-******************************************************************************/
 #include "mergeFile.h"
 
-
 MergeFile::MergeFile(ContextMerge *context)
-: _context(context),
-  _recordOutputMgr(NULL)
-{
-	_recordOutputMgr = new RecordOutputMgr();
-	_recordOutputMgr->init(_context);
+: ToolBase(context) {
+
 }
 
-MergeFile::~MergeFile()
-{
-	delete _recordOutputMgr;
-	_recordOutputMgr = NULL;
+MergeFile::~MergeFile() {
+
 }
 
-bool MergeFile::merge()
+bool MergeFile::init()
 {
-    RecordKeyVector hitSet;
-    FileRecordMgr *frm = _context->getFile(0);
-    while (!frm->eof()) {
-    	Record *key = frm->getNextRecord(&hitSet);
-    	if (key == NULL) continue;
-		_recordOutputMgr->printRecord(hitSet.getKey(), _context->getColumnOpsVal(hitSet));
+	_frm = static_cast<FileRecordMergeMgr *>(upCast(_context)->getFile(0));
+	return true;
+}
+
+bool MergeFile::findNext(RecordKeyVector &hits)
+{
+    while (!_frm->eof()) {
+    	_frm->getNextRecord(&hits);
+    	if (hits.getKey() == NULL) continue;
+    	return true;
     }
-    return true;
+    return false;
+
 }
+
+void MergeFile::processHits(RecordOutputMgr *outputMgr, RecordKeyVector &hits)
+{
+	outputMgr->printRecord(hits.getKey(), upCast(_context)->getColumnOpsVal(hits));
+
+}
+
+void MergeFile::cleanupHits(RecordKeyVector &hits)
+{
+	_frm->deleteMergedRecord(hits);
+}
+

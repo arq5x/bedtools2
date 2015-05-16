@@ -124,9 +124,10 @@ private:
 	bool isVCFformat(const char *buffer);
 	bool isGFFformat();
 	bool delimiterTesting(vector<int> &counts, char suspectChar);
-
-
-
+	bool isStrandField(int field);
+	bool passesBed5();
+	bool passesBed6();
+	bool passesBed12();
 
 };
 

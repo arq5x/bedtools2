@@ -5,33 +5,7 @@
  *      Author: nek3d
  */
 
-#include <iostream>
-#include "ContextSample.h"
-#include "SampleFile.h"
-
-#define PROGRAM_NAME "bedtools sample"
-
-void sample_help(void);
-
-int sample_main(int argc, char **argv)
-{
-    ContextSample *context = new ContextSample();
-    if (!context->parseCmdArgs(argc, argv, 1) || context->getShowHelp() || !context->isValidState()) {
-    	if (!context->getErrorMsg().empty()) {
-    		cerr << context->getErrorMsg() << endl;
-    	}
-    	sample_help();
-    	delete context;
-    	return 1;
-    }
-    SampleFile *sampleFile = new SampleFile(context);
-
-	bool retVal = sampleFile->takeSample();
-	delete sampleFile;
-	delete context;
-	return retVal ? 0 : 1;
-
-}
+#include "CommonHelp.h"
 
 void sample_help(void) {
 
@@ -39,7 +13,7 @@ void sample_help(void) {
     cerr << "Version: " << VERSION << "\n";
     cerr << "Summary: Take sample of input file(s) using reservoir sampling algorithm." << endl << endl;
 
-    cerr << "Usage:   " << PROGRAM_NAME << " [OPTIONS] -i <bed/gff/vcf/bam>" << endl << endl;
+    cerr << "Usage:   " << "bedtools sample" << " [OPTIONS] -i <bed/gff/vcf/bam>" << endl << endl;
 
     cerr << "WARNING:\tThe current sample algorithm will hold all requested sample records in memory prior to output." << endl;
     cerr << "\t\tThe user must ensure that there is adequate memory for this." << endl << endl;

@@ -12,32 +12,38 @@
 #ifndef INTERSECTFILE_H
 #define INTERSECTFILE_H
 
-#include "RecordKeyVector.h"
+#include "ToolBase.h"
+#include "ContextIntersect.h"
+#include "NewChromsweep.h"
 
-using namespace std;
 
-class ContextIntersect;
 class BlockMgr;
-class RecordOutputMgr;
+class BinTree;
 
-class FileIntersect {
+class IntersectFile : public ToolBase {
 
 public:
-    FileIntersect(ContextIntersect *context);
-    ~FileIntersect(void);
+    IntersectFile(ContextIntersect *context);
+    virtual ~IntersectFile();
+	virtual bool init();
+	virtual bool findNext(RecordKeyVector &hits);
+	virtual void processHits(RecordOutputMgr *outputMgr, RecordKeyVector &hits);
+	virtual void cleanupHits(RecordKeyVector &hits);
+	virtual bool finalizeCalculations();
+	virtual void  giveFinalReport(RecordOutputMgr *outputMgr) {}
 
-    bool intersectFiles();
 
-private:
-    ContextIntersect *_context;
-	Record *_queryRec;
-	Record *_databaseRec;
-	BlockMgr *_blockMgr;
-	RecordOutputMgr *_recordOutputMgr;
+protected:
+	NewChromSweep *_sweep;
+	BinTree *_binTree;
+	FileRecordMgr *_queryFRM;
 
-	void processHits(RecordKeyVector &hits);
-	bool processSortedFiles();
-	bool processUnsortedFiles();
+	virtual bool nextSortedFind(RecordKeyVector &hits);
+	virtual bool nextUnsortedFind(RecordKeyVector &hits);
+	void checkSplits(RecordKeyVector &hits);
+	virtual void makeSweep();
+	virtual ContextIntersect *upCast(ContextBase *context) { return static_cast<ContextIntersect *>(context); }
+
 
 };
 

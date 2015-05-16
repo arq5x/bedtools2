@@ -19,13 +19,14 @@ INCLUDES = -I$(UTILITIES_DIR)/Contexts/ \
            -I$(UTILITIES_DIR)/FileRecordTools/Records/ \
  			-I$(UTILITIES_DIR)/KeyListOps/ \
           -I$(UTILITIES_DIR)/RecordOutputMgr/ \
-            -I$(UTILITIES_DIR)/version/
+            -I$(UTILITIES_DIR)/version/ \
+           -I$(UTILITIES_DIR)/ToolBase/ \
 
 # ----------------------------------
 # define our source and object files
 # ----------------------------------
-SOURCES= spacingMain.cpp SpacingFile.cpp SpacingFile.h
-OBJECTS= spacingMain.o SpacingFile.o
+SOURCES= spacingHelp.cpp spacingFile.cpp spacingFile.h
+OBJECTS= spacingHelp.o spacingFile.o
 BUILT_OBJECTS= $(patsubst %,$(OBJ_DIR)/%,$(OBJECTS))
 PROGRAM= spacing
 
@@ -39,6 +40,6 @@ $(BUILT_OBJECTS): $(SOURCES)
 	
 clean:
 	@echo "Cleaning up."
-	@rm -f $(OBJ_DIR)/sampleMain.o $(OBJ_DIR)/SpacingFile.o
+	@rm -f $(OBJ_DIR)/spacingHelp.o $(OBJ_DIR)/spacingFile.o
 
 .PHONY: clean

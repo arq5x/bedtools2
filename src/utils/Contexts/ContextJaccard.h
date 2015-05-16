@@ -17,7 +17,7 @@ public:
 	virtual bool parseCmdArgs(int argc, char **argv, int skipFirstArgs);
 	virtual bool isValidState();
 
-private:
+protected:
 	bool handle_s();
 	bool handle_S();
 };

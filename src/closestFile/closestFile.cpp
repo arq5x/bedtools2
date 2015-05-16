@@ -1,45 +1,35 @@
 /*
- * newClosestFile.cpp
+ * closestFile.cpp
  *
- *  Created on: Sep 25, 2014
+ *  Created on: Apr 22, 2015
  *      Author: nek3d
  */
 
-#include "FileRecordMgr.h"
-#include "RecordOutputMgr.h"
 #include "closestFile.h"
 #include "CloseSweep.h"
 
 ClosestFile::ClosestFile(ContextClosest *context)
-: _context(context),
- _recordOutputMgr(NULL)
+: IntersectFile(context)
 {
-	_recordOutputMgr = new RecordOutputMgr();
-	_recordOutputMgr->init(_context);
+
 }
 
-ClosestFile::~ClosestFile() {
-	delete _recordOutputMgr;
+bool ClosestFile::findNext(RecordKeyVector &hits)
+{
+	return nextSortedFind(hits);
 }
 
-bool ClosestFile::getClosest() {
-    CloseSweep sweep(_context);
-    if (!sweep.init()) {
-      return false;
-    }
-    RecordKeyVector hitSet;
-    while (sweep.next(hitSet)) {
-    	if (_context->reportDistance()) {
-    		_recordOutputMgr->printClosest(hitSet, &(sweep.getDistances()));
-    	} else {
-    		_recordOutputMgr->printClosest(hitSet, NULL);
+void ClosestFile::processHits(RecordOutputMgr *outputMgr, RecordKeyVector &hits)
+{
+	if (upCast(_context)->reportDistance()) {
+		outputMgr->printClosest(hits, &(upCastSweep()->getDistances()));
+	} else {
+		outputMgr->printClosest(hits, NULL);
+	}
+}
 
-    	}
-    }
-    if (!_context->hasGenomeFile()) {
-    	sweep.closeOut(true);
-    }
 
-    return true;
 
+void ClosestFile::makeSweep() {
+	_sweep = new CloseSweep(upCast(_context));
 }

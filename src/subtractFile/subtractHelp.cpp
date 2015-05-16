@@ -6,35 +6,7 @@
  */
 
 
-#include "subtractFile.h"
-#include "ContextSubtract.h"
 #include "CommonHelp.h"
-
-using namespace std;
-
-// define our program name
-#define PROGRAM_NAME "bedtools subtract"
-
-void subtract_help(void);
-
-int subtract_main(int argc, char* argv[]) {
-
-    ContextSubtract *context = new ContextSubtract();
-    if (!context->parseCmdArgs(argc, argv, 1) || context->getShowHelp() || !context->isValidState()) {
-    	if (!context->getErrorMsg().empty()) {
-    		cerr << context->getErrorMsg() << endl;
-    	}
-    	subtract_help();
-    	delete context;
-    	return 1;
-    }
-	SubtractFile *subtractFile = new SubtractFile(context);
-
-	bool retVal = subtractFile->subtractFiles();
-	delete subtractFile;
-	delete context;
-	return retVal ? 0 : 1;
-}
 
 void subtract_help(void) {
     cerr << "\nTool:    bedtools subtract (aka subtractBed)" << endl;
@@ -42,7 +14,7 @@ void subtract_help(void) {
     cerr << "Summary: Removes the portion(s) of an interval that is overlapped" << endl;
     cerr << "\t by another feature(s)." << endl << endl;
 
-    cerr << "Usage:   " << PROGRAM_NAME << " [OPTIONS] -a <bed/gff/vcf> -b <bed/gff/vcf>" << endl << endl;
+    cerr << "Usage:   " << "bedtools subtract" << " [OPTIONS] -a <bed/gff/vcf> -b <bed/gff/vcf>" << endl << endl;
 
     cerr << "Options: " << endl;
     cerr << "\t-f\t"            << "Minimum overlap required as a fraction of A." << endl;

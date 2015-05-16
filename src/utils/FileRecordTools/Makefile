@@ -21,7 +21,7 @@ SUBDIRS = ./FileReaders \
 # ----------------------------------
 # define our source and object files
 # ----------------------------------
-SOURCES= FileRecordMgr.cpp FileRecordMgr.h FileRecordMergeMgr.cpp FileRecordMergeMgr.h 
+SOURCES= FileRecordMgr.cpp FileRecordMgr.h FileRecordMergeMgr.cpp FileRecordMergeMgr.h
 OBJECTS= FileRecordMgr.o FileRecordMergeMgr.o
 _EXT_OBJECTS=SingleLineDelimTextFileReader.o BamFileReader.o Bed3Interval.o Bed6Interval.o BedPlusInterval.o Bed12Interval.o BamRecord.o \
 	SingleLineDelimTransferBuffer.o FileRecordTypeChecker.o QuickString.o ParseTools.o RecordKeyList.o BufferedStreamMgr.o

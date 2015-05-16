@@ -138,6 +138,7 @@ public:
 
 	bool hasChrInChromName() const;
 	bool hasLeadingZeroInChromName(bool chrKnown = false) const;
+	virtual int getLength(bool obeySplits) const;
 
 
 protected:

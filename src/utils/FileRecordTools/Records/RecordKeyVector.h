@@ -22,7 +22,7 @@ public:
 	typedef vecType::const_iterator const_iterator_type;
 	RecordKeyVector();
     RecordKeyVector(elemType item);
-    RecordKeyVector(elemType item, const vecType &vector);
+    RecordKeyVector(elemType item, const vecType *vector);
     ~RecordKeyVector();
 
     const RecordKeyVector &operator=(const RecordKeyVector &other);
@@ -37,7 +37,7 @@ public:
 
     //setVectorNoCopy will make our list share the nodes of another
     //list, not copy them.
-    void setVector(const vecType &list);
+    void setVector(vecType *vec);
 
     // WARNING! clearVector will NOT delete records pointed to by list nodes. Caller must do that separately, since the RecordKeyVector
     // does not have it's own RecordMgr member.
@@ -50,12 +50,14 @@ public:
     bool allClear() { return (_key == NULL && empty()); }
 
     void sortVector();
+    void swap(RecordKeyVector &other);
 
 
 private:
     elemType _key;
-    vecType _recVec;
+    vecType *_recVec;
     int _currPos;
+    bool _mustDeleteVec;
 };
 
 

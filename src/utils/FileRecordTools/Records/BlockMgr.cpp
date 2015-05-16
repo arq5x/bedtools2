@@ -35,7 +35,7 @@ void BlockMgr::getBlocks(RecordKeyVector &keyList, bool &mustDelete)
 	switch (keyList.getKey()->getType()) {
 	case FileRecordTypeChecker::BED12_RECORD_TYPE:
 		getBlocksFromBed12(keyList, mustDelete);
-		break; //not necessary after return, but here in case code is later modified.
+		break;
 
 	case FileRecordTypeChecker::BAM_RECORD_TYPE:
 		getBlocksFromBam(keyList, mustDelete);
@@ -174,7 +174,7 @@ int BlockMgr::findBlockedOverlaps(RecordKeyVector &keyList, RecordKeyVector &hit
 		RecordKeyVector hitBlocks(*hitListIter);
 		bool deleteHitBlocks = false;
 		getBlocks(hitBlocks, deleteHitBlocks); //get all blocks for the hit record.
-		int hitBlockSumLength = getTotalBlockLength(hitBlocks); //get total lentgh of the bocks for the hitRecord.
+		int hitBlockSumLength = getTotalBlockLength(hitBlocks); //get total length of the bocks for the hitRecord.
 		int totalHitOverlap = 0;
 		bool hitHasOverlap = false;
 

@@ -21,13 +21,15 @@ INCLUDES = -I$(UTILITIES_DIR)/Contexts/ \
            -I$(UTILITIES_DIR)/RecordOutputMgr/ \
            -I$(UTILITIES_DIR)/NewChromsweep \
            -I$(UTILITIES_DIR)/BinTree \
-           -I$(UTILITIES_DIR)/version/
+           -I$(UTILITIES_DIR)/version/ \
+           -I$(UTILITIES_DIR)/ToolBase/
+           
 
 # ----------------------------------
 # define our source and object files
 # ----------------------------------
-SOURCES= mergeMain.cpp mergeFile.cpp mergeFile.h
-OBJECTS= mergeMain.o mergeFile.o
+SOURCES= mergeHelp.cpp mergeFile.cpp mergeFile.h
+OBJECTS= mergeHelp.o mergeFile.o
 BUILT_OBJECTS= $(patsubst %,$(OBJ_DIR)/%,$(OBJECTS))
 
 
@@ -41,6 +43,6 @@ $(BUILT_OBJECTS): $(SOURCES)
 
 clean:
 	@echo "Cleaning up."
-	@rm -f $(OBJ_DIR)/mergeMain.o $(OBJ_DIR)/mergeFile.o
+	@rm -f $(OBJ_DIR)/mergeHelp.o $(OBJ_DIR)/mergeFile.o
 
 .PHONY: clean

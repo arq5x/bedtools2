@@ -11,6 +11,8 @@
 using namespace std;
 
 #include <iostream>
+#include "version.h"
+#include <cstdlib> //for exit
 
 extern void CommonHelp();
 

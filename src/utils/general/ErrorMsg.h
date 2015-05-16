@@ -10,5 +10,4 @@
 
 
 
-
 #endif /* ERRORMSG_H_ */
