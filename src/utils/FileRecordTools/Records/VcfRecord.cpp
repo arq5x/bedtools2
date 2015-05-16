@@ -21,8 +21,14 @@ bool VcfRecord::initFromFile(SingleLineDelimTextFileReader *fileReader)
 	fileReader->getField(4, _varAlt);
 	fileReader->getField(3, _varRef);
 	if (_varAlt[0] == '<') {
-		//this is a structural variant. Need to parse the tags to find the endpos.
-		_endPos = _startPos + fileReader->getVcfSVlen();
+		// this is a structural variant. Need to parse the tags to find the endpos,
+		// UNLESS it's an insertion.
+		if (!(_varAlt[1] == 'I' && _varAlt[2] == 'N' && _varAlt[3] == 'S')) {
+			_endPos = _startPos + fileReader->getVcfSVlen();
+		} else {
+			//for insertions, treat as zero-length records
+			_endPos = _startPos;
+		}
 	} else {
 		//endPos is just the startPos plus the length of the variant
 		_endPos = _startPos + _varRef.size();
@@ -64,7 +70,7 @@ void VcfRecord::print(QuickString &outBuf, const QuickString & start, const Quic
 }
 
 void VcfRecord::printNull(QuickString &outBuf) const {
-	outBuf.append(".\t-1\t.\t.\t.\t-1");
+	outBuf.append(".\t-1\t.");
 	for (int i= startOtherIdx; i < _numPrintFields; i++) {
 		outBuf.append("\t.");
 	}
@@ -79,7 +85,7 @@ void VcfRecord::printOtherFields(QuickString &outBuf) const {
 	outBuf.append(_varAlt);
 	outBuf.append('\t');
 	outBuf.append(_score);
-	for (int i= 0; i < (int)_otherIdxs.size(); i++) {
+	for (int i= constPrintStartIdx; i < (int)_otherIdxs.size(); i++) {
 		outBuf.append('\t');
 		outBuf.append(*(_otherIdxs[i]));
 	}

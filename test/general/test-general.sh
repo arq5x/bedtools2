@@ -40,9 +40,8 @@ rm obs exp
 ###########################################################
 echo "    general.t03...\c"
 echo \
-"chr1	.	2" | $BT merge -i - 2> obs
-echo "Error: Invalid record in file -. Record is 
-chr1	-0	2" > exp
+"***** ERROR: illegal character '.' found in integer conversion of string \".\". Exiting..." > exp
+echo "chr1	.	2" | $BT merge -i - 2> obs
 check obs exp
 rm obs exp
 
@@ -53,8 +52,7 @@ rm obs exp
 echo "    general.t04...\c"
 echo \
 "chr1	.	2" | $BT merge -i - 2> obs
-echo "Error: Invalid record in file -. Record is 
-chr1	-0	2" > exp
+echo "***** ERROR: illegal character '.' found in integer conversion of string \".\". Exiting..." > exp
 check obs exp
 rm obs exp
 

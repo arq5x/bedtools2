@@ -1,40 +1,28 @@
-/*****************************************************************************
-  mapFile.h
+/*
+ * mapFile.h
+ *
+ *  Created on: Apr 22, 2015
+ *      Author: nek3d
+ */
 
-  (c) 2009 - Aaron Quinlan
-  Hall Laboratory
-  Department of Biochemistry and Molecular Genetics
-  University of Virginia
-  aaronquinlan@gmail.com
+#ifndef MAPFILE_H_
+#define MAPFILE_H_
 
-  Licenced under the GNU General Public License 2.0 license.
-******************************************************************************/
-#ifndef MAPFILE_H
-#define MAPFILE_H
-
-#include <sstream>
-#include <iomanip>
-#include "VectorOps.h"
-#include "RecordKeyVector.h"
+#include "intersectFile.h"
 #include "ContextMap.h"
 
-using namespace std;
-
-class BlockMgr;
-class RecordOutputMgr;
-
-class FileMap {
+class MapFile : public IntersectFile {
 
 public:
-    FileMap(ContextMap *context);
-    ~FileMap(void);
+    MapFile(ContextMap *context);
+	virtual bool findNext(RecordKeyVector &hits);
+ 	virtual void processHits(RecordOutputMgr *outputMgr, RecordKeyVector &hits);
 
-    bool mapFiles();
-
-private:
-    ContextMap *_context;
-    BlockMgr *_blockMgr;
-    RecordOutputMgr *_recordOutputMgr;
+protected:
+	virtual ContextMap *upCast(ContextBase *context) { return static_cast<ContextMap *>(context); }
 };
 
-#endif /* MAPFILE_H */
+
+
+
+#endif /* MAPFILE_H_ */

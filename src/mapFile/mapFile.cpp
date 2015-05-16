@@ -1,57 +1,29 @@
-/*****************************************************************************
-  mapBed.cpp
+/*
+ * mapFile.cpp
+ *
+ *  Created on: Apr 22, 2015
+ *      Author: nek3d
+ */
 
-  (c) 2009 - Aaron Quinlan
-  Hall Laboratory
-  Department of Biochemistry and Molecular Genetics
-  University of Virginia
-  aaronquinlan@gmail.com
-
-  Licenced under the GNU General Public License 2.0 license.
-******************************************************************************/
 #include "mapFile.h"
-#include "ContextMap.h"
-#include "FileRecordMgr.h"
-#include "NewChromsweep.h"
-#include "BinTree.h"
-#include "RecordOutputMgr.h"
 
-const int PRECISION = 21;
-
-FileMap::FileMap(ContextMap *context)
-: _context(context),
-  _blockMgr(NULL),
-  _recordOutputMgr(NULL)
+MapFile::MapFile(ContextMap *context)
+: IntersectFile(context)
 {
-  _blockMgr = new BlockMgr(_context->getOverlapFraction(), _context->getReciprocal());
-  _recordOutputMgr = new RecordOutputMgr();
-  _recordOutputMgr->init(_context);
+
 }
 
-FileMap::~FileMap(void) {
-	delete _blockMgr;
-	_blockMgr = NULL;
-	delete _recordOutputMgr;
-	_recordOutputMgr = NULL;
+bool MapFile::findNext(RecordKeyVector &hits)
+{
+	if (nextSortedFind(hits)) {
+		 checkSplits(hits);
+		 return true;
+	}
+	return false;
 }
 
-bool FileMap::mapFiles()
+void MapFile::processHits(RecordOutputMgr *outputMgr, RecordKeyVector &hits)
 {
-    NewChromSweep sweep(_context);
-    if (!sweep.init()) {
-      return false;
-    }
-    RecordKeyVector hitSet;
-    while (sweep.next(hitSet)) {
-    	if (_context->getObeySplits()) {
-			RecordKeyVector keySet(hitSet.getKey());
-			RecordKeyVector resultSet(hitSet.getKey());
-			_blockMgr->findBlockedOverlaps(keySet, hitSet, resultSet);
-			_recordOutputMgr->printRecord(resultSet.getKey(), _context->getColumnOpsVal(resultSet));
-    	} else {
-			_recordOutputMgr->printRecord(hitSet.getKey(), _context->getColumnOpsVal(hitSet));
-		}
-    }
-    return true;
+	outputMgr->printRecord(hits.getKey(), _context->getColumnOpsVal(hits));
 }
 

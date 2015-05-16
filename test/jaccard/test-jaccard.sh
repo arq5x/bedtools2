@@ -78,7 +78,7 @@ rm obs exp
 echo "    jaccard.t08...\c"
 echo \
 "intersection	union-intersection	jaccard	n_intersections
-5	55	0.0909091	1" > exp
+5	35	0.142857	1" > exp
 $BT jaccard -a three_blocks_match.bed -b e.bed -split > obs
 check obs exp
 rm obs exp
@@ -90,7 +90,7 @@ echo "    jaccard.t09...\c"
 echo \
 "intersection	union-intersection	jaccard	n_intersections
 10	150	0.0666667	1" > exp
-$BT jaccard -a a.bam -b three_blocks_match.bam > obs
+$BT jaccard -a a.bam -b three_blocks_match.bam -bed > obs
 check exp obs
 rm exp obs
 
@@ -112,7 +112,7 @@ rm obs exp
 echo "    jaccard.t11...\c"
 echo \
 "intersection	union-intersection	jaccard	n_intersections
-70	340	0.205882	3" >exp
+120	290	0.413793	4" >exp
 $BT jaccard -a aMixedStrands.bed -b bMixedStrands.bed -s > obs
 check obs exp
 rm obs exp
@@ -140,3 +140,4 @@ echo \
 $BT jaccard -a aMixedStrands.bed -b bMixedStrands.bed -S - > obs
 check obs exp
 rm obs exp
+

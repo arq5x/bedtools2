@@ -1,123 +1,45 @@
-/*
- * subtractFile.cpp
- *
- *  Created on: Feb 19, 2015
- *      Author: nek3d
- */
-
-
-/*****************************************************************************
-  subtractFile.cpp
-
-  (c) 2009 - Aaron Quinlan
-  Hall Laboratory
-  Department of Biochemistry and Molecular Genetics
-  University of Virginia
-  aaronquinlan@gmail.com
-
-  Licenced under the GNU General Public License 2.0 license.
-******************************************************************************/
-
 #include "subtractFile.h"
-#include "ContextSubtract.h"
-#include "FileRecordMgr.h"
-#include "NewChromsweep.h"
-#include "BinTree.h"
-#include "RecordOutputMgr.h"
-
-#include <numeric> //for std::accumulate
+#include <numeric>
 
 SubtractFile::SubtractFile(ContextSubtract *context)
-: _context(context),
-  _blockMgr(NULL),
-  _recordOutputMgr(NULL),
-  _tmpBlocksMgr(NULL)
+: IntersectFile(context),
+  _tmpBlocksMgr(NULL),
+  _deleteTmpBlocks(false),
+  _dontReport(false)
 {
-	_recordOutputMgr = new RecordOutputMgr();
-	_recordOutputMgr->init(_context);
-	if (_context->getObeySplits()) {
-		_blockMgr = new BlockMgr(_context->getOverlapFraction(), _context->getReciprocal());
-		_recordOutputMgr->setSplitInfo(_blockMgr);
-	}
-	_tmpBlocksMgr = new BlockMgr(_context->getOverlapFraction(), _context->getReciprocal());
+	_tmpBlocksMgr = new BlockMgr(upCast(_context)->getOverlapFraction(), upCast(_context)->getReciprocal());
 }
 
-SubtractFile::~SubtractFile(void) {
-	delete _blockMgr;
-	_blockMgr = NULL;
-	delete _recordOutputMgr;
+SubtractFile::~SubtractFile() {
 	delete _tmpBlocksMgr;
+	_tmpBlocksMgr = NULL;
 }
 
-void SubtractFile::processHits(RecordKeyVector &hits) {
-    _recordOutputMgr->printRecord(hits);
-}
-
-bool SubtractFile::subtractFiles()
+bool SubtractFile::findNext(RecordKeyVector &hits)
 {
-	 if (_context->getSortedInput()) {
-		 return processSortedFiles();
-	 }
-	 return processUnsortedFiles();
-}
-
-bool SubtractFile::processSortedFiles()
-{
-    // use the chromsweep algorithm to detect overlaps on the fly.
-    NewChromSweep sweep(_context);
-
-    if (!sweep.init()) {
-    	return false;
-    }
-
-    RecordKeyVector hitSet;
-    while (sweep.next(hitSet)) {
-    	if (_context->getObeySplits()) {
-    		RecordKeyVector keySet(hitSet.getKey());
-    		RecordKeyVector resultSet(hitSet.getKey());
-    		_blockMgr->findBlockedOverlaps(keySet, hitSet, resultSet);
-    		subtractHits(resultSet);
-    	} else {
-    		subtractHits(hitSet);
-    	}
-    }
-    if (!_context->hasGenomeFile()) {
-    	sweep.closeOut(true);
-    }
-    return true;
-}
-
-bool SubtractFile::processUnsortedFiles()
-{
-	BinTree *binTree = new BinTree( _context);
-	binTree->loadDB();
-
-	FileRecordMgr *queryFRM = _context->getFile(_context->getQueryFileIdx());
-
-
-	while (!queryFRM->eof()) {
-		Record *queryRecord = queryFRM->getNextRecord();
-		if (queryRecord == NULL) {
-			continue;
-		}
-		RecordKeyVector hitSet(queryRecord);
-		binTree->getHits(queryRecord, hitSet);
-    	if (_context->getObeySplits()) {
-    		RecordKeyVector keySet(hitSet.getKey());
-    		RecordKeyVector resultSet;
-    		_blockMgr->findBlockedOverlaps(keySet, hitSet, resultSet);
-    		subtractHits(resultSet);
-    	} else {
-    		subtractHits(hitSet);
-    	}
-		queryFRM->deleteRecord(queryRecord);
+	if (IntersectFile::findNext(hits)) {
+		subtractHits(hits);
+		return true;
 	}
-
-	//clean up.
-	delete binTree;
-	return true;
+	return false;
 }
 
+void SubtractFile::processHits(RecordOutputMgr *outputMgr, RecordKeyVector &hits)
+{
+	if (!_dontReport) {
+		IntersectFile::processHits(outputMgr, hits);
+	}
+	_dontReport = false;
+}
+
+void SubtractFile::cleanupHits(RecordKeyVector &hits)
+{
+	if (_deleteTmpBlocks) {
+	    _tmpBlocksMgr->deleteBlocks(hits);
+	    _deleteTmpBlocks = false;
+	}
+	IntersectFile::cleanupHits(hits);
+}
 
 void SubtractFile::subtractHits(RecordKeyVector &hits) {
 	if (hits.empty()) {
@@ -126,14 +48,13 @@ void SubtractFile::subtractHits(RecordKeyVector &hits) {
 		// self-intersection. This is just for reporting
 		// purposes.
 		hits.push_back(hits.getKey());
-		processHits(hits);
 		return;
 	}
 
-	if (_context->getRemoveAll() && _context->getSubtractFraction() == 0.0) {
+	if (upCast(_context)->getRemoveAll() && upCast(_context)->getSubtractFraction() == 0.0) {
 		// hits aren't empty, meaning there is intersection,
 		// so we want to not report the hit.
-		hits.clearAll();
+		_dontReport = true;
 		return;
 	}
 
@@ -163,7 +84,7 @@ void SubtractFile::subtractHits(RecordKeyVector &hits) {
 		float coveragePct = (float)coveredLen / (float)keyLen;
 		//for each base in the hit, set the base in the query to false.
 		//this effectively "erases" the covered bits. Only do
-		if (_context->getRemoveSum() || coveragePct >= _context->getSubtractFraction()) {
+		if (upCast(_context)->getRemoveSum() || coveragePct >= upCast(_context)->getSubtractFraction()) {
 			std::fill(keyBases.begin() + startIdx, keyBases.begin() + endIdx, false);
 			basesRemoved = true;
 		}
@@ -173,33 +94,31 @@ void SubtractFile::subtractHits(RecordKeyVector &hits) {
 		//treat as if there were no intersection
 		hits.clearVector();
 		hits.push_back(hits.getKey());
-		processHits(hits);
 		return;
-	} else if (_context->getRemoveAll()) {
-		hits.clearAll();
+	} else if (upCast(_context)->getRemoveAll()) {
+		_dontReport = true;
 		return;
 	}
 	// if the -N option is used ( removeSum), do not report if the percentage of
 	// uniquely covered bases exceeds the overlap fraction.
-	if (_context->getRemoveSum()) {
+	if (upCast(_context)->getRemoveSum()) {
 		//determine how many bases are left uncovered.
 		int numBasesUncovered = std::accumulate(keyBases.begin(), keyBases.end(), 0);
 		//determine percentage that are covered.
 		float pctCovered = 1.0 - (float)numBasesUncovered / (float)(keyEnd - keyStart);
-		if (pctCovered > _context->getSubtractFraction()) {
-			hits.clearAll();
+		if (pctCovered > upCast(_context)->getSubtractFraction()) {
+			_dontReport = true;
 			return;
 		} else {
 			hits.clearVector();
 			hits.push_back(hits.getKey());
 		}
-		processHits(hits);
 		return;
 	}
 
 	//now make "blocks" out of the query's remaining stretches of
 	//uncovered bases.
-	RecordKeyVector tempHits(keyRec);
+	hits.clearVector();
     for (int i = 0; i < (int)keyBases.size(); i++) {
         if (keyBases[i] == true) {
             int blockStart = keyStart + i;
@@ -207,10 +126,9 @@ void SubtractFile::subtractHits(RecordKeyVector &hits) {
                 i++;
             }
             int blockEnd = min(keyStart + i, keyEnd);
-            tempHits.push_back(_tmpBlocksMgr->allocateAndAssignRecord(keyRec, blockStart, blockEnd));
+            hits.push_back(_tmpBlocksMgr->allocateAndAssignRecord(keyRec, blockStart, blockEnd));
         }
     }
-    processHits(tempHits);
-    _tmpBlocksMgr->deleteBlocks(tempHits);
+    _deleteTmpBlocks = true;
 
 }

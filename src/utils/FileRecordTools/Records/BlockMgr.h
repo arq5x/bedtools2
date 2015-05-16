@@ -25,7 +25,6 @@ public:
 	BlockMgr(float overlapFraction = 1E-9, bool hasReciprocal = false);
 	~BlockMgr();
 
-	// Return value is the number of blocks this main record has been split into.
 	void getBlocks(RecordKeyVector &keyList, bool &mustDelete);
 	void deleteBlocks(RecordKeyVector &keyList);
 

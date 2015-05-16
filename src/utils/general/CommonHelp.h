@@ -8,9 +8,11 @@
 #ifndef COMMONHELPFILE_H_
 #define COMMONHELPFILE_H_
 
-using namespace std;
-
 #include <iostream>
+#include "version.h"
+#include <cstdlib> //for exit
+
+using namespace std;
 
 extern void CommonHelp();
 

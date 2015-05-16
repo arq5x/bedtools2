@@ -38,6 +38,7 @@ public:
 	QuickString &operator = (char);
 	QuickString &operator = (int);
 	QuickString &operator = (uint32_t);
+	QuickString &operator = (size_t);
 	QuickString &operator = (float);
 	QuickString &operator = (double);
 	QuickString &operator += (const QuickString &);
@@ -46,6 +47,7 @@ public:
 	QuickString &operator += (char);
 	QuickString &operator += (int);
 	QuickString &operator += (uint32_t);
+	QuickString &operator += (size_t);
 	QuickString &operator += (float);
 	QuickString &operator += (double);
 
@@ -71,6 +73,7 @@ public:
 	//for better performance.
 	void append(int num);
 	void append(uint32_t num);
+	void append(size_t num);
 	void append(float num);
 	void append(double num);
 

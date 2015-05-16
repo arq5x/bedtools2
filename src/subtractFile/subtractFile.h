@@ -9,40 +9,27 @@
 #define SUBTRACTFILE_H_
 
 
-#include "RecordKeyVector.h"
-#include "BlockMgr.h"
+#include "intersectFile.h"
+#include "ContextSubtract.h"
 
-using namespace std;
-
-class ContextSubtract;
-class BlockMgr;
-class RecordOutputMgr;
-class BlockMgr;
-
-class SubtractFile {
+class SubtractFile : public IntersectFile {
 
 public:
     SubtractFile(ContextSubtract *context);
-    ~SubtractFile(void);
+    virtual ~SubtractFile();
 
-    bool subtractFiles();
+	virtual bool findNext(RecordKeyVector &hits);
+	virtual void processHits(RecordOutputMgr *outputMgr, RecordKeyVector &hits);
+	virtual void cleanupHits(RecordKeyVector &hits);
 
-private:
-    ContextSubtract *_context;
-	Record *_queryRec;
-	Record *_databaseRec;
-	BlockMgr *_blockMgr;
-	RecordOutputMgr *_recordOutputMgr;
-
-	void processHits(RecordKeyVector &hits);
-	bool processSortedFiles();
-	bool processUnsortedFiles();
-
-	void subtractHits(RecordKeyVector &hits);
-
+protected:
 	BlockMgr *_tmpBlocksMgr;
-};
+	bool _deleteTmpBlocks;
+	bool _dontReport;
 
+	virtual ContextSubtract *upCast(ContextBase *context) { return static_cast<ContextSubtract *>(context); }
+	void subtractHits(RecordKeyVector &hits);
+};
 
 
 

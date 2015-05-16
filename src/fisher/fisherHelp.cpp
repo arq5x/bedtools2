@@ -1,31 +1,4 @@
-#include "Fisher.h"
-#include "version.h"
-
-using namespace std;
-
-#define PROGRAM_NAME "bedtools fisher"
-
-void fisher_help(void);
-
-int fisher_main(int argc, char* argv[]) {
-
-    ContextFisher *context = new ContextFisher();
-    if (!context->parseCmdArgs(argc, argv, 1) || context->getShowHelp() || !context->isValidState()) {
-    	if (!context->getErrorMsg().empty()) {
-    		cerr << context->getErrorMsg() << endl;
-    	}
-    	fisher_help();
-    	delete context;
-    	return 1;
-    }
-	Fisher *fisher = new Fisher(context);
-
-	bool retVal = fisher->calculate();
-	delete fisher;
-	delete context;
-	return retVal ? 0 : 1;
-}
-
+#include "CommonHelp.h"
 
 void fisher_help(void) {
 
@@ -34,7 +7,7 @@ void fisher_help(void) {
     cerr << "Summary: Calculate Fisher statistic b/w two feature files."
          << endl << endl;
 
-    cerr << "Usage:   " << PROGRAM_NAME << " [OPTIONS] -a <bed/gff/vcf> -b <bed/gff/vcf> -g <genome file>" << endl << endl;
+    cerr << "Usage:   " << "bedtools fisher" << " [OPTIONS] -a <bed/gff/vcf> -b <bed/gff/vcf> -g <genome file>" << endl << endl;
 
     cerr << "Options: " << endl;
 
@@ -60,6 +33,9 @@ void fisher_help(void) {
     cerr << "\t\t"             << "Follow with + or - to force merge from only" << endl;
     cerr << "\t\t"			   << "the forward or reverse strand, respectively." << endl;
     cerr << "\t\t"			   << "- By default, merging is done without respect to strand." << endl << endl;
+
+    cerr << "\t-nonamecheck\t"       << "For sorted data, don't throw an error if the file has different naming conventions" << endl;
+    cerr							<< "\t\t\tfor the same chromosome. ex. \"chr1\" vs \"chr01\"." << endl << endl;
 
     cerr << "Notes: " << endl;
     cerr << "\t(1) Input files must be sorted by chrom, then start position."
