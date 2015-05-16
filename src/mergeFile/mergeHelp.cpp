@@ -34,16 +34,12 @@ void merge_help(void) {
     cerr << "\t-d\t"           << "Maximum distance between features allowed for features" << endl;    cerr                       << "\t\tto be merged." << endl;    cerr                       << "\t\t- Def. 0. That is, overlapping & book-ended features are merged." << endl;
     cerr                       << "\t\t- (INTEGER)" << endl;
     cerr                       << "\t\t- Note: negative values enforce the number of b.p. required for overlap." << endl << endl;
-    cerr << "\t-header\t"      << "Print the header from the A file prior to results." << endl << endl;
 
-    cerr << "\t-c\t"             << "Specify columns from the input file to operate upon (see -o option, below)." << endl;
-    cerr						<<  "\t\tMultiple columns can be specified in a comma-delimited list." << endl << endl;
-
-    cerr << "\t-prec\t"   		<< "Sets the decimal precision for output (Default: 5)" << endl << endl;
 
     KeyListOpsHelp();
+    allToolsCommonHelp();
+
     cerr << "Notes: " << endl;
- 
     cerr << "\t(1) The input file (-i) file must be sorted by chrom, then start." << endl << endl;
 
     // end the program here

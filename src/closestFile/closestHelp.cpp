@@ -17,13 +17,6 @@ void closest_help(void) {
     cerr << "Usage:   " << "bedtools closest" << " [OPTIONS] -a <bed/gff/vcf> -b <bed/gff/vcf>" << endl << endl;
 
     cerr << "Options: " << endl;
-    cerr << "\t-s\t"            << "Req. same strandedness.  That is, find the closest feature in" << endl;
-    cerr                        << "\t\tB that overlaps A on the _same_ strand." << endl;
-    cerr                        << "\t\t- By default, overlaps are reported without respect to strand." << endl << endl;
-
-    cerr << "\t-S\t"            << "Req. opposite strandedness.  That is, find the closest feature" << endl;
-    cerr                        << "\t\tin B that overlaps A on the _opposite_ strand." << endl;
-    cerr                        << "\t\t- By default, overlaps are reported without respect to strand." << endl << endl;
 
     cerr << "\t-d\t"            << "In addition to the closest feature in B, " << endl;
     cerr                        << "\t\treport its distance to A as an extra column." << endl;
@@ -73,23 +66,14 @@ void closest_help(void) {
     cerr                        << "\t\t- \"each\"    Report closest records for each database (default)." << endl;
     cerr                        << "\t\t- \"all\"  Report closest records among all databases." << endl << endl;
 
-	cerr << "\t-names\t" 		<< "When using multiple databases (-b), provide an alias for each that" << endl;
-	cerr 						<<"\t\twill appear instead of a fileId when also printing the DB record." << endl << endl;
-
-	cerr << "\t-filenames" 		<< "\tWhen using multiple databases (-b), show each complete filename" << endl;
-	cerr 						<<"\t\t\tinstead of a fileId when also printing the DB record." << endl << endl;
-
     cerr << "\t-k\t"            << "Report the k closest hits. Default is 1. If tieMode = \"all\", " << endl;
     cerr                        << "\t\t- all ties will still be reported." << endl << endl;
 
     cerr << "\t-N\t"            << "Require that the query and the closest hit have different names." << endl;
     cerr                        << "\t\tFor BED, the 4th column is compared." << endl << endl;
 
-    cerr << "\t-header\t"       << "Print the header from the A file prior to results." << endl << endl;
-
-    cerr << "\t-nonamecheck\t"       << "For sorted data, don't throw an error if the file has different naming conventions" << endl;
-    cerr							<< "\t\t\tfor the same chromosome. ex. \"chr1\" vs \"chr01\"." << endl << endl;
-
+    IntersectCommonHelp();
+    allToolsCommonHelp();
 
     cerr << "Notes: " << endl;
     cerr << "\tReports \"none\" for chrom and \"-1\" for all other fields when a feature" << endl;

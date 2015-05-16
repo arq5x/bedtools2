@@ -35,6 +35,9 @@ void spacing_help(void) {
     cerr << "\tchr1    35  45  5 " << endl;
     cerr << "\tchr1    100 200 55 " << endl << endl;
 
+    allToolsCommonHelp();
+
+
     // end the program here
     exit(1);
 }
