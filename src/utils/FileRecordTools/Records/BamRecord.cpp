@@ -271,3 +271,23 @@ void BamRecord::buildCigarStr() {
 	}
 }
 
+
+int BamRecord::getLength(bool obeySplits) const {
+	//only bed12 and BAM need to check splits
+	if (!obeySplits) {
+		return _endPos - _startPos;
+	} else {
+		int length = 0;
+    	//parse the Cigar Data.
+		const vector<BamTools::CigarOp> &cigarData = _bamAlignment.CigarData;
+	    for (int i=0; i < (int)cigarData.size(); i++) {
+	    	char op = cigarData[i].Type;
+	    	if (op == 'M' || op == 'N' || op == 'I') {
+	    		length += (int)cigarData[i].Length;
+	    	}
+	    }
+	    return length;
+	}
+}
+
+

@@ -261,7 +261,7 @@ bool NewChromSweep::nextRecord(bool query, int dbIdx) {
 	if (query) {
 		_currQueryRec = _queryFRM->getNextRecord();
 		if (_currQueryRec != NULL) {
-			_queryRecordsTotalLength += (unsigned long)(_currQueryRec->getEndPos() - _currQueryRec->getStartPos());
+			_queryRecordsTotalLength += (unsigned long)(_currQueryRec->getLength(_context->getObeySplits()));
             _queryTotalRecords++;
 			return true;
 		}
@@ -270,7 +270,7 @@ bool NewChromSweep::nextRecord(bool query, int dbIdx) {
 		Record *rec = _dbFRMs[dbIdx]->getNextRecord();
 		_currDbRecs[dbIdx] = rec;
 		if (rec != NULL) {
-			_databaseRecordsTotalLength += (unsigned long)(rec->getEndPos() - rec->getStartPos());
+			_databaseRecordsTotalLength += (unsigned long)(rec->getLength(_context->getObeySplits()));
 			_databaseTotalRecords++;
 			return true;
 		}

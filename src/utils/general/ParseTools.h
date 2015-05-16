@@ -37,11 +37,6 @@ int str2chrPos(const QuickString &str);
 template<class T>
 void int2str(int number, T& buffer, bool appendToBuf = false)
 {
-	int maxVal = (1 << 31) -1;
-	if (((int)(abs(number))) > maxVal) {
-		fprintf(stderr, "ERROR: number out of bounds.\n");
-		exit(1);
-	}
 	register int useNum = number;
 	if (useNum == 0) {
 		if (appendToBuf) {

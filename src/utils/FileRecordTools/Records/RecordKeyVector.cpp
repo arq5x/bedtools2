@@ -84,10 +84,12 @@ void RecordKeyVector::setKey(elemType key) {
 }
 
 void RecordKeyVector::setVector(vecType *vec) {
+	_currPos = 0;
 	_recVec = vec;
 }
 
 void RecordKeyVector::clearVector() {
+	_currPos = 0;
 	_recVec->clear();
 }
 

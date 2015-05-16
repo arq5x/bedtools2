@@ -13,6 +13,7 @@ ContextCoverage::ContextCoverage()
   _showHist(false),
   _coverageType(DEFAULT)
 {
+	setExplicitBedOutput(true); //do not allow BAM output
 
 }
 
