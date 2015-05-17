@@ -148,7 +148,7 @@ std::FILE* BedSplit::saveFileChunk(std::string& filename,size_t file_index)
     
     char tmp[10];
     filename.assign(this->outfileprefix);
-    sprintf(tmp,"%05lu",(file_index+1));
+    sprintf(tmp,"%05zu",(file_index+1));
     filename.append(".").append(tmp).append(".bed");
     FILE* out = fopen(filename.c_str(),"w");
     if(out==NULL)
