@@ -14,8 +14,6 @@
 
 using namespace std;
 
-using namespace std;
-
 extern void CommonHelp();
 
 
