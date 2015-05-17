@@ -34,7 +34,7 @@ public:
     NewChromSweep(ContextIntersect *context);
     
     
-    ~NewChromSweep(void);
+    virtual ~NewChromSweep(void);
     virtual bool init();
     
     typedef RecordList recListType;

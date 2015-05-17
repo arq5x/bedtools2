@@ -19,9 +19,9 @@ public:
 	VcfRecord() {}
 	virtual bool initFromFile(SingleLineDelimTextFileReader *);
 	virtual void clear();
-	virtual void print(QuickString &outBuf) const;
-	virtual void print(QuickString &outBuf, int start, int end) const;
-	virtual void print(QuickString &outBuf, const QuickString & start, const QuickString & end) const;
+	void print(QuickString &outBuf) const;
+	void print(QuickString &outBuf, int start, int end) const;
+	void print(QuickString &outBuf, const QuickString & start, const QuickString & end) const;
 	virtual void printNull(QuickString &outBuf) const;
 	virtual FileRecordTypeChecker::RECORD_TYPE getType() const { return FileRecordTypeChecker::VCF_RECORD_TYPE; }
 
@@ -34,6 +34,7 @@ public:
 protected:
 	QuickString _varRef;
 	QuickString _varAlt;
+	static const int constPrintStartIdx = 3;
 	void printOtherFields(QuickString &outBuf) const;
 };
 

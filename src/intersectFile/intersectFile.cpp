@@ -13,95 +13,110 @@
 #include "intersectFile.h"
 #include "ContextIntersect.h"
 #include "FileRecordMgr.h"
-#include "NewChromsweep.h"
 #include "BinTree.h"
 #include "RecordOutputMgr.h"
 
 
-FileIntersect::FileIntersect(ContextIntersect *context)
-: _context(context),
-  _blockMgr(NULL),
-  _recordOutputMgr(NULL)
+IntersectFile::IntersectFile(ContextIntersect *context)
+: ToolBase(upCast(context)),
+  _sweep(NULL),
+  _binTree(NULL),
+  _queryFRM(NULL)
 {
-	_recordOutputMgr = new RecordOutputMgr();
-	_recordOutputMgr->init(_context);
-	if (_context->getObeySplits()) {
-		_blockMgr = new BlockMgr(_context->getOverlapFraction(), _context->getReciprocal());
-		_recordOutputMgr->setSplitInfo(_blockMgr);
-	}
+
 }
 
-FileIntersect::~FileIntersect(void) {
-	delete _blockMgr;
-	_blockMgr = NULL;
-	delete _recordOutputMgr;
+IntersectFile::~IntersectFile(void) {
+	delete _sweep;
+	_sweep = NULL;
+
+	delete _binTree;
+	_binTree = NULL;
 }
 
-void FileIntersect::processHits(RecordKeyVector &hits) {
-    _recordOutputMgr->printRecord(hits);
-}
+bool IntersectFile::init() {
 
-bool FileIntersect::intersectFiles()
-{
-	 if (_context->getSortedInput()) {
-		 return processSortedFiles();
+	_queryFRM = upCast(_context)->getFile(upCast(_context)->getQueryFileIdx());
+
+	 if (upCast(_context)->getSortedInput()) {
+		 makeSweep();
+		return _sweep->init();
+	 } else {
+		_binTree = new BinTree( upCast(_context));
+		_binTree->loadDB();
 	 }
-	 return processUnsortedFiles();
+
+	 return true;
 }
 
-bool FileIntersect::processSortedFiles()
+bool IntersectFile::findNext(RecordKeyVector &hits)
 {
-    // use the chromsweep algorithm to detect overlaps on the fly.
-    NewChromSweep sweep(_context);
+	bool retVal = false;
+	 if (upCast(_context)->getSortedInput()) {
+		retVal = nextSortedFind(hits);
+	 } else {
+		retVal = nextUnsortedFind(hits);
+	 }
+	 if (retVal) {
+		 checkSplits(hits);
+	 }
+	 return retVal;
+}
 
-    if (!sweep.init()) {
-    	return false;
-    }
+void IntersectFile::processHits(RecordOutputMgr *outputMgr, RecordKeyVector &hits)
+{
+	outputMgr->printRecord(hits);
+}
 
-    RecordKeyVector hitSet;
-    while (sweep.next(hitSet)) {
-    	if (_context->getObeySplits()) {
-    		RecordKeyVector keySet(hitSet.getKey());
-    		RecordKeyVector resultSet(hitSet.getKey());
-    		_blockMgr->findBlockedOverlaps(keySet, hitSet, resultSet);
-    		processHits(resultSet);
-    	} else {
-    		processHits(hitSet);
-    	}
-    }
-    if (!_context->hasGenomeFile()) {
-    	sweep.closeOut(true);
+void IntersectFile::cleanupHits(RecordKeyVector &hits)
+{
+	_queryFRM->deleteRecord(hits.getKey());
+	hits.clearAll();
+}
+
+bool IntersectFile::finalizeCalculations()
+{
+    if (upCast(_context)->getSortedInput() && !upCast(_context)->hasGenomeFile()) {
+    	_sweep->closeOut(true);
     }
     return true;
 }
 
-bool FileIntersect::processUnsortedFiles()
+bool IntersectFile::nextSortedFind(RecordKeyVector &hits)
 {
-	BinTree *binTree = new BinTree( _context);
-	binTree->loadDB();
+    if (!_sweep->next(hits)) {
+    	return false;
+    }
+    return true;
+}
 
-	FileRecordMgr *queryFRM = _context->getFile(_context->getQueryFileIdx());
+bool IntersectFile::nextUnsortedFind(RecordKeyVector &hits)
+{
 
-
-	while (!queryFRM->eof()) {
-		Record *queryRecord = queryFRM->getNextRecord();
+	while (!_queryFRM->eof()) {
+		Record *queryRecord = _queryFRM->getNextRecord();
 		if (queryRecord == NULL) {
 			continue;
+		} else {
+			_context->testNameConventions(queryRecord);
+			hits.setKey(queryRecord);
+			 _binTree->getHits(queryRecord, hits);
+			return true;
 		}
-		RecordKeyVector hitSet(queryRecord);
-		binTree->getHits(queryRecord, hitSet);
-    	if (_context->getObeySplits()) {
-    		RecordKeyVector keySet(hitSet.getKey());
-    		RecordKeyVector resultSet;
-    		_blockMgr->findBlockedOverlaps(keySet, hitSet, resultSet);
-    		processHits(resultSet);
-    	} else {
-    		processHits(hitSet);
-    	}
-		queryFRM->deleteRecord(queryRecord);
 	}
+	return false;
+}
 
-	//clean up.
-	delete binTree;
-	return true;
+void IntersectFile::makeSweep() {
+	_sweep = new NewChromSweep(upCast(_context));
+}
+
+void IntersectFile::checkSplits(RecordKeyVector &hitSet)
+{
+	if (upCast(_context)->getObeySplits()) {
+		RecordKeyVector keySet(hitSet.getKey());
+		RecordKeyVector resultSet(hitSet.getKey());
+		upCast(_context)->getSplitBlockInfo()->findBlockedOverlaps(keySet, hitSet, resultSet);
+		hitSet.swap(resultSet);
+	}
 }

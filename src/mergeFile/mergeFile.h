@@ -1,37 +1,42 @@
-/*****************************************************************************
-  mergeFile.h
+/*
+ * mergeFile.h
+ *
+ *  Created on: Apr 22, 2015
+ *      Author: nek3d
+ */
 
-  (c) 2009 - Aaron Quinlan
-  Hall Laboratory
-  Department of Biochemistry and Molecular Genetics
-  University of Virginia
-  aaronquinlan@gmail.com
+#ifndef MERGEFILE_H_
+#define MERGEFILE_H_
 
-  Licenced under the GNU General Public License 2.0 license.
-******************************************************************************/
-
-#ifndef MERGE_FILE_H_
-#define MERGE_FILE_H_
-
-//************************************************
-// Class methods and elements
-//************************************************
-
+#include "ToolBase.h"
 #include "ContextMerge.h"
-#include "RecordOutputMgr.h"
 
-class MergeFile {
+
+class BlockMgr;
+class BinTree;
+
+class MergeFile : public ToolBase {
 
 public:
-  MergeFile(ContextMerge *context);
-  ~MergeFile();
+    MergeFile(ContextMerge *context);
+    virtual ~MergeFile();
+	virtual bool init();
+	virtual bool findNext(RecordKeyVector &hits);
+	virtual void processHits(RecordOutputMgr *outputMgr, RecordKeyVector &hits);
+	virtual void cleanupHits(RecordKeyVector &hits);
+	virtual bool finalizeCalculations() { return true; }
+	virtual void  giveFinalReport(RecordOutputMgr *outputMgr) {}
 
-  bool merge();
 
-private:
-  ContextMerge *_context;
-  RecordOutputMgr *_recordOutputMgr;
-    
+protected:
+	FileRecordMergeMgr *_frm;
+
+	virtual ContextMerge *upCast(ContextBase *context) { return static_cast<ContextMerge *>(context); }
+
+
 };
 
-#endif
+
+
+
+#endif /* MERGEFILE_H_ */

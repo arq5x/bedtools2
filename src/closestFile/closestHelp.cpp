@@ -1,38 +1,11 @@
 /*
- * newClosestMain.cpp
+ * closestHelp.cpp
  *
- *  Created on: Sep 25, 2014
+ *  Created on: Apr 22, 2015
  *      Author: nek3d
  */
 
-#include "ContextClosest.h"
-#include "closestFile.h"
-
-using namespace std;
-
-// define our program name
-#define PROGRAM_NAME "bedtools closest"
-
-void closest_help(void);
-
-int closest_main(int argc, char* argv[]) {
-
-    ContextClosest *context = new ContextClosest();
-    if (!context->parseCmdArgs(argc, argv, 1) || context->getShowHelp() || !context->isValidState()) {
-        if (!context->getErrorMsg().empty()) {
-            cerr << context->getErrorMsg() << endl;
-        }
-        closest_help();
-        delete context;
-        return 1;
-    }
-    ClosestFile *closestFile = new ClosestFile(context);
-
-    bool retVal = closestFile->getClosest();
-    delete closestFile;
-    delete context;
-    return retVal ? 0 : 1;
-}
+#include "CommonHelp.h"
 
 void closest_help(void) {
 
@@ -41,7 +14,7 @@ void closest_help(void) {
     cerr << "Summary: For each feature in A, finds the closest " << endl;
     cerr << "\t feature (upstream or downstream) in B." << endl << endl;
 
-    cerr << "Usage:   " << PROGRAM_NAME << " [OPTIONS] -a <bed/gff/vcf> -b <bed/gff/vcf>" << endl << endl;
+    cerr << "Usage:   " << "bedtools closest" << " [OPTIONS] -a <bed/gff/vcf> -b <bed/gff/vcf>" << endl << endl;
 
     cerr << "Options: " << endl;
     cerr << "\t-s\t"            << "Req. same strandedness.  That is, find the closest feature in" << endl;
@@ -116,7 +89,6 @@ void closest_help(void) {
 
     cerr << "\t-nonamecheck\t"       << "For sorted data, don't throw an error if the file has different naming conventions" << endl;
     cerr							<< "\t\t\tfor the same chromosome. ex. \"chr1\" vs \"chr01\"." << endl << endl;
-
 
 
     cerr << "Notes: " << endl;

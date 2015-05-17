@@ -8,12 +8,12 @@
 #ifndef BEDPLUSINTERVAL_H_
 #define BEDPLUSINTERVAL_H_
 
-#include "Bed6Interval.h"
+#include "Bed3Interval.h"
 #include <vector>
 
 class SingleLineDelimTextFileReader;
 
-class BedPlusInterval : public Bed6Interval {
+class BedPlusInterval : public Bed3Interval {
 public:
 	friend class FreeList<BedPlusInterval>;
 
@@ -42,13 +42,13 @@ public:
 
 
 protected:
+	vector<QuickString *> _otherIdxs;
+	static const int startOtherIdx = 3; //first six fields have names, and are not stored in otherIdxs.
+	int _numPrintFields;
+
 	virtual ~BedPlusInterval();
 	bool initOtherFieldsFromFile(SingleLineDelimTextFileReader *fileReader);
-
-
-	vector<QuickString *> _otherIdxs;
-	static const int startOtherIdx = 6; //first six fields have names, and are not stored in otherIdxs.
-	int _numPrintFields;
+	virtual void printOtherFields(QuickString &outBuf) const;
 };
 
 

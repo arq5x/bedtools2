@@ -21,14 +21,17 @@ SUBDIRS = ./FileReaders \
 # ----------------------------------
 # define our source and object files
 # ----------------------------------
-SOURCES= FileRecordMgr.cpp FileRecordMgr.h FileRecordMergeMgr.cpp FileRecordMergeMgr.h 
+SOURCES= FileRecordMgr.cpp FileRecordMgr.h FileRecordMergeMgr.cpp FileRecordMergeMgr.h
 OBJECTS= FileRecordMgr.o FileRecordMergeMgr.o
 _EXT_OBJECTS=SingleLineDelimTextFileReader.o BamFileReader.o Bed3Interval.o Bed6Interval.o BedPlusInterval.o Bed12Interval.o BamRecord.o \
 	SingleLineDelimTransferBuffer.o FileRecordTypeChecker.o QuickString.o ParseTools.o RecordKeyList.o BufferedStreamMgr.o
 EXT_OBJECTS=$(patsubst %,$(OBJ_DIR)/%,$(_EXT_OBJECTS))
 BUILT_OBJECTS= $(patsubst %,$(OBJ_DIR)/%,$(OBJECTS))
 
-$(BUILT_OBJECTS): $(SOURCES) $(SUBDIRS)
+all: $(BUILT_OBJECTS) $(SUBDIRS)
+.PHONY: all
+
+$(BUILT_OBJECTS): $(SOURCES)
 	@echo "  * compiling FileRecordMgr.cpp"
 	@$(CXX) -c -o $(OBJ_DIR)/FileRecordMgr.o FileRecordMgr.cpp $(LDFLAGS) $(CXXFLAGS) $(INCLUDES)
 	@echo "  * compiling FileRecordMergeMgr.cpp"

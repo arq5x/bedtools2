@@ -9,39 +9,9 @@
 
   Licenced under the GNU General Public License 2.0 license.
 ******************************************************************************/
-#include "mergeFile.h"
-#include "version.h"
+#include "CommonHelp.h"
+#include "KeyListOps.h"
 
-using namespace std;
-
-// define our program name
-#define PROGRAM_NAME "bedtools merge"
-
-
-// define our parameter checking macro
-#define PARAMETER_CHECK(param, paramLen, actualLen) (strncmp(argv[i], param, min(actualLen, paramLen))== 0) && (actualLen == paramLen)
-
-// function declarations
-void merge_help(void);
-
-int merge_main(int argc, char* argv[]) {
-
-    ContextMerge *context = new ContextMerge();
-    if (!context->parseCmdArgs(argc, argv, 1) || context->getShowHelp() || !context->isValidState()) {
-        if (!context->getErrorMsg().empty()) {
-            cerr << context->getErrorMsg() << endl;
-        }
-        merge_help();
-        delete context;
-        return 1;
-    }
-    MergeFile *mergeFile = new MergeFile(context);
-
-    bool retVal = mergeFile->merge();
-    delete mergeFile;
-    delete context;
-    return retVal ? 0 : 1;
-}
 
 void merge_help(void) {
     
@@ -49,7 +19,7 @@ void merge_help(void) {
     cerr << "Version: " << VERSION << "\n";        
     cerr << "Summary: Merges overlapping BED/GFF/VCF entries into a single interval." << endl << endl;
 
-    cerr << "Usage:   " << PROGRAM_NAME << " [OPTIONS] -i <bed/gff/vcf>" << endl << endl;
+    cerr << "Usage:   " << "bedtools merge" << " [OPTIONS] -i <bed/gff/vcf>" << endl << endl;
 
     cerr << "Options: " << endl;
     cerr << "\t-s\t"           << "Force strandedness.  That is, only merge features" << endl;

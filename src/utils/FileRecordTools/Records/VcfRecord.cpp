@@ -70,7 +70,7 @@ void VcfRecord::print(QuickString &outBuf, const QuickString & start, const Quic
 }
 
 void VcfRecord::printNull(QuickString &outBuf) const {
-	outBuf.append(".\t-1\t.\t.\t.\t-1");
+	outBuf.append(".\t-1\t.");
 	for (int i= startOtherIdx; i < _numPrintFields; i++) {
 		outBuf.append("\t.");
 	}
@@ -85,7 +85,7 @@ void VcfRecord::printOtherFields(QuickString &outBuf) const {
 	outBuf.append(_varAlt);
 	outBuf.append('\t');
 	outBuf.append(_score);
-	for (int i= 0; i < (int)_otherIdxs.size(); i++) {
+	for (int i= constPrintStartIdx; i < (int)_otherIdxs.size(); i++) {
 		outBuf.append('\t');
 		outBuf.append(*(_otherIdxs[i]));
 	}

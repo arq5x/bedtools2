@@ -105,6 +105,12 @@ QuickString &QuickString::operator = (uint32_t val) {
 	return *this;
 }
 
+QuickString &QuickString::operator = (size_t val) {
+	clear();
+	append(val);
+	return *this;
+}
+
 QuickString &QuickString::operator = (float val) {
 	clear();
 	append(val);
@@ -152,6 +158,10 @@ QuickString &QuickString::operator += (uint32_t num) {
 	return *this;
 }
 
+QuickString &QuickString::operator += (size_t num) {
+	append(num);
+	return *this;
+}
 QuickString &QuickString::operator += (float num) {
 	append(num);
 	return *this;
@@ -251,6 +261,10 @@ void QuickString::append(int num) {
 }
 
 void QuickString::append(uint32_t num) {
+	int2str((int)num, *this, true);
+}
+
+void QuickString::append(size_t num) {
 	int2str((int)num, *this, true);
 }
 

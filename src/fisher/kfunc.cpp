@@ -1,10 +1,10 @@
-#include <cmath>
-#include <stdlib.h>
-
 /* Log gamma function
  * \log{\Gamma(z)}
  * AS245, 2nd algorithm, http://lib.stat.cmu.edu/apstat/245
  */
+
+#include "kfunc.h"
+
 double kf_lgamma(double z)
 {
 	double x = 0;
@@ -69,7 +69,7 @@ double kf_erfc(double x)
 #define KF_TINY 1e-290
 
 // regularized lower incomplete gamma function, by series expansion
-static double _kf_gammap(double s, double z)
+ double _kf_gammap(double s, double z)
 {
 	double sum, x;
 	long long k;
@@ -80,7 +80,7 @@ static double _kf_gammap(double s, double z)
 	return exp(s * log(z) - z - kf_lgamma(s + 1.) + log(sum));
 }
 // regularized upper incomplete gamma function, by continued fraction
-static double _kf_gammaq(double s, double z)
+ double _kf_gammaq(double s, double z)
 {
 	long long j;
 	double C, D, f;
@@ -118,7 +118,7 @@ double kf_gammaq(double s, double z)
  *
  *   http://www.danielsoper.com/statcalc/calc36.aspx
  */
-static double kf_betai_aux(double a, double b, double x)
+ double kf_betai_aux(double a, double b, double x)
 {
 	double C, D, f;
 	long long j;
@@ -163,7 +163,7 @@ long long main(long long argc, char *argv[])
 
 
 // log\binom{n}{k}
-static double lbinom(long long n, long long k)
+ double lbinom(long long n, long long k)
 {
     if (k == 0 || n == k) return 0;
     return lgamma(n+1) - lgamma(k+1) - lgamma(n-k+1);
@@ -175,18 +175,14 @@ static double lbinom(long long n, long long k)
 // n_1  n_2  | n
 
 // hypergeometric distribution
-static double hypergeo(long long n11, long long n1_, long long n_1, long long n)
+ double hypergeo(long long n11, long long n1_, long long n_1, long long n)
 {
     return exp(lbinom(n1_, n11) + lbinom(n-n1_, n_1-n11) - lbinom(n, n_1));
 }
 
-typedef struct {
-    long long n11, n1_, n_1, n;
-    double p;
-} hgacc_t;
 
 // incremental version of hypergenometric distribution
-static double hypergeo_acc(long long n11, long long n1_, long long n_1, long long n, hgacc_t *aux)
+ double hypergeo_acc(long long n11, long long n1_, long long n_1, long long n, hgacc_t *aux)
 {
     if (n1_ || n_1 || n) {
         aux->n11 = n11; aux->n1_ = n1_; aux->n_1 = n_1; aux->n = n;

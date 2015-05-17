@@ -29,14 +29,6 @@ ContextMerge::~ContextMerge()
 
 bool ContextMerge::parseCmdArgs(int argc, char **argv, int skipFirstArgs)
 {
-	_argc = argc;
-	_argv = argv;
-	_skipFirstArgs = skipFirstArgs;
-
-	setProgram(_programNames[argv[0]]);
-
-	_argsProcessed.resize(_argc - _skipFirstArgs, false);
-
 	for (_i=_skipFirstArgs; _i < argc; _i++) {
 		if (isUsed(_i - _skipFirstArgs)) {
 			continue;

@@ -27,11 +27,9 @@ public:
 	void printRecord(const Record *record);
 	void printRecord(RecordKeyVector &keyList);
 	void printRecord(const Record *record, const QuickString & value);
+	void checkForHeader();
 
 	void printClosest(RecordKeyVector &keyList, const vector<int> *dists = NULL);
-
-	//where necessary, pass additional information about splits through the blockMgr.
-	void setSplitInfo(const BlockMgr *blockMgr) { _splitInfo = blockMgr; }
 
 private:
 	typedef enum { NOT_BAM, BAM_AS_BAM, BAM_AS_BED} printBamType;
@@ -43,11 +41,11 @@ private:
 
 	QuickString _outBuf;
 
-	//
 	BlockMgr *_bamBlockMgr;
-	const BlockMgr *_splitInfo;
 	QuickString _afterVal; //to store values to be printed after record, such as column operations.
 	//some helper functions to neaten the code.
+	int _numOverlapBases;
+
 	void tab() { _outBuf.append('\t'); }
 	void newline() { _outBuf.append('\n'); }
 	void null(bool queryType, bool dbType);
@@ -58,7 +56,6 @@ private:
 	void addDbFileId(int fileId);
 	bool printKeyAndTerminate(RecordKeyVector &keyList);
 	printBamType printBamRecord(RecordKeyVector &keyList, bool bamOutputOnly = false);
-	void checkForHeader();
 	void reportOverlapDetail(const Record *keyRecord, const Record *hitRecord, int hitIdx = 0);
 	void reportOverlapSummary(RecordKeyVector &keyList);
 

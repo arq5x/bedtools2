@@ -1,6 +1,7 @@
 UTILITIES_DIR = ../utils/
 OBJ_DIR = ../../obj/
 BIN_DIR = ../../bin/
+TOOL_DIR = ../../src/
 
 # -------------------
 # define our includes
@@ -21,13 +22,15 @@ INCLUDES = -I$(UTILITIES_DIR)/Contexts/ \
            -I$(UTILITIES_DIR)/RecordOutputMgr/ \
            -I$(UTILITIES_DIR)/NewChromsweep \
            -I$(UTILITIES_DIR)/BinTree \
-           -I$(UTILITIES_DIR)/version/
+           -I$(UTILITIES_DIR)/version/ \
+           -I$(UTILITIES_DIR)/ToolBase/ \
+           -I$(TOOL_DIR)/intersectFile/
 
 # ----------------------------------
 # define our source and object files
 # ----------------------------------
-SOURCES= subtractMain.cpp subtractFile.cpp subtractFile.h
-OBJECTS= subtractMain.o subtractFile.o
+SOURCES= subtractHelp.cpp subtractFile.cpp subtractFile.h
+OBJECTS= subtractHelp.o subtractFile.o
 BUILT_OBJECTS= $(patsubst %,$(OBJ_DIR)/%,$(OBJECTS))
 PROGRAM= subtractFile
 
@@ -41,6 +44,6 @@ $(BUILT_OBJECTS): $(SOURCES)
 	
 clean:
 	@echo "Cleaning up."
-	@rm -f $(OBJ_DIR)/subtractMain.o $(OBJ_DIR)/subtractFile.o
+	@rm -f $(OBJ_DIR)/subtractHelp.o $(OBJ_DIR)/subtractFile.o
 
 .PHONY: clean

@@ -184,13 +184,13 @@ bool FileRecordTypeChecker::handleTextFormat(const char *buffer, size_t len)
 					_fourthFieldNumeric = false;
 					_recordType = BED4_RECORD_TYPE;
 				}
-			} else if (_numFields == 5) {
+			} else if (_numFields == 5 && passesBed5()) {
 				_recordType = BED5_RECORD_TYPE;
-			} else if (_numFields == 6) {
+			} else if (_numFields == 6 && passesBed6()) {
 				_recordType = BED6_RECORD_TYPE;
-			} else if (_numFields == 12) {
+			} else if (_numFields == 12 && passesBed12()) {
 				_recordType = BED12_RECORD_TYPE;
-			} else if (_numFields >6) {
+			} else if (_numFields >3) {
 				_recordType = BED_PLUS_RECORD_TYPE;
 			}
 			return true;
@@ -391,4 +391,23 @@ void FileRecordTypeChecker::setBam()
 	_recordType = BAM_RECORD_TYPE;
 	_isBinary = true;
 	_isBAM = true;
+}
+
+bool FileRecordTypeChecker::passesBed5() {
+	return _isBed && _numFields == 5 && isNumeric(_tokenizer.getElem(4));
+}
+
+bool FileRecordTypeChecker::passesBed6() {
+	return (_isBed && _numFields == 6 && isStrandField(5));
+}
+
+bool FileRecordTypeChecker::passesBed12() {
+
+	return (isStrandField(5) && isNumeric(_tokenizer.getElem(6)) &&
+			isNumeric(_tokenizer.getElem(7)) && isNumeric(_tokenizer.getElem(9)));
+}
+
+bool FileRecordTypeChecker::isStrandField(int field) {
+	const QuickString &strandChar = _tokenizer.getElem(field);
+	return (strandChar == "+" || strandChar == "-" || strandChar == ".");
 }

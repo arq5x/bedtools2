@@ -1,26 +1,15 @@
-/*
- * SampleFile.cpp
- *
- *  Created on: Nov 18, 2013
- *      Author: nek3d
- */
-
-#include "SampleFile.h"
-#include "ContextSample.h"
-#include "FileRecordMgr.h"
-#include "RecordOutputMgr.h"
+#include "sampleFile.h"
 
 static const bool SampleRecordLtFn(const Record *rec1, const Record *rec2) {
 	return (*rec1 < *rec2);
 }
 
 SampleFile::SampleFile(ContextSample *context)
-:	_context(context),
-	_inputFile(NULL),
-	_outputMgr(NULL),
-	_numSamples(0),
-	_numCurrSamples(0),
-	_currRecordNum(0)
+: ToolBase(context),
+_inputFile(NULL),
+_numSamples(0),
+_numCurrSamples(0),
+_currRecordNum(0)
 {
 	_numSamples = context->getNumOutputRecords();
 	if (_numSamples == 0) {
@@ -28,12 +17,14 @@ SampleFile::SampleFile(ContextSample *context)
 	}
 }
 
-SampleFile::~SampleFile() {
+
+SampleFile::~SampleFile()
+{
 
 }
 
-bool SampleFile::takeSample()
-{
+ bool SampleFile::init()
+ {
 	//we're only operating on one file, so the idx is zero.
 	_inputFile =  _context->getFile(0);
 	_samples.resize(_numSamples, NULL);
@@ -45,22 +36,27 @@ bool SampleFile::takeSample()
 	if (!_context->hasConstantSeed()) {
 		_context->getUnspecifiedSeed();
 	}
+	return true;
+ }
 
-	_outputMgr = new RecordOutputMgr();
-	_outputMgr->init(_context);
 
-
+ bool SampleFile::findNext(RecordKeyVector &hits) {
 	while (!_inputFile->eof()) {
 		Record *record = _inputFile->getNextRecord();
 		if (record == NULL) {
 			continue;
+		} else {
+			_currRecordNum++;
+			if (!keepRecord(record)) {
+				_inputFile->deleteRecord(record);
+			}
+			return true;
 		}
-		if (!keepRecord(record)) {
-			_inputFile->deleteRecord(record);
-		}
-		_currRecordNum++;
 	}
+	return false;
+}
 
+void  SampleFile::giveFinalReport(RecordOutputMgr *outputMgr) {
 	if (_currRecordNum < _numSamples) {
 		//die with error;
 		cerr << "\n***** ERROR: Input file has fewer records than the requested number of output records. *****" << endl << endl;
@@ -73,11 +69,8 @@ bool SampleFile::takeSample()
 	}
 	// Now output all the kept records, then do cleanup.
 	for (size_t i=0; i < _numSamples; i++) {
-		_outputMgr->printRecord(_samples[i]);
+		outputMgr->printRecord(_samples[i]);
 	}
-	delete _outputMgr;
-	_inputFile->close();
-	return true;
 }
 
 bool SampleFile::keepRecord(Record *record)
@@ -108,13 +101,13 @@ bool SampleFile::keepRecord(Record *record)
 }
 
 bool SampleFile::strandComplies(const Record * record) {
-	if (!_context->getSameStrand()) {
+	if (!upCast(_context)->getSameStrand()) {
 		return true;
 	}
-	if (_context->getForwardOnly() && record->getStrandVal() == Record::FORWARD) {
+	if (upCast(_context)->getForwardOnly() && record->getStrandVal() == Record::FORWARD) {
 		return true;
 	}
-	if (_context->getReverseOnly() && record->getStrandVal() == Record::REVERSE) {
+	if (upCast(_context)->getReverseOnly() && record->getStrandVal() == Record::REVERSE) {
 		return true;
 	}
 	return false;

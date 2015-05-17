@@ -9,6 +9,10 @@
 #define COMMONHELPFILE_H_
 
 #include <iostream>
+#include "version.h"
+#include <cstdlib> //for exit
+
+using namespace std;
 
 using namespace std;
 
