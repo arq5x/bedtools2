@@ -88,7 +88,7 @@ AGCTYRWSKMDVHBXN
 agctyrwskmdvhbxn" > exp
 $BT getfasta  -fi test.iupac.fa -bed test.iupac.bed -fo - > obs
 check obs exp
-rm obs exp
+rm obs exp test.iupac.fa.fai
 
 
 # test IUPAC revcomp
@@ -100,4 +100,5 @@ NXVDBHKMSWYRAGCT
 nxvdbhkmswyragct" > exp
 $BT getfasta  -fi test.iupac.fa -bed test.iupac.bed -s -fo - > obs
 check obs exp
-rm obs exp
+rm obs exp test.iupac.fa.fai
+
