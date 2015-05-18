@@ -16,8 +16,8 @@ void coverage_help(void) {
 
     cerr << "\nTool:    bedtools coverage (aka coverageBed)" << endl;
     cerr << "Version: " << VERSION << "\n";    
-    cerr << "Summary: Returns the depth and breadth of coverage of features from A" << endl;
-    cerr << "\t on the intervals in B." << endl << endl;
+    cerr << "Summary: Returns the depth and breadth of coverage of features from B" << endl;
+    cerr << "\t on the intervals in A." << endl << endl;
 
     cerr << "Usage:   " << "bedtools coverage" << " [OPTIONS] -a <bed/gff/vcf> -b <bed/gff/vcf>" << endl << endl;
 
@@ -40,11 +40,11 @@ void coverage_help(void) {
     allToolsCommonHelp();
 
     cerr << "Default Output:  " << endl;
-    cerr << "\t" << " After each entry in B, reports: " << endl;
-    cerr << "\t   1) The number of features in A that overlapped the B interval." << endl;
-    cerr << "\t   2) The number of bases in B that had non-zero coverage." << endl;
-    cerr << "\t   3) The length of the entry in B." << endl;
-    cerr << "\t   4) The fraction of bases in B that had non-zero coverage." << endl << endl;
+    cerr << "\t" << " After each entry in A, reports: " << endl;
+    cerr << "\t   1) The number of features in B that overlapped the A interval." << endl;
+    cerr << "\t   2) The number of bases in A that had non-zero coverage." << endl;
+    cerr << "\t   3) The length of the entry in A." << endl;
+    cerr << "\t   4) The fraction of bases in A that had non-zero coverage." << endl << endl;
 
     exit(1);
 }

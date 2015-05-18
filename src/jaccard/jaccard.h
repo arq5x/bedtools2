@@ -38,8 +38,4 @@ protected:
 
 };
 
-
-
-
-
 #endif /* JACCARD_H_ */

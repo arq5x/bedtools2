@@ -17,21 +17,21 @@ class SpacingFile : public ToolBase {
 public:
     SpacingFile(ContextSpacing *context);
     virtual ~SpacingFile();
-	virtual bool init();
-	virtual bool findNext(RecordKeyVector &hits);
-	virtual void processHits(RecordOutputMgr *outputMgr, RecordKeyVector &hits);
-	virtual void cleanupHits(RecordKeyVector &hits);
-	virtual bool finalizeCalculations() { return true; }
-	virtual void  giveFinalReport(RecordOutputMgr *outputMgr) {}
+    virtual bool init();
+    virtual bool findNext(RecordKeyVector &hits);
+    virtual void processHits(RecordOutputMgr *outputMgr, RecordKeyVector &hits);
+    virtual void cleanupHits(RecordKeyVector &hits);
+    virtual bool finalizeCalculations() { return true; }
+    virtual void  giveFinalReport(RecordOutputMgr *outputMgr) {}
 
 
 protected:
-	const Record *_prevRec;
-	const Record *_currRec;
-	QuickString _distance;
+    const Record *_prevRec;
+    const Record *_currRec;
+    QuickString _distance;
 
-	FileRecordMgr *_inputFile;
-	virtual ContextSpacing *upCast(ContextBase *context) { return static_cast<ContextSpacing *>(context); }
+    FileRecordMgr *_inputFile;
+    virtual ContextSpacing *upCast(ContextBase *context) { return static_cast<ContextSpacing *>(context); }
 
 
 

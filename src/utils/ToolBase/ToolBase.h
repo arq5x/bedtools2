@@ -8,10 +8,10 @@
 #ifndef TOOLBASE_H_
 #define TOOLBASE_H_
 
-using namespace std;
-
 #include "RecordKeyVector.h"
 #include "RecordOutputMgr.h"
+
+using namespace std;
 
 class ContextBase;
 

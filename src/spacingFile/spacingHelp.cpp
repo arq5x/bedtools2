@@ -11,14 +11,14 @@ void spacing_help(void) {
 
     cerr << "\nTool:    bedtools spacing" << endl;
     cerr << "Version: " << VERSION << "\n";
-    cerr << "Summary: Report (last col.) the length of the space between intervals." << endl << endl;
+    cerr << "Summary: Report (last col.) the gap lengths between intervals in a file." << endl << endl;
 
     cerr << "Usage:   " << "bedtools spacing" << " [OPTIONS] -i <bed/gff/vcf/bam>" << endl << endl;
     
     cerr << "Notes: " << endl;
     cerr << "\t(1)  Input must be sorted by chrom,start (sort -k1,1 -k2,2n for BED)." << endl;
     cerr << "\t(2)  The 1st element for each chrom will have NULL distance. (\".\")." << endl;
-    cerr << "\t(3)  The distance for both overlapping and bookended intervals is 0." << endl << endl;
+    cerr << "\t(3)  Distance for overlapping intervaks is -1 and bookended is 0." << endl << endl;
 
     cerr << "Example: " << endl;
     cerr << "\t$ cat test.bed " << endl;

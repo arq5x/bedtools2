@@ -24,6 +24,7 @@
 // Class methods and elements
 //************************************************
 class BedSplit {
+
 private:
     std::string bedFileName;
     std::string outfileprefix;
@@ -37,10 +38,8 @@ private:
     void loadBed();
     int doSimpleSplit();
     int doEuristicSplitOnTotalSize();
+
 public:
-
-
-
     // constructor
     BedSplit();
     // destructor

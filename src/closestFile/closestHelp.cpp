@@ -84,5 +84,3 @@ void closest_help(void) {
     exit(1);
 }
 
-
-

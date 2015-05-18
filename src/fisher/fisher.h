@@ -15,10 +15,10 @@
 
 class Fisher : public Jaccard {
 public:
-	Fisher(ContextFisher *context);
-	bool init();
-	bool finalizeCalculations();
-	void giveFinalReport(RecordOutputMgr *outputMgr);
+    Fisher(ContextFisher *context);
+    bool init();
+    bool finalizeCalculations();
+    void giveFinalReport(RecordOutputMgr *outputMgr);
 
 protected:
     bool _haveExclude;
@@ -28,7 +28,7 @@ protected:
     vector<int> _qsizes;
     BedFile *_excludeFile;
     unsigned long getTotalIntersection(RecordKeyVector &hits);
-	virtual ContextFisher *upCast(ContextBase *context) { return static_cast<ContextFisher *>(context); }
+    virtual ContextFisher *upCast(ContextBase *context) { return static_cast<ContextFisher *>(context); }
 
 };
 

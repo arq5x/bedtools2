@@ -179,7 +179,7 @@ $(UTIL_SUBDIRS) $(SUBDIRS): $(OBJ_DIR) $(BIN_DIR)
 clean:
 	@$(MAKE) --no-print-directory --directory=$(BT_ROOT) clean_api
 	@echo " * Cleaning up."
-	@rm -f $(OBJ_DIR)/* $(BIN_DIR)/*
+	@rm -f $(VERSION_FILE) $(OBJ_DIR)/* $(BIN_DIR)/*
 .PHONY: clean
 
 test: all
