@@ -509,6 +509,7 @@ echo "    intersect.t41...\c"
 echo \
 "22" > exp
 $BT intersect -a bug167_strandSweep.bed -b bug167_strandSweep.bed -sorted -s -wa -wb | wc -l > obs
+sed -i 's/^\s*//' obs
 check exp obs
 rm exp obs
 
@@ -519,6 +520,7 @@ echo "    intersect.t42...\c"
 echo \
 "20" > exp
 $BT intersect -a bug167_strandSweep.bed -b bug167_strandSweep.bed -sorted -S -wa -wb | wc -l > obs
+sed -i 's/^\s*//' obs
 check exp obs
 rm exp obs
 
