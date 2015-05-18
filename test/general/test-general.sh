@@ -284,5 +284,5 @@ $BT merge -i c.bed.gz > obs
 echo -n "" > exp
 check obs exp
 
-rm a.bed.gz b.bed.gz a.bed b.bed genome.txt
+rm a.bed.gz b.bed.gz c.bed.gz a.bed b.bed c.bed genome.txt exp obs
 
