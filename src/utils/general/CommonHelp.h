@@ -12,6 +12,8 @@
 #include "version.h"
 #include <cstdlib> //for exit
 
+using namespace std;
+
 extern void allToolsCommonHelp();
 extern void IntersectCommonHelp();
 extern void IntersectOutputHelp();

@@ -6,8 +6,6 @@
  */
 #include "CommonHelp.h"
 
-<<<<<<< HEAD
-
 void IntersectOutputHelp() {
 	cerr << "\t-wa\t"           << "Write the original entry in A for each overlap." << endl << endl;
 
