@@ -244,7 +244,14 @@ void FastaReference::open(string reffilename, bool usemmap, bool useFullHeader) 
     struct stat stFileInfo; 
     string indexFileName = filename + index->indexFileExtension(); 
     // if we can find an index file, use it
-    if(stat(indexFileName.c_str(), &stFileInfo) == 0) { 
+    if(stat(indexFileName.c_str(), &stFileInfo) == 0) {
+        // check if the index file is older than the FASTA file
+        struct stat index_attrib, fasta_attrib;
+        stat(indexFileName.c_str(), &index_attrib);
+        stat(reffilename.c_str(), &fasta_attrib);
+        if (fasta_attrib.st_mtime > index_attrib.st_mtime) {
+            cerr << "Warning: the index file is older than the FASTA file." << endl;
+        }
         index->readIndexFile(indexFileName);
     } else { // otherwise, read the reference and generate the index file in the cwd
         cerr << "index file " << indexFileName << " not found, generating..." << endl;
