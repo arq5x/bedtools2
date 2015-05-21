@@ -30,9 +30,6 @@ void sample_help(void) {
 
     cerr << "\t-ubam\t"         << "Write uncompressed BAM output. Default writes compressed BAM." << endl << endl;
 
-    cerr << "\t-bed\t"          << "When using BAM input (-abam), write output as BED. The default" << endl;
-    cerr                        << "\t\tis to write output in BAM when using -abam." << endl << endl;
-
     cerr << "\t-s\t"            << "Require same strandedness.  That is, only give records" << endl;
     cerr                        << "\t\tthat have the same strand. Use '-s forward' or '-s reverse'" << endl;
     cerr						<< "\t\tfor forward or reverse strand records, respectively." << endl;
@@ -40,8 +37,10 @@ void sample_help(void) {
 
     cerr << "\t-header\t"       << "Print the header from the input file prior to results." << endl << endl;
 
+    allToolsCommonHelp();
+
     cerr << "Notes: " << endl;
-    cerr << "\tTBD: Enter other usage notes here." << endl << endl;
+//    cerr << "\tTBD: Enter other usage notes here." << endl << endl;
 
     // end the program here
     exit(1);

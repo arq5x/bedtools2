@@ -14,8 +14,9 @@
 
 using namespace std;
 
-extern void CommonHelp();
-
-
+extern void allToolsCommonHelp();
+extern void IntersectCommonHelp();
+extern void IntersectOutputHelp();
+extern void sortedHelp();
 
 #endif /* COMMONHELPFILE_H_ */
