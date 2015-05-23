@@ -88,7 +88,7 @@ AGCTYRWSKMDVHBXN
 agctyrwskmdvhbxn" > exp
 $BT getfasta  -fi test.iupac.fa -bed test.iupac.bed -fo - > obs
 check obs exp
-rm obs exp
+rm obs exp test.iupac.fa.fai
 
 
 # test IUPAC revcomp
@@ -100,4 +100,26 @@ NXVDBHKMSWYRAGCT
 nxvdbhkmswyragct" > exp
 $BT getfasta  -fi test.iupac.fa -bed test.iupac.bed -s -fo - > obs
 check obs exp
-rm obs exp
+rm obs exp test.iupac.fa.fai
+
+# test the warning about an outdated FASTA index file
+echo "    getfasta.t10...\c"
+echo \
+">chr1
+cggggggggg
+>chr2
+AAATTTTTTTTTT" > test.fa
+# create an index file
+echo -e "chr2\t2\t10" | $BT getfasta -fi test.fa -bed - -fo - > /dev/null
+# modify the FASTA file
+echo \
+">chr1 ver 2.2.2.2.2
+cggggggggg
+>chr2
+AAATTTTTTTTTT" > test.fa
+echo -e "chr2\t2\t10" | $BT getfasta -fi test.fa -bed - -fo - \
+	> /dev/null 2> obs
+echo "Warning: the index file is older than the FASTA file." > exp
+check obs exp
+rm obs exp test.fa test.fa.fai
+
