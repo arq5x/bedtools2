@@ -111,8 +111,12 @@ cggggggggg
 AAATTTTTTTTTT" > test.fa
 # create an index file
 echo -e "chr2\t2\t10" | $BT getfasta -fi test.fa -bed - -fo - > /dev/null
-# update the FASTA file modification time
-touch test.fa
+# modify the FASTA file
+echo \
+">chr1 ver 2.2.2.2.2
+cggggggggg
+>chr2
+AAATTTTTTTTTT" > test.fa
 echo -e "chr2\t2\t10" | $BT getfasta -fi test.fa -bed - -fo - \
 	> /dev/null 2> obs
 echo "Warning: the index file is older than the FASTA file." > exp
