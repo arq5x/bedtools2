@@ -7,7 +7,8 @@
 
 ContextFisher::ContextFisher() {
 	setSortedInput(true);
-	setUseMergedIntervals(false);
+	setUseMergedIntervals(false); //by default,
+	//intervals are merged in Jaccard, but unmerged in fisher.
 }
 
 ContextFisher::~ContextFisher() {
@@ -21,45 +22,23 @@ bool ContextFisher::parseCmdArgs(int argc, char **argv, int skipFirstArgs)
 		else if (strcmp(_argv[_i], "-exclude") == 0) {
 			if (!handle_exclude()) return false;
 		}
+		else if (strcmp(_argv[_i], "-m") == 0) {
+			if (!handle_m()) return false;
+		}
+
 	}
 	return ContextIntersect::parseCmdArgs(argc, argv, _skipFirstArgs);
 }
 
 bool ContextFisher::isValidState()
 {
-	if (!ContextIntersect::isValidState()) {
+	if (!ContextJaccard::isValidState()) {
 		return false;
-	}
-	// Tests for stranded merge
-	//
-	if (_desiredStrand != FileRecordMergeMgr::ANY_STRAND) { // requested stranded merge
-		for (int i=0; i < getNumInputFiles(); i++) {
-			// make sure file has strand.
-			if (!getFile(i)->recordsHaveStrand()) {
-				_errorMsg = "\n***** ERROR: stranded merge requested, but input file ";
-				_errorMsg  += getInputFileName(i);
-				_errorMsg  += " does not have strands. *****";
-				return false;
-			}
-			//make sure file is not VCF.
-			if (getFile(1)->getFileType() == FileRecordTypeChecker::VCF_FILE_TYPE) {
-				_errorMsg = "\n***** ERROR: stranded merge not supported for VCF file ";
-				_errorMsg += getInputFileName(i);
-				_errorMsg += ". *****";
-				return false;
-			}
-		}
 	}
     if (_genomeFile == NULL){
         _errorMsg = "\nERROR*****: specify -g genome file*****\n";
         return false;
     }
-	//column operations not allowed with BAM input
-	if (hasColumnOpsMethods() &&
-			getFile(0)->getFileType() == FileRecordTypeChecker::BAM_FILE_TYPE) {
-		_errorMsg = "\n***** ERROR: stranded merge not supported for VCF files. *****";
-		return false;
-	}
 	return true;
 }
 
@@ -77,5 +56,13 @@ bool ContextFisher::handle_exclude()
     } while (_argc > _i+1 && _argv[_i+1][0] != '-');
     setExcludeFile(string(_argv[_i]));
     return true;
+}
+
+bool ContextFisher::handle_m()
+{
+	setUseMergedIntervals(true);
+    markUsed(_i - _skipFirstArgs);
+    _i++;
+	return true;
 }
 
