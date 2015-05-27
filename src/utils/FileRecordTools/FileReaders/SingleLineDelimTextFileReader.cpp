@@ -139,6 +139,11 @@ bool SingleLineDelimTextFileReader::findDelimiters() {
 }
 
 int SingleLineDelimTextFileReader::getVcfSVlen() {
+
+	// The SVLEN field can appear anywhere in the info tag, and may be followed by a semi-colon, tab, newline, or end in NULL.
+	// it can contain one, two, or more numbers, which would be separated by a comma.
+	// We want the minimum number.
+
 	int startPos = _delimPositions[VCF_TAG_FIELD] +1;
 	const char *startPtr = strstr(_sLine.c_str() + startPos, "SVLEN=");
 	if (startPtr == NULL) {
@@ -146,16 +151,30 @@ int SingleLineDelimTextFileReader::getVcfSVlen() {
 		return 1;
 	}
 	startPtr +=6; // length of label "SVLEN="
-	const char *endPtr = strchr(startPtr, ';');
-	const char *midPtr = strchr(startPtr, ',');
-	int endCoord = -1;
-	if (midPtr != NULL && midPtr < endPtr) {
-		//comma found in the number, that means there are two numbers
-		int num1 = str2chrPos(startPtr, midPtr - startPtr);
-		int num2 = str2chrPos(midPtr +1, endPtr - (midPtr +1));
-		endCoord = min(abs(num1), abs(num2));
-	} else {
-		endCoord = abs(str2chrPos(startPtr, endPtr - startPtr));
-	}
-	return endCoord;
+	const char *currPtr = startPtr;
+	const char *endPtr = _sLine.c_str() + _sLine.size();
+
+	int minVal = INT_MAX;
+	int currVal = 0;
+	QuickString currValStr;
+	while (1) {
+		if (currPtr == endPtr || *currPtr == ';' || *currPtr == '\t' || *currPtr == '\n' || *currPtr == ',') {
+			if (currPtr > startPtr) {
+				currValStr.assign(startPtr, currPtr - startPtr);
+				currVal = abs(str2chrPos(currValStr));
+				if (currVal < minVal) minVal = currVal;
+				startPtr = currPtr;
+			}
+
+			if (currPtr == endPtr || *currPtr != ',') {
+				//if end of line or non-comma delimiter, break.
+				break;
+			} else {
+				//skip the comma
+				startPtr++;
+			}
+		}
+		currPtr++;
+	};
+	return minVal;
 }

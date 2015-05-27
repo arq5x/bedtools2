@@ -582,6 +582,35 @@ $BT intersect -a bug223_sv1_a.vcf -b bug223_sv1_b.vcf | cut -f1-6 > obs
 check exp obs
 rm exp obs
 
+##################################################################
+# see that SVLEN in VCF files can handle multiple numbers,
+# at end of line, followed by NULL.
+##################################################################
+echo "    intersect.t48...\c"
+echo \
+"chr1	1	a	G	<DEL>	70.90
+chr1	1	a	G	<DEL>	70.90
+chr1	4	a	G	<DEL>	70.90
+chr1	4	a	G	<DEL>	70.90" > exp
+$BT intersect -a bug223_d.vcf -b bug223_d.vcf | cut -f1-6 > obs
+check exp obs
+rm exp obs
+
+##################################################################
+# see that SVLEN in VCF files can handle multiple numbers,
+# at end of line, followed by a tab
+##################################################################
+echo "    intersect.t49...\c"
+echo \
+"chr1	1	a	G	<DEL>	70.90
+chr1	1	a	G	<DEL>	70.90
+chr1	4	a	G	<DEL>	70.90
+chr1	4	a	G	<DEL>	70.90" > exp
+$BT intersect -a bug223_e.vcf -b bug223_e.vcf | cut -f1-6 > obs
+check exp obs
+rm exp obs
+
+
 
 cd multi_intersect
 bash test-multi_intersect.sh
