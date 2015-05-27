@@ -21,9 +21,11 @@ computes the fraction of bases in the interval in A that were overlapped by one 
 
 .. important::
 
-    As of version 2.24.0, the `coverage` tool can accept multiple files for
-    the `-b` option. This allows one to identify overlaps between a single
-    query (`-a`) file and multiple database files (`-b`) at once!
+    As of version 2.24.0, the `coverage` tool has changed such that the coverage is
+    computed for the A file, not the B file. This changes the command line interface
+    to be consistent with the other tools.  Also, the `coverage` tool
+    can accept multiple files for the `-b` option. This allows one to measure 
+    coverage between a single query (`-a`) file and multiple database files (`-b`) at once!
 
 
 .. seealso::
