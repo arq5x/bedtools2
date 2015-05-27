@@ -18,5 +18,6 @@ extern void allToolsCommonHelp();
 extern void IntersectCommonHelp();
 extern void IntersectOutputHelp();
 extern void sortedHelp();
+extern void multiDbOutputHelp();
 
 #endif /* COMMONHELPFILE_H_ */

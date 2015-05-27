@@ -57,17 +57,14 @@ void BinTree::getHits(Record *record, RecordKeyVector &hitSet)
 		return;
 	}
 
-    binNumType startBin = 0;
-    binNumType endBin = 0;
-
     binNumType startPos = record->getStartPos();
     binNumType endPos = record->getEndPos();
 
-    startBin = (startPos >> _binFirstShift);
-    endBin = ((endPos-1) >> _binFirstShift);
+    binNumType startBin = (startPos >> _binFirstShift);
+    binNumType endBin = ((endPos-1) >> _binFirstShift);
 
 
-	const allBinsType bins = mainIter->second;
+	const allBinsType &bins = mainIter->second;
 
     /* SYNOPSIS:
          1. We loop through each UCSC BIN level for feature A's chrom.
