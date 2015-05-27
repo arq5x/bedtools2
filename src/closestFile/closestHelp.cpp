@@ -73,6 +73,7 @@ void closest_help(void) {
     cerr                        << "\t\tFor BED, the 4th column is compared." << endl << endl;
 
     IntersectCommonHelp();
+    multiDbOutputHelp();
     allToolsCommonHelp();
 
     cerr << "Notes: " << endl;

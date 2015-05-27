@@ -33,6 +33,7 @@ void intersect_help(void) {
     IntersectCommonHelp();
 
     sortedHelp();
+    multiDbOutputHelp();
     allToolsCommonHelp();
 
     cerr << "Notes: " << endl;

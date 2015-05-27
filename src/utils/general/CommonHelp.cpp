@@ -69,7 +69,12 @@ void IntersectCommonHelp() {
     cerr << "\t-g\t"       		<< "Provide a genome file to enforce consistent chromosome sort order" << endl;
     cerr 						<<"\t\tacross input files. Only applies when used with -sorted option." << endl << endl;
 
+    cerr << "\t-nonamecheck\t"       << "For sorted data, don't throw an error if the file has different naming conventions" << endl;
+    cerr							<< "\t\t\tfor the same chromosome. ex. \"chr1\" vs \"chr01\"." << endl << endl;
 
+}
+
+void multiDbOutputHelp() {
     cerr << "\t-names\t"       << "When using multiple databases, provide an alias for each that" << endl;
     cerr						<<"\t\twill appear instead of a fileId when also printing the DB record." << endl << endl;
 
@@ -78,10 +83,6 @@ void IntersectCommonHelp() {
 
     cerr << "\t-sortout\t"       << "When using multiple databases, sort the output DB hits" << endl;
     cerr						<< "\t\t\tfor each record." << endl << endl;
-
-    cerr << "\t-nonamecheck\t"       << "For sorted data, don't throw an error if the file has different naming conventions" << endl;
-    cerr							<< "\t\t\tfor the same chromosome. ex. \"chr1\" vs \"chr01\"." << endl << endl;
-
 }
 
 
