@@ -24,6 +24,7 @@ public:
 protected:
 	string _excludeFile;
 	bool handle_exclude();
+	bool handle_m();
 
 
 };

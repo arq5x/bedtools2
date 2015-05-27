@@ -37,8 +37,9 @@ private:
     //
     // BIN HANDLING
     //
-	static const uint32_t NUM_BINS = 37450;
-	static const uint32_t NUM_BIN_LEVELS = 7;
+	typedef uint32_t binNumType;
+	static const binNumType NUM_BINS = 37450;
+	static const binNumType NUM_BIN_LEVELS = 7;
 
 	// bins range in size from 16kb to 512Mb
 	// Bin  0          spans 512Mbp,   # Level 1
@@ -47,25 +48,30 @@ private:
 	// Bins 73-584     span 1Mbp       # Level 4
 	// Bins 585-4680   span 128Kbp     # Level 5
 	// Bins 4681-37449 span 16Kbp      # Level 6
-	uint32_t *_binOffsetsExtended;
-	static const uint32_t _binFirstShift = 14;       /* How much to shift to get to finest bin. */
-	static const uint32_t _binNextShift  = 3;        /* How much to shift to get to next larger bin. */
+	binNumType *_binOffsetsExtended;
+	static const binNumType _binFirstShift = 14;       /* How much to shift to get to finest bin. */
+	static const binNumType _binNextShift  = 3;        /* How much to shift to get to next larger bin. */
 
-	typedef RecordList innerListType;
-	typedef const RecordListNode * innerListIterType;
-	typedef innerListType * binType;
-	typedef binType * allBinsType;
-	typedef QuickString mainKeyType;
-	typedef map<mainKeyType, allBinsType> mainMapType;
+//	typedef RecordList innerListType;
+//	typedef const RecordListNode * innerListIterType;
+//	typedef innerListType * binType;
+//	typedef binType * allBinsType;
+//	typedef QuickString mainKeyType;
+//	typedef map<mainKeyType, allBinsType> mainMapType;
+//	mainMapType _mainMap;
+
+	typedef vector<const Record *> binType;
+	typedef map<binNumType, binType> allBinsType; //for each bin number, have a RecordList
+	typedef map<QuickString, allBinsType> mainMapType; //for each chrom, a map of bin num to RecordLists.
 	mainMapType _mainMap;
 
-	bool _showBinMetrics;
-	uint32_t _maxBinNumFound;
-	map<uint32_t, int> _binsHit;
+
+	binNumType _maxBinNumFound;
+	map<binNumType, int> _binsHit;
 
 	bool addRecordToTree(const Record *);
-	uint32_t getBin(uint32_t start, uint32_t end) const;
-	uint32_t getBin(const Record *record) const;
+	binNumType getBin(binNumType start, binNumType end) const;
+	binNumType getBin(const Record *record) const;
 
 
 };
