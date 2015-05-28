@@ -31,6 +31,9 @@ cd genomecov; bash test-genomecov.sh; cd ..
 echo " Testing bedtools getfasta:"
 cd getfasta; bash test-getfasta.sh; cd ..
 
+echo " Testing innerSubtractBed:"
+cd innerSubtractBed; bash test-innersubtract.sh; cd ..
+
 echo " Testing bedtools intersect:"
 cd intersect; bash test-intersect.sh; bash new_test-intersect.sh; cd ..
 
