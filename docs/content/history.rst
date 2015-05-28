@@ -4,10 +4,8 @@ Release History
 
 Version 2.24.0 (27-May-2015)
 ============================
-1. The `closest` tool now takes advantage of pre-sorted intervals via the `-sorted` option. This allows the `coverage` tool to be much faster, 
-use far less memory, and report coverage for intervals in their original order in the input file.
-2. We have changed the behavior of the `coverage` tool such that it is consistent with the other tools. Specifically, coverage is now 
-computed for the intervals in the A file based on the overlaps with the B file, rather than vice versa.
+1. The `closest` tool now takes advantage of pre-sorted intervals via the `-sorted` option. This allows the `coverage` tool to be much faster, use far less memory, and report coverage for intervals in their original order in the input file.
+2. We have changed the behavior of the `coverage` tool such that it is consistent with the other tools. Specifically, coverage is now computed for the intervals in the A file based on the overlaps with the B file, rather than vice versa.
 3. The ``subtract`` tool now supports pre-sorted data via the ``-sorted`` option and is therefore much faster and scalable.
 4. The ``-nonamecheck`` option provides greater tolerance for chromosome labeling when using the ``-sorted`` option.
 5. Support for multiple SVLEN tags in VCF format, and fixed a bug that failed to process SVLEN tags coming at the end of a VCF INFO field.
