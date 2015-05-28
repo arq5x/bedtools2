@@ -2,6 +2,53 @@
 Release History
 ###############
 
+Version 2.24.0 (27-May-2015)
+============================
+1. The `closest` tool now takes advantage of pre-sorted intervals via the `-sorted` option. This allows the `coverage` tool to be much faster, 
+use far less memory, and report coverage for intervals in their original order in the input file.
+2. We have changed the behavior of the `coverage` tool such that it is consistent with the other tools. Specifically, coverage is now 
+computed for the intervals in the A file based on the overlaps with the B file, rather than vice versa.
+3. The ``subtract`` tool now supports pre-sorted data via the ``-sorted`` option and is therefore much faster and scalable.
+4. The ``-nonamecheck`` option provides greater tolerance for chromosome labeling when using the ``-sorted`` option.
+5. Support for multiple SVLEN tags in VCF format, and fixed a bug that failed to process SVLEN tags coming at the end of a VCF INFO field.
+6. Support for reverse complementing IUPAC codes in the ``getfasta`` tool.
+7. Provided greater flexibility for "BED+" files, where the first 3 columns are chrom, start, and end, and the remaining columns are free-form.
+8. We now detect stale FAI files and recreate an index thanks to a fix from @gtamazian.
+9. New feature from Pierre Lindenbaum allowing the ``sort`` tool to sort files based on the chromosome order in a ``faidx`` file.
+10. Eliminated multiple compilation warnings thanks to John Marshall.
+11. Fixed bug in handling INS variants in VCF files.
+
+
+Version 2.23.0 (22-Feb-2015)
+============================
+1. Added ``-k`` option to the closest tool to report the k-closest features in one or more -b files.
+2. Added ``-fd`` option to the closest tool to for the reporting of downstream features in one or more -b files. Requires -D to dictate how "downstream" should be defined.
+3. Added ``-fu`` option to the closest tool to for the reporting of downstream features in one or more -b files. Requires -D to dictate how "downstream" should be defined.
+4. Pierre Lindenbaum added a new split tool that will split an input file into multiple sub files. Unlike UNIX split, it can balance the chunking of the sub files not just by number of lines, but also by total number of base pairs in each sub file.
+5. Added a new spacing tool that reports the distances between features in a file.
+6. Jay Hesselberth added a ``-reverse`` option to the makewindows tool that reverses the order of the assigned window numbers.
+7. Fixed a bug that caused incorrect reporting of overlap for zero-length BED records. Thanks to @roryk.
+8. Fixed a bug that caused the map tool to not allow ``-b`` to be specified before ``-a``. Thanks to @semenko.
+9. Fixed a bug in ``makewindows`` that mistakenly required ``-s`` with ``-n``.
+
+Version 2.22.1 (01-Jan-2015)
+============================
+1. When using -sorted with intersect, map, and closest, bedtools can now detect and warn you when your input datasets employ different chromosome sorting orders.
+2. Fixed multiple bugs in the new, faster closest tool. Specifically, the -iu, -id, and -D options were not behaving properly with the new "sweeping" algorithm that was implemented for the 2.22.0 release. Many thanks to Sol Katzman for reporting these issues and for providing a detailed analysis and example files.
+3. We FINALLY wrote proper documentation for the closest tool (http://bedtools.readthedocs.org/en/latest/content/tools/closest.html)
+4. Fixed bug in the tag tool when using -intervals, -names, or -scores. Thanks to Yarden Katz for reporting this.
+5. Fixed issues with chromosome boundaries in the slop tool when using negative distances. Thanks to @acdaugherty!
+6. Multiple improvements to the fisher tool. Added a -m option to the fisher tool to merge overlapping intervals prior to comparing overlaps between two input files. Thanks to@brentp
+7. Fixed a bug in makewindows tool requiring the use of -b with -s.
+8. Fixed a bug in intersect that prevented -split from detecting complete overlaps with -f 1. Thanks to @tleonardi .
+9. Restored the default decimal precision to the groupby tool.
+10. Added the -prec option to the merge and map tools to specific the decimal precision of the output.
+
+Version 2.22.0 (12-Nov-2014)
+============================
+1. The "closest" tool now requires sorted files, but this requirement now enables it to simultaneously find the closest intervals from many (not just one) files.
+2. We now have proper support for "imprecise" SVs in VCF format. This addresses a long standing (sorry) limitation in the way bedtools handles VCF files.
+
 Version 2.21.0 (18-Sep-2014)
 ============================
 1. Added ability to intersect against multiple `-b` files in the `intersect` tool.
