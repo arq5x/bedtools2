@@ -18,6 +18,7 @@ FileRecordTypeChecker::FileRecordTypeChecker()
 	_isVCF = false;
 	_isBAM = false;
 	_isGFF = false;
+	_isGFFplus = false;
 	_isGzipped = false;
 	_insufficientData = false;
 	_fourthFieldNumeric = false;
@@ -32,6 +33,7 @@ FileRecordTypeChecker::FileRecordTypeChecker()
 	_hasName[BAM_RECORD_TYPE] = true;
 	_hasName[VCF_RECORD_TYPE] = true;
 	_hasName[GFF_RECORD_TYPE] = true;
+	_hasName[GFF_PLUS_RECORD_TYPE] = true;
 
 	_hasScore[UNKNOWN_RECORD_TYPE] = false;
 	_hasScore[EMPTY_RECORD_TYPE] = false;
@@ -42,6 +44,7 @@ FileRecordTypeChecker::FileRecordTypeChecker()
 	_hasScore[BAM_RECORD_TYPE] = true;
 	_hasScore[VCF_RECORD_TYPE] = true;
 	_hasScore[GFF_RECORD_TYPE] = true;
+	_hasScore[GFF_PLUS_RECORD_TYPE] = true;
 
 	_hasStrand[UNKNOWN_RECORD_TYPE] = false;
 	_hasStrand[EMPTY_RECORD_TYPE] = false;
@@ -52,6 +55,7 @@ FileRecordTypeChecker::FileRecordTypeChecker()
 	_hasStrand[BAM_RECORD_TYPE] = true;
 	_hasStrand[VCF_RECORD_TYPE] = true;
 	_hasStrand[GFF_RECORD_TYPE] = true;
+	_hasStrand[GFF_PLUS_RECORD_TYPE] = true;
 
 	_recordTypeNames[UNKNOWN_RECORD_TYPE] = "Unknown record type";
 	_recordTypeNames[EMPTY_RECORD_TYPE] = "Empty record type";
@@ -61,7 +65,8 @@ FileRecordTypeChecker::FileRecordTypeChecker()
 	_recordTypeNames[BED_PLUS_RECORD_TYPE] = "BedPlus record type";
 	_recordTypeNames[BAM_RECORD_TYPE] = "BAM record type";
 	_recordTypeNames[VCF_RECORD_TYPE] = "VCF record type";
-	_recordTypeNames[GFF_RECORD_TYPE] = "GFF record type";
+	_recordTypeNames[GFF_RECORD_TYPE] = "Gff record type";
+	_recordTypeNames[GFF_PLUS_RECORD_TYPE] = "GffPlus record type";
 
 	_fileTypeNames[UNKNOWN_FILE_TYPE] = "Unknown file type";
 	_fileTypeNames[EMPTY_FILE_TYPE] = "Empty file type";
@@ -196,6 +201,10 @@ bool FileRecordTypeChecker::handleTextFormat(const char *buffer, size_t len)
 			return true;
 		}
 		if (isGFFformat()) {
+			if (_isGFFplus) {
+				_recordType = GFF_PLUS_RECORD_TYPE;
+				return true;
+			}
 			_isGFF = true;
 			_recordType = GFF_RECORD_TYPE;
 			return true;
@@ -241,8 +250,8 @@ bool FileRecordTypeChecker::isBedFormat() {
 
 bool FileRecordTypeChecker::isGFFformat()
 {
-	//a GFF file may have 8 or 9 fields.
-	if (_numFields < 7 || _numFields > 9) {
+	//a GFF file may have 8 or 9 fields. More than thats is GFFplus
+	if (_numFields < 7 ) {
 		return false;
 	}
 	//the 4th and 5th fields must be numeric.
@@ -253,6 +262,9 @@ bool FileRecordTypeChecker::isGFFformat()
 	int end = str2chrPos(_tokenizer.getElem(4));
 	if (end < start) {
 		return false;
+	}
+	if (_numFields > 8) {
+		_isGFFplus = true;
 	}
 	return true;
 }

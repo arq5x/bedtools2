@@ -154,7 +154,7 @@ int SingleLineDelimTextFileReader::getVcfSVlen() {
 	const char *currPtr = startPtr;
 	const char *endPtr = _sLine.c_str() + _sLine.size();
 
-	int minVal = INT_MAX;
+	int maxVal = INT_MIN;
 	int currVal = 0;
 	QuickString currValStr;
 	while (1) {
@@ -162,7 +162,7 @@ int SingleLineDelimTextFileReader::getVcfSVlen() {
 			if (currPtr > startPtr) {
 				currValStr.assign(startPtr, currPtr - startPtr);
 				currVal = abs(str2chrPos(currValStr));
-				if (currVal < minVal) minVal = currVal;
+				if (currVal > maxVal) maxVal = currVal;
 				startPtr = currPtr;
 			}
 
@@ -176,5 +176,5 @@ int SingleLineDelimTextFileReader::getVcfSVlen() {
 		}
 		currPtr++;
 	};
-	return minVal;
+	return maxVal;
 }

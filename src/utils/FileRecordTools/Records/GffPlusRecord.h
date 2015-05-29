@@ -1,34 +1,34 @@
 /*
- * BedPlusInterval.h
+ * GffRecord.h
  *
  *  Created on: Nov 13, 2012
  *      Author: nek3d
  */
 
-#ifndef BEDPLUSINTERVAL_H_
-#define BEDPLUSINTERVAL_H_
+#ifndef GFFPLUSRECORD_H_
+#define GFFPLUSRECORD_H_
 
-#include "Bed3Interval.h"
+#include "GffRecord.h"
 #include "PlusFields.h"
 
 class SingleLineDelimTextFileReader;
 
-class BedPlusInterval : public Bed3Interval {
+class GffPlusRecord : public GffRecord {
 public:
-	friend class FreeList<BedPlusInterval>;
+	friend class FreeList<GffPlusRecord>;
 
-	BedPlusInterval();
-	virtual ~BedPlusInterval() {}
+	GffPlusRecord();
+	virtual ~GffPlusRecord();
 	virtual bool initFromFile(SingleLineDelimTextFileReader *);
 	virtual void clear();
 	virtual void print(QuickString &outBuf) const;
 	virtual void print(QuickString &outBuf, int start, int end) const;
 	virtual void print(QuickString &outBuf, const QuickString & start, const QuickString & end) const;
 	virtual void printNull(QuickString &outBuf) const;
-	virtual FileRecordTypeChecker::RECORD_TYPE getType() const { return FileRecordTypeChecker::BED_PLUS_RECORD_TYPE; }
+	virtual FileRecordTypeChecker::RECORD_TYPE getType() const { return FileRecordTypeChecker::GFF_PLUS_RECORD_TYPE; }
 
 	virtual const QuickString &getField(int fieldNum) const;
-	virtual int getNumFields() const  { return numFixedFields + _plusFields.size(); }
+	virtual int getNumFields() const  { return GffRecord::getNumFields() + _plusFields.size(); }
 
 	virtual void setNumPrintFields(int num) { _numPrintFields = num; }
 	virtual int getNumPrintFields() const { return _numPrintFields; }
@@ -36,7 +36,6 @@ public:
 
 
 protected:
-	static const int numFixedFields = 3; //first three fields have names, and are not stored in otherIdxs.
 	PlusFields _plusFields;
 	int _numPrintFields;
 
@@ -44,4 +43,4 @@ protected:
 
 
 
-#endif /* BEDPLUSINTERVAL_H_ */
+#endif /* GFFPLUSRECORD_H_ */

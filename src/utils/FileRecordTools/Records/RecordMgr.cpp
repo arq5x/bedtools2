@@ -69,6 +69,11 @@ RecordMgr::RecordMgr(FileRecordTypeChecker::RECORD_TYPE recType, int blockSize)
 			_freeList = new FreeList<GffRecord>(_freeListBlockSize);
 			break;
 		}
+		case FileRecordTypeChecker::GFF_PLUS_RECORD_TYPE:
+		{
+			_freeList = new FreeList<GffPlusRecord>(_freeListBlockSize);
+			break;
+		}
 
 
 		default:
@@ -133,10 +138,14 @@ RecordMgr::~RecordMgr()
 			delete (FreeList<VcfRecord> *)_freeList;
 			break;
 		}
-
 		case FileRecordTypeChecker::GFF_RECORD_TYPE:
 		{
 			delete (FreeList<GffRecord> *)_freeList;
+			break;
+		}
+		case FileRecordTypeChecker::GFF_PLUS_RECORD_TYPE:
+		{
+			delete (FreeList<GffPlusRecord> *)_freeList;
 			break;
 		}
 
@@ -222,6 +231,12 @@ Record *RecordMgr::allocateRecord()
 			record = gfr;
 			break;
 		}
+		case FileRecordTypeChecker::GFF_PLUS_RECORD_TYPE:
+		{
+			GffPlusRecord *gfpr = ((FreeList<GffPlusRecord> *)_freeList)->newObj();
+			record = gfpr;
+			break;
+		}
 
 
 		default:
@@ -292,6 +307,11 @@ void RecordMgr::deleteRecord(const Record *record)
 		case FileRecordTypeChecker::GFF_RECORD_TYPE:
 		{
 			((FreeList<GffRecord> *)_freeList)->deleteObj(static_cast<const GffRecord *>(record));
+			break;
+		}
+		case FileRecordTypeChecker::GFF_PLUS_RECORD_TYPE:
+		{
+			((FreeList<GffPlusRecord> *)_freeList)->deleteObj(static_cast<const GffPlusRecord *>(record));
 			break;
 		}
 
