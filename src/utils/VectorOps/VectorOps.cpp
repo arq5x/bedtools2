@@ -267,6 +267,25 @@ string VectorOps::GetDistinct(void)
     return distinct.str();
 }
 
+string VectorOps::GetDistinctSortNum(void)
+{
+    ostringstream distinct;
+    // remove duplicate entries from the vector
+    // http://stackoverflow.com/questions/1041620/most-efficient-way-to-erase-duplicates-and-sort-a-c-vector
+    // convert the vec of strings to a vec of doubles
+    transform(_vecs.begin(), _vecs.end(), back_inserter(_vecd), MakeDouble);
+
+    sort( _vecd.begin(), _vecd.end() );
+    _vecd.erase( unique( _vecd.begin(), _vecd.end() ), _vecd.end() );
+
+    for( size_t i = 0; i < _vecd.size(); i++ ) {
+        if (i>0)
+            distinct << ",";
+        distinct << _vecd[i];
+    }
+    return distinct.str();
+}
+
 string VectorOps::GetFreqDesc(void)
 {
     // compute the frequency of each unique value
@@ -349,5 +368,3 @@ string VectorOps::GetLast(void)
 {
     return _vecs[_vecs.size() - 1];
 }
-
-

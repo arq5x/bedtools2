@@ -72,7 +72,9 @@ public:
     // return a concatenation of all elements in the vector
     string GetConcat(void);           
     // return a comma-separated list of the _unique_ elements
-    string GetDistinct(void);         
+    string GetDistinct(void);
+    // return a comma-separated list of the _unique_ elements, sorted numerically
+    string GetDistinctSortNum(void);
     // return a histogram of values and their freqs. in desc. order of frequency
     string GetFreqDesc(void);         
     // return a histogram of values and their freqs. in asc. order of frequency
