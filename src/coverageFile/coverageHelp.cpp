@@ -23,14 +23,14 @@ void coverage_help(void) {
 
     cerr << "Options: " << endl;
 
-    cerr << "\t-hist\t"         << "Report a histogram of coverage for each feature in B" << endl;
-    cerr                        << "\t\tas well as a summary histogram for _all_ features in B." << endl << endl;
-    cerr                        << "\t\tOutput (tab delimited) after each feature in B:" << endl;
-    cerr                        << "\t\t  1) depth\n\t\t  2) # bases at depth\n\t\t  3) size of B\n\t\t  4) % of B at depth" << endl << endl;
+    cerr << "\t-hist\t"         << "Report a histogram of coverage for each feature in A" << endl;
+    cerr                        << "\t\tas well as a summary histogram for _all_ features in A." << endl << endl;
+    cerr                        << "\t\tOutput (tab delimited) after each feature in A:" << endl;
+    cerr                        << "\t\t  1) depth\n\t\t  2) # bases at depth\n\t\t  3) size of A\n\t\t  4) % of A at depth" << endl << endl;
 
-    cerr << "\t-d\t"            << "Report the depth at each position in each B feature." << endl;
+    cerr << "\t-d\t"            << "Report the depth at each position in each A feature." << endl;
     cerr                        << "\t\tPositions reported are one based.  Each position" << endl;
-    cerr                        << "\t\tand depth follow the complete B feature." << endl << endl;
+    cerr                        << "\t\tand depth follow the complete A feature." << endl << endl;
     
     cerr << "\t-counts\t"       << "Only report the count of overlaps, don't compute fraction, etc." << endl << endl;
 
