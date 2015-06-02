@@ -201,17 +201,30 @@ const QuickString &KeyListOpsMethods::getDistinct() {
 
 const QuickString &KeyListOpsMethods::getDistinctOnly() {
 	if (empty()) return _nullVal;
-
-	//separated list of only unique values. If item repeats, discard.
+	// separated list of unique values. If something repeats, don't report.
 	makeFreqMap();
 	_retStr.clear();
 	for (; _freqIter != _freqMap.end(); _freqIter++) {
-		if (_freqIter->second != 1) continue;
+		if (_freqIter->second > 1) continue;
 		if (_freqIter != _freqMap.begin()) _retStr += _delimStr;
 		_retStr.append(_freqIter->first);
 	}
 	return _retStr;
 }
+
+const QuickString &KeyListOpsMethods::getDistinctSortNum(bool asc) {
+	toArray(true, asc ? ASC : DESC);
+	vector<double>::iterator endIter = std::unique(_numArray.begin(), _numArray.end());
+
+	_retStr.clear();
+	for (vector<double>::iterator iter = _numArray.begin(); iter != endIter; iter++) {
+		if (iter != _numArray.begin()) _retStr += _delimStr;
+		_retStr.append(*iter);
+	}
+	return  _retStr;
+
+}
+
 
 // return a the count of _unique_ elements in the vector
 uint32_t KeyListOpsMethods::getCountDistinct() {

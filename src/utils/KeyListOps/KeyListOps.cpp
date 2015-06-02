@@ -28,6 +28,9 @@ _dbFileType(FileRecordTypeChecker::UNKNOWN_FILE_TYPE)
 	_opCodes["distinct"] = DISTINCT;
 	_opCodes["count_distinct"] = COUNT_DISTINCT;
 	_opCodes["distinct_only"] = DISTINCT_ONLY;
+	_opCodes["distinct_sort_num"] = DISTINCT_SORT_NUM;
+	_opCodes["distinct_sort_num_desc"] = DISTINCT_SORT_NUM_DESC;
+
 	_opCodes["collapse"] = COLLAPSE;
 	_opCodes["concat"] = CONCAT;
 	_opCodes["freq_asc"] = FREQ_ASC;
@@ -267,6 +270,14 @@ const QuickString & KeyListOps::getOpVals(RecordKeyVector &hits)
 			_outVals.append(_methods.getDistinct());
 			break;
 
+		case DISTINCT_SORT_NUM:
+			_outVals.append(_methods.getDistinctSortNum());
+			break;
+
+		case DISTINCT_SORT_NUM_DESC:
+			_outVals.append(_methods.getDistinctSortNum(false));
+			break;
+
 		case COUNT_DISTINCT:
 			_outVals.append(_methods.getCountDistinct());
 			break;
@@ -340,6 +351,9 @@ void KeyListOpsHelp() {
     cerr                         << "\t\t    mean, median," << endl;
     cerr                         << "\t\t    collapse (i.e., print a delimited list (duplicates allowed)), " << endl;
     cerr                         << "\t\t    distinct (i.e., print a delimited list (NO duplicates allowed)), " << endl;
+    cerr                         << "\t\t    distinct_sort_num (as distinct, sorted numerically, ascending)," << endl;
+    cerr                         << "\t\t    distinct_sort_num_desc (as distinct, sorted numerically, desscending)," << endl;
+    cerr                         << "\t\t    distinct_only (delimited list of only unique values)," << endl;
     cerr                         << "\t\t    count" << endl;
     cerr                         << "\t\t    count_distinct (i.e., a count of the unique values in the column), " << endl;
     cerr                         << "\t\t    first (i.e., just the first value in the column), " << endl;

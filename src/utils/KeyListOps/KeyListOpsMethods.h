@@ -58,7 +58,12 @@ public:
     uint32_t getCountDistinct();
     // return only those elements that occur once
     const QuickString &getDistinctOnly();
-    // return a delimiter-separated list of elements
+    // as distinct, but sorted numerically.
+    const QuickString &getDistinctSortNum(bool ascending = true);
+    // as distinct, but sorted numerically, descending
+
+
+     // return a delimiter-separated list of elements
     const QuickString & getCollapse(const QuickString & delimiter = ",");
     // return a concatenation of all elements in the vector
     const QuickString & getConcat();
