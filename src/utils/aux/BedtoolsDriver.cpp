@@ -24,7 +24,8 @@
 #include "fisher.h"
 #include "coverageFile.h"
 
-BedtoolsDriver::BedtoolsDriver() {
+BedtoolsDriver::BedtoolsDriver()
+: _hadError(false) {
 	_supported.insert("intersect");
 	_supported.insert("map");
 	_supported.insert("closest");
@@ -50,6 +51,7 @@ bool BedtoolsDriver::subMain(int argc, char **argv) {
 	//process all command line arguments, check for valid usage,
 	//show help and error messages if needed.
 	if (!context->testCmdArgs(argc - 1, argv + 1)) {
+		_hadError = context->errorEncountered();
 		delete context;
 		return false;
 	}

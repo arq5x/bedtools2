@@ -8,9 +8,11 @@ public:
 	bool supports(const QuickString &tool);
 	ContextBase *getContext();
 	ToolBase *getTool(ContextBase *context);
+	bool hadError() const { return _hadError; }
 protected:
 	QuickString _subCmd;
 	typedef set<QuickString> supportType;
 	supportType _supported;
+	bool _hadError;
 
 };
