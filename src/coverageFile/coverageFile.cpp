@@ -47,6 +47,10 @@ void CoverageFile::processHits(RecordOutputMgr *outputMgr, RecordKeyVector &hits
 		   doPerBase(outputMgr, hits);
 		   break;
 
+	   case ContextCoverage::MEAN:
+		   doMean(outputMgr, hits);
+		   break;
+
 	   case ContextCoverage::HIST:
 		   doHist(outputMgr, hits);
 		   break;
@@ -55,6 +59,7 @@ void CoverageFile::processHits(RecordOutputMgr *outputMgr, RecordKeyVector &hits
 	   default:
 		   doDefault(outputMgr, hits);
 		   break;
+
 	   }
 
 }
@@ -139,7 +144,7 @@ void CoverageFile::doCounts(RecordOutputMgr *outputMgr, RecordKeyVector &hits)
 
 void CoverageFile::doPerBase(RecordOutputMgr *outputMgr, RecordKeyVector &hits)
 {
-	//loop through all bases in query, printing full record and metrcis for each
+	//loop through all bases in query, printing full record and metrics for each
 	const Record * queryRec = hits.getKey();
 	for (size_t i= 0; i < _queryLen; i++) {
 		_finalOutput = i +1;
@@ -149,6 +154,17 @@ void CoverageFile::doPerBase(RecordOutputMgr *outputMgr, RecordKeyVector &hits)
 		outputMgr->printRecord(queryRec, _finalOutput);
 	}
 }
+
+void CoverageFile::doMean(RecordOutputMgr *outputMgr, RecordKeyVector &hits)
+{
+	size_t sum =0;
+	for (size_t i= 0; i < _queryLen; i++) {
+		sum += _depthArray[i];
+	}
+	format((float)sum / (float)_queryLen);
+	outputMgr->printRecord(hits.getKey(), _finalOutput);
+}
+
 
 void CoverageFile::doHist(RecordOutputMgr *outputMgr, RecordKeyVector &hits)
 {
@@ -200,4 +216,3 @@ void CoverageFile::format(float val)
 	sprintf(_floatValBuf, "%0.7f", val);
    _finalOutput.append(_floatValBuf);
 }
-

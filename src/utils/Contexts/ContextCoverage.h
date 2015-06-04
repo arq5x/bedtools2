@@ -19,18 +19,22 @@ public:
     virtual bool hasIntersectMethods() const { return true; }
     virtual bool isValidState();
 
-    typedef enum { DEFAULT, COUNT, PER_BASE, HIST } coverageType;
+    typedef enum { DEFAULT, COUNT, PER_BASE, HIST, MEAN } coverageType;
     coverageType getCoverageType() const { return _coverageType; }
+    virtual bool usingColOps() const { return _usingColOps; }
 
 private:
     bool _count;
     bool _perBase;
     bool _showHist;
+    bool _mean;
     coverageType _coverageType;
+    bool _usingColOps;
 
 	bool handle_c();
 	bool handle_d();
 	bool handle_hist();
+	bool handle_mean();
 
 
 };
