@@ -2,15 +2,31 @@
 #include "SingleLineDelimTextFileReader.h"
 
 BedPlusInterval::BedPlusInterval()
-:  _numPrintFields(0)
+:  _numFixedFields(defaultNumFixedFields),
+  _numPrintFields(0)
 {
-	_plusFields.setNumOffsetFields(numFixedFields);
+	_plusFields.setNumOffsetFields(defaultNumFixedFields);
+}
+
+void BedPlusInterval::setNumFixedFields(int numFields) {
+	_numFixedFields = numFields;
+	_plusFields.setNumOffsetFields(numFields);
 }
 
 
 bool BedPlusInterval::initFromFile(SingleLineDelimTextFileReader *fileReader)
 {
-	return (Bed3Interval::initFromFile(fileReader) && _plusFields.initFromFile(fileReader));
+	bool baseRetFlag = Bed3Interval::initFromFile(fileReader);
+
+	if (_numFixedFields != defaultNumFixedFields) {
+		fileReader->getField(3, _name);
+		fileReader->getField(4, _score);
+		fileReader->getField(5, _strand);
+		adjustStrandVal();
+	}
+	_plusFields.initFromFile(fileReader);
+	return baseRetFlag;
+
 }
 
 
@@ -22,18 +38,21 @@ void BedPlusInterval::clear() {
 void BedPlusInterval::print(QuickString &outBuf) const
 {
 	Bed3Interval::print(outBuf);
+	printBed6PlusFields(outBuf);
 	_plusFields.printFields(outBuf);
 }
 
 void BedPlusInterval::print(QuickString &outBuf, int start, int end) const
 {
 	Bed3Interval::print(outBuf, start, end);
+	printBed6PlusFields(outBuf);
 	_plusFields.printFields(outBuf);
 }
 
 void BedPlusInterval::print(QuickString &outBuf, const QuickString & start, const QuickString & end) const
 {
 	Bed3Interval::print(outBuf, start, end);
+	printBed6PlusFields(outBuf);
 	_plusFields.printFields(outBuf);
 }
 
@@ -41,14 +60,15 @@ void BedPlusInterval::print(QuickString &outBuf, const QuickString & start, cons
 void BedPlusInterval::printNull(QuickString &outBuf) const
 {
 	Bed3Interval::printNull(outBuf);
-	for (int i=numFixedFields; i < _numPrintFields; i++) {
+	printBed6PlusNullFields(outBuf);
+	for (int i=_numFixedFields; i < _numPrintFields; i++) {
 		outBuf.append("\t.");
 	}
 }
 
 const QuickString &BedPlusInterval::getField(int fieldNum) const
 {
-	if (fieldNum > numFixedFields) {
+	if (fieldNum > _numFixedFields) {
 		return _plusFields.getField(fieldNum);
 	}
 	return Bed3Interval::getField(fieldNum);
@@ -61,9 +81,27 @@ bool BedPlusInterval::isNumericField(int fieldNum) {
 	// fields after the 3rd are numeric, so for now we'll give the user the
 	// benefit of the doubt on those.
 	//
-	if (fieldNum > numFixedFields) {
+	if (fieldNum > defaultNumFixedFields) {
 		return true;
 	}
 	return Bed3Interval::isNumericField(fieldNum);
 }
 
+void BedPlusInterval::printBed6PlusFields(QuickString &outBuf) const {
+	if (_numFixedFields != defaultNumFixedFields) {
+		outBuf.append('\t');
+		outBuf.append(_name);
+		outBuf.append('\t');
+		outBuf.append(_score);
+		outBuf.append('\t');
+		outBuf.append(_strand);
+	}
+
+}
+
+void BedPlusInterval::printBed6PlusNullFields(QuickString &outBuf) const {
+	if (_numFixedFields != defaultNumFixedFields) {
+		outBuf.append("\t.\t.\t.");
+	}
+
+}

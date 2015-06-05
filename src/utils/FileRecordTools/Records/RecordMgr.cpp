@@ -45,6 +45,7 @@ RecordMgr::RecordMgr(FileRecordTypeChecker::RECORD_TYPE recType, int blockSize)
 			break;
 		}
 		case FileRecordTypeChecker::BED_PLUS_RECORD_TYPE:
+		case FileRecordTypeChecker::BED6_PLUS_RECORD_TYPE:
 		{
 			_freeList = new FreeList<BedPlusInterval>(_freeListBlockSize);
 			break;
@@ -119,6 +120,7 @@ RecordMgr::~RecordMgr()
 			break;
 		}
 		case FileRecordTypeChecker::BED_PLUS_RECORD_TYPE:
+		case FileRecordTypeChecker::BED6_PLUS_RECORD_TYPE:
 		{
 			delete (FreeList<BedPlusInterval> *)_freeList;
 			break;
@@ -200,8 +202,12 @@ Record *RecordMgr::allocateRecord()
 			break;
 		}
 		case FileRecordTypeChecker::BED_PLUS_RECORD_TYPE:
+		case FileRecordTypeChecker::BED6_PLUS_RECORD_TYPE:
 		{
 			BedPlusInterval *bPi = ((FreeList<BedPlusInterval> *)_freeList)->newObj();
+			if (_recordType == FileRecordTypeChecker::BED6_PLUS_RECORD_TYPE) {
+				bPi->setNumFixedFields(6);
+			}
 			record = bPi;
 			break;
 		}
@@ -284,6 +290,7 @@ void RecordMgr::deleteRecord(const Record *record)
 			break;
 		}
 		case FileRecordTypeChecker::BED_PLUS_RECORD_TYPE:
+		case FileRecordTypeChecker::BED6_PLUS_RECORD_TYPE:
 		{
 			((FreeList<BedPlusInterval> *)_freeList)->deleteObj(static_cast<const BedPlusInterval *>(record));
 			break;

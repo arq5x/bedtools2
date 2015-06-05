@@ -1,0 +1,4 @@
+#chr	start	stop	name	score	strand
+chr1	10000	20000	gene1	50	-
+chr1	20100	25000	gene1	50	-
+

@@ -19,6 +19,7 @@ public:
 
 	BedPlusInterval();
 	virtual ~BedPlusInterval() {}
+	void setNumFixedFields(int numFields);
 	virtual bool initFromFile(SingleLineDelimTextFileReader *);
 	virtual void clear();
 	virtual void print(QuickString &outBuf) const;
@@ -28,7 +29,7 @@ public:
 	virtual FileRecordTypeChecker::RECORD_TYPE getType() const { return FileRecordTypeChecker::BED_PLUS_RECORD_TYPE; }
 
 	virtual const QuickString &getField(int fieldNum) const;
-	virtual int getNumFields() const  { return numFixedFields + _plusFields.size(); }
+	virtual int getNumFields() const  { return _numFixedFields + _plusFields.size(); }
 
 	virtual void setNumPrintFields(int num) { _numPrintFields = num; }
 	virtual int getNumPrintFields() const { return _numPrintFields; }
@@ -36,9 +37,13 @@ public:
 
 
 protected:
-	static const int numFixedFields = 3; //first three fields have names, and are not stored in otherIdxs.
+	int _numFixedFields; //first fields have names, and are not stored in otherIdxs.
+	static const int defaultNumFixedFields = 3;
 	PlusFields _plusFields;
 	int _numPrintFields;
+
+	void printBed6PlusFields(QuickString &outBuf) const;
+	void printBed6PlusNullFields(QuickString &outBuf) const;
 
 };
 

@@ -30,6 +30,7 @@ FileRecordTypeChecker::FileRecordTypeChecker()
 	_hasName[BED6_RECORD_TYPE] = true;
 	_hasName[BED12_RECORD_TYPE] = true;
 	_hasName[BED_PLUS_RECORD_TYPE] = true;
+	_hasName[BED6_PLUS_RECORD_TYPE] = true;
 	_hasName[BAM_RECORD_TYPE] = true;
 	_hasName[VCF_RECORD_TYPE] = true;
 	_hasName[GFF_RECORD_TYPE] = true;
@@ -41,6 +42,7 @@ FileRecordTypeChecker::FileRecordTypeChecker()
 	_hasScore[BED6_RECORD_TYPE] = true;
 	_hasScore[BED12_RECORD_TYPE] = true;
 	_hasScore[BED_PLUS_RECORD_TYPE] = true;
+	_hasScore[BED6_PLUS_RECORD_TYPE] = true;
 	_hasScore[BAM_RECORD_TYPE] = true;
 	_hasScore[VCF_RECORD_TYPE] = true;
 	_hasScore[GFF_RECORD_TYPE] = true;
@@ -51,7 +53,8 @@ FileRecordTypeChecker::FileRecordTypeChecker()
 	_hasStrand[BED3_RECORD_TYPE] = false;
 	_hasStrand[BED6_RECORD_TYPE] = true;
 	_hasStrand[BED12_RECORD_TYPE] = true;
-	_hasStrand[BED_PLUS_RECORD_TYPE] = true;
+	_hasStrand[BED_PLUS_RECORD_TYPE] = false;
+	_hasStrand[BED6_PLUS_RECORD_TYPE] = true;
 	_hasStrand[BAM_RECORD_TYPE] = true;
 	_hasStrand[VCF_RECORD_TYPE] = true;
 	_hasStrand[GFF_RECORD_TYPE] = true;
@@ -196,7 +199,12 @@ bool FileRecordTypeChecker::handleTextFormat(const char *buffer, size_t len)
 			} else if (_numFields == 12 && passesBed12()) {
 				_recordType = BED12_RECORD_TYPE;
 			} else if (_numFields >3) {
-				_recordType = BED_PLUS_RECORD_TYPE;
+				if (_numFields >= 6 && isStrandField(5)) {
+					_recordType = BED6_PLUS_RECORD_TYPE;
+				} else {
+					_recordType = BED_PLUS_RECORD_TYPE;
+				}
+
 			}
 			return true;
 		}
