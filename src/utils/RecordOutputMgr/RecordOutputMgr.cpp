@@ -82,6 +82,12 @@ bool RecordOutputMgr::printKeyAndTerminate(RecordKeyVector &keyList) {
 		//bed3 format, which is surprisingly difficult to do. Had to use the following:
 		const Bed3Interval *bed3 = static_cast<const Bed3Interval *>(keyList.getKey());
 		bed3->Bed3Interval::print(_outBuf);
+
+		//in addition, if we're doing stranded merges, we need to print the strand sign.
+		if (_context->getDesiredStrand() != FileRecordMergeMgr::ANY_STRAND) {
+			_outBuf.append("\t");
+			_outBuf.append(keyList.getKey()->getStrand());
+		}
 		return false;
 	}
 	printBamType bamCode = printBamRecord(keyList);

@@ -43,7 +43,7 @@ public:
 	void setKeyList(RecordKeyVector *keyList) { _methods.setKeyList(keyList); }
 
 	typedef enum { SUM, MEAN, STDDEV, SAMPLE_STDDEV, MEDIAN, MODE, ANTIMODE, MIN, MAX, ABSMIN, ABSMAX, COUNT, DISTINCT, COUNT_DISTINCT,
-    	DISTINCT_ONLY, COLLAPSE, CONCAT, FREQ_ASC, FREQ_DESC, FIRST, LAST, INVALID } OP_TYPES;
+    	DISTINCT_ONLY, DISTINCT_SORT_NUM, DISTINCT_SORT_NUM_DESC, COLLAPSE, CONCAT, FREQ_ASC, FREQ_DESC, FIRST, LAST, INVALID } OP_TYPES;
 
 	void setDBfileType(FileRecordTypeChecker::FILE_TYPE type) { _dbFileType = type; }
 	bool isValidColumnOps(FileRecordMgr *dbFile);

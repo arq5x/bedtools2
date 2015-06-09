@@ -59,6 +59,7 @@ VectorOps::VectorOps(const vector<string> &vec)
 : _vecs(vec)
 , _vecd()
 , _size(vec.size())
+, _delimStr(",")
 {
     _vecd.reserve(vec.size());
 }
@@ -261,8 +262,32 @@ string VectorOps::GetDistinct(void)
     
     for( size_t i = 0; i < _vecs.size(); i++ ) {
         if (i>0)
-            distinct << ",";
+            distinct << _delimStr;
         distinct << _vecs[i];
+    }
+    return distinct.str();
+}
+
+string VectorOps::GetDistinctSortNum(bool ascending)
+{
+    ostringstream distinct;
+    // remove duplicate entries from the vector
+    // http://stackoverflow.com/questions/1041620/most-efficient-way-to-erase-duplicates-and-sort-a-c-vector
+    // convert the vec of strings to a vec of doubles
+    transform(_vecs.begin(), _vecs.end(), back_inserter(_vecd), MakeDouble);
+
+    if (ascending) {
+    	sort( _vecd.begin(), _vecd.end(), less<double>());
+    } else {
+    	sort( _vecd.begin(), _vecd.end(), greater<double>());
+
+    }
+    _vecd.erase( unique( _vecd.begin(), _vecd.end() ), _vecd.end() );
+
+    for( size_t i = 0; i < _vecd.size(); i++ ) {
+        if (i>0)
+            distinct << _delimStr;
+        distinct << _vecd[i];
     }
     return distinct.str();
 }
@@ -297,7 +322,7 @@ string VectorOps::GetFreqDesc(void)
     vector< pair<int, string> >::const_iterator iter    = freqList.begin();
     vector< pair<int, string> >::const_iterator iterEnd = freqList.end();
     for (; iter != iterEnd; ++iter)
-        buffer << iter->second << ":" << iter->first << ",";
+        buffer << iter->second << ":" << iter->first << _delimStr;
     
     return buffer.str();
 }
@@ -333,7 +358,7 @@ string VectorOps::GetFreqAsc(void)
     vector< pair<int, string> >::const_iterator iter    = freqList.begin();
     vector< pair<int, string> >::const_iterator iterEnd = freqList.end();
     for (; iter != iterEnd; ++iter)
-        buffer << iter->second << ":" << iter->first << ",";
+        buffer << iter->second << ":" << iter->first << _delimStr;
     
     return buffer.str();
 }
@@ -349,5 +374,3 @@ string VectorOps::GetLast(void)
 {
     return _vecs[_vecs.size() - 1];
 }
-
-

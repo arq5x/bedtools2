@@ -11,9 +11,12 @@ ContextCoverage::ContextCoverage()
 : _count(false),
   _perBase(false),
   _showHist(false),
-  _coverageType(DEFAULT)
+  _coverageType(DEFAULT),
+  _usingColOps(false)
 {
 	setExplicitBedOutput(true); //do not allow BAM output
+	setColumnOpsMethods(true);
+
 
 }
 
@@ -36,6 +39,10 @@ bool ContextCoverage::parseCmdArgs(int argc, char **argv, int skipFirstArgs) {
 		if (strcmp(_argv[_i], "-hist") == 0) {
 			if (!handle_hist()) return false;
 		}
+		if (strcmp(_argv[_i], "-mean") == 0) {
+			if (!handle_mean()) return false;
+		}
+
 	}
 	return ContextIntersect::parseCmdArgs(argc, argv, _skipFirstArgs);
 }
@@ -46,8 +53,8 @@ bool ContextCoverage::isValidState()
 		return false;
 	}
 	//Can only use one output option. Were two or more set?
-	if (((int)_count + (int)_perBase + (int)_showHist) > 1) {
-		_errorMsg = "\n***** ERROR: -counts, -d, and -hist are mutually exclusive options. *****";
+	if (((int)_count + (int)_perBase + (int)_showHist) + (int)_mean > 1) {
+		_errorMsg = "\n***** ERROR: -counts, -d, -mean, and -hist are all mutually exclusive options. *****";
 		return false;
 	}
 
@@ -73,6 +80,14 @@ bool ContextCoverage::handle_hist()
 {
 	_showHist = true;
 	_coverageType = HIST;
+	markUsed(_i - _skipFirstArgs);
+	return true;
+}
+
+bool ContextCoverage::handle_mean()
+{
+	_mean = true;
+	_coverageType = MEAN;
 	markUsed(_i - _skipFirstArgs);
 	return true;
 }

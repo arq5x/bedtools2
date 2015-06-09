@@ -43,6 +43,7 @@ protected:
 
 	void doCounts(RecordOutputMgr *outputMgr, RecordKeyVector &hits);
 	void doPerBase(RecordOutputMgr *outputMgr, RecordKeyVector &hits);
+	void doMean(RecordOutputMgr *outputMgr, RecordKeyVector &hits);
 	void doHist(RecordOutputMgr *outputMgr, RecordKeyVector &hits);
 	void doDefault(RecordOutputMgr *outputMgr, RecordKeyVector &hits);
 

@@ -70,6 +70,7 @@ public:
 	ContextFileType getOutputFileType() const { return _outputFileType; }
 
 	virtual bool testCmdArgs(int argc, char **argv);
+	virtual bool errorEncountered() const { return !_errorMsg.empty(); }
 
 	 //isValidState checks that parameters to context are in an acceptable state.
 	// If not, the error msg string will be set with a reason why it failed.

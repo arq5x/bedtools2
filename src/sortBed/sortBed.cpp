@@ -40,7 +40,7 @@ void BedSort::SortBed() {
     for (masterBedMapNoBin::iterator m = _bed->bedMapNoBin.begin(); m != _bed->bedMapNoBin.end(); ++m) {
 
         // bedList is already sorted by start position.
-        vector<BED> bedList = m->second;
+        const vector<BED> &bedList = m->second;
 
         for (unsigned int i = 0; i < bedList.size(); ++i) {
             _bed->reportBedNewLine(bedList[i]);
@@ -105,7 +105,7 @@ void BedSort::SortBedOnFaidx()
 			if( m == _bed->bedMapNoBin.end() ) continue; //this chromosome is not present in BED
 			
 		    // bedList is already sorted by start position.
-		    vector<BED> bedList = m->second;
+		    const vector<BED> &bedList = m->second;
 
 		    for (unsigned int i = 0; i < bedList.size(); ++i) {
 		        _bed->reportBedNewLine(bedList[i]);
@@ -124,11 +124,11 @@ void BedSort::SortBedBySizeAsc() {
     for (masterBedMapNoBin::iterator m = _bed->bedMapNoBin.begin(); m != _bed->bedMapNoBin.end(); ++m) {
 
         // bedList is already sorted by start position.
-        vector<BED> bedList = m->second;
+        const vector<BED> &bedList = m->second;
 
         // add the entries from this chromosome to the current list
-        for (unsigned int i = 0; i < m->second.size(); ++i) {
-            masterList.push_back(m->second[i]);
+        for (unsigned int i = 0; i < bedList.size(); ++i) {
+            masterList.push_back(bedList[i]);
         }
     }
 
@@ -151,11 +151,11 @@ void BedSort::SortBedBySizeDesc() {
     for (masterBedMapNoBin::iterator m = _bed->bedMapNoBin.begin(); m != _bed->bedMapNoBin.end(); ++m) {
 
         // bedList is already sorted by start position.
-        vector<BED> bedList = m->second;
+        const vector<BED> &bedList = m->second;
 
         // add the entries from this chromosome to the current list
-        for (unsigned int i = 0; i < m->second.size(); ++i) {
-            masterList.push_back(m->second[i]);
+        for (unsigned int i = 0; i < bedList.size(); ++i) {
+            masterList.push_back(bedList[i]);
         }
     }
 
@@ -174,7 +174,7 @@ void BedSort::SortBedByChromThenSizeAsc() {
     for (masterBedMapNoBin::iterator m = _bed->bedMapNoBin.begin(); m != _bed->bedMapNoBin.end(); ++m) {
 
         // bedList is already sorted by start position.
-        vector<BED> bedList = m->second;
+        vector<BED> &bedList = m->second;
         sort(bedList.begin(), bedList.end(), sortBySizeAsc);
 
         for (unsigned int i = 0; i < bedList.size(); ++i) {
@@ -190,7 +190,7 @@ void BedSort::SortBedByChromThenSizeDesc() {
     for (masterBedMapNoBin::iterator m = _bed->bedMapNoBin.begin(); m != _bed->bedMapNoBin.end(); ++m) {
 
         // bedList is already sorted by start position.
-        vector<BED> bedList = m->second;
+        vector<BED> &bedList = m->second;
 
         sort(bedList.begin(), bedList.end(), sortBySizeDesc);
 
@@ -208,7 +208,7 @@ void BedSort::SortBedByChromThenScoreAsc() {
         for (masterBedMapNoBin::iterator m = _bed->bedMapNoBin.begin(); m != _bed->bedMapNoBin.end(); ++m) {
 
             // bedList is already sorted by start position.
-            vector<BED> bedList = m->second;
+            vector<BED> &bedList = m->second;
             sort(bedList.begin(), bedList.end(), sortByScoreAsc);
 
             for (unsigned int i = 0; i < bedList.size(); ++i) {
@@ -230,7 +230,7 @@ void BedSort::SortBedByChromThenScoreDesc() {
         for (masterBedMapNoBin::iterator m = _bed->bedMapNoBin.begin(); m != _bed->bedMapNoBin.end(); ++m) {
 
             // bedList is already sorted by start position.
-            vector<BED> bedList = m->second;
+            vector<BED> &bedList = m->second;
             sort(bedList.begin(), bedList.end(), sortByScoreDesc);
 
             for (unsigned int i = 0; i < bedList.size(); ++i) {

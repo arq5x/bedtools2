@@ -34,6 +34,8 @@ void coverage_help(void) {
     
     cerr << "\t-counts\t"       << "Only report the count of overlaps, don't compute fraction, etc." << endl << endl;
 
+    cerr << "\t-mean\t"       	<< "Report the mean depth of all positions in each A feature." << endl << endl;
+
 
     IntersectCommonHelp();
     sortedHelp();

@@ -1,0 +1,11 @@
+#Header line for a.bed
+chr7	240	560	x	86	-
+chr7	210	525	d	21	+
+chr7	2100	2310	e	32	+
+chr3	40	260	p	41	-
+chr3	10	220	f	12	+
+chr3	100	320	g	96	-
+chr9	140	160	z	05	+
+chr9	110	120	a	81	-
+chr9	1100	1120	b	12	+
+
