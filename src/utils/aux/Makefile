@@ -35,7 +35,7 @@ INCLUDES = -I$(UTILITIES_DIR)/bedFile/ \
 			-I$(TOOLS_DIR)/bed12ToBed6/ \
 			-I$(TOOLS_DIR)/closestFile/ \
 			-I$(TOOLS_DIR)/clusterBed/ \
-			-I$(TOOLS_DIR)/complementBed/ \
+			-I$(TOOLS_DIR)/complementFile/ \
 			-I$(TOOLS_DIR)/coverageFile/ \
 			-I$(TOOLS_DIR)/expand/ \
 			-I$(TOOLS_DIR)/fastaFromBed/ \

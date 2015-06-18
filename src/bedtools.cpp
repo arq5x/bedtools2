@@ -46,7 +46,7 @@ int bedtoigv_main(int argc, char* argv[]);//
 int bedpetobam_main(int argc, char* argv[]);//
 void closest_help();
 int cluster_main(int argc, char* argv[]); //
-int complement_main(int argc, char* argv[]);//
+void complement_help();
 void coverage_help();
 int regress_test_main(int argc, char **argv); //
 int expand_main(int argc, char* argv[]);//
@@ -106,7 +106,6 @@ int main(int argc, char *argv[])
     else if (subCmd == "window")      return window_main(argc-1, argv+1);
     else if (subCmd == "genomecov")   return genomecoverage_main(argc-1, argv+1);
     else if (subCmd == "cluster")     return cluster_main(argc-1, argv+1);
-    else if (subCmd == "complement")  return complement_main(argc-1, argv+1);
     else if (subCmd == "slop")        return slop_main(argc-1, argv+1);
     else if (subCmd == "split")       return split_main(argc-1, argv+1);
     else if (subCmd == "flank")       return flank_main(argc-1, argv+1);
@@ -307,6 +306,8 @@ void showHelp(const QuickString &subCmd) {
 		fisher_help();
 	} else if (subCmd == "coverage") {
 		coverage_help();
+	} else if (subCmd == "complement") {
+		complement_help();
 	}
 
 }
