@@ -68,7 +68,7 @@ bool BufferedStreamMgr::getTypeData()
 	_currScanBuffer = _inputStreamMgr->getSavedData();
 	_typeChecker.setFilename(_filename);
 	do {
-		if (!_typeChecker.scanBuffer(_currScanBuffer.c_str(), _currScanBuffer.size(), _inputStreamMgr->getEofHit()) && !_typeChecker.needsMoreData()) {
+		if (!_typeChecker.scanBuffer(_currScanBuffer.c_str(), _currScanBuffer.size(), _inputStreamMgr->getEofHit(), _inputStreamMgr->isCompressed()) && !_typeChecker.needsMoreData()) {
 			return false;
 		} else if (_typeChecker.needsMoreData()) {
 			if (!_inputStreamMgr->populateScanBuffer()) {

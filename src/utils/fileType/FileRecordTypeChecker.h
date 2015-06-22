@@ -35,7 +35,7 @@ public:
 		GFF_PLUS_RECORD_TYPE} RECORD_TYPE;
 
 	void setFilename(const QuickString & filename) { _filename = filename; }
-	bool scanBuffer(const char *buf, size_t len, bool eofHit);
+	bool scanBuffer(const char *buf, size_t len, bool eofHit, bool isCompressed = false);
 	bool needsMoreData() const { return _insufficientData; }
 
 	bool recordTypeHasName(RECORD_TYPE type) const { return _hasName.find(type) != _hasName.end(); }
@@ -105,6 +105,7 @@ private:
 	bool _isGFF;
 	bool _isGFFplus;
 	bool _isGzipped;
+	bool _isCompressed;
 	bool _insufficientData; //set to true if scan buffer had only header lines.
 	bool _fourthFieldNumeric; //this is just to distinguish between Bed4 and BedGraph files.
 	bool _givenEmptyBuffer;
