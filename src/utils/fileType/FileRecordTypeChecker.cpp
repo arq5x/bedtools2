@@ -20,6 +20,7 @@ FileRecordTypeChecker::FileRecordTypeChecker()
 	_isGFF = false;
 	_isGFFplus = false;
 	_isGzipped = false;
+	_isCompressed = false;
 	_insufficientData = false;
 	_fourthFieldNumeric = false;
 	_givenEmptyBuffer = false;
@@ -80,9 +81,10 @@ FileRecordTypeChecker::FileRecordTypeChecker()
 }
 
 
-bool FileRecordTypeChecker::scanBuffer(const char *buffer, size_t len, bool eofHit)
+bool FileRecordTypeChecker::scanBuffer(const char *buffer, size_t len, bool eofHit, bool isCompressed)
 {
 	_eofHit = eofHit;
+	_isCompressed = isCompressed;
 	_numBytesInBuffer = len;
 	if (_numBytesInBuffer == 0) {
 		_fileType = EMPTY_FILE_TYPE;
@@ -281,7 +283,7 @@ bool FileRecordTypeChecker::isTextDelimtedFormat(const char *buffer, size_t len)
 {
 	//Break single string buffer into vector of QuickStrings. Delimiter is newline.
 	_tokenizer.setKeepFinalIncompleteElem(Tokenizer::IGNORE);
-	int numLines = _tokenizer.tokenize(buffer, '\n', _eofHit);
+	int numLines = _tokenizer.tokenize(buffer, '\n', _eofHit, _isCompressed);
 
 	//anticipated delimiter characters are tab, comma, and semi-colon.
 	//If we need new ones, they must be added in this method.

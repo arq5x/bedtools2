@@ -31,6 +31,9 @@ public:
 
 	void printClosest(RecordKeyVector &keyList, const vector<int> *dists = NULL);
 
+	void tab() { _outBuf.append('\t'); }
+	void newline() { _outBuf.append('\n'); }
+
 private:
 	typedef enum { NOT_BAM, BAM_AS_BAM, BAM_AS_BED} printBamType;
 
@@ -46,8 +49,6 @@ private:
 	//some helper functions to neaten the code.
 	int _numOverlapBases;
 
-	void tab() { _outBuf.append('\t'); }
-	void newline() { _outBuf.append('\n'); }
 	void null(bool queryType, bool dbType);
 
 	void printRecord(RecordKeyVector &keyList, RecordKeyVector *blockList);

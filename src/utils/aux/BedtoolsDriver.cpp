@@ -23,6 +23,7 @@
 #include "spacingFile.h"
 #include "fisher.h"
 #include "coverageFile.h"
+#include "complementFile.h"
 
 BedtoolsDriver::BedtoolsDriver()
 : _hadError(false) {
@@ -36,6 +37,7 @@ BedtoolsDriver::BedtoolsDriver()
 	_supported.insert("spacing");
 	_supported.insert("fisher");
 	_supported.insert("coverage");
+	_supported.insert("complement");
 }
 
 
@@ -106,7 +108,9 @@ ContextBase *BedtoolsDriver::getContext()
 		context = new ContextFisher();
 	} else if (_subCmd == "coverage") {
 		context = new ContextCoverage();
-	} else {
+	} else if (_subCmd == "complement") {
+		context = new ContextComplement();
+	}else {
 		cerr << "Error: Tool " << _subCmd << " is not supported. Exiting..." << endl;
 		exit(1);
 	}
@@ -136,6 +140,8 @@ ToolBase *BedtoolsDriver::getTool(ContextBase *context)
 		tool = new Fisher(static_cast<ContextFisher *>(context));
 	} else if (_subCmd == "coverage") {
 		tool = new CoverageFile(static_cast<ContextCoverage *>(context));
+	} else if (_subCmd == "complement") {
+		tool = new ComplementFile(static_cast<ContextComplement *>(context));
 	}
 
 	else {

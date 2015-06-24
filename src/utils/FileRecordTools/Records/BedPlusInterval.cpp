@@ -70,6 +70,13 @@ const QuickString &BedPlusInterval::getField(int fieldNum) const
 {
 	if (fieldNum > _numFixedFields) {
 		return _plusFields.getField(fieldNum);
+	} else if (fieldNum == 4 && _numFixedFields >=4) {
+		return _name;
+	} else if (fieldNum == 5 && _numFixedFields >=5) {
+		return _score;
+	}
+	else if (fieldNum == 6 && _numFixedFields >=6) {
+		return _strand;
 	}
 	return Bed3Interval::getField(fieldNum);
 }

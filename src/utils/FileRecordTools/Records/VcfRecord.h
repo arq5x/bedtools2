@@ -31,6 +31,7 @@ public:
 protected:
 	QuickString _varRef;
 	QuickString _varAlt;
+	static const int numFixedFields = 6;
 
 	void printOtherFields(QuickString &outBuf) const;
 };

@@ -33,9 +33,9 @@ public:
 	virtual int getNumFields() const  { return 3; }
 
 	static bool isNumericField(int fieldNum);
+	virtual ~Bed3Interval();
 
 protected:
-	virtual ~Bed3Interval();
 
 	bool _skipFirstThreeFieldsWhenPrinting;
 
