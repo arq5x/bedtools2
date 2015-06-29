@@ -27,7 +27,7 @@ FileRecordMgr::FileRecordMgr(const QuickString &filename)
   _genomeFile(NULL),
   _ioBufSize(0),
   _noEnforceCoordSort(false)
-{
+ {
 }
 
 FileRecordMgr::~FileRecordMgr(){
@@ -45,6 +45,8 @@ FileRecordMgr::~FileRecordMgr(){
 
 bool FileRecordMgr::open(bool inheader){
 	_bufStreamMgr = new BufferedStreamMgr(_filename);
+	_bufStreamMgr->getTypeChecker().setInHeader(inheader);
+
 	if (_ioBufSize > 0) _bufStreamMgr->setIoBufSize(_ioBufSize);
 	if (!_bufStreamMgr->init()) {
 		cerr << "Error: unable to open file or unable to determine types for file " << _filename << endl;
@@ -110,8 +112,8 @@ Record *FileRecordMgr::getNextRecord(RecordKeyVector *keyList)
 	// but still return it so the -v (noHit) option and the like will still
 	// see it.
 
-	if (!record->isUnmapped()) {
-		if (!record->coordsValid()) {
+	if (!record->isUnmapped() ) {
+		if (!record->coordsValid() && (record->getType() != FileRecordTypeChecker::NO_POS_PLUS_RECORD_TYPE)) {
 			cerr << "Error: Invalid record in file " << _filename << ". Record is " << endl << *record << endl;
 			exit(1);
 		}

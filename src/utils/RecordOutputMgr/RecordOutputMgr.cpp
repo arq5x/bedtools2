@@ -296,14 +296,6 @@ void RecordOutputMgr::checkForHeader() {
 	// Do we need to print a header?
 	if (!_context->getPrintHeader()) return;
 
-	//if the program is based on intersection, we want the header from the query file.
-	if (_context->hasIntersectMethods()) {
-		int queryIdx = (static_cast<ContextIntersect *>(_context))->getQueryFileIdx();
-		const QuickString &header  = _context->getFile(queryIdx)->getHeader();
-		_outBuf.append(header);
-	} else {
-		_outBuf.append(_context->getFile(0)->getHeader());
-	}
 	//If the tool is groupBy, and outheader was set,  but the header is empty, we need to print groupBy's
 	//default header
 	if (_context->getProgram() == ContextBase::GROUP_BY) {
@@ -314,7 +306,16 @@ void RecordOutputMgr::checkForHeader() {
 		} else {
 			_outBuf.append(header);
 		}
+	} else if (_context->hasIntersectMethods()) {
+		//if the tool is based on intersection, we want the header from the query file.
+
+		int queryIdx = (static_cast<ContextIntersect *>(_context))->getQueryFileIdx();
+		const QuickString &header  = _context->getFile(queryIdx)->getHeader();
+		_outBuf.append(header);
+	} else {
+		_outBuf.append(_context->getFile(0)->getHeader());
 	}
+
 	_context->setPrintHeader(false);
 	flush();
 }

@@ -44,7 +44,7 @@ bool GroupBy::init()
 		}
 	}
 	_queryFRM = _context->getFile(0);
-	_prevFields.resize(numElems);
+	_prevFields.resize(_groupCols.size());
 
 	_prevRecord = getNextRecord();
 	return true;

@@ -76,6 +76,12 @@ ContextBase::ContextBase()
 	_programNames["jaccard"] = JACCARD;
 	_programNames["spacing"] = SPACING;
 	_programNames["fisher"] = FISHER;
+	_programNames["sample"] = SAMPLE;
+	_programNames["coverage"] = COVERAGE;
+	_programNames["complement"] = COMPLEMENT;
+	_programNames["groupby"] = GROUP_BY;
+
+
 
 	if (hasColumnOpsMethods()) {
 		_keyListOps = new KeyListOps();
@@ -241,6 +247,12 @@ bool ContextBase::isValidState()
 		return false;
 	}
 	if (!determineOutputType()) {
+		return false;
+	}
+	if (_program != GROUP_BY && _files[0]->getRecordType() == FileRecordTypeChecker::NO_POS_PLUS_RECORD_TYPE) {
+		_errorMsg = "ERROR: file ";
+		_errorMsg.append(_files[0]->getFileName());
+		_errorMsg.append(" has non positional records, which are only valid for the groupBy tool.");
 		return false;
 	}
 	if (getObeySplits()) {

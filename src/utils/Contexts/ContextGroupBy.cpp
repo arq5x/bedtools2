@@ -98,15 +98,17 @@ bool ContextGroupBy::handle_inheader()
 }
 
 bool ContextGroupBy::handle_outheader() {
-	return ContextBase::handle_header();
+	setPrintHeader(true);
+	markUsed(_i - _skipFirstArgs);
+	return true;
 }
 
 bool ContextGroupBy::handle_header() {
 	_inheader = true;
-	return ContextBase::handle_header();
+	setPrintHeader(true);
+	markUsed(_i - _skipFirstArgs);
 	return true;
 }
-
 
 bool ContextGroupBy::handle_full() {
 	_printFullCols = true;
@@ -130,5 +132,7 @@ const QuickString &ContextGroupBy::getDefaultHeader() {
 		_defaultHeader.append(i);
 		_defaultHeader.append('\t');
 	}
+	//change last tab into newline
+	_defaultHeader[_defaultHeader.size()-1] = '\n';
 	return _defaultHeader;
 }

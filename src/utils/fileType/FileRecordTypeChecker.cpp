@@ -4,7 +4,8 @@
 #include "ParseTools.h"
 
 FileRecordTypeChecker::FileRecordTypeChecker()
-: _eofHit(false)
+: _eofHit(false),
+  _inheader(false)
 {
 	_fileType = UNKNOWN_FILE_TYPE;
 	_recordType = UNKNOWN_RECORD_TYPE;
@@ -226,8 +227,9 @@ bool FileRecordTypeChecker::handleTextFormat(const char *buffer, size_t len)
 			_recordType = GFF_RECORD_TYPE;
 			return true;
 		}
-		//Here the Record must not have positions, so it is the NoPosPlus Type
-		return false;
+		//Here the Record must not have positions, so it is the NoPosPlus Type.
+		_recordType = NO_POS_PLUS_RECORD_TYPE;
+		return true;
 	}
 	return false;
 }
@@ -325,7 +327,15 @@ bool FileRecordTypeChecker::isTextDelimtedFormat(const char *buffer, size_t len)
 			continue;
 		}
 
+		//
 		//skip over any header line
+		//
+
+		if (_inheader) {
+			headerCount++;
+			_inheader = false; //inheaders can only apply to first line
+			continue;
+		}
 		if (isHeaderLine(line)) {
 			//clear any previously found supposedly valid data lines, because valid lines can only come after header lines.
 			if (_firstValidDataLineIdx > -1 && _firstValidDataLineIdx < i) {
@@ -336,6 +346,9 @@ bool FileRecordTypeChecker::isTextDelimtedFormat(const char *buffer, size_t len)
 			headerCount++;
 			continue;
 		}
+
+
+
 		//a line must have some alphanumeric characters in order to be valid.
 		bool hasAlphaNum = false;
 		for (int j=0; j < len; j++) {

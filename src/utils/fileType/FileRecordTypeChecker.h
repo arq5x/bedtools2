@@ -79,7 +79,7 @@ public:
 	bool isBed12() const { return (_isBed && _numFields == 12); }
 	bool isGFF() const { return _isGFF; }
 
-
+	void setInHeader(bool val) { _inheader = val; }
 
 
 
@@ -118,6 +118,7 @@ private:
 	map<RECORD_TYPE, bool> _hasStrand;
 
 	bool _eofHit;
+	bool _inheader;
 
 	bool isBinaryBuffer(const char *buffer, size_t len);
 	bool isBAM(const char *buffer);
