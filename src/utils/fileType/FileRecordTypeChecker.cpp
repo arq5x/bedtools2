@@ -36,6 +36,7 @@ FileRecordTypeChecker::FileRecordTypeChecker()
 	_hasName[VCF_RECORD_TYPE] = true;
 	_hasName[GFF_RECORD_TYPE] = true;
 	_hasName[GFF_PLUS_RECORD_TYPE] = true;
+	_hasName[NO_POS_PLUS_RECORD_TYPE] = true;
 
 	_hasScore[UNKNOWN_RECORD_TYPE] = false;
 	_hasScore[EMPTY_RECORD_TYPE] = false;
@@ -48,6 +49,8 @@ FileRecordTypeChecker::FileRecordTypeChecker()
 	_hasScore[VCF_RECORD_TYPE] = true;
 	_hasScore[GFF_RECORD_TYPE] = true;
 	_hasScore[GFF_PLUS_RECORD_TYPE] = true;
+	_hasScore[NO_POS_PLUS_RECORD_TYPE] = true;
+
 
 	_hasStrand[UNKNOWN_RECORD_TYPE] = false;
 	_hasStrand[EMPTY_RECORD_TYPE] = false;
@@ -60,6 +63,8 @@ FileRecordTypeChecker::FileRecordTypeChecker()
 	_hasStrand[VCF_RECORD_TYPE] = true;
 	_hasStrand[GFF_RECORD_TYPE] = true;
 	_hasStrand[GFF_PLUS_RECORD_TYPE] = true;
+	_hasStrand[NO_POS_PLUS_RECORD_TYPE] = true;
+
 
 	_recordTypeNames[UNKNOWN_RECORD_TYPE] = "Unknown record type";
 	_recordTypeNames[EMPTY_RECORD_TYPE] = "Empty record type";
@@ -71,6 +76,8 @@ FileRecordTypeChecker::FileRecordTypeChecker()
 	_recordTypeNames[VCF_RECORD_TYPE] = "VCF record type";
 	_recordTypeNames[GFF_RECORD_TYPE] = "Gff record type";
 	_recordTypeNames[GFF_PLUS_RECORD_TYPE] = "GffPlus record type";
+	_recordTypeNames[NO_POS_PLUS_RECORD_TYPE] = "NoPosPlus record type";
+
 
 	_fileTypeNames[UNKNOWN_FILE_TYPE] = "Unknown file type";
 	_fileTypeNames[EMPTY_FILE_TYPE] = "Empty file type";
@@ -219,6 +226,7 @@ bool FileRecordTypeChecker::handleTextFormat(const char *buffer, size_t len)
 			_recordType = GFF_RECORD_TYPE;
 			return true;
 		}
+		//Here the Record must not have positions, so it is the NoPosPlus Type
 		return false;
 	}
 	return false;

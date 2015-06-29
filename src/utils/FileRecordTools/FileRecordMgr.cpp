@@ -25,7 +25,8 @@ FileRecordMgr::FileRecordMgr(const QuickString &filename)
   _bamReader(NULL),
   _hasGenomeFile(false),
   _genomeFile(NULL),
-  _ioBufSize(0)
+  _ioBufSize(0),
+  _noEnforceCoordSort(false)
 {
 }
 
@@ -42,7 +43,7 @@ FileRecordMgr::~FileRecordMgr(){
 	_recordMgr = NULL;
 }
 
-bool FileRecordMgr::open(){
+bool FileRecordMgr::open(bool inheader){
 	_bufStreamMgr = new BufferedStreamMgr(_filename);
 	if (_ioBufSize > 0) _bufStreamMgr->setIoBufSize(_ioBufSize);
 	if (!_bufStreamMgr->init()) {
@@ -60,7 +61,7 @@ bool FileRecordMgr::open(){
 		_bufStreamMgr = NULL;
 		exit(1);
 	}
-	allocateFileReader();
+	allocateFileReader(inheader);
 	_recordMgr = new RecordMgr(_recordType, _freeListBlockSize);
 
 	_fileReader->setFileName(_filename.c_str());
@@ -116,7 +117,7 @@ Record *FileRecordMgr::getNextRecord(RecordKeyVector *keyList)
 		}
 
 		//test for sorted order, if necessary.
-		if (_isSortedInput) {
+		if (_isSortedInput && !_noEnforceCoordSort) {
 			testInputSortOrder(record);
 		}
 	}
@@ -140,12 +141,6 @@ void FileRecordMgr::assignChromId(Record *record) {
 
 void FileRecordMgr::testInputSortOrder(Record *record)
 {
-	// User specified that file must be sorted. Check that it is so.
-	// TBD: In future versions, we might not want/need all files to be sorted,
-	// even if the -sorted option is used, depending on number of input files
-	// and program being run. Should that occur, this block will need adjusting.
-	// NEK - 9/5/13
-
 
 	// Special: For BAM records that aren't mapped, we actually don't want
 	// to test the sort order. Another ugly hack sponsored by the letters B, A, and M.
@@ -207,13 +202,14 @@ void FileRecordMgr::deleteRecord(RecordKeyVector *keyList) {
 	_recordMgr->deleteRecord(keyList->getKey());
 }
 
-void FileRecordMgr::allocateFileReader()
+void FileRecordMgr::allocateFileReader(bool inheader)
 {
 	switch (_fileType) {
 	case FileRecordTypeChecker::EMPTY_FILE_TYPE:
 	case FileRecordTypeChecker::SINGLE_LINE_DELIM_TEXT_FILE_TYPE:
 	case FileRecordTypeChecker::VCF_FILE_TYPE:
 		_fileReader = new SingleLineDelimTextFileReader(_bufStreamMgr->getTypeChecker().getNumFields(), _bufStreamMgr->getTypeChecker().getDelimChar());
+		static_cast<SingleLineDelimTextFileReader *>(_fileReader)->setInHeader(inheader);
 		break;
 
 	case FileRecordTypeChecker::BAM_FILE_TYPE:

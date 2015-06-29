@@ -54,7 +54,7 @@ int fastafrombed_main(int argc, char* argv[]);//
 int flank_main(int argc, char* argv[]); //
 int genomecoverage_main(int argc, char* argv[]);//
 int getoverlap_main(int argc, char* argv[]);//
-int groupby_main(int argc, char* argv[]);//
+void groupby_help();
 void intersect_help();
 void map_help();
 void jaccard_help(); //
@@ -146,7 +146,6 @@ int main(int argc, char *argv[])
     else if (subCmd == "igv")         return bedtoigv_main(argc-1, argv+1);
     else if (subCmd == "links")       return links_main(argc-1, argv+1);
     else if (subCmd == "makewindows") return windowmaker_main(argc-1, argv+1);
-    else if (subCmd == "groupby")     return groupby_main(argc-1, argv+1);
     else if (subCmd == "expand")      return expand_main(argc-1, argv+1);
     else if (subCmd == "neksb1")       return nek_sandbox1_main(argc-1, argv+1);
     else if (subCmd == "regresstest")  return regress_test_main(argc, argv); //this command does need all the orig args.
@@ -308,6 +307,9 @@ void showHelp(const QuickString &subCmd) {
 		coverage_help();
 	} else if (subCmd == "complement") {
 		complement_help();
+	} else if (subCmd == "groupby") {
+		groupby_help();
 	}
+
 
 }

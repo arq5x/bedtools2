@@ -63,6 +63,7 @@ public:
 	const char &operator [] (int pos) const { return _buffer[pos]; }
 	char &operator [] (int pos) { return _buffer[pos]; }
 	char &at(size_t pos) { return _buffer[pos]; }
+	bool stricmp(const QuickString &str) const; //case insensitive compare. False if same aside from case, true if different aside from case.
 
 	void append(const QuickString &str) { append(str.c_str(), str.size()); }
 	void append(const char *buf, size_t bufLen);

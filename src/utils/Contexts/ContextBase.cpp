@@ -62,6 +62,8 @@ ContextBase::ContextBase()
   _splitBlockInfo(NULL),
   _allFilesHaveChrInChromNames(UNTESTED),
   _allFileHaveLeadingZeroInChromNames(UNTESTED),
+  _noEnforceCoordSort(false),
+  _inheader(false),
   _nameConventionWarningTripped(false)
 
 {
@@ -314,8 +316,11 @@ bool ContextBase::openFiles() {
 		frm->setFullBamFlags(_useFullBamTags);
 		frm->setIsSorted(_sortedInput);
 		frm->setIoBufSize(_ioBufSize);
-		if (!frm->open()) {
+		if (!frm->open(_inheader)) {
 			return false;
+		}
+		if (_noEnforceCoordSort) {
+			frm->setNoEnforceCoodSort(true);
 		}
 		_files[i] = frm;
 	}

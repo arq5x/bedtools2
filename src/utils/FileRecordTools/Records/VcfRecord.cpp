@@ -37,7 +37,7 @@ bool VcfRecord::initFromFile(SingleLineDelimTextFileReader *fileReader)
 	fileReader->getField(2, _name);
 	fileReader->getField(5, _score);
 
-	_plusFields.setNumOffsetFields(6);
+	_plusFields.setNumOffsetFields(numFixedFields);
 	return _plusFields.initFromFile(fileReader);
 }
 

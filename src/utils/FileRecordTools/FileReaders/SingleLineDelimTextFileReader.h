@@ -28,7 +28,7 @@ public:
 	virtual void appendField(int fieldNum, QuickString &str) const;
 	virtual const QuickString &getHeader() const { return _header; }
 	virtual bool hasHeader() const { return _fullHeaderFound; }
-
+	virtual void setInHeader(bool val) { _inheader = val; }
 
 protected:
 	int _numFields;
@@ -41,6 +41,7 @@ protected:
 	QuickString _currChromStr;
 	QuickString _tempChrPosStr;
 	int _lineNum;
+	bool _inheader;
 	bool detectAndHandleHeader();
 	bool findDelimiters();
 

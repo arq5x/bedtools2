@@ -21,9 +21,10 @@ INCLUDES =  -I$(UTILITIES_DIR)/general/ \
 # ----------------------------------
 SOURCES= ContextBase.cpp ContextBase.h ContextIntersect.cpp ContextIntersect.h ContextFisher.cpp ContextFisher.h ContextMap.cpp \
 	ContextMap.h ContextSample.cpp ContextSpacing.cpp ContextSample.h ContextSpacing.h ContextMerge.h ContextMerge.cpp ContextJaccard.h ContextJaccard.cpp \
-	ContextClosest.cpp ContextClosest.h ContextSubtract.cpp ContextSubtract.h ContextCoverage.cpp ContextCoverage.h ContextComplement.cpp ContextComplement.h
+	ContextClosest.cpp ContextClosest.h ContextSubtract.cpp ContextSubtract.h ContextCoverage.cpp ContextCoverage.h ContextComplement.cpp ContextComplement.h \
+	ContextGroupBy.cpp ContextGroupBy.cpp
 OBJECTS= ContextBase.o ContextIntersect.o ContextFisher.o ContextMap.o ContextSample.o ContextSpacing.o ContextMerge.o ContextJaccard.o ContextClosest.o \
-	ContextSubtract.o ContextCoverage.o ContextComplement.o
+	ContextSubtract.o ContextCoverage.o ContextComplement.o ContextGroupBy.o
 _EXT_OBJECTS=ParseTools.o QuickString.o
 EXT_OBJECTS=$(patsubst %,$(OBJ_DIR)/%,$(_EXT_OBJECTS))
 BUILT_OBJECTS= $(patsubst %,$(OBJ_DIR)/%,$(OBJECTS))
@@ -47,7 +48,8 @@ clean:
 	       $(OBJ_DIR)/ContextMerge.o \
 	       $(OBJ_DIR)/ContextJaccard.o \
 	       $(OBJ_DIR)/ContextClosest.o \
-			$(OBJ_DIR)/ContextSubtract.o \
-			$(OBJ_DIR)/ContextCoverage.o \
-			$(OBJ_DIR)/ContextComplement.o 
+		   $(OBJ_DIR)/ContextSubtract.o \
+		   $(OBJ_DIR)/ContextCoverage.o \
+		   $(OBJ_DIR)/ContextComplement.o \
+		   $(OBJ_DIR)/ContextGroupBy.o
 .PHONY: clean

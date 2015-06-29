@@ -32,7 +32,7 @@ public:
 
 	typedef enum  { UNKNOWN_RECORD_TYPE, EMPTY_RECORD_TYPE, BED3_RECORD_TYPE, BED4_RECORD_TYPE, BEDGRAPH_RECORD_TYPE, BED5_RECORD_TYPE,
 		BED6_RECORD_TYPE, BED12_RECORD_TYPE, BED_PLUS_RECORD_TYPE, BED6_PLUS_RECORD_TYPE, BAM_RECORD_TYPE, VCF_RECORD_TYPE, GFF_RECORD_TYPE,
-		GFF_PLUS_RECORD_TYPE} RECORD_TYPE;
+		GFF_PLUS_RECORD_TYPE, NO_POS_PLUS_RECORD_TYPE} RECORD_TYPE;
 
 	void setFilename(const QuickString & filename) { _filename = filename; }
 	bool scanBuffer(const char *buf, size_t len, bool eofHit, bool isCompressed = false);

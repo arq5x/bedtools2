@@ -22,6 +22,7 @@
 #include "VcfRecord.h"
 #include "GffRecord.h"
 #include "GffPlusRecord.h"
+#include "NoPosPlusRecord.h"
 
 #include "FileRecordTypeChecker.h"
 
