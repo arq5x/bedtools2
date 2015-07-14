@@ -19,18 +19,6 @@ ContextJaccard::~ContextJaccard() {
 
 bool ContextJaccard::parseCmdArgs(int argc, char **argv, int skipFirstArgs)
 {
-	_argc = argc;
-	_argv = argv;
-	_skipFirstArgs = skipFirstArgs;
-	if (_argc < 2) {
-		setShowHelp(true);
-		return false;
-	}
-
-	setProgram(_programNames[argv[0]]);
-
-	_argsProcessed.resize(_argc - _skipFirstArgs, false);
-
 	for (_i=_skipFirstArgs; _i < argc; _i++) {
 		if (isUsed(_i - _skipFirstArgs)) {
 			continue;
@@ -69,12 +57,6 @@ bool ContextJaccard::isValidState()
 				return false;
 			}
 		}
-	}
-	//column operations not allowed with BAM input
-	if (hasColumnOpsMethods() &&
-			getFile(0)->getFileType() == FileRecordTypeChecker::BAM_FILE_TYPE) {
-		_errorMsg = "\n***** ERROR: stranded merge not supported for VCF files. *****";
-		return false;
 	}
 	return true;
 }

@@ -12,8 +12,6 @@
 #ifndef NEW_CHROMSWEEP_H
 #define NEW_CHROMSWEEP_H
 
-using namespace std;
-
 #include <string>
 #include "BTlist.h"
 #include "RecordKeyList.h"
@@ -23,6 +21,8 @@ using namespace std;
 #include <fstream>
 #include <stdlib.h>
 #include "QuickString.h"
+
+using namespace std;
 
 class Record;
 class FileRecordMgr;
@@ -34,7 +34,7 @@ public:
     NewChromSweep(ContextIntersect *context);
     
     
-    ~NewChromSweep(void);
+    virtual ~NewChromSweep(void);
     virtual bool init();
     
     typedef RecordList recListType;

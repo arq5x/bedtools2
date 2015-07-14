@@ -42,7 +42,7 @@ void groupby_help(void);
 void GroupBy(const string &inFile, const vector<int> &groupColumns, 
              const vector<int> &opColumns, const vector<string> &ops, 
              const bool printOriginalLine, const bool printHeaderLine,
-             const bool InputHaveHeaderLine, const bool ignoreCase, int precision);
+             const bool InputHaveHeaderLine, const bool ignoreCase, int precision, const string &delim);
 
 void PrintHeaderLine(const vector<string> &InputFields, 
                      const vector<int> &groupColumns, 
@@ -54,7 +54,7 @@ void PrintHeaderLine(const vector<string> &InputFields,
 void ReportSummary(const vector<string> &group, 
                    const vector<vector<string> > &data, 
                    const vector<string> &ops,
-                   int precision);
+                   int precision, const string &delim);
 
 void addValue (const vector<string> &fromList, 
                vector<string> &toList, 
@@ -83,8 +83,8 @@ int groupby_main(int argc, char* argv[]) {
     bool InputHaveHeaderLine = false;
     bool ignoreCase    = false;
     int precision = 21;
-
-    // check to see if we should print out some help
+    string delim(",");
+     // check to see if we should print out some help
     if(argc <= 1) showHelp = true;
 
     for(int i = 1; i < argc; i++) {
@@ -156,6 +156,20 @@ int groupby_main(int argc, char* argv[]) {
                 i++;
             }
         }
+        else if(PARAMETER_CHECK("-delim", 6, parameterLength))
+         {
+             if ((i+1) >= argc || LOOKS_LIKE_A_PARAM(argv[i+1])) {
+                 cerr << endl
+                      << "*****ERROR: -delim parameter requires a value."
+                      << endl << endl;
+                 groupby_help();
+                 break;
+             }
+             else {
+                 delim  = argv[i + 1];
+                 i++;
+             }
+         }
         else if(PARAMETER_CHECK("-full", 5, parameterLength)) {
             printOriginalLine = true;
         }
@@ -186,6 +200,7 @@ int groupby_main(int argc, char* argv[]) {
                 i++;
             }
         }
+
         else {
             cerr << endl 
                  << "*****ERROR: Unrecognized parameter: " 
@@ -216,9 +231,9 @@ int groupby_main(int argc, char* argv[]) {
             (ops[i] != "antimode") && (ops[i] != "stdev") &&
             (ops[i] != "sstdev") && (ops[i] != "count") && 
             (ops[i] != "count_distinct") && (ops[i] != "collapse") && 
-            (ops[i] != "distinct") && (ops[i] != "concat") && 
+            (ops[i] != "distinct") && (ops[i] != "distinct_sort_num") && (ops[i] != "distinct_sort_num_desc")&& (ops[i] != "concat") &&
             (ops[i] != "freqdesc") && (ops[i] != "freqasc") &&
-            (ops[i] != "first") && (ops[i] != "last") ) 
+            (ops[i] != "first") && (ops[i] != "last") && (ops[i] != "delim"))
         {
             cerr << endl 
                  << "*****" 
@@ -283,7 +298,7 @@ int groupby_main(int argc, char* argv[]) {
         }
         GroupBy(inFile, groupColumnsInt, opColumnsInt, ops,
             printOriginalLine, printHeaderLine, InputHaveHeaderLine,
-            ignoreCase, precision);
+            ignoreCase, precision, delim);
     }
     else {
         groupby_help();
@@ -318,6 +333,8 @@ void groupby_help(void) {
     cerr                         << "\t\t\t    stdev, sstdev (sample standard dev.)," << endl;
     cerr                         << "\t\t\t    collapse (i.e., print a comma separated list (duplicates allowed)), " << endl;
     cerr                         << "\t\t\t    distinct (i.e., print a comma separated list (NO duplicates allowed)), " << endl;
+    cerr                         << "\t\t\t    distinct_sort_num (as distinct, but sorted numerically, ascending), " << endl;
+    cerr                         << "\t\t\t    distinct_sort_num_desc (as distinct, but sorted numerically, descending), " << endl;
     cerr                         << "\t\t\t    concat   (i.e., merge values into a single, non-delimited string), " << endl;
     cerr                         << "\t\t\t    freqdesc (i.e., print desc. list of values:freq)" << endl;
     cerr                         << "\t\t\t    freqasc (i.e., print asc. list of values:freq)" << endl;
@@ -342,6 +359,9 @@ void groupby_help(void) {
     cerr << "\t-ignorecase\t"   << "Group values regardless of upper/lower case." << endl << endl;
 
     cerr << "\t-prec\t"   << "Sets the decimal precision for output (Default: 5)" << endl << endl;
+    cerr << "\t-delim\t"                 << "Specify a custom delimiter for the collapse operations." << endl;
+    cerr                                 << "\t\t- Example: -delim \"|\"" << endl;
+    cerr                                 << "\t\t- Default: \",\"." << endl << endl;
 
     cerr << "Examples: " << endl;
     cerr << "\t$ cat ex1.out" << endl;
@@ -377,7 +397,7 @@ void GroupBy (const string &inFile,
     const bool printHeaderLine,
     const bool InputHaveHeaderLine,
     const bool ignoreCase,
-    int precision) {
+    int precision, const string &delim) {
 
     // current line number
     int lineNum = 0;
@@ -440,7 +460,7 @@ void GroupBy (const string &inFile,
             if ((currGroup != prevGroup) && (prevGroup.size() > 0)) {
                 // Summarize this group
                 ReportSummary(printOriginalLine?inFieldsFirstLineInGroup:prevGroup, 
-                          values, ops, precision);
+                          values, ops, precision, delim);
                 // reset and add the first value for the next group.
                 values.clear();
                 for( size_t i = 0; i < opColumns.size(); i++ ) {
@@ -465,7 +485,7 @@ void GroupBy (const string &inFile,
     }
     // report the last group
     ReportSummary(printOriginalLine?inFieldsFirstLineInGroup:currGroup, 
-                  values, ops, precision);
+                  values, ops, precision, delim);
     _tab->Close();
 }
 
@@ -473,7 +493,7 @@ void GroupBy (const string &inFile,
 void ReportSummary(const vector<string> &group, 
                    const vector<vector<string> > &data, 
                    const vector<string> &ops,
-                   int precision) 
+                   int precision, const string &delim)
 {
 
     vector<string> result;
@@ -486,6 +506,7 @@ void ReportSummary(const vector<string> &group,
         string op = ops[i];
         std::stringstream buffer;
         VectorOps vo(data[i]);
+        vo.setDelim(delim);
 
         if (op == "sum") {
             buffer << setprecision (precision) << vo.GetSum();
@@ -496,6 +517,12 @@ void ReportSummary(const vector<string> &group,
         }
         else if (op == "distinct") {
             result.push_back(vo.GetDistinct());
+        }
+        else if (op == "distinct_sort_num") {
+            result.push_back(vo.GetDistinctSortNum());
+        }
+        else if (op == "distinct_sort_num_desc") {
+            result.push_back(vo.GetDistinctSortNum(false));
         }
         else if (op == "concat") {
             result.push_back(vo.GetConcat());

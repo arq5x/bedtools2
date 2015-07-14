@@ -2,13 +2,11 @@
 #include "SingleLineDelimTextFileReader.h"
 #include <cstring>
 
-GffRecord::GffRecord()
-{
+GffRecord::GffRecord() {
 
 }
 
-GffRecord::~GffRecord()
-{
+GffRecord::~GffRecord() {
 
 }
 
@@ -43,7 +41,7 @@ bool GffRecord::initFromFile(SingleLineDelimTextFileReader *fileReader)
 	adjustStrandVal();
 
 	fileReader->getField(7, _frame);
-	_numFields = fileReader->getNumFields();
+	_numFields = min(9, fileReader->getNumFields());
 	if (_numFields == 9) {
 		fileReader->getField(8, _group);
 	}

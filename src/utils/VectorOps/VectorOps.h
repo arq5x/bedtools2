@@ -40,6 +40,7 @@ public:
     ~VectorOps(void);
 
     // user-interface
+    void setDelim(const string &str) { _delimStr = str; }
     
     // return the total of the values in the vector
     double GetSum(void);             
@@ -72,7 +73,9 @@ public:
     // return a concatenation of all elements in the vector
     string GetConcat(void);           
     // return a comma-separated list of the _unique_ elements
-    string GetDistinct(void);         
+    string GetDistinct(void);
+    // return a comma-separated list of the _unique_ elements, sorted numerically
+    string GetDistinctSortNum(bool asc = true);
     // return a histogram of values and their freqs. in desc. order of frequency
     string GetFreqDesc(void);         
     // return a histogram of values and their freqs. in asc. order of frequency
@@ -86,6 +89,7 @@ private:
     vector<string> _vecs;
     vector<double> _vecd;
     uint32_t _size;
+    string _delimStr;
 };
 
 #endif /* VECTOROPS_H */

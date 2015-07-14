@@ -33,9 +33,12 @@ public:
 	bool populateScanBuffer();
 	const QuickString &getSavedData() const { return _saveDataStr; }
 	bool isGzipped() const { return _isGzipped; }
+	bool isBGzipped() const { return _isBgzipped; }
+	bool isBam() const { return _isBam; }
+
+	bool isCompressed() const { return _isGzipped || _isBgzipped || _isBam; }
 	PushBackStreamBuf *getPushBackStreamBuf() const {return _pushBackStreamBuf; }
 //	void getSavedData(QuickString &str) const { str = _saveDataStr; }
-	bool isBam() const { return _isBam; }
 	BamTools::BamReader *getBamReader() { return _bamReader; }
 	bool resetStream();
 	bool getEofHit() { return _eofHit; }

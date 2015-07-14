@@ -19,13 +19,14 @@ INCLUDES = -I$(UTILITIES_DIR)/Contexts/ \
            -I$(UTILITIES_DIR)/FileRecordTools/Records/ \
  			-I$(UTILITIES_DIR)/KeyListOps/ \
           -I$(UTILITIES_DIR)/RecordOutputMgr/ \
-            -I$(UTILITIES_DIR)/version/
+            -I$(UTILITIES_DIR)/version/ \
+           -I$(UTILITIES_DIR)/ToolBase/ 
 
 # ----------------------------------
 # define our source and object files
 # ----------------------------------
-SOURCES= sampleMain.cpp SampleFile.cpp SampleFile.h
-OBJECTS= sampleMain.o SampleFile.o
+SOURCES= sampleHelp.cpp sampleFile.cpp sampleFile.h
+OBJECTS= sampleHelp.o sampleFile.o
 BUILT_OBJECTS= $(patsubst %,$(OBJ_DIR)/%,$(OBJECTS))
 PROGRAM= sample
 
@@ -39,6 +40,6 @@ $(BUILT_OBJECTS): $(SOURCES)
 	
 clean:
 	@echo "Cleaning up."
-	@rm -f $(OBJ_DIR)/sampleMain.o $(OBJ_DIR)/SampleFile.o
+	@rm -f $(OBJ_DIR)/sampleHelp.o $(OBJ_DIR)/sampleFile.o
 
 .PHONY: clean

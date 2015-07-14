@@ -31,6 +31,7 @@ int sort_main(int argc, char* argv[]) {
 
     // input files
     string bedFile  = "stdin";
+    string faidxFile; 
     bool haveBed    = true;
     int sortChoices = 0;
 
@@ -40,6 +41,7 @@ int sort_main(int argc, char* argv[]) {
     bool sortByChromThenSizeDesc  = false;
     bool sortByChromThenScoreAsc  = false;
     bool sortByChromThenScoreDesc = false;
+    bool sortByFaidx              = false;
     bool printHeader        = false;
 
     for(int i = 1; i < argc; i++) {
@@ -88,6 +90,14 @@ int sort_main(int argc, char* argv[]) {
             sortByChromThenScoreDesc = true;
             sortChoices++;
         }
+        else if(PARAMETER_CHECK("-faidx", 6, parameterLength)) {
+             if ((i+1) < argc) {
+                faidxFile = argv[i + 1];
+                i++;
+           		  }
+           	sortByFaidx = true;
+            sortChoices++;
+        }
         else if(PARAMETER_CHECK("-header", 7, parameterLength)) {
             printHeader = true;
         }
@@ -109,7 +119,7 @@ int sort_main(int argc, char* argv[]) {
 
 
     if (!showHelp) {
-        BedSort *bm = new BedSort(bedFile, printHeader);
+        BedSort *bm = new BedSort(bedFile, printHeader,faidxFile);
 
         if (sortBySizeAsc) {
             bm->SortBedBySizeAsc();
@@ -129,6 +139,9 @@ int sort_main(int argc, char* argv[]) {
         else if (sortByChromThenScoreDesc) {
             bm->SortBedByChromThenScoreDesc();
         }
+        else if (sortByFaidx) {
+            bm->SortBedOnFaidx();
+        }       
         else {
             bm->SortBed();
         }
@@ -148,13 +161,14 @@ void sort_help(void) {
     cerr << "Usage:   " << PROGRAM_NAME << " [OPTIONS] -i <bed/gff/vcf>" << endl << endl;
 
     cerr << "Options: " << endl;
-    cerr << "\t" << "-sizeA\t\t"    << "Sort by feature size in ascending order." << endl;
-    cerr << "\t" << "-sizeD\t\t"    << "Sort by feature size in descending order." << endl;
-    cerr << "\t" << "-chrThenSizeA\t"   << "Sort by chrom (asc), then feature size (asc)." << endl;
-    cerr << "\t" << "-chrThenSizeD\t"   << "Sort by chrom (asc), then feature size (desc)." << endl;
-    cerr << "\t" << "-chrThenScoreA\t"  << "Sort by chrom (asc), then score (asc)." << endl;
-    cerr << "\t" << "-chrThenScoreD\t"  << "Sort by chrom (asc), then score (desc)." << endl;
-
+    cerr << "\t" << "-sizeA\t\t\t"    << "Sort by feature size in ascending order." << endl;
+    cerr << "\t" << "-sizeD\t\t\t"    << "Sort by feature size in descending order." << endl;
+    cerr << "\t" << "-chrThenSizeA\t\t"   << "Sort by chrom (asc), then feature size (asc)." << endl;
+    cerr << "\t" << "-chrThenSizeD\t\t"   << "Sort by chrom (asc), then feature size (desc)." << endl;
+    cerr << "\t" << "-chrThenScoreA\t\t"  << "Sort by chrom (asc), then score (asc)." << endl;
+    cerr << "\t" << "-chrThenScoreD\t\t"  << "Sort by chrom (asc), then score (desc)." << endl;
+    cerr << "\t" << "-faidx (names.txt)\t"  << "Sort according to the chromosomes declared in \"names.txt\"" << endl;
+    
     cerr << "\t-header\t"       << "Print the header from the A file prior to results." << endl << endl;
 
     exit(1);

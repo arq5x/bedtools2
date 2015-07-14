@@ -1,6 +1,7 @@
 UTILITIES_DIR = ../utils/
 OBJ_DIR = ../../obj/
 BIN_DIR = ../../bin/
+TOOL_DIR = ../../src/
 
 # -------------------
 # define our includes
@@ -21,12 +22,15 @@ INCLUDES = -I$(UTILITIES_DIR)/Contexts/ \
            -I$(UTILITIES_DIR)/RecordOutputMgr/ \
            -I$(UTILITIES_DIR)/NewChromsweep \
            -I$(UTILITIES_DIR)/BinTree \
-           -I$(UTILITIES_DIR)/version/
+           -I$(UTILITIES_DIR)/version/ \
+          -I$(UTILITIES_DIR)/ToolBase/ \
+           -I$(TOOL_DIR)/intersectFile/
+
 # ----------------------------------
 # define our source and object files
 # ----------------------------------
-SOURCES= closestMain.cpp closestFile.cpp closestFile.h
-OBJECTS= closestMain.o closestFile.o
+SOURCES= closestHelp.cpp closestFile.cpp closestFile.h
+OBJECTS= closestHelp.o closestFile.o
 BUILT_OBJECTS= $(patsubst %,$(OBJ_DIR)/%,$(OBJECTS))
 
 all: $(BUILT_OBJECTS)
@@ -39,6 +43,6 @@ $(BUILT_OBJECTS): $(SOURCES)
 
 clean:
 	@echo "Cleaning up."
-	@rm -f $(OBJ_DIR)/closestMain.o  $(OBJ_DIR)/closestFile.o
+	@rm -f $(OBJ_DIR)/closestHelp.o  $(OBJ_DIR)/closestFile.o
 	
 .PHONY: clean

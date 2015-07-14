@@ -271,3 +271,8 @@ void Record::print(FILE *fp, bool newline) const {
 	fprintf(fp, "%s", buf.c_str());
 	if(newline) fprintf(fp, "\n");
 }
+
+int Record::getLength(bool obeySplits) const {
+	//only bed12 and BAM need to check splits
+	return _endPos - _startPos;
+}

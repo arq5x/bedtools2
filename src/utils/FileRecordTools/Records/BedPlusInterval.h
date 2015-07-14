@@ -8,16 +8,18 @@
 #ifndef BEDPLUSINTERVAL_H_
 #define BEDPLUSINTERVAL_H_
 
-#include "Bed6Interval.h"
-#include <vector>
+#include "Bed3Interval.h"
+#include "PlusFields.h"
 
 class SingleLineDelimTextFileReader;
 
-class BedPlusInterval : public Bed6Interval {
+class BedPlusInterval : public Bed3Interval {
 public:
 	friend class FreeList<BedPlusInterval>;
 
 	BedPlusInterval();
+	virtual ~BedPlusInterval() {}
+	void setNumFixedFields(int numFields);
 	virtual bool initFromFile(SingleLineDelimTextFileReader *);
 	virtual void clear();
 	virtual void print(QuickString &outBuf) const;
@@ -26,29 +28,23 @@ public:
 	virtual void printNull(QuickString &outBuf) const;
 	virtual FileRecordTypeChecker::RECORD_TYPE getType() const { return FileRecordTypeChecker::BED_PLUS_RECORD_TYPE; }
 
-	//Note: using the assignment operator in a BedPlusInterval can potentially be a performance hit,
-	//if the number of fields frequently differ between this object and the one being copied.
-	const BedPlusInterval &operator=(const BedPlusInterval &other);
-
 	virtual const QuickString &getField(int fieldNum) const;
-	virtual int getNumFields() const  { return startOtherIdx + _otherIdxs.size(); }
+	virtual int getNumFields() const  { return _numFixedFields + _plusFields.size(); }
 
-	virtual void setField(int fieldNum, const QuickString &str) { (*(_otherIdxs[fieldNum])) = str; }
-	virtual void setField(int fieldNum, const string &str) { (*(_otherIdxs[fieldNum])) = str; }
-	virtual void setField(int fieldNum, const char *str) { (*(_otherIdxs[fieldNum])) = str; }
 	virtual void setNumPrintFields(int num) { _numPrintFields = num; }
 	virtual int getNumPrintFields() const { return _numPrintFields; }
 	static bool isNumericField(int fieldNum);
 
 
 protected:
-	virtual ~BedPlusInterval();
-	bool initOtherFieldsFromFile(SingleLineDelimTextFileReader *fileReader);
-
-
-	vector<QuickString *> _otherIdxs;
-	static const int startOtherIdx = 6; //first six fields have names, and are not stored in otherIdxs.
+	int _numFixedFields; //first fields have names, and are not stored in otherIdxs.
+	static const int defaultNumFixedFields = 3;
+	PlusFields _plusFields;
 	int _numPrintFields;
+
+	void printBed6PlusFields(QuickString &outBuf) const;
+	void printBed6PlusNullFields(QuickString &outBuf) const;
+
 };
 
 

@@ -21,8 +21,14 @@ bool VcfRecord::initFromFile(SingleLineDelimTextFileReader *fileReader)
 	fileReader->getField(4, _varAlt);
 	fileReader->getField(3, _varRef);
 	if (_varAlt[0] == '<') {
-		//this is a structural variant. Need to parse the tags to find the endpos.
-		_endPos = _startPos + fileReader->getVcfSVlen();
+		// this is a structural variant. Need to parse the tags to find the endpos,
+		// UNLESS it's an insertion.
+		if (!(_varAlt[1] == 'I' && _varAlt[2] == 'N' && _varAlt[3] == 'S')) {
+			_endPos = _startPos + fileReader->getVcfSVlen();
+		} else {
+			//for insertions, treat as zero-length records
+			_endPos = _startPos;
+		}
 	} else {
 		//endPos is just the startPos plus the length of the variant
 		_endPos = _startPos + _varRef.size();
@@ -31,7 +37,8 @@ bool VcfRecord::initFromFile(SingleLineDelimTextFileReader *fileReader)
 	fileReader->getField(2, _name);
 	fileReader->getField(5, _score);
 
-	return initOtherFieldsFromFile(fileReader);
+	_plusFields.setNumOffsetFields(6);
+	return _plusFields.initFromFile(fileReader);
 }
 
 void VcfRecord::clear()
@@ -64,8 +71,8 @@ void VcfRecord::print(QuickString &outBuf, const QuickString & start, const Quic
 }
 
 void VcfRecord::printNull(QuickString &outBuf) const {
-	outBuf.append(".\t-1\t.\t.\t.\t-1");
-	for (int i= startOtherIdx; i < _numPrintFields; i++) {
+	outBuf.append(".\t-1\t.");
+	for (int i= 2; i < _numPrintFields; i++) {
 		outBuf.append("\t.");
 	}
 }
@@ -79,18 +86,13 @@ void VcfRecord::printOtherFields(QuickString &outBuf) const {
 	outBuf.append(_varAlt);
 	outBuf.append('\t');
 	outBuf.append(_score);
-	for (int i= 0; i < (int)_otherIdxs.size(); i++) {
-		outBuf.append('\t');
-		outBuf.append(*(_otherIdxs[i]));
-	}
-
+	_plusFields.printFields(outBuf);
 }
 
 const QuickString &VcfRecord::getField(int fieldNum) const
 {
 	//a request for any of the first six fields will retrieve
-	//chrom, start, end, name, score, and strand, in that order.
-	//A request for field 6+ will go to the otherIdxs.
+	//chrom, start, name, varRef, varAlt, score,  in that order.
 
 	switch (fieldNum) {
 	case 1:
@@ -111,6 +113,31 @@ const QuickString &VcfRecord::getField(int fieldNum) const
 		return _score;
 	default:
 		return BedPlusInterval::getField(fieldNum);
+		break;
+	}
+}
+
+bool VcfRecord::isNumericField(int fieldNum) {
+
+	switch (fieldNum) {
+	case 1:
+		return false; //_chrName;
+		break;
+	case 2:
+		return true; //_startPosStr;
+		break;
+	case 3:
+		return false; //_name;
+	case 4:
+		return false; //_varRef;
+		break;
+	case 5:
+		return false; //_varAlt;
+		break;
+	case 6:
+		return true; //_score;
+	default:
+		return BedPlusInterval::isNumericField(fieldNum);
 		break;
 	}
 }

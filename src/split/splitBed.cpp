@@ -124,7 +124,7 @@ int BedSplit::main(int argc,char** argv)
         }
     if(num_chuncks<=0)
         {
-        cerr << "Error: num_chuncks==0.\n" << endl;
+        cerr << "Error: num_chunks==0.\n" << endl;
         usage(cerr);
         return EXIT_FAILURE;
         }
@@ -138,7 +138,7 @@ int BedSplit::main(int argc,char** argv)
         }
     else 
         {
-        cerr << "Unknow split algorithm " << algorithm << endl;
+        cerr << "Unknown split algorithm " << algorithm << endl;
         return EXIT_FAILURE;
         }
     }
@@ -151,6 +151,7 @@ std::FILE* BedSplit::saveFileChunk(std::string& filename,size_t file_index)
     sprintf(tmp,"%05d",(file_index+1));
     filename.append(".").append(tmp).append(".bed");
     FILE* out = fopen(filename.c_str(),"w");
+    
     if(out==NULL)
         {
         fprintf(stderr,"Cannot open \"%s\". %s\n",

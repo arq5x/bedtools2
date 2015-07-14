@@ -52,6 +52,9 @@ cd reldist; bash test-reldist.sh; cd ..
 echo " Testing bedtools slop:"
 cd slop; bash test-slop.sh; cd ..
 
+echo " Testing bedtools sort:"
+cd slop; bash test-sort.sh; cd ..
+
 echo " Testing bedtools shuffle:"
 cd shuffle; bash test-shuffle.sh; cd ..
 
@@ -64,3 +67,5 @@ cd sample; bash test-sample.sh; cd ..
 echo " Testing bedtools split:"
 cd split; bash test-split.sh; cd ..
 
+echo " Testing bedtools spacing:"
+cd spacing; bash test-spacing.sh; cd ..

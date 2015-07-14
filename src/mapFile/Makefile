@@ -1,20 +1,7 @@
 UTILITIES_DIR = ../utils/
 OBJ_DIR = ../../obj/
 BIN_DIR = ../../bin/
-
-# -------------------
-# define our includes
-# -------------------
-# INCLUDES = -I$(UTILITIES_DIR)/bedFile/ \
-#            -I$(UTILITIES_DIR)/gzstream/ \
-#            -I$(UTILITIES_DIR)/genomeFile/ \
-#            -I$(UTILITIES_DIR)/lineFileUtilities/ \
-#            -I$(UTILITIES_DIR)/fileType/ \
-#            -I$(UTILITIES_DIR)/BamTools/include \
-#            -I$(UTILITIES_DIR)/BamTools-Ancillary \
-#            -I$(UTILITIES_DIR)/chromsweep \
-#            -I$(UTILITIES_DIR)/VectorOps \
-#            -I$(UTILITIES_DIR)/version/
+TOOL_DIR = ../../src/
 
 INCLUDES = -I$(UTILITIES_DIR)/Contexts/ \
 			-I$(UTILITIES_DIR)/general/ \
@@ -33,13 +20,15 @@ INCLUDES = -I$(UTILITIES_DIR)/Contexts/ \
            -I$(UTILITIES_DIR)/NewChromsweep \
            -I$(UTILITIES_DIR)/VectorOps \
            -I$(UTILITIES_DIR)/BinTree \
-           -I$(UTILITIES_DIR)/version/
+           -I$(UTILITIES_DIR)/version/ \
+           -I$(UTILITIES_DIR)/ToolBase/ \
+           -I$(TOOL_DIR)/intersectFile/
 
 # ----------------------------------
 # define our source and object files
 # ----------------------------------
-SOURCES= mapMain.cpp mapFile.cpp mapFile.h
-OBJECTS= mapMain.o mapFile.o
+SOURCES= mapHelp.cpp mapFile.cpp mapFile.h
+OBJECTS= mapHelp.o mapFile.o
 BUILT_OBJECTS= $(patsubst %,$(OBJ_DIR)/%,$(OBJECTS))
 
 all: $(BUILT_OBJECTS)
@@ -52,6 +41,6 @@ $(BUILT_OBJECTS): $(SOURCES)
 
 clean:
 	@echo "Cleaning up."
-	@rm -f $(OBJ_DIR)/mapMain.o $(OBJ_DIR)/mapFile.o
+	@rm -f $(OBJ_DIR)/mapHelp.o $(OBJ_DIR)/mapFile.o
 
 .PHONY: clean

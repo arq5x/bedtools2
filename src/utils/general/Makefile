@@ -4,13 +4,14 @@ UTILITIES_DIR = ../../utils/
 # -------------------
 # define our includes
 # -------------------
-INCLUDES = -I$(UTILITIES_DIR)/lineFileUtilities/
+INCLUDES = -I$(UTILITIES_DIR)/lineFileUtilities/ \
+			-I$(UTILITIES_DIR)/version/
 
 # ----------------------------------
 # define our source and object files
 # ----------------------------------
 SOURCES= QuickString.h QuickString.cpp ParseTools.h ParseTools.cpp PushBackStreamBuf.cpp PushBackStreamBuf.h CompressionTools.h CompressionTools.cpp \
-		 Tokenizer.h Tokenizer.h CommonHelp.h CommonHelp.cpp
+		 Tokenizer.h Tokenizer.cpp CommonHelp.h CommonHelp.cpp ErrorMsg.h ErrorMsg.cpp
 OBJECTS= QuickString.o ParseTools.o PushBackStreamBuf.o CompressionTools.o Tokenizer.o CommonHelp.o
 BUILT_OBJECTS= $(patsubst %,$(OBJ_DIR)/%,$(OBJECTS))
 

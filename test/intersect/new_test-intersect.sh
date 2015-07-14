@@ -816,4 +816,3 @@ echo \
 $BT intersect -a a_vcfSVtest.vcf -b b_vcfSVtest.vcf -wa -wb -sorted >obs
 check exp obs
 rm exp obs
-

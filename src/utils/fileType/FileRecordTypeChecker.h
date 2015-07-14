@@ -31,10 +31,11 @@ public:
 			GFF_FILE_TYPE, GZIP_FILE_TYPE, BAM_FILE_TYPE, VCF_FILE_TYPE} FILE_TYPE;
 
 	typedef enum  { UNKNOWN_RECORD_TYPE, EMPTY_RECORD_TYPE, BED3_RECORD_TYPE, BED4_RECORD_TYPE, BEDGRAPH_RECORD_TYPE, BED5_RECORD_TYPE,
-		BED6_RECORD_TYPE, BED12_RECORD_TYPE, BED_PLUS_RECORD_TYPE, BAM_RECORD_TYPE, VCF_RECORD_TYPE, GFF_RECORD_TYPE} RECORD_TYPE;
+		BED6_RECORD_TYPE, BED12_RECORD_TYPE, BED_PLUS_RECORD_TYPE, BED6_PLUS_RECORD_TYPE, BAM_RECORD_TYPE, VCF_RECORD_TYPE, GFF_RECORD_TYPE,
+		GFF_PLUS_RECORD_TYPE} RECORD_TYPE;
 
 	void setFilename(const QuickString & filename) { _filename = filename; }
-	bool scanBuffer(const char *buf, size_t len, bool eofHit);
+	bool scanBuffer(const char *buf, size_t len, bool eofHit, bool isCompressed = false);
 	bool needsMoreData() const { return _insufficientData; }
 
 	bool recordTypeHasName(RECORD_TYPE type) const { return _hasName.find(type) != _hasName.end(); }
@@ -102,7 +103,9 @@ private:
 	bool _isVCF;
 	bool _isBAM;
 	bool _isGFF;
+	bool _isGFFplus;
 	bool _isGzipped;
+	bool _isCompressed;
 	bool _insufficientData; //set to true if scan buffer had only header lines.
 	bool _fourthFieldNumeric; //this is just to distinguish between Bed4 and BedGraph files.
 	bool _givenEmptyBuffer;
@@ -124,9 +127,10 @@ private:
 	bool isVCFformat(const char *buffer);
 	bool isGFFformat();
 	bool delimiterTesting(vector<int> &counts, char suspectChar);
-
-
-
+	bool isStrandField(int field);
+	bool passesBed5();
+	bool passesBed6();
+	bool passesBed12();
 
 };
 

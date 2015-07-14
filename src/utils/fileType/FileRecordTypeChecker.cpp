@@ -18,7 +18,9 @@ FileRecordTypeChecker::FileRecordTypeChecker()
 	_isVCF = false;
 	_isBAM = false;
 	_isGFF = false;
+	_isGFFplus = false;
 	_isGzipped = false;
+	_isCompressed = false;
 	_insufficientData = false;
 	_fourthFieldNumeric = false;
 	_givenEmptyBuffer = false;
@@ -29,9 +31,11 @@ FileRecordTypeChecker::FileRecordTypeChecker()
 	_hasName[BED6_RECORD_TYPE] = true;
 	_hasName[BED12_RECORD_TYPE] = true;
 	_hasName[BED_PLUS_RECORD_TYPE] = true;
+	_hasName[BED6_PLUS_RECORD_TYPE] = true;
 	_hasName[BAM_RECORD_TYPE] = true;
 	_hasName[VCF_RECORD_TYPE] = true;
 	_hasName[GFF_RECORD_TYPE] = true;
+	_hasName[GFF_PLUS_RECORD_TYPE] = true;
 
 	_hasScore[UNKNOWN_RECORD_TYPE] = false;
 	_hasScore[EMPTY_RECORD_TYPE] = false;
@@ -39,19 +43,23 @@ FileRecordTypeChecker::FileRecordTypeChecker()
 	_hasScore[BED6_RECORD_TYPE] = true;
 	_hasScore[BED12_RECORD_TYPE] = true;
 	_hasScore[BED_PLUS_RECORD_TYPE] = true;
+	_hasScore[BED6_PLUS_RECORD_TYPE] = true;
 	_hasScore[BAM_RECORD_TYPE] = true;
 	_hasScore[VCF_RECORD_TYPE] = true;
 	_hasScore[GFF_RECORD_TYPE] = true;
+	_hasScore[GFF_PLUS_RECORD_TYPE] = true;
 
 	_hasStrand[UNKNOWN_RECORD_TYPE] = false;
 	_hasStrand[EMPTY_RECORD_TYPE] = false;
 	_hasStrand[BED3_RECORD_TYPE] = false;
 	_hasStrand[BED6_RECORD_TYPE] = true;
 	_hasStrand[BED12_RECORD_TYPE] = true;
-	_hasStrand[BED_PLUS_RECORD_TYPE] = true;
+	_hasStrand[BED_PLUS_RECORD_TYPE] = false;
+	_hasStrand[BED6_PLUS_RECORD_TYPE] = true;
 	_hasStrand[BAM_RECORD_TYPE] = true;
 	_hasStrand[VCF_RECORD_TYPE] = true;
 	_hasStrand[GFF_RECORD_TYPE] = true;
+	_hasStrand[GFF_PLUS_RECORD_TYPE] = true;
 
 	_recordTypeNames[UNKNOWN_RECORD_TYPE] = "Unknown record type";
 	_recordTypeNames[EMPTY_RECORD_TYPE] = "Empty record type";
@@ -61,7 +69,8 @@ FileRecordTypeChecker::FileRecordTypeChecker()
 	_recordTypeNames[BED_PLUS_RECORD_TYPE] = "BedPlus record type";
 	_recordTypeNames[BAM_RECORD_TYPE] = "BAM record type";
 	_recordTypeNames[VCF_RECORD_TYPE] = "VCF record type";
-	_recordTypeNames[GFF_RECORD_TYPE] = "GFF record type";
+	_recordTypeNames[GFF_RECORD_TYPE] = "Gff record type";
+	_recordTypeNames[GFF_PLUS_RECORD_TYPE] = "GffPlus record type";
 
 	_fileTypeNames[UNKNOWN_FILE_TYPE] = "Unknown file type";
 	_fileTypeNames[EMPTY_FILE_TYPE] = "Empty file type";
@@ -72,9 +81,10 @@ FileRecordTypeChecker::FileRecordTypeChecker()
 }
 
 
-bool FileRecordTypeChecker::scanBuffer(const char *buffer, size_t len, bool eofHit)
+bool FileRecordTypeChecker::scanBuffer(const char *buffer, size_t len, bool eofHit, bool isCompressed)
 {
 	_eofHit = eofHit;
+	_isCompressed = isCompressed;
 	_numBytesInBuffer = len;
 	if (_numBytesInBuffer == 0) {
 		_fileType = EMPTY_FILE_TYPE;
@@ -184,18 +194,27 @@ bool FileRecordTypeChecker::handleTextFormat(const char *buffer, size_t len)
 					_fourthFieldNumeric = false;
 					_recordType = BED4_RECORD_TYPE;
 				}
-			} else if (_numFields == 5) {
+			} else if (_numFields == 5 && passesBed5()) {
 				_recordType = BED5_RECORD_TYPE;
-			} else if (_numFields == 6) {
+			} else if (_numFields == 6 && passesBed6()) {
 				_recordType = BED6_RECORD_TYPE;
-			} else if (_numFields == 12) {
+			} else if (_numFields == 12 && passesBed12()) {
 				_recordType = BED12_RECORD_TYPE;
-			} else if (_numFields >6) {
-				_recordType = BED_PLUS_RECORD_TYPE;
+			} else if (_numFields >3) {
+				if (_numFields >= 6 && isStrandField(5)) {
+					_recordType = BED6_PLUS_RECORD_TYPE;
+				} else {
+					_recordType = BED_PLUS_RECORD_TYPE;
+				}
+
 			}
 			return true;
 		}
 		if (isGFFformat()) {
+			if (_isGFFplus) {
+				_recordType = GFF_PLUS_RECORD_TYPE;
+				return true;
+			}
 			_isGFF = true;
 			_recordType = GFF_RECORD_TYPE;
 			return true;
@@ -241,8 +260,8 @@ bool FileRecordTypeChecker::isBedFormat() {
 
 bool FileRecordTypeChecker::isGFFformat()
 {
-	//a GFF file may have 8 or 9 fields.
-	if (_numFields < 7 || _numFields > 9) {
+	//a GFF file may have 8 or 9 fields. More than thats is GFFplus
+	if (_numFields < 7 ) {
 		return false;
 	}
 	//the 4th and 5th fields must be numeric.
@@ -254,6 +273,9 @@ bool FileRecordTypeChecker::isGFFformat()
 	if (end < start) {
 		return false;
 	}
+	if (_numFields > 8) {
+		_isGFFplus = true;
+	}
 	return true;
 }
 
@@ -261,7 +283,7 @@ bool FileRecordTypeChecker::isTextDelimtedFormat(const char *buffer, size_t len)
 {
 	//Break single string buffer into vector of QuickStrings. Delimiter is newline.
 	_tokenizer.setKeepFinalIncompleteElem(Tokenizer::IGNORE);
-	int numLines = _tokenizer.tokenize(buffer, '\n', _eofHit);
+	int numLines = _tokenizer.tokenize(buffer, '\n', _eofHit, _isCompressed);
 
 	//anticipated delimiter characters are tab, comma, and semi-colon.
 	//If we need new ones, they must be added in this method.
@@ -391,4 +413,23 @@ void FileRecordTypeChecker::setBam()
 	_recordType = BAM_RECORD_TYPE;
 	_isBinary = true;
 	_isBAM = true;
+}
+
+bool FileRecordTypeChecker::passesBed5() {
+	return _isBed && _numFields == 5 && isNumeric(_tokenizer.getElem(4));
+}
+
+bool FileRecordTypeChecker::passesBed6() {
+	return (_isBed && _numFields == 6 && isStrandField(5));
+}
+
+bool FileRecordTypeChecker::passesBed12() {
+
+	return (isStrandField(5) && isNumeric(_tokenizer.getElem(6)) &&
+			isNumeric(_tokenizer.getElem(7)) && isNumeric(_tokenizer.getElem(9)));
+}
+
+bool FileRecordTypeChecker::isStrandField(int field) {
+	const QuickString &strandChar = _tokenizer.getElem(field);
+	return (strandChar == "+" || strandChar == "-" || strandChar == ".");
 }

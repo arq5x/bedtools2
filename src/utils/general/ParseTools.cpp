@@ -61,7 +61,7 @@ int str2chrPos(const char *str, size_t ulen) {
 			return atoi(str);
 		}
 		if (!isdigit(currChar)) {
-			fprintf(stderr, "***** ERROR: illegal character '%c' found in integer conversion of string %s. Exiting...\n", currChar, str);
+			fprintf(stderr, "***** ERROR: illegal character '%c' found in integer conversion of string \"%s\". Exiting...\n", currChar, str);
 			exit(1);
 		}
 

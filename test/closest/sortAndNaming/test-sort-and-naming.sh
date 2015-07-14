@@ -74,9 +74,9 @@ rm obs
 ############################################################
 echo "    closest.t05...\c"
 echo \
-"ERROR: File db1_noChr.bed has inconsistent naming convention for record:
+"***** WARNING: File db1_noChr.bed has inconsistent naming convention for record:
 2	50	80" > exp
-$BT closest -a q1_num.bed -b db1_noChr.bed  2>&1 > /dev/null | cat - > obs
+$BT closest -a q1_num.bed -b db1_noChr.bed  2>&1 > /dev/null | cat - | head -2 > obs
 check obs exp
 rm obs
 
@@ -86,9 +86,9 @@ rm obs
 ############################################################
 echo "    closest.t06...\c"
 echo \
-"ERROR: File db1_leadingZero.txt has a record where naming convention (leading zero) is inconsistent with other files:
+"***** WARNING: File db1_leadingZero.txt has a record where naming convention (leading zero) is inconsistent with other files:
 chr01	10	20" > exp
-$BT closest -a q1_num.bed -b db1_leadingZero.txt 2>&1 > /dev/null | cat - > obs
+$BT closest -a q1_num.bed -b db1_leadingZero.txt 2>&1 > /dev/null | cat - | head -2 > obs
 check obs exp
 rm obs
 

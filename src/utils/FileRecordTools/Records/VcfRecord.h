@@ -19,21 +19,20 @@ public:
 	VcfRecord() {}
 	virtual bool initFromFile(SingleLineDelimTextFileReader *);
 	virtual void clear();
-	virtual void print(QuickString &outBuf) const;
-	virtual void print(QuickString &outBuf, int start, int end) const;
-	virtual void print(QuickString &outBuf, const QuickString & start, const QuickString & end) const;
+	void print(QuickString &outBuf) const;
+	void print(QuickString &outBuf, int start, int end) const;
+	void print(QuickString &outBuf, const QuickString & start, const QuickString & end) const;
 	virtual void printNull(QuickString &outBuf) const;
 	virtual FileRecordTypeChecker::RECORD_TYPE getType() const { return FileRecordTypeChecker::VCF_RECORD_TYPE; }
 
-	//Note: using the assignment operator in a BedPlusInterval can potentially be a performance hit,
-	//if the number of fields frequently differ between this object and the one being copied.
-	const BedPlusInterval &operator=(const VcfRecord &other);
-
 	virtual const QuickString &getField(int fieldNum) const;
+	static bool isNumericField(int fieldNum);
 
 protected:
 	QuickString _varRef;
 	QuickString _varAlt;
+	static const int numFixedFields = 6;
+
 	void printOtherFields(QuickString &outBuf) const;
 };
 

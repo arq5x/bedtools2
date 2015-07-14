@@ -17,8 +17,8 @@
 #include <iostream>
 #include <fstream>
 #include <stdlib.h>
-#include <string>
 #include "version.h"
+#include "BedtoolsDriver.h"
 
 using namespace std;
 
@@ -34,6 +34,9 @@ using namespace std;
 // define our parameter checking macro
 #define PARAMETER_CHECK(param, paramLen, actualLen) (strncmp(argv[i], param, min(actualLen, paramLen))== 0) && (actualLen == paramLen)
 
+bool sub_main(const QuickString &subCmd);
+void showHelp(const QuickString &subCmd);
+
 int annotate_main(int argc, char* argv[]);//
 int bamtobed_main(int argc, char* argv[]);//
 int bamtofastq_main(int argc, char* argv[]);//
@@ -41,10 +44,10 @@ int bed12tobed6_main(int argc, char* argv[]); //
 int bedtobam_main(int argc, char* argv[]);//
 int bedtoigv_main(int argc, char* argv[]);//
 int bedpetobam_main(int argc, char* argv[]);//
-int closest_main(int argc, char* argv[]); //
+void closest_help();
 int cluster_main(int argc, char* argv[]); //
-int complement_main(int argc, char* argv[]);//
-int coverage_main(int argc, char* argv[]); //
+void complement_help();
+void coverage_help();
 int regress_test_main(int argc, char **argv); //
 int expand_main(int argc, char* argv[]);//
 int fastafrombed_main(int argc, char* argv[]);//
@@ -52,13 +55,14 @@ int flank_main(int argc, char* argv[]); //
 int genomecoverage_main(int argc, char* argv[]);//
 int getoverlap_main(int argc, char* argv[]);//
 int groupby_main(int argc, char* argv[]);//
-int intersect_main(int argc, char* argv[]); //
-int jaccard_main(int argc, char* argv[]); //
-int fisher_main(int argc, char* argv[]); //
+void intersect_help();
+void map_help();
+void jaccard_help(); //
+void fisher_help();
 int links_main(int argc, char* argv[]);//
 int maskfastafrombed_main(int argc, char* argv[]);//
 int map_main(int argc, char* argv[]); //
-int merge_main(int argc, char* argv[]); //
+void merge_help();
 int multibamcov_main(int argc, char* argv[]);//
 int multiintersect_main(int argc, char* argv[]);//
 int nek_sandbox1_main(int argc, char* argv[]);//
@@ -67,13 +71,13 @@ int pairtobed_main(int argc, char* argv[]);//
 int pairtopair_main(int argc, char* argv[]);//
 int random_main(int argc, char* argv[]); //
 int reldist_main(int argc, char* argv[]); //
-int sample_main(int argc, char* argv[]); //
+void sample_help();
 int shuffle_main(int argc, char* argv[]); //
 int slop_main(int argc, char* argv[]); //
 int split_main(int argc, char* argv[]); //
 int sort_main(int argc, char* argv[]); //
-int spacing_main(int argc, char* argv[]); //
-int subtract_main(int argc, char* argv[]); //
+void spacing_help();
+void subtract_help();
 int tagbam_main(int argc, char* argv[]);//
 int unionbedgraphs_main(int argc, char* argv[]);//
 int window_main(int argc, char* argv[]); //
@@ -87,83 +91,81 @@ int main(int argc, char *argv[])
     // make sure the user at least entered a sub_command
     if (argc < 2) return bedtools_help();
 
-    std::string sub_cmd = argv[1];
+    QuickString subCmd(argv[1]);
+    BedtoolsDriver btDriver;
+    if (btDriver.supports(subCmd)) {
+		if (btDriver.subMain(argc, argv)) {
+			return 0;
+		} else if (!btDriver.hadError()) {
+			showHelp(subCmd);
+			return 1;
+		}
+	}
 
     // genome arithmetic tools
-    if (sub_cmd == "intersect")        return intersect_main(argc-1, argv+1);
-    else if (sub_cmd == "window")      return window_main(argc-1, argv+1);
-    else if (sub_cmd == "closest")     return closest_main(argc-1, argv+1);
-    else if (sub_cmd == "coverage")    return coverage_main(argc-1, argv+1);
-    else if (sub_cmd == "map")         return map_main(argc-1, argv+1);
-    else if (sub_cmd == "genomecov")   return genomecoverage_main(argc-1, argv+1);
-    else if (sub_cmd == "merge")       return merge_main(argc-1, argv+1);
-    else if (sub_cmd == "cluster")     return cluster_main(argc-1, argv+1);    
-    else if (sub_cmd == "complement")  return complement_main(argc-1, argv+1);
-    else if (sub_cmd == "subtract")    return subtract_main(argc-1, argv+1);
-    else if (sub_cmd == "slop")        return slop_main(argc-1, argv+1);
-    else if (sub_cmd == "split")       return split_main(argc-1, argv+1);
-    else if (sub_cmd == "flank")       return flank_main(argc-1, argv+1);
-    else if (sub_cmd == "sort")        return sort_main(argc-1, argv+1);
-    else if (sub_cmd == "random")      return random_main(argc-1, argv+1);
-    else if (sub_cmd == "shuffle")     return shuffle_main(argc-1, argv+1);
-    else if (sub_cmd == "spacing")     return spacing_main(argc-1, argv+1);
-    else if (sub_cmd == "annotate")    return annotate_main(argc-1, argv+1);
+    else if (subCmd == "window")      return window_main(argc-1, argv+1);
+    else if (subCmd == "genomecov")   return genomecoverage_main(argc-1, argv+1);
+    else if (subCmd == "cluster")     return cluster_main(argc-1, argv+1);
+    else if (subCmd == "slop")        return slop_main(argc-1, argv+1);
+    else if (subCmd == "split")       return split_main(argc-1, argv+1);
+    else if (subCmd == "flank")       return flank_main(argc-1, argv+1);
+    else if (subCmd == "sort")        return sort_main(argc-1, argv+1);
+    else if (subCmd == "random")      return random_main(argc-1, argv+1);
+    else if (subCmd == "shuffle")     return shuffle_main(argc-1, argv+1);
+    else if (subCmd == "annotate")    return annotate_main(argc-1, argv+1);
 
     // Multi-way file comparisonstools
-    else if (sub_cmd == "multiinter")  return multiintersect_main(argc-1, argv+1);
-    else if (sub_cmd == "unionbedg")   return unionbedgraphs_main(argc-1, argv+1);
+    else if (subCmd == "multiinter")  return multiintersect_main(argc-1, argv+1);
+    else if (subCmd == "unionbedg")   return unionbedgraphs_main(argc-1, argv+1);
 
     // paired-end conversion tools
-    else if (sub_cmd == "pairtobed")   return pairtobed_main(argc-1, argv+1);
-    else if (sub_cmd == "pairtopair")  return pairtopair_main(argc-1, argv+1);
+    else if (subCmd == "pairtobed")   return pairtobed_main(argc-1, argv+1);
+    else if (subCmd == "pairtopair")  return pairtopair_main(argc-1, argv+1);
 
     // format conversion tools
-    else if (sub_cmd == "bamtobed")    return bamtobed_main(argc-1, argv+1);
-    else if (sub_cmd == "bedtobam")    return bedtobam_main(argc-1, argv+1);
-    else if (sub_cmd == "bamtofastq")  return bamtofastq_main(argc-1, argv+1);
-    else if (sub_cmd == "bedpetobam")  return bedpetobam_main(argc-1, argv+1);
-    else if (sub_cmd == "bed12tobed6") return bed12tobed6_main(argc-1, argv+1);
+    else if (subCmd == "bamtobed")    return bamtobed_main(argc-1, argv+1);
+    else if (subCmd == "bedtobam")    return bedtobam_main(argc-1, argv+1);
+    else if (subCmd == "bamtofastq")  return bamtofastq_main(argc-1, argv+1);
+    else if (subCmd == "bedpetobam")  return bedpetobam_main(argc-1, argv+1);
+    else if (subCmd == "bed12tobed6") return bed12tobed6_main(argc-1, argv+1);
 
     // BAM-specific tools
-    else if (sub_cmd == "multicov")    return multibamcov_main(argc-1, argv+1);
-    else if (sub_cmd == "tag")         return tagbam_main(argc-1, argv+1);
+    else if (subCmd == "multicov")    return multibamcov_main(argc-1, argv+1);
+    else if (subCmd == "tag")         return tagbam_main(argc-1, argv+1);
 
     // fasta tools
-    else if (sub_cmd == "getfasta")    return fastafrombed_main(argc-1, argv+1);
-    else if (sub_cmd == "maskfasta")   return maskfastafrombed_main(argc-1, argv+1);
-    else if (sub_cmd == "nuc")         return nuc_main(argc-1, argv+1);
+    else if (subCmd == "getfasta")    return fastafrombed_main(argc-1, argv+1);
+    else if (subCmd == "maskfasta")   return maskfastafrombed_main(argc-1, argv+1);
+    else if (subCmd == "nuc")         return nuc_main(argc-1, argv+1);
 
     // statistics tools
-    else if (sub_cmd == "jaccard")     return jaccard_main(argc-1, argv+1);
-    else if (sub_cmd == "reldist")     return reldist_main(argc-1, argv+1);
-    else if (sub_cmd == "fisher")     return fisher_main(argc-1, argv+1);
+    else if (subCmd == "reldist")     return reldist_main(argc-1, argv+1);
 
     // misc. tools
-    else if (sub_cmd == "overlap")     return getoverlap_main(argc-1, argv+1);
-    else if (sub_cmd == "igv")         return bedtoigv_main(argc-1, argv+1);
-    else if (sub_cmd == "links")       return links_main(argc-1, argv+1);
-    else if (sub_cmd == "makewindows") return windowmaker_main(argc-1, argv+1);
-    else if (sub_cmd == "groupby")     return groupby_main(argc-1, argv+1);
-    else if (sub_cmd == "expand")      return expand_main(argc-1, argv+1);
-    else if (sub_cmd == "sample")       return sample_main(argc-1, argv+1);
-    else if (sub_cmd == "neksb1")       return nek_sandbox1_main(argc-1, argv+1);
-    else if (sub_cmd == "regresstest")  return regress_test_main(argc, argv); //this command does need all the orig args.
+    else if (subCmd == "overlap")     return getoverlap_main(argc-1, argv+1);
+    else if (subCmd == "igv")         return bedtoigv_main(argc-1, argv+1);
+    else if (subCmd == "links")       return links_main(argc-1, argv+1);
+    else if (subCmd == "makewindows") return windowmaker_main(argc-1, argv+1);
+    else if (subCmd == "groupby")     return groupby_main(argc-1, argv+1);
+    else if (subCmd == "expand")      return expand_main(argc-1, argv+1);
+    else if (subCmd == "neksb1")       return nek_sandbox1_main(argc-1, argv+1);
+    else if (subCmd == "regresstest")  return regress_test_main(argc, argv); //this command does need all the orig args.
     // help
-    else if (sub_cmd == "-h" || sub_cmd == "--help" ||
-             sub_cmd == "-help")
+    else if (subCmd == "-h" || subCmd == "--help" ||
+             subCmd == "-help")
         return bedtools_help();
 
     // frequently asked questions
-    else if (sub_cmd == "--FAQ" || sub_cmd == "--faq" ||
-             sub_cmd == "-FAQ"  || sub_cmd == "-faq")
+    else if (subCmd == "--FAQ" || subCmd == "--faq" ||
+             subCmd == "-FAQ"  || subCmd == "-faq")
         return bedtools_faq();
 
     // verison information
-    else if (sub_cmd == "-version" || sub_cmd == "--version")
+    else if (subCmd == "-version" || subCmd == "--version")
         cout << "bedtools " << VERSION << endl;
 
     // verison information
-    else if (sub_cmd == "-contact" || sub_cmd == "--contact")
+    else if (subCmd == "-contact" || subCmd == "--contact")
     {
         cout << endl;
         cout << "- For further help, or to report a bug, please " << endl;
@@ -210,7 +212,7 @@ int bedtools_help(void)
     cout  << "    random        "  << "Generate random intervals in a genome.\n";
     cout  << "    shuffle       "  << "Randomly redistrubute intervals in a genome.\n";
     cout  << "    sample        "  << "Sample random records from file using reservoir sampling.\n";   
-    cout  << "    spacing       "  << "Report the spacing between intervals in a file.\n";     
+    cout  << "    spacing       "  << "Report the gap lengths between intervals in a file.\n";     
     cout  << "    annotate      "  << "Annotate coverage of features from multiple files.\n";
     
     cout  << endl;
@@ -281,4 +283,31 @@ int bedtools_faq(void)
 
     cout << "\n";
     return 0;
+}
+
+void showHelp(const QuickString &subCmd) {
+	if (subCmd == "intersect") {
+		intersect_help();
+	} else if (subCmd == "map") {
+		map_help();
+	} else if (subCmd == "closest") {
+		closest_help();
+	} else if (subCmd == "merge") {
+		merge_help();
+	} else if (subCmd == "jaccard") {
+		jaccard_help();
+	} else if (subCmd == "subtract") {
+		subtract_help();
+	} else if (subCmd == "sample") {
+		sample_help();
+	} else if (subCmd == "spacing") {
+		spacing_help();
+	} else if (subCmd == "fisher") {
+		fisher_help();
+	} else if (subCmd == "coverage") {
+		coverage_help();
+	} else if (subCmd == "complement") {
+		complement_help();
+	}
+
 }

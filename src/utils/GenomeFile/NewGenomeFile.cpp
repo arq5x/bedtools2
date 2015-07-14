@@ -121,6 +121,18 @@ CHRPOS NewGenomeFile::getChromSize(const QuickString &chrom) {
     return INT_MAX;
 }
 
+CHRPOS NewGenomeFile::getChromSize(const QuickString &chrom) const {
+	if (chrom == _currChromName) {
+		return _currChromSize;
+	}
+	lookupType::const_iterator iter= _chromSizeIds.find(chrom);
+    if (iter != _chromSizeIds.end()) {
+    	return iter->second.first;
+    }
+    cerr << "Error: chromosome " << chrom << " is not in the genome file " << _genomeFileName << ". Exiting." << endl;
+    return INT_MAX;
+}
+
 CHRPOS NewGenomeFile::getChromId(const QuickString &chrom) {
 	if (chrom == _currChromName) {
 		return _currChromId;

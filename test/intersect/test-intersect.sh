@@ -537,35 +537,105 @@ check exp obs
 rm exp obs
 
 ##################################################################
-# see that -nonamecheck only works for sorted data
+# see that naming conventions are tested with unsorted data.
 ##################################################################
 echo "    intersect.t44...\c"
 echo \
-"***** ERROR: -nonamecheck option is only valid for sorted input. *****" > exp
-$BT intersect -a nonamecheck_a.bed -b nonamecheck_b.bed -nonamecheck 2>&1 > /dev/null | cat - | head -2 | tail -1 > obs
+"***** WARNING: File nonamecheck_a.bed has a record where naming convention (leading zero) is inconsistent with other files:
+chr1	10	20" > exp
+$BT intersect -a nonamecheck_a.bed -b nonamecheck_b.bed 2>&1 > /dev/null | cat - | head -2 > obs
 check exp obs
 rm exp obs
+
 
 ##################################################################
 # see that differently named chroms don't work with -sorted
 ##################################################################
 echo "    intersect.t45...\c"
 echo \
-"ERROR: File nonamecheck_b.bed has a record where naming convention (leading zero) is inconsistent with other files:
+"***** WARNING: File nonamecheck_b.bed has a record where naming convention (leading zero) is inconsistent with other files:
 chr01	15	25" > exp
-$BT intersect -a nonamecheck_a.bed -b nonamecheck_b.bed -sorted 2>&1 > /dev/null | cat - > obs
+$BT intersect -a nonamecheck_a.bed -b nonamecheck_b.bed -sorted 2>&1 > /dev/null | cat - | head -2 > obs
 check exp obs
 rm exp obs
 
 ##################################################################
 # see that differently named chroms  -sorted and -nonamecheck
-# don't complain
+# don't complain with -nonamecheck
 ##################################################################
 echo "    intersect.t46...\c"
 touch exp
 $BT intersect -a nonamecheck_a.bed -b nonamecheck_b.bed -sorted -nonamecheck 2>&1 > /dev/null | cat - > obs
 check exp obs
 rm exp obs
+
+##################################################################
+# see that SVLEN in VCF files is treated as zero length 
+# records when the SV type is an insertion
+##################################################################
+echo "    intersect.t47...\c"
+echo \
+"chr1	1	a	G	<DEL>	70.90
+chr1	1	a	G	<DEL>	70.90
+chr1	4	a	G	<INS>	70.90" > exp
+$BT intersect -a bug223_sv1_a.vcf -b bug223_sv1_b.vcf | cut -f1-6 > obs
+check exp obs
+rm exp obs
+
+##################################################################
+# see that SVLEN in VCF files can handle multiple numbers,
+# at end of line, followed by NULL.
+##################################################################
+echo "    intersect.t48...\c"
+echo \
+"chr1	1	a	G	<DEL>	70.90
+chr1	1	a	G	<DEL>	70.90
+chr1	4	a	G	<DEL>	70.90
+chr1	4	a	G	<DEL>	70.90" > exp
+$BT intersect -a bug223_d.vcf -b bug223_d.vcf | cut -f1-6 > obs
+check exp obs
+rm exp obs
+
+##################################################################
+# see that SVLEN in VCF files can handle multiple numbers,
+# at end of line, followed by a tab
+##################################################################
+echo "    intersect.t49...\c"
+echo \
+"chr1	1	a	G	<DEL>	70.90
+chr1	1	a	G	<DEL>	70.90
+chr1	4	a	G	<DEL>	70.90
+chr1	4	a	G	<DEL>	70.90" > exp
+$BT intersect -a bug223_e.vcf -b bug223_e.vcf | cut -f1-6 > obs
+check exp obs
+rm exp obs
+
+##################################################################
+# see that SVLEN in VCF files can handle single numbers,
+# at end of line, followed by null
+##################################################################
+echo "    intersect.t50...\c"
+echo \
+"chr1	1	a	G	<DEL>	70.90
+chr1	1	a	G	<DEL>	70.90
+chr1	4	a	G	<DEL>	70.90
+chr1	4	a	G	<DEL>	70.90" > exp
+$BT intersect -a bug223_f.vcf -b bug223_f.vcf | cut -f1-6 > obs
+check exp obs
+rm exp obs
+
+##################################################################
+# Bug 44: test that bgzipped vcf file works correctly
+# with race condition
+##################################################################
+echo "    intersect.t51...\c"
+echo \
+"MT	2706	.	A	G	2965	PASS	BRF=0.05;FR=1;HP=1;HapScore=1;MGOF=17;MMLQ=30;MQ=62.05;NF=7607;NR=8147;PP=2965;QD=20;SC=AGGCGGGCATAACACAGCAAG;SbPval=0.52;Source=Platypus;TC=15840;TCF=7679;TCR=8161;TR=15754;WE=2749;WS=2693;CSQ=G|ENSG00000198763|ENST00000361453|Transcript|upstream_gene_variant||||||rs2854128|1764|1|MT-ND2|HGNC|7456|protein_coding|YES||ENSP00000355046|NU2M_HUMAN|Q7GXY9_HUMAN&Q5Q3P5_HUMAN&Q14X33_HUMAN&Q14WT3_HUMAN&A6ZH82_HUMAN&A6ZGN8_HUMAN&A6ZGG3_HUMAN|UPI0000000AA2||||||A:0.1656|||||||||||||,G|ENSG00000210151|ENST00000387416|Transcript|downstream_gene_variant||||||rs2854128|4740|-1|MT-TS1|HGNC|7497|Mt_tRNA|YES|||||||||||A:0.1656|||||||||||||,G|ENSG00000210077|ENST00000387342|Transcript|downstream_gene_variant||||||rs2854128|1036|1|MT-TV|HGNC|7500|Mt_tRNA|YES|||||||||||A:0.1656|||||||||||||,G|ENSG00000210144|ENST00000387409|Transcript|downstream_gene_variant||||||rs2854128|3120|-1|MT-TY|HGNC|7502|Mt_tRNA|YES|||||||||||A:0.1656|||||||||||||,G|ENSG00000210117|ENST00000387382|Transcript|upstream_gene_variant||||||rs2854128|2806|1|MT-TW|HGNC|7501|Mt_tRNA|YES|||||||||||A:0.1656|||||||||||||,G|ENSG00000210107|ENST00000387372|Transcript|downstream_gene_variant||||||rs2854128|1623|-1|MT-TQ|HGNC|7495|Mt_tRNA|YES|||||||||||A:0.1656|||||||||||||,G|ENSG00000210140|ENST00000387405|Transcript|downstream_gene_variant||||||rs2854128|3055|-1|MT-TC|HGNC|7477|Mt_tRNA|YES|||||||||||A:0.1656|||||||||||||,G|ENSG00000211459|ENST00000389680|Transcript|downstream_gene_variant||||||rs2854128|1105|1|MT-RNR1|HGNC|7470|Mt_rRNA|YES|||||||||||A:0.1656|||||||||||||,G|ENSG00000210082|ENST00000387347|Transcript|non_coding_transcript_exon_variant&non_coding_transcript_variant|1036|||||rs2854128||1|MT-RNR2|HGNC|7471|Mt_rRNA|YES||||||||1/1|||A:0.1656|||||||||||||,G|ENSG00000210127|ENST00000387392|Transcript|downstream_gene_variant||||||rs2854128|2881|-1|MT-TA|HGNC|7475|Mt_tRNA|YES|||||||||||A:0.1656|||||||||||||,G|ENSG00000198712|ENST00000361739|Transcript|upstream_gene_variant||||||rs2854128|4880|1|MT-CO2|HGNC|7421|protein_coding|YES||ENSP00000354876|COX2_HUMAN|Q7GXZ8_HUMAN&Q4R1L5_HUMAN&Q4R1L3_HUMAN&Q14XT3_HUMAN&K7WVJ5_HUMAN&H9E7W2_HUMAN&H9E7T7_HUMAN&H9E7P8_HUMAN&H9E7F7_HUMAN&E2DTL8_HUMAN&D3WYY9_HUMAN&D2Y6Y2_HUMAN&D2Y6Y1_HUMAN&B2YKU2_HUMAN|UPI0000000AA4||||||A:0.1656|||||||||||||,G|ENSG00000210049|ENST00000387314|Transcript|downstream_gene_variant||||||rs2854128|2059|1|MT-TF|HGNC|7481|Mt_tRNA|YES|||||||||||A:0.1656|||||||||||||,G|ENSG00000198888|ENST00000361390|Transcript|upstream_gene_variant||||||rs2854128|601|1|MT-ND1|HGNC|7455|protein_coding|YES||ENSP00000354687|NU1M_HUMAN|Q85KV6_HUMAN&Q8WCX9_HUMAN&Q5Q757_HUMAN&Q14WI3_HUMAN&G3EBI1_HUMAN&D2Y6X8_HUMAN&D2Y6X6_HUMAN&A6ZHG8_HUMAN|UPI0000000AA1||||||A:0.1656|||||||||||||,G|ENSG00000209082|ENST00000386347|Transcript|upstream_gene_variant||||||rs2854128|524|1|MT-TL1|HGNC|7490|Mt_tRNA|YES|||||||||||A:0.1656|||||||||||||,G|ENSG00000198804|ENST00000361624|Transcript|upstream_gene_variant||||||rs2854128|3198|1|MT-CO1|HGNC|7419|protein_coding|YES||ENSP00000354499|COX1_HUMAN|Q957U9_HUMAN&Q7GXY8_HUMAN&M9Z2G2_HUMAN&Q8HBX8_HUMAN&Q5Q1W2_HUMAN&Q4R1L4_HUMAN&Q14XD3_HUMAN&Q14X83_HUMAN&F8U4W0_HUMAN&D3WYY6_HUMAN&D3WYY5_HUMAN&D3WYY4_HUMAN&D2Y6W4_HUMAN&C8YAE4_HUMAN&C3UPN2_HUMAN&B7TCT8_HUMAN&B2Y9D8_HUMAN&A5YMT3_HUMAN&A1XP63_HUMAN&A0S1I7_HUMAN|UPI0000000AA3||||||A:0.1656|||||||||||||,G|ENSG00000210154|ENST00000387419|Transcript|upstream_gene_variant||||||rs2854128|4812|1|MT-TD|HGNC|7478|Mt_tRNA|YES|||||||||||A:0.1656|||||||||||||,G|ENSG00000210112|ENST00000387377|Transcript|upstream_gene_variant||||||rs2854128|1696|1|MT-TM|HGNC|7492|Mt_tRNA|YES|||||||||||A:0.1656|||||||||||||,G|ENSG00000210135|ENST00000387400|Transcript|downstream_gene_variant||||||rs2854128|2951|-1|MT-TN|HGNC|7493|Mt_tRNA|YES|||||||||||A:0.1656|||||||||||||,G|ENSG00000210100|ENST00000387365|Transcript|upstream_gene_variant||||||rs2854128|1557|1|MT-TI|HGNC|7488|Mt_tRNA|YES|||||||||||A:0.1656|||||||||||||;GR=3.07;PH=0.654;PS=0.002	GT:GL:GOF:GQ:NR:NV	1/1:-300,-298.01,0:3:99:2733:2718	1/1:-300,-298.01,0:17:99:6509:6461	1/1:-300,-298.01,0:2:99:6598:6575	MT	2591	2747	rRNA" > exp
+$BT intersect -a bug44_a.vcf.gz -b bug44_b.bed -wa -wb > obs
+check exp obs
+rm exp obs
+
+
 
 
 cd multi_intersect

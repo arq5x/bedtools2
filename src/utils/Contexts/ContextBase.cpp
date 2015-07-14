@@ -59,14 +59,21 @@ ContextBase::ContextBase()
   _maxDistance(0),
   _useMergedIntervals(false),
   _reportPrecision(-1),
+  _splitBlockInfo(NULL),
   _allFilesHaveChrInChromNames(UNTESTED),
-  _allFileHaveLeadingZeroInChromNames(UNTESTED)
+  _allFileHaveLeadingZeroInChromNames(UNTESTED),
+  _nameConventionWarningTripped(false)
 
 {
 	_programNames["intersect"] = INTERSECT;
 	_programNames["sample"] = SAMPLE;
 	_programNames["map"] = MAP;
 	_programNames["merge"] = MERGE;
+	_programNames["closest"] = CLOSEST;
+	_programNames["subtract"] = SUBTRACT;
+	_programNames["jaccard"] = JACCARD;
+	_programNames["spacing"] = SPACING;
+	_programNames["fisher"] = FISHER;
 
 	if (hasColumnOpsMethods()) {
 		_keyListOps = new KeyListOps();
@@ -78,6 +85,14 @@ ContextBase::~ContextBase()
 	delete _genomeFile;
 	_genomeFile = NULL;
 
+	delete _splitBlockInfo;
+	_splitBlockInfo = NULL;
+
+	if (_nameConventionWarningTripped) {
+		cerr << _nameConventionWarningMsg << endl;
+	}
+
+
 	//close all files and delete FRM objects.
 	for (int i=0; i < (int)_files.size(); i++) {
 		_files[i]->close();
@@ -88,7 +103,6 @@ ContextBase::~ContextBase()
 		delete _keyListOps;
 		_keyListOps = NULL;
 	}
-
 }
 
 bool ContextBase::determineOutputType() {
@@ -127,14 +141,24 @@ void ContextBase::openGenomeFile(const BamTools::RefVector &refVector)
 	_genomeFile = new NewGenomeFile(refVector);
 }
 
-bool ContextBase::parseCmdArgs(int argc, char **argv, int skipFirstArgs) {
+bool ContextBase::testCmdArgs(int argc, char **argv) {
 	_argc = argc;
 	_argv = argv;
-	_skipFirstArgs = skipFirstArgs;
-
+	_skipFirstArgs = 1;
 	setProgram(_programNames[argv[0]]);
-
 	_argsProcessed.resize(_argc - _skipFirstArgs, false);
+
+	if (!parseCmdArgs(argc, argv, 1) || getShowHelp() || !isValidState()) {
+		if (!_errorMsg.empty()) {
+			cerr <<_errorMsg << endl;
+		}
+		return false;
+	}
+	return true;
+}
+
+bool ContextBase::parseCmdArgs(int argc, char **argv, int skipFirstArgs) {
+
 
 	for (_i=_skipFirstArgs; _i < argc; _i++) {
 		if (isUsed(_i - _skipFirstArgs)) {
@@ -216,6 +240,9 @@ bool ContextBase::isValidState()
 	}
 	if (!determineOutputType()) {
 		return false;
+	}
+	if (getObeySplits()) {
+		_splitBlockInfo = new BlockMgr(_overlapFraction, _reciprocal);
 	}
 	if (hasColumnOpsMethods()) {
 
@@ -430,7 +457,7 @@ bool ContextBase::handle_seed()
 bool ContextBase::handle_split()
 {
     setObeySplits(true);
-    markUsed(_i - _skipFirstArgs);
+     markUsed(_i - _skipFirstArgs);
 	return true;
 }
 
@@ -623,7 +650,9 @@ bool ContextBase::parseIoBufSize(QuickString bufStr)
 }
 
 void ContextBase::testNameConventions(const Record *record) {
-	if (getNameCheckDisabled()) return;
+	//Do nothing if using the -nonamecheck option,
+	//warning already given, or record is unmapped BAM record
+	if (getNameCheckDisabled() || _nameConventionWarningTripped || record->isUnmapped()) return;
 
 	int fileIdx = record->getFileIdx();
 
@@ -636,15 +665,9 @@ void ContextBase::testNameConventions(const Record *record) {
 
 	if (testChrVal == UNTESTED) {
 		_fileHasChrInChromNames[fileIdx] = hasChr ? YES : NO;
-	} else if ((testChrVal == YES && !hasChr) || (testChrVal == NO && hasChr)) {
-		fprintf(stderr, "ERROR: File %s has inconsistent naming convention for record:\n", _fileNames[fileIdx].c_str());
-		record->print(stderr, true);
-		exit(1);
 	}
 	if ((_allFilesHaveChrInChromNames == YES && !hasChr) || (_allFilesHaveChrInChromNames == NO && hasChr)) {
-		fprintf(stderr, "ERROR: File %s has a record where naming convention is inconsistent with other files:\n", _fileNames[fileIdx].c_str());
-		record->print(stderr, true);
-		exit(1);
+		nameConventionWarning(record, _fileNames[fileIdx], " has inconsistent naming convention for record:\n");
 	}
 
 	if (_allFilesHaveChrInChromNames == UNTESTED) {
@@ -661,15 +684,9 @@ void ContextBase::testNameConventions(const Record *record) {
 	testChrVal = fileHasLeadingZeroInChromNames(fileIdx);
 	if (testChrVal == UNTESTED) {
 		_fileHasLeadingZeroInChromNames[fileIdx] = zeroVal ? YES : NO;
-	} else if ((testChrVal == YES && !zeroVal) || (testChrVal == NO && zeroVal)) {
-		fprintf(stderr, "ERROR: File %s has inconsistent naming convention (leading zero) for record:\n", _fileNames[fileIdx].c_str());
-		record->print(stderr, true);
-		exit(1);
 	}
 	if ((_allFileHaveLeadingZeroInChromNames == YES && !zeroVal) || (_allFileHaveLeadingZeroInChromNames == NO && zeroVal)) {
-		fprintf(stderr, "ERROR: File %s has a record where naming convention (leading zero) is inconsistent with other files:\n", _fileNames[fileIdx].c_str());
-		record->print(stderr, true);
-		exit(1);
+		nameConventionWarning(record, _fileNames[fileIdx], " has a record where naming convention (leading zero) is inconsistent with other files:\n");
 	}
 
 	if (_allFileHaveLeadingZeroInChromNames == UNTESTED) {
@@ -693,3 +710,44 @@ ContextBase::testType ContextBase::fileHasLeadingZeroInChromNames(int fileIdx) {
 	return iter->second;
 }
 
+
+
+void ContextBase::warn(const Record *record, const QuickString str1, const QuickString str2, const QuickString str3) {
+	QuickString msg;
+	setErrorMsg(msg, true, record, str1, str2, str3);
+	cerr << msg << endl;
+}
+
+void ContextBase::die(const Record *record, const QuickString str1, const QuickString str2, const QuickString str3) {
+	QuickString msg;
+	setErrorMsg(msg, false, record, str1, str2, str3);
+	cerr << msg << endl;
+	exit(1);
+}
+
+void ContextBase::setErrorMsg(QuickString &msg, bool onlyWarn, const Record * record, QuickString str1, const QuickString str2, const QuickString str3) {
+	if (onlyWarn) {
+		msg = "\n***** WARNING: ";
+	} else {
+		msg = "\n***** ERROR: ";
+	}
+	msg.append(str1);
+	msg.append(str2);
+	msg.append(str3);
+	msg.append(" Exiting...\n");
+	if (record != NULL) {
+		record->print(msg);
+	}
+}
+
+void ContextBase::nameConventionWarning(const Record *record, const QuickString &filename, const QuickString &message)
+{
+	 _nameConventionWarningMsg = "***** WARNING: File ";
+	 _nameConventionWarningMsg.append(filename);
+	 _nameConventionWarningMsg.append(message);
+	 record->print(_nameConventionWarningMsg);
+	 _nameConventionWarningMsg.append("\n");
+	 _nameConventionWarningTripped = true;
+
+	 cerr << _nameConventionWarningMsg << endl;
+}

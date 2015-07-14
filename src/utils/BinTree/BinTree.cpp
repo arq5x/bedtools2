@@ -5,66 +5,20 @@
 BinTree::BinTree(ContextIntersect *context)
 :  _context(context),
   _binOffsetsExtended(NULL),
-  _showBinMetrics(false),
   _maxBinNumFound(0)
  {
-	_binOffsetsExtended = new uint32_t[NUM_BIN_LEVELS];
-	memset(_binOffsetsExtended, 0, NUM_BIN_LEVELS * sizeof(uint32_t));
+	_binOffsetsExtended = new binNumType[NUM_BIN_LEVELS];
+	memset(_binOffsetsExtended, 0, NUM_BIN_LEVELS * sizeof(binNumType));
 
 	//start at idx 1, because the memset above already initialized
 	//the first idx to zero, which is what we want.
-	for (uint32_t i= 1; i < NUM_BIN_LEVELS; i++) {
+	for (binNumType i= 1; i < NUM_BIN_LEVELS; i++) {
 		_binOffsetsExtended[i] = _binOffsetsExtended[i-1] + (1 << ((NUM_BIN_LEVELS - i -1) * 3));
 	}
 }
 
 BinTree::~BinTree() {
-	//TBD: pass all elements in tree back to FRM for proper cleanup/deletion
-	for (mainMapType::iterator mainIter = _mainMap.begin(); mainIter != _mainMap.end(); mainIter++) {
-		allBinsType bins = mainIter->second;
-		if (bins == NULL) {
-			fprintf(stderr, "ERROR: In BinTree destructor: found chromosome with NULL bin array.\n");
-			continue;
-		}
-		if (!_showBinMetrics) { //don't clean up bins when simply reporting metrics.
-
-			for (uint32_t i=0; i < NUM_BINS; i++) {
-				binType bin = bins[i];
-				if (bin == NULL) {
-					continue;
-				}
-				for (innerListIterType listIter = bin->begin(); listIter != bin->end(); listIter = bin->next()) {
-					const Record *record = listIter->value();
-					_context->getFile(record->getFileIdx())->deleteRecord(record);
-				}
-				delete bin;
-				bin = NULL;
-			}
-		}
-		delete [] bins;
-		bins = NULL;
-	}
 	delete [] _binOffsetsExtended;
-
-	if (_showBinMetrics) {
-		map<int, int> hitsHistogram;
-		FILE *fp = fopen("BinsHitFile.txt", "w");
-		fprintf(fp, "The largest bin was %u\n", _maxBinNumFound);
-		fprintf(fp, "There were %d different bins hit by database.\n", (int)_binsHit.size());
-		for (map<uint32_t, int>::iterator binIter = _binsHit.begin(); binIter != _binsHit.end(); binIter++) {
-			uint32_t binNum = binIter->first;
-			int numHits = binIter->second;
-			fprintf(fp, "%u\t%d\n", binNum, numHits);
-			hitsHistogram[numHits]++;
-		}
-		fclose(fp);
-		fp = fopen("BinHitsHistogram.txt", "w");
-		fprintf(fp, "NumHits\tNumBins\n");
-		for (map<int, int>::iterator histIter = hitsHistogram.begin(); histIter != hitsHistogram.end(); histIter++) {
-			fprintf(fp, "%d\t%d\n", histIter->first, histIter->second);
-		}
-		fclose(fp);
-	}
 }
 
 void BinTree::loadDB()
@@ -93,9 +47,6 @@ void BinTree::loadDB()
 
 void BinTree::getHits(Record *record, RecordKeyVector &hitSet)
 {
-	if (_showBinMetrics) {
-		return; //don't care about query entries just yet.
-	}
 	if (record->isUnmapped()) {
 		return;
 	}
@@ -106,17 +57,14 @@ void BinTree::getHits(Record *record, RecordKeyVector &hitSet)
 		return;
 	}
 
-    uint32_t startBin = 0;
-    uint32_t endBin = 0;
+    binNumType startPos = record->getStartPos();
+    binNumType endPos = record->getEndPos();
 
-    uint32_t startPos = record->getStartPos();
-    uint32_t endPos = record->getEndPos();
-
-    startBin = (startPos >> _binFirstShift);
-    endBin = ((endPos-1) >> _binFirstShift);
+    binNumType startBin = (startPos >> _binFirstShift);
+    binNumType endBin = ((endPos-1) >> _binFirstShift);
 
 
-	const allBinsType bins = mainIter->second;
+	const allBinsType &bins = mainIter->second;
 
     /* SYNOPSIS:
          1. We loop through each UCSC BIN level for feature A's chrom.
@@ -124,25 +72,19 @@ void BinTree::getHits(Record *record, RecordKeyVector &hitSet)
             hits if it meets all of the user's requests, which include:
                (a) overlap fractio, (b) strandedness, (c) reciprocal overlap
     */
-    for (uint32_t i = 0; i < NUM_BIN_LEVELS; i++) {
-        uint32_t offset = _binOffsetsExtended[i];
-        for (uint32_t j = (startBin+offset); j <= (endBin+offset); j++)  {
+    for (binNumType i = 0; i < NUM_BIN_LEVELS; i++) {
+        binNumType offset = _binOffsetsExtended[i];
+        for (binNumType j = (startBin+offset); j <= (endBin+offset); j++)  {
 
         	// move to the next bin if this one is empty
-        	const binType &bin = bins[j];
-        	if (bin == NULL) {
-        		//no list of records in this bin.
+        	allBinsType::const_iterator allBinsIter = bins.find(j);
+        	if (allBinsIter == bins.end()) {
         		continue;
         	}
-        	if (bin->empty()) {
-        		//bin has list, but it's empty.
-        		//Actually, this should never happen, so throw an error.
-        		fprintf(stderr, "ERROR: found empty list for bin %u of chromosome %s\n",
-        				j, chr.c_str());
-        		continue;
-        	}
-            for (innerListIterType listIter = bin->begin(); listIter != bin->end(); listIter = bin->next()) {
-            	const Record *dbRec = listIter->value();
+        	const binType &bin = allBinsIter->second;
+
+        	for (binType::const_iterator iter = bin.begin(); iter != bin.end(); iter++) {
+            	const Record *dbRec = *iter;
             	if (record->intersects(dbRec, _context->getSameStrand(), _context->getDiffStrand(),
             			_context->getOverlapFraction(), _context->getReciprocal())) {
             		hitSet.push_back(dbRec);
@@ -159,55 +101,31 @@ void BinTree::getHits(Record *record, RecordKeyVector &hitSet)
 
 bool BinTree::addRecordToTree(const Record *record)
 {
-	// Get chr, bin. allocate all bins and single bins as needed.
+	// Get chr, bin.
 	const QuickString &chr = record->getChrName();
-	uint32_t startPos = (uint32_t)(record->getStartPos());
-	uint32_t endPos = (uint32_t)(record->getEndPos());
-
-	//is this chr currently in the main map?
-	allBinsType bins = NULL;
-	mainMapType::iterator mainIter = _mainMap.find(chr);
-	if (mainIter == _mainMap.end()) {
-		//this is a new chr NOT currently in the map.
-		bins = new binType[NUM_BINS];
-		memset(bins, 0, NUM_BINS * sizeof(binType));
-		_mainMap[chr] = bins;
-	} else {
-		bins = mainIter->second;
-	}
-	uint32_t binNum = getBin(startPos, endPos);
-
-	if (_showBinMetrics) {
-		if (binNum > _maxBinNumFound) {
-			_maxBinNumFound = binNum;
-		}
-		_binsHit[binNum]++;
-		return true;
-	}
+	binNumType startPos = (binNumType)(record->getStartPos());
+	binNumType endPos = (binNumType)(record->getEndPos());
+	binNumType binNum = getBin(startPos, endPos);
 
 	if (binNum < 0 || binNum >= NUM_BINS) {
 		fprintf(stderr, "ERROR: Received illegal bin number %u from getBin call.\n", binNum);
 		return false;
 	}
-	binType &bin = bins[binNum];
-	if (bin == NULL) {
-		bin = new innerListType;
-	}
-	bin->push_back(record);
-
+	_mainMap[chr][binNum].push_back(record);
 	return true;
 }
 
-uint32_t BinTree::getBin(const Record *record) const {
-	return getBin((uint32_t)(record->getStartPos()), (uint32_t)(record->getEndPos()));
+
+BinTree::binNumType BinTree::getBin(const Record *record) const {
+	return getBin((binNumType)(record->getStartPos()), (binNumType)(record->getEndPos()));
 }
 
-uint32_t BinTree::getBin(uint32_t start, uint32_t end) const {
+BinTree::binNumType BinTree::getBin(binNumType start, binNumType end) const {
     --end;
     start >>= _binFirstShift;
     end   >>= _binFirstShift;
 
-    for (uint32_t i = 0; i < NUM_BIN_LEVELS; ++i) {
+    for (binNumType i = 0; i < NUM_BIN_LEVELS; ++i) {
         if (start == end) {
         	return _binOffsetsExtended[i] + start;
         }

@@ -21,13 +21,14 @@ INCLUDES = -I$(UTILITIES_DIR)/Contexts/ \
            -I$(UTILITIES_DIR)/RecordOutputMgr/ \
            -I$(UTILITIES_DIR)/NewChromsweep \
            -I$(UTILITIES_DIR)/BinTree \
+           -I$(UTILITIES_DIR)/ToolBase \
            -I$(UTILITIES_DIR)/version/
 
 # ----------------------------------
 # define our source and object files
 # ----------------------------------
-SOURCES= intersectMain.cpp intersectFile.cpp intersectFile.h
-OBJECTS= intersectMain.o intersectFile.o
+SOURCES= intersectHelp.cpp intersectFile.cpp intersectFile.h
+OBJECTS= intersectHelp.o intersectFile.o
 BUILT_OBJECTS= $(patsubst %,$(OBJ_DIR)/%,$(OBJECTS))
 PROGRAM= intersectFile
 
@@ -41,6 +42,6 @@ $(BUILT_OBJECTS): $(SOURCES)
 	
 clean:
 	@echo "Cleaning up."
-	@rm -f $(OBJ_DIR)/intersectMain.o $(OBJ_DIR)/intersectFile.o
+	@rm -f $(OBJ_DIR)/intersectHelp.o $(OBJ_DIR)/intersectFile.o
 
 .PHONY: clean

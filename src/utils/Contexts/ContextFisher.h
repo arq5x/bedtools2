@@ -8,10 +8,10 @@
 #ifndef CONTEXTFISHER_H_
 #define CONTEXTFISHER_H_
 
-#include "ContextIntersect.h"
+#include "ContextJaccard.h"
 #include "GenomeFile.h"
 
-class ContextFisher : public ContextIntersect {
+class ContextFisher : public ContextJaccard {
 public:
   ContextFisher();
   ~ContextFisher();
@@ -21,11 +21,10 @@ public:
 	void setExcludeFile(string excludeFile) { _excludeFile = excludeFile; }
 
 
-private:
-	bool handle_s();
-	bool handle_S();
-	bool handle_exclude();
+protected:
 	string _excludeFile;
+	bool handle_exclude();
+	bool handle_m();
 
 
 };

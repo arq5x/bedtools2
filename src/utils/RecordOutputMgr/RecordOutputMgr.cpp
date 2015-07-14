@@ -82,6 +82,12 @@ bool RecordOutputMgr::printKeyAndTerminate(RecordKeyVector &keyList) {
 		//bed3 format, which is surprisingly difficult to do. Had to use the following:
 		const Bed3Interval *bed3 = static_cast<const Bed3Interval *>(keyList.getKey());
 		bed3->Bed3Interval::print(_outBuf);
+
+		//in addition, if we're doing stranded merges, we need to print the strand sign.
+		if (_context->getDesiredStrand() != FileRecordMergeMgr::ANY_STRAND) {
+			_outBuf.append("\t");
+			_outBuf.append(keyList.getKey()->getStrand());
+		}
 		return false;
 	}
 	printBamType bamCode = printBamRecord(keyList);
@@ -126,9 +132,13 @@ void RecordOutputMgr::printRecord(const Record *record)
 void RecordOutputMgr::printRecord(const Record *record, const QuickString & value)
 {	
 	_afterVal = value;
-	printRecord(record);
+	bool recordPrinted = false;
+	if (record != NULL) {
+		printRecord(record);
+		recordPrinted = true;
+	}
 	if (!value.empty()) {
-		tab();
+		if (recordPrinted) tab();
 		_outBuf.append(value);
 	}
 	newline();
@@ -215,7 +225,7 @@ void RecordOutputMgr::printRecord(RecordKeyVector &keyList, RecordKeyVector *blo
 	const_cast<Record *>(keyList.getKey())->undoZeroLength();
 	_currBamBlockList = blockList;
 
-	if (_context->getProgram() == ContextBase::INTERSECT) {
+	if (_context->getProgram() == ContextBase::INTERSECT || _context->getProgram() == ContextBase::SUBTRACT) {
 		if (_printable) {
 			if (keyList.empty()) {
 				if ((static_cast<ContextIntersect *>(_context))->getWriteAllOverlap()) {
@@ -270,7 +280,7 @@ void RecordOutputMgr::printRecord(RecordKeyVector &keyList, RecordKeyVector *blo
 		if (!printKeyAndTerminate(keyList)) {
 			newline();
 		}
-	} else if (_context->getProgram() == ContextBase::MAP || _context->getProgram() == ContextBase::MERGE) {
+	} else { // if (_context->getProgram() == ContextBase::MAP || _context->getProgram() == ContextBase::MERGE) {
 		printKeyAndTerminate(keyList);
 	}
 	_currBamBlockList = NULL;
@@ -291,7 +301,7 @@ void RecordOutputMgr::checkForHeader() {
 		_outBuf.append(_context->getFile(0)->getHeader());
 	}
 	_context->setPrintHeader(false);
-	if (needsFlush()) flush();
+	flush();
 }
 
 void RecordOutputMgr::reportOverlapDetail(const Record *keyRecord, const Record *hitRecord, int hitIdx)
@@ -381,7 +391,7 @@ void RecordOutputMgr::reportOverlapDetail(const Record *keyRecord, const Record 
 	else if ((static_cast<ContextIntersect *>(_context))->getWriteOverlap()) {
 		int printOverlapBases = 0;
 		if (_context->getObeySplits()) {
-			printOverlapBases = _splitInfo->getOverlapBases(hitIdx);
+			printOverlapBases = _context->getSplitBlockInfo()->getOverlapBases(hitIdx);
 		} else {
 			printOverlapBases = minEnd - maxStart;
 		}

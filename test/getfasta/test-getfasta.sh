@@ -77,3 +77,46 @@ echo $'chr1 assembled by consortium X\t1\t10' | $BT getfasta -fi t_fH.fa -bed - 
 check obs exp
 
 rm obs exp
+
+
+# test IUPAC
+echo "    getfasta.t08...\c"
+echo \
+">1:0-16
+AGCTYRWSKMDVHBXN
+>2:0-16
+agctyrwskmdvhbxn" > exp
+$BT getfasta  -fi test.iupac.fa -bed test.iupac.bed -fo - > obs
+check obs exp
+rm obs exp test.iupac.fa.fai
+
+
+# test IUPAC revcomp
+echo "    getfasta.t09...\c"
+echo \
+">1:0-16(-)
+NXVDBHKMSWYRAGCT
+>2:0-16(-)
+nxvdbhkmswyragct" > exp
+$BT getfasta  -fi test.iupac.fa -bed test.iupac.bed -s -fo - > obs
+check obs exp
+rm obs exp test.iupac.fa.fai
+
+# test the warning about an outdated FASTA index file
+echo "    getfasta.t10...\c"
+echo \
+">chr1
+cggggggggg
+>chr2
+AAATTTTTTTTTT" > test.fa
+# create an index file
+echo -e "chr2\t2\t10" | $BT getfasta -fi test.fa -bed - -fo - > /dev/null
+# modify the FASTA file in a second
+sleep 1 
+touch test.fa
+echo -e "chr2\t2\t10" | $BT getfasta -fi test.fa -bed - -fo - \
+	> /dev/null 2> obs
+echo "Warning: the index file is older than the FASTA file." > exp
+check obs exp
+rm obs exp test.fa test.fa.fai
+

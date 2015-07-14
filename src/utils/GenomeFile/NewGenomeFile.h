@@ -36,10 +36,12 @@ public:
     
     CHRPOS getGenomeSize(void) const { return _genomeLength; }                // return the total size of the genome
     CHRPOS getChromSize(const QuickString &chrom);  // return the size of a chromosome
+    CHRPOS getChromSize(const QuickString &chrom) const;  // return the size of a chromosome
     CHRPOS getChromId(const QuickString &chrom); // return chromosome's sort order
     const vector<QuickString> &getChromList() const { return _chromList; }  // return a list of chrom names
     CHRPOS getNumberOfChroms() const { return _chromList.size() -1; }//the -1 excludes the blank chrom added for unmapped reads
     const QuickString &getGenomeFileName() const { return _genomeFileName; }
+    bool hasChrom(const QuickString &chrom) const { return _chromSizeIds.find(chrom) != _chromSizeIds.end(); }
 
 
 

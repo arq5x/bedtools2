@@ -127,7 +127,7 @@ chr2	10	20	+	a1	5	1
 chr2	30	40	+	a2	6	1
 chr2	42	50	+	a3	7	1
 chr2	45	100	-	a4	8	1" > exp
-$BT merge -i a.full.bed -s -c 6,4,5,6 -o distinct,collapse,sum,count > obs
+$BT merge -i a.full.bed -s -c 4,5,6 -o collapse,sum,count > obs
 check obs exp
 rm obs exp
 
@@ -204,7 +204,7 @@ echo \
 chr1	20	90	-
 chr2	20	60	+
 chr2	25	80	-" > exp
-$BT merge -i mixedStrands.bed -s -c 6 -o distinct > obs
+$BT merge -i mixedStrands.bed -s  > obs
 check exp obs
 rm obs exp
 
@@ -216,7 +216,7 @@ echo "    merge.t16...\c"
 echo \
 "chr1	10	80	+
 chr2	20	60	+" > exp
-$BT merge -i mixedStrands.bed -S + -c 6 -o distinct > obs
+$BT merge -i mixedStrands.bed -S + > obs
 check exp obs
 rm obs exp
 
@@ -228,7 +228,7 @@ echo "    merge.t17...\c"
 echo \
 "chr1	20	90	-
 chr2	25	80	-" > exp
-$BT merge -i mixedStrands.bed -S - -c 6 -o distinct > obs
+$BT merge -i mixedStrands.bed -S - > obs
 check exp obs
 rm obs exp
 
@@ -579,6 +579,27 @@ echo \
 chr1	5481008	5484749	1.6454e+07
 chr1	6763278	6766882	6.7669e+06" > exp
 $BT merge -i precisionTest2.bed -c 8 -o sum -prec 5 > obs
+check exp obs
+rm obs exp
+
+###########################################################
+#  Test stranded merge with bedPlus files that have strand
+###########################################################
+echo "    merge.t48...\c"
+echo \
+"chr1	10000	25000	-" > exp
+$BT merge -i bug254_d.bed -s -d 200 > obs
+check exp obs
+rm obs exp
+
+###########################################################
+#  Test stranded merge with bedPlus files that have strand
+###########################################################
+echo "    merge.t49...\c"
+echo \
+"chr1	10000	20000	-
+chr1	20100	25000	+" > exp
+$BT merge -i bug254_e.bed -s -d 200 > obs
 check exp obs
 rm obs exp
 

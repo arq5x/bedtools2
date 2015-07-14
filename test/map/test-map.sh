@@ -808,3 +808,32 @@ chr1	15000	20000	11.44444444" > exp
 $BT map -a d.bed -b fullFields.bam -c 5 -o mean > obs
 check exp obs
 rm exp obs
+
+
+###########################################################
+#  Bug 262: Test stranded map with BedPlus records. 
+# -s (lowercase) should give results
+############################################################
+echo "    map.t54...\c"
+echo \
+"1	3215742	3216021	.	0	-	1
+1	3217007	3218115	.	0	-	1" > exp
+$BT map -a bug262_a.bed -b bug262_b.bed -s > obs
+check exp obs
+rm exp obs
+
+
+###########################################################
+#  Bug 262: Test stranded map with BedPlus records. 
+# -S (uppercase) should NOT give results
+############################################################
+echo "    map.t55...\c"
+echo \
+"1	3215742	3216021	.	0	-	.
+1	3217007	3218115	.	0	-	." > exp
+$BT map -a bug262_a.bed -b bug262_b.bed -S > obs
+check exp obs
+rm exp obs
+
+
+
