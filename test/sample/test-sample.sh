@@ -93,6 +93,7 @@ rm obs exp
 echo "    sample.new.t07...\c"
 echo "10" > exp
 $BT sample -i mainFile.bed -n 10 | wc -l > obs
+sed -i 's/^\s*//' obs
 check obs exp
 #rm obs exp
 

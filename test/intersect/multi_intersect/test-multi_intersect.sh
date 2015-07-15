@@ -129,7 +129,7 @@ rm obs
 #  output will give the correct result
 ###########################################################
 echo "    intersect.t09...\c"
-cat exp1 exp2 exp3 | sort -k1,1V -k2,2n > exp
+cat exp1 exp2 exp3 | sort -k1.4,1n -k2,2n > exp
 $BT intersect -a query2.bed -b d4.bed d5.bed d6.bed -g g.bed -sortout > obs
 check exp obs
 rm obs exp1 exp2 exp3
