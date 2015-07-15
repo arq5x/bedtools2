@@ -24,6 +24,7 @@
 #include "fisher.h"
 #include "coverageFile.h"
 #include "complementFile.h"
+#include "groupBy.h"
 
 BedtoolsDriver::BedtoolsDriver()
 : _hadError(false) {
@@ -38,6 +39,7 @@ BedtoolsDriver::BedtoolsDriver()
 	_supported.insert("fisher");
 	_supported.insert("coverage");
 	_supported.insert("complement");
+	_supported.insert("groupby");
 }
 
 
@@ -110,7 +112,9 @@ ContextBase *BedtoolsDriver::getContext()
 		context = new ContextCoverage();
 	} else if (_subCmd == "complement") {
 		context = new ContextComplement();
-	}else {
+	} else if (_subCmd == "groupby") {
+		context = new ContextGroupBy();
+	} else {
 		cerr << "Error: Tool " << _subCmd << " is not supported. Exiting..." << endl;
 		exit(1);
 	}
@@ -142,6 +146,8 @@ ToolBase *BedtoolsDriver::getTool(ContextBase *context)
 		tool = new CoverageFile(static_cast<ContextCoverage *>(context));
 	} else if (_subCmd == "complement") {
 		tool = new ComplementFile(static_cast<ContextComplement *>(context));
+	} else if (_subCmd == "groupby") {
+		tool = new GroupBy(static_cast<ContextGroupBy *>(context));
 	}
 
 	else {

@@ -32,7 +32,7 @@ public:
 
 	typedef enum  { UNKNOWN_RECORD_TYPE, EMPTY_RECORD_TYPE, BED3_RECORD_TYPE, BED4_RECORD_TYPE, BEDGRAPH_RECORD_TYPE, BED5_RECORD_TYPE,
 		BED6_RECORD_TYPE, BED12_RECORD_TYPE, BED_PLUS_RECORD_TYPE, BED6_PLUS_RECORD_TYPE, BAM_RECORD_TYPE, VCF_RECORD_TYPE, GFF_RECORD_TYPE,
-		GFF_PLUS_RECORD_TYPE} RECORD_TYPE;
+		GFF_PLUS_RECORD_TYPE, NO_POS_PLUS_RECORD_TYPE} RECORD_TYPE;
 
 	void setFilename(const QuickString & filename) { _filename = filename; }
 	bool scanBuffer(const char *buf, size_t len, bool eofHit, bool isCompressed = false);
@@ -79,7 +79,7 @@ public:
 	bool isBed12() const { return (_isBed && _numFields == 12); }
 	bool isGFF() const { return _isGFF; }
 
-
+	void setInHeader(bool val) { _inheader = val; }
 
 
 
@@ -118,6 +118,7 @@ private:
 	map<RECORD_TYPE, bool> _hasStrand;
 
 	bool _eofHit;
+	bool _inheader;
 
 	bool isBinaryBuffer(const char *buffer, size_t len);
 	bool isBAM(const char *buffer);

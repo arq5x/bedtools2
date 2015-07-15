@@ -20,7 +20,7 @@ public:
 
 	bool init();
 
-	const FileRecordTypeChecker & getTypeChecker() const { return _typeChecker; }
+	FileRecordTypeChecker & getTypeChecker() { return _typeChecker; }
 
 	bool eof() const { return _eof; }
 	bool getLine(QuickString &line);

@@ -193,6 +193,18 @@ bool QuickString::operator == (const string &str) const {
 
 }
 
+bool QuickString::stricmp(const QuickString &str) const {
+	if (str.size() != _currSize) {
+		return true;
+	}
+	for (size_t i=0; i < _currSize; i++) {
+		if (tolower(str[i]) != tolower(_buffer[i])) {
+			return true;
+		}
+	}
+	return false;
+}
+
 bool QuickString::operator == (const char *str) const {
 	size_t inLen = strlen(str);
 	if (inLen != _currSize) {

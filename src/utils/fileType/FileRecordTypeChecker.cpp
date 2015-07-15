@@ -4,7 +4,8 @@
 #include "ParseTools.h"
 
 FileRecordTypeChecker::FileRecordTypeChecker()
-: _eofHit(false)
+: _eofHit(false),
+  _inheader(false)
 {
 	_fileType = UNKNOWN_FILE_TYPE;
 	_recordType = UNKNOWN_RECORD_TYPE;
@@ -36,6 +37,7 @@ FileRecordTypeChecker::FileRecordTypeChecker()
 	_hasName[VCF_RECORD_TYPE] = true;
 	_hasName[GFF_RECORD_TYPE] = true;
 	_hasName[GFF_PLUS_RECORD_TYPE] = true;
+	_hasName[NO_POS_PLUS_RECORD_TYPE] = true;
 
 	_hasScore[UNKNOWN_RECORD_TYPE] = false;
 	_hasScore[EMPTY_RECORD_TYPE] = false;
@@ -48,6 +50,8 @@ FileRecordTypeChecker::FileRecordTypeChecker()
 	_hasScore[VCF_RECORD_TYPE] = true;
 	_hasScore[GFF_RECORD_TYPE] = true;
 	_hasScore[GFF_PLUS_RECORD_TYPE] = true;
+	_hasScore[NO_POS_PLUS_RECORD_TYPE] = true;
+
 
 	_hasStrand[UNKNOWN_RECORD_TYPE] = false;
 	_hasStrand[EMPTY_RECORD_TYPE] = false;
@@ -60,6 +64,8 @@ FileRecordTypeChecker::FileRecordTypeChecker()
 	_hasStrand[VCF_RECORD_TYPE] = true;
 	_hasStrand[GFF_RECORD_TYPE] = true;
 	_hasStrand[GFF_PLUS_RECORD_TYPE] = true;
+	_hasStrand[NO_POS_PLUS_RECORD_TYPE] = true;
+
 
 	_recordTypeNames[UNKNOWN_RECORD_TYPE] = "Unknown record type";
 	_recordTypeNames[EMPTY_RECORD_TYPE] = "Empty record type";
@@ -71,6 +77,8 @@ FileRecordTypeChecker::FileRecordTypeChecker()
 	_recordTypeNames[VCF_RECORD_TYPE] = "VCF record type";
 	_recordTypeNames[GFF_RECORD_TYPE] = "Gff record type";
 	_recordTypeNames[GFF_PLUS_RECORD_TYPE] = "GffPlus record type";
+	_recordTypeNames[NO_POS_PLUS_RECORD_TYPE] = "NoPosPlus record type";
+
 
 	_fileTypeNames[UNKNOWN_FILE_TYPE] = "Unknown file type";
 	_fileTypeNames[EMPTY_FILE_TYPE] = "Empty file type";
@@ -219,7 +227,9 @@ bool FileRecordTypeChecker::handleTextFormat(const char *buffer, size_t len)
 			_recordType = GFF_RECORD_TYPE;
 			return true;
 		}
-		return false;
+		//Here the Record must not have positions, so it is the NoPosPlus Type.
+		_recordType = NO_POS_PLUS_RECORD_TYPE;
+		return true;
 	}
 	return false;
 }
@@ -317,7 +327,15 @@ bool FileRecordTypeChecker::isTextDelimtedFormat(const char *buffer, size_t len)
 			continue;
 		}
 
+		//
 		//skip over any header line
+		//
+
+		if (_inheader) {
+			headerCount++;
+			_inheader = false; //inheaders can only apply to first line
+			continue;
+		}
 		if (isHeaderLine(line)) {
 			//clear any previously found supposedly valid data lines, because valid lines can only come after header lines.
 			if (_firstValidDataLineIdx > -1 && _firstValidDataLineIdx < i) {
@@ -328,6 +346,9 @@ bool FileRecordTypeChecker::isTextDelimtedFormat(const char *buffer, size_t len)
 			headerCount++;
 			continue;
 		}
+
+
+
 		//a line must have some alphanumeric characters in order to be valid.
 		bool hasAlphaNum = false;
 		for (int j=0; j < len; j++) {

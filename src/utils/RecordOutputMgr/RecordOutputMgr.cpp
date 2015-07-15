@@ -9,6 +9,7 @@
 #include "ContextBase.h"
 #include "ContextIntersect.h"
 #include "ContextClosest.h"
+#include "ContextGroupBy.h"
 #include "BlockMgr.h"
 #include "Bed3Interval.h"
 #include "Bed4Interval.h"
@@ -20,6 +21,7 @@
 #include "BamRecord.h"
 #include "VcfRecord.h"
 #include "GffRecord.h"
+#include "NoPosPlusRecord.h"
 
 
 
@@ -131,6 +133,8 @@ void RecordOutputMgr::printRecord(const Record *record)
 
 void RecordOutputMgr::printRecord(const Record *record, const QuickString & value)
 {	
+	checkForHeader();
+
 	_afterVal = value;
 	bool recordPrinted = false;
 	if (record != NULL) {
@@ -292,14 +296,26 @@ void RecordOutputMgr::checkForHeader() {
 	// Do we need to print a header?
 	if (!_context->getPrintHeader()) return;
 
-	//if the program is based on intersection, we want the header from the query file.
-	if (_context->hasIntersectMethods()) {
+	//If the tool is groupBy, and outheader was set,  but the header is empty, we need to print groupBy's
+	//default header
+	if (_context->getProgram() == ContextBase::GROUP_BY) {
+		const QuickString &header = _context->getFile(0)->getHeader();
+		if (header.empty()) {
+			const QuickString &defaultHeader = (static_cast<ContextGroupBy *>(_context))->getDefaultHeader();
+			_outBuf.append(defaultHeader);
+		} else {
+			_outBuf.append(header);
+		}
+	} else if (_context->hasIntersectMethods()) {
+		//if the tool is based on intersection, we want the header from the query file.
+
 		int queryIdx = (static_cast<ContextIntersect *>(_context))->getQueryFileIdx();
 		const QuickString &header  = _context->getFile(queryIdx)->getHeader();
 		_outBuf.append(header);
 	} else {
 		_outBuf.append(_context->getFile(0)->getHeader());
 	}
+
 	_context->setPrintHeader(false);
 	flush();
 }

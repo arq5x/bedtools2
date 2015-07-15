@@ -34,7 +34,7 @@ class FileRecordMgr {
 public:
 	FileRecordMgr(const QuickString & filename);
 	virtual ~FileRecordMgr();
-	bool open();
+	bool open(bool inheader=false);
 	void close();
 	virtual bool eof();
 	void setFileIdx(int fileIdx) { _fileIdx = fileIdx; }
@@ -106,6 +106,7 @@ public:
 
 	void setIsSorted(bool val) { _isSortedInput = val; }
 	void setIoBufSize(int val) { _ioBufSize = val; }
+	void setNoEnforceCoodSort(bool val) { _noEnforceCoordSort = val; }
 
 protected:
 	int _fileIdx;
@@ -139,8 +140,9 @@ protected:
 	bool _hasGenomeFile;
 	NewGenomeFile *_genomeFile;
 	int _ioBufSize;
+	bool _noEnforceCoordSort; //only true for GroupBy
 
-	void allocateFileReader();
+	void allocateFileReader(bool inheader=false);
 	void testInputSortOrder(Record *record);
 	void assignChromId(Record *);
 	void sortError(const Record *record, bool genomeFileError);
