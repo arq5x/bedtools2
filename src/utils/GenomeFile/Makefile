@@ -20,9 +20,9 @@ BUILT_OBJECTS= $(patsubst %,$(OBJ_DIR)/%,$(OBJECTS))
 
 $(BUILT_OBJECTS): $(SOURCES) $(SUBDIRS)
 	@echo "  * compiling GenomeFile.cpp"
-	@$(CXX) -c -o $(OBJ_DIR)/GenomeFile.o GenomeFile.cpp $(LDFLAGS) $(CXXFLAGS) $(INCLUDES)
+	@$(CXX) -c -o $(OBJ_DIR)/GenomeFile.o GenomeFile.cpp $(LDFLAGS) $(CXXFLAGS) $(CPPFLAGS) $(INCLUDES)
 	@echo "  * compiling NewGenomeFile.cpp"
-	@$(CXX) -c -o $(OBJ_DIR)/NewGenomeFile.o NewGenomeFile.cpp $(LDFLAGS) $(CXXFLAGS) $(INCLUDES)
+	@$(CXX) -c -o $(OBJ_DIR)/NewGenomeFile.o NewGenomeFile.cpp $(LDFLAGS) $(CXXFLAGS) $(CPPFLAGS) $(INCLUDES)
 
 #$(EXT_OBJECTS):
 #	@$(MAKE) --no-print-directory -C $(UTILITIES_DIR)/lineFileUtilities/

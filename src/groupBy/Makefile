@@ -25,7 +25,7 @@ INCLUDES = -I$(UTILITIES_DIR)/Contexts/ \
            -I$(UTILITIES_DIR)/version/ \
            -I$(UTILITIES_DIR)/ToolBase/ \
            -I$(TOOL_DIR)/intersectFile/
-            
+
 
 # ----------------------------------
 # define our source and object files
@@ -41,7 +41,7 @@ all: $(BUILT_OBJECTS)
 
 $(BUILT_OBJECTS): $(SOURCES)
 	@echo "  * compiling" $(*F).cpp
-	@$(CXX) -c -o $@ $(*F).cpp $(LDFLAGS) $(CXXFLAGS) $(DFLAGS) $(INCLUDES)
+	@$(CXX) -c -o $@ $(*F).cpp $(LDFLAGS) $(CXXFLAGS) $(CPPFLAGS) $(INCLUDES)
 	
 clean:
 	@echo "Cleaning up."

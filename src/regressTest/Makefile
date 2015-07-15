@@ -32,15 +32,15 @@ PROGRAM= regressTest
 
 all: #$(BUILT_OBJECTS)
 	@echo "compiling RegressTest.cpp"
-	@$(CXX) -c -o $(OBJ_DIR)/RegressTest.o RegressTest.cpp $(LDFLAGS) $(CXXFLAGS) $(INCLUDES)
+	@$(CXX) -c -o $(OBJ_DIR)/RegressTest.o RegressTest.cpp $(LDFLAGS) $(CXXFLAGS) $(CPPFLAGS) $(INCLUDES)
 	@echo "compiling regressTestMain.cpp"
-	@$(CXX) -c -o $(OBJ_DIR)/regressTestMain.o regressTestMain.cpp $(LDFLAGS) $(CXXFLAGS) $(INCLUDES)
+	@$(CXX) -c -o $(OBJ_DIR)/regressTestMain.o regressTestMain.cpp $(LDFLAGS) $(CXXFLAGS) $(CPPFLAGS) $(INCLUDES)
 	
 .PHONY: all
 
 #$(BUILT_OBJECTS): $(SOURCES)
 #	@echo "  * compiling" $(*F).cpp
-#	@$(CXX) -c -o $@ $(*F).cpp $(LDFLAGS) $(CXXFLAGS) $(INCLUDES)
+#	@$(CXX) -c -o $@ $(*F).cpp $(LDFLAGS) $(CXXFLAGS) $(CPPFLAGS) $(INCLUDES)
 
 
 clean:
