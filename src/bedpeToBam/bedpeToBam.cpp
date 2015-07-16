@@ -37,8 +37,8 @@ using namespace std;
 
 // function declarations
 void bedpetobam_help(void);
-void ProcessBedPE(BedFilePE *bedpe, GenomeFile *genome,  int mapQual, bool uncompressedBam);
-void ConvertBedPEToBam(const BEDPE &bedpe, BamAlignment &bam1,BamAlignment &bam2, map<string, int> &chromToId, int mapQual, int lineNum);
+void ProcessBedPE(BedFilePE *bedpe, GenomeFile *genome,  int mapQual, bool uncompressedBam, bool bedpeseq);
+void ConvertBedPEToBam(const BEDPE &bedpe, BamAlignment &bam1,BamAlignment &bam2, map<string, int> &chromToId, int mapQual, int lineNum, bool bedpeseq);
 
 void bedpetobam_MakeBamHeader(const string &genomeFile, RefVector &refs, string &header, map<string, int> &chromToInt);
 int  bedpetobam_reg2bin(int beg, int end);
@@ -61,6 +61,7 @@ int bedpetobam_main(int argc, char* argv[]) {
     bool haveMapQual     = false;
    // bool isBED12         = false;
     bool uncompressedBam = false;
+    bool bedpeseq = false; // beisi xu
 
     for(int i = 1; i < argc; i++) {
         int parameterLength = (int)strlen(argv[i]);
@@ -101,6 +102,9 @@ int bedpetobam_main(int argc, char* argv[]) {
         else if(PARAMETER_CHECK("-ubam", 5, parameterLength)) {
             uncompressedBam = true;
         }
+        else if(PARAMETER_CHECK("-seq", 4, parameterLength)) {
+            bedpeseq = true; // beisi xu
+        }
         else {
             cerr << endl << "*****ERROR: Unrecognized parameter: " << argv[i] << " *****" << endl << endl;
             showHelp = true;
@@ -126,7 +130,7 @@ int bedpetobam_main(int argc, char* argv[]) {
         BedFilePE *bedpe= new BedFilePE(bedpeFile);
         GenomeFile *genome = new GenomeFile(genomeFile);
 
-       ProcessBedPE(bedpe, genome,  mapQual, uncompressedBam);
+       ProcessBedPE(bedpe, genome,  mapQual, uncompressedBam, bedpeseq);
     }
     else {
         bedpetobam_help();
@@ -149,6 +153,7 @@ void bedpetobam_help(void) {
     cerr                    << "\t\t(INT) Default: 255" << endl << endl;
 
     cerr << "\t-ubam\t"     << "Write uncompressed BAM output. Default writes compressed BAM." << endl << endl;
+    cerr << "\t-seq\t"     << "Write sequence in bam file. Default not" << endl << endl;
 
     cerr << "Notes: " << endl;
     cerr << "\t(1)  BED files must be at least BED4 to create BAM (needs name field)." << endl << endl;
@@ -158,7 +163,7 @@ void bedpetobam_help(void) {
     exit(1);
 }
 
-void ProcessBedPE(BedFilePE *bedpe, GenomeFile *genome,  int mapQual, bool uncompressedBam) {
+void ProcessBedPE(BedFilePE *bedpe, GenomeFile *genome,  int mapQual, bool uncompressedBam, bool bedpeseq) {
 
     BamWriter *writer = new BamWriter();
 
@@ -188,7 +193,7 @@ void ProcessBedPE(BedFilePE *bedpe, GenomeFile *genome,  int mapQual, bool uncom
            	BamAlignment bamEntry2;
 
             if (bedpe->bedType >= 10) {
-                ConvertBedPEToBam(bedpeEntry, bamEntry1, bamEntry2, chromToId,  mapQual, lineNum);
+                ConvertBedPEToBam(bedpeEntry, bamEntry1, bamEntry2, chromToId,  mapQual, lineNum, bedpeseq);
                 writer->SaveAlignment(bamEntry1);
                 writer->SaveAlignment(bamEntry2);
 
@@ -209,7 +214,7 @@ void ProcessBedPE(BedFilePE *bedpe, GenomeFile *genome,  int mapQual, bool uncom
 //void ConvertBedPEToBam(const BEDPE &bedpe, BamAlignment &bam1,BamAlignment &bam2, map<string, int, std::less<string> > &chromToId,
  //                    bool isBED12, int mapQual, int lineNum) {
 void ConvertBedPEToBam(const BEDPE &bedpe, BamAlignment &bam1,BamAlignment &bam2, map<string, int, std::less<string> > &chromToId,
-	                    int mapQual, int lineNum) {
+	                    int mapQual, int lineNum, bool bedpeseq) {
 
     bam1.Name       = bedpe.name;
     bam1.Position   = bedpe.start1;
@@ -226,10 +231,20 @@ void ConvertBedPEToBam(const BEDPE &bedpe, BamAlignment &bam1,BamAlignment &bam2
     // so the sequence is inherently the same as it's
     // reference genome.
     // Thanks to James M. Ward for pointing this out.
+    if (!bedpeseq){
     bam1.QueryBases = "";
     bam1.Qualities  = "";
  	bam2.QueryBases = "";
     bam2.Qualities  = "";
+    }
+    else {
+    string seq1 = bedpe.fields[bedpe.other_idxs[0]];
+    string seq2 = bedpe.fields[bedpe.other_idxs[1]];
+    bam1.QueryBases = seq1;
+    bam1.Qualities  = std::string(seq1.size(), 'J');
+ 	bam2.QueryBases = seq2;
+    bam2.Qualities  = std::string(seq2.size(), 'J');
+    }
 
     // chrom and map quality
     bam1.RefID      = chromToId[bedpe.chrom1];
@@ -244,7 +259,6 @@ void ConvertBedPEToBam(const BEDPE &bedpe, BamAlignment &bam1,BamAlignment &bam2
    if (bedpe.strand1 == "-"){
         bam1.SetIsReverseStrand(true);
 		bam2.SetIsMateReverseStrand(true);
-		
 	}
 	
    if (bedpe.strand2 == "-"){
@@ -254,8 +268,10 @@ void ConvertBedPEToBam(const BEDPE &bedpe, BamAlignment &bam1,BamAlignment &bam2
     bam1.MatePosition = bedpe.start2;
     
 	if(chromToId[bedpe.chrom1] == chromToId[bedpe.chrom2]){
-		bam1.InsertSize   = bedpe.start2-bedpe.start1;
-		bam2.InsertSize   = bedpe.start2-bedpe.start1;
+		bam1.InsertSize   = bedpe.end2-bedpe.start1; //beisi xu ATAC
+		bam2.InsertSize   = bedpe.start1-bedpe.end2; //beisi xu ATAC
+//    	bam1.InsertSize   = bedpe.start2-bedpe.start1; 
+//		bam2.InsertSize   = bedpe.start2-bedpe.start1;
 		if((bedpe.strand1 == "+") && (bedpe.strand2 == "-")){
 			bam1.SetIsProperPair(true);
 			bam2.SetIsProperPair(true);

@@ -43,7 +43,7 @@ void ConvertBamToBed(const string &bamFile, bool useEditDistance,
                      bool useNovoalign, bool useBWA);
                      
 void ConvertBamToBedpe(const string &bamFile, 
-                       const bool &useEditDistance, bool mate1First);
+                       const bool &useEditDistance, bool mate1First, bool writeBedPEseq);
 
 string PrintTag(const BamAlignment &bam, const string &tag);
 
@@ -59,7 +59,8 @@ void PrintBed12(const BamAlignment &bam, const RefVector &refs,
                 string color = "255,0,0");
 
 void PrintBedPE(const BamAlignment &bam1, const BamAlignment &bam2,
-                const RefVector &refs, bool useEditDistance, bool mate1First);
+                const RefVector &refs, bool useEditDistance, bool mate1First,
+                bool writeBedPEseq);
 
 void ParseCigarBed12(const vector<CigarOp> &cigar, vector<int> &blockStarts,
                      vector<int> &blockEnds, int &alignmentEnd);
@@ -83,6 +84,7 @@ int bamtobed_main(int argc, char* argv[]) {
     bool haveColor         = false;
     bool haveOtherTag      = false;
     bool writeBedPE        = false;
+    bool writeBedPEseq     = false;
     bool writeBed12        = false;
     bool useEditDistance   = false;
     bool useAlignmentScore = false;
@@ -118,6 +120,10 @@ int bamtobed_main(int argc, char* argv[]) {
             }
         }
         else if(PARAMETER_CHECK("-bedpe", 6, parameterLength)) {
+            writeBedPE = true;
+        }
+        else if(PARAMETER_CHECK("-bedpeseq", 9, parameterLength)) {
+            writeBedPEseq = true;
             writeBedPE = true;
         }
         else if(PARAMETER_CHECK("-bed12", 6, parameterLength)) {
@@ -221,7 +227,7 @@ int bamtobed_main(int argc, char* argv[]) {
                             color, useCigar,
                             useNovoalign, useBWA);
         else
-            ConvertBamToBedpe(bamFile, useEditDistance, mate1First);
+            ConvertBamToBedpe(bamFile, useEditDistance, mate1First, writeBedPEseq);
     }
     else {
         bamtobed_help();
@@ -241,6 +247,9 @@ void bamtobed_help(void) {
     cerr << "Options: " << endl;
 
     cerr << "\t-bedpe\t"      << "Write BEDPE format." << endl;
+    cerr                      << "\t\t- Requires BAM to be grouped or sorted by query." << endl << endl;
+
+    cerr << "\t-bedpeseq\n"      << "\t\tWrite BEDPE format with sequence" << endl;
     cerr                      << "\t\t- Requires BAM to be grouped or sorted by query." << endl << endl;
 
     cerr << "\t-mate1\t"      << "When writing BEDPE (-bedpe) format, " << endl;
@@ -316,7 +325,7 @@ void ConvertBamToBed(const string &bamFile, bool useEditDistance, const string &
 */
 void ConvertBamToBedpe(const string &bamFile, 
                        const bool &useEditDistance,
-                       bool mate1First) 
+                       bool mate1First, bool writeBedPEseq) 
 {
     // open the BAM file
     BamReader reader;
@@ -346,10 +355,10 @@ void ConvertBamToBedpe(const string &bamFile,
                 bam1 = bam2;
                 reader.GetNextAlignment(bam2);
             }
-            PrintBedPE(bam1, bam2, refs, useEditDistance, mate1First);
+            PrintBedPE(bam1, bam2, refs, useEditDistance, mate1First, writeBedPEseq);
         }
         else if (bam1.IsPaired() && bam2.IsPaired()) {
-            PrintBedPE(bam1, bam2, refs, useEditDistance, mate1First);
+            PrintBedPE(bam1, bam2, refs, useEditDistance, mate1First, writeBedPEseq);
         }
     }
     reader.Close();
@@ -586,14 +595,15 @@ void PrintBed12(const BamAlignment &bam, const RefVector &refs,
 
 
 void PrintBedPE(const BamAlignment &bam1, const BamAlignment &bam2, 
-                const RefVector &refs, bool useEditDistance, bool mate1First) {
+                const RefVector &refs, bool useEditDistance, bool mate1First,
+                bool writeBedPEseq) {
 
     // initialize BEDPE variables
-    string chrom1, chrom2, strand1, strand2;
+    string chrom1, chrom2, strand1, strand2, seq1, seq2;
     int start1, start2, end1, end2;
     uint32_t editDistance1, editDistance2;
     start1 = start2 = end1 = end2 = -1;
-    chrom1 = chrom2 = strand1 = strand2 = ".";
+    chrom1 = chrom2 = strand1 = strand2 = seq1 = seq2 = ".";
     editDistance1 = editDistance2 = 0;
     uint16_t minMapQuality = 0;
 
@@ -613,6 +623,10 @@ void PrintBedPE(const BamAlignment &bam1, const BamAlignment &bam2,
             cerr << "The edit distance tag (NM) was not found in the BAM file.  Please disable -ed.  Exiting\n";
             exit(1);
         }
+
+        if (writeBedPEseq) {
+            seq1 = bam1.QueryBases;
+        }
     }
 
     // extract relevant info for end 2
@@ -631,6 +645,10 @@ void PrintBedPE(const BamAlignment &bam1, const BamAlignment &bam2,
             cerr << "The edit distance tag (NM) was not found in the BAM file.  Please disable -ed.  Exiting\n";
             exit(1);
         }
+
+        if (writeBedPEseq) {
+            seq2 = bam2.QueryBases;
+        }
     }
 
     // swap the ends if necessary
@@ -641,6 +659,9 @@ void PrintBedPE(const BamAlignment &bam1, const BamAlignment &bam2,
             swap(start1, start2);
             swap(end1, end2);
             swap(strand1, strand2);
+            if (writeBedPEseq) {
+                swap(seq1, seq2);
+            }
         }
     }
     // if -mate1First, make sure the first block is always mate 1
@@ -651,6 +672,9 @@ void PrintBedPE(const BamAlignment &bam1, const BamAlignment &bam2,
             swap(start1, start2);
             swap(end1, end2);
             swap(strand1, strand2);
+            if (writeBedPEseq) {
+                swap(seq1, seq2);
+            }
         }
     }
 
@@ -660,12 +684,23 @@ void PrintBedPE(const BamAlignment &bam1, const BamAlignment &bam2,
         if (bam1.IsMapped() == true && bam2.IsMapped() == true)
             minMapQuality = min(bam1.MapQuality, bam2.MapQuality);
 
+        if (writeBedPEseq) {
+        printf("%s\t%d\t%d\t%s\t%d\t%d\t%s\t%d\t%s\t%s\t%s\t%s\n",
+                chrom1.c_str(), start1, 
+                end1, chrom2.c_str(), 
+                start2, end2,
+                bam1.Name.c_str(), minMapQuality, 
+                strand1.c_str(), strand2.c_str(),
+                seq1.c_str(), seq2.c_str());
+        }
+        else {
         printf("%s\t%d\t%d\t%s\t%d\t%d\t%s\t%d\t%s\t%s\n",
                 chrom1.c_str(), start1, 
                 end1, chrom2.c_str(), 
                 start2, end2,
                 bam1.Name.c_str(), minMapQuality, 
                 strand1.c_str(), strand2.c_str());
+        }
     }
     // report BEDPE using total edit distance
     else {
@@ -677,12 +712,23 @@ void PrintBedPE(const BamAlignment &bam1, const BamAlignment &bam2,
         else if (bam2.IsMapped() == true)
             totalEditDistance = editDistance2;
 
+        if (writeBedPEseq) {
+        printf("%s\t%d\t%d\t%s\t%d\t%d\t%s\t%d\t%s\t%s\t%s\t%s\n",
+                chrom1.c_str(), start1, 
+                end1, chrom2.c_str(), 
+                start2, end2,
+                bam1.Name.c_str(), totalEditDistance, 
+                strand1.c_str(), strand2.c_str(),
+                seq1.c_str(), seq2.c_str());
+        }
+        else {
         printf("%s\t%d\t%d\t%s\t%d\t%d\t%s\t%d\t%s\t%s\n",
                 chrom1.c_str(), start1, 
                 end1, chrom2.c_str(), 
                 start2, end2,
                 bam1.Name.c_str(), totalEditDistance, 
                 strand1.c_str(), strand2.c_str());
+        }
     }
 }
 
