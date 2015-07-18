@@ -143,5 +143,95 @@ $BT genomecov -ibam sam-w-del.bam -bg > obs
 check obs exp
 rm obs exp
 
+##################################################################
+#  Test bam with chroms that have no coverage
+##################################################################
+echo "    genomecov.t8...\c"
+echo \
+"1	0	93	100	0.93
+1	1	4	100	0.04
+1	2	3	100	0.03
+2	0	100	100	1
+3	0	100	100	1
+genome	0	293	300	0.976667
+genome	1	4	300	0.0133333
+genome	2	3	300	0.01" > exp
+$BT genomecov -ibam y.bam > obs
+check obs exp
+rm obs exp
+
+##################################################################
+#  Test bam with chroms that have no coverage
+##################################################################
+echo "    genomecov.t9...\c"
+echo \
+"1	15	17	1
+1	17	20	2
+1	20	22	1" > exp
+$BT genomecov -ibam y.bam -bg > obs
+check obs exp
+rm obs exp
+
+##################################################################
+#  Test bam with chroms that have no coverage
+##################################################################
+echo "    genomecov.t10...\c"
+echo \
+"1	0	15	0
+1	15	17	1
+1	17	20	2
+1	20	22	1
+1	22	100	0
+2	0	100	0
+3	0	100	0" > exp
+$BT genomecov -ibam y.bam -bga > obs
+check obs exp
+rm obs exp
+
+##################################################################
+#  Test bed with chroms that have no coverage
+##################################################################
+echo "    genomecov.t11...\c"
+echo \
+"1	0	93	100	0.93
+1	1	4	100	0.04
+1	2	3	100	0.03
+2	0	100	100	1
+3	0	100	100	1
+genome	0	293	300	0.976667
+genome	1	4	300	0.0133333
+genome	2	3	300	0.01" > exp
+$BT genomecov -i y.bed -g genome.txt > obs
+check obs exp
+rm obs exp
+
+##################################################################
+#  Test bed with chroms that have no coverage
+##################################################################
+echo "    genomecov.t12...\c"
+echo \
+"1	15	17	1
+1	17	20	2
+1	20	22	1" > exp
+$BT genomecov -i y.bed -g genome.txt -bg > obs
+check obs exp
+rm obs exp
+
+##################################################################
+#  Test bed with chroms that have no coverage
+##################################################################
+echo "    genomecov.t13...\c"
+echo \
+"1	0	15	0
+1	15	17	1
+1	17	20	2
+1	20	22	1
+1	22	100	0
+2	0	100	0
+3	0	100	0" > exp
+$BT genomecov -i y.bed -g genome.txt -bga > obs
+check obs exp
+rm obs exp
+
 
 rm *.bam

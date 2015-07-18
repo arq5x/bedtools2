@@ -14,7 +14,7 @@ Licenced under the GNU General Public License 2.0 license.
 
 
 BedGenomeCoverage::BedGenomeCoverage(string bedFile, string genomeFile,
-                                     bool eachBase, bool startSites, 
+                                     bool eachBase, bool startSites,
                                      bool bedGraph, bool bedGraphAll,
                                      int max, float scale,
                                      bool bamInput, bool obeySplits,
@@ -43,11 +43,11 @@ BedGenomeCoverage::BedGenomeCoverage(string bedFile, string genomeFile,
     _currChromName = "";
     _currChromSize = 0 ;
 
-    
+
     if (_bamInput == false) {
         _genome = new GenomeFile(genomeFile);
     }
-    
+
     PrintTrackDefinitionLine();
 
     if (_bamInput == false) {
@@ -188,17 +188,45 @@ void BedGenomeCoverage::CoverageBed() {
         }
     }
     _bed->Close();
-    PrintFinalCoverage();
-}
-
-
-void BedGenomeCoverage::PrintFinalCoverage()
-{
-
 
     // process the results of the last chromosome.
     ReportChromCoverage(_currChromCoverage, _currChromSize,
             _currChromName, _currChromDepthHist);
+
+    // report all empty chromsomes
+    PrintEmptyChromosomes();
+
+    // report the overall coverage if asked.
+    PrintFinalCoverage();
+}
+
+
+void BedGenomeCoverage::PrintEmptyChromosomes()
+{
+    // get the list of chromosome names in the genome
+    vector<string> chromList = _genome->getChromList();
+    vector<string>::const_iterator chromItr = chromList.begin();
+    vector<string>::const_iterator chromEnd = chromList.end();
+    for (; chromItr != chromEnd; ++chromItr) {
+        string chrom = *chromItr;
+        if (_visitedChromosomes.find(chrom) == _visitedChromosomes.end()) {
+            _currChromName = chrom;
+            _currChromSize = _genome->getChromSize(_currChromName);
+            std::vector<DEPTH>().swap(_currChromCoverage);
+            _currChromCoverage.resize(_currChromSize);
+            for (int i = 0; i < _currChromSize; ++i)
+            {
+                _currChromCoverage[i].starts = 0;
+                _currChromCoverage[i].ends = 0;
+            }
+            ReportChromCoverage(_currChromCoverage, _currChromSize,
+                    _currChromName, _currChromDepthHist);
+        }
+    }
+}
+
+void BedGenomeCoverage::PrintFinalCoverage()
+{
     if (_eachBase == false && _bedGraph == false && _bedGraphAll == false) {
         ReportGenomeCoverage(_currChromDepthHist);
     }
@@ -240,7 +268,7 @@ void BedGenomeCoverage::CoverageBam(string bamFile) {
         string chrom(refs.at(bam.RefID).RefName);
         CHRPOS start = bam.Position;
         CHRPOS end = bam.GetEndPosition(false, false) - 1;
-        
+
         // are we on a new chromosome?
         if ( chrom != _currChromName )
             StartNewChrom(chrom);
@@ -269,6 +297,15 @@ void BedGenomeCoverage::CoverageBam(string bamFile) {
     }
     // close the BAM
     reader.Close();
+
+    // process the results of the last chromosome.
+    ReportChromCoverage(_currChromCoverage, _currChromSize,
+            _currChromName, _currChromDepthHist);
+
+    // report all empty chromsomes
+    PrintEmptyChromosomes();
+
+    // report the overall coverage if asked.
     PrintFinalCoverage();
 }
 

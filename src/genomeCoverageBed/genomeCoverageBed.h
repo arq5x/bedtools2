@@ -41,10 +41,10 @@ class BedGenomeCoverage {
 public:
 
     // constructor
-    BedGenomeCoverage(string bedFile, string genomeFile, 
+    BedGenomeCoverage(string bedFile, string genomeFile,
                       bool eachBase, bool startSites,
-                      bool bedGraph, bool bedGraphAll, 
-                      int max, float scale, 
+                      bool bedGraph, bool bedGraphAll,
+                      int max, float scale,
                       bool bamInput, bool obeySplits,
                       bool filterByStrand, string requestedStrand,
                       bool only_5p_end, bool only_3p_end,
@@ -99,6 +99,6 @@ private:
     void AddCoverage (int start, int end);
     void AddBlockedCoverage(const vector<BED> &bedBlocks);
     void PrintFinalCoverage();
+    void PrintEmptyChromosomes();
     void PrintTrackDefinitionLine();
 };
-
