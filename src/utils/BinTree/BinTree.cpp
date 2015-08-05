@@ -85,8 +85,16 @@ void BinTree::getHits(Record *record, RecordKeyVector &hitSet)
 
         	for (binType::const_iterator iter = bin.begin(); iter != bin.end(); iter++) {
             	const Record *dbRec = *iter;
-            	if (record->intersects(dbRec, _context->getSameStrand(), _context->getDiffStrand(),
-            			_context->getOverlapFraction(), _context->getReciprocal())) {
+            	if (record->intersects(dbRec,
+                                       _context->getSameStrand(),
+                                       _context->getDiffStrand(),
+            			               _context->getOverlapFractionA(),
+                                       _context->getOverlapFractionB(),
+                                       _context->getReciprocalFraction(),
+                                       _context->getEitherFraction()
+                                      )
+                    )
+                {
             		hitSet.push_back(dbRec);
             	}
             }

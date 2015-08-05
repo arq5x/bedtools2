@@ -126,13 +126,23 @@ public:
 
 	//does this record intersect with another record?
 	virtual bool intersects(const Record *otherRecord,
-			bool sameStrand, bool diffStrand, float overlapFraction, bool reciprocal) const;
+							bool sameStrand,
+							bool diffStrand,
+							float overlapFractionA,
+							float overlapFractionB,
+							bool reciprocalFraction,
+						    bool eitherFraction) const;
 
 	// *** WARNING !!! ** sameChromIntersects is a faster version of the intersects method,
 	// BUT the caller MUST ensure that the records are on the same
 	//chromosome. If you're not absolutely sure, use the regular intersects method.
 	virtual bool sameChromIntersects(const Record *otherRecord,
-			bool sameStrand, bool diffStrand, float overlapFraction, bool reciprocal) const;
+									 bool sameStrand,
+									 bool diffStrand,
+									 float overlapFractionA,
+									 float overlapFractionB,
+									 bool reciprocalFraction,
+									 bool eitherFraction) const;
 
 //	virtual static bool isNumericField(int fieldNum) const = 0;
 

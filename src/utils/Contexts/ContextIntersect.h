@@ -63,14 +63,23 @@ public:
 	bool getWriteAllOverlap() const {return _writeAllOverlap; }
 	void setWriteAllOverlap(bool val) { _writeAllOverlap = val; }
 
-	bool getHaveFraction() const {return _haveFraction; }
-	void setHaveFraction(bool val) { _haveFraction = val; }
+	bool getHaveFractionA() const {return _haveFractionA; }
+	void setHaveFractionA(bool val) { _haveFractionA = val; }
 
-	float getOverlapFraction() const { return _overlapFraction; }
-	void setOverlapFraction(float fraction) { _overlapFraction = fraction; }
+	bool getHaveFractionB() const {return _haveFractionB; }
+	void setHaveFractionB(bool val) { _haveFractionB = val; }
 
-	bool getReciprocal() const {return _reciprocal; }
-	void setReciprocal(bool val) { _reciprocal = val; }
+	float getOverlapFractionA() const { return _overlapFractionA; }
+	void setOverlapFractionA(float fraction) { _overlapFractionA = fraction; }
+
+	float getOverlapFractionB() const { return _overlapFractionB; }
+	void setOverlapFractionB(float fraction) { _overlapFractionB = fraction; }
+
+	bool getReciprocalFraction() const {return _reciprocalFraction; }
+	void setReciprocalFraction(bool val) { _reciprocalFraction = val; }
+
+	bool getEitherFraction() const {return _eitherFraction; }
+	void setEitherFraction(bool val) { _eitherFraction = val; }
 
 	bool getSameStrand() const {return _sameStrand; }
 	void setSameStrand(bool val) { _sameStrand = val; }
@@ -94,8 +103,10 @@ protected:
 
 	virtual bool handle_c();
 	virtual bool handle_f();
+	virtual bool handle_F();
 	virtual bool handle_loj();
 	virtual bool handle_r();
+	virtual bool handle_e();
 	virtual bool handle_s();
 	virtual bool handle_S();
 	virtual bool handle_u();

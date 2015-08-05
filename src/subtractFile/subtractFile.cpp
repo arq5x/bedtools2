@@ -7,7 +7,7 @@ SubtractFile::SubtractFile(ContextSubtract *context)
   _deleteTmpBlocks(false),
   _dontReport(false)
 {
-	_tmpBlocksMgr = new BlockMgr(upCast(_context)->getOverlapFraction(), upCast(_context)->getReciprocal());
+	_tmpBlocksMgr = new BlockMgr(upCast(_context)->getOverlapFractionA(), upCast(_context)->getReciprocalFraction());
 }
 
 SubtractFile::~SubtractFile() {

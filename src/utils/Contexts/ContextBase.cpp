@@ -31,9 +31,12 @@ ContextBase::ContextBase()
   _writeCount(false),
   _writeOverlap(false),
   _writeAllOverlap(false),
-  _haveFraction(false),
-  _overlapFraction(0.0),
-  _reciprocal(false),
+  _haveFractionA(false),
+  _haveFractionB(false),
+  _overlapFractionA(0.0),
+  _overlapFractionB(0.0),
+  _reciprocalFraction(false),
+  _eitherFraction(false),
   _sameStrand(false),
   _diffStrand(false),
   _sortedInput(false),
@@ -256,7 +259,7 @@ bool ContextBase::isValidState()
 		return false;
 	}
 	if (getObeySplits()) {
-		_splitBlockInfo = new BlockMgr(_overlapFraction, _reciprocal);
+		_splitBlockInfo = new BlockMgr(_overlapFractionA, _reciprocalFraction);
 	}
 	if (hasColumnOpsMethods()) {
 

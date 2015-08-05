@@ -185,9 +185,12 @@ protected:
     bool _writeCount;
     bool _writeOverlap;
     bool _writeAllOverlap;
-    bool _haveFraction;
-    float _overlapFraction;
-    bool _reciprocal;
+    bool _haveFractionA;
+    bool _haveFractionB;
+    float _overlapFractionA;
+    float _overlapFractionB;
+    bool _reciprocalFraction;
+    bool _eitherFraction;
     bool _sameStrand;
     bool _diffStrand;
     bool _sortedInput;

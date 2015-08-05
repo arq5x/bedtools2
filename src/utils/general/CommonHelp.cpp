@@ -60,9 +60,18 @@ void IntersectCommonHelp() {
     cerr                        << "\t\t- Default is 1E-9 (i.e., 1bp)." << endl;
     cerr                        << "\t\t- FLOAT (e.g. 0.50)" << endl << endl;
 
-    cerr << "\t-r\t"            << "Require that the fraction overlap be reciprocal for A and B." << endl;
+	cerr << "\t-F\t"            << "Minimum overlap required as a fraction of B." << endl;
+    cerr                        << "\t\t- Default is 1E-9 (i.e., 1bp)." << endl;
+    cerr                        << "\t\t- FLOAT (e.g. 0.50)" << endl << endl;
+
+    cerr << "\t-r\t"            << "Require that the fraction overlap be reciprocal for A AND B." << endl;
     cerr                        << "\t\t- In other words, if -f is 0.90 and -r is used, this requires" << endl;
     cerr                        << "\t\t  that B overlap 90% of A and A _also_ overlaps 90% of B." << endl << endl;
+
+	cerr << "\t-e\t"            << "Require that the minimum fraction be satisfied for A OR B." << endl;
+    cerr                        << "\t\t- In other words, if -e is used with -f 0.90 and -F 0.10 this requires" << endl;
+    cerr                        << "\t\t  that either 90% of A is covered OR 10% of  B is covered." << endl;
+    cerr                        << "\t\t  Without -e, both fractions would have to be satisfied." << endl << endl;
 
     cerr << "\t-split\t"        << "Treat \"split\" BAM or BED12 entries as distinct BED intervals." << endl << endl;
 

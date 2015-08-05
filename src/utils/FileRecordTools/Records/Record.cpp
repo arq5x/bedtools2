@@ -126,17 +126,30 @@ bool Record::after(const Record *other) const
 }
 
 bool Record::intersects(const Record *record,
-			bool wantSameStrand, bool wantDiffStrand, float overlapFraction, bool reciprocal) const
+                        bool sameStrand,
+                        bool diffStrand,
+                        float overlapFractionA,
+                        float overlapFractionB,
+                        bool reciprocalFraction,
+                        bool eitherFraction) const
 {
 	//must be on same chromosome
 	if (!sameChrom(record)) {
 		return false;
 	}
-	return sameChromIntersects(record, wantSameStrand, wantDiffStrand, overlapFraction, reciprocal);
+	return sameChromIntersects(record,
+                               sameStrand, diffStrand,
+                               overlapFractionA, overlapFractionB,
+                               reciprocalFraction, eitherFraction);
 }
 
 bool Record::sameChromIntersects(const Record *record,
-		bool wantSameStrand, bool wantDiffStrand, float overlapFraction, bool reciprocal) const
+                                 bool sameStrand,
+                                 bool diffStrand,
+                                 float overlapFractionA,
+                                 float overlapFractionB,
+                                 bool reciprocalFraction,
+                                 bool eitherFraction) const
 {
 	// Special: For records that are unmapped, intersect should automatically return false
 	if (_isUnmapped || record->isUnmapped()) {
@@ -150,10 +163,10 @@ bool Record::sameChromIntersects(const Record *record,
 	bool isSameStrand = (_strandVal == record->_strandVal && _strandVal != UNKNOWN);
 	bool isDiffStrand = ( _strandVal != UNKNOWN && record->_strandVal != UNKNOWN && _strandVal != record->_strandVal);
 
-	if (wantSameStrand && !isSameStrand) {
+	if (sameStrand && !isSameStrand) {
 		return false; //want same, but they're not same.
 	}
-	if (wantDiffStrand && !isDiffStrand) {
+	if (diffStrand && !isDiffStrand) {
 		return false; //want different, but they're not different.
 	}
 
@@ -171,7 +184,8 @@ bool Record::sameChromIntersects(const Record *record,
 	}
 
 
-	if (overlapFraction == 0.0) {
+	if ((overlapFractionA == 0.0) && (overlapFractionB == 0.0))
+    {
 		//don't care about amount of overlap.
 		//however, if minEnd and maxStart are equal, and
 		//neither record is zeroLen, return false.
@@ -182,23 +196,24 @@ bool Record::sameChromIntersects(const Record *record,
 	}
 
 	int overlapBases = minEnd - maxStart;
-	int len = _endPos - _startPos;
-	int otherLen = otherEnd - otherStart;
+	int aLen = _endPos - _startPos;
+	int bLen = otherEnd - otherStart;
 
-	if ((float)overlapBases / (float)len < overlapFraction) {
-		return false;
-	}
+    float overlapA = (float)overlapBases / (float)aLen;
+    float overlapB = (float)overlapBases / (float)bLen;
 
-	//at this point, we've ruled out strandedness, non-intersection,
-	//and query coverage (overlapFraction). The only thing left is
-	//database coverage.
-	if (!reciprocal) {
-		return true;
-	}
+    bool sufficentFractionA = (overlapA >= overlapFractionA);
+    bool sufficentFractionB = (overlapB >= overlapFractionB);
 
-	if ((float)overlapBases / (float)otherLen >= overlapFraction) {
-		return true;
-	}
+    if (!eitherFraction)
+    {
+        if (sufficentFractionA && sufficentFractionB) { return true; }
+        return false;
+    }
+    else {
+        if (sufficentFractionA || sufficentFractionB) { return true; }
+        return false;
+    }
 
 	return false;
 }

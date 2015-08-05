@@ -335,7 +335,7 @@ rm exp obs
 echo "    intersect.t23...\c"
 echo \
 "mapped	16	chr1	1	40	30M	*	0	0	GAAGGCCACCGCCGCGGTTATTTTCCTTCA	CCCDDB?=FJIIJIGFJIJHIJJJJJJJJI	MD:Z:50" > exp
-samtools view -Sb mapped_and_unmapped.sam 2>/dev/null | $BT intersect -abam - -b a.bed | samtools view - > obs 
+samtools view -Sb mapped_and_unmapped.sam 2>/dev/null | $BT intersect -abam - -b a.bed | samtools view - > obs
 check obs exp
 rm obs exp
 
@@ -345,7 +345,7 @@ rm obs exp
 echo "    intersect.t24...\c"
 echo \
 "umapped	4	*	1	40	30M	*	0	0	GAAGGCCACCGCCGCGGTTATTTTCCTTCA	CCCDDB?=FJIIJIGFJIJHIJJJJJJJJI	MD:Z:50" > exp
-samtools view -Sb mapped_and_unmapped.sam 2>/dev/null | $BT intersect -abam - -b a.bed -v | samtools view - > obs 
+samtools view -Sb mapped_and_unmapped.sam 2>/dev/null | $BT intersect -abam - -b a.bed -v | samtools view - > obs
 check obs exp
 rm obs exp
 
@@ -379,7 +379,7 @@ $BT intersect -abam one_block.bam -b c.bed -wo -bed > obs
 check obs exp
 
 ##################################################################
-#  Test BED3 with BED3 
+#  Test BED3 with BED3
 ##################################################################
 echo "    intersect.t28...\c"
 echo \
@@ -388,7 +388,7 @@ $BT intersect -a bed3.bed -b bed3.bed -wa -wb | cat -t > obs
 check obs exp
 
 ##################################################################
-#  Test BED4 with BED3 
+#  Test BED4 with BED3
 ##################################################################
 echo "    intersect.t29...\c"
 echo \
@@ -397,7 +397,7 @@ $BT intersect -a bed4.bed -b bed3.bed -wa -wb | cat -t > obs
 check obs exp
 
 ##################################################################
-#  Test BED5 with BED3 
+#  Test BED5 with BED3
 ##################################################################
 echo "    intersect.t30...\c"
 echo \
@@ -406,7 +406,7 @@ $BT intersect -a bed5.bed -b bed3.bed -wa -wb | cat -t > obs
 check obs exp
 
 ##################################################################
-#  Test BED6 (without a proper strand) with BED3 
+#  Test BED6 (without a proper strand) with BED3
 ##################################################################
 echo "    intersect.t31...\c"
 echo \
@@ -415,7 +415,7 @@ $BT intersect -a bed6.bed -b bed3.bed -wa -wb | cat -t > obs
 check obs exp
 
 ##################################################################
-#  Test BED6 (with a strand) with BED3 
+#  Test BED6 (with a strand) with BED3
 ##################################################################
 echo "    intersect.t32...\c"
 echo \
@@ -424,7 +424,7 @@ $BT intersect -a bed6.strand.bed -b bed3.bed -wa -wb | cat -t > obs
 check obs exp
 
 ##################################################################
-#  Test BED PLUS with BED3 
+#  Test BED PLUS with BED3
 ##################################################################
 echo "    intersect.t33...\c"
 echo \
@@ -433,7 +433,7 @@ $BT intersect -a bedplus.bed -b bed3.bed -wa -wb | cat -t > obs
 check obs exp
 
 ##################################################################
-#  Test for strand matches with BED3 
+#  Test for strand matches with BED3
 ##################################################################
 echo "    intersect.t34...\c"
 echo \
@@ -442,7 +442,7 @@ $BT intersect -a bed6.bed -b bed6.strand.bed -wa -wb | cat -t > obs
 check obs exp
 
 ##################################################################
-#  Test for strand matches with BED3 
+#  Test for strand matches with BED3
 ##################################################################
 echo "    intersect.t35...\c"
 echo \
@@ -451,7 +451,7 @@ $BT intersect -a bed6.strand.bed -b bed6.strand2.bed -wa -wb -s | cat -t > obs
 check obs exp
 
 ##################################################################
-#  Test for strand matches with BED3 
+#  Test for strand matches with BED3
 ##################################################################
 echo "    intersect.t36...\c"
 echo \
@@ -487,7 +487,7 @@ rm obs exp
 ##################################################################
 echo "    intersect.t39...\c"
 echo \
-"***** ERROR: _overlapFraction must be in the range (0.0, 1.0]. *****" > exp
+"***** ERROR: -f must be in the range (0.0, 1.0]. *****" > exp
 $BT intersect -a a.bed -b b.bed -f 0.0 2>&1 > /dev/null | cat - | head -2 | tail -1 > obs
 check exp obs
 rm exp obs
@@ -497,7 +497,7 @@ rm exp obs
 ##################################################################
 echo "    intersect.t40...\c"
 echo \
-"***** ERROR: _overlapFraction must be in the range (0.0, 1.0]. *****" > exp
+"***** ERROR: -f must be in the range (0.0, 1.0]. *****" > exp
 $BT intersect -a a.bed -b b.bed -f 1.00001 2>&1 > /dev/null | cat - | head -2 | tail -1 > obs
 check exp obs
 rm exp obs
@@ -572,7 +572,7 @@ check exp obs
 rm exp obs
 
 ##################################################################
-# see that SVLEN in VCF files is treated as zero length 
+# see that SVLEN in VCF files is treated as zero length
 # records when the SV type is an insertion
 ##################################################################
 echo "    intersect.t47...\c"
@@ -637,8 +637,78 @@ $BT intersect -a bug44_a.vcf.gz -b bug44_b.bed -wa -wb > obs
 check exp obs
 rm exp obs
 
+##################################################################
+# Test basic -f functionality
+##################################################################
+echo "    intersect.t52...\c"
+echo "chr1	10	12	a1	1	+
+chr2	10	12	a2	1	-" > exp
+$BT intersect -a x.bed -b y.bed -f 0.2 > obs
+check exp obs
+rm exp obs
+
+echo "    intersect.t53...\c"
+echo "\c" > exp
+$BT intersect -a x.bed -b y.bed -f 0.21 > obs
+check exp obs
+rm exp obs
+
+##################################################################
+# Test basic -F functionality
+##################################################################
+echo "    intersect.t54...\c"
+echo "chr1	10	20	a1	1	+	chr1	8	12	b1	1	+
+chr2	10	20	a2	1	-	chr2	8	12	b2	1	+" > exp
+$BT intersect -a x.bed -b y.bed -F 0.21 -wa -wb > obs
+check exp obs
+rm exp obs
+
+##################################################################
+# Test basic -f with -F
+##################################################################
+echo "    intersect.t55...\c"
+echo "\c" > exp
+$BT intersect -a x.bed -b y.bed -f 0.21 -F 0.21 -wa -wb > obs
+check exp obs
+rm exp obs
+
+echo "    intersect.t56...\c"
+echo "chr1	10	20	a1	1	+	chr1	8	12	b1	1	+
+chr2	10	20	a2	1	-	chr2	8	12	b2	1	+" > exp
+$BT intersect -a x.bed -b y.bed -f 0.19 -F 0.21 -wa -wb > obs
+check exp obs
+rm exp obs
+
+echo "    intersect.t57...\c"
+echo "chr1	10	20	a1	1	+	chr1	8	12	b1	1	+
+chr2	10	20	a2	1	-	chr2	8	12	b2	1	+" > exp
+$BT intersect -a x.bed -b y.bed -f 0.19 -F 0.21 -wa -wb > obs
+check exp obs
+rm exp obs
+
+echo "    intersect.t58...\c"
+echo "chr1	10	20	a1	1	+	chr1	8	12	b1	1	+
+chr2	10	20	a2	1	-	chr2	8	12	b2	1	+" > exp
+$BT intersect -a x.bed -b y.bed -f 0.19 -F 0.50 -wa -wb > obs
+check exp obs
+rm exp obs
+
+echo "    intersect.t59...\c"
+echo "\c" > exp
+$BT intersect -a x.bed -b y.bed -f 0.19 -F 0.51 -wa -wb > obs
+check exp obs
+rm exp obs
 
 
+##################################################################
+# Test basic -f with -F and -e
+##################################################################
+echo "    intersect.t60...\c"
+echo "chr1	10	20	a1	1	+	chr1	8	12	b1	1	+
+chr2	10	20	a2	1	-	chr2	8	12	b2	1	+" > exp
+$BT intersect -a x.bed -b y.bed -f 0.21 -F 0.21 -wa -wb -e > obs
+check exp obs
+rm exp obs
 
 cd multi_intersect
 bash test-multi_intersect.sh

@@ -48,7 +48,7 @@ bool SpacingFile::findNext(RecordKeyVector &hits)
 			if (_currRec->getChrName() == _prevRec->getChrName())
 			{
 				// do _currRec and _prevRec overlap?
-				if (_currRec->sameChromIntersects(_prevRec, false, false, 1E-9, false))
+				if (_currRec->sameChromIntersects(_prevRec, false, false, 1E-9, 1E-9, false, false))
 					_distance.append(0);
 				else
 					_distance.append(_currRec->getStartPos() - _prevRec->getEndPos());
@@ -77,6 +77,3 @@ void SpacingFile::cleanupHits(RecordKeyVector &hits)
 	_distance.clear();
 	hits.clearAll();
 }
-
-
-

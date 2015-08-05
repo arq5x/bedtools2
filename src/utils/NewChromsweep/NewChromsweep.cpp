@@ -35,12 +35,12 @@ NewChromSweep::NewChromSweep(ContextIntersect *context)
 
 
 bool NewChromSweep::init() {
-    
+
 	//Create new FileRecordMgrs for the input files.
 	//Open them, and get the first record from each.
 	//otherwise, return true.
     _queryFRM = _context->getFile(_context->getQueryFileIdx());
-    
+
     _dbFRMs.resize(_numDBs, NULL);
     for (int i=0; i < _numDBs; i++) {
     	_dbFRMs[i] = _context->getDatabaseFile(i);
@@ -280,8 +280,15 @@ bool NewChromSweep::nextRecord(bool query, int dbIdx) {
 
 bool NewChromSweep::intersects(const Record *rec1, const Record *rec2) const
 {
-	return rec1->sameChromIntersects(rec2, _context->getSameStrand(), _context->getDiffStrand(),
-			_context->getOverlapFraction(), _context->getReciprocal());
+	//return rec1->sameChromIntersects(rec2, _context->getSameStrand(), _context->getDiffStrand(),
+	//		_context->getOverlapFraction(), _context->getReciprocal());
+    return rec1->sameChromIntersects(rec2,
+                                     _context->getSameStrand(),
+                                     _context->getDiffStrand(),
+			                         _context->getOverlapFractionA(),
+                                     _context->getOverlapFractionB(),
+                                     _context->getReciprocalFraction(),
+                                     _context->getEitherFraction());
 }
 
 

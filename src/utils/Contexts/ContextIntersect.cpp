@@ -44,6 +44,9 @@ bool ContextIntersect::parseCmdArgs(int argc, char **argv, int skipFirstArgs) {
         else if (strcmp(_argv[_i], "-f") == 0) {
 			if (!handle_f()) return false;
         }
+        else if (strcmp(_argv[_i], "-F") == 0) {
+			if (!handle_F()) return false;
+        }
         else if (strcmp(_argv[_i], "-wa") == 0) {
 			if (!handle_wa()) return false;
         }
@@ -61,6 +64,9 @@ bool ContextIntersect::parseCmdArgs(int argc, char **argv, int skipFirstArgs) {
         }
         else if(strcmp(_argv[_i], "-r") == 0) {
 			if (!handle_r()) return false;
+        }
+        else if(strcmp(_argv[_i], "-e") == 0) {
+			if (!handle_e()) return false;
         }
         else if (strcmp(_argv[_i], "-v") == 0) {
 			if (!handle_v()) return false;
@@ -108,8 +114,20 @@ bool ContextIntersect::isValidState()
 		}
 	}
 
-	if (_haveFraction && (_overlapFraction <= 0.0 || _overlapFraction > 1.0)) {
-		_errorMsg = "\n***** ERROR: _overlapFraction must be in the range (0.0, 1.0]. *****";
+	if (_haveFractionA && (_overlapFractionA <= 0.0 || _overlapFractionA > 1.0)) {
+		_errorMsg = "\n***** ERROR: -f must be in the range (0.0, 1.0]. *****";
+		return false;
+	}
+	if (_haveFractionB && (_overlapFractionB <= 0.0 || _overlapFractionB > 1.0)) {
+		_errorMsg = "\n***** ERROR: -F must be in the range (0.0, 1.0]. *****";
+		return false;
+	}
+	if (_haveFractionB && !_haveFractionA && _eitherFraction) {
+		_errorMsg = "\n***** ERROR: -e must be used with -f. *****";
+		return false;
+	}
+	if (_haveFractionB && _reciprocalFraction) {
+		_errorMsg = "\n***** ERROR: -r must be used with -f. *****";
 		return false;
 	}
 	if (getUseDBnameTags() && _dbNameTags.size() != _dbFileIdxs.size()) {
@@ -267,8 +285,20 @@ bool ContextIntersect::handle_c()
 bool ContextIntersect::handle_f()
 {
     if ((_i+1) < _argc) {
-        setHaveFraction(true);
-        setOverlapFraction(atof(_argv[_i + 1]));
+        setHaveFractionA(true);
+        setOverlapFractionA(atof(_argv[_i + 1]));
+        markUsed(_i - _skipFirstArgs);
+        _i++;
+        markUsed(_i - _skipFirstArgs);
+    }
+    return true;
+}
+
+bool ContextIntersect::handle_F()
+{
+    if ((_i+1) < _argc) {
+        setHaveFractionB(true);
+        setOverlapFractionB(atof(_argv[_i + 1]));
         markUsed(_i - _skipFirstArgs);
         _i++;
         markUsed(_i - _skipFirstArgs);
@@ -285,7 +315,14 @@ bool ContextIntersect::handle_loj()
 
 bool ContextIntersect::handle_r()
 {
-	setReciprocal(true);
+	setReciprocalFraction(true);
+	markUsed(_i - _skipFirstArgs);
+    return true;
+}
+
+bool ContextIntersect::handle_e()
+{
+	setEitherFraction(true);
 	markUsed(_i - _skipFirstArgs);
     return true;
 }
@@ -346,4 +383,3 @@ bool ContextIntersect::handle_wo()
 	markUsed(_i - _skipFirstArgs);
     return true;
 }
-
