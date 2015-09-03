@@ -97,7 +97,7 @@ UTIL_SUBDIRS =	$(SRC_DIR)/utils/bedFile \
 				$(SRC_DIR)/utils/GenomeFile \
 				$(SRC_DIR)/utils/RecordOutputMgr \
 				$(SRC_DIR)/utils/ToolBase \
-				$(SRC_DIR)/utils/aux
+				$(SRC_DIR)/utils/driver
 
 BUILT_OBJECTS = $(OBJ_DIR)/*.o
 
@@ -129,7 +129,7 @@ INCLUDES =	-I$(SRC_DIR)/utils/bedFile \
 				-I$(SRC_DIR)/utils/GenomeFile \
 				-I$(SRC_DIR)/utils/RecordOutputMgr \
 				-I$(SRC_DIR)/utils/ToolBase \
-				-I$(SRC_DIR)/utils/aux \
+				-I$(SRC_DIR)/utils/driver \
 				
 
 all: print_banner $(OBJ_DIR) $(BIN_DIR) autoversion $(UTIL_SUBDIRS) $(SUBDIRS)
