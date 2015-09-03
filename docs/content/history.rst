@@ -2,6 +2,21 @@
 Release History
 ###############
 
+Version 2.25.0 (3-Sept-2015)
+============================
+1. Added new `-F` option that allows one to set the minimum fraction of overlap required for the B interval. This complements the functionality of the `-f` option.
+Available for `intersect`, `coverage`, `map`, `subtract`, and `jaccard`.
+2. Added new `-e` option that allows one to require that the minimum fraction overlap is achieved in either A _OR_ B, not A _AND_ B which is the behavior of the `-r` option. Available for `intersect`, `coverage`, `map`, `subtract`, and `jaccard`.
+3. Fixed a longstanding bug that prevented `genomecov` from reporting chromosomes that lack a single interval.
+4. Modified a src directory called "aux" to "driver" to prevent compilation errors on Windows machines. Thanks very much to John Marshall.
+5. Fixed a regression that caused the `coverage` tool to complain if BED files had less than 5 columns.
+6. Fixed a variable overload bug that prevented compilation on Debian machines.
+7. Speedups to the `groupby` tool.
+8. New `-delim` option for the `groupby` tool.
+9. Fixed a bug in `map` that prevented strand-specifc overlaps from being reported when using certain BEDPLUS formats.
+10. Prevented excessive memory usage when not using pre-sorted input.
+
+
 Version 2.24.0 (27-May-2015)
 ============================
 1. The `coverage` tool now takes advantage of pre-sorted intervals via the `-sorted` option. This allows the `coverage` tool to be much faster, use far less memory, and report coverage for intervals in their original order in the input file.
