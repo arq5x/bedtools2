@@ -4,8 +4,7 @@ Release History
 
 Version 2.25.0 (3-Sept-2015)
 ============================
-1. Added new `-F` option that allows one to set the minimum fraction of overlap required for the B interval. This complements the functionality of the `-f` option.
-Available for `intersect`, `coverage`, `map`, `subtract`, and `jaccard`.
+1. Added new `-F` option that allows one to set the minimum fraction of overlap required for the B interval. This complements the functionality of the `-f` option.Available for `intersect`, `coverage`, `map`, `subtract`, and `jaccard`.
 2. Added new `-e` option that allows one to require that the minimum fraction overlap is achieved in either A _OR_ B, not A _AND_ B which is the behavior of the `-r` option. Available for `intersect`, `coverage`, `map`, `subtract`, and `jaccard`.
 3. Fixed a longstanding bug that prevented `genomecov` from reporting chromosomes that lack a single interval.
 4. Modified a src directory called "aux" to "driver" to prevent compilation errors on Windows machines. Thanks very much to John Marshall.
