@@ -37,6 +37,7 @@ with both BED/GFF/VCF and BAM files as input.
 .. seealso::
 
     :doc:`../tools/subtract`
+    :doc:`../tools/map`
     :doc:`../tools/window`
     
 ===============================
@@ -75,7 +76,9 @@ Option                         Description
 **-c** 		                     For each entry in A, report the number of hits in B while restricting to -f. Reports 0 for A entries that have no overlap with B. Restricted by -f and -r.
 **-v**	 	                     Only report those entries in A that have no overlap in B. Restricted by -f and -r.
 **-f**		                     Minimum overlap required as a fraction of A. Default is 1E-9 (i.e. 1bp).
+**-F**                         Minimum overlap required as a fraction of B. Default is 1E-9 (i.e., 1bp).
 **-r**		                     Require that the fraction of overlap be reciprocal for A and B. In other words, if -f is 0.90 and -r is used, this requires that B overlap at least 90% of A and that A also overlaps at least 90% of B.
+**-e**                         Require that the minimum fraction be satisfied for A _OR_ B. In other words, if -e is used with -f 0.90 and -F 0.10 this requires that either 90% of A is covered OR 10% of  B is covered. Without -e, both fractions would have to be satisfied.
 **-s**		                     Force "strandedness". That is, only report hits in B that overlap A on the same strand. By default, overlaps are reported without respect to strand.
 **-S**	                       Require different strandedness.  That is, only report hits in B that overlap A on the _opposite_ strand. By default, overlaps are reported without respect to strand.
 **-split**	                   Treat "split" BAM (i.e., having an "N" CIGAR operation) or BED12 entries as distinct BED intervals.
