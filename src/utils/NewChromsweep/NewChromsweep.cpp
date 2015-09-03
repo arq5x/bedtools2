@@ -436,7 +436,9 @@ void NewChromSweep::testThatAllDbChromsExistInQuery()
 		const _orderTrackType *dbTrack = _fileTracks[i];
 		for (_orderTrackType::const_iterator iter = dbTrack->begin(); iter != dbTrack->end(); iter++) {
 			const QuickString &chrom = iter->first;
-			if (qTrack->find(chrom) == qTrack->end()) {
+            if (qTrack->find(chrom) == qTrack->end()
+                && !chrom.empty())  // don't raise an error if the chrom is unknown (e.g., unmapped BAM)
+            {
 				fprintf(stderr, "ERROR: Database file %s contains chromosome %s, but the query file does not.\n",
 						_context->getInputFileName(i).c_str(), chrom.c_str());
 				fprintf(stderr, "       Please re-reun with the -g option for a genome file.\n       See documentation for details.\n");
