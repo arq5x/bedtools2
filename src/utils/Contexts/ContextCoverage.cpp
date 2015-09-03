@@ -11,17 +11,12 @@ ContextCoverage::ContextCoverage()
 : _count(false),
   _perBase(false),
   _showHist(false),
-  _coverageType(DEFAULT),
-  _usingColOps(false)
+  _coverageType(DEFAULT)
 {
 	setExplicitBedOutput(true); //do not allow BAM output
-	setColumnOpsMethods(true);
-
-
 }
 
 ContextCoverage::~ContextCoverage() {
-
 }
 
 bool ContextCoverage::parseCmdArgs(int argc, char **argv, int skipFirstArgs) {

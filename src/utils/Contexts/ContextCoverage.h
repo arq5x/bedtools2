@@ -21,7 +21,6 @@ public:
 
     typedef enum { DEFAULT, COUNT, PER_BASE, HIST, MEAN } coverageType;
     coverageType getCoverageType() const { return _coverageType; }
-    virtual bool usingColOps() const { return _usingColOps; }
 
 private:
     bool _count;
@@ -29,7 +28,6 @@ private:
     bool _showHist;
     bool _mean;
     coverageType _coverageType;
-    bool _usingColOps;
 
 	bool handle_c();
 	bool handle_d();
