@@ -674,21 +674,12 @@ bool CloseSweep::beforeLeftClosestEndPos(int dbIdx, const Record *rec)
 	if (!_context->getSameStrand() && !_context->getDiffStrand()) {
 		return recEndPos < prevPos;
 	} else {
-		if (_context->getSameStrand()) {
 			if (rec->getStrandVal() == Record::FORWARD) {
 				return recEndPos < prevPos;
 			} else {
 				return recEndPos < prevPosReverse;
 			}
-		} else {
-			//want diff strand
-			if (rec->getStrandVal() == Record::FORWARD) {
-				return recEndPos < prevPosReverse;
-			} else {
-				return recEndPos < prevPos;
-			}
-		}
-	}
+  }
 	return false;
 }
 
