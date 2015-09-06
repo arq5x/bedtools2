@@ -57,7 +57,7 @@ public:
 		return find(dist, dummyVal);
 	}
 	typedef pair<chromDirType, const Record *> elemPairType;
-	typedef vector<elemPairType>elemsType;
+	typedef vector<elemPairType> elemsType;
 	typedef pair<int, int> indexType;
 
 	int getMaxDist() const { return _empty ? 0 : _distIndex[_currNumIdxs-1].first; }
@@ -127,7 +127,6 @@ private:
     void setLeftClosestEndPos(int dbIdx);
     bool beforeLeftClosestEndPos(int dbIdx, const Record *rec);
     void clearClosestEndPos(int dbIdx);
-    bool canStopScan(const Record *cacheRec, bool ignored, streamDirType streamDir);
     int addRecsToRetList(const RecDistList::elemsType *recs, int currDist, RecordKeyVector &retList);
     void addSingleRec(const Record *rec, int currDist, int &hitsUsed, RecordKeyVector &retList);
     rateOvlpType tryToAddRecord(const Record *cacheRec, int dist, int dbIdx, bool &stopScanning, chromDirType chromDir, streamDirType streamDir);

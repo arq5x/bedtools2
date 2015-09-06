@@ -177,9 +177,11 @@ int RecDistList::getMaxLeftEndPos() const {
 	if (_empty) return -1;
 
 	int maxDist =_distIndex[_currNumIdxs-1].first;
-	const elemsType *elems = _allRecs[_distIndex[_currNumIdxs-1].second];
+
+  const elemsType *elems = _allRecs[_distIndex[_currNumIdxs-1].second];
 	for (int i=0; i < (int)elems->size(); i++) {
-		if ((*elems)[i].first == LEFT) {
+    const elemPairType & elem = (*elems)[i];
+		if (elem.first == LEFT) {
 			return maxDist;
 		}
 	}
@@ -283,40 +285,7 @@ void CloseSweep::scanCache(int dbIdx, RecordKeyVector &retList) {
 
 CloseSweep::rateOvlpType CloseSweep::considerRecord(const Record *cacheRec, int dbIdx, bool &stopScanning) {
 
-	if (_context->diffNames() && cacheRec->getName() == _currQueryRec->getName()) {
-
-		// We can ignore this, but we need to know whether to stop scanning.
-		// do so IF:
-		// 1 ) We are not ignoring downstream hits, AND
-		// 2 ) The hit is after the query record, AND
-		// 3 ) Some downstream hits have been found.
-		if (!_context->ignoreDownstream() && cacheRec->after(_currQueryRec) && !_minDownstreamRecs[dbIdx]->empty()) {
-			stopScanning = true;
-		}
-
-		// Secondly, we also want to know whether to delete this hit from the cache.
-		//
-		// TBD: Not sure how to determine this accurately. Leave it for now and hope the
-		// performance doesn't suffer too badly.
-
-
-		return IGNORE;
-	}
-
-	// If strand is specified, and either record has an unknown strand, ignore
-	if ((_context->getSameStrand() || _context->getDiffStrand()) && ((_currQueryRec->getStrandVal() == Record::UNKNOWN) || cacheRec->getStrandVal() == Record::UNKNOWN)) {
-		return IGNORE;
-	}
-	// If want same strand, and aren't sure they're the same, ignore
-	if (_context->getSameStrand() &&  (_currQueryRec->getStrandVal() != cacheRec->getStrandVal())) {
-		return IGNORE;
-	}
-	// If we want diff strand, and aren't sure they're different, ignore.
-	if (_context->getDiffStrand() && (_currQueryRec->getStrandVal() == cacheRec->getStrandVal())) {
-		return IGNORE;
-	}
-
-	// Now determine whether the hit and query intersect, and if so, what to do about it.
+	// Determine whether the hit and query intersect, and if so, what to do about it.
 	int currDist = 0;
 
 	if (intersects(_currQueryRec, cacheRec)) {
@@ -363,7 +332,7 @@ void CloseSweep::finalizeSelections(int dbIdx, RecordKeyVector &retList) {
 	// the k closest hits.
 
 	// The first thing to do is set the leftmost end pos used by records on the left.
-	// This will control when the cahce is purged during the next query's sweep.
+	// This will control when the cache is purged during the next query's sweep.
 	setLeftClosestEndPos(dbIdx);
 
 
@@ -650,11 +619,12 @@ void CloseSweep::setLeftClosestEndPos(int dbIdx)
 		//can't set purge point, except for some special cases.
 		if (purgePointException(dbIdx)) {
 			_maxPrevLeftClosestEndPos[dbIdx] = max(_currQueryRec->getStartPos(), _maxPrevLeftClosestEndPos[dbIdx]);
+			_maxPrevLeftClosestEndPosReverse[dbIdx] = max(_currQueryRec->getStartPos(), _maxPrevLeftClosestEndPosReverse[dbIdx]);
 		}
 		return;
 	}
 
-	int leftMostEndPos = (_currQueryRec->getStartPos() - max(upDist, downDist));
+	int leftMostEndPos = (_currQueryRec->getStartPos() - max(upDist, downDist)) +1;
 	if ((!_context->getSameStrand() && !_context->getDiffStrand()) ||
 		(_context->getSameStrand() && _currQueryRec->getStrandVal() == Record::FORWARD) ||
 		(_context->getDiffStrand() && _currQueryRec->getStrandVal() == Record::REVERSE)) {
@@ -677,7 +647,7 @@ bool CloseSweep::beforeLeftClosestEndPos(int dbIdx, const Record *rec)
 			if (rec->getStrandVal() == Record::FORWARD) {
 				return recEndPos < prevPos;
 			} else {
-				return recEndPos < prevPosReverse;
+ 				return recEndPos < prevPosReverse;
 			}
   }
 	return false;
@@ -692,67 +662,87 @@ void CloseSweep::clearClosestEndPos(int dbIdx)
 
 CloseSweep::rateOvlpType CloseSweep::tryToAddRecord(const Record *cacheRec, int dist, int dbIdx, bool &stopScanning, chromDirType chromDir, streamDirType streamDir) {
 
-	//establish which set of hits we are looking at.
-	RecDistList *useList = (streamDir == UPSTREAM ? _minUpstreamRecs[dbIdx] : (streamDir == INTERSECT ? _overlapRecs[dbIdx] : _minDownstreamRecs[dbIdx]));
-	bool shouldIgnore = (streamDir == UPSTREAM ? _context->ignoreUpstream() : (streamDir == DOWNSTREAM ? _context->ignoreDownstream() :  _context->ignoreOverlaps()));
+  //
+  // Decide whether to ignore hit
+  //
+	// If want same strand, and they're unknown or not the same, ignore
+  // If we want diff strand, and they're unknown or different, ignore.
+  // If we want diff names and they're the same, ignore
+  // If stream is unwanted, ignore.
+  bool hasUnknownStrands = (_currQueryRec->getStrandVal() == Record::UNKNOWN || cacheRec->getStrandVal() == Record::UNKNOWN);
+  bool wantedSameNotSame = (_context->getSameStrand() && (hasUnknownStrands || (_currQueryRec->getStrandVal() != cacheRec->getStrandVal())));
+  bool wantedDiffNotDiff = (_context->getDiffStrand() && (hasUnknownStrands || (_currQueryRec->getStrandVal() == cacheRec->getStrandVal())));
+  bool badStrand = wantedSameNotSame || wantedDiffNotDiff;
+  bool badNames = (_context->diffNames() && (cacheRec->getName() == _currQueryRec->getName()));
+	bool badStream = (streamDir == UPSTREAM ? _context->ignoreUpstream() : (streamDir == DOWNSTREAM ? _context->ignoreDownstream() :  _context->ignoreOverlaps()));
 
-	if (chromDir == OVERLAP) {
-		if (shouldIgnore || useList->addRec(0, cacheRec, RecDistList::OVERLAP)) {
-		}
-		return IGNORE;
+  bool shouldIgnore = badStrand || badNames || badStream;
+
+
+  // You would think ignoring it means we could stop here, but even then,
+  // hits on the left may need to be purged from the cache,
+  // and hits on the right tell us when to stop scanning the cache.
+
+
+  //establish which set of hits we are looking at.
+	RecDistList *useList = (streamDir == UPSTREAM ? _minUpstreamRecs[dbIdx] : (streamDir == INTERSECT ? _overlapRecs[dbIdx] : _minDownstreamRecs[dbIdx]));
+
+
+	if (chromDir == OVERLAP && !shouldIgnore) {
+    useList->addRec(0, cacheRec, RecDistList::OVERLAP);
 	}
 
-	if (chromDir == LEFT) {
+	else if (chromDir == LEFT) {
 		if (beforeLeftClosestEndPos(dbIdx, cacheRec)) {
 			return DELETE;
 		}
 		if (!shouldIgnore) {
 			useList->addRec(dist, cacheRec, RecDistList::LEFT);
 		}
-		return IGNORE;
 	}
-	// Here, chromDir == RIGHT
-	else if (shouldIgnore || !useList->addRec(dist, cacheRec, RecDistList::RIGHT)) {
-		// Stop scanning here, if we have no DIST mode.
-		// If we do have a dist mode, or it's ref mode,
-		// still stop scanning, UNLESS we only ignored the hit
-		// because it and the query both have strands.
-		if  (canStopScan(cacheRec, shouldIgnore, streamDir)) {
-			stopScanning = true;
-		} else {
-//			printf("Couldn't stop scan.\n");
-		}
-	}
+
+  else if (chromDir == RIGHT && (shouldIgnore || !useList->addRec(dist, cacheRec, RecDistList::RIGHT))) {
+    // Stop scanning here, UNLESS we only ignored the hit
+    // because the strand or name was bad, or if
+    //the stream was bad and have a non-ref DIST mode
+    if  (!badStrand && !badNames) {
+      stopScanning = true;
+    }
+    if (badStream && (_context->getStrandedDistMode() == ContextClosest::A_DIST || _context->getStrandedDistMode() == ContextClosest::B_DIST)) {
+      stopScanning = false;
+    }
+  }
 	return IGNORE;
 }
 
-bool CloseSweep::canStopScan(const Record *cacheRec, bool ignored, streamDirType streamDir) {
-	if (!_context->hasStrandedDistMode() || (_context->getStrandedDistMode() == ContextClosest::REF_DIST) ||
-			(cacheRec->getStrandVal() == Record::UNKNOWN || _currQueryRec->getStrandVal() == Record::UNKNOWN)) {
-		return true;
-	}
-	//now we know we're in A_DIST or B_DIST mode, and the query and hit both have strands.
-	if (!ignored){
-		//ok, now we're only here because the record was out of range.
-		return true;
-	}
-	// In A_DIST mode, when the query is negative, all records to the right are UPSTREAM.
-	// pos query means all records are down stream. In these cases, it'll never stop scanning. Found that out the hard way.
-	if ((_context->getStrandedDistMode() == ContextClosest::A_DIST) &&
-		((streamDir == UPSTREAM && _currQueryRec->getStrandVal() == Record::REVERSE) ||
-		 (streamDir == DOWNSTREAM && _currQueryRec->getStrandVal() == Record::FORWARD))) {
-		return true;
-	}
-
-	return false;
-
-}
 
 bool CloseSweep::purgePointException(int dbIdx) {
-	// we can only make an exception when ignoring upstream records, AND:
-	// either have no dist mode, or it's REF dist mode, OR
-	// either the query file or db file has unstranded records.
-	return (_context->ignoreUpstream() &&
-			((!_context->hasStrandedDistMode() || _context->getStrandedDistMode() == ContextClosest::REF_DIST) ||
-			(!_context->getQueryFile()->recordsHaveStrand() || !_context->getDatabaseFile(dbIdx)->recordsHaveStrand())));
+
+  // Normally, we can't set a cache purge point if there are no
+  // records to the left of the query.
+  //
+	// But we can make an exception when ignoring upstream records, AND:
+	//       either the query file or db file has unstranded records OR
+  //       they both have strands and we're using the -s or -S option AND
+  //       our DIST mode is ref (-D ref).
+  //
+  // The converse also applies, meaning we can also make an exception
+  // if ignoring downstream records AND
+  //       the dist mode is B, AND
+  //
+  //       one file is unstranded, OR
+  //       we're using -s or S.
+
+  bool atLeastOneFileUnstranded = (!_context->getQueryFile()->recordsHaveStrand() || !_context->getDatabaseFile(dbIdx)->recordsHaveStrand());
+  bool wantStrand = _context->getSameStrand() || _context->getDiffStrand();
+  bool refDist = _context->getStrandedDistMode() == ContextClosest::REF_DIST;
+  bool aDist = _context->getStrandedDistMode() == ContextClosest::A_DIST;
+
+	return ((_context->ignoreUpstream() && refDist &&
+          (atLeastOneFileUnstranded || wantStrand))
+
+          ||
+
+          (_context->ignoreDownstream() && (aDist && _currQueryRec->getStrandVal() == Record::REVERSE) &&
+           (atLeastOneFileUnstranded || wantStrand)));
 }
