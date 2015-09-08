@@ -123,6 +123,7 @@ private:
 
     typedef enum { LEFT, OVERLAP, RIGHT } chromDirType;
     typedef enum { UPSTREAM, INTERSECT, DOWNSTREAM } streamDirType;
+    typedef enum { NEITHER, FORWARD_ONLY, REVERSE_ONLY, BOTH } purgeDirectionType;
 
     void setLeftClosestEndPos(int dbIdx);
     bool beforeLeftClosestEndPos(int dbIdx, const Record *rec);
@@ -130,7 +131,7 @@ private:
     int addRecsToRetList(const RecDistList::elemsType *recs, int currDist, RecordKeyVector &retList);
     void addSingleRec(const Record *rec, int currDist, int &hitsUsed, RecordKeyVector &retList);
     rateOvlpType tryToAddRecord(const Record *cacheRec, int dist, int dbIdx, bool &stopScanning, chromDirType chromDir, streamDirType streamDir);
-    bool purgePointException(int dbIdx);
+    purgeDirectionType purgePointException(int dbIdx);
 
 };
 

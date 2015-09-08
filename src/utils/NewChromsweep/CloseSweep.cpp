@@ -285,6 +285,7 @@ void CloseSweep::scanCache(int dbIdx, RecordKeyVector &retList) {
 
 CloseSweep::rateOvlpType CloseSweep::considerRecord(const Record *cacheRec, int dbIdx, bool &stopScanning) {
 
+  //fprintf(stderr, "HELLO!!!\n");
 	// Determine whether the hit and query intersect, and if so, what to do about it.
 	int currDist = 0;
 
@@ -608,26 +609,35 @@ bool CloseSweep::chromChange(int dbIdx, RecordKeyVector &retList, bool wantScan)
 
 void CloseSweep::setLeftClosestEndPos(int dbIdx)
 {
-	RecDistList *upRecs = _minUpstreamRecs[dbIdx];
+
+  //try to determine max end pos of hits to left of query.
+  //first check for exceptions due to options that cause
+  //complete rejection of all left side hits.
+
+  //no records found to left of query,
+  //can't set purge point, except for some special cases.
+  purgeDirectionType purgeDir = purgePointException(dbIdx);
+  if (purgeDir == BOTH || purgeDir == FORWARD_ONLY) {
+    _maxPrevLeftClosestEndPos[dbIdx] = max(_currQueryRec->getStartPos(), _maxPrevLeftClosestEndPos[dbIdx]);
+  }
+  if (purgeDir == BOTH || purgeDir == REVERSE_ONLY) {
+    _maxPrevLeftClosestEndPosReverse[dbIdx] = max(_currQueryRec->getStartPos(), _maxPrevLeftClosestEndPosReverse[dbIdx]);
+  }
+  if (purgeDir != NEITHER) return;
+
+  RecDistList *upRecs = _minUpstreamRecs[dbIdx];
 	RecDistList *downRecs = _minDownstreamRecs[dbIdx];
 
 	int upDist = upRecs->getMaxLeftEndPos();
 	int downDist = downRecs->getMaxLeftEndPos();
 
-	if (upDist == -1 && downDist == -1) {
-		//no records found to left of query,
-		//can't set purge point, except for some special cases.
-		if (purgePointException(dbIdx)) {
-			_maxPrevLeftClosestEndPos[dbIdx] = max(_currQueryRec->getStartPos(), _maxPrevLeftClosestEndPos[dbIdx]);
-			_maxPrevLeftClosestEndPosReverse[dbIdx] = max(_currQueryRec->getStartPos(), _maxPrevLeftClosestEndPosReverse[dbIdx]);
-		}
-		return;
-	}
+
+  if (upDist == -1 && downDist == -1) return;
 
 	int leftMostEndPos = (_currQueryRec->getStartPos() - max(upDist, downDist)) +1;
 	if ((!_context->getSameStrand() && !_context->getDiffStrand()) ||
 		(_context->getSameStrand() && _currQueryRec->getStrandVal() == Record::FORWARD) ||
-		(_context->getDiffStrand() && _currQueryRec->getStrandVal() == Record::REVERSE)) {
+		(_context->getDiffStrand() && _currQueryRec->getStrandVal() == Record::REVERSE))  {
 
 		_maxPrevLeftClosestEndPos[dbIdx] = max(leftMostEndPos, _maxPrevLeftClosestEndPos[dbIdx]);
 	} else {
@@ -705,44 +715,72 @@ CloseSweep::rateOvlpType CloseSweep::tryToAddRecord(const Record *cacheRec, int 
     // Stop scanning here, UNLESS we only ignored the hit
     // because the strand or name was bad, or if
     //the stream was bad and have a non-ref DIST mode
-    if  (!badStrand && !badNames) {
+    if  (!badStrand && !badNames &&
+         (!(badStream && _context->getStrandedDistMode() == ContextClosest::B_DIST))) { //&& cacheRec->getStartPos() <= _currQueryRec->getEndPos() && ((int)useList->totalSize() <= _kClosest)))) {
       stopScanning = true;
-    }
-    if (badStream && (_context->getStrandedDistMode() == ContextClosest::A_DIST || _context->getStrandedDistMode() == ContextClosest::B_DIST)) {
-      stopScanning = false;
     }
   }
 	return IGNORE;
 }
 
 
-bool CloseSweep::purgePointException(int dbIdx) {
+CloseSweep::purgeDirectionType CloseSweep::purgePointException(int dbIdx) {
 
   // Normally, we can't set a cache purge point if there are no
   // records to the left of the query.
-  //
-	// But we can make an exception when ignoring upstream records, AND:
-	//       either the query file or db file has unstranded records OR
-  //       they both have strands and we're using the -s or -S option AND
-  //       our DIST mode is ref (-D ref).
-  //
-  // The converse also applies, meaning we can also make an exception
-  // if ignoring downstream records AND
-  //       the dist mode is B, AND
-  //
-  //       one file is unstranded, OR
-  //       we're using -s or S.
 
-  bool atLeastOneFileUnstranded = (!_context->getQueryFile()->recordsHaveStrand() || !_context->getDatabaseFile(dbIdx)->recordsHaveStrand());
-  bool wantStrand = _context->getSameStrand() || _context->getDiffStrand();
+  // This method will detect use cases that cause all of the left side
+  // hits to have been rejected, and tell us whether to purge the forward
+  // cache, reverse cache, both, or neither.
+
+
+  // Some abbreviations to make the code less miserable.
+
+  bool sameStrand = _context->getSameStrand();
+  bool diffStrand = _context->getDiffStrand();
+
   bool refDist = _context->getStrandedDistMode() == ContextClosest::REF_DIST;
   bool aDist = _context->getStrandedDistMode() == ContextClosest::A_DIST;
+  bool bDist = _context->getStrandedDistMode() == ContextClosest::B_DIST;
 
-	return ((_context->ignoreUpstream() && refDist &&
-          (atLeastOneFileUnstranded || wantStrand))
+  bool qForward = _currQueryRec->getStrandVal() == Record::FORWARD;
+  bool qReverse = _currQueryRec->getStrandVal() == Record::REVERSE;
 
-          ||
+  bool ignoreUpstream = _context->ignoreUpstream();
+  bool ignoreDownstream = _context->ignoreDownstream();
 
-          (_context->ignoreDownstream() && (aDist && _currQueryRec->getStrandVal() == Record::REVERSE) &&
-           (atLeastOneFileUnstranded || wantStrand)));
+
+  purgeDirectionType purgeDir = NEITHER;
+
+  if (ignoreUpstream && ignoreDownstream) purgeDir = BOTH;
+
+   else if (ignoreUpstream) {
+    if (refDist) {
+      purgeDir = BOTH;
+    } else if (aDist && qForward) {
+      if (sameStrand) {
+        purgeDir = FORWARD_ONLY;
+      } else if (diffStrand) {
+        purgeDir = REVERSE_ONLY;
+      }
+    } else if (bDist) {
+      if (qForward && diffStrand) purgeDir = REVERSE_ONLY;
+      else if (qReverse && sameStrand) purgeDir = REVERSE_ONLY;
+    }
+   } else { //ignoreDownstream
+     // if refDist, do nothing. left hits can't be downstream.
+     if (aDist) {
+       //if qForward, do nothing. left hits can't be downstream.
+       if (qReverse) {
+         if (sameStrand) purgeDir = REVERSE_ONLY;
+         else if (diffStrand) purgeDir = FORWARD_ONLY;
+       }
+     } else if (bDist) {
+       if (qForward && sameStrand) purgeDir = FORWARD_ONLY;
+       else if (qReverse && diffStrand) purgeDir = FORWARD_ONLY;
+     }
+   }
+
+  return purgeDir;
+
 }
