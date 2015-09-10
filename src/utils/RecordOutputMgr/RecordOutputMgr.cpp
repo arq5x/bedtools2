@@ -475,7 +475,6 @@ void RecordOutputMgr::null(bool queryType, bool dbType)
 	}
 	//This is kind of a hack. Need an instance of the correct class of record in order to call it's printNull method.
 	Record *dummyRecord = NULL;
-
 	switch (recordType) {
 	case FileRecordTypeChecker::BED3_RECORD_TYPE:
 		dummyRecord = new Bed3Interval();
@@ -499,6 +498,10 @@ void RecordOutputMgr::null(bool queryType, bool dbType)
 		dummyRecord = new BedPlusInterval();
 		(static_cast<BedPlusInterval *>(dummyRecord))->setNumPrintFields((static_cast<ContextIntersect *>(_context))->getMaxNumDatabaseFields());
 		break;
+	case FileRecordTypeChecker::BED6_PLUS_RECORD_TYPE:
+		dummyRecord = new BedPlusInterval();
+		(static_cast<BedPlusInterval *>(dummyRecord))->setNumPrintFields((static_cast<ContextIntersect *>(_context))->getMaxNumDatabaseFields());
+		break;
 	case FileRecordTypeChecker::VCF_RECORD_TYPE:
 		dummyRecord = new VcfRecord();
 		(static_cast<VcfRecord *>(dummyRecord))->setNumPrintFields((static_cast<ContextIntersect *>(_context))->getMaxNumDatabaseFields());
@@ -513,10 +516,8 @@ void RecordOutputMgr::null(bool queryType, bool dbType)
 	default:
 		break;
 	}
-
 	dummyRecord->printNull(_outBuf);
 	delete dummyRecord;
-
 }
 
 void RecordOutputMgr::printKey(const Record *key, const QuickString & start, const QuickString & end)
