@@ -1,6 +1,9 @@
 bedtools - a swiss army knife for genome arithmetic         
 ===================================================
 
+![shamalamadingdong](https://github.com/arq5x/bedtools2/blob/master/docs/bedtools.swiss.png "foo")
+
+
 [Download current version](https://github.com/arq5x/bedtools2/releases/latest)
 
 [Documentation](http://bedtools.readthedocs.org)
