@@ -66,7 +66,7 @@ bool NewChromSweep::init() {
     //end of the query file is hit as well.
 
     if (_context->getNoHit() || _context->getWriteCount() || _context->getWriteOverlap() || _context->getWriteAllOverlap() || _context->getLeftJoin()) {
-        _runToQueryEnd = true;
+    _runToQueryEnd = true;
     }
     _wasInitialized = true;
     return true;
@@ -79,6 +79,7 @@ void NewChromSweep::closeOut(bool testChromOrderVal) {
     while (!_queryFRM->eof()) {
         nextRecord(true);
         testChromOrder(_currQueryRec);
+        _queryFRM->deleteRecord(_currQueryRec);
     }
     if (testChromOrderVal) testChromOrder(_currQueryRec);
 
@@ -226,7 +227,6 @@ bool NewChromSweep::chromChange(int dbIdx, RecordKeyVector &retList, bool wantSc
 bool NewChromSweep::next(RecordKeyVector &retList) {
     retList.clearVector();
 
-
     //make sure the first read of the query file is tested for chrom sort order.
     bool needTestSortOrder = false;
     if (_currQueryRec != NULL) {
@@ -251,7 +251,6 @@ bool NewChromSweep::next(RecordKeyVector &retList) {
     if (_context->getSortOutput()) {
         retList.sortVector();
     }
-
 
     _prevQueryChromName = _currQueryChromName;
     return true;
