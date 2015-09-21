@@ -163,6 +163,10 @@ bool ContextIntersect::isValidState()
 		_errorMsg = "\n***** ERROR: request -s for sameStrand, or -S for diffStrand, not both. *****";
 		return false;
 	}
+	if ((getSameStrand() || getDiffStrand()) && !strandedToolSupported()) {
+		//error msg set within strandedToolSupported method.
+		return false;
+	}
 
 	if (getQueryFileType() == FileRecordTypeChecker::BAM_FILE_TYPE && getPrintHeader()) {
 		cerr << endl << "*****" << endl << "*****WARNING: -header option is not valid for BAM input." << endl << "*****" << endl;

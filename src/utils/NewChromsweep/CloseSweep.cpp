@@ -12,7 +12,9 @@ RecDistList::RecDistList(int maxSize)
 :  _kVal(maxSize),
    _empty(true),
    _currNumIdxs(0),
-   _totalRecs(0) {
+   _totalRecs(0)
+
+    {
 
 	_allRecs.resize(_kVal);
 	for (int i=0; i < _kVal; i++) {
@@ -193,7 +195,26 @@ int RecDistList::getMaxLeftEndPos() const {
 CloseSweep::CloseSweep(ContextClosest *context)
 :	NewChromSweep(context),
  	_context(context),
- 	_kClosest(_context->getNumClosestHitsWanted())
+ 	_kClosest(_context->getNumClosestHitsWanted()),
+	_sameStrand(false),
+	_diffStrand(false),
+
+	_refDist(false),
+	_aDist(false),
+	_bDist(false),
+
+	_ignoreUpstream(false),
+	_ignoreDownstream(false),
+
+	_qForward(false),
+	_qReverse(false),
+	_dbForward(false),
+	_dbReverse(false),
+
+	_tieMode(ContextClosest::ALL_TIES),
+	_firstTie(false),
+	_lastTie(false),
+	_allTies(false)
  	{
 
 	_minUpstreamRecs.resize(_numDBs, NULL);
@@ -222,10 +243,32 @@ bool CloseSweep::init() {
 
     bool retVal =  NewChromSweep::init();
     _runToQueryEnd = true;
+
+	// Some abbreviations to make the code less miserable.
+	_sameStrand = _context->getSameStrand();
+	_diffStrand = _context->getDiffStrand();
+
+	_refDist = _context->getStrandedDistMode() == ContextClosest::REF_DIST;
+	_aDist = _context->getStrandedDistMode() == ContextClosest::A_DIST;
+	_bDist = _context->getStrandedDistMode() == ContextClosest::B_DIST;
+
+	_ignoreUpstream = _context->ignoreUpstream();
+	_ignoreDownstream = _context->ignoreDownstream();
+
+	_tieMode = _context->getTieMode();
+	_firstTie = _tieMode == ContextClosest::FIRST_TIE;
+	_lastTie = _tieMode == ContextClosest::LAST_TIE;
+	_allTies = _tieMode == ContextClosest::ALL_TIES;
+
+
     return retVal;
  }
 
 void CloseSweep::masterScan(RecordKeyVector &retList) {
+
+	_qForward = _currQueryRec->getStrandVal() == Record::FORWARD;
+	_qReverse = _currQueryRec->getStrandVal() == Record::REVERSE;
+
 	if (_currQueryChromName != _prevQueryChromName) testChromOrder(_currQueryRec);
 	if (_context->reportDistance()) {
 		_finalDistances.clear();
@@ -285,8 +328,9 @@ void CloseSweep::scanCache(int dbIdx, RecordKeyVector &retList) {
 
 CloseSweep::rateOvlpType CloseSweep::considerRecord(const Record *cacheRec, int dbIdx, bool &stopScanning) {
 
-  //fprintf(stderr, "HELLO!!!\n");
 	// Determine whether the hit and query intersect, and if so, what to do about it.
+	_dbForward = cacheRec->getStrandVal() == Record::FORWARD;
+	_dbReverse = cacheRec->getStrandVal() == Record::REVERSE;
 	int currDist = 0;
 
 	if (intersects(_currQueryRec, cacheRec)) {
@@ -300,8 +344,8 @@ CloseSweep::rateOvlpType CloseSweep::considerRecord(const Record *cacheRec, int 
 
 		 currDist = (cacheRec->getStartPos() - _currQueryRec->getEndPos()) + 1;
 		 if (_context->signDistance()) {
-			 if ((_context->getStrandedDistMode() == ContextClosest::A_DIST && _currQueryRec->getStrandVal() == Record::REVERSE) ||
-				 (_context->getStrandedDistMode() == ContextClosest::B_DIST && cacheRec->getStrandVal() == Record::FORWARD))
+			 if ((_aDist && _qReverse) ||
+				 (_bDist && _dbForward))
 				 {
 					 // hit is "upstream" of A
 					 return tryToAddRecord(cacheRec, abs(currDist), dbIdx, stopScanning, RIGHT, UPSTREAM);
@@ -314,8 +358,8 @@ CloseSweep::rateOvlpType CloseSweep::considerRecord(const Record *cacheRec, int 
 		 // HIT IS TO THE LEFT OF THE QUERY.
 		 currDist = (_currQueryRec->getStartPos() - cacheRec->getEndPos()) + 1;
 		 if (_context->signDistance()) {
-			 if ((_context->getStrandedDistMode() == ContextClosest::A_DIST && _currQueryRec->getStrandVal() == Record::REVERSE) ||
-				 (_context->getStrandedDistMode() == ContextClosest::B_DIST && cacheRec->getStrandVal() == Record::FORWARD))
+			 if ((_aDist && _qReverse) ||
+				 (_bDist && _dbForward))
 			 {
 				 // HIT IS DOWNSTREAM.
 				 return tryToAddRecord(cacheRec, abs(currDist), dbIdx, stopScanning, LEFT, DOWNSTREAM);
@@ -343,7 +387,6 @@ void CloseSweep::finalizeSelections(int dbIdx, RecordKeyVector &retList) {
 	RecDistList *overlaps = _overlapRecs[dbIdx];
 	RecDistList::constIterType upIter = upRecs->begin();
 	RecDistList::constIterType downIter = downRecs->begin();
-	ContextClosest::tieModeType tieMode = _context->getTieMode();
 	int upDist = INT_MAX;
 	int downDist = INT_MAX;
 
@@ -397,12 +440,12 @@ void CloseSweep::finalizeSelections(int dbIdx, RecordKeyVector &retList) {
 		bool tie = upDist == downDist;
 		bool usedUp = false;
 		bool usedDown = false;
-		if (upDist < downDist || (tie && tieMode != ContextClosest::LAST_TIE)) {
+		if (upDist < downDist || (tie && !_lastTie)) {
 			totalHitsUsed += addRecsToRetList(upRecs->allElems(upIter), 0 - upDist, retList);
 			upIter++;
 			usedUp = true;
 		}
-		if (downDist < upDist || (tie && tieMode != ContextClosest::FIRST_TIE)) {
+		if (downDist < upDist || (tie && !_firstTie)) {
 			totalHitsUsed += addRecsToRetList(downRecs->allElems(downIter), downDist, retList);
 			downIter++;
 			usedDown = true;
@@ -428,13 +471,12 @@ int CloseSweep::addRecsToRetList(const RecDistList::elemsType *recs, int currDis
 	int hitsUsed = 0;
 	int numRecs = (int)recs->size(); //just to clean the code some.
 
-	ContextClosest::tieModeType tieMode = _context->getTieMode();
 
-	if (tieMode == ContextClosest::FIRST_TIE) {
+	if (_firstTie) {
 		addSingleRec(recs->at(0).second, currDist, hitsUsed, retList);
 		return 1;
 
-	} else if (tieMode == ContextClosest::LAST_TIE) {
+	} else if (_lastTie) {
 		addSingleRec(recs->at(numRecs-1).second, currDist, hitsUsed, retList);
 		return 1;
 
@@ -498,7 +540,6 @@ void CloseSweep::checkMultiDbs(RecordKeyVector &retList) {
 	_finalDistances.clear();
 
 	int hitsUsed = 0;
-	ContextClosest::tieModeType tieMode = _context->getTieMode();
 	for (i=0; i < numHits && hitsUsed < _kClosest; i++) {
 		int dist = copyDists[i]._dist;
 		bool isNeg = copyDists[i]._isNeg;
@@ -507,8 +548,8 @@ void CloseSweep::checkMultiDbs(RecordKeyVector &retList) {
 		if (iter != ties.end()) {
 			//tie was found
 			int numTies = iter->second;
-			if (tieMode != ContextClosest::ALL_TIES) {
-				if (tieMode == ContextClosest::FIRST_TIE) {
+			if (!_allTies) {
+				if (_firstTie) {
 					//just add the first of the ties
 					addSingleRec(copyDists[i]._rec, (isNeg ? 0 - dist : dist), hitsUsed, retList);
 					i += numTies - 1; // use first, then skip ahead by the number of ties, minus 1 because
@@ -635,9 +676,9 @@ void CloseSweep::setLeftClosestEndPos(int dbIdx)
   if (upDist == -1 && downDist == -1) return;
 
 	int leftMostEndPos = (_currQueryRec->getStartPos() - max(upDist, downDist)) +1;
-	if ((!_context->getSameStrand() && !_context->getDiffStrand()) ||
-		(_context->getSameStrand() && _currQueryRec->getStrandVal() == Record::FORWARD) ||
-		(_context->getDiffStrand() && _currQueryRec->getStrandVal() == Record::REVERSE))  {
+	if ((!_sameStrand && !_diffStrand) ||
+		(_sameStrand && _qForward) ||
+		(_diffStrand && _qReverse))  {
 
 		_maxPrevLeftClosestEndPos[dbIdx] = max(leftMostEndPos, _maxPrevLeftClosestEndPos[dbIdx]);
 	} else {
@@ -651,7 +692,7 @@ bool CloseSweep::beforeLeftClosestEndPos(int dbIdx, const Record *rec)
 	int prevPos = _maxPrevLeftClosestEndPos[dbIdx];
 	int prevPosReverse = _maxPrevLeftClosestEndPosReverse[dbIdx];
 
-	if (!_context->getSameStrand() && !_context->getDiffStrand()) {
+	if (!_sameStrand && !_diffStrand) {
 		return recEndPos < prevPos;
 	} else {
 			if (rec->getStrandVal() == Record::FORWARD) {
@@ -672,34 +713,34 @@ void CloseSweep::clearClosestEndPos(int dbIdx)
 
 CloseSweep::rateOvlpType CloseSweep::tryToAddRecord(const Record *cacheRec, int dist, int dbIdx, bool &stopScanning, chromDirType chromDir, streamDirType streamDir) {
 
-  //
-  // Decide whether to ignore hit
-  //
+	//
+	// Decide whether to ignore hit
+	//
 	// If want same strand, and they're unknown or not the same, ignore
-  // If we want diff strand, and they're unknown or different, ignore.
-  // If we want diff names and they're the same, ignore
-  // If stream is unwanted, ignore.
-  bool hasUnknownStrands = (_currQueryRec->getStrandVal() == Record::UNKNOWN || cacheRec->getStrandVal() == Record::UNKNOWN);
-  bool wantedSameNotSame = (_context->getSameStrand() && (hasUnknownStrands || (_currQueryRec->getStrandVal() != cacheRec->getStrandVal())));
-  bool wantedDiffNotDiff = (_context->getDiffStrand() && (hasUnknownStrands || (_currQueryRec->getStrandVal() == cacheRec->getStrandVal())));
-  bool badStrand = wantedSameNotSame || wantedDiffNotDiff;
-  bool badNames = (_context->diffNames() && (cacheRec->getName() == _currQueryRec->getName()));
-	bool badStream = (streamDir == UPSTREAM ? _context->ignoreUpstream() : (streamDir == DOWNSTREAM ? _context->ignoreDownstream() :  _context->ignoreOverlaps()));
+	// If we want diff strand, and they're unknown or different, ignore.
+	// If we want diff names and they're the same, ignore
+	// If stream is unwanted, ignore.
+	bool hasUnknownStrands = (_currQueryRec->getStrandVal() == Record::UNKNOWN || cacheRec->getStrandVal() == Record::UNKNOWN);
+	bool wantedSameNotSame = (_sameStrand && (hasUnknownStrands || (_currQueryRec->getStrandVal() != cacheRec->getStrandVal())));
+	bool wantedDiffNotDiff = (_diffStrand && (hasUnknownStrands || (_currQueryRec->getStrandVal() == cacheRec->getStrandVal())));
+	bool badStrand = wantedSameNotSame || wantedDiffNotDiff;
+	bool badNames = (_context->diffNames() && (cacheRec->getName() == _currQueryRec->getName()));
+	bool badStream = (streamDir == UPSTREAM ? _ignoreUpstream : (streamDir == DOWNSTREAM ? _ignoreDownstream :  _context->ignoreOverlaps()));
 
-  bool shouldIgnore = badStrand || badNames || badStream;
-
-
-  // You would think ignoring it means we could stop here, but even then,
-  // hits on the left may need to be purged from the cache,
-  // and hits on the right tell us when to stop scanning the cache.
+	bool shouldIgnore = badStrand || badNames || badStream;
 
 
-  //establish which set of hits we are looking at.
+	// You would think ignoring it means we could stop here, but even then,
+	// hits on the left may need to be purged from the cache,
+	// and hits on the right tell us when to stop scanning the cache.
+
+
+	//establish which set of hits we are looking at.
 	RecDistList *useList = (streamDir == UPSTREAM ? _minUpstreamRecs[dbIdx] : (streamDir == INTERSECT ? _overlapRecs[dbIdx] : _minDownstreamRecs[dbIdx]));
 
 
 	if (chromDir == OVERLAP && !shouldIgnore) {
-    useList->addRec(0, cacheRec, RecDistList::OVERLAP);
+		useList->addRec(0, cacheRec, RecDistList::OVERLAP);
 	}
 
 	else if (chromDir == LEFT) {
@@ -711,16 +752,46 @@ CloseSweep::rateOvlpType CloseSweep::tryToAddRecord(const Record *cacheRec, int 
 		}
 	}
 
-  else if (chromDir == RIGHT && (shouldIgnore || !useList->addRec(dist, cacheRec, RecDistList::RIGHT))) {
-    // Stop scanning here, UNLESS we only ignored the hit
-    // because the strand or name was bad, or if
-    //the stream was bad and have a non-ref DIST mode
-    if  (!badStrand && !badNames &&
-         (!(badStream && _context->getStrandedDistMode() == ContextClosest::B_DIST))) { //&& cacheRec->getStartPos() <= _currQueryRec->getEndPos() && ((int)useList->totalSize() <= _kClosest)))) {
-      stopScanning = true;
-    }
-  }
+	else if (chromDir == RIGHT) {
+		//hit is to the right of query. Need to know when to stop scanning.
+		// if NOT ignoring:
+		//		if we're able to add it to the useList, definitely DON'T stop,
+		//		hit was valid, so next one could be too.
+		//		if we're UNABLE to add it to the uselist, definitely DO stop,
+		//		because useList is full.
+		// but if we ARE ignoring:
+		//      can only stop in the rare cases where hits to the right
+		//		are ALWAYS getting ignored, regardless of query and cache strand
+		//      Otherwise, always continue.
+		if (!shouldIgnore) {
+			if (!useList->addRec(dist, cacheRec, RecDistList::RIGHT)) {
+				stopScanning = true;
+			}
+		} else { // hit is ignored
+			if (allHitsRightOfQueryIgnored()) {
+				stopScanning = true;
+			}
+		}
+	}
+
+
+//	else if (chromDir == RIGHT && (shouldIgnore || !useList->addRec(dist, cacheRec, RecDistList::RIGHT))) {
+//	// Stop scanning here, UNLESS we only ignored the hit
+//	// because the strand or name was bad, or if
+//	//the stream was bad and have a non-ref DIST mode
+//		if  (!badStrand && !badNames &&
+//			 (!(badStream && _bDist))) { //&& cacheRec->getStartPos() <= _currQueryRec->getEndPos() && ((int)useList->totalSize() <= _kClosest)))) {
+//		  stopScanning = true;
+//		}
+//	}
 	return IGNORE;
+}
+
+bool CloseSweep::allHitsRightOfQueryIgnored() {
+	return ((_refDist && _ignoreDownstream) ||
+			(_aDist && ((_ignoreUpstream && _qReverse) || (_ignoreDownstream && _qForward))) ||
+			(_bDist && ((_ignoreDownstream && ((_qForward && _diffStrand) || (_qReverse && _sameStrand))) ||
+					((_ignoreUpstream && ((_qReverse && _diffStrand) || (_qForward && _sameStrand)))))));
 }
 
 
@@ -733,51 +804,34 @@ CloseSweep::purgeDirectionType CloseSweep::purgePointException(int dbIdx) {
   // hits to have been rejected, and tell us whether to purge the forward
   // cache, reverse cache, both, or neither.
 
-
-  // Some abbreviations to make the code less miserable.
-
-  bool sameStrand = _context->getSameStrand();
-  bool diffStrand = _context->getDiffStrand();
-
-  bool refDist = _context->getStrandedDistMode() == ContextClosest::REF_DIST;
-  bool aDist = _context->getStrandedDistMode() == ContextClosest::A_DIST;
-  bool bDist = _context->getStrandedDistMode() == ContextClosest::B_DIST;
-
-  bool qForward = _currQueryRec->getStrandVal() == Record::FORWARD;
-  bool qReverse = _currQueryRec->getStrandVal() == Record::REVERSE;
-
-  bool ignoreUpstream = _context->ignoreUpstream();
-  bool ignoreDownstream = _context->ignoreDownstream();
-
-
   purgeDirectionType purgeDir = NEITHER;
 
-  if (ignoreUpstream && ignoreDownstream) purgeDir = BOTH;
+  if (_ignoreUpstream && _ignoreDownstream) purgeDir = BOTH;
 
-   else if (ignoreUpstream) {
-    if (refDist) {
+   else if (_ignoreUpstream) {
+    if (_refDist) {
       purgeDir = BOTH;
-    } else if (aDist && qForward) {
-      if (sameStrand) {
+    } else if (_aDist && _qForward) {
+      if (_sameStrand) {
         purgeDir = FORWARD_ONLY;
-      } else if (diffStrand) {
+      } else if (_diffStrand) {
         purgeDir = REVERSE_ONLY;
       }
-    } else if (bDist) {
-      if (qForward && diffStrand) purgeDir = REVERSE_ONLY;
-      else if (qReverse && sameStrand) purgeDir = REVERSE_ONLY;
+    } else if (_bDist) {
+      if (_qForward && _diffStrand) purgeDir = REVERSE_ONLY;
+      else if (_qReverse && _sameStrand) purgeDir = REVERSE_ONLY;
     }
    } else { //ignoreDownstream
      // if refDist, do nothing. left hits can't be downstream.
-     if (aDist) {
+     if (_aDist) {
        //if qForward, do nothing. left hits can't be downstream.
-       if (qReverse) {
-         if (sameStrand) purgeDir = REVERSE_ONLY;
-         else if (diffStrand) purgeDir = FORWARD_ONLY;
+       if (_qReverse) {
+         if (_sameStrand) purgeDir = REVERSE_ONLY;
+         else if (_diffStrand) purgeDir = FORWARD_ONLY;
        }
-     } else if (bDist) {
-       if (qForward && sameStrand) purgeDir = FORWARD_ONLY;
-       else if (qReverse && diffStrand) purgeDir = FORWARD_ONLY;
+     } else if (_bDist) {
+       if (_qForward && _sameStrand) purgeDir = FORWARD_ONLY;
+       else if (_qReverse && _diffStrand) purgeDir = FORWARD_ONLY;
      }
    }
 

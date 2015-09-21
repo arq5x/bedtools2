@@ -12,7 +12,7 @@
 #include <list>
 #include <set>
 
-class ContextClosest;
+#include "ContextClosest.h"
 
 class distanceTuple {
 public:
@@ -107,6 +107,36 @@ private:
 	vector<int> _finalDistances;
 
 
+	//
+	// Some abbreviations to make the code less miserable.
+	//
+	bool _sameStrand;
+	bool _diffStrand;
+
+	bool _refDist;
+	bool _aDist;
+	bool _bDist;
+
+	bool _ignoreUpstream;
+	bool _ignoreDownstream;
+
+	bool _qForward;
+	bool _qReverse;
+	bool _dbForward;
+	bool _dbReverse;
+
+	ContextClosest::tieModeType _tieMode;
+	bool _firstTie;
+	bool _lastTie;
+	bool _allTies;
+
+	bool allHitsRightOfQueryIgnored(); //true if, no matter what the strands
+	// of the hit and query are, we'd ignore the hit so long as it's on the right
+	// of the query. Set only during initilization, this is strictly a function
+	// of the user provided arguments. Ex: -D ref -id
+
+
+
 	//structs to help with finding closest among all of multiple dbs.
 	RecordKeyVector _copyRetList;
 	vector<int> _copyDists;
@@ -115,6 +145,7 @@ private:
 	void masterScan(RecordKeyVector &retList);
     void scanCache(int dbIdx, RecordKeyVector &retList);
     bool chromChange(int dbIdx, RecordKeyVector &retList, bool wantScan);
+
 
  	typedef enum { IGNORE, DELETE } rateOvlpType;
     rateOvlpType considerRecord(const Record *cacheRec, int dbIdx, bool &stopScanning);
