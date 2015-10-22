@@ -1,22 +1,17 @@
-bedtools - a swiss army knife for genome arithmetic         
-===================================================
+![shamalamadingdong](https://github.com/arq5x/bedtools2/blob/master/docs/bedtools.swiss.png "foo")
+
+bedtools - the swiss army knife for genome arithmetic         
+=====================================================
 
 [Download current version](https://github.com/arq5x/bedtools2/releases/latest)
 
-Note
--------
-Stable release for bedtools were formerly archived on Google Code. Unfortunately, the Google Code
-downloads facility is shutting down; so henceforth, all source code and stable releases will be 
-maintained via this Github repository.
-
-**Full documentation**:  http://bedtools.readthedocs.org
+[Documentation](http://bedtools.readthedocs.org)
 
 Summary
 -------
 Collectively, the bedtools utilities are a swiss-army knife of tools for a wide-range of genomics analysis tasks. The most widely-used tools enable genome arithmetic: that is, set theory on the genome. For example, bedtools allows one to intersect, merge, count, complement, and shuffle genomic intervals from multiple files in widely-used genomic file formats such as BAM, BED, GFF/GTF, VCF.
 
 While each individual tool is designed to do a relatively simple task (e.g., intersect two interval files), quite sophisticated analyses can be conducted by combining multiple bedtools operations on the UNIX command line.
-
 
 Performance
 -----------
