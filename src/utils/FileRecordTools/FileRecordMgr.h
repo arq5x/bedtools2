@@ -107,6 +107,7 @@ public:
 	void setIsSorted(bool val) { _isSortedInput = val; }
 	void setIoBufSize(int val) { _ioBufSize = val; }
 	void setNoEnforceCoodSort(bool val) { _noEnforceCoordSort = val; }
+	void setIsGroupBy(bool val) { _isGroupBy = val; }
 
 protected:
 	int _fileIdx;
@@ -141,6 +142,7 @@ protected:
 	NewGenomeFile *_genomeFile;
 	int _ioBufSize;
 	bool _noEnforceCoordSort; //only true for GroupBy
+	bool _isGroupBy; //hopefully also only true for GroupBy
 
 	void allocateFileReader(bool inheader=false);
 	void testInputSortOrder(Record *record);
