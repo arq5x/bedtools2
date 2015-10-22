@@ -23,6 +23,7 @@ GroupBy::~GroupBy()
 
 bool GroupBy::init()
 {
+	cout << "what?\n";
 	Tokenizer groupColsTokens;
 	groupColsTokens.tokenize(upCast(_context)->getGroupCols(), ',');
 	int numElems = groupColsTokens.getNumValidElems();
@@ -60,7 +61,9 @@ bool GroupBy::findNext(RecordKeyVector &hits)
 	hits.setKey(_prevRecord);
 	hits.push_back(_prevRecord); //key should also be part of group for calculations
 	while (1) {
+		cout << "hi\n";
 		const Record *newRecord = getNextRecord();
+		cout << "hi2\n";
 		if (newRecord == NULL) {
 			_prevRecord = NULL;
 			break;
@@ -90,13 +93,17 @@ void GroupBy::processHits(RecordOutputMgr *outputMgr, RecordKeyVector &hits)
 		outBuf.append(opVal);
 		outputMgr->printRecord(NULL, outBuf);
 	}
+	cleanupHits(hits);
 }
 
 void GroupBy::cleanupHits(RecordKeyVector &hits)
 {
-	_queryFRM->deleteRecord(hits.getKey());
+	RecordKeyVector::const_iterator_type iter = hits.begin();
+	for (; iter != hits.end(); iter = hits.next()) 
+	{
+		_queryFRM->deleteRecord(*iter);	
+	}
 	hits.clearAll();
-
 }
 
 const Record *GroupBy::getNextRecord() {
