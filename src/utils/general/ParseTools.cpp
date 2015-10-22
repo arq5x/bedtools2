@@ -17,6 +17,19 @@ bool isNumeric(const QuickString &str) {
 	return true;
 }
 
+//As above, but does not allow decimal points
+bool isInteger(const QuickString &str) {
+	for (int i=0; i < (int)str.size(); i++) {
+		char currChar = str[i];
+		if (!(isdigit(currChar) || currChar == '-' || currChar == '+' || currChar == 'e' || currChar == 'E')) {
+			return false;
+		}
+	}
+	return true;
+}
+
+
+
 int str2chrPos(const QuickString &str) {
 	return str2chrPos(str.c_str(), str.size());
 }
@@ -30,7 +43,7 @@ int str2chrPos(const char *str, size_t ulen) {
 	//first test for exponents / scientific notation
 	bool hasExponent = false;
 	for (size_t i=0; i < ulen; i++) {
-		if (str[i] == 'e' || str[i] == 'E') {
+		if (str[i] == 'e' || str[i] == 'E' || str[i] == '.') {
 			std::istringstream ss(str);
 			double retVal;
 			ss >> retVal;

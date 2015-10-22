@@ -259,7 +259,7 @@ bool FileRecordTypeChecker::isBedFormat() {
 		return false;
 	}
 	//the 2nd and 3rd fields must be numeric.
-	if (!isNumeric(_tokenizer.getElem(1)) || !isNumeric(_tokenizer.getElem(2))) {
+	if (!isInteger(_tokenizer.getElem(1)) || !isInteger(_tokenizer.getElem(2))) {
 		return false;
 	}
 

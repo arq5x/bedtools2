@@ -23,7 +23,6 @@ GroupBy::~GroupBy()
 
 bool GroupBy::init()
 {
-	cout << "what?\n";
 	Tokenizer groupColsTokens;
 	groupColsTokens.tokenize(upCast(_context)->getGroupCols(), ',');
 	int numElems = groupColsTokens.getNumValidElems();
@@ -61,9 +60,7 @@ bool GroupBy::findNext(RecordKeyVector &hits)
 	hits.setKey(_prevRecord);
 	hits.push_back(_prevRecord); //key should also be part of group for calculations
 	while (1) {
-		cout << "hi\n";
 		const Record *newRecord = getNextRecord();
-		cout << "hi2\n";
 		if (newRecord == NULL) {
 			_prevRecord = NULL;
 			break;

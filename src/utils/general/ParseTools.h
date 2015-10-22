@@ -19,6 +19,7 @@
 using namespace std;
 
 bool isNumeric(const QuickString &str);
+bool isInteger(const QuickString &str);
 
 //This method is a faster version of atoi, but is limited to a maximum of
 //9 digit numbers in Base 10 only. The string may begin with a negative.
