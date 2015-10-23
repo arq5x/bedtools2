@@ -26,6 +26,8 @@ FileRecordTypeChecker::FileRecordTypeChecker()
 	_fourthFieldNumeric = false;
 	_givenEmptyBuffer = false;
 
+	// TO DO: Bed4, Bed5, and BedGraph are missing from all of these.
+
 	_hasName[UNKNOWN_RECORD_TYPE] = false;
 	_hasName[EMPTY_RECORD_TYPE] = false;
 	_hasName[BED3_RECORD_TYPE] = false;
@@ -58,7 +60,7 @@ FileRecordTypeChecker::FileRecordTypeChecker()
 	_hasStrand[BED3_RECORD_TYPE] = false;
 	_hasStrand[BED6_RECORD_TYPE] = true;
 	_hasStrand[BED12_RECORD_TYPE] = true;
-	_hasStrand[BED_PLUS_RECORD_TYPE] = false;
+	_hasStrand[BED_PLUS_RECORD_TYPE] = true; //actually, unknown. Give benefit of doubt.
 	_hasStrand[BED6_PLUS_RECORD_TYPE] = true;
 	_hasStrand[BAM_RECORD_TYPE] = true;
 	_hasStrand[VCF_RECORD_TYPE] = true;
@@ -201,6 +203,7 @@ bool FileRecordTypeChecker::handleTextFormat(const char *buffer, size_t len)
 				} else {
 					_fourthFieldNumeric = false;
 					_recordType = BED4_RECORD_TYPE;
+					_hasStrand[BED4_RECORD_TYPE] = isStrandField(3);
 				}
 			} else if (_numFields == 5 && passesBed5()) {
 				_recordType = BED5_RECORD_TYPE;
@@ -256,7 +259,7 @@ bool FileRecordTypeChecker::isBedFormat() {
 		return false;
 	}
 	//the 2nd and 3rd fields must be numeric.
-	if (!isNumeric(_tokenizer.getElem(1)) || !isNumeric(_tokenizer.getElem(2))) {
+	if (!isInteger(_tokenizer.getElem(1)) || !isInteger(_tokenizer.getElem(2))) {
 		return false;
 	}
 

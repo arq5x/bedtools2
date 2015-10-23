@@ -26,7 +26,8 @@ FileRecordMgr::FileRecordMgr(const QuickString &filename)
   _hasGenomeFile(false),
   _genomeFile(NULL),
   _ioBufSize(0),
-  _noEnforceCoordSort(false)
+  _noEnforceCoordSort(false),
+  _isGroupBy(false)
  {
 }
 
@@ -57,6 +58,14 @@ bool FileRecordMgr::open(bool inheader){
 
 	_fileType = _bufStreamMgr->getTypeChecker().getFileType();
 	_recordType = _bufStreamMgr->getTypeChecker().getRecordType();
+
+	//HACK: If groupBy and not Bam, over-ride file type.
+	if (_isGroupBy && _fileType != FileRecordTypeChecker::BAM_FILE_TYPE) {
+		_bufStreamMgr->getTypeChecker().setFileType(FileRecordTypeChecker::SINGLE_LINE_DELIM_TEXT_FILE_TYPE);
+		_bufStreamMgr->getTypeChecker().setRecordType(FileRecordTypeChecker::NO_POS_PLUS_RECORD_TYPE);
+		_fileType = FileRecordTypeChecker::SINGLE_LINE_DELIM_TEXT_FILE_TYPE;
+		_recordType = FileRecordTypeChecker::NO_POS_PLUS_RECORD_TYPE;
+	}
 	if (_fileType == FileRecordTypeChecker::UNKNOWN_FILE_TYPE || _recordType == FileRecordTypeChecker::UNKNOWN_RECORD_TYPE) {
 		cerr << "Error: Unable to determine type for file " << _filename << endl;
 		delete _bufStreamMgr;

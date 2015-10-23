@@ -38,26 +38,6 @@ bool ContextJaccard::isValidState()
 	if (!ContextIntersect::isValidState()) {
 		return false;
 	}
-	// Tests for stranded merge
-	//
-	if (_desiredStrand != FileRecordMergeMgr::ANY_STRAND) { // requested stranded merge
-		for (int i=0; i < getNumInputFiles(); i++) {
-			// make sure file has strand.
-			if (!getFile(i)->recordsHaveStrand()) {
-				_errorMsg = "\n***** ERROR: stranded merge requested, but input file ";
-				_errorMsg  += getInputFileName(i);
-				_errorMsg  += " does not have strands. *****";
-				return false;
-			}
-			//make sure file is not VCF.
-			if (getFile(1)->getFileType() == FileRecordTypeChecker::VCF_FILE_TYPE) {
-				_errorMsg = "\n***** ERROR: stranded merge not supported for VCF file ";
-				_errorMsg += getInputFileName(i);
-				_errorMsg += ". *****";
-				return false;
-			}
-		}
-	}
 	return true;
 }
 

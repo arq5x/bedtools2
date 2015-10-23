@@ -156,7 +156,8 @@ bool ContextBase::testCmdArgs(int argc, char **argv) {
 	_argc = argc;
 	_argv = argv;
 	_skipFirstArgs = 1;
-	setProgram(_programNames[argv[0]]);
+	_origProgramName = argv[0];
+	setProgram(_programNames[_origProgramName]);
 	_argsProcessed.resize(_argc - _skipFirstArgs, false);
 
 	if (!parseCmdArgs(argc, argv, 1) || getShowHelp() || !isValidState()) {
@@ -331,6 +332,7 @@ bool ContextBase::openFiles() {
 		frm->setFullBamFlags(_useFullBamTags);
 		frm->setIsSorted(_sortedInput);
 		frm->setIoBufSize(_ioBufSize);
+		frm->setIsGroupBy(_program == GROUP_BY);
 		if (!frm->open(_inheader)) {
 			return false;
 		}
@@ -771,3 +773,31 @@ void ContextBase::nameConventionWarning(const Record *record, const QuickString 
 
 	 cerr << _nameConventionWarningMsg << endl;
 }
+
+bool ContextBase::strandedToolSupported() {
+	//Test that all files have strands. Should be called if any tool
+	// invoked with sameStrand / diffStrand option.
+	for (int i=0; i < getNumInputFiles(); i++) {
+
+		// make sure file has strand.
+		if (!getFile(i)->recordsHaveStrand()) {
+			_errorMsg = "\n***** ERROR: stranded ";
+			_errorMsg += _origProgramName;
+			_errorMsg += " requested, but input file ";
+			_errorMsg  += getInputFileName(i);
+			_errorMsg  += " does not have strands. *****";
+			return false;
+		}
+		//make sure file is not VCF.
+		if (getFile(i)->getFileType() == FileRecordTypeChecker::VCF_FILE_TYPE) {
+			_errorMsg = "\n***** ERROR: stranded ";
+			_errorMsg += _origProgramName;
+			_errorMsg += " not supported for VCF file ";
+			_errorMsg += getInputFileName(i);
+			_errorMsg += ". *****";
+			return false;
+		}
+	}
+	return true;
+}
+

@@ -12,7 +12,7 @@
 #include <list>
 #include <set>
 
-class ContextClosest;
+#include "ContextClosest.h"
 
 class distanceTuple {
 public:
@@ -57,7 +57,7 @@ public:
 		return find(dist, dummyVal);
 	}
 	typedef pair<chromDirType, const Record *> elemPairType;
-	typedef vector<elemPairType>elemsType;
+	typedef vector<elemPairType> elemsType;
 	typedef pair<int, int> indexType;
 
 	int getMaxDist() const { return _empty ? 0 : _distIndex[_currNumIdxs-1].first; }
@@ -107,6 +107,36 @@ private:
 	vector<int> _finalDistances;
 
 
+	//
+	// Some abbreviations to make the code less miserable.
+	//
+	bool _sameStrand;
+	bool _diffStrand;
+
+	bool _refDist;
+	bool _aDist;
+	bool _bDist;
+
+	bool _ignoreUpstream;
+	bool _ignoreDownstream;
+
+	bool _qForward;
+	bool _qReverse;
+	bool _dbForward;
+	bool _dbReverse;
+
+	ContextClosest::tieModeType _tieMode;
+	bool _firstTie;
+	bool _lastTie;
+	bool _allTies;
+
+	bool allHitsRightOfQueryIgnored(); //true if, no matter what the strands
+	// of the hit and query are, we'd ignore the hit so long as it's on the right
+	// of the query. Set only during initilization, this is strictly a function
+	// of the user provided arguments. Ex: -D ref -id
+
+
+
 	//structs to help with finding closest among all of multiple dbs.
 	RecordKeyVector _copyRetList;
 	vector<int> _copyDists;
@@ -116,6 +146,7 @@ private:
     void scanCache(int dbIdx, RecordKeyVector &retList);
     bool chromChange(int dbIdx, RecordKeyVector &retList, bool wantScan);
 
+
  	typedef enum { IGNORE, DELETE } rateOvlpType;
     rateOvlpType considerRecord(const Record *cacheRec, int dbIdx, bool &stopScanning);
     void finalizeSelections(int dbIdx, RecordKeyVector &retList);
@@ -123,15 +154,15 @@ private:
 
     typedef enum { LEFT, OVERLAP, RIGHT } chromDirType;
     typedef enum { UPSTREAM, INTERSECT, DOWNSTREAM } streamDirType;
+    typedef enum { NEITHER, FORWARD_ONLY, REVERSE_ONLY, BOTH } purgeDirectionType;
 
     void setLeftClosestEndPos(int dbIdx);
     bool beforeLeftClosestEndPos(int dbIdx, const Record *rec);
     void clearClosestEndPos(int dbIdx);
-    bool canStopScan(const Record *cacheRec, bool ignored, streamDirType streamDir);
     int addRecsToRetList(const RecDistList::elemsType *recs, int currDist, RecordKeyVector &retList);
     void addSingleRec(const Record *rec, int currDist, int &hitsUsed, RecordKeyVector &retList);
     rateOvlpType tryToAddRecord(const Record *cacheRec, int dist, int dbIdx, bool &stopScanning, chromDirType chromDir, streamDirType streamDir);
-    bool purgePointException(int dbIdx);
+    purgeDirectionType purgePointException(int dbIdx);
 
 };
 

@@ -159,6 +159,7 @@ protected:
 	vector<FileRecordMgr *> _files;
 	bool _allFilesOpened;
 	map<QuickString, PROGRAM_TYPE> _programNames;
+	QuickString _origProgramName;
 
 	NewGenomeFile *_genomeFile;
 
@@ -302,6 +303,7 @@ protected:
     //private error handler
     void setErrorMsg(QuickString &msg, bool onlyWarn, const Record * record, QuickString str1, const QuickString str2, const QuickString str3);
 
+    bool strandedToolSupported();
 
 };
 
