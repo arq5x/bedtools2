@@ -304,9 +304,11 @@ void BedGenomeCoverage::CoverageBam(string bamFile) {
             }
         } else if (_haveSize) {
             if(bam.IsReverseStrand()) {
-                AddCoverage(end-_fragmentSize, end);
+                int pos = end-_fragmentSize;
+                pos>0?pos:0;
+                AddCoverage(pos, end);
             } else {
-                AddCoverage(start,start+-_fragmentSize);
+                AddCoverage(start,start+_fragmentSize);
             }
         } else
         // add coverage accordingly.
