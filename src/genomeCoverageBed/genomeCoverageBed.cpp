@@ -20,6 +20,7 @@ BedGenomeCoverage::BedGenomeCoverage(string bedFile, string genomeFile,
                                      bool bamInput, bool obeySplits,
                                      bool filterByStrand, string requestedStrand,
                                      bool only_5p_end, bool only_3p_end,
+                                     bool pair_chip, bool haveSize, int fragmentSize,
                                      bool eachBaseZeroBased,
                                      bool add_gb_track_line, string gb_track_line_opts) {
 
@@ -38,6 +39,9 @@ BedGenomeCoverage::BedGenomeCoverage(string bedFile, string genomeFile,
     _requestedStrand = requestedStrand;
     _only_3p_end = only_3p_end;
     _only_5p_end = only_5p_end;
+    _pair_chip_ = pair_chip;
+    _haveSize = haveSize;
+    _fragmentSize = fragmentSize;
     _add_gb_track_line = add_gb_track_line;
     _gb_track_line_opts = gb_track_line_opts;
     _currChromName = "";
@@ -272,7 +276,39 @@ void BedGenomeCoverage::CoverageBam(string bamFile) {
         // are we on a new chromosome?
         if ( chrom != _currChromName )
             StartNewChrom(chrom);
+        if(_pair_chip_) {
+            // Skip if not a proper pair
+            if (bam.IsPaired() && (!bam.IsProperPair() or !bam.IsMateMapped()) )
+                continue;
+            // Skip if wrong coordinates
+            if( ( (bam.Position<bam.MatePosition) && bam.IsReverseStrand() ) ||
+                ( (bam.MatePosition < bam.Position) && bam.IsMateReverseStrand() ) ) {
+                    //chemically designed: left on positive strand, right on reverse one
+                    continue;
+            }
 
+            if(_haveSize) {
+                if (bam.IsFirstMate() && bam.IsReverseStrand()) { //put fragmentSize in to the middle of pair end_fragment
+                    AddCoverage(bam.MatePosition+bam.InsertSize/2-_fragmentSize/2, bam.MatePosition+bam.InsertSize/2+_fragmentSize/2);
+                }
+                else if (bam.IsFirstMate() && bam.IsMateReverseStrand()) { //put fragmentSize in to the middle of pair end_fragment
+                    AddCoverage(start+bam.InsertSize/2-_fragmentSize/2, start+bam.InsertSize/2+_fragmentSize/2);
+                }
+            } else {
+                if (bam.IsFirstMate() && bam.IsReverseStrand()) { //prolong to the mate to the left
+                    AddCoverage(bam.MatePosition, end);
+                }
+                else if (bam.IsFirstMate() && bam.IsMateReverseStrand()) { //prolong to the mate to the right
+                    AddCoverage(start, start + bam.InsertSize - 1);
+                }
+            }
+        } else if (_haveSize) {
+            if(bam.IsReverseStrand()) {
+                AddCoverage(end-_fragmentSize, end);
+            } else {
+                AddCoverage(start,start+-_fragmentSize);
+            }
+        } else
         // add coverage accordingly.
         if (!_only_5p_end && !_only_3p_end) {
             bedVector bedBlocks;
