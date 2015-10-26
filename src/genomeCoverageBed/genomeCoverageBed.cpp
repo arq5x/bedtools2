@@ -289,10 +289,18 @@ void BedGenomeCoverage::CoverageBam(string bamFile) {
 
             if(_haveSize) {
                 if (bam.IsFirstMate() && bam.IsReverseStrand()) { //put fragmentSize in to the middle of pair end_fragment
-                    AddCoverage(bam.MatePosition+bam.InsertSize/2-_fragmentSize/2, bam.MatePosition+bam.InsertSize/2+_fragmentSize/2);
+                    int mid = bam.MatePosition+abs(bam.InsertSize)/2;
+                    if(mid<_fragmentSize/2)
+                        AddCoverage(0, mid+_fragmentSize/2);
+                    else
+                        AddCoverage(mid-_fragmentSize/2, mid+_fragmentSize/2);
                 }
                 else if (bam.IsFirstMate() && bam.IsMateReverseStrand()) { //put fragmentSize in to the middle of pair end_fragment
-                    AddCoverage(start+bam.InsertSize/2-_fragmentSize/2, start+bam.InsertSize/2+_fragmentSize/2);
+                    int mid = start+abs(bam.InsertSize)/2;
+                    if(mid<_fragmentSize/2)
+                        AddCoverage(0, mid+_fragmentSize/2);
+                    else
+                        AddCoverage(mid-_fragmentSize/2, mid+_fragmentSize/2);
                 }
             } else {
                 if (bam.IsFirstMate() && bam.IsReverseStrand()) { //prolong to the mate to the left
@@ -304,9 +312,11 @@ void BedGenomeCoverage::CoverageBam(string bamFile) {
             }
         } else if (_haveSize) {
             if(bam.IsReverseStrand()) {
-                int pos = end-_fragmentSize;
-                pos>0?pos:0;
-                AddCoverage(pos, end);
+                if(end<_fragmentSize) { //sometimes fragmentSize is bigger :(
+                    AddCoverage(0, end);
+                } else {
+                    AddCoverage(end - _fragmentSize, end);
+                }
             } else {
                 AddCoverage(start,start+_fragmentSize);
             }
