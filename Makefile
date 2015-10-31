@@ -109,61 +109,61 @@ UTIL_SUBDIRS =	$(SRC_DIR)/utils/FileRecordTools \
 				$(SRC_DIR)/utils/GenomeFile \
 				$(SRC_DIR)/utils/RecordOutputMgr \
 				$(SRC_DIR)/utils/ToolBase \
-				$(SRC_DIR)/utils/driver \
-				$(SRC_DIR)/utils/htslib
+				$(SRC_DIR)/utils/driver
 
-BUILT_OBJECTS = $(OBJ_DIR)/*.o
-
-
-REAL_SRC_DIR=$(shell pwd)/$(SRC_DIR)
-
-INCLUDES =	-I"$(REAL_SRC_DIR)/utils/bedFile" \
-				-I"$(REAL_SRC_DIR)/utils/BinTree" \
-				-I"$(REAL_SRC_DIR)/utils/version" \
-				-I"$(REAL_SRC_DIR)/utils/bedGraphFile" \
-				-I"$(REAL_SRC_DIR)/utils/chromsweep" \
-				-I"$(REAL_SRC_DIR)/utils/Contexts" \
-				-I"$(REAL_SRC_DIR)/utils/FileRecordTools" \
-				-I"$(REAL_SRC_DIR)/utils/FileRecordTools/FileReaders" \
-				-I"$(REAL_SRC_DIR)/utils/FileRecordTools/Records" \
-				-I"$(REAL_SRC_DIR)/utils/general" \
-				-I"$(REAL_SRC_DIR)/utils/gzstream" \
-				-I"$(REAL_SRC_DIR)/utils/fileType" \
-				-I"$(REAL_SRC_DIR)/utils/gzstream/" \
-				-I"$(REAL_SRC_DIR)/utils/lineFileUtilities" \
-				-I"$(REAL_SRC_DIR)/utils/KeyListOps" \
-				-I"$(REAL_SRC_DIR)/utils/NewChromsweep" \
-				-I"$(REAL_SRC_DIR)/utils/sequenceUtilities" \
-				-I"$(REAL_SRC_DIR)/utils/tabFile" \
-				-I"$(REAL_SRC_DIR)/utils/BamTools/include" \
-				-I"$(REAL_SRC_DIR)/utils/BamTools-Ancillary" \
-				-I"$(REAL_SRC_DIR)/utils/BlockedIntervals" \
-				-I"$(REAL_SRC_DIR)/utils/Fasta" \
-				-I"$(REAL_SRC_DIR)/utils/VectorOps" \
-				-I"$(REAL_SRC_DIR)/utils/GenomeFile" \
-				-I"$(REAL_SRC_DIR)/utils/RecordOutputMgr" \
-				-I"$(REAL_SRC_DIR)/utils/ToolBase" \
-				-I"$(REAL_SRC_DIR)/utils/driver" \
-				-I"$(REAL_SRC_DIR)/utils/htslib"
+INCLUDES =		$(addprefix -I,$(SUBDIRS) $(UTIL_SUBDIRS)) \
+				-I$(SRC_DIR)/utils/BamTools/include \
+				-I$(HTSDIR) \
+				-I$(SRC_DIR)/utils/lineFileUtilities \
+				-I$(SRC_DIR)/utils/Point \
+				-I$(SRC_DIR)/utils/stringUtilities
 
 
-all: print_banner $(OBJ_DIR) $(BIN_DIR) autoversion $(UTIL_SUBDIRS) $(SUBDIRS)
+all: print_banner $(BIN_DIR)/bedtools $(BIN_DIR)/intersectBed
+
+BUILT_OBJECTS = $(OBJ_DIR)/bedtools.o
+# Include all the Makefile fragments, which add to $(BUILT_OBJECTS)
+include $(patsubst %,%/Makefile.frag,$(SUBDIRS) $(UTIL_SUBDIRS))
+
+## Automatically generate C++ dependencies.
+## $(DEPFLAGS) is a set of compiler flags that causes the compiler to generate
+## dependencies as a byproduct (which we write to a temporary file, only moving
+## it into place on successful compilations).
+## We then include the dependency files into this Makefile.
+## The subdirectories' Makefile fragments contain rules like the one for
+## $(OBJ_DIR)/bedtools.o below, with a dependency on obj/foo.d so that if
+## the dependency file is missing the target will be rebuilt.
+##
+DEPFLAGS = -MT $@ -MMD -MP -MF $*.Td
+
+define CXX_COMPILE
+@echo "  * compiling $<"
+$(CCPREFIX)$(CXX) $(CXXFLAGS) $(CPPFLAGS) $(INCLUDES) $(DEPFLAGS) -c -o $@ $<
+@mv -f $*.Td $*.d
+endef
+
+$(OBJ_DIR)/%.d: ;
+.PRECIOUS: $(OBJ_DIR)/%.d
+
+-include $(patsubst %.o,%.d,$(BUILT_OBJECTS))
+
+$(OBJ_DIR)/bedtools.o: $(SRC_DIR)/bedtools.cpp $(OBJ_DIR)/bedtools.d
+	$(CXX_COMPILE)
+
+# HTSlib's htslib.mk provides rules to rebuild $(HTSDIR)/libhts.a.
+HTSDIR = src/utils/htslib
+include $(HTSDIR)/htslib.mk
+
+# This order-only prerequisite ensures OBJ_DIR exists before building any .o file
+# but ignores the directory's timestamp, which changes every time a .o file is written.
+$(BUILT_OBJECTS): | $(OBJ_DIR)
+
+$(BIN_DIR)/bedtools: autoversion $(BUILT_OBJECTS) $(HTSDIR)/libhts.a | $(BIN_DIR)
 	@echo "- Building main bedtools binary."
-	$(CCPREFIX) $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c src/bedtools.cpp -o obj/bedtools.o $(INCLUDES)
-	$(CCPREFIX) $(CXX) -o $(BIN_DIR)/bedtools $(BUILT_OBJECTS) $(SRC_DIR)/utils/htslib/libhts.a $(LIBS) $(LDFLAGS)
+	$(CCPREFIX) $(CXX) $(LDFLAGS) -o $(BIN_DIR)/bedtools $(BUILT_OBJECTS) $(HTSDIR)/libhts.a $(LIBS)
 	@echo "done."
 
-	@echo "- Creating executables for old CLI."
-	@python scripts/makeBashScripts.py
-	@chmod +x bin/*
-	@echo "done."
-
-all-static: print_banner $(OBJ_DIR) $(BIN_DIR) autoversion $(UTIL_SUBDIRS) $(SUBDIRS)
-	@echo "- Building main bedtools binary."
-	$(CCPREFIX) $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c src/bedtools.cpp -o obj/bedtools.o $(INCLUDES)
-	$(CCPREFIX) $(CXX) -static -o $(BIN_DIR)/bedtools $(BUILT_OBJECTS) $(SRC_DIR)/utils/htslib/libhts.a $(LIBS) $(LDFLAGS)
-	@echo "done."
-
+$(BIN_DIR)/intersectBed: | $(BIN_DIR)
 	@echo "- Creating executables for old CLI."
 	@python scripts/makeBashScripts.py
 	@chmod +x bin/*
@@ -181,21 +181,13 @@ install: all
 print_banner:
 	@echo "Building BEDTools:"
 	@echo "========================================================="
-	$(info $$CXXFLAGS is [${CXXFLAGS}])
+	@echo "CXXFLAGS is [$(CXXFLAGS)]"
 .PHONY: print_banner
 
 # make the "obj/" and "bin/" directories, if they don't exist
 $(OBJ_DIR) $(BIN_DIR):
 	@mkdir -p $@
 
-
-
-# even though these are real directories, treat them as phony targets, forcing to always go in them are re-make.
-# a future improvement would be the check for the compiled object, and rebuild only if the source code is newer.
-.PHONY: $(UTIL_SUBDIRS) $(SUBDIRS)
-$(UTIL_SUBDIRS) $(SUBDIRS): $(OBJ_DIR) $(BIN_DIR)
-	@echo "- Building in $@"
-	@$(MAKE) --no-print-directory --directory=$@
 
 # Usually HTSlib's configure script has not been used (detected via config.mk
 # not existing), so clean should also remove the generated config.h.
