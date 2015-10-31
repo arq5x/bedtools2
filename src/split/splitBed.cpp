@@ -9,6 +9,8 @@
 ******************************************************************************/
 #include <cmath>
 #include <climits>
+#include <sstream>
+#include <iomanip>
 #include <inttypes.h>
 #include <getopt.h>
 #include "lineFileUtilities.h"
@@ -145,11 +147,10 @@ int BedSplit::main(int argc,char** argv)
 
 std::FILE* BedSplit::saveFileChunk(std::string& filename,size_t file_index)
    {
-    
-    char tmp[10];
-    filename.assign(this->outfileprefix);
-    sprintf(tmp,"%05d",(file_index+1));
-    filename.append(".").append(tmp).append(".bed");
+    ostringstream name;
+    name << this->outfileprefix << '.'
+         << setfill('0') << setw(5) << file_index+1 << ".bed";
+    filename = name.str();
     FILE* out = fopen(filename.c_str(),"w");
     
     if(out==NULL)
