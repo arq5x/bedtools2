@@ -12,30 +12,33 @@ RELEASED_VERSION_FILE=./src/utils/version/version_release.txt
 
 # define our object and binary directories
 ifeq ($(VERBOSE),1)
-export CCPREFIX = 
+CCPREFIX =
 else
-export CCPREFIX = @
+CCPREFIX = @
 endif
-export OBJ_DIR	= obj
-export BIN_DIR	= bin
-export SRC_DIR	= src
-export UTIL_DIR	= src/utils
-export CXX		= g++
+OBJ_DIR	= obj
+BIN_DIR	= bin
+SRC_DIR	= src
+
+CXX     = g++
+
 ifeq ($(DEBUG),1)
-export CXXFLAGS = -Wconversion -Wall -Wextra -DDEBUG -D_DEBUG -g -O0 -D_FILE_OFFSET_BITS=64 -DWITH_HTS_CB_API $(INCLUDES)
+BT_CPPFLAGS = -DDEBUG -D_DEBUG -D_FILE_OFFSET_BITS=64 -DWITH_HTS_CB_API $(INCLUDES)
+BT_CXXFLAGS = -Wconversion -Wall -Wextra -g -O0
 else
-export CXXFLAGS = -g -Wall -O2 -D_FILE_OFFSET_BITS=64 -DWITH_HTS_CB_API $(INCLUDES)
+BT_CPPFLAGS = -D_FILE_OFFSET_BITS=64 -DWITH_HTS_CB_API $(INCLUDES)
+BT_CXXFLAGS = -g -Wall -O2
 endif
 
 # If the user has specified to do so, tell the compile to use rand() (instead of mt19937).
 ifeq ($(USE_RAND),1)
-export CXXFLAGS += -DUSE_RAND
+BT_CXXFLAGS += -DUSE_RAND
 else
-export CXXFLAGS += -std=c++11
-endif 
+BT_CXXFLAGS += -std=c++11
+endif
 
-export LIBS		= -lz -lm -lbz2 -llzma -lpthread
-export BT_ROOT  = src/utils/BamTools/
+BT_LDFLAGS =
+BT_LIBS    = -lz -lm -lbz2 -llzma -lpthread
 
 prefix ?= /usr/local
 
@@ -119,6 +122,13 @@ INCLUDES =		$(addprefix -I,$(SUBDIRS) $(UTIL_SUBDIRS)) \
 				-I$(SRC_DIR)/utils/stringUtilities
 
 
+# Ensure that the user's $CXXFLAGS/etc are applied after bedtools's.
+ALL_CXXFLAGS = $(BT_CXXFLAGS) $(CXXFLAGS)
+ALL_CPPFLAGS = $(BT_CPPFLAGS) $(CPPFLAGS)
+ALL_LDFLAGS  = $(BT_LDFLAGS) $(LDFLAGS)
+ALL_LIBS     = $(BT_LIBS) $(LIBS)
+
+
 all: print_banner $(BIN_DIR)/bedtools $(BIN_DIR)/intersectBed
 
 BUILT_OBJECTS = $(OBJ_DIR)/bedtools.o
@@ -138,7 +148,7 @@ DEPFLAGS = -MT $@ -MMD -MP -MF $*.Td
 
 define CXX_COMPILE
 @echo "  * compiling $<"
-$(CCPREFIX)$(CXX) $(CXXFLAGS) $(CPPFLAGS) $(INCLUDES) $(DEPFLAGS) -c -o $@ $<
+$(CCPREFIX)$(CXX) $(ALL_CXXFLAGS) $(ALL_CPPFLAGS) $(DEPFLAGS) -c -o $@ $<
 @mv -f $*.Td $*.d
 endef
 
@@ -160,7 +170,7 @@ $(BUILT_OBJECTS): | $(OBJ_DIR)
 
 $(BIN_DIR)/bedtools: autoversion $(BUILT_OBJECTS) $(HTSDIR)/libhts.a | $(BIN_DIR)
 	@echo "- Building main bedtools binary."
-	$(CCPREFIX) $(CXX) $(LDFLAGS) -o $(BIN_DIR)/bedtools $(BUILT_OBJECTS) $(HTSDIR)/libhts.a $(LIBS)
+	$(CCPREFIX)$(CXX) $(ALL_LDFLAGS) -o $(BIN_DIR)/bedtools $(BUILT_OBJECTS) $(HTSDIR)/libhts.a $(ALL_LIBS)
 	@echo "done."
 
 $(BIN_DIR)/intersectBed: | $(BIN_DIR)
@@ -181,7 +191,7 @@ install: all
 print_banner:
 	@echo "Building BEDTools:"
 	@echo "========================================================="
-	@echo "CXXFLAGS is [$(CXXFLAGS)]"
+	@echo "CXXFLAGS is [$(ALL_CXXFLAGS)]"
 .PHONY: print_banner
 
 # make the "obj/" and "bin/" directories, if they don't exist

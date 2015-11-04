@@ -34,5 +34,7 @@
 
 BUILT_OBJECTS += obj/gzstream.o
 
+# Uses $(CPPFLAGS) rather than $(ALL_CPPFLAGS) to avoid bedtools includes etc.
+
 obj/gzstream.o: src/utils/gzstream/gzstream.C src/utils/gzstream/gzstream.h
-	$(CXX) $(CXXFLAGS) -I$(<D) $(CPPFLAGS) -c -o $@ $<
+	$(CXX) $(ALL_CXXFLAGS) -I$(<D) $(CPPFLAGS) -c -o $@ $<
