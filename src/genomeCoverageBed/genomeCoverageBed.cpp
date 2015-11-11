@@ -20,7 +20,7 @@ BedGenomeCoverage::BedGenomeCoverage(string bedFile, string genomeFile,
                                      bool bamInput, bool obeySplits,
                                      bool filterByStrand, string requestedStrand,
                                      bool only_5p_end, bool only_3p_end,
-                                     bool pair_chip, bool haveSize, int fragmentSize,
+                                     bool pair_chip, bool haveSize, int fragmentSize, bool dUTP,
                                      bool eachBaseZeroBased,
                                      bool add_gb_track_line, string gb_track_line_opts) {
 
@@ -42,6 +42,7 @@ BedGenomeCoverage::BedGenomeCoverage(string bedFile, string genomeFile,
     _pair_chip_ = pair_chip;
     _haveSize = haveSize;
     _fragmentSize = fragmentSize;
+    _dUTP = dUTP;
     _add_gb_track_line = add_gb_track_line;
     _gb_track_line_opts = gb_track_line_opts;
     _currChromName = "";
@@ -262,10 +263,16 @@ void BedGenomeCoverage::CoverageBam(string bamFile) {
         if (bam.IsMapped() == false)
             continue;
 
+        bool _isReverseStrand = bam.IsReverseStrand();
+
+        //changing second mate's strand to opposite
+        if( _dUTP && bam.IsPaired() && bam.IsMateMapped() && bam.IsSecondMate())
+            _isReverseStrand = !bam.IsReverseStrand();
+
         // skip if we care about strands and the strand isn't what
         // the user wanted
         if ( (_filterByStrand == true) &&
-             ((_requestedStrand == "-") != bam.IsReverseStrand()) )
+             ((_requestedStrand == "-") != _isReverseStrand) )
             continue;
 
         // extract the chrom, start and end from the BAM alignment
@@ -287,7 +294,7 @@ void BedGenomeCoverage::CoverageBam(string bamFile) {
                     continue;
             }
 
-            if(_haveSize) {
+            /*if(_haveSize) {
                 if (bam.IsFirstMate() && bam.IsReverseStrand()) { //put fragmentSize in to the middle of pair end_fragment
                     int mid = bam.MatePosition+abs(bam.InsertSize)/2;
                     if(mid<_fragmentSize/2)
@@ -302,23 +309,23 @@ void BedGenomeCoverage::CoverageBam(string bamFile) {
                     else
                         AddCoverage(mid-_fragmentSize/2, mid+_fragmentSize/2);
                 }
-            } else {
-                if (bam.IsFirstMate() && bam.IsReverseStrand()) { //prolong to the mate to the left
-                    AddCoverage(bam.MatePosition, end);
-                }
-                else if (bam.IsFirstMate() && bam.IsMateReverseStrand()) { //prolong to the mate to the right
-                    AddCoverage(start, start + bam.InsertSize - 1);
-                }
+            } else */
+
+            if (bam.IsFirstMate() && bam.IsReverseStrand()) { //prolong to the mate to the left
+                AddCoverage(bam.MatePosition, end);
+            }
+            else if (bam.IsFirstMate() && bam.IsMateReverseStrand()) { //prolong to the mate to the right
+                AddCoverage(start, start + bam.InsertSize - 1);
             }
         } else if (_haveSize) {
             if(bam.IsReverseStrand()) {
                 if(end<_fragmentSize) { //sometimes fragmentSize is bigger :(
                     AddCoverage(0, end);
                 } else {
-                    AddCoverage(end - _fragmentSize, end);
+                    AddCoverage(end + 1 - _fragmentSize, end );
                 }
             } else {
-                AddCoverage(start,start+_fragmentSize);
+                AddCoverage(start,start+_fragmentSize - 1);
             }
         } else
         // add coverage accordingly.
