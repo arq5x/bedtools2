@@ -81,14 +81,16 @@ void NewChromSweep::closeOut(bool testChromOrderVal) {
         testChromOrder(_currQueryRec);
         _queryFRM->deleteRecord(_currQueryRec);
     }
-    if (testChromOrderVal) testChromOrder(_currQueryRec);
-
-    for (int i=0; i < _numDBs; i++) {
-        while (!_dbFRMs[i]->eof()) {
+    if (testChromOrderVal) {
+        testChromOrder(_currQueryRec);
+        for (int i=0; i < _numDBs; i++) {
+            while (!_dbFRMs[i]->eof()) {
+                if (testChromOrderVal) testChromOrder(_currDbRecs[i]);
+                _dbFRMs[i]->deleteRecord(_currDbRecs[i]);
+                nextRecord(false, i);
+            }
             if (testChromOrderVal) testChromOrder(_currDbRecs[i]);
-            nextRecord(false, i);
         }
-           if (testChromOrderVal) testChromOrder(_currDbRecs[i]);
     }
 }
 
@@ -162,7 +164,8 @@ void NewChromSweep::masterScan(RecordKeyVector &retList) {
             // advance the db until we are ahead of the query. update hits and cache as necessary
             while (_currDbRecs[i] != NULL &&
                     _currQueryRec->sameChrom(_currDbRecs[i]) &&
-                    !(_currDbRecs[i]->after(_currQueryRec))) {
+                    !(_currDbRecs[i]->after(_currQueryRec))) 
+            {
                 if (intersects(_currQueryRec, _currDbRecs[i])) {
                     retList.push_back(_currDbRecs[i]);
                 }
@@ -235,7 +238,10 @@ bool NewChromSweep::next(RecordKeyVector &retList) {
         needTestSortOrder = true;
     }
 
-    if (!nextRecord(true)) return false; // query EOF hit
+    if (!nextRecord(true)) { // query EOF hit
+        return false; 
+    }
+
     retList.setKey(_currQueryRec);
 
     if (needTestSortOrder) testChromOrder(_currQueryRec);

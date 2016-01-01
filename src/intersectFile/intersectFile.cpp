@@ -76,8 +76,12 @@ void IntersectFile::cleanupHits(RecordKeyVector &hits)
 
 bool IntersectFile::finalizeCalculations()
 {
-    if (upCast(_context)->getSortedInput() && !upCast(_context)->hasGenomeFile()) {
-    	_sweep->closeOut(true);
+    if (upCast(_context)->getSortedInput() && !upCast(_context)->hasGenomeFile()) 
+    {
+        if (_context->getNameCheckDisabled())
+            _sweep->closeOut(false);
+        else
+            _sweep->closeOut(true);
     }
     return true;
 }
