@@ -45,7 +45,7 @@ void Bed4Interval::printNull(QuickString &outBuf) const
 {
 	Bed3Interval::printNull(outBuf);
 	outBuf.append('\t');
-	outBuf.append("\t.", 2);
+	outBuf.append(".");
 }
 
 const QuickString &Bed4Interval::getField(int fieldNum) const
