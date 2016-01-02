@@ -33,8 +33,8 @@ _dbFileType(FileRecordTypeChecker::UNKNOWN_FILE_TYPE)
 
 	_opCodes["collapse"] = COLLAPSE;
 	_opCodes["concat"] = CONCAT;
-	_opCodes["freq_asc"] = FREQ_ASC;
-	_opCodes["freq_desc"] = FREQ_DESC;
+	_opCodes["freqasc"] = FREQ_ASC;
+	_opCodes["freqdesc"] = FREQ_DESC;
 	_opCodes["first"] = FIRST;
 	_opCodes["last"] = LAST;
 
