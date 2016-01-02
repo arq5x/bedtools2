@@ -174,7 +174,6 @@ bool FileRecordTypeChecker::handleTextFormat(const char *buffer, size_t len)
 	if (isVCFformat(buffer)) {
 		return isTextDelimtedFormat(buffer, len);
 	} else if (isTextDelimtedFormat(buffer, len)) {
-
 		//At this point, _isText and _isDelimited are set. _numFields and _delimChar are
 		//set.
 		_fileType = SINGLE_LINE_DELIM_TEXT_FILE_TYPE;
@@ -396,6 +395,10 @@ bool FileRecordTypeChecker::isTextDelimtedFormat(const char *buffer, size_t len)
 	if (delimiterTesting(tabCounts, '\t')) {
 		return true;
 	}
+	else if (validLinesFound) {
+		return true;
+	}
+
 	if (delimiterTesting(commaCounts, ',')) {
 		return true;
 	}
@@ -427,7 +430,10 @@ bool FileRecordTypeChecker::delimiterTesting(vector<int> &counts, char suspectCh
 			return false;
 		}
 	}
-	return false;
+	else { // there is just a single column with no delimiter.
+		_numFields = 1;
+		return false;
+	}
 }
 
 
