@@ -143,7 +143,7 @@ double KeyListOpsMethods::getMin() {
 	double minVal = DBL_MAX;
 	for (begin(); !end(); next()) {
 		double currVal = getColValNum();
-		minVal = (currVal < minVal) ? currVal : minVal;
+		minVal = ((float) currVal <= (float) minVal) ? currVal : minVal;
 	}
 	return  minVal;
 }
@@ -155,7 +155,7 @@ double KeyListOpsMethods::getMax() {
 	double maxVal = DBL_MIN;
 	for (begin(); !end(); next()) {
 		double currVal = getColValNum();
-		maxVal = (currVal > maxVal) ? currVal : maxVal;
+		maxVal = ((float) currVal >= (float) maxVal) ? currVal : maxVal;
 	}
 	return maxVal;
 }
@@ -167,7 +167,7 @@ double KeyListOpsMethods::getAbsMin() {
 	double minVal = DBL_MAX;
 	for (begin(); !end(); next()) {
 		double currVal = abs(getColValNum());
-		minVal = (currVal < minVal) ? currVal : minVal;
+		minVal = ((float)currVal <= (float)minVal) ? currVal : minVal;
 	}
 	return minVal;
 }
@@ -178,7 +178,7 @@ double KeyListOpsMethods::getAbsMax() {
 	double maxVal = DBL_MIN;
 	for (begin(); !end(); next()) {
 		double currVal = abs(getColValNum());
-		maxVal = (currVal > maxVal) ? currVal : maxVal;
+		maxVal = ((float)currVal >= (float)maxVal) ? currVal : maxVal;
 	}
 	return maxVal;
 }
