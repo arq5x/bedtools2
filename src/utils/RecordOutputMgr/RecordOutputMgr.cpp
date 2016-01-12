@@ -235,7 +235,6 @@ void RecordOutputMgr::printRecord(RecordKeyVector &keyList, RecordKeyVector *blo
 				if ((static_cast<ContextIntersect *>(_context))->getWriteAllOverlap()) {
 					// -wao the user wants to force the reporting of 0 overlap
 					if (printKeyAndTerminate(keyList)) {
-
 						_currBamBlockList = NULL;
 						const_cast<Record *>(keyList.getKey())->adjustZeroLength();
 
@@ -507,6 +506,10 @@ void RecordOutputMgr::null(bool queryType, bool dbType)
 		break;
 	case FileRecordTypeChecker::GFF_RECORD_TYPE:
 		dummyRecord = new GffRecord();
+		(static_cast<GffRecord *>(dummyRecord))->setNumFields((static_cast<ContextIntersect *>(_context))->getMaxNumDatabaseFields());
+		break;
+	case FileRecordTypeChecker::GFF_PLUS_RECORD_TYPE:
+		dummyRecord = new GffPlusRecord();
 		(static_cast<GffRecord *>(dummyRecord))->setNumFields((static_cast<ContextIntersect *>(_context))->getMaxNumDatabaseFields());
 		break;
 	default:

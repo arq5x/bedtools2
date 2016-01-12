@@ -673,27 +673,47 @@ check exp obs
 rm exp obs
 
 echo "    intersect.t56...\c"
-echo "chr1	10	20	a1	1	+	chr1	8	12	b1	1	+
-chr2	10	20	a2	1	-	chr2	8	12	b2	1	+" > exp
-$BT intersect -a x.bed -b y.bed -f 0.19 -F 0.21 -wa -wb > obs
+echo "\c" > exp
+$BT intersect -a x.bed -b y.bed -f 0.21 -r -wa -wb > obs
 check exp obs
 rm exp obs
 
 echo "    intersect.t57...\c"
 echo "chr1	10	20	a1	1	+	chr1	8	12	b1	1	+
 chr2	10	20	a2	1	-	chr2	8	12	b2	1	+" > exp
-$BT intersect -a x.bed -b y.bed -f 0.19 -F 0.21 -wa -wb > obs
+$BT intersect -a x.bed -b y.bed -f 0.19 -r -wa -wb > obs
 check exp obs
 rm exp obs
 
 echo "    intersect.t58...\c"
 echo "chr1	10	20	a1	1	+	chr1	8	12	b1	1	+
 chr2	10	20	a2	1	-	chr2	8	12	b2	1	+" > exp
-$BT intersect -a x.bed -b y.bed -f 0.19 -F 0.50 -wa -wb > obs
+$BT intersect -a x.bed -b y.bed -F 0.50 -wa -wb > obs
 check exp obs
 rm exp obs
 
 echo "    intersect.t59...\c"
+echo "chr1	10	20	a1	1	+	chr1	8	12	b1	1	+
+chr2	10	20	a2	1	-	chr2	8	12	b2	1	+" > exp
+$BT intersect -a x.bed -b y.bed -f 0.19 -F 0.21 -wa -wb > obs
+check exp obs
+rm exp obs
+
+echo "    intersect.t60...\c"
+echo "chr1	10	20	a1	1	+	chr1	8	12	b1	1	+
+chr2	10	20	a2	1	-	chr2	8	12	b2	1	+" > exp
+$BT intersect -a x.bed -b y.bed -f 0.19 -F 0.21 -wa -wb > obs
+check exp obs
+rm exp obs
+
+echo "    intersect.t61...\c"
+echo "chr1	10	20	a1	1	+	chr1	8	12	b1	1	+
+chr2	10	20	a2	1	-	chr2	8	12	b2	1	+" > exp
+$BT intersect -a x.bed -b y.bed -f 0.19 -F 0.50 -wa -wb > obs
+check exp obs
+rm exp obs
+
+echo "    intersect.t62...\c"
 echo "\c" > exp
 $BT intersect -a x.bed -b y.bed -f 0.19 -F 0.51 -wa -wb > obs
 check exp obs
@@ -702,34 +722,34 @@ rm exp obs
 ##################################################################
 # Test basic -f with -F with BAM
 ##################################################################
-echo "    intersect.t60...\c"
+echo "    intersect.t63...\c"
 echo "\c" > exp
 $BT intersect -a x.bam -b y.bed -f 0.21 -F 0.21 -wa -wb | samtools view - > obs
 check exp obs
 rm exp obs
 
-echo "    intersect.t61...\c"
+echo "    intersect.t64...\c"
 echo "a1	0	chr1	11	255	10M	*	0	0	*	*
 a2	16	chr2	11	255	10M	*	0	0	*	*" > exp
 $BT intersect -a x.bam -b y.bed -f 0.19 -F 0.21 -wa -wb | samtools view - > obs
 check exp obs
 rm exp obs
 
-echo "    intersect.t62...\c"
+echo "    intersect.t65...\c"
 echo "a1	0	chr1	11	255	10M	*	0	0	*	*
 a2	16	chr2	11	255	10M	*	0	0	*	*" > exp
 $BT intersect -a x.bam -b y.bed -f 0.19 -F 0.21 -wa -wb | samtools view - > obs
 check exp obs
 rm exp obs
 
-echo "    intersect.t63...\c"
+echo "    intersect.t66...\c"
 echo "a1	0	chr1	11	255	10M	*	0	0	*	*
 a2	16	chr2	11	255	10M	*	0	0	*	*" > exp
 $BT intersect -a x.bam -b y.bed -f 0.19 -F 0.50 -wa -wb | samtools view - > obs
 check exp obs
 rm exp obs
 
-echo "    intersect.t64...\c"
+echo "    intersect.t67...\c"
 echo "\c" > exp
 $BT intersect -a x.bam -b y.bed -f 0.19 -F 0.51 -wa -wb | samtools view - > obs
 check exp obs
@@ -739,7 +759,7 @@ rm exp obs
 ##################################################################
 # Test basic -f with -F and -e
 ##################################################################
-echo "    intersect.t65...\c"
+echo "    intersect.t68...\c"
 echo "chr1	10	20	a1	1	+	chr1	8	12	b1	1	+
 chr2	10	20	a2	1	-	chr2	8	12	b2	1	+" > exp
 $BT intersect -a x.bed -b y.bed -f 0.21 -F 0.21 -wa -wb -e > obs
