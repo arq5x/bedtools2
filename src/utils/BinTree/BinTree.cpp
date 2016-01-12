@@ -88,7 +88,7 @@ void BinTree::getHits(Record *record, RecordKeyVector &hitSet)
             	if (record->intersects(dbRec,
                                        _context->getSameStrand(),
                                        _context->getDiffStrand(),
-            			               _context->getOverlapFractionA(),
+            			                     _context->getOverlapFractionA(),
                                        _context->getOverlapFractionB(),
                                        _context->getReciprocalFraction(),
                                        _context->getEitherFraction()

@@ -1,4 +1,3 @@
-
 #include "Record.h"
 #include <cstdio>
 
@@ -169,7 +168,6 @@ bool Record::sameChromIntersects(const Record *record,
 	if (diffStrand && !isDiffStrand) {
 		return false; //want different, but they're not different.
 	}
-
 	int otherStart = record->getStartPos();
 	int otherEnd = record->getEndPos();
 
@@ -182,7 +180,6 @@ bool Record::sameChromIntersects(const Record *record,
 	if (minEnd < maxStart) {
 		return false;
 	}
-
 
 	if ((overlapFractionA == 0.0) && (overlapFractionB == 0.0))
     {
