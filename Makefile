@@ -25,7 +25,7 @@ export CXXFLAGS = -Wall -O2 -D_FILE_OFFSET_BITS=64 -fPIC $(INCLUDES)
 export LIBS		= -lz
 export BT_ROOT  = src/utils/BamTools/
 
-prefix = /usr/local
+prefix ?= /usr/local
 
 SUBDIRS = $(SRC_DIR)/annotateBed \
 		  $(SRC_DIR)/bamToBed \
