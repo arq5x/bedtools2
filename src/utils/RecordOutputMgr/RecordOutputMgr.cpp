@@ -342,13 +342,10 @@ void RecordOutputMgr::reportOverlapDetail(const Record *keyRecord, const Record 
 		//the normal process for intersection that allows us to simply report the maxStart and minEnd do not necessarily apply.
 		if (hitEnd >= keyStart) {
 			//this is ok. We have a normal intersection where the key comes after the hit.
-
 			maxStart = keyStart;
 			startStr = &(keyRecord->getStartPosStr());
-
 			minEnd = min(keyEnd, hitEnd);
 			endStr = keyRecord->getEndPos() < hitRecord->getEndPos() ? &(keyRecord->getEndPosStr()) : &(hitRecord->getEndPosStr());
-
 		} else {
 			//this is the weird case of not a "real" intersection. The keyStart is greater than the hitEnd. So just report the key as is.
 			maxStart = keyStart;
@@ -371,7 +368,6 @@ void RecordOutputMgr::reportOverlapDetail(const Record *keyRecord, const Record 
 			minEnd = hitEnd;
 			startStr = &(hitRecord->getStartPosStr());
 			endStr = &(hitRecord->getEndPosStr());
-
 		}
 	}
 

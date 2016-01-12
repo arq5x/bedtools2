@@ -1,4 +1,3 @@
-
 #include "Bed3Interval.h"
 #include "SingleLineDelimTextFileReader.h"
 #include <cstdio>
