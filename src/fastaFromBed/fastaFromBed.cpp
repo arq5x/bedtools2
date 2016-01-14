@@ -15,14 +15,13 @@
 
 
 Bed2Fa::Bed2Fa(bool useName, const string &dbFile, 
-               const string &bedFile, const string &fastaOutFile, 
+               const string &bedFile,
                bool useFasta, bool useStrand, 
                bool useBlocks, bool useFullHeader,
                bool useBedOut) :
     _useName(useName),
     _dbFile(dbFile),
     _bedFile(bedFile),
-    _fastaOutFile(fastaOutFile),
     _useFasta(useFasta),
     _useBedOut(useBedOut),
     _useStrand(useStrand),
@@ -30,26 +29,6 @@ Bed2Fa::Bed2Fa(bool useName, const string &dbFile,
     _useFullHeader(useFullHeader)
 {
     _bed = new BedFile(_bedFile);
-
-    // Figure out what the output file should be.
-    if (fastaOutFile == "stdout" || fastaOutFile == "-") {
-        _faOut = &cout;
-    }
-    else {
-        // Make sure we can open the file.
-        ofstream fa(fastaOutFile.c_str(), ios::out);
-        if ( !fa ) {
-            cerr << "Error: The requested fasta output file (" 
-                 << fastaOutFile << ") could not be opened. Exiting!" 
-                 << endl;
-            exit (1);
-        }
-        else {
-            fa.close();
-            _faOut = new ofstream(fastaOutFile.c_str(), ios::out);
-        }
-    }
-
     // Extract the requested intervals from the FASTA input file.
     ExtractDNA();
 }
@@ -76,14 +55,14 @@ void Bed2Fa::ReportDNA(const BED &bed, string &dna) {
         if (!(_useName)) {
             if (_useFasta == true) {
                 if (_useStrand == true)
-                    *_faOut << ">" << bed.chrom << ":" 
+                    cout << ">" << bed.chrom << ":" 
                             << bed.start << "-" << bed.end   
                             << "(" << bed.strand << ")" 
                             << endl 
                             << dna
                             << endl;
                 else
-                    *_faOut << ">" << bed.chrom << ":" 
+                    cout << ">" << bed.chrom << ":" 
                             << bed.start << "-" << bed.end 
                             << endl 
                             << dna
@@ -91,13 +70,13 @@ void Bed2Fa::ReportDNA(const BED &bed, string &dna) {
             }
             else {
                 if (_useStrand == true)
-                    *_faOut << bed.chrom << ":" 
+                    cout << bed.chrom << ":" 
                             << bed.start << "-" << bed.end
                             << "(" << bed.strand << ")" << "\t" 
                             << dna 
                             << endl;
                 else
-                    *_faOut << bed.chrom << ":" 
+                    cout << bed.chrom << ":" 
                             << bed.start << "-" << bed.end << "\t" 
                             << dna 
                             << endl;
@@ -105,9 +84,9 @@ void Bed2Fa::ReportDNA(const BED &bed, string &dna) {
         }
         else {
             if (_useFasta == true)
-                *_faOut << ">" << bed.name << endl << dna << endl;
+                cout << ">" << bed.name << endl << dna << endl;
             else
-                *_faOut << bed.name << "\t" << dna << endl;
+                cout << bed.name << "\t" << dna << endl;
         }
     }
 }

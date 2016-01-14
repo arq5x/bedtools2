@@ -33,13 +33,9 @@ int fastafrombed_main(int argc, char* argv[]) {
     string fastaDbFile;
     string bedFile;
 
-    // output files
-    string fastaOutFile;
-
     // checks for existence of parameters
     bool haveFastaDb = false;
     bool haveBed = false;
-    bool haveFastaOut = false;
     bool useNameOnly = false;
     bool useFasta = true;
     bool useStrand = false;
@@ -70,13 +66,6 @@ int fastafrombed_main(int argc, char* argv[]) {
             if ((i+1) < argc) {
                 haveFastaDb = true;
                 fastaDbFile = argv[i + 1];
-                i++;
-            }
-        }
-        else if(PARAMETER_CHECK("-fo", 3, parameterLength)) {
-            if ((i+1) < argc) {
-                haveFastaOut = true;
-                fastaOutFile = argv[i + 1];
                 i++;
             }
         }
@@ -119,15 +108,10 @@ int fastafrombed_main(int argc, char* argv[]) {
         showHelp = true;
     }
 
-    if (!haveFastaOut) {
-        fastaOutFile = "stdout";
-    }
-
     if (!showHelp) {
 
         Bed2Fa *b2f = new Bed2Fa(useNameOnly, fastaDbFile, 
-                                 bedFile, fastaOutFile, 
-                                 useFasta, useStrand, 
+                                 bedFile, useFasta, useStrand, 
                                  useBlocks, useFullHeader,
                                  useBedOut);
         delete b2f;
@@ -142,16 +126,15 @@ void fastafrombed_help(void) {
     
     cerr << "\nTool:    bedtools getfasta (aka fastaFromBed)" << endl;
     cerr << "Version: " << VERSION << "\n";
-    cerr << "Summary: Extract DNA sequences into a fasta file based on feature coordinates." << endl << endl;
+    cerr << "Summary: Extract DNA sequences from a fasta file based on feature coordinates." << endl << endl;
 
     cerr << "Usage:   " << PROGRAM_NAME 
-         << " [OPTIONS] -fi <fasta> -bed <bed/gff/vcf> -fo <fasta> " 
+         << " [OPTIONS] -fi <fasta> -bed <bed/gff/vcf>" 
          << endl << endl;
 
     cerr << "Options: " << endl;
     cerr << "\t-fi\tInput FASTA file" << endl;
     cerr << "\t-bed\tBED/GFF/VCF file of ranges to extract from -fi" << endl;
-    cerr << "\t-fo\tOutput file (can be FASTA or TAB-delimited)" << endl;
     cerr << "\t-name\tUse the name field for the FASTA header" << endl;
     cerr << "\t-split\tgiven BED12 fmt., extract and concatenate the sequences"
          << "from the BED \"blocks\" (e.g., exons)" << endl;
