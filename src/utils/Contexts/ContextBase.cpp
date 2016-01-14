@@ -226,10 +226,10 @@ bool ContextBase::parseCmdArgs(int argc, char **argv, int skipFirstArgs) {
         else if (strcmp(_argv[_i], "-seed") == 0) {
 			if (!handle_seed()) return false;
         }
-        else if (strcmp(_argv[_i], "-o") == 0) {
+        else if ((strcmp(_argv[_i], "-o") == 0) || (strcmp(_argv[_i], "-ops") == 0)) {
 			if (!handle_o()) return false;
         }
-        else if (strcmp(_argv[_i], "-c") == 0) {
+        else if ((strcmp(_argv[_i], "-c") == 0) || (strcmp(_argv[_i], "-opCols") == 0)) {
 			if (!handle_c()) return false;
         }
         else if (strcmp(_argv[_i], "-null") == 0) {
