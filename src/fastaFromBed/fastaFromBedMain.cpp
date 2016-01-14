@@ -45,6 +45,7 @@ int fastafrombed_main(int argc, char* argv[]) {
     bool useStrand = false;
     bool useBlocks = false;
     bool useFullHeader = false;
+    bool useBedOut = false;
 
     // check to see if we should print out some help
     if(argc <= 1) showHelp = true;
@@ -95,6 +96,10 @@ int fastafrombed_main(int argc, char* argv[]) {
         else if(PARAMETER_CHECK("-tab", 4, parameterLength)) {
             useFasta = false;
         }
+        else if(PARAMETER_CHECK("-bedOut", 7, parameterLength)) {
+            useFasta = false;
+            useBedOut = true;
+        }
         else if(PARAMETER_CHECK("-s", 2, parameterLength)) {
             useStrand = true;
         }
@@ -110,8 +115,12 @@ int fastafrombed_main(int argc, char* argv[]) {
         }
     }
 
-    if (!haveFastaDb || !haveFastaOut || !haveBed) {
+    if (!haveFastaDb || !haveBed) {
         showHelp = true;
+    }
+
+    if (!haveFastaOut) {
+        fastaOutFile = "stdout";
     }
 
     if (!showHelp) {
@@ -119,7 +128,8 @@ int fastafrombed_main(int argc, char* argv[]) {
         Bed2Fa *b2f = new Bed2Fa(useNameOnly, fastaDbFile, 
                                  bedFile, fastaOutFile, 
                                  useFasta, useStrand, 
-                                 useBlocks, useFullHeader);
+                                 useBlocks, useFullHeader,
+                                 useBedOut);
         delete b2f;
     }
     else {
