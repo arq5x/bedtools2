@@ -94,9 +94,10 @@ int main(int argc, char *argv[])
     QuickString subCmd(argv[1]);
     BedtoolsDriver btDriver;
     if (btDriver.supports(subCmd)) {
+
 		if (btDriver.subMain(argc, argv)) {
 			return 0;
-		} else if (!btDriver.hadError()) {
+		} else if (btDriver.hadError()) {
 			showHelp(subCmd);
 			return 1;
 		}

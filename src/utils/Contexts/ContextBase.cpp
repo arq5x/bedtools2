@@ -116,6 +116,13 @@ ContextBase::~ContextBase()
 	}
 }
 
+bool ContextBase::errorEncountered() {
+	if (_argc == 1) {    // just a subcommand was given with no options.
+		return true;
+	} 
+	return !_errorMsg.empty();
+}
+
 bool ContextBase::determineOutputType() {
 	if (_outputTypeDetermined) {
 		return true;
