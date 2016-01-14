@@ -31,7 +31,7 @@ public:
 
     // constructor
     Bed2Fa(bool useName, const string &dbFile, 
-           const string &bedFile, const string &fastaOutFile, 
+           const string &bedFile,
            bool useFasta, bool useStrand, 
            bool useBlocks, bool useFullHeader,
            bool useBedOut);
@@ -48,7 +48,6 @@ private:
     bool _useName;
     string _dbFile;
     string _bedFile;
-    string _fastaOutFile;
     bool _useFasta;
     bool _useBedOut;    // priginal BED records followed by FASTA on same line
     bool _useStrand;    // should the extracted sequence obey strandedness?
@@ -58,7 +57,6 @@ private:
 
     // instance of a bed file class.
     BedFile  *_bed;
-    ostream *_faOut;
 };
 
 #endif
