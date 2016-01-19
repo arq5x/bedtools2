@@ -48,6 +48,7 @@ The full list of `bedtools` sub-commands.
    tools/pairtopair  
    tools/random     
    tools/reldist    
+   tools/shift      
    tools/shuffle    
    tools/slop       
    tools/sort       
