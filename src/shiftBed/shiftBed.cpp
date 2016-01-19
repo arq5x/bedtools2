@@ -1,11 +1,9 @@
 /*****************************************************************************
   shiftBed.cpp
 
-  (c) 2009 - Aaron Quinlan
-  Hall Laboratory
-  Department of Biochemistry and Molecular Genetics
-  University of Virginia
-  aaronquinlan@gmail.com
+  (c) 2016 - David Richardson
+  European Molecular Biology Laboratory, European Bioinformatics Institute
+  davidr@ebi.ac.uk
 
   Licensed under the GNU General Public License 2.0 license.
 ******************************************************************************/
