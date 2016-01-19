@@ -37,6 +37,7 @@ def main():
                  'pairtobed': 'pairToBed', 
                  'pairtopair': 'pairToPair', 
                  'random': 'randomBed', 
+                 'shift': 'shiftBed',
                  'shuffle': 'shuffleBed', 
                  'slop': 'slopBed', 
                  'sort': 'sortBed', 
