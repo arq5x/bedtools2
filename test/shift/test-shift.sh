@@ -103,3 +103,13 @@ $BT shift -i a.bed -s 1000 -g tiny.genome > obs
 check obs exp
 rm obs exp
 
+###########################################################
+# test shift being larger than a signed int
+###########################################################
+echo "    shift.t8...\c"
+echo \
+"chr1	999	1000	a1	1	+
+chr1	999	1000	a2	2	-" > exp
+$BT shift -i a.bed -s 3000000000 -g tiny.genome > obs
+check obs exp
+rm obs exp
