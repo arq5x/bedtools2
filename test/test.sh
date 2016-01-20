@@ -49,6 +49,9 @@ cd multicov; bash test-multicov.sh; cd ..
 echo " Testing bedtools reldist:"
 cd reldist; bash test-reldist.sh; cd ..
 
+echo " Testing bedtools shift:"
+cd shift; bash test-shift.sh; cd ..
+
 echo " Testing bedtools slop:"
 cd slop; bash test-slop.sh; cd ..
 
