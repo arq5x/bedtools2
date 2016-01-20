@@ -68,33 +68,28 @@ void BedShift::AddShift(BED &bed) {
 
     CHRPOS chromSize = (CHRPOS)_genome->getChromSize(bed.chrom);
 
-	int start,end;
+	float shift;
 
 	if (bed.strand == "-"){
-		start = bed.start + (int)_shiftMinus;
-		end = bed.end + (int)_shiftMinus;
+		shift = _shiftMinus;
 	}
 	else {
-		start = bed.start + (int)_shiftPlus;
-		end = bed.end + (int)_shiftPlus;
+		shift = _shiftPlus;
 	}
 	
-	// has the entry run off the end of the genome?
-	if (start < 0) {
-		start = 0;
-	}
-	if (end < 1) {
-		end = 1;
-	}
-	if (start > (chromSize-1)){
-		start = (chromSize-1);
-	}
-	if (end > chromSize){
-		end = chromSize;
-	}
+	if ((bed.start + shift) < 0)
+		bed.start = 0;
+	else if ( (bed.start + shift) > (chromSize - 1))
+		bed.start = (chromSize - 1);
+	else
+		bed.start = bed.start + shift;
 	
-	bed.start = start;
-	bed.end = end;
+	if ((bed.end + shift) <= 0)
+		bed.end = 1;
+	else if ((bed.start + shift) > chromSize)
+		bed.end = chromSize;
+	else
+		bed.end = bed.end + shift;
 
 }
 
