@@ -72,6 +72,7 @@ int pairtopair_main(int argc, char* argv[]);//
 int random_main(int argc, char* argv[]); //
 int reldist_main(int argc, char* argv[]); //
 void sample_help();
+int shift_main(int argc, char* argv[]); //
 int shuffle_main(int argc, char* argv[]); //
 int slop_main(int argc, char* argv[]); //
 int split_main(int argc, char* argv[]); //
@@ -84,6 +85,7 @@ int window_main(int argc, char* argv[]); //
 int windowmaker_main(int argc, char* argv[]); //
 int bedtools_help(void);
 int bedtools_faq(void);
+
 
 
 int main(int argc, char *argv[])
@@ -107,6 +109,7 @@ int main(int argc, char *argv[])
     else if (subCmd == "window")      return window_main(argc-1, argv+1);
     else if (subCmd == "genomecov")   return genomecoverage_main(argc-1, argv+1);
     else if (subCmd == "cluster")     return cluster_main(argc-1, argv+1);
+	else if (subCmd == "shift")        return shift_main(argc-1, argv+1);
     else if (subCmd == "slop")        return slop_main(argc-1, argv+1);
     else if (subCmd == "split")       return split_main(argc-1, argv+1);
     else if (subCmd == "flank")       return flank_main(argc-1, argv+1);
@@ -205,6 +208,7 @@ int bedtools_help(void)
     cout  << "    merge         "  << "Combine overlapping/nearby intervals into a single interval.\n";
     cout  << "    cluster       "  << "Cluster (but don't merge) overlapping/nearby intervals.\n";
     cout  << "    complement    "  << "Extract intervals _not_ represented by an interval file.\n";
+    cout  << "    shift         "  << "Adjust the position of intervals.\n";
     cout  << "    subtract      "  << "Remove intervals based on overlaps b/w two files.\n";
     cout  << "    slop          "  << "Adjust the size of intervals.\n";
     cout  << "    flank         "  << "Create new intervals from the flanks of existing intervals.\n";
