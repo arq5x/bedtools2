@@ -771,6 +771,21 @@ $BT closest -a bug281_a.flip.medium.bed -b bug281_b.flip.bed -S > obs
 check exp obs
 rm exp obs
 
+###########################################################
+#  Test intersect -wao with multiple databases and -names
+############################################################
+echo "    closest.t68...\c"
+echo \
+"1	100	200	a1	ax	b	1	100	200	b1	bx
+1	100	200	a1	ax	c	1	500	600	c4	cq
+1	300	400	a2	ay	b	1	100	200	b1	bx
+1	300	400	a2	ay	c	1	500	600	c4	cq
+1	400	500	a3	az	b	1	100	200	b1	bx
+1	400	500	a3	az	c	1	500	600	c4	cq
+2	500	600	a4	aq	.	.	-1	-1	.	." > exp
+$BT closest -a null_a.bed -b null_b.bed null_c.bed -names b c > obs
+check exp obs
+rm exp obs
 
 cd sortAndNaming
 bash test-sort-and-naming.sh
