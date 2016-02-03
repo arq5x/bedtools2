@@ -60,6 +60,7 @@ INCLUDES = -I$(UTILITIES_DIR)/bedFile/ \
 			-I$(TOOLS_DIR)/regressTest/ \
 			-I$(TOOLS_DIR)/reldist/ \
 			-I$(TOOLS_DIR)/sampleFile/ \
+			-I$(TOOLS_DIR)/shiftBed/ \
 			-I$(TOOLS_DIR)/shuffleBed/ \
 			-I$(TOOLS_DIR)/slopBed/ \
 			-I$(TOOLS_DIR)/sortBed/ \
