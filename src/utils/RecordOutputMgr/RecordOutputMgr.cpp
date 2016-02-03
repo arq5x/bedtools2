@@ -186,6 +186,11 @@ void RecordOutputMgr::printClosest(RecordKeyVector &keyList, const vector<int> *
 	} else {
 		printKey(keyRec, keyRec->getStartPosStr(), keyRec->getEndPosStr());
 		tab();
+		// need to add a dummy file id if multiple DB files are used
+		if (_context->getNumInputFiles() > 2) {
+			_outBuf.append('.');
+			tab();
+		}		
 		null(false, true);
 		if (context->reportDistance()) {
 			tab();
@@ -241,6 +246,11 @@ void RecordOutputMgr::printRecord(RecordKeyVector &keyList, RecordKeyVector *blo
 						return;
 					}
 					tab();
+					// need to add a dummy file id if multiple DB files are used
+					if (_context->getNumInputFiles() > 2) {
+						_outBuf.append('.');
+						tab();
+					}
 					null(false, true);
 					tab();
 					_outBuf.append('0');
@@ -255,6 +265,11 @@ void RecordOutputMgr::printRecord(RecordKeyVector &keyList, RecordKeyVector *blo
 						return;
 					}
 					tab();
+					// need to add a dummy file id if multiple DB files are used
+					if (_context->getNumInputFiles() > 2) {
+						_outBuf.append('.');
+						tab();
+					}
 					null(false, true);
 					newline();
 					if (needsFlush()) flush();
