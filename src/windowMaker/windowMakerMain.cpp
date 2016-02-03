@@ -41,6 +41,7 @@ int windowmaker_main(int argc, char* argv[]) {
 
     bool haveGenome = false;
     bool haveBed = false;
+    bool haveStep = false;
     bool haveSize = false;
     bool haveCount = false;
     bool reverse = false;
@@ -81,13 +82,13 @@ int windowmaker_main(int argc, char* argv[]) {
             if ((i+1) < argc) {
                 haveSize = true;
                 size = atoi(argv[i + 1]);
-                step = size;
                 i++;
             }
         }
         else if(PARAMETER_CHECK("-s", 2, parameterLength)) {
             if ((i+1) < argc) {
                 step = atoi(argv[i + 1]);
+                haveStep = true;
                 i++;
             }
         }
@@ -123,6 +124,9 @@ int windowmaker_main(int argc, char* argv[]) {
     }
 
     // make sure we have both input files
+    if (!haveStep) {
+        step = size;
+    }
     if (!haveGenome && !haveBed) {
         cerr << endl << "*****" << endl << "*****ERROR: Need -g (genome file) or -b (BED file) for interval source. " << endl << "*****" << endl;
         showHelp = true;
@@ -143,6 +147,7 @@ int windowmaker_main(int argc, char* argv[]) {
         cerr << endl << "*****" << endl << "*****ERROR: The step (-s) option must be greater than zero. " << endl << "*****" << endl;
         showHelp = true;
     }
+
     if (!showHelp) {
         WindowMaker *wm = NULL;
         if (haveCount)
