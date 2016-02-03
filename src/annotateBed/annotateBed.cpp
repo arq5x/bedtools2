@@ -57,7 +57,7 @@ void BedAnnotate::PrintHeader() {
     // print a hash to indicate header and then write a tab
     // for each field in the main file.
     printf("#");
-    for (size_t i = 0; i < _bed->bedType - 1; ++i)
+    for (size_t i = 0; i < _bed->bedType; ++i)
         printf("\t");
 
     // now print the label for each file.
