@@ -816,3 +816,55 @@ echo \
 $BT intersect -a a_vcfSVtest.vcf -b b_vcfSVtest.vcf -wa -wb -sorted >obs
 check exp obs
 rm exp obs
+
+###########################################################
+#  Test intersect -loj with multiple databases
+############################################################
+echo "    intersect.new.t69...\c"
+echo \
+"1	100	200	a1	ax	1	1	100	200	b1	bx
+1	300	400	a2	ay	.	.	-1	-1	.	.
+1	400	500	a3	az	.	.	-1	-1	.	.
+2	500	600	a4	aq	.	.	-1	-1	.	." > exp
+$BT intersect -a null_a.bed -b null_b.bed null_c.bed -loj > obs
+check exp obs
+rm exp obs
+
+###########################################################
+#  Test intersect -loj with multiple databases and -names
+############################################################
+echo "    intersect.new.t70...\c"
+echo \
+"1	100	200	a1	ax	b	1	100	200	b1	bx
+1	300	400	a2	ay	.	.	-1	-1	.	.
+1	400	500	a3	az	.	.	-1	-1	.	.
+2	500	600	a4	aq	.	.	-1	-1	.	." > exp
+$BT intersect -a null_a.bed -b null_b.bed null_c.bed -loj -names b c > obs
+check exp obs
+rm exp obs
+
+###########################################################
+#  Test intersect -wao with multiple databases
+############################################################
+echo "    intersect.new.t71...\c"
+echo \
+"1	100	200	a1	ax	1	1	100	200	b1	bx	100
+1	300	400	a2	ay	.	.	-1	-1	.	.	0
+1	400	500	a3	az	.	.	-1	-1	.	.	0
+2	500	600	a4	aq	.	.	-1	-1	.	.	0" > exp
+$BT intersect -a null_a.bed -b null_b.bed null_c.bed -wao > obs
+check exp obs
+rm exp obs
+
+###########################################################
+#  Test intersect -wao with multiple databases and -names
+############################################################
+echo "    intersect.new.t72...\c"
+echo \
+"1	100	200	a1	ax	b	1	100	200	b1	bx	100
+1	300	400	a2	ay	.	.	-1	-1	.	.	0
+1	400	500	a3	az	.	.	-1	-1	.	.	0
+2	500	600	a4	aq	.	.	-1	-1	.	.	0" > exp
+$BT intersect -a null_a.bed -b null_b.bed null_c.bed -wao -names b c > obs
+check exp obs
+rm exp obs
