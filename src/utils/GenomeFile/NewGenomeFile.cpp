@@ -98,7 +98,7 @@ bool NewGenomeFile::projectOnGenome(CHRPOS genome_pos, QuickString &chrom, CHRPO
     // use the iterator to identify the appropriate index 
     // into the chrom name and start vectors
     CHRPOS i = CHRPOS(low-_startOffsets.begin());
-    if (i < 0 || i >= _chromList.size()) {
+    if (i >= _chromList.size()) {
     	return false; //position not on genome
     }
     chrom = _chromList[i - 1];

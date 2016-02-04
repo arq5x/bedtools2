@@ -37,7 +37,7 @@ private:
     //
     // BIN HANDLING
     //
-	typedef uint32_t binNumType;
+	typedef int32_t binNumType;
 	static const binNumType NUM_BINS = 37450;
 	static const binNumType NUM_BIN_LEVELS = 7;
 
@@ -65,8 +65,6 @@ private:
 	typedef map<QuickString, allBinsType> mainMapType; //for each chrom, a map of bin num to RecordLists.
 	mainMapType _mainMap;
 
-
-	binNumType _maxBinNumFound;
 	map<binNumType, int> _binsHit;
 
 	bool addRecordToTree(const Record *);
