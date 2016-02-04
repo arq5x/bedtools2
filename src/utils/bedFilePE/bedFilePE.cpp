@@ -284,10 +284,6 @@ bool BedFilePE::parseBedPELine (BEDPE &bed, const vector<string> &lineVector, co
             cerr << "Error: malformed BEDPE entry at line " << lineNum << ". Start2 was greater than End2. Ignoring it and moving on." << endl;
             return false;
         }
-        else if ( (bed.start1 < 0) || (bed.end1 < 0) || (bed.start2 < 0) || (bed.end2 < 0) ) {
-            cerr << "Error: malformed BEDPE entry at line " << lineNum << ". Coordinate <= 0. Ignoring it and moving on." << endl;
-            return false;
-        }
     }
     else if ( (lineNum > 1) && (lineVector.size() == this->bedType)) {
 
@@ -376,10 +372,6 @@ bool BedFilePE::parseBedPELine (BEDPE &bed, const vector<string> &lineVector, co
         }
         else if (bed.start2 > bed.end2) {
             cerr << "Error: malformed BED entry at line " << lineNum << ". Start2 was greater than End2. Ignoring it and moving on." << endl;
-            return false;
-        }
-        else if ( (bed.start1 < 0) || (bed.end1 < 0) || (bed.start2 < 0) || (bed.end2 < 0) ) {
-            cerr << "Error: malformed BED entry at line " << lineNum << ". Coordinate <= 0. Ignoring it and moving on." << endl;
             return false;
         }
     }

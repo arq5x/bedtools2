@@ -41,7 +41,6 @@ int str2chrPos(const char *str, size_t ulen) {
 	}
 
 	//first test for exponents / scientific notation
-	bool hasExponent = false;
 	for (size_t i=0; i < ulen; i++) {
 		if (str[i] == 'e' || str[i] == 'E' || str[i] == '.') {
 			std::istringstream ss(str);
@@ -57,7 +56,7 @@ int str2chrPos(const char *str, size_t ulen) {
 		exit(1);
 	}
 
-	register int sum=0;
+	int sum=0;
 	int startPos =0;
 	bool isNegative = false;
 

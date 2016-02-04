@@ -49,7 +49,7 @@ void int2str(int number, T& buffer, bool appendToBuf = false)
 	}
 	//check for negative numbers.
 	bool isNegative = number < 0;
-	register unsigned useNum = number;
+	unsigned useNum = number;
 	if (isNegative) {
 		useNum = 0 - useNum; //convert to positive.
 	}

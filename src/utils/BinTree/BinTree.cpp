@@ -4,8 +4,7 @@
 
 BinTree::BinTree(ContextIntersect *context)
 :  _context(context),
-  _binOffsetsExtended(NULL),
-  _maxBinNumFound(0)
+  _binOffsetsExtended(NULL)
  {
 	_binOffsetsExtended = new binNumType[NUM_BIN_LEVELS];
 	memset(_binOffsetsExtended, 0, NUM_BIN_LEVELS * sizeof(binNumType));
