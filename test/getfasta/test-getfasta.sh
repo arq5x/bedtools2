@@ -72,7 +72,7 @@ fi
 # test without -fullHeader
 echo "    getfasta.t07...\c"
 echo "WARNING. chromosome (chr1 assembled by consortium X) was not found in the FASTA file. Skipping." > exp
-echo $'chr1 assembled by consortium X\t1\t10' | $BT getfasta -fi t_fH.fa -bed -  2> obs
+echo $'chr1 assembled by consortium X\t1\t10' | $BT getfasta -fi t_fH.fa -bed - 2> obs
 
 check obs exp
 
@@ -86,7 +86,7 @@ echo \
 AGCTYRWSKMDVHBXN
 >2:0-16
 agctyrwskmdvhbxn" > exp
-$BT getfasta  -fi test.iupac.fa -bed test.iupac.bed  > obs
+$BT getfasta  -fi test.iupac.fa -bed test.iupac.bed > obs
 check obs exp
 rm obs exp test.iupac.fa.fai
 
@@ -98,7 +98,7 @@ echo \
 NXVDBHKMSWYRAGCT
 >2:0-16(-)
 nxvdbhkmswyragct" > exp
-$BT getfasta  -fi test.iupac.fa -bed test.iupac.bed -s  > obs
+$BT getfasta  -fi test.iupac.fa -bed test.iupac.bed -s > obs
 check obs exp
 rm obs exp test.iupac.fa.fai
 
@@ -110,7 +110,7 @@ cggggggggg
 >chr2
 AAATTTTTTTTTT" > test.fa
 # create an index file
-echo -e "chr2\t2\t10" | $BT getfasta -fi test.fa -bed -  > /dev/null
+echo -e "chr2\t2\t10" | $BT getfasta -fi test.fa -bed - > /dev/null
 # modify the FASTA file in a second
 sleep 1 
 touch test.fa
