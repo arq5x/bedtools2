@@ -49,6 +49,7 @@ Usage and option summary
                                  | ``samtools view -b <BAM> | genomeCoverageBed -ibam stdin -g hg18.genome``
 **-d**                           Report the depth at each genome position with 1-based coordinates.
 **-dz**                          Report the depth at each genome position with 0-based coordinates.
+                                 Unlike, `-d`, this reports only non-zero positions.
 **-bg**                          Report depth in BedGraph format. For details, see: http://genome.ucsc.edu/goldenPath/help/bedgraph.html
 **-bga**                         Report depth in BedGraph format, as above (i.e., -bg). However with this option, regions with zero coverage are also reported. This allows one to quickly extract all regions of a genome with 0 coverage by applying: "grep -w 0$" to the output.
 **-split**                       Treat "split" BAM or BED12 entries as distinct BED intervals when computing coverage. For BAM files, this uses the CIGAR "N" and "D" operations to infer the blocks for computing coverage. For BED12 files, this uses the BlockCount, BlockStarts, and BlockEnds fields (i.e., columns 10,11,12).
