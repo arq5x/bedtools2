@@ -54,8 +54,13 @@ void ComplementFile::processHits(RecordOutputMgr *outputMgr, RecordKeyVector &hi
 		_outRecord.setChrName(newChrom);
 	}
 
-	int endPos = rec->getStartPos();
-	printRecord(endPos);
+	// safegaurd agains the first record for the chrom
+	// starting with 0.
+	if (rec->getStartPos() != 0)
+	{
+		int endPos = rec->getStartPos();
+		printRecord(endPos);		
+	}
 	_currStartPos = rec->getEndPos();
 }
 
