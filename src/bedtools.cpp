@@ -65,7 +65,6 @@ int map_main(int argc, char* argv[]); //
 void merge_help();
 int multibamcov_main(int argc, char* argv[]);//
 int multiintersect_main(int argc, char* argv[]);//
-int nek_sandbox1_main(int argc, char* argv[]);//
 int nuc_main(int argc, char* argv[]);//
 int pairtobed_main(int argc, char* argv[]);//
 int pairtopair_main(int argc, char* argv[]);//
@@ -151,7 +150,6 @@ int main(int argc, char *argv[])
     else if (subCmd == "links")       return links_main(argc-1, argv+1);
     else if (subCmd == "makewindows") return windowmaker_main(argc-1, argv+1);
     else if (subCmd == "expand")      return expand_main(argc-1, argv+1);
-    else if (subCmd == "neksb1")       return nek_sandbox1_main(argc-1, argv+1);
     else if (subCmd == "regresstest")  return regress_test_main(argc, argv); //this command does need all the orig args.
     // help
     else if (subCmd == "-h" || subCmd == "--help" ||

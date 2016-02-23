@@ -9,7 +9,8 @@
 #define BED12INTERVAL_H_
 
 #include "Bed6Interval.h"
-
+#include "lineFileUtilities.h"
+#include <numeric>
 class SingleLineDelimTextFileReader;
 
 
