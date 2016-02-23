@@ -177,18 +177,8 @@ int Bed12Interval::getLength(bool obeySplits) const {
 	if (!obeySplits || _blockCount <=0) {
 		return _endPos - _startPos;
 	} else {
-		int length = 0;
-    	//parse the blockSizes string.
-		char numBuf[16];
-		const char *startPtr = _blockSizes.c_str();
-		const char *endPtr = startPtr;
-	    for (int i=0; i < _blockCount; i++) {
-	    	memset(numBuf, 0, 16);
-	    	endPtr = strchr(endPtr, ',');
-	    	memcpy(numBuf, startPtr, endPtr - startPtr);
-	    	length += str2chrPos(numBuf);
-	    	startPtr = ++endPtr;
-	    }
-	    return length;
+		vector<int> vBlockSizes;
+		Tokenize(_blockSizes.str(), vBlockSizes, ',');
+	    return accumulate(vBlockSizes.begin(), vBlockSizes.end(), 0);
 	}
 }
