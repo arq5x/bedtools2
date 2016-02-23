@@ -15,8 +15,8 @@ _dbFileType(FileRecordTypeChecker::UNKNOWN_FILE_TYPE)
 {
 	_opCodes["sum"] = SUM;
 	_opCodes["mean"] = MEAN;
-	_opCodes["stddev"] = STDDEV;
-	_opCodes["sample_stddev"] = SAMPLE_STDDEV;
+	_opCodes["stdev"] = STDDEV;
+	_opCodes["sstdev"] = SAMPLE_STDDEV;
 	_opCodes["median"] = MEDIAN;
 	_opCodes["mode"] = MODE;
 	_opCodes["antimode"] = ANTIMODE;
@@ -348,7 +348,8 @@ void KeyListOpsHelp() {
     cerr << "\t-o\t"             << "Specify the operation that should be applied to -c." << endl;
     cerr                         << "\t\tValid operations:" << endl;
     cerr                         << "\t\t    sum, min, max, absmin, absmax," << endl;
-    cerr                         << "\t\t    mean, median," << endl;
+    cerr                         << "\t\t    mean, median, mode, antimode" << endl;
+    cerr                         << "\t\t    stdev, sstdev" << endl;
     cerr                         << "\t\t    collapse (i.e., print a delimited list (duplicates allowed)), " << endl;
     cerr                         << "\t\t    distinct (i.e., print a delimited list (NO duplicates allowed)), " << endl;
     cerr                         << "\t\t    distinct_sort_num (as distinct, sorted numerically, ascending)," << endl;
