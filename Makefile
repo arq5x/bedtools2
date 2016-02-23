@@ -53,7 +53,6 @@ SUBDIRS = $(SRC_DIR)/annotateBed \
 		  $(SRC_DIR)/mergeFile \
 		  $(SRC_DIR)/multiBamCov \
 		  $(SRC_DIR)/multiIntersectBed \
-		  $(SRC_DIR)/nekSandbox1 \
 		  $(SRC_DIR)/nucBed \
 		  $(SRC_DIR)/pairToBed \
 		  $(SRC_DIR)/pairToPair \
@@ -73,15 +72,15 @@ SUBDIRS = $(SRC_DIR)/annotateBed \
 		  $(SRC_DIR)/windowBed \
 		  $(SRC_DIR)/windowMaker
 
-UTIL_SUBDIRS =	$(SRC_DIR)/utils/bedFile \
+UTIL_SUBDIRS =	$(SRC_DIR)/utils/FileRecordTools \
+				$(SRC_DIR)/utils/FileRecordTools/FileReaders \
+				$(SRC_DIR)/utils/FileRecordTools/Records \
+				$(SRC_DIR)/utils/bedFile \
 				$(SRC_DIR)/utils/BinTree \
 				$(SRC_DIR)/utils/version \
 				$(SRC_DIR)/utils/bedGraphFile \
 				$(SRC_DIR)/utils/chromsweep \
 				$(SRC_DIR)/utils/Contexts \
-				$(SRC_DIR)/utils/FileRecordTools \
-				$(SRC_DIR)/utils/FileRecordTools/FileReaders \
-				$(SRC_DIR)/utils/FileRecordTools/Records \
 				$(SRC_DIR)/utils/general \
 				$(SRC_DIR)/utils/gzstream \
 				$(SRC_DIR)/utils/fileType \
@@ -115,7 +114,8 @@ INCLUDES =	-I$(SRC_DIR)/utils/bedFile \
 				-I$(SRC_DIR)/utils/general \
 				-I$(SRC_DIR)/utils/gzstream \
 				-I$(SRC_DIR)/utils/fileType \
-				-I$(SRC_DIR)/utils/bedFilePE \
+				-I$(SRC_DIR)/utils/gzstream/ \
+				-I$(SRC_DIR)/utils/lineFileUtilities \
 				-I$(SRC_DIR)/utils/KeyListOps \
 				-I$(SRC_DIR)/utils/NewChromsweep \
 				-I$(SRC_DIR)/utils/sequenceUtilities \

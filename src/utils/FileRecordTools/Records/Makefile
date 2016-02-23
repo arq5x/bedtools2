@@ -4,7 +4,8 @@ UTILITIES_DIR = ../../../utils/
 # -------------------
 # define our includes
 # -------------------
-INCLUDES = -I$(UTILITIES_DIR)/FileRecordTools/FileReaders/ \
+INCLUDES = -I$(UTILITIES_DIR)/lineFileUtilities/ \
+           -I$(UTILITIES_DIR)/FileRecordTools/FileReaders/ \
 			-I$(UTILITIES_DIR)/general/ \
 			-I$(UTILITIES_DIR)/fileType/ \
 			-I$(UTILITIES_DIR)/Contexts/ \
