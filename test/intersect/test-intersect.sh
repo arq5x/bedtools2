@@ -766,6 +766,32 @@ $BT intersect -a x.bed -b y.bed -f 0.21 -F 0.21 -wa -wb -e > obs
 check exp obs
 rm exp obs
 
+
+##################################################################
+# Test basic -split with BED12 w/ and w/o trailing commas for blocks
+# Issue 366
+##################################################################
+echo "    intersect.t69...\c"
+echo "chr1	0	45	oneblock_comma	0	+	0	0	0	1	45,	0,
+chr1	0	45	oneblock_comma	0	+	0	0	0	1	45,	0,
+chr1	0	45	oneblock_comma	0	+	0	0	0	1	45,	0,
+chr1	0	45	oneblock_comma	0	+	0	0	0	1	45,	0,
+chr1	0	45	oneblock_nocomma	0	+	0	0	0	1	45	0
+chr1	0	45	oneblock_nocomma	0	+	0	0	0	1	45	0
+chr1	0	45	oneblock_nocomma	0	+	0	0	0	1	45	0
+chr1	0	45	oneblock_nocomma	0	+	0	0	0	1	45	0
+chr1	0	45	three_blocks_comma	0	+	0	0	0	3	10,10,10,	0,20,40,
+chr1	0	45	three_blocks_comma	0	+	0	0	0	3	10,10,10,	0,20,40,
+chr1	0	50	three_blocks_comma	0	+	0	0	0	3	10,10,10,	0,20,40,
+chr1	0	50	three_blocks_comma	0	+	0	0	0	3	10,10,10,	0,20,40,
+chr1	0	45	three_blocks_nocomma	0	+	0	0	0	3	10,10,10	0,20,40
+chr1	0	45	three_blocks_nocomma	0	+	0	0	0	3	10,10,10	0,20,40
+chr1	0	50	three_blocks_nocomma	0	+	0	0	0	3	10,10,10	0,20,40
+chr1	0	50	three_blocks_nocomma	0	+	0	0	0	3	10,10,10	0,20,40" > exp
+$BT intersect  -a blocks.bed12 -b blocks.bed12 -split > obs
+check exp obs
+rm exp obs
+
 cd multi_intersect
 bash test-multi_intersect.sh
 cd ..
