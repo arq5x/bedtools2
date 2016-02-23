@@ -6,7 +6,6 @@
  */
 
 #include "KeyListOpsMethods.h"
-#include <cfloat>
 #include <cmath>
 #include <algorithm>
 #include "ParseTools.h" //to get the isNumeric function
@@ -66,7 +65,7 @@ double KeyListOpsMethods::getStddev() {
 		double diff = val - avg;
 		squareDiffSum += diff * diff;
 	}
-	return squareDiffSum / (float)getCount();
+	return sqrt(squareDiffSum / (float)getCount());
 }
 // return the standard deviation
 double KeyListOpsMethods::getSampleStddev() {
@@ -79,7 +78,7 @@ double KeyListOpsMethods::getSampleStddev() {
 		double diff = val - avg;
 		squareDiffSum += diff * diff;
 	}
-	return  squareDiffSum / ((float)getCount() - 1.0);
+	return sqrt(squareDiffSum / ((float)getCount() - 1.0));
 }
 
 // return the median value in the vector
@@ -140,10 +139,11 @@ const QuickString &KeyListOpsMethods::getAntiMode() {
 double KeyListOpsMethods::getMin() {
 	if (empty()) return NAN;
 
-	double minVal = DBL_MAX;
-	for (begin(); !end(); next()) {
+	begin();
+	double minVal = getColValNum();
+	for (; !end(); next()) {
 		double currVal = getColValNum();
-		minVal = ((float) currVal <= (float) minVal) ? currVal : minVal;
+		minVal = (currVal < minVal) ? currVal : minVal;
 	}
 	return  minVal;
 }
@@ -152,10 +152,11 @@ double KeyListOpsMethods::getMin() {
 double KeyListOpsMethods::getMax() {
 	if (empty()) return NAN;
 
-	double maxVal = DBL_MIN;
-	for (begin(); !end(); next()) {
+	begin();
+	double maxVal = getColValNum();
+	for (; !end(); next()) {
 		double currVal = getColValNum();
-		maxVal = ((float) currVal >= (float) maxVal) ? currVal : maxVal;
+		maxVal = (currVal > maxVal) ? currVal : maxVal;
 	}
 	return maxVal;
 }
@@ -164,10 +165,11 @@ double KeyListOpsMethods::getMax() {
 double KeyListOpsMethods::getAbsMin() {
 	if (empty()) return NAN;
 
-	double minVal = DBL_MAX;
-	for (begin(); !end(); next()) {
+	begin();
+	double minVal = abs(getColValNum());
+	for (; !end(); next()) {
 		double currVal = abs(getColValNum());
-		minVal = ((float)currVal <= (float)minVal) ? currVal : minVal;
+		minVal = (currVal < minVal) ? currVal : minVal;
 	}
 	return minVal;
 }
@@ -175,10 +177,11 @@ double KeyListOpsMethods::getAbsMin() {
 double KeyListOpsMethods::getAbsMax() {
 	if (empty()) return NAN;
 
-	double maxVal = DBL_MIN;
-	for (begin(); !end(); next()) {
+	begin();
+	double maxVal = abs(getColValNum());
+	for (; !end(); next()) {
 		double currVal = abs(getColValNum());
-		maxVal = ((float)currVal >= (float)maxVal) ? currVal : maxVal;
+		maxVal = (currVal > maxVal) ? currVal : maxVal;
 	}
 	return maxVal;
 }
