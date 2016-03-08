@@ -68,7 +68,7 @@ echo \
 #_________________________________________
 # p-values for fisher's exact test
 left	right	two-tail	ratio
-1	1	1	nan" > exp
+1	1	1	-nan" > exp
 $BT fisher -a a_merge.bed -b b.bed -g t.60.genome > obs
 check obs exp
 rm obs exp
