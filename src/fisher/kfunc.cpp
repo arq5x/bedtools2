@@ -239,7 +239,7 @@ double kt_fisher_exact(long long n11, long long n12, long long n21, long long n2
     *two = left + right;
     if (*two > 1.) *two = 1.;
     // adjust left and right
-    if (abs((long) (i - n11)) < abs((long) (j - n11))) right = 1. - left + q;
+    if (labs((long) (i - n11)) < labs((long) (j - n11))) right = 1. - left + q;
     else left = 1.0 - right + q;
     *_left = left; *_right = right;
     return q;

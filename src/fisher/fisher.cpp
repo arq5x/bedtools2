@@ -64,7 +64,7 @@ void Fisher::giveFinalReport(RecordOutputMgr *outputMgr)
     // this could be < 0 because multiple overlaps
     long long n12 = (long)max(0L, (long)_queryCounts - (long)_overlapCounts);
     long long n21 = max(0L, (long)(_dbCounts - _overlapCounts));
-    long long n22_full = max(n21 + n21 + n11, (long long)(n22_full_bases / bMean));
+    long long n22_full = max(n21 + n12 + n11, (long long)(n22_full_bases / bMean));
     long long n22 = max(0L, (long)(n22_full - n12 - n21 - n11));
 
     printf("# Number of query intervals: %lu\n", _queryCounts);
