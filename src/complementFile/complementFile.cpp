@@ -63,7 +63,7 @@ void ComplementFile::processHits(RecordOutputMgr *outputMgr, RecordKeyVector &hi
 	if (rec->getStartPos() != 0)
 	{
 		int endPos = rec->getStartPos();
-		printRecord(endPos);		
+		printRecord(endPos);
 	}
 	_currStartPos = rec->getEndPos();
 }
@@ -87,10 +87,10 @@ void ComplementFile::cleanupHits(RecordKeyVector &hits)
 	_frm->deleteMergedRecord(hits);
 }
 
-bool ComplementFile::finalizeCalculations() {
+void ComplementFile::giveFinalReport(RecordOutputMgr *outputMgr) {
+  	_outputMgr = outputMgr;
 	outPutLastRecordInPrevChrom();
 	fastForward("");
-	return true;
 }
 
 void ComplementFile::outPutLastRecordInPrevChrom()
@@ -146,5 +146,3 @@ void ComplementFile::printRecord(int endPos)
 	_outputMgr->newline();
 
 }
-
-
