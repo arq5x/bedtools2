@@ -125,3 +125,12 @@ $BT shuffle -seed 42 -i simrep.bed  \
 | $BT intersect -a - -b excl.bed | head > obs
 check obs exp
 rm obs exp
+
+###############################################################
+# test an interval that is bigger than the max chrom length
+###############################################################
+echo "    shuffle.t6...\c"
+echo "Error, line 1: tried 1000 potential loci for entry, but could not avoid excluded regions.  Ignoring entry and moving on." > exp
+$BT shuffle -i <(echo -e "chr1\t0\t110") -g <(echo -e "chr1\t100") &> obs
+check obs exp
+rm obs exp
