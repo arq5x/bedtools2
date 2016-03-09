@@ -237,7 +237,8 @@ void RecordOutputMgr::printRecord(RecordKeyVector &keyList, RecordKeyVector *blo
 	if (_context->getProgram() == ContextBase::INTERSECT || _context->getProgram() == ContextBase::SUBTRACT) {
 		if (_printable) {
 			if (keyList.empty()) {
-				if ((static_cast<ContextIntersect *>(_context))->getWriteAllOverlap()) {
+				if ((static_cast<ContextIntersect *>(_context))->getWriteAllOverlap())
+				{
 					// -wao the user wants to force the reporting of 0 overlap
 					if (printKeyAndTerminate(keyList)) {
 						_currBamBlockList = NULL;
@@ -257,7 +258,8 @@ void RecordOutputMgr::printRecord(RecordKeyVector &keyList, RecordKeyVector *blo
 					newline();
 					if (needsFlush()) flush();
 				}
-				else if ((static_cast<ContextIntersect *>(_context))->getLeftJoin()) {
+				else if ((static_cast<ContextIntersect *>(_context))->getLeftJoin()) 
+				{
 					if (printKeyAndTerminate(keyList)) {
 						_currBamBlockList = NULL;
 
