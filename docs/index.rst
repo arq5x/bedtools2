@@ -21,7 +21,7 @@ We have developed a fairly comprehensive `tutorial <http://quinlanlab.org/tutori
 Interesting Usage Examples
 ==========================
 
-In addition, here are a few examples of ways in which bedtools has been used for genome research. If you have interesteding examples, please send them our way and we will add them to the list.
+In addition, here are a few examples of how bedtools has been used for genome research. If you have interesting examples, please send them our way and we will add them to the list.
 
 
 - `Coverage analysis for targeted DNA capture <http://gettinggeneticsdone.blogspot.com/2014/03/visualize-coverage-exome-targeted-ngs-bedtools.html>`_. Thanks to `Stephen Turner <https://twitter.com/genetics_blog>`_.
