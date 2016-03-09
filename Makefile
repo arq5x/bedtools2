@@ -17,11 +17,11 @@ export BIN_DIR	= bin
 export SRC_DIR	= src
 export UTIL_DIR	= src/utils
 export CXX		= g++
-#ifeq ($(DEBUG),1)
-#export CXXFLAGS = -Wall -O0 -g -fno-inline -fkeep-inline-functions -D_FILE_OFFSET_BITS=64 -fPIC -DDEBUG -D_DEBUG
-#else
+ifeq ($(DEBUG),1)
+export CXXFLAGS = -Wall -O0 -g -fno-inline -fkeep-inline-functions -D_FILE_OFFSET_BITS=64 -fPIC -DDEBUG -D_DEBUG
+else
 export CXXFLAGS = -Wall -O2 -D_FILE_OFFSET_BITS=64 -fPIC $(INCLUDES)
-#endif
+endif
 export LIBS		= -lz
 export BT_ROOT  = src/utils/BamTools/
 
@@ -131,19 +131,19 @@ INCLUDES =	-I$(SRC_DIR)/utils/bedFile \
 				-I$(SRC_DIR)/utils/RecordOutputMgr \
 				-I$(SRC_DIR)/utils/ToolBase \
 				-I$(SRC_DIR)/utils/driver \
-				
+
 
 all: print_banner $(OBJ_DIR) $(BIN_DIR) autoversion $(UTIL_SUBDIRS) $(SUBDIRS)
 	@echo "- Building main bedtools binary."
 	@$(CXX) $(CXXFLAGS) $(CPPFLAGS) -c src/bedtools.cpp -o obj/bedtools.o $(INCLUDES)
 	@$(CXX) $(CXXFLAGS) $(CPPFLAGS) -o $(BIN_DIR)/bedtools $(BUILT_OBJECTS) -L$(UTIL_DIR)/BamTools/lib/ -lbamtools $(LIBS) $(LDFLAGS) $(INCLUDES)
 	@echo "done."
-	
+
 	@echo "- Creating executables for old CLI."
 	@python scripts/makeBashScripts.py
 	@chmod +x bin/*
 	@echo "done."
-	
+
 
 .PHONY: all
 
