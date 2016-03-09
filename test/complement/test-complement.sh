@@ -98,9 +98,19 @@ rm obs exp
 ###########################################################
 echo "    complement.t8...\c"
 echo "chr2	0	10" > exp
-$BT complement -i <(echo -e "chr1\t00\t20\nchr2\t10\t20") \
+$BT complement -i <(echo -e "chr1\t0\t20\nchr2\t10\t20") \
                -g <(echo -e "chr1\t20\nchr2\t20") \
                > obs
 check obs exp
 rm obs exp
 
+###########################################################
+# record exceeds chrom length
+###########################################################
+echo "    complement.t9...\c"
+echo -e "***** WARNING: chr1:90-110 exceeds the length of chromosome (chr1)\nchr1\t0\t90" > exp
+$BT complement -i <(echo -e "chr1\t90\t110") \
+               -g <(echo -e "chr1\t100") \
+               &> obs
+check obs exp
+rm obs exp
