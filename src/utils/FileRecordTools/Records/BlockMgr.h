@@ -36,7 +36,8 @@ public:
 	// the total block lengths of the hitList and keyList. All hits that pass will be in the resultList.
 	// Return value is the number of hits in the result set.
 
-	int findBlockedOverlaps(RecordKeyVector &keyList, RecordKeyVector &hitList, RecordKeyVector &resultList);
+	int findBlockedOverlaps(RecordKeyVector &keyList, RecordKeyVector &hitList, 
+							RecordKeyVector &resultList, RecordKeyVector &overlapList);
 
 	//these are setting options for splitting BAM records
 	void setBreakOnDeletionOps(bool val) { _breakOnDeletionOps = val; }

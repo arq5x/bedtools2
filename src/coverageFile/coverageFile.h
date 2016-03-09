@@ -37,6 +37,7 @@ protected:
 	depthMapType _finalDepthMap;
 
 	virtual ContextCoverage *upCast(ContextBase *context) { return static_cast<ContextCoverage*>(context); }
+	
 	void makeDepthCount(RecordKeyVector &hits);
 
 	size_t countBasesAtDepth(size_t depth);
