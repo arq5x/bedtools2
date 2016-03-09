@@ -112,6 +112,7 @@ void SubtractFile::subtractHits(RecordKeyVector &hits) {
 		} else {
             hits.clearVector();
             hits.push_back(hits.getKey());
+        }
 		return;
 	}
 
