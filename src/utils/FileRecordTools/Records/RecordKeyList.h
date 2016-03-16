@@ -22,9 +22,9 @@ public:
     ~RecordKeyList();
 
     const RecordKeyList &operator=(const RecordKeyList &other);
-    const const_iterator_type begin();
-    const const_iterator_type next();
-    const const_iterator_type end();
+    const_iterator_type begin();
+    const_iterator_type next();
+    const_iterator_type end();
     size_t size() const ;
     bool empty() const ; //only checks whether list is empty. Doesn't check key.
     void push_back(elemType item);

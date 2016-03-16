@@ -1,6 +1,6 @@
 #include "sampleFile.h"
 
-static const bool SampleRecordLtFn(const Record *rec1, const Record *rec2) {
+static bool SampleRecordLtFn(const Record *rec1, const Record *rec2) {
 	return (*rec1 < *rec2);
 }
 

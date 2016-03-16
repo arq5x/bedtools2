@@ -48,18 +48,18 @@ const RecordKeyVector &RecordKeyVector::operator=(const RecordKeyVector &other)
 	return *this;
 }
 
-const RecordKeyVector::const_iterator_type RecordKeyVector::begin()  {
+RecordKeyVector::const_iterator_type RecordKeyVector::begin()  {
 	_currPos = 0;
 	return _recVec->begin();
 }
 
-const RecordKeyVector::const_iterator_type RecordKeyVector::next()  {
+RecordKeyVector::const_iterator_type RecordKeyVector::next()  {
 	_currPos++;
 	return _recVec->begin() + _currPos;
 }
 
 
-const RecordKeyVector::const_iterator_type RecordKeyVector::end() {
+RecordKeyVector::const_iterator_type RecordKeyVector::end() {
 	return _recVec->end();
 }
 

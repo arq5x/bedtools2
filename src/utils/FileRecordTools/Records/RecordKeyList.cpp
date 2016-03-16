@@ -26,16 +26,16 @@ const RecordKeyList &RecordKeyList::operator=(const RecordKeyList &other)
 	return *this;
 }
 
-const RecordKeyList::const_iterator_type RecordKeyList::begin()  {
+RecordKeyList::const_iterator_type RecordKeyList::begin()  {
 	return _list.begin();
 }
 
-const RecordKeyList::const_iterator_type RecordKeyList::next()  {
+RecordKeyList::const_iterator_type RecordKeyList::next()  {
 	return _list.next();
 }
 
 
-const RecordKeyList::const_iterator_type RecordKeyList::end() {
+RecordKeyList::const_iterator_type RecordKeyList::end() {
 	return _list.end();
 }
 
