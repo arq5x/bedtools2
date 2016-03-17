@@ -169,7 +169,7 @@ void RegressTest::echoOptions() const
 
 	for (int i=0; i < 2; i++) {
 		fileListType *fileList = i == 0 ?  _correctFiles : _performFiles;
-		fprintf(_fpReportFile, "\n\n\%s TEST FILES:\n", i ==0 ? "CORRECTNESS" : "PERFORMANCE");
+		fprintf(_fpReportFile, "\n\n%s TEST FILES:\n", i ==0 ? "CORRECTNESS" : "PERFORMANCE");
 		for (fileListType::const_iterator iter = fileList->begin(); iter != fileList->end(); iter++) {
 
 			const string &filename = iter->first;
