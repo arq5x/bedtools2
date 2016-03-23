@@ -15,7 +15,7 @@ by combining multiple bedtools operations on the UNIX command line.
 ==========================
 Tutorial
 ==========================
-We have developed a fairly comprehensive `tutorial <http://quinlanlab.org/tutorials/cshl2014/bedtools.html>`_ that demonstrates both the basics, as well as some more advanced examples of how bedtools can help you in your research. Please have a look.
+We have developed a fairly comprehensive `tutorial <http://quinlanlab.org/tutorials/bedtools/bedtools.html>`_ that demonstrates both the basics, as well as some more advanced examples of how bedtools can help you in your research. Please have a look.
 
 ==========================
 Interesting Usage Examples
