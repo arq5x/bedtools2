@@ -518,20 +518,17 @@ void CloseSweep::checkMultiDbs(RecordKeyVector &retList) {
 		copyDists[i]._isNeg = dist < 0;
 		i++;
 	}
-//	sort(copyDists.begin(), copyDists.end(), less<distanceTuple>());
+
+	// sort the hits by distance
 	sort(copyDists.begin(), copyDists.end(), DistanceTupleSortAscFunctor());
+
 	//now we want to build a map telling us what distances are tied,
 	//and how many of each of these there are. Use a map<int, int>,
 	//where the key is a distance (in absolute value) and the value
 	//is the number of ties that that distance has.
-
 	map<int, int> ties;
-	for (i=0; i < numHits; i++) {
-		int j = i +1;
-		while ((j < numHits) && (copyDists[j]._dist == copyDists[i]._dist)) j++;
-		if (j - i > 1) ties[copyDists[i]._dist] = j-i;
-	}
-
+	for (vector<distanceTuple>::iterator i = copyDists.begin(); i != copyDists.end(); ++i)
+    	++ties[i->_dist];
 
 	// Clear the original list and distances, and re-populate
 	// until we have the desired number of hits, skipping
