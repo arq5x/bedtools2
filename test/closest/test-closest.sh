@@ -787,6 +787,41 @@ $BT closest -a null_a.bed -b null_b.bed null_c.bed -names b c > obs
 check exp obs
 rm exp obs
 
+###########################################################
+#  Test -mdb all
+############################################################
+echo "    closest.t69...\c"
+echo \
+"chr10	21805001	21805500	shores.bed	chr10	21803197	21805197	0	0
+chr10	21805001	21805500	tfbs.bed	chr10	21805031	21805041	V	931	-	0	0
+chr10	21805001	21805500	islands.bed	chr10	21805197	21805759	CpG:_22	0	0" > exp
+$BT closest -a dmr.bed -b islands.bed tfbs.bed shores.bed -filenames -d -mdb all > obs
+check exp obs
+rm exp obs
+
+###########################################################
+#  Test -mdb all with the islands record having no overlap
+############################################################
+echo "    closest.t70...\c"
+echo \
+"chr10	21805001	21805500	shores.bed	chr10	21803197	21805197	0	0
+chr10	21805001	21805500	tfbs.bed	chr10	21805031	21805041	V	931	-	0	0" > exp
+$BT closest -a dmr.bed -b islands.2.bed tfbs.bed shores.bed -filenames -d -mdb all > obs
+check exp obs
+rm exp obs
+
+###########################################################
+#  Test -mdb each with the islands record having no overlap
+############################################################
+echo "    closest.t71...\c"
+echo \
+"chr10	21805001	21805500	islands.2.bed	chr10	21805597	21805759	CpG:_22	0	98
+chr10	21805001	21805500	tfbs.bed	chr10	21805031	21805041	V	931	-	0	0
+chr10	21805001	21805500	shores.bed	chr10	21803197	21805197	0	0" > exp
+$BT closest -a dmr.bed -b islands.2.bed tfbs.bed shores.bed -filenames -d -mdb each > obs
+check exp obs
+rm exp obs
+
 cd sortAndNaming
 bash test-sort-and-naming.sh
 cd ..
