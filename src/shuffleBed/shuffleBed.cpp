@@ -34,10 +34,10 @@ BedShuffle::BedShuffle(string &bedFile, string &genomeFile,
     _chooseChrom     = chooseChrom;
     _isBedpe         = isBedpe;
     _maxTries        = maxTries;
-    _tries        = 0;
+    _tries           = 0;
     _noOverlapping   = noOverlapping;
     _preventExceedingChromEnd = preventExceedingChromEnd;
-
+    _cumLen          = 0;
 
     // use the supplied seed for the random
     // number generation if given.  else,
@@ -75,24 +75,12 @@ BedShuffle::BedShuffle(string &bedFile, string &genomeFile,
     
     if (_haveInclude) {
         _include = new BedFile(includeFile);
+	_include->loadBedFileIntoVector();
 
-        // the user wants to choose the chromosome randomly first
-        if (_chooseChrom) {
-            _include->loadBedFileIntoMapNoBin();
-            _numIncludeChroms = 0;
-            masterBedMapNoBin::const_iterator it  = _include->bedMapNoBin.begin(); 
-            masterBedMapNoBin::const_iterator itEnd = _include->bedMapNoBin.end();
-            for(; it != itEnd; ++it) {
-                _includeChroms.push_back(it->first);
-                _numIncludeChroms++;
-            }
-        }
-        // thue user wants the intervals shuffled accordingly to the 
-        // chrom distribution in the -incl file.
-        else
-        {
-            _include->loadBedFileIntoVector();
-        }   
+	for(std::vector<BED>::iterator it = _include->bedList.begin();
+	    it != _include->bedList.end(); it++){
+	  _cumLen += (*it).end - (*it).start;
+	}	
     }
 
     if (_haveExclude == true && _haveInclude == false)
@@ -473,24 +461,26 @@ void BedShuffle::ChooseLocusFromInclusionFile(BED &bedEntry) {
     BED includeInterval;
     
     // choose an -incl interval randomly.
-    if (_chooseChrom == false) {
-        includeInterval = _include->bedList[rand() % _include->bedList.size()];
-        bedEntry.chrom = includeInterval.chrom;
-    }
-    // choose a chromosome randomly from the -incl file. then choose an 
-    // interval from that chrom randomly.
-    else {
-        // grab a random chromosome from the inclusion file.
-        randomChrom            = _includeChroms[rand() % _numIncludeChroms];
-        // get the number of inclusion intervals for that chrom
-        size_t size            =  _include->bedMapNoBin[randomChrom].size();
-        // grab a random interval on the chosen chromosome.
-        size_t interval        = rand() % size;
-        // retrieve a random -incl interval on the selected chrom
-        includeInterval        = _include->bedMapNoBin[randomChrom][interval];
+    
+    bool nohit = true;
+    while(nohit){
+      
+      includeInterval = _include->bedList[rand() % _include->bedList.size()];
+      
+      double prop = double(includeInterval.end
+			   - includeInterval.start) / _cumLen;
+      double runif =((double)rand()/(double)RAND_MAX);
 
-        bedEntry.chrom = randomChrom;
+      if(runif < prop){
+	nohit = false;
+      }
+      if(_sameChrom == true && (includeInterval.chrom != chrom)){
+	nohit = true;
+      }
+           
     }
+
+    bedEntry.chrom = includeInterval.chrom;
     randomStart    = includeInterval.start + rand() % (includeInterval.size());
     bedEntry.start = randomStart;
     bedEntry.end   = randomStart + length;
