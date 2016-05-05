@@ -89,7 +89,6 @@ uint32_t WindowMaker::CalculateWindows(const BED& interval) {
 void WindowMaker::MakeFixedSizeWindow(const BED& interval) {
     uint32_t i=1;
     uint32_t num_windows = CalculateWindows(interval);
-
     for (uint32_t start = interval.start; start <= interval.end; start += _step, ++i) {
         string name = GenerateID(interval, i, num_windows, _reverse);
         if ((start + _size) <= interval.end) {
@@ -103,23 +102,48 @@ void WindowMaker::MakeFixedSizeWindow(const BED& interval) {
 
 void WindowMaker::MakeFixedCountWindow(const BED& interval) {
     uint32_t interval_size = interval.end - interval.start ;
-    uint32_t window_size = (interval_size-1)/_count + 1; // integer version of ceil(interval_size/_count)
+    uint32_t window_size = (interval_size)/_count; // integer version of ceil(interval_size/_count)
 
-    if (window_size==0 || interval_size==0)
+    if (window_size == 0)
+    {
+        cerr << "WARNING: Interval " 
+             << interval.chrom << ":" 
+             << interval.start << "-" 
+             << interval.end
+             << " is smaller than the number of windows requested. Skipping."
+             << endl;
         return;
+    } 
+    if (interval_size == 0)
+    {
+        cerr << "WARNING: Interval " 
+             << interval.chrom << ":" 
+             << interval.start << "-" 
+             << interval.end
+             << " has zero length and cannot be partitioned. Skipping."
+             << endl;
+        return;
+    }
+
 
     uint32_t i=1;
     for (uint32_t start = interval.start; start < interval.end; start += window_size, ++i) {
         string name = GenerateID(interval, i, _count, _reverse);
         uint32_t end = min(start + window_size,interval.end);
+
+        // extend range of last interval if necessary
+        if (i == _count) 
+        {
+            end = interval.end;
+            cout << interval.chrom << "\t" << start << "\t" << end << name << endl;
+            break;
+        }
         cout << interval.chrom << "\t" << start << "\t" << end << name << endl;
     }
 }
 
 string WindowMaker::GenerateID(const BED& interval, uint32_t window_index, uint32_t num_windows, bool _reverse) const {
     stringstream s;
-    // cout << "num_windows: " << num_windows << endl;
-    // cout << "window_index: " << window_index << endl << endl;
     switch(_id_method) {
     case ID_SOURCE_ID:
          s << "\t" << interval.name;
