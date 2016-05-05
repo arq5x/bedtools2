@@ -74,7 +74,7 @@ void GffRecord::print(QuickString &outBuf, int start, int end) const
 	outBuf.append('\t');
 	outBuf.append(_name);
 	outBuf.append('\t');
-	outBuf.append(start +1);
+	outBuf.append(start);
 	outBuf.append('\t');
 	outBuf.append(end);
 	outBuf.append('\t');

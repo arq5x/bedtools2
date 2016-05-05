@@ -648,7 +648,7 @@ check exp obs
 rm exp obs
 
 echo "    intersect.t53...\c"
-echo "\c" > exp
+echo -n "" > exp
 $BT intersect -a x.bed -b y.bed -f 0.21 > obs
 check exp obs
 rm exp obs
@@ -667,13 +667,13 @@ rm exp obs
 # Test basic -f with -F
 ##################################################################
 echo "    intersect.t55...\c"
-echo "\c" > exp
+echo -n "" > exp
 $BT intersect -a x.bed -b y.bed -f 0.21 -F 0.21 -wa -wb > obs
 check exp obs
 rm exp obs
 
 echo "    intersect.t56...\c"
-echo "\c" > exp
+echo -n "" > exp
 $BT intersect -a x.bed -b y.bed -f 0.21 -r -wa -wb > obs
 check exp obs
 rm exp obs
@@ -714,7 +714,7 @@ check exp obs
 rm exp obs
 
 echo "    intersect.t62...\c"
-echo "\c" > exp
+echo -n "" > exp
 $BT intersect -a x.bed -b y.bed -f 0.19 -F 0.51 -wa -wb > obs
 check exp obs
 rm exp obs
@@ -723,7 +723,7 @@ rm exp obs
 # Test basic -f with -F with BAM
 ##################################################################
 echo "    intersect.t63...\c"
-echo "\c" > exp
+echo -n "" > exp
 $BT intersect -a x.bam -b y.bed -f 0.21 -F 0.21 -wa -wb | samtools view - > obs
 check exp obs
 rm exp obs
@@ -750,7 +750,7 @@ check exp obs
 rm exp obs
 
 echo "    intersect.t67...\c"
-echo "\c" > exp
+echo -n "" > exp
 $BT intersect -a x.bam -b y.bed -f 0.19 -F 0.51 -wa -wb | samtools view - > obs
 check exp obs
 rm exp obs
@@ -804,6 +804,70 @@ rm exp obs
 echo "    intersect.t71...\c"
 echo "1	31	32	1	pseudogene	exon	32	32	.	-	.	 gene_id \"ENSG00000224777\"; transcript_id \"ENST00000424047\"; exon_number \"1\"; gene_name \"OR4F2P\"; transcript_name \"OR4F2P-001\";" > exp
 $BT intersect -a a.issue311.bed -b b.issue311.gff -wb > obs
+check exp obs
+rm exp obs
+
+# GFF   ----------
+# BED        -----------
+echo "    intersect.t72...\c"
+echo "1	.	.	16	20	.	-	.	." > exp
+$BT intersect -a <(echo -e  "1\t.\t.\t10\t20\t.\t-\t.\t.") -b <(echo -e  "1\t15\t25") > obs
+check exp obs
+rm exp obs
+
+# BED   ----------
+# GFF        -----------
+echo "    intersect.t73...\c"
+echo "1	15	20" > exp
+$BT intersect -a <(echo -e  "1\t15\t25") -b <(echo -e  "1\t.\t.\t10\t20\t.\t-\t.\t.")  > obs
+check exp obs
+rm exp obs
+
+# GFF        ----------
+# BED    -----------
+echo "    intersect.t74...\c"
+echo "1	.	.	15	20	.	-	.	." > exp
+$BT intersect -a <(echo -e  "1\t.\t.\t15\t25\t.\t-\t.\t.") -b <(echo -e  "1\t10\t20") > obs
+check exp obs
+rm exp obs
+
+# BED        ----------
+# GFF    -----------
+echo "    intersect.t75...\c"
+echo "1	15	20" > exp
+$BT intersect  -a <(echo -e  "1\t15\t25") -b <(echo -e  "1\t.\t.\t10\t20\t.\t-\t.\t.") > obs
+check exp obs
+rm exp obs
+
+# GFF        ----------
+# BED    -------------------
+echo "    intersect.t76...\c"
+echo "1	.	.	15	20	.	-	.	." > exp
+$BT intersect -a <(echo -e  "1\t.\t.\t15\t20\t.\t-\t.\t.") -b <(echo -e  "1\t10\t25") > obs
+check exp obs
+rm exp obs
+
+# BED        ----------
+# GFF    --------------------
+echo "    intersect.t77...\c"
+echo "1	15	20" > exp
+$BT intersect -a <(echo -e "1\t15\t20") -b <(echo -e "1\t.\t.\t10\t25\t.\t-\t.\t.")  > obs
+check exp obs
+rm exp obs
+
+# GFF        ----------
+# BED    -------------------
+echo "    intersect.t78...\c"
+echo "1	.	.	16	20	.	-	.	." > exp
+$BT intersect -a <(echo -e "1\t.\t.\t10\t25\t.\t-\t.\t.") -b <(echo -e "1\t15\t20") > obs
+check exp obs
+rm exp obs
+
+# BED        ----------
+# GFF    --------------------
+echo "    intersect.t79...\c"
+echo "1	14	20" > exp
+$BT intersect -a <(echo -e "1\t10\t25") -b <(echo -e "1\t.\t.\t15\t20\t.\t-\t.\t.")  > obs
 check exp obs
 rm exp obs
 
