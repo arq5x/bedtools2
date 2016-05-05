@@ -256,5 +256,3 @@ $BT genomecov -ibam chip.bam -bg -fs 100 > obs
 check obs exp
 rm obs exp
 
-
-rm *.bam
