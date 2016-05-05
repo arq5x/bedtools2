@@ -33,7 +33,7 @@ public:
 	virtual void setNumPrintFields(int num) { _numPrintFields = num; }
 	virtual int getNumPrintFields() const { return _numPrintFields; }
 	static bool isNumericField(int fieldNum);
-
+	virtual bool isZeroBased() const {return false;};
 
 protected:
 	PlusFields _plusFields;

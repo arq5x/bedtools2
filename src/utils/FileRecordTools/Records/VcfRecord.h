@@ -28,6 +28,7 @@ public:
 	virtual const QuickString &getField(int fieldNum) const;
 	static bool isNumericField(int fieldNum);
 
+	virtual bool isZeroBased() const {return false;};
 protected:
 	QuickString _varRef;
 	QuickString _varAlt;
