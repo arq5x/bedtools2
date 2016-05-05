@@ -648,7 +648,7 @@ check exp obs
 rm exp obs
 
 echo "    intersect.t53...\c"
-echo "\c" > exp
+echo -n "" > exp
 $BT intersect -a x.bed -b y.bed -f 0.21 > obs
 check exp obs
 rm exp obs
@@ -667,13 +667,13 @@ rm exp obs
 # Test basic -f with -F
 ##################################################################
 echo "    intersect.t55...\c"
-echo "\c" > exp
+echo -n "" > exp
 $BT intersect -a x.bed -b y.bed -f 0.21 -F 0.21 -wa -wb > obs
 check exp obs
 rm exp obs
 
 echo "    intersect.t56...\c"
-echo "\c" > exp
+echo -n "" > exp
 $BT intersect -a x.bed -b y.bed -f 0.21 -r -wa -wb > obs
 check exp obs
 rm exp obs
@@ -714,7 +714,7 @@ check exp obs
 rm exp obs
 
 echo "    intersect.t62...\c"
-echo "\c" > exp
+echo -n "" > exp
 $BT intersect -a x.bed -b y.bed -f 0.19 -F 0.51 -wa -wb > obs
 check exp obs
 rm exp obs
@@ -723,7 +723,7 @@ rm exp obs
 # Test basic -f with -F with BAM
 ##################################################################
 echo "    intersect.t63...\c"
-echo "\c" > exp
+echo -n "" > exp
 $BT intersect -a x.bam -b y.bed -f 0.21 -F 0.21 -wa -wb | samtools view - > obs
 check exp obs
 rm exp obs
@@ -750,7 +750,7 @@ check exp obs
 rm exp obs
 
 echo "    intersect.t67...\c"
-echo "\c" > exp
+echo -n "" > exp
 $BT intersect -a x.bam -b y.bed -f 0.19 -F 0.51 -wa -wb | samtools view - > obs
 check exp obs
 rm exp obs
@@ -806,6 +806,37 @@ echo "1	31	32	1	pseudogene	exon	32	32	.	-	.	 gene_id \"ENSG00000224777\"; transc
 $BT intersect -a a.issue311.bed -b b.issue311.gff -wb > obs
 check exp obs
 rm exp obs
+
+
+##################################################################
+# Issue 316. SVLEN and END
+##################################################################
+echo "    intersect.t72...\c"
+
+echo "##fileformat=VCF4.1
+#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO
+1	32	.	A	<DEL>	0	PASS	DP=22;END=52" > a
+echo "##fileformat=VCF4.1
+#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO
+1	52	.	A	T	0	PASS	DP=22;SVLEN=100" > b
+echo "1	32	.	A	<DEL>	0	PASS	DP=22;END=52" > exp
+$BT intersect -a a -b b > obs
+check exp obs
+rm exp obs a b
+
+echo "    intersect.t73...\c"
+
+echo "##fileformat=VCF4.1
+#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO
+1	32	.	A	<DEL>	0	PASS	DP=22;END=51" > a
+echo "##fileformat=VCF4.1
+#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO
+1	52	.	A	T	0	PASS	DP=22;SVLEN=100" > b
+echo -n "" > exp
+$BT intersect -a a -b b > obs
+check exp obs
+rm exp obs a b
+
 
 
 cd multi_intersect
