@@ -658,11 +658,11 @@ rm obs exp
 ############################################################
 echo "    intersect.new.t55...\c"
 echo \
-"chr2L	.	UTR	50	70	0	+	.	ID=mRNA:xs2:UTR:41-70;Parent=mRNA:xs2;
+"chr2L	.	UTR	51	70	0	+	.	ID=mRNA:xs2:UTR:41-70;Parent=mRNA:xs2;
 chr2L	.	CDS	71	100	0	+	.	ID=mRNA:xs2:CDS:71-130;Parent=mRNA:xs2;
-chr2L	.	exon	50	100	0	+	.	ID=mRNA:xs2:exon:41-130;Parent=mRNA:xs2;
-chr2L	.	mRNA	50	100	0	+	.	ID=mRNA:xs2;Parent=g2;
-chr2L	.	gene	50	100	0	+	.	ID=g2;" > exp
+chr2L	.	exon	51	100	0	+	.	ID=mRNA:xs2:exon:41-130;Parent=mRNA:xs2;
+chr2L	.	mRNA	51	100	0	+	.	ID=mRNA:xs2;Parent=g2;
+chr2L	.	gene	51	100	0	+	.	ID=g2;" > exp
 $BT intersect -a gdc.gff -b gdc_one.bed > obs
 check obs exp
 rm obs exp

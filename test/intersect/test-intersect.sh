@@ -807,6 +807,70 @@ $BT intersect -a a.issue311.bed -b b.issue311.gff -wb > obs
 check exp obs
 rm exp obs
 
+# GFF   ----------
+# BED        -----------
+echo "    intersect.t72...\c"
+echo "1	.	.	16	20	.	-	.	." > exp
+$BT intersect -a <(echo -e  "1\t.\t.\t10\t20\t.\t-\t.\t.") -b <(echo -e  "1\t15\t25") > obs
+check exp obs
+rm exp obs
+
+# BED   ----------
+# GFF        -----------
+echo "    intersect.t73...\c"
+echo "1	15	20" > exp
+$BT intersect -a <(echo -e  "1\t15\t25") -b <(echo -e  "1\t.\t.\t10\t20\t.\t-\t.\t.")  > obs
+check exp obs
+rm exp obs
+
+# GFF        ----------
+# BED    -----------
+echo "    intersect.t74...\c"
+echo "1	.	.	15	20	.	-	.	." > exp
+$BT intersect -a <(echo -e  "1\t.\t.\t15\t25\t.\t-\t.\t.") -b <(echo -e  "1\t10\t20") > obs
+check exp obs
+rm exp obs
+
+# BED        ----------
+# GFF    -----------
+echo "    intersect.t75...\c"
+echo "1	15	20" > exp
+$BT intersect  -a <(echo -e  "1\t15\t25") -b <(echo -e  "1\t.\t.\t10\t20\t.\t-\t.\t.") > obs
+check exp obs
+rm exp obs
+
+# GFF        ----------
+# BED    -------------------
+echo "    intersect.t76...\c"
+echo "1	.	.	15	20	.	-	.	." > exp
+$BT intersect -a <(echo -e  "1\t.\t.\t15\t20\t.\t-\t.\t.") -b <(echo -e  "1\t10\t25") > obs
+check exp obs
+rm exp obs
+
+# BED        ----------
+# GFF    --------------------
+echo "    intersect.t77...\c"
+echo "1	15	20" > exp
+$BT intersect -a <(echo -e "1\t15\t20") -b <(echo -e "1\t.\t.\t10\t25\t.\t-\t.\t.")  > obs
+check exp obs
+rm exp obs
+
+# GFF        ----------
+# BED    -------------------
+echo "    intersect.t78...\c"
+echo "1	.	.	16	20	.	-	.	." > exp
+$BT intersect -a <(echo -e "1\t.\t.\t10\t25\t.\t-\t.\t.") -b <(echo -e "1\t15\t20") > obs
+check exp obs
+rm exp obs
+
+# BED        ----------
+# GFF    --------------------
+echo "    intersect.t79...\c"
+echo "1	14	20" > exp
+$BT intersect -a <(echo -e "1\t10\t25") -b <(echo -e "1\t.\t.\t15\t20\t.\t-\t.\t.")  > obs
+check exp obs
+rm exp obs
+
 
 ##################################################################
 # Issue 316. SVLEN and END
