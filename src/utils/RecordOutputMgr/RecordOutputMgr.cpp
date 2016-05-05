@@ -375,7 +375,21 @@ void RecordOutputMgr::reportOverlapDetail(const Record *keyRecord, const Record 
 		if (keyEnd >= hitStart) {
 			//normal intersection, key first
 			maxStart = hitStart;
-			startStr = &(hitRecord->getStartPosStr());
+			// we need to use the zero based version of the start coordinate
+			// for reporting if the hit is 1-based
+			if (hitRecord->getType() == FileRecordTypeChecker::VCF_RECORD_TYPE ||
+				hitRecord->getType() == FileRecordTypeChecker::GFF_RECORD_TYPE ||
+				hitRecord->getType() == FileRecordTypeChecker::GFF_PLUS_RECORD_TYPE
+			   )
+			{
+				QuickString *temp = new QuickString();
+				temp->append(hitRecord->getStartPos());
+				startStr = temp; 
+			}
+			else
+			{
+				startStr = &(hitRecord->getStartPosStr());				
+			}
 			minEnd = min(keyEnd, hitEnd);
 			endStr = keyRecord->getEndPos() < hitRecord->getEndPos() ? &(keyRecord->getEndPosStr()) : &(hitRecord->getEndPosStr());
 		} else {

@@ -792,6 +792,22 @@ $BT intersect  -a blocks.bed12 -b blocks.bed12 -split > obs
 check exp obs
 rm exp obs
 
+##################################################################
+# Issue 311
+##################################################################
+echo "    intersect.t70...\c"
+echo "1	31	32	1	32	.	A	T	0	PASS	DP=22" > exp
+$BT intersect -a a.issue311.bed -b b.issue311.vcf -wb > obs
+check exp obs
+rm exp obs
+
+echo "    intersect.t71...\c"
+echo "1	31	32	1	pseudogene	exon	32	32	.	-	.	 gene_id \"ENSG00000224777\"; transcript_id \"ENST00000424047\"; exon_number \"1\"; gene_name \"OR4F2P\"; transcript_name \"OR4F2P-001\";" > exp
+$BT intersect -a a.issue311.bed -b b.issue311.gff -wb > obs
+check exp obs
+rm exp obs
+
+
 cd multi_intersect
 bash test-multi_intersect.sh
 cd ..
