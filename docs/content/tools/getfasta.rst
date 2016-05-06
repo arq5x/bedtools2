@@ -34,19 +34,20 @@ Usage and option summary
 
 .. code-block:: bash
 
-  $ bedtools getfasta [OPTIONS] -fi <input FASTA> -bed <BED/GFF/VCF> -fo <output FASTA>
+  $ bedtools getfasta [OPTIONS] -fi <input FASTA> -bed <BED/GFF/VCF> 
   
 **(or):**
 
 .. code-block:: bash
 
-  $ getFastaFromBed [OPTIONS] -fi <input FASTA> -bed <BED/GFF/VCF> -fo <output FASTA>
+  $ getFastaFromBed [OPTIONS] -fi <input FASTA> -bed <BED/GFF/VCF>
 
 
 
 ===========================      ===============================================================================================================================================================================================================
  Option                           Description
 ===========================      ===============================================================================================================================================================================================================
+**-fo**                  Specify an output file name. By default, output goes to stdout.
 **-name**				         Use the "name" column in the BED file for the FASTA headers in the output FASTA file.								 
 **-tab**					     Report extract sequences in a tab-delimited format instead of in FASTA format.
 **-s**                           Force strandedness. If the feature occupies the antisense strand, the sequence will be reverse complemented. *Default: strand information is ignored*.
@@ -71,6 +72,11 @@ extracted sequence will be formatted as follows: "<chrom>:<start>-<end>".
   $ cat test.bed
   chr1 5 10
 
+  $ bedtools getfasta -fi test.fa -bed test.bed 
+  >chr1:5-10
+  AAACC
+
+  # optionally write to an output file
   $ bedtools getfasta -fi test.fa -bed test.bed -fo test.fa.out
 
   $ cat test.fa.out
@@ -95,9 +101,7 @@ sequence to be the "name" columns from the BED feature.
   $ cat test.bed
   chr1 5 10 myseq
 
-  $ bedtools getfasta -fi test.fa -bed test.bed -fo test.fa.out -name
-
-  $ cat test.fa.out
+  $ bedtools getfasta -fi test.fa -bed test.bed -name
   >myseq
   AAACC
 
@@ -118,9 +122,7 @@ instead of in FASTA format.
   $ cat test.bed
   chr1 5 10 myseq
 
-  $ bedtools getfasta -fi test.fa -bed test.bed -fo test.fa.out.tab -name -tab
-
-  $ cat test.fa.out
+  $ bedtools getfasta -fi test.fa -bed test.bed -name -tab
   myseq AAACC
   
   
@@ -141,9 +143,7 @@ the strand column when the "-s" option is used.
   chr1 20 25 forward 1 +
   chr1 20 25 reverse 1 -
 
-  $ bedtools getfasta -fi test.fa -bed test.bed -s -name -fo test.fa.out
-
-  $ cat test.fa.out
+  $ bedtools getfasta -fi test.fa -bed test.bed -s -name
   >forward
   CGCTA
   >reverse
@@ -168,7 +168,7 @@ and UTRs in the case of genes described with BED12).
   chr1	235855	267253	ENST00000424587.1	0	-	267253	267253	0	4	2100,150,105,158,	0,2562,23161,31240,
   chr1	317810	328455	ENST00000426316.1	0	+	328455	328455	0	2	323,145,	0,10500,
   
-  $ bedtools getfasta -fi chr1.fa -bed genes.bed12 -split -name -fo stdout
+  $ bedtools getfasta -fi chr1.fa -bed genes.bed12 -split -name
   >ENST00000466557.1
   gaggcgggaagatcacttgatatcaggagtcgaggcgggaagatcacttgacgtcaggagttcgagactggcccggccaacatggtgaaaccgcatctccactaaaaatacaaaaattagcctggtatggtggtgggcacctgtaatcccagtgacttgggaggctaaggcaggagaatttcttgaacccaggaggcagaggttgcagtgaccagcaaggttgcgccattgcaccccagcctgggcgataagagtgaaaactccatctcaaaaaaaaaaaaaaaaaaaaaaTTCCTTTGGGAAGGCCTTCTACATAAAAATCTTCAACATGAGACTGGAAAAAAGGGTATGGGATCATCACCGGACCTTTGGCTTTTACAGCTCGAGCTGACAAAGTTGATTTATCAAGTTGTAAATCTTCACCTGTTGAATTCATAAGTTCATGTCATATTTTCTTTCAGACAATTCTTCAGTTTGTTTACGTAGATCAGCGATACGATGATTCCATTTCTtcggatccttgtaagagcagagcaggtgatggagagggtgggaggtgtagtgacagaagcaggaaactccagtcattcgagacgggcagcacaagctgcggagtgcaggccacctctacggccaggaaacggattctcccgcagagcctcggaagctaccgaccctgctcccaccttgactcagtaggacttactgtagaattctggccttcagacCTGAGCCTGGCAGCTCTCTCCAACTTTGGAAGCCCAGGGGCATGGCCCCTGTCCACAGATGCACCTGGCATGAGGCGTGCCCAGAGGGACAGAGGCAGATGAGTttcgtctcctccactggattgtgagggcCAGAGTTGAACTCCCTCATTTTCCGTTCCCCAGCATTGGCAGGTTCTGGGACTGGTGGCTGTGGTGGCTCGTTGGTCTTTGTCTCTTAGAAGGTGGGGAATAATCATCATCT
   >ENST00000424587.1
@@ -178,7 +178,7 @@ and UTRs in the case of genes described with BED12).
   
   # use the UNIX fold command to wrap the FASTA sequence such that each line
   # has at most 60 characters
-  $ bedtools getfasta -fi chr1.fa -bed genes.bed12 -split -name -fo stdout | \
+  $ bedtools getfasta -fi chr1.fa -bed genes.bed12 -split -name | \
         fold -w 60
   >ENST00000466557.1
   gaggcgggaagatcacttgatatcaggagtcgaggcgggaagatcacttgacgtcaggag
