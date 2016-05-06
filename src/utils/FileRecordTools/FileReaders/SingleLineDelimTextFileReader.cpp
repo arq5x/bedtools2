@@ -3,6 +3,8 @@
 #include "BufferedStreamMgr.h"
 #include "ParseTools.h"
 
+bool abs_cmp(int i, int j) { return abs(i)<abs(j); }
+
 SingleLineDelimTextFileReader::SingleLineDelimTextFileReader(int numFields, char delimChar)
 : _numFields(numFields),
   _delimChar(delimChar),
@@ -133,7 +135,13 @@ bool SingleLineDelimTextFileReader::findDelimiters() {
 	}
 	_delimPositions[currField] = len;
 	if (currField != _numFields) {
-		cerr << "Error: line number " << _lineNum << " of file " << _filename << " has " << currField << " fields, but " << _numFields << " were expected." << endl;
+		cerr << "Error: line number " 
+			 << _lineNum << " of file " 
+			 << _filename << " has " 
+			 << currField << " fields, but " 
+			 << _numFields 
+			 << " were expected." 
+			 << endl;
 		exit(1);
 	}
 	return true;
@@ -156,22 +164,20 @@ int SingleLineDelimTextFileReader::getVcfSVlen() {
         //hey->val
         //SVLEN->100
         if (keytoval.size() == 2) {
-        	if (keytoval.at(0) == "SVLEN")
-        	{
+        	if (keytoval.at(0) == "SVLEN") {
         		vector<int> svlens;
         		Tokenize(keytoval.at(1), svlens, ',');
         		// are the multiple SVLENS?
-        		if (svlens.size() == 1)
-        		{
+        		if (svlens.size() == 1) {
         			return abs(svlens[0]);
         		}
-        		else 
-        		{
-        			return abs(*max_element(svlens.begin(),svlens.end()));
+        		else {
+        			// return the abs_max SVLEN
+        			int max_len = *max_element(svlens.begin(),svlens.end(), abs_cmp);
+        			return abs(max_len);
         		}
         	}
-        	else if (keytoval.at(0) == "END")
-        	{
+        	else if (keytoval.at(0) == "END") {
         		QuickString start_str;
         		getField(1, start_str);
         		// length is END - POS + 1
