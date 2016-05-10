@@ -96,15 +96,15 @@ rm obs exp
 ############################################################
 echo "    makewindows.t05...\c"
 echo \
-"chr5	60000	63334	1
-chr5	63334	66668	2
-chr5	66668	70000	3
-chr5	73000	78667	1
-chr5	78667	84334	2
-chr5	84334	90000	3
-chr5	100000	100334	1
-chr5	100334	100668	2
-chr5	100668	101000	3" > exp
+"chr5	60000	63333	1
+chr5	63333	66666	2
+chr5	66666	70000	3
+chr5	73000	78666	1
+chr5	78666	84332	2
+chr5	84332	90000	3
+chr5	100000	100333	1
+chr5	100333	100666	2
+chr5	100666	101000	3" > exp
 $BT makewindows -n 3 -b input.bed -i winnum > obs
 check obs exp
 rm obs exp
@@ -114,15 +114,63 @@ rm obs exp
 ############################################################
 echo "    makewindows.t06...\c"
 echo \
-"chr5	60000	63334	3
-chr5	63334	66668	2
-chr5	66668	70000	1
-chr5	73000	78667	3
-chr5	78667	84334	2
-chr5	84334	90000	1
-chr5	100000	100334	3
-chr5	100334	100668	2
-chr5	100668	101000	1" > exp
+"chr5	60000	63333	3
+chr5	63333	66666	2
+chr5	66666	70000	1
+chr5	73000	78666	3
+chr5	78666	84332	2
+chr5	84332	90000	1
+chr5	100000	100333	3
+chr5	100333	100666	2
+chr5	100666	101000	1" > exp
 $BT makewindows -n 3 -b input.bed -reverse -i winnum > obs
+check obs exp
+rm obs exp
+
+###########################################################
+#  Test that we alway get the number of requested windows
+###########################################################
+echo "    makewindows.t07...\c"
+echo \
+"1	11	14	A_1
+1	14	17	A_2
+1	17	20	A_3
+1	20	23	A_4
+1	23	26	A_5
+1	26	29	A_6
+1	29	32	A_7
+1	32	35	A_8
+1	35	38	A_9
+1	38	44	A_10" > exp
+$BT makewindows -b a.33bp.bed -n 10 -i srcwinnum> obs
+check obs exp
+rm obs exp
+
+###########################################################
+#  Test that we alway get the number of requested windows
+###########################################################
+echo "    makewindows.t08...\c"
+echo \
+"1	10	12	B_1
+1	12	14	B_2
+1	14	16	B_3
+1	16	18	B_4
+1	18	20	B_5
+1	20	22	B_6
+1	22	24	B_7
+1	24	26	B_8
+1	26	28	B_9
+1	28	30	B_10" > exp
+$BT makewindows -b a.20bp.bed -n 10 -i srcwinnum> obs
+check obs exp
+rm obs exp
+
+###########################################################
+#  interval is smaller than n
+###########################################################
+echo "    makewindows.t09...\c"
+echo \
+"WARNING: Interval 1:10-19 is smaller than the number of windows requested. Skipping." > exp
+$BT makewindows -b a.19bp.bed -n 10 -i srcwinnum 2> obs
 check obs exp
 rm obs exp

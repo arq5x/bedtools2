@@ -172,6 +172,8 @@ void shuffle_help(void) {
     cerr << "\t-incl\t"             << "Instead of randomly placing features in a genome, the -incl" << endl;
     cerr                            << "\t\toptions defines a BED/GFF/VCF file of coordinates in which " << endl;
     cerr                            << "\t\tfeatures in -i should be randomly placed (e.g. genes.bed). " << endl;
+    cerr                            << "\t\tLarger -incl intervals will contain more shuffled regions. " << endl;
+    cerr                            << "\t\tThis method DISABLES -chromFirst. " << endl;
     
     cerr << "\t-chrom\t"            << "Keep features in -i on the same chromosome."<< endl;
     cerr                            << "\t\t- By default, the chrom and position are randomly chosen." << endl;

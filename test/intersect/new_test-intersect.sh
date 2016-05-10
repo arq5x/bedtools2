@@ -658,11 +658,11 @@ rm obs exp
 ############################################################
 echo "    intersect.new.t55...\c"
 echo \
-"chr2L	.	UTR	50	70	0	+	.	ID=mRNA:xs2:UTR:41-70;Parent=mRNA:xs2;
+"chr2L	.	UTR	51	70	0	+	.	ID=mRNA:xs2:UTR:41-70;Parent=mRNA:xs2;
 chr2L	.	CDS	71	100	0	+	.	ID=mRNA:xs2:CDS:71-130;Parent=mRNA:xs2;
-chr2L	.	exon	50	100	0	+	.	ID=mRNA:xs2:exon:41-130;Parent=mRNA:xs2;
-chr2L	.	mRNA	50	100	0	+	.	ID=mRNA:xs2;Parent=g2;
-chr2L	.	gene	50	100	0	+	.	ID=g2;" > exp
+chr2L	.	exon	51	100	0	+	.	ID=mRNA:xs2:exon:41-130;Parent=mRNA:xs2;
+chr2L	.	mRNA	51	100	0	+	.	ID=mRNA:xs2;Parent=g2;
+chr2L	.	gene	51	100	0	+	.	ID=g2;" > exp
 $BT intersect -a gdc.gff -b gdc_one.bed > obs
 check obs exp
 rm obs exp
@@ -792,7 +792,7 @@ rm exp obs
 ###########################################################
 #  Test vcf struct var intersection
 ############################################################
-echo "    intersect.new.t67...\c"
+echo "    intersect.new.t67a...\c"
 echo \
 "19	252806	791255	G	<DEL>	70.90	.	TOOL=LUMPY;SVTYPE=DEL;SVLEN=-389,-4611;END=253195;STR=+-:4;IMPRECISE;CIPOS=-2,137;CIEND=0,0;EVENT=791255;SUP=4;PESUP=4;SRSUP=0;EV=PE;PRIN;CSQ=intergenic_variant||||||||||	19	256900	791255	G	T	70.90	.	TOOL=LUMPY;SVTYPE=DEL;SVLEN=-389,-4611;END=253195;STR=+-:4;IMPRECISE;CIPOS=-2,137;CIEND=0,0;EVENT=791255;SUP=4;PESUP=4;SRSUP=0;EV=PE;PRIN;CSQ=intergenic_variant||||||||||
 19	260365	791256	C	<DEL>	33.71	.	TOOL=LUMPY;SVTYPE=DEL;SVLEN=-680;END=261045;STR=+-:4;IMPRECISE;CIPOS=-1,257;CIEND=0,0;EVENT=791256;SUP=4;PESUP=4;SRSUP=0;EV=PE;PRIN;CSQ=upstream_gene_variant|||ENSG00000271846|CTD-3113P16.9|ENST00000607399|||||processed_pseudogene	19	260800	791256	C	<INS>	33.71	.	TOOL=LUMPY;SVTYPE=DEL;SVLEN=680;END=261045;STR=+-:4;IMPRECISE;CIPOS=-1,257;CIEND=0,0;EVENT=791256;SUP=4;PESUP=4;SRSUP=0;EV=PE;PRIN;CSQ=upstream_gene_variant|||ENSG00000271846|CTD-3113P16.9|ENST00000607399|||||processed_pseudogene
@@ -803,10 +803,16 @@ $BT intersect -a a_vcfSVtest.vcf -b b_vcfSVtest.vcf -wa -wb >obs
 check exp obs
 rm exp obs
 
+echo "    intersect.new.t67b...\c"
+echo -n "" > exp
+$BT intersect -a a_vcfSVtest.vcf -b b_vcfSVtest.vcf -wa -wb -v >obs
+check exp obs
+rm exp obs
+
 ###########################################################
 #  Test vcf struct var intersection, sorted
 ############################################################
-echo "    intersect.new.t68...\c"
+echo "    intersect.new.t68a...\c"
 echo \
 "19	252806	791255	G	<DEL>	70.90	.	TOOL=LUMPY;SVTYPE=DEL;SVLEN=-389,-4611;END=253195;STR=+-:4;IMPRECISE;CIPOS=-2,137;CIEND=0,0;EVENT=791255;SUP=4;PESUP=4;SRSUP=0;EV=PE;PRIN;CSQ=intergenic_variant||||||||||	19	256900	791255	G	T	70.90	.	TOOL=LUMPY;SVTYPE=DEL;SVLEN=-389,-4611;END=253195;STR=+-:4;IMPRECISE;CIPOS=-2,137;CIEND=0,0;EVENT=791255;SUP=4;PESUP=4;SRSUP=0;EV=PE;PRIN;CSQ=intergenic_variant||||||||||
 19	260365	791256	C	<DEL>	33.71	.	TOOL=LUMPY;SVTYPE=DEL;SVLEN=-680;END=261045;STR=+-:4;IMPRECISE;CIPOS=-1,257;CIEND=0,0;EVENT=791256;SUP=4;PESUP=4;SRSUP=0;EV=PE;PRIN;CSQ=upstream_gene_variant|||ENSG00000271846|CTD-3113P16.9|ENST00000607399|||||processed_pseudogene	19	260800	791256	C	<INS>	33.71	.	TOOL=LUMPY;SVTYPE=DEL;SVLEN=680;END=261045;STR=+-:4;IMPRECISE;CIPOS=-1,257;CIEND=0,0;EVENT=791256;SUP=4;PESUP=4;SRSUP=0;EV=PE;PRIN;CSQ=upstream_gene_variant|||ENSG00000271846|CTD-3113P16.9|ENST00000607399|||||processed_pseudogene
@@ -814,5 +820,63 @@ echo \
 19	265986	791258	A	<DEL>	22.15	.	TOOL=LUMPY;SVTYPE=DEL;SVLEN=-401;END=266387;STR=+-:6;IMPRECISE;CIPOS=-2,87;CIEND=0,0;EVENT=791258;SUP=6;PESUP=6;SRSUP=0;EV=PE;PRIN;CSQ=intergenic_variant||||||||||	19	265500	791257	A	<DEL>	20.25	.	TOOL=LUMPY;SVTYPE=DEL;SVLEN=-558;END=265692;STR=+-:4;IMPRECISE;CIPOS=-1,196;CIEND=0,0;EVENT=791257;SUP=4;PESUP=4;SRSUP=0;EV=PE;PRIN;CSQ=intergenic_variant||||||||||
 19	265986	791258	A	<DEL>	22.15	.	TOOL=LUMPY;SVTYPE=DEL;SVLEN=-401;END=266387;STR=+-:6;IMPRECISE;CIPOS=-2,87;CIEND=0,0;EVENT=791258;SUP=6;PESUP=6;SRSUP=0;EV=PE;PRIN;CSQ=intergenic_variant||||||||||	19	266003	791258	A	C	22.15	.	TOOL=LUMPY;SVTYPE=DEL;SVLEN=-401;END=266387;STR=+-:6;IMPRECISE;CIPOS=-2,87;CIEND=0,0;EVENT=791258;SUP=6;PESUP=6;SRSUP=0;EV=PE;PRIN;CSQ=intergenic_variant||||||||||" > exp
 $BT intersect -a a_vcfSVtest.vcf -b b_vcfSVtest.vcf -wa -wb -sorted >obs
+check exp obs
+rm exp obs
+
+echo "    intersect.new.t68b...\c"
+echo -n "" > exp
+$BT intersect -a a_vcfSVtest.vcf -b b_vcfSVtest.vcf -wa -wb -v -sorted>obs
+check exp obs
+rm exp obs
+
+###########################################################
+#  Test intersect -loj with multiple databases
+############################################################
+echo "    intersect.new.t69...\c"
+echo \
+"1	100	200	a1	ax	1	1	100	200	b1	bx
+1	300	400	a2	ay	.	.	-1	-1	.	.
+1	400	500	a3	az	.	.	-1	-1	.	.
+2	500	600	a4	aq	.	.	-1	-1	.	." > exp
+$BT intersect -a null_a.bed -b null_b.bed null_c.bed -loj > obs
+check exp obs
+rm exp obs
+
+###########################################################
+#  Test intersect -loj with multiple databases and -names
+############################################################
+echo "    intersect.new.t70...\c"
+echo \
+"1	100	200	a1	ax	b	1	100	200	b1	bx
+1	300	400	a2	ay	.	.	-1	-1	.	.
+1	400	500	a3	az	.	.	-1	-1	.	.
+2	500	600	a4	aq	.	.	-1	-1	.	." > exp
+$BT intersect -a null_a.bed -b null_b.bed null_c.bed -loj -names b c > obs
+check exp obs
+rm exp obs
+
+###########################################################
+#  Test intersect -wao with multiple databases
+############################################################
+echo "    intersect.new.t71...\c"
+echo \
+"1	100	200	a1	ax	1	1	100	200	b1	bx	100
+1	300	400	a2	ay	.	.	-1	-1	.	.	0
+1	400	500	a3	az	.	.	-1	-1	.	.	0
+2	500	600	a4	aq	.	.	-1	-1	.	.	0" > exp
+$BT intersect -a null_a.bed -b null_b.bed null_c.bed -wao > obs
+check exp obs
+rm exp obs
+
+###########################################################
+#  Test intersect -wao with multiple databases and -names
+############################################################
+echo "    intersect.new.t72...\c"
+echo \
+"1	100	200	a1	ax	b	1	100	200	b1	bx	100
+1	300	400	a2	ay	.	.	-1	-1	.	.	0
+1	400	500	a3	az	.	.	-1	-1	.	.	0
+2	500	600	a4	aq	.	.	-1	-1	.	.	0" > exp
+$BT intersect -a null_a.bed -b null_b.bed null_c.bed -wao -names b c > obs
 check exp obs
 rm exp obs

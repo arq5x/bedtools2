@@ -48,6 +48,7 @@ public:
                       bool bamInput, bool obeySplits,
                       bool filterByStrand, string requestedStrand,
                       bool only_5p_end, bool only_3p_end,
+                      bool pair_chip,bool haveSize, int fragmentSize, bool dUTP,
                       bool eachBaseZeroBased,
                       bool add_gb_track_line, string gb_track_line_opts);
 
@@ -71,6 +72,10 @@ private:
     bool _filterByStrand;
     bool _only_5p_end;
     bool _only_3p_end;
+    bool _pair_chip_;
+    bool _haveSize;
+    bool _dUTP;
+    int _fragmentSize;
     bool _add_gb_track_line;
     string _gb_track_line_opts;
     string _requestedStrand;

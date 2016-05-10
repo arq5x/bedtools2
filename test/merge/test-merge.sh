@@ -145,9 +145,10 @@ rm obs exp
 ###########################################################
 #  Test that stranded merge not allowed with VCF
 ###########################################################
+VCF_FILE=testA.vcf
 echo "    merge.t11...\c"
-echo "***** ERROR: stranded merge not supported for VCF files. *****" >exp
-$BT merge -i testA.vcf -s 2>&1 > /dev/null | head -2 | tail -1 > obs
+echo "***** ERROR: stranded merge not supported for VCF file $VCF_FILE. *****" >exp
+$BT merge -i $VCF_FILE -s 2>&1 > /dev/null | head -2 | tail -1 > obs
 check exp obs
 rm obs exp
 
@@ -533,7 +534,7 @@ rm obs exp
 ###########################################################
 #  Test that struct vars in VCF get correct length
 ###########################################################
-echo "    merge.t44...\c"
+echo "    merge.t44a...\c"
 echo \
 "19	252805	257416
 19	260364	261044
@@ -543,6 +544,15 @@ $BT merge -i vcfSVtest.vcf > obs
 check exp obs
 rm obs exp
 
+###########################################################
+#  Test that struct vars in VCF get correct length
+###########################################################
+echo "    merge.t44b...\c"
+echo \
+"19	252805	297416" > exp
+$BT merge -i vcfSVtest.2.vcf > obs
+check exp obs
+rm obs exp
 
 ###########################################################
 #  Test that stdin is used by default

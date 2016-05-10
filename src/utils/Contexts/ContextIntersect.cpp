@@ -127,14 +127,26 @@ bool ContextIntersect::isValidState()
 		return false;
 	}
 	if (_haveFractionB && _reciprocalFraction) {
-		_errorMsg = "\n***** ERROR: -r must be used with -f. *****";
+		_errorMsg = "\n***** ERROR: -r must be used solely with -f. *****";
 		return false;
 	}
+	if (_haveFractionA && _haveFractionB && _reciprocalFraction) {
+		_errorMsg = "\n***** ERROR: -r must be used solely with -f. *****";
+		return false;
+	}
+
+	// if -f and -r are given, then we need to set _overlapFractionB to be the same as _overlapFractionA
+	if (_haveFractionA && _reciprocalFraction) {
+		setOverlapFractionB(_overlapFractionA);
+	}
+
 	if (getUseDBnameTags() && _dbNameTags.size() != _dbFileIdxs.size()) {
 		_errorMsg = "\n***** ERROR: Number of database name tags given does not match number of databases. *****";
 		return false;
 
 	}
+
+
 	if (getWriteOverlap()) {
 
 		if (getWriteA()) {
@@ -161,6 +173,10 @@ bool ContextIntersect::isValidState()
 	}
 	if (getSameStrand() && getDiffStrand()) {
 		_errorMsg = "\n***** ERROR: request -s for sameStrand, or -S for diffStrand, not both. *****";
+		return false;
+	}
+	if ((getSameStrand() || getDiffStrand()) && !strandedToolSupported()) {
+		//error msg set within strandedToolSupported method.
 		return false;
 	}
 

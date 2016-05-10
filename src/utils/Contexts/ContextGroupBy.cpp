@@ -36,7 +36,7 @@ bool ContextGroupBy::parseCmdArgs(int argc, char **argv, int skipFirstArgs)
 		if (isUsed(_i - _skipFirstArgs)) {
 			continue;
 		}
-		else if (strcmp(_argv[_i], "-g") == 0) {
+		else if ((strcmp(_argv[_i], "-g") == 0) || (strcmp(_argv[_i], "-grp") == 0)) {
 			if (!handle_g()) return false;
 		}
 		else if (strcmp(_argv[_i], "-inheader") == 0) {

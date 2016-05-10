@@ -158,7 +158,7 @@ void BedFile::GetLine(void) {
     getline(*_bedStream, _bedLine);
     
     // ditch \r for Windows.
-    if (_bedLine[_bedLine.size()-1] == '\r') {
+    if (_bedLine.size() && _bedLine[_bedLine.size()-1] == '\r') {
         _bedLine.resize(_bedLine.size()-1);
     }
     // increment the line number

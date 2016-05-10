@@ -49,6 +49,7 @@ Usage and option summary
                                  | ``samtools view -b <BAM> | genomeCoverageBed -ibam stdin -g hg18.genome``
 **-d**                           Report the depth at each genome position with 1-based coordinates.
 **-dz**                          Report the depth at each genome position with 0-based coordinates.
+                                 Unlike, `-d`, this reports only non-zero positions.
 **-bg**                          Report depth in BedGraph format. For details, see: http://genome.ucsc.edu/goldenPath/help/bedgraph.html
 **-bga**                         Report depth in BedGraph format, as above (i.e., -bg). However with this option, regions with zero coverage are also reported. This allows one to quickly extract all regions of a genome with 0 coverage by applying: "grep -w 0$" to the output.
 **-split**                       Treat "split" BAM or BED12 entries as distinct BED intervals when computing coverage. For BAM files, this uses the CIGAR "N" and "D" operations to infer the blocks for computing coverage. For BED12 files, this uses the BlockCount, BlockStarts, and BlockEnds fields (i.e., columns 10,11,12).
@@ -63,6 +64,11 @@ Usage and option summary
 **-trackline**                   | Adds a UCSC/Genome-Browser track line definition in the first line of the output.
                                  | See `here <http://genome.ucsc.edu/goldenPath/help/bedgraph.html>`_ for more details about track line definition:
 **-trackopts**                   Writes additional track line definition parameters in the first line.
+**-pc**                          | Calculates coverage of intervals from left point of a pair reads to the right point.
+                                 | Works for BAM files only
+**-fs**                          | Forces to use fragment size instead of read length
+                                 | Works for BAM files only
+
 ===========================      ===============================================================================================================================================================================================================
 
 
@@ -287,7 +293,7 @@ to
 ==========================================================================
 ``-scale`` Scaling coverage by a constant factor.
 ==========================================================================
-The ``-strand`` option allows one to scale the coverage observed in an interval
+The ``-scale`` option allows one to scale the coverage observed in an interval
 file by a constant factor. Each coverage value is multiplied by this factor 
 before being reported. This can be useful for normalizing coverage by, 
 e.g., metrics such as reads per million (RPM). 
@@ -336,3 +342,23 @@ interstitial intron sequence). The ``-split`` command allows for such
 overlaps to be performed.
 
 
+==============================================================================
+Coverage by fragment
+==============================================================================
+
+|
+
+.. image:: ../images/tool-glyphs/barski_binding_site.png
+
+|
+
+In ChiP-Seq the binding site is usually not at the coordinate where reads map,
+but in the middle of the fragment. For this reason we often try to estimate average fragment size
+for single-read experiment and extend the reads in the 5’-3’ direction up to the estimated fragment length.
+The coverage "by estimated fragments" or by actual pair-end fragments graph is expected to peak at the actual binding site.
+
+
+``-fs`` Forces to use provided fragment size.
+
+
+``-pc`` Calculates coverage for paired-end reads, coverage is calculated as the number of fragments covering each base pair

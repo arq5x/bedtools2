@@ -54,20 +54,43 @@ void ComplementFile::processHits(RecordOutputMgr *outputMgr, RecordKeyVector &hi
 		_outRecord.setChrName(newChrom);
 	}
 
-	int endPos = rec->getStartPos();
-	printRecord(endPos);
+	// warn if the record's interval is beyond the 
+	// length of the chromosome
+	checkCoordinatesAgainstChromLength(rec);
+	
+	// safe guard against the first record for the chrom
+	// starting with 0.
+	if (rec->getStartPos() != 0)
+	{
+		int endPos = rec->getStartPos();
+		printRecord(endPos);
+	}
 	_currStartPos = rec->getEndPos();
 }
+
+void ComplementFile::checkCoordinatesAgainstChromLength(const Record *rec)
+{
+	int maxChromSize = _genomeFile->getChromSize(_currChrom);	
+	if (rec->getStartPos() > maxChromSize || rec->getEndPos() > maxChromSize)
+	{
+		cerr << "***** WARNING: " 
+		     << rec->getChrName() << ":" << rec->getStartPos() << "-" << rec->getEndPos() 
+		     << " exceeds the length of chromosome (" 
+		     << _currChrom
+		     << ")"
+             << endl;
+	}
+} 
 
 void ComplementFile::cleanupHits(RecordKeyVector &hits)
 {
 	_frm->deleteMergedRecord(hits);
 }
 
-bool ComplementFile::finalizeCalculations() {
+void ComplementFile::giveFinalReport(RecordOutputMgr *outputMgr) {
+  	_outputMgr = outputMgr;
 	outPutLastRecordInPrevChrom();
 	fastForward("");
-	return true;
 }
 
 void ComplementFile::outPutLastRecordInPrevChrom()
@@ -123,5 +146,3 @@ void ComplementFile::printRecord(int endPos)
 	_outputMgr->newline();
 
 }
-
-

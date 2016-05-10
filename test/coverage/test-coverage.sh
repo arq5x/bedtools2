@@ -32,9 +32,6 @@ check obs exp
 rm obs exp
 
 
-rm *.bam
-
-
 ##################################################################
 #  Test default
 ##################################################################
@@ -459,11 +456,130 @@ $BT coverage -a a.bed -b b.bed -S > obs
 check exp obs
 rm exp obs
 
+##################################################################
+#  Test -S
+##################################################################
+echo "    coverage.t9...\c"
+echo \
+"chr1	20	70	6	25	+	0	0	50	0.0000000
+chr1	50	100	1	25	-	4	50	50	1.0000000
+chr1	200	250	3	25	+	4	38	50	0.7600000
+chr2	80	130	5	25	-	2	50	50	1.0000000
+chr2	150	200	4	25	+	4	50	50	1.0000000
+chr2	180	230	2	25	-	2	50	50	1.0000000" > exp
+$BT coverage -a a.bed -b b.bed -S > obs
+check exp obs
+rm exp obs
+
+
+##################################################################
+#  Test -split
+##################################################################
+echo "    coverage.t10...\c"
+echo \
+"chr1	0	50	3	30	50	0.6000000
+chr1	12	20	0	0	8	0.0000000" > exp
+$BT coverage -a c.bed -b three_blocks_match.bam -split > obs
+check exp obs
+rm exp obs
+
+##################################################################
+#  Test w/o -split
+##################################################################
+echo "    coverage.t11...\c"
+echo \
+"chr1	0	50	1	50	50	1.0000000
+chr1	12	20	1	8	8	1.0000000" > exp
+$BT coverage -a c.bed -b three_blocks_match.bam  > obs
+check exp obs
+rm exp obs
+
+##################################################################
+#  Test -split and -d
+##################################################################
+echo "    coverage.t12...\c"
+echo \
+"chr1	0	50	1	1
+chr1	0	50	2	1
+chr1	0	50	3	1
+chr1	0	50	4	1
+chr1	0	50	5	1
+chr1	0	50	6	1
+chr1	0	50	7	1
+chr1	0	50	8	1
+chr1	0	50	9	1
+chr1	0	50	10	1
+chr1	0	50	11	0
+chr1	0	50	12	0
+chr1	0	50	13	0
+chr1	0	50	14	0
+chr1	0	50	15	0
+chr1	0	50	16	0
+chr1	0	50	17	0
+chr1	0	50	18	0
+chr1	0	50	19	0
+chr1	0	50	20	0
+chr1	0	50	21	1
+chr1	0	50	22	1
+chr1	0	50	23	1
+chr1	0	50	24	1
+chr1	0	50	25	1
+chr1	0	50	26	1
+chr1	0	50	27	1
+chr1	0	50	28	1
+chr1	0	50	29	1
+chr1	0	50	30	1
+chr1	0	50	31	0
+chr1	0	50	32	0
+chr1	0	50	33	0
+chr1	0	50	34	0
+chr1	0	50	35	0
+chr1	0	50	36	0
+chr1	0	50	37	0
+chr1	0	50	38	0
+chr1	0	50	39	0
+chr1	0	50	40	0
+chr1	0	50	41	1
+chr1	0	50	42	1
+chr1	0	50	43	1
+chr1	0	50	44	1
+chr1	0	50	45	1
+chr1	0	50	46	1
+chr1	0	50	47	1
+chr1	0	50	48	1
+chr1	0	50	49	1
+chr1	0	50	50	1
+chr1	12	20	1	0
+chr1	12	20	2	0
+chr1	12	20	3	0
+chr1	12	20	4	0
+chr1	12	20	5	0
+chr1	12	20	6	0
+chr1	12	20	7	0
+chr1	12	20	8	0" > exp
+$BT coverage -a c.bed -b three_blocks_match.bam -split -d > obs
+check exp obs
+rm exp obs
+
+##################################################################
+#  Test -split and -hist
+##################################################################
+echo "    coverage.t13...\c"
+echo \
+"chr1	0	50	0	20	50	0.4000000
+chr1	0	50	1	30	50	0.6000000
+chr1	12	20	0	8	8	1.0000000
+all	0	28	58	0.4827586
+all	1	30	58	0.5172414" > exp
+$BT coverage -a c.bed -b three_blocks_match.bam -split -hist > obs
+check exp obs
+rm exp obs
+
 
 ##################################################################
 #  Test that -counts, -hist are mutually exclusive options
 ##################################################################
-echo "    coverage.t9...\c"
+echo "    coverage.t14...\c"
 echo \
 "***** ERROR: -counts, -d, -mean, and -hist are all mutually exclusive options. *****" > exp
 $BT coverage -a a.bed -b b.bed -counts -hist 2>&1 > /dev/null | head -2 | tail -1 | cat - > obs
@@ -473,7 +589,7 @@ rm exp obs
 ##################################################################
 #  Test that -counts, -d are mutually exclusive options
 ##################################################################
-echo "    coverage.t10...\c"
+echo "    coverage.t15...\c"
 echo \
 "***** ERROR: -counts, -d, -mean, and -hist are all mutually exclusive options. *****" > exp
 $BT coverage -a a.bed -b b.bed -counts -d 2>&1 > /dev/null | head -2 | tail -1 | cat - > obs
@@ -483,7 +599,7 @@ rm exp obs
 ##################################################################
 #  Test that -hist, -d are mutually exclusive options
 ##################################################################
-echo "    coverage.t11...\c"
+echo "    coverage.t16...\c"
 echo \
 "***** ERROR: -counts, -d, -mean, and -hist are all mutually exclusive options. *****" > exp
 $BT coverage -a a.bed -b b.bed -hist -d 2>&1 > /dev/null | head -2 | tail -1 | cat - > obs
@@ -494,13 +610,11 @@ rm exp obs
 ##################################################################
 #  Test that -mean, -d are mutually exclusive options
 ##################################################################
-echo "    coverage.t12...\c"
+echo "    coverage.t17...\c"
 echo \
 "***** ERROR: -counts, -d, -mean, and -hist are all mutually exclusive options. *****" > exp
 $BT coverage -a a.bed -b b.bed -mean -d 2>&1 > /dev/null | head -2 | tail -1 | cat - > obs
 check exp obs
 rm exp obs
-
-
 
 

@@ -1,0 +1,4 @@
+chr1	0	45	oneblock_comma	0	+	0	0	0	1	45,	0,
+chr1	0	45	oneblock_nocomma	0	+	0	0	0	1	45	0
+chr1	0	50	three_blocks_comma	0	+	0	0	0	3	10,10,10,	0,20,40,
+chr1	0	50	three_blocks_nocomma	0	+	0	0	0	3	10,10,10	0,20,40

@@ -34,6 +34,7 @@ int genomecoverage_main(int argc, char* argv[]) {
     string genomeFile;
     int max = INT_MAX;
     float scale = 1.0;
+    float fragmentSize = 146; //Nucleosome :)
 
     bool haveBed = false;
     bool bamInput = false;
@@ -46,6 +47,9 @@ int genomecoverage_main(int argc, char* argv[]) {
     bool obeySplits = false;
     bool haveScale = false;
     bool filterByStrand = false;
+    bool pair_chip = false;
+    bool haveSize = false;
+    bool dUTP = false;
     bool only_5p_end = false;
     bool only_3p_end = false;
     bool add_gb_track_line = false;
@@ -143,6 +147,19 @@ int genomecoverage_main(int argc, char* argv[]) {
         else if(PARAMETER_CHECK("-5", 2, parameterLength)) {
                 only_5p_end = true;
         }
+        else if(PARAMETER_CHECK("-pc", 3, parameterLength)) {
+                pair_chip = true;
+        }
+        else if(PARAMETER_CHECK("-fs", 3, parameterLength)) {
+            if ((i+1) < argc) {
+                haveSize = true;
+                fragmentSize = atoi(argv[i + 1]);
+                i++;
+            }
+        }
+        else if(PARAMETER_CHECK("-du", 3, parameterLength)) {
+            dUTP = true;
+        }
         else if(PARAMETER_CHECK("-trackline", 10, parameterLength)) {
                 add_gb_track_line = true;
         }
@@ -202,6 +219,7 @@ int genomecoverage_main(int argc, char* argv[]) {
                                                       max, scale, bamInput, obeySplits,
                                                       filterByStrand, requestedStrand,
                                                       only_5p_end, only_3p_end,
+                                                      pair_chip, haveSize, fragmentSize, dUTP,
                                                       eachBaseZeroBased,
                                                       add_gb_track_line, gb_track_opts);
         delete bc;
@@ -251,6 +269,15 @@ void genomecoverage_help(void) {
     cerr << "\t-strand\t\t" << "Calculate coverage of intervals from a specific strand." << endl;
     cerr << "\t\t\tWith BED files, requires at least 6 columns (strand is column 6). " << endl;
     cerr << "\t\t\t- (STRING): can be + or -" << endl << endl;
+
+    cerr << "\t-pc\t\t" << "Calculate coverage of pair-end fragments." << endl;
+    cerr << "\t\t\tWorks for BAM files only" << endl;
+
+    cerr << "\t-fs\t\t" << "Force to use provided fragment size instead of read length" << endl;
+    cerr << "\t\t\tWorks for BAM files only" << endl;
+
+    cerr << "\t-du\t\t" << "Change strand af the mate read (so both reads from the same strand) useful for strand specific" << endl;
+    cerr << "\t\t\tWorks for BAM files only" << endl;
 
     cerr << "\t-5\t\t" << "Calculate coverage of 5\" positions (instead of entire interval)." << endl << endl;
 

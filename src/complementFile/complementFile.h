@@ -25,9 +25,10 @@ public:
 	virtual bool init();
 	virtual bool findNext(RecordKeyVector &hits);
 	virtual void processHits(RecordOutputMgr *outputMgr, RecordKeyVector &hits);
+    virtual void checkCoordinatesAgainstChromLength(const Record *rec);
 	virtual void cleanupHits(RecordKeyVector &hits);
-	virtual bool finalizeCalculations();
-	virtual void  giveFinalReport(RecordOutputMgr *outputMgr) {}
+	virtual bool finalizeCalculations() {return true;}
+	virtual void giveFinalReport(RecordOutputMgr *outputMgr);
 
 
 protected:

@@ -769,32 +769,32 @@ rm obs exp
 
 
 ###########################################################
-#  Test stddev
+#  Test stdev
 ############################################################
 echo "    map.t51...\c"
 echo \
-"chr1	0	100	12.91666667
+"chr1	0	100	3.593976442
 chr1	100	200	0
 chr2	0	100	.
 chr2	100	200	.
-chr3	0	100	76.22222222
-chr3	100	200	0.25" > exp
-$BT map -a ivls.bed -b values4.bed -c 7 -o stddev > obs
+chr3	0	100	8.730533902
+chr3	100	200	0.5" > exp
+$BT map -a ivls.bed -b values4.bed -c 7 -o stdev > obs
 check obs exp
 rm obs exp
 
 ###########################################################
-#  Test sample_stddev
+#  Test sstdev
 ############################################################
 echo "    map.t52...\c"
 echo \
-"chr1	0	100	15.5
+"chr1	0	100	3.937003937
 chr1	100	200	.
 chr2	0	100	.
 chr2	100	200	.
-chr3	0	100	114.3333333
-chr3	100	200	0.5" > exp
-$BT map -a ivls.bed -b values4.bed -c 7 -o sample_stddev > obs
+chr3	0	100	10.69267662
+chr3	100	200	0.7071067812" > exp
+$BT map -a ivls.bed -b values4.bed -c 7 -o sstdev > obs
 check obs exp
 rm obs exp
 

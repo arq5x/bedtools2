@@ -319,7 +319,7 @@ BIN getBin(CHRPOS start, CHRPOS end) {
     start >>= _binFirstShift;
     end   >>= _binFirstShift;
 
-    for (register short i = 0; i < _binLevels; ++i) {
+    for (short i = 0; i < _binLevels; ++i) {
         if (start == end) return _binOffsetsExtended[i] + start;
         start >>= _binNextShift;
         end   >>= _binNextShift;
@@ -786,7 +786,7 @@ private:
                     bed.other_idxs.push_back(i);
             }
 
-            if ((bed.start <= bed.end) && (bed.start >= 0) && (bed.end >= 0)) {
+            if ((bed.start <= bed.end) && (bed.start >= 0) && ((bed.end) >= 0)) {
                 return true;
             }
             else if (bed.start > bed.end) {
@@ -796,7 +796,7 @@ private:
                     << endl;
                 exit(1);
             }
-            else if ( (bed.start < 0) || (bed.end < 0) ) {
+            else if ( (bed.start < 0) || ((bed.end) < 0) ) {
                 cerr << "Error: malformed VCF entry at line " 
                      << _lineNum << ". Coordinate detected that is < 0. "
                      << "Exiting." 
@@ -874,7 +874,7 @@ private:
                      << endl;
                 exit(1);
             }
-            if ( (bed.start < 0) || (bed.end < 0) ) {
+            if ( (bed.start < 0) || ((bed.end) < 0) ) {
                 cerr << "Error: malformed GFF entry at line " 
                      << _lineNum 
                      << ". Coordinate detected that is < 1. Exiting." 

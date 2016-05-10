@@ -54,7 +54,7 @@ int bedpetobam_main(int argc, char* argv[]) {
     string bedpeFile = "stdin";
     string genomeFile;
 
-    unsigned int mapQual = 255;
+    int mapQual = 255;
 
     bool haveBedPE         = true;
     bool haveGenome      = false;

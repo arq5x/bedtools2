@@ -90,13 +90,17 @@ void GroupBy::processHits(RecordOutputMgr *outputMgr, RecordKeyVector &hits)
 		outBuf.append(opVal);
 		outputMgr->printRecord(NULL, outBuf);
 	}
+	cleanupHits(hits);
 }
 
 void GroupBy::cleanupHits(RecordKeyVector &hits)
 {
-	_queryFRM->deleteRecord(hits.getKey());
+	RecordKeyVector::const_iterator_type iter = hits.begin();
+	for (; iter != hits.end(); iter = hits.next()) 
+	{
+		_queryFRM->deleteRecord(*iter);	
+	}
 	hits.clearAll();
-
 }
 
 const Record *GroupBy::getNextRecord() {

@@ -17,15 +17,15 @@ export BIN_DIR	= bin
 export SRC_DIR	= src
 export UTIL_DIR	= src/utils
 export CXX		= g++
-#ifeq ($(DEBUG),1)
-#export CXXFLAGS = -Wall -O0 -g -fno-inline -fkeep-inline-functions -D_FILE_OFFSET_BITS=64 -fPIC -DDEBUG -D_DEBUG
-#else
+ifeq ($(DEBUG),1)
+export CXXFLAGS = -Wall -O0 -g -fno-inline -fkeep-inline-functions -D_FILE_OFFSET_BITS=64 -fPIC -DDEBUG -D_DEBUG
+else
 export CXXFLAGS = -Wall -O2 -D_FILE_OFFSET_BITS=64 -fPIC $(INCLUDES)
-#endif
+endif
 export LIBS		= -lz
 export BT_ROOT  = src/utils/BamTools/
 
-prefix = /usr/local
+prefix ?= /usr/local
 
 SUBDIRS = $(SRC_DIR)/annotateBed \
 		  $(SRC_DIR)/bamToBed \
@@ -53,7 +53,6 @@ SUBDIRS = $(SRC_DIR)/annotateBed \
 		  $(SRC_DIR)/mergeFile \
 		  $(SRC_DIR)/multiBamCov \
 		  $(SRC_DIR)/multiIntersectBed \
-		  $(SRC_DIR)/nekSandbox1 \
 		  $(SRC_DIR)/nucBed \
 		  $(SRC_DIR)/pairToBed \
 		  $(SRC_DIR)/pairToPair \
@@ -61,6 +60,7 @@ SUBDIRS = $(SRC_DIR)/annotateBed \
 		  $(SRC_DIR)/regressTest \
 		  $(SRC_DIR)/reldist \
 		  $(SRC_DIR)/sampleFile \
+		  $(SRC_DIR)/shiftBed \
 		  $(SRC_DIR)/shuffleBed \
 		  $(SRC_DIR)/slopBed \
 		  $(SRC_DIR)/sortBed \
@@ -72,15 +72,15 @@ SUBDIRS = $(SRC_DIR)/annotateBed \
 		  $(SRC_DIR)/windowBed \
 		  $(SRC_DIR)/windowMaker
 
-UTIL_SUBDIRS =	$(SRC_DIR)/utils/bedFile \
+UTIL_SUBDIRS =	$(SRC_DIR)/utils/FileRecordTools \
+				$(SRC_DIR)/utils/FileRecordTools/FileReaders \
+				$(SRC_DIR)/utils/FileRecordTools/Records \
+				$(SRC_DIR)/utils/bedFile \
 				$(SRC_DIR)/utils/BinTree \
 				$(SRC_DIR)/utils/version \
 				$(SRC_DIR)/utils/bedGraphFile \
 				$(SRC_DIR)/utils/chromsweep \
 				$(SRC_DIR)/utils/Contexts \
-				$(SRC_DIR)/utils/FileRecordTools \
-				$(SRC_DIR)/utils/FileRecordTools/FileReaders \
-				$(SRC_DIR)/utils/FileRecordTools/Records \
 				$(SRC_DIR)/utils/general \
 				$(SRC_DIR)/utils/gzstream \
 				$(SRC_DIR)/utils/fileType \
@@ -114,7 +114,8 @@ INCLUDES =	-I$(SRC_DIR)/utils/bedFile \
 				-I$(SRC_DIR)/utils/general \
 				-I$(SRC_DIR)/utils/gzstream \
 				-I$(SRC_DIR)/utils/fileType \
-				-I$(SRC_DIR)/utils/bedFilePE \
+				-I$(SRC_DIR)/utils/gzstream/ \
+				-I$(SRC_DIR)/utils/lineFileUtilities \
 				-I$(SRC_DIR)/utils/KeyListOps \
 				-I$(SRC_DIR)/utils/NewChromsweep \
 				-I$(SRC_DIR)/utils/sequenceUtilities \
@@ -130,19 +131,19 @@ INCLUDES =	-I$(SRC_DIR)/utils/bedFile \
 				-I$(SRC_DIR)/utils/RecordOutputMgr \
 				-I$(SRC_DIR)/utils/ToolBase \
 				-I$(SRC_DIR)/utils/driver \
-				
+
 
 all: print_banner $(OBJ_DIR) $(BIN_DIR) autoversion $(UTIL_SUBDIRS) $(SUBDIRS)
 	@echo "- Building main bedtools binary."
 	@$(CXX) $(CXXFLAGS) $(CPPFLAGS) -c src/bedtools.cpp -o obj/bedtools.o $(INCLUDES)
 	@$(CXX) $(CXXFLAGS) $(CPPFLAGS) -o $(BIN_DIR)/bedtools $(BUILT_OBJECTS) -L$(UTIL_DIR)/BamTools/lib/ -lbamtools $(LIBS) $(LDFLAGS) $(INCLUDES)
 	@echo "done."
-	
+
 	@echo "- Creating executables for old CLI."
 	@python scripts/makeBashScripts.py
 	@chmod +x bin/*
 	@echo "done."
-	
+
 
 .PHONY: all
 

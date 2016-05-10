@@ -70,7 +70,7 @@ public:
 	ContextFileType getOutputFileType() const { return _outputFileType; }
 
 	virtual bool testCmdArgs(int argc, char **argv);
-	virtual bool errorEncountered() const { return !_errorMsg.empty(); }
+	virtual bool errorEncountered();
 
 	 //isValidState checks that parameters to context are in an acceptable state.
 	// If not, the error msg string will be set with a reason why it failed.
@@ -159,6 +159,7 @@ protected:
 	vector<FileRecordMgr *> _files;
 	bool _allFilesOpened;
 	map<QuickString, PROGRAM_TYPE> _programNames;
+	QuickString _origProgramName;
 
 	NewGenomeFile *_genomeFile;
 
@@ -302,6 +303,7 @@ protected:
     //private error handler
     void setErrorMsg(QuickString &msg, bool onlyWarn, const Record * record, QuickString str1, const QuickString str2, const QuickString str3);
 
+    bool strandedToolSupported();
 
 };
 

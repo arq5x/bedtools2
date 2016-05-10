@@ -19,6 +19,7 @@
 using namespace std;
 
 bool isNumeric(const QuickString &str);
+bool isInteger(const QuickString &str);
 
 //This method is a faster version of atoi, but is limited to a maximum of
 //9 digit numbers in Base 10 only. The string may begin with a negative.
@@ -48,7 +49,7 @@ void int2str(int number, T& buffer, bool appendToBuf = false)
 	}
 	//check for negative numbers.
 	bool isNegative = number < 0;
-	register unsigned useNum = number;
+	unsigned useNum = number;
 	if (isNegative) {
 		useNum = 0 - useNum; //convert to positive.
 	}

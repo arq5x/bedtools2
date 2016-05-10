@@ -8,8 +8,10 @@
 #ifndef SINGLELINETEXTFILEREADER_H_
 #define SINGLELINETEXTFILEREADER_H_
 
+#include <algorithm>
 #include "FileReader.h"
 #include "QuickString.h"
+#include "lineFileUtilities.h"
 
 class SingleLineDelimTextFileReader : public FileReader {
 public:

@@ -674,6 +674,154 @@ $BT closest -a a.bed -b b.bed -header > obs
 check exp obs
 rm exp obs
 
+
+###########################################################
+#
+# BUG 281 TESTS: -s and -S (correct cache purging for 
+#   opposite strand sweep).
+#
+###########################################################
+
+###########################################################
+# a_med vs b, -s
+###########################################################
+echo "    closest.t60...\c"
+echo \
+"chr1	249120154	249120155	21176	0	-	chr1	247242115	247242116	551	0	-
+chr1	249132529	249132530	6425	0	+	chr1	247495324	247495325	510	0	+" > exp
+$BT closest -a bug281_a.medium.bed -b bug281_b.bed -s > obs
+check exp obs
+rm exp obs
+
+
+###########################################################
+# a_med vs b, -S
+###########################################################
+echo "    closest.t61...\c"
+echo \
+"chr1	249120154	249120155	21176	0	-	chr1	247495324	247495325	510	0	+
+chr1	249132529	249132530	6425	0	+	chr1	247242115	247242116	551	0	-" > exp
+$BT closest -a bug281_a.medium.bed -b bug281_b.bed -S > obs
+check exp obs
+rm exp obs
+
+###########################################################
+# a_med.flip vs b, -s
+###########################################################
+echo "    closest.t62...\c"
+echo \
+"chr1	249120154	249120155	21176	0	+	chr1	247495324	247495325	510	0	+
+chr1	249132529	249132530	6425	0	-	chr1	247242115	247242116	551	0	-" > exp
+$BT closest -a bug281_a.flip.medium.bed -b bug281_b.bed -s > obs
+check exp obs
+rm exp obs
+
+###########################################################
+# a_med.flip vs b, -S
+###########################################################
+echo "    closest.t63...\c"
+echo \
+"chr1	249120154	249120155	21176	0	+	chr1	247242115	247242116	551	0	-
+chr1	249132529	249132530	6425	0	-	chr1	247495324	247495325	510	0	+" > exp
+$BT closest -a bug281_a.flip.medium.bed -b bug281_b.bed -S > obs
+check exp obs
+rm exp obs
+
+###########################################################
+# a_med vs b.flip, -s
+###########################################################
+echo "    closest.t64...\c"
+echo \
+"chr1	249120154	249120155	21176	0	-	chr1	247495324	247495325	510	0	-
+chr1	249132529	249132530	6425	0	+	chr1	247242115	247242116	551	0	+" > exp
+$BT closest -a bug281_a.medium.bed -b bug281_b.flip.bed -s > obs
+check exp obs
+rm exp obs
+
+###########################################################
+# a_med vs b.flip, -S
+###########################################################
+echo "    closest.t65...\c"
+echo \
+"chr1	249120154	249120155	21176	0	-	chr1	247242115	247242116	551	0	+
+chr1	249132529	249132530	6425	0	+	chr1	247495324	247495325	510	0	-" > exp
+$BT closest -a bug281_a.medium.bed -b bug281_b.flip.bed -S > obs
+check exp obs
+rm exp obs
+
+###########################################################
+# a_med.flip vs b.flip, -s
+###########################################################
+echo "    closest.t66...\c"
+echo \
+"chr1	249120154	249120155	21176	0	+	chr1	247242115	247242116	551	0	+
+chr1	249132529	249132530	6425	0	-	chr1	247495324	247495325	510	0	-" > exp
+$BT closest -a bug281_a.flip.medium.bed -b bug281_b.flip.bed -s > obs
+check exp obs
+rm exp obs
+
+###########################################################
+# a_med.flip vs b.flip, -S
+###########################################################
+echo "    closest.t67...\c"
+echo \
+"chr1	249120154	249120155	21176	0	+	chr1	247495324	247495325	510	0	-
+chr1	249132529	249132530	6425	0	-	chr1	247242115	247242116	551	0	+" > exp
+$BT closest -a bug281_a.flip.medium.bed -b bug281_b.flip.bed -S > obs
+check exp obs
+rm exp obs
+
+###########################################################
+#  Test intersect -wao with multiple databases and -names
+############################################################
+echo "    closest.t68...\c"
+echo \
+"1	100	200	a1	ax	b	1	100	200	b1	bx
+1	100	200	a1	ax	c	1	500	600	c4	cq
+1	300	400	a2	ay	b	1	100	200	b1	bx
+1	300	400	a2	ay	c	1	500	600	c4	cq
+1	400	500	a3	az	b	1	100	200	b1	bx
+1	400	500	a3	az	c	1	500	600	c4	cq
+2	500	600	a4	aq	.	.	-1	-1	.	." > exp
+$BT closest -a null_a.bed -b null_b.bed null_c.bed -names b c > obs
+check exp obs
+rm exp obs
+
+###########################################################
+#  Test -mdb all
+############################################################
+echo "    closest.t69...\c"
+echo \
+"chr10	21805001	21805500	shores.bed	chr10	21803197	21805197	0	0
+chr10	21805001	21805500	tfbs.bed	chr10	21805031	21805041	V	931	-	0	0
+chr10	21805001	21805500	islands.bed	chr10	21805197	21805759	CpG:_22	0	0" > exp
+$BT closest -a dmr.bed -b islands.bed tfbs.bed shores.bed -filenames -d -mdb all > obs
+check exp obs
+rm exp obs
+
+###########################################################
+#  Test -mdb all with the islands record having no overlap
+############################################################
+echo "    closest.t70...\c"
+echo \
+"chr10	21805001	21805500	shores.bed	chr10	21803197	21805197	0	0
+chr10	21805001	21805500	tfbs.bed	chr10	21805031	21805041	V	931	-	0	0" > exp
+$BT closest -a dmr.bed -b islands.2.bed tfbs.bed shores.bed -filenames -d -mdb all > obs
+check exp obs
+rm exp obs
+
+###########################################################
+#  Test -mdb each with the islands record having no overlap
+############################################################
+echo "    closest.t71...\c"
+echo \
+"chr10	21805001	21805500	islands.2.bed	chr10	21805597	21805759	CpG:_22	0	98
+chr10	21805001	21805500	tfbs.bed	chr10	21805031	21805041	V	931	-	0	0
+chr10	21805001	21805500	shores.bed	chr10	21803197	21805197	0	0" > exp
+$BT closest -a dmr.bed -b islands.2.bed tfbs.bed shores.bed -filenames -d -mdb each > obs
+check exp obs
+rm exp obs
+
 cd sortAndNaming
 bash test-sort-and-naming.sh
 cd ..

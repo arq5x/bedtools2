@@ -186,6 +186,11 @@ void RecordOutputMgr::printClosest(RecordKeyVector &keyList, const vector<int> *
 	} else {
 		printKey(keyRec, keyRec->getStartPosStr(), keyRec->getEndPosStr());
 		tab();
+		// need to add a dummy file id if multiple DB files are used
+		if (_context->getNumInputFiles() > 2) {
+			_outBuf.append('.');
+			tab();
+		}		
 		null(false, true);
 		if (context->reportDistance()) {
 			tab();
@@ -232,23 +237,29 @@ void RecordOutputMgr::printRecord(RecordKeyVector &keyList, RecordKeyVector *blo
 	if (_context->getProgram() == ContextBase::INTERSECT || _context->getProgram() == ContextBase::SUBTRACT) {
 		if (_printable) {
 			if (keyList.empty()) {
-				if ((static_cast<ContextIntersect *>(_context))->getWriteAllOverlap()) {
+				if ((static_cast<ContextIntersect *>(_context))->getWriteAllOverlap())
+				{
 					// -wao the user wants to force the reporting of 0 overlap
 					if (printKeyAndTerminate(keyList)) {
-
 						_currBamBlockList = NULL;
 						const_cast<Record *>(keyList.getKey())->adjustZeroLength();
 
 						return;
 					}
 					tab();
+					// need to add a dummy file id if multiple DB files are used
+					if (_context->getNumInputFiles() > 2) {
+						_outBuf.append('.');
+						tab();
+					}
 					null(false, true);
 					tab();
 					_outBuf.append('0');
 					newline();
 					if (needsFlush()) flush();
 				}
-				else if ((static_cast<ContextIntersect *>(_context))->getLeftJoin()) {
+				else if ((static_cast<ContextIntersect *>(_context))->getLeftJoin()) 
+				{
 					if (printKeyAndTerminate(keyList)) {
 						_currBamBlockList = NULL;
 
@@ -256,6 +267,11 @@ void RecordOutputMgr::printRecord(RecordKeyVector &keyList, RecordKeyVector *blo
 						return;
 					}
 					tab();
+					// need to add a dummy file id if multiple DB files are used
+					if (_context->getNumInputFiles() > 2) {
+						_outBuf.append('.');
+						tab();
+					}
 					null(false, true);
 					newline();
 					if (needsFlush()) flush();
@@ -322,104 +338,66 @@ void RecordOutputMgr::checkForHeader() {
 
 void RecordOutputMgr::reportOverlapDetail(const Record *keyRecord, const Record *hitRecord, int hitIdx)
 {
-	//get the max start and min end as strings.
-	const_cast<Record *>(hitRecord)->undoZeroLength();
 
+	// overlap interval is defined by min(e1,e2) - max(s1,s2)
+	int maxStart = max(keyRecord->getStartPos(), hitRecord->getStartPos());
+	int minEnd = min(keyRecord->getEndPos(), hitRecord->getEndPos());
 
-	const QuickString *startStr = NULL;
-	const QuickString *endStr = NULL;
-	int maxStart = 0;
-	int minEnd = 0;
+	// need to undo our conversion of 1-based start coordinates to 0-based
+	if (!keyRecord->isZeroBased())
+		maxStart++;
 
-	int keyStart = keyRecord->getStartPos();
-	int keyEnd = keyRecord->getEndPos();
-	int hitStart = hitRecord->getStartPos();
-	int hitEnd = hitRecord->getEndPos();
-
-	if (  keyStart>= hitStart) {
-		//the key start is after the hit start, but we need to check and make sure the hit end is at least after the keyStart.
-		//The reason for this is that, in some rare cases, such as both the key and hit having been zero length intervals,
-		//the normal process for intersection that allows us to simply report the maxStart and minEnd do not necessarily apply.
-		if (hitEnd >= keyStart) {
-			//this is ok. We have a normal intersection where the key comes after the hit.
-
-			maxStart = keyStart;
-			startStr = &(keyRecord->getStartPosStr());
-
-			minEnd = min(keyEnd, hitEnd);
-			endStr = keyRecord->getEndPos() < hitRecord->getEndPos() ? &(keyRecord->getEndPosStr()) : &(hitRecord->getEndPosStr());
-
-		} else {
-			//this is the weird case of not a "real" intersection. The keyStart is greater than the hitEnd. So just report the key as is.
-			maxStart = keyStart;
-			minEnd = keyEnd;
-			startStr = &(keyRecord->getStartPosStr());
-			endStr = &(keyRecord->getEndPosStr());
-		}
-
-	} else {
-		//all of the above, but backwards. keyStart is before hitStart.
-		if (keyEnd >= hitStart) {
-			//normal intersection, key first
-			maxStart = hitStart;
-			startStr = &(hitRecord->getStartPosStr());
-			minEnd = min(keyEnd, hitEnd);
-			endStr = keyRecord->getEndPos() < hitRecord->getEndPos() ? &(keyRecord->getEndPosStr()) : &(hitRecord->getEndPosStr());
-		} else {
-			//this is the weird case of not a "real" intersection. The hitStart is greater than the keyEnd. So just report the hit as is.
-			maxStart = hitStart;
-			minEnd = hitEnd;
-			startStr = &(hitRecord->getStartPosStr());
-			endStr = &(hitRecord->getEndPosStr());
-
-		}
-	}
-
-
+	// all of the different printing scenarios based upon the options used.
 	if (!(static_cast<ContextIntersect *>(_context))->getWriteA() && !(static_cast<ContextIntersect *>(_context))->getWriteB()
 			&& !(static_cast<ContextIntersect *>(_context))->getWriteOverlap() && !(static_cast<ContextIntersect *>(_context))->getLeftJoin()) {
-		printKey(keyRecord, *startStr, *endStr);
-		newline();
-		if (needsFlush()) flush();
+		const_cast<Record *>(keyRecord)->undoZeroLength();
+		printKey(keyRecord, maxStart, minEnd);
 	}
 	else if (((static_cast<ContextIntersect *>(_context))->getWriteA() &&
 			(static_cast<ContextIntersect *>(_context))->getWriteB()) || (static_cast<ContextIntersect *>(_context))->getLeftJoin()) {
+		const_cast<Record *>(keyRecord)->undoZeroLength();
 		printKey(keyRecord);
 		tab();
+		const_cast<Record *>(hitRecord)->undoZeroLength();
 		addDbFileId(hitRecord->getFileIdx());
 		hitRecord->print(_outBuf);
-		newline();
-		if (needsFlush()) flush();
 	}
 	else if ((static_cast<ContextIntersect *>(_context))->getWriteA()) {
+		const_cast<Record *>(keyRecord)->undoZeroLength();
 		printKey(keyRecord);
-		newline();
-		if (needsFlush()) flush();
 	}
 	else if ((static_cast<ContextIntersect *>(_context))->getWriteB()) {
-		printKey(keyRecord, *startStr, *endStr);
+		printKey(keyRecord, maxStart, minEnd);
 		tab();
 		addDbFileId(hitRecord->getFileIdx());
+		const_cast<Record *>(hitRecord)->undoZeroLength();
 		hitRecord->print(_outBuf);
-		newline();
-		if (needsFlush()) flush();
 	}
 	else if ((static_cast<ContextIntersect *>(_context))->getWriteOverlap()) {
 		int printOverlapBases = 0;
 		if (_context->getObeySplits()) {
 			printOverlapBases = _context->getSplitBlockInfo()->getOverlapBases(hitIdx);
 		} else {
+			// if one of the records was zerolength, the number of
+			// overlapping bases needs to be corrected 
+			if (keyRecord->isZeroLength() || hitRecord->isZeroLength	())
+			{
+				maxStart++;
+				minEnd--;
+			}
 			printOverlapBases = minEnd - maxStart;
 		}
+		const_cast<Record *>(keyRecord)->undoZeroLength();
 		printKey(keyRecord);
 		tab();
 		addDbFileId(hitRecord->getFileIdx());
+		const_cast<Record *>(hitRecord)->undoZeroLength();
 		hitRecord->print(_outBuf);
 		tab();
 		int2str(printOverlapBases, _outBuf, true);
-		newline();
-		if (needsFlush()) flush();
 	}
+	newline();
+    if (needsFlush()) flush();
 	const_cast<Record *>(hitRecord)->adjustZeroLength();
 }
 
@@ -475,7 +453,6 @@ void RecordOutputMgr::null(bool queryType, bool dbType)
 	}
 	//This is kind of a hack. Need an instance of the correct class of record in order to call it's printNull method.
 	Record *dummyRecord = NULL;
-
 	switch (recordType) {
 	case FileRecordTypeChecker::BED3_RECORD_TYPE:
 		dummyRecord = new Bed3Interval();
@@ -499,6 +476,10 @@ void RecordOutputMgr::null(bool queryType, bool dbType)
 		dummyRecord = new BedPlusInterval();
 		(static_cast<BedPlusInterval *>(dummyRecord))->setNumPrintFields((static_cast<ContextIntersect *>(_context))->getMaxNumDatabaseFields());
 		break;
+	case FileRecordTypeChecker::BED6_PLUS_RECORD_TYPE:
+		dummyRecord = new BedPlusInterval();
+		(static_cast<BedPlusInterval *>(dummyRecord))->setNumPrintFields((static_cast<ContextIntersect *>(_context))->getMaxNumDatabaseFields());
+		break;
 	case FileRecordTypeChecker::VCF_RECORD_TYPE:
 		dummyRecord = new VcfRecord();
 		(static_cast<VcfRecord *>(dummyRecord))->setNumPrintFields((static_cast<ContextIntersect *>(_context))->getMaxNumDatabaseFields());
@@ -510,16 +491,27 @@ void RecordOutputMgr::null(bool queryType, bool dbType)
 		dummyRecord = new GffRecord();
 		(static_cast<GffRecord *>(dummyRecord))->setNumFields((static_cast<ContextIntersect *>(_context))->getMaxNumDatabaseFields());
 		break;
+	case FileRecordTypeChecker::GFF_PLUS_RECORD_TYPE:
+		dummyRecord = new GffPlusRecord();
+		(static_cast<GffRecord *>(dummyRecord))->setNumFields((static_cast<ContextIntersect *>(_context))->getMaxNumDatabaseFields());
+		break;
 	default:
 		break;
 	}
-
 	dummyRecord->printNull(_outBuf);
 	delete dummyRecord;
-
 }
 
 void RecordOutputMgr::printKey(const Record *key, const QuickString & start, const QuickString & end)
+{
+	if (key->getType() != FileRecordTypeChecker::BAM_RECORD_TYPE) {
+		key->print(_outBuf, start, end);
+	} else {
+		static_cast<const BamRecord *>(key)->print(_outBuf, start, end, _currBamBlockList);
+	}
+}
+
+void RecordOutputMgr::printKey(const Record *key, int start, int end)
 {
 	if (key->getType() != FileRecordTypeChecker::BAM_RECORD_TYPE) {
 		key->print(_outBuf, start, end);

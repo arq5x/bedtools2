@@ -43,11 +43,11 @@ void SubtractFile::cleanupHits(RecordKeyVector &hits)
 
 void SubtractFile::subtractHits(RecordKeyVector &hits) {
 	if (hits.empty()) {
-		// no intersection, nothing to subtract.
-		// just copy key to hits as if it were a
-		// self-intersection. This is just for reporting
-		// purposes.
-		hits.push_back(hits.getKey());
+        // no intersection, nothing to subtract.
+        // just copy key to hits as if it were a
+        // self-intersection. This is just for reporting
+        // purposes.
+        hits.push_back(hits.getKey());
 		return;
 	}
 
@@ -110,9 +110,9 @@ void SubtractFile::subtractHits(RecordKeyVector &hits) {
 			_dontReport = true;
 			return;
 		} else {
-			hits.clearVector();
-			hits.push_back(hits.getKey());
-		}
+            hits.clearVector();
+            hits.push_back(hits.getKey());
+        }
 		return;
 	}
 

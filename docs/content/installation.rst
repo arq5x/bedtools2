@@ -17,24 +17,26 @@ Installing stable releases
 --------------------------
 
 .....................................
-Compiling from source via Google Code
+Compiling from source via Github
 .....................................
 
-Stable, versioned releases of bedtools are made available The following commands
-will install ``bedtools`` in a local directory on an UNIX or OS X machine.
-Note that the **"<version>"** refers to the latest posted version number
-on http://bedtools.googlecode.com/.
+Stable, versioned releases of bedtools are made available on Github at the
+`bedtools2 repository <https://github.com/arq5x/bedtools2/>`_ under 
+the `releases <https://github.com/arq5x/bedtools2/releases>`_ tab.  
+The following commands will install ``bedtools`` in a local directory on an UNIX or OS X machine.
 
 .. note::
-
-    The bedtools Makefiles utilize the GCC compiler. One should edit the
+    1. This example is based on version 2.25.0. For future releasese, you should replace 
+    the version number with the version you intend to install.
+    
+    2. The bedtools Makefiles utilize the GCC compiler. One should edit the
     Makefiles accordingly if one wants to use a different compiler.
 
 .. code-block:: bash
 
-  $ curl http://bedtools.googlecode.com/files/BEDTools.<version>.tar.gz > BEDTools.tar.gz
-  $ tar -zxvf BEDTools.tar.gz
-  $ cd BEDTools-<version>
+  $ wget https://github.com/arq5x/bedtools2/releases/download/v2.25.0/bedtools-2.25.0.tar.gz 
+  $ tar -zxvf bedtools-2.25.0.tar.gz
+  $ cd bedtools2
   $ make
 
 At this point, one should copy the binaries in ./bin/ to either

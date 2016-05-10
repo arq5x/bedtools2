@@ -93,9 +93,7 @@ void CoverageFile::giveFinalReport(RecordOutputMgr *outputMgr) {
 
 		outputMgr->printRecord(NULL, _finalOutput);
 	}
-
 }
-
 
 void CoverageFile::makeDepthCount(RecordKeyVector &hits) {
 	const Record *key = hits.getKey();
@@ -124,7 +122,6 @@ void CoverageFile::makeDepthCount(RecordKeyVector &hits) {
 		}
 	}
 }
-
 
 size_t CoverageFile::countBasesAtDepth(size_t depth) {
 	size_t retCount = 0;

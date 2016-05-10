@@ -65,13 +65,13 @@ int map_main(int argc, char* argv[]); //
 void merge_help();
 int multibamcov_main(int argc, char* argv[]);//
 int multiintersect_main(int argc, char* argv[]);//
-int nek_sandbox1_main(int argc, char* argv[]);//
 int nuc_main(int argc, char* argv[]);//
 int pairtobed_main(int argc, char* argv[]);//
 int pairtopair_main(int argc, char* argv[]);//
 int random_main(int argc, char* argv[]); //
 int reldist_main(int argc, char* argv[]); //
 void sample_help();
+int shift_main(int argc, char* argv[]); //
 int shuffle_main(int argc, char* argv[]); //
 int slop_main(int argc, char* argv[]); //
 int split_main(int argc, char* argv[]); //
@@ -86,6 +86,7 @@ int bedtools_help(void);
 int bedtools_faq(void);
 
 
+
 int main(int argc, char *argv[])
 {
     // make sure the user at least entered a sub_command
@@ -94,9 +95,10 @@ int main(int argc, char *argv[])
     QuickString subCmd(argv[1]);
     BedtoolsDriver btDriver;
     if (btDriver.supports(subCmd)) {
+
 		if (btDriver.subMain(argc, argv)) {
 			return 0;
-		} else if (!btDriver.hadError()) {
+		} else if (btDriver.hadError()) {
 			showHelp(subCmd);
 			return 1;
 		}
@@ -106,6 +108,7 @@ int main(int argc, char *argv[])
     else if (subCmd == "window")      return window_main(argc-1, argv+1);
     else if (subCmd == "genomecov")   return genomecoverage_main(argc-1, argv+1);
     else if (subCmd == "cluster")     return cluster_main(argc-1, argv+1);
+	else if (subCmd == "shift")        return shift_main(argc-1, argv+1);
     else if (subCmd == "slop")        return slop_main(argc-1, argv+1);
     else if (subCmd == "split")       return split_main(argc-1, argv+1);
     else if (subCmd == "flank")       return flank_main(argc-1, argv+1);
@@ -147,7 +150,6 @@ int main(int argc, char *argv[])
     else if (subCmd == "links")       return links_main(argc-1, argv+1);
     else if (subCmd == "makewindows") return windowmaker_main(argc-1, argv+1);
     else if (subCmd == "expand")      return expand_main(argc-1, argv+1);
-    else if (subCmd == "neksb1")       return nek_sandbox1_main(argc-1, argv+1);
     else if (subCmd == "regresstest")  return regress_test_main(argc, argv); //this command does need all the orig args.
     // help
     else if (subCmd == "-h" || subCmd == "--help" ||
@@ -204,6 +206,7 @@ int bedtools_help(void)
     cout  << "    merge         "  << "Combine overlapping/nearby intervals into a single interval.\n";
     cout  << "    cluster       "  << "Cluster (but don't merge) overlapping/nearby intervals.\n";
     cout  << "    complement    "  << "Extract intervals _not_ represented by an interval file.\n";
+    cout  << "    shift         "  << "Adjust the position of intervals.\n";
     cout  << "    subtract      "  << "Remove intervals based on overlaps b/w two files.\n";
     cout  << "    slop          "  << "Adjust the size of intervals.\n";
     cout  << "    flank         "  << "Create new intervals from the flanks of existing intervals.\n";

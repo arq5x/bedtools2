@@ -4,8 +4,7 @@
 
 BinTree::BinTree(ContextIntersect *context)
 :  _context(context),
-  _binOffsetsExtended(NULL),
-  _maxBinNumFound(0)
+  _binOffsetsExtended(NULL)
  {
 	_binOffsetsExtended = new binNumType[NUM_BIN_LEVELS];
 	memset(_binOffsetsExtended, 0, NUM_BIN_LEVELS * sizeof(binNumType));
@@ -88,7 +87,7 @@ void BinTree::getHits(Record *record, RecordKeyVector &hitSet)
             	if (record->intersects(dbRec,
                                        _context->getSameStrand(),
                                        _context->getDiffStrand(),
-            			               _context->getOverlapFractionA(),
+            			                     _context->getOverlapFractionA(),
                                        _context->getOverlapFractionB(),
                                        _context->getReciprocalFraction(),
                                        _context->getEitherFraction()

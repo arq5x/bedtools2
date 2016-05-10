@@ -8,10 +8,10 @@
 #ifndef PLUSFIELDS_H_
 #define PLUSFIELDS_H_
 
-using namespace std;
-
 #include "QuickString.h"
 #include <vector>
+
+using namespace std;
 
 class SingleLineDelimTextFileReader;
 

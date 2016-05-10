@@ -322,3 +322,12 @@ $BT groupby -i gdc.bam -g 1,3 -c 4 -o mean > obs
 check obs exp
 rm obs exp
 
+###########################################################
+#  Test a single column of data
+###########################################################
+echo "    groupby.t18...\c"
+echo \
+"chr1	chr1,chr1,chr1" > exp
+cut -f 1 test.bed | $BT groupby -g 1 -i - -c 1 -o collapse > obs
+check obs exp
+rm obs exp

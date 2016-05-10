@@ -47,13 +47,12 @@ private:
 	BlockMgr *_bamBlockMgr;
 	QuickString _afterVal; //to store values to be printed after record, such as column operations.
 	//some helper functions to neaten the code.
-	int _numOverlapBases;
-
 	void null(bool queryType, bool dbType);
 
 	void printRecord(RecordKeyVector &keyList, RecordKeyVector *blockList);
 	void printKey(const Record *key);
 	void printKey(const Record *key, const QuickString & start, const QuickString & end);
+	void printKey(const Record *key, int start, int end);
 	void addDbFileId(int fileId);
 	bool printKeyAndTerminate(RecordKeyVector &keyList);
 	printBamType printBamRecord(RecordKeyVector &keyList, bool bamOutputOnly = false);

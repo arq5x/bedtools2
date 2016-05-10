@@ -40,21 +40,12 @@ rm obs exp
 ###########################################################
 echo "    general.t03...\c"
 echo \
-"***** ERROR: illegal character '.' found in integer conversion of string \".\". Exiting..." > exp
-echo "chr1	.	2" | $BT merge -i - 2> obs
+"ERROR: file - has non positional records, which are only valid for the groupBy tool." > exp
+echo "chr1	.	2" | $BT merge -i - 2> o
+head -n 1 o > obs
 check obs exp
 rm obs exp
 
-
-###########################################################
-#  Enforce integer coordinates
-###########################################################
-echo "    general.t04...\c"
-echo \
-"chr1	.	2" | $BT merge -i - 2> obs
-echo "***** ERROR: illegal character '.' found in integer conversion of string \".\". Exiting..." > exp
-check obs exp
-rm obs exp
 
 
 ###########################################################
@@ -63,7 +54,9 @@ rm obs exp
 echo "    general.t05...\c"
 echo \
 "chr1 1 2" | $BT merge -i - 2> obs
-echo "Error: unable to open file or unable to determine types for file -" > exp
+echo \
+"ERROR: file - has non positional records, which are only valid for the groupBy tool." > exp
+head -n 1 o > obs
 check obs exp
 rm obs exp
 

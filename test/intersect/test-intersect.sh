@@ -648,7 +648,7 @@ check exp obs
 rm exp obs
 
 echo "    intersect.t53...\c"
-echo "\c" > exp
+echo -n "" > exp
 $BT intersect -a x.bed -b y.bed -f 0.21 > obs
 check exp obs
 rm exp obs
@@ -667,34 +667,54 @@ rm exp obs
 # Test basic -f with -F
 ##################################################################
 echo "    intersect.t55...\c"
-echo "\c" > exp
+echo -n "" > exp
 $BT intersect -a x.bed -b y.bed -f 0.21 -F 0.21 -wa -wb > obs
 check exp obs
 rm exp obs
 
 echo "    intersect.t56...\c"
-echo "chr1	10	20	a1	1	+	chr1	8	12	b1	1	+
-chr2	10	20	a2	1	-	chr2	8	12	b2	1	+" > exp
-$BT intersect -a x.bed -b y.bed -f 0.19 -F 0.21 -wa -wb > obs
+echo -n "" > exp
+$BT intersect -a x.bed -b y.bed -f 0.21 -r -wa -wb > obs
 check exp obs
 rm exp obs
 
 echo "    intersect.t57...\c"
 echo "chr1	10	20	a1	1	+	chr1	8	12	b1	1	+
 chr2	10	20	a2	1	-	chr2	8	12	b2	1	+" > exp
-$BT intersect -a x.bed -b y.bed -f 0.19 -F 0.21 -wa -wb > obs
+$BT intersect -a x.bed -b y.bed -f 0.19 -r -wa -wb > obs
 check exp obs
 rm exp obs
 
 echo "    intersect.t58...\c"
 echo "chr1	10	20	a1	1	+	chr1	8	12	b1	1	+
 chr2	10	20	a2	1	-	chr2	8	12	b2	1	+" > exp
-$BT intersect -a x.bed -b y.bed -f 0.19 -F 0.50 -wa -wb > obs
+$BT intersect -a x.bed -b y.bed -F 0.50 -wa -wb > obs
 check exp obs
 rm exp obs
 
 echo "    intersect.t59...\c"
-echo "\c" > exp
+echo "chr1	10	20	a1	1	+	chr1	8	12	b1	1	+
+chr2	10	20	a2	1	-	chr2	8	12	b2	1	+" > exp
+$BT intersect -a x.bed -b y.bed -f 0.19 -F 0.21 -wa -wb > obs
+check exp obs
+rm exp obs
+
+echo "    intersect.t60...\c"
+echo "chr1	10	20	a1	1	+	chr1	8	12	b1	1	+
+chr2	10	20	a2	1	-	chr2	8	12	b2	1	+" > exp
+$BT intersect -a x.bed -b y.bed -f 0.19 -F 0.21 -wa -wb > obs
+check exp obs
+rm exp obs
+
+echo "    intersect.t61...\c"
+echo "chr1	10	20	a1	1	+	chr1	8	12	b1	1	+
+chr2	10	20	a2	1	-	chr2	8	12	b2	1	+" > exp
+$BT intersect -a x.bed -b y.bed -f 0.19 -F 0.50 -wa -wb > obs
+check exp obs
+rm exp obs
+
+echo "    intersect.t62...\c"
+echo -n "" > exp
 $BT intersect -a x.bed -b y.bed -f 0.19 -F 0.51 -wa -wb > obs
 check exp obs
 rm exp obs
@@ -702,35 +722,35 @@ rm exp obs
 ##################################################################
 # Test basic -f with -F with BAM
 ##################################################################
-echo "    intersect.t60...\c"
-echo "\c" > exp
+echo "    intersect.t63...\c"
+echo -n "" > exp
 $BT intersect -a x.bam -b y.bed -f 0.21 -F 0.21 -wa -wb | samtools view - > obs
 check exp obs
 rm exp obs
 
-echo "    intersect.t61...\c"
+echo "    intersect.t64...\c"
 echo "a1	0	chr1	11	255	10M	*	0	0	*	*
 a2	16	chr2	11	255	10M	*	0	0	*	*" > exp
 $BT intersect -a x.bam -b y.bed -f 0.19 -F 0.21 -wa -wb | samtools view - > obs
 check exp obs
 rm exp obs
 
-echo "    intersect.t62...\c"
+echo "    intersect.t65...\c"
 echo "a1	0	chr1	11	255	10M	*	0	0	*	*
 a2	16	chr2	11	255	10M	*	0	0	*	*" > exp
 $BT intersect -a x.bam -b y.bed -f 0.19 -F 0.21 -wa -wb | samtools view - > obs
 check exp obs
 rm exp obs
 
-echo "    intersect.t63...\c"
+echo "    intersect.t66...\c"
 echo "a1	0	chr1	11	255	10M	*	0	0	*	*
 a2	16	chr2	11	255	10M	*	0	0	*	*" > exp
 $BT intersect -a x.bam -b y.bed -f 0.19 -F 0.50 -wa -wb | samtools view - > obs
 check exp obs
 rm exp obs
 
-echo "    intersect.t64...\c"
-echo "\c" > exp
+echo "    intersect.t67...\c"
+echo -n "" > exp
 $BT intersect -a x.bam -b y.bed -f 0.19 -F 0.51 -wa -wb | samtools view - > obs
 check exp obs
 rm exp obs
@@ -739,12 +759,149 @@ rm exp obs
 ##################################################################
 # Test basic -f with -F and -e
 ##################################################################
-echo "    intersect.t65...\c"
+echo "    intersect.t68...\c"
 echo "chr1	10	20	a1	1	+	chr1	8	12	b1	1	+
 chr2	10	20	a2	1	-	chr2	8	12	b2	1	+" > exp
 $BT intersect -a x.bed -b y.bed -f 0.21 -F 0.21 -wa -wb -e > obs
 check exp obs
 rm exp obs
+
+
+##################################################################
+# Test basic -split with BED12 w/ and w/o trailing commas for blocks
+# Issue 366
+##################################################################
+echo "    intersect.t69...\c"
+echo "chr1	0	45	oneblock_comma	0	+	0	0	0	1	45,	0,
+chr1	0	45	oneblock_comma	0	+	0	0	0	1	45,	0,
+chr1	0	45	oneblock_comma	0	+	0	0	0	1	45,	0,
+chr1	0	45	oneblock_comma	0	+	0	0	0	1	45,	0,
+chr1	0	45	oneblock_nocomma	0	+	0	0	0	1	45	0
+chr1	0	45	oneblock_nocomma	0	+	0	0	0	1	45	0
+chr1	0	45	oneblock_nocomma	0	+	0	0	0	1	45	0
+chr1	0	45	oneblock_nocomma	0	+	0	0	0	1	45	0
+chr1	0	45	three_blocks_comma	0	+	0	0	0	3	10,10,10,	0,20,40,
+chr1	0	45	three_blocks_comma	0	+	0	0	0	3	10,10,10,	0,20,40,
+chr1	0	50	three_blocks_comma	0	+	0	0	0	3	10,10,10,	0,20,40,
+chr1	0	50	three_blocks_comma	0	+	0	0	0	3	10,10,10,	0,20,40,
+chr1	0	45	three_blocks_nocomma	0	+	0	0	0	3	10,10,10	0,20,40
+chr1	0	45	three_blocks_nocomma	0	+	0	0	0	3	10,10,10	0,20,40
+chr1	0	50	three_blocks_nocomma	0	+	0	0	0	3	10,10,10	0,20,40
+chr1	0	50	three_blocks_nocomma	0	+	0	0	0	3	10,10,10	0,20,40" > exp
+$BT intersect  -a blocks.bed12 -b blocks.bed12 -split > obs
+check exp obs
+rm exp obs
+
+##################################################################
+# Issue 311
+##################################################################
+echo "    intersect.t70...\c"
+echo "1	31	32	1	32	.	A	T	0	PASS	DP=22" > exp
+$BT intersect -a a.issue311.bed -b b.issue311.vcf -wb > obs
+check exp obs
+rm exp obs
+
+echo "    intersect.t71...\c"
+echo "1	31	32	1	pseudogene	exon	32	32	.	-	.	 gene_id \"ENSG00000224777\"; transcript_id \"ENST00000424047\"; exon_number \"1\"; gene_name \"OR4F2P\"; transcript_name \"OR4F2P-001\";" > exp
+$BT intersect -a a.issue311.bed -b b.issue311.gff -wb > obs
+check exp obs
+rm exp obs
+
+# GFF   ----------
+# BED        -----------
+echo "    intersect.t72...\c"
+echo "1	.	.	16	20	.	-	.	." > exp
+$BT intersect -a <(echo -e  "1\t.\t.\t10\t20\t.\t-\t.\t.") -b <(echo -e  "1\t15\t25") > obs
+check exp obs
+rm exp obs
+
+# BED   ----------
+# GFF        -----------
+echo "    intersect.t73...\c"
+echo "1	15	20" > exp
+$BT intersect -a <(echo -e  "1\t15\t25") -b <(echo -e  "1\t.\t.\t10\t20\t.\t-\t.\t.")  > obs
+check exp obs
+rm exp obs
+
+# GFF        ----------
+# BED    -----------
+echo "    intersect.t74...\c"
+echo "1	.	.	15	20	.	-	.	." > exp
+$BT intersect -a <(echo -e  "1\t.\t.\t15\t25\t.\t-\t.\t.") -b <(echo -e  "1\t10\t20") > obs
+check exp obs
+rm exp obs
+
+# BED        ----------
+# GFF    -----------
+echo "    intersect.t75...\c"
+echo "1	15	20" > exp
+$BT intersect  -a <(echo -e  "1\t15\t25") -b <(echo -e  "1\t.\t.\t10\t20\t.\t-\t.\t.") > obs
+check exp obs
+rm exp obs
+
+# GFF        ----------
+# BED    -------------------
+echo "    intersect.t76...\c"
+echo "1	.	.	15	20	.	-	.	." > exp
+$BT intersect -a <(echo -e  "1\t.\t.\t15\t20\t.\t-\t.\t.") -b <(echo -e  "1\t10\t25") > obs
+check exp obs
+rm exp obs
+
+# BED        ----------
+# GFF    --------------------
+echo "    intersect.t77...\c"
+echo "1	15	20" > exp
+$BT intersect -a <(echo -e "1\t15\t20") -b <(echo -e "1\t.\t.\t10\t25\t.\t-\t.\t.")  > obs
+check exp obs
+rm exp obs
+
+# GFF        ----------
+# BED    -------------------
+echo "    intersect.t78...\c"
+echo "1	.	.	16	20	.	-	.	." > exp
+$BT intersect -a <(echo -e "1\t.\t.\t10\t25\t.\t-\t.\t.") -b <(echo -e "1\t15\t20") > obs
+check exp obs
+rm exp obs
+
+# BED        ----------
+# GFF    --------------------
+echo "    intersect.t79...\c"
+echo "1	14	20" > exp
+$BT intersect -a <(echo -e "1\t10\t25") -b <(echo -e "1\t.\t.\t15\t20\t.\t-\t.\t.")  > obs
+check exp obs
+rm exp obs
+
+
+##################################################################
+# Issue 316. SVLEN and END
+##################################################################
+echo "    intersect.t72...\c"
+
+echo "##fileformat=VCF4.1
+#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO
+1	32	.	A	<DEL>	0	PASS	DP=22;END=52" > a
+echo "##fileformat=VCF4.1
+#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO
+1	52	.	A	T	0	PASS	DP=22;SVLEN=100" > b
+echo "1	32	.	A	<DEL>	0	PASS	DP=22;END=52" > exp
+$BT intersect -a a -b b > obs
+check exp obs
+rm exp obs a b
+
+echo "    intersect.t73...\c"
+
+echo "##fileformat=VCF4.1
+#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO
+1	32	.	A	<DEL>	0	PASS	DP=22;END=51" > a
+echo "##fileformat=VCF4.1
+#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO
+1	52	.	A	T	0	PASS	DP=22;SVLEN=100" > b
+echo -n "" > exp
+$BT intersect -a a -b b > obs
+check exp obs
+rm exp obs a b
+
+
 
 cd multi_intersect
 bash test-multi_intersect.sh

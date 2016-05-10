@@ -59,6 +59,7 @@ private:
     bool _haveSeed;
     bool _chooseChrom;
     bool _isBedpe;
+    size_t _tries;
     size_t _maxTries;
     bool _noOverlapping;
     bool _preventExceedingChromEnd;
@@ -75,9 +76,12 @@ private:
     vector<string> _chroms;
     int _numChroms;
     vector<string> _includeChroms;
-    int _numIncludeChroms;
+    //    int _numIncludeChroms;
     uint32_t _genomeSize;
 
+    // include length sum
+    long double _cumLen;
+    
     // methods
     void Shuffle();
     void ShuffleWithExclusions();

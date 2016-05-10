@@ -18,6 +18,8 @@ samtools view -Sb one_block.sam > one_block.bam 2>/dev/null
 samtools view -Sb two_blocks.sam > two_blocks.bam 2>/dev/null
 samtools view -Sb three_blocks.sam > three_blocks.bam 2>/dev/null
 samtools view -Sb sam-w-del.sam > sam-w-del.bam 2>/dev/null
+samtools view -Sb pair-chip.sam > pair-chip.bam 2>/dev/null
+samtools view -Sb chip.sam > chip.bam 2>/dev/null
 
 
 
@@ -233,5 +235,24 @@ $BT genomecov -i y.bed -g genome.txt -bga > obs
 check obs exp
 rm obs exp
 
+##################################################################
+#  Test pair-end chip 
+##################################################################
+echo "    genomecov.t14...\c"
+echo \
+"chr1	0	203	1" > exp
+$BT genomecov -ibam pair-chip.bam -bg -pc > obs
+check obs exp
+rm obs exp
 
-rm *.bam
+##################################################################
+#  Test chip fragmentSize
+##################################################################
+echo "    genomecov.t15...\c"
+echo \
+"chr1	1	101	1
+chr1	200	300	1" > exp
+$BT genomecov -ibam chip.bam -bg -fs 100 > obs
+check obs exp
+rm obs exp
+

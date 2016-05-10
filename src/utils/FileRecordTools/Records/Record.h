@@ -39,6 +39,9 @@ public:
 
 	virtual const Record & operator=(const Record &);
 
+
+	virtual bool isZeroBased() const {return true;};
+
 	virtual const QuickString &getChrName() const { return _chrName; }
 	virtual void setChrName(const QuickString &chr) { _chrName = chr; }
 	virtual void setChrName(const string &chr) { _chrName = chr; }
