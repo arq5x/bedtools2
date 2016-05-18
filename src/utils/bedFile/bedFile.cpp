@@ -153,20 +153,6 @@ void BedFile::Close(void) {
         delete _bedStream;
 }
 
-void BedFile::GetLine(void) {
-    // parse the bedStream pointer
-    getline(*_bedStream, _bedLine);
-    
-    // ditch \r for Windows.
-    if (_bedLine.size() && _bedLine[_bedLine.size()-1] == '\r') {
-        _bedLine.resize(_bedLine.size()-1);
-    }
-    // increment the line number
-    _lineNum++;
-    // split into a string vector.
-    Tokenize(_bedLine, _bedFields);
-}
-
 // Extract and store the header for the file.
 void BedFile::GetHeader(void) {
     while(getline(*_bedStream, _bedLine))
@@ -211,59 +197,66 @@ bool BedFile::GetNextBed(BED &bed, bool forceSorted) {
     // if so, tokenize, validate and return the BED entry.
     _bedFields.clear();
     // clear out the previous bed's data
-    if (_bedStream->good()) {
-        // read the next line in the file and parse into discrete fields
-        if (!_firstLine)
-            GetLine();
-        else {
-            // handle the first line as a special case because
-            // of reading the header.
-            
-            // ditch \r for Windows if necessary.
-            if (_bedLine[_bedLine.size()-1] == '\r') {
-                _bedLine.resize(_bedLine.size()-1);
-            }
-            Tokenize(_bedLine, _bedFields);
-            _firstLine = false;
-            setBedType(_bedFields.size());
-        }
-        // load the BED struct as long as it's a valid BED entry.
-        
-        _numFields = _bedFields.size();
-        _status = parseLine(bed, _bedFields);
-        if (_status == BED_INVALID) return false;
-        
-        if (_status == BED_VALID) {
-            if (bed.chrom == _prev_chrom) {
-                if ((int) bed.start >= _prev_start) {
-                    _prev_chrom = bed.chrom;
-                    _prev_start = bed.start;
-                }
-                else if (forceSorted) {
-                    cerr << "ERROR: input file: (" << bedFile 
-                         << ") is not sorted by chrom then start." << endl
-                         << "       The start coordinate at line " << _lineNum 
-                         << " is less than the start at line " << _lineNum-1 
-                         << endl;
-                    exit(1);
-                }
-            }
-            else if (bed.chrom != _prev_chrom) {
-                _prev_chrom = bed.chrom;
-                _prev_start = bed.start;
-            }
-            _total_length += (bed.end - bed.start);
-            return true;
-        }
-        else if (_status == BED_HEADER || _status == BED_BLANK) 
-        {
-            return true;
-        }
+
+    // read the next line in the file (unless this is the first line,
+    // which has already been read by GetHeader()).
+    if (!_firstLine) {
+	if (!getline(*_bedStream, _bedLine)) {
+	    _status = BED_INVALID;
+	    return false;
+	}
+	_lineNum++;
     }
 
-    // default if file is closed or EOF
-    _status = BED_INVALID;
-    return false;
+    // ditch \r for Windows if necessary.
+    if (_bedLine.size() && _bedLine[_bedLine.size()-1] == '\r') {
+	_bedLine.resize(_bedLine.size()-1);
+    }
+
+    // split into a string vector.
+    Tokenize(_bedLine, _bedFields);
+
+    if (_firstLine) {
+	_firstLine = false;
+	setBedType(_bedFields.size());
+    }
+
+    // load the BED struct as long as it's a valid BED entry.
+
+    _numFields = _bedFields.size();
+    _status = parseLine(bed, _bedFields);
+
+    if (_status == BED_VALID) {
+	if (bed.chrom == _prev_chrom) {
+	    if ((int) bed.start >= _prev_start) {
+		_prev_chrom = bed.chrom;
+		_prev_start = bed.start;
+	    }
+	    else if (forceSorted) {
+		cerr << "ERROR: input file: (" << bedFile
+		     << ") is not sorted by chrom then start." << endl
+		     << "       The start coordinate at line " << _lineNum
+		     << " is less than the start at line " << _lineNum-1
+		     << endl;
+		exit(1);
+	    }
+	}
+	else if (bed.chrom != _prev_chrom) {
+	    _prev_chrom = bed.chrom;
+	    _prev_start = bed.start;
+	}
+	_total_length += (bed.end - bed.start);
+	return true;
+    }
+    else if (_status == BED_HEADER || _status == BED_BLANK)
+    {
+	return true;
+    }
+    else
+    {
+	_status = BED_INVALID;
+	return false;
+    }
 }
 
 
