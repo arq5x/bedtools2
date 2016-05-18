@@ -21,6 +21,9 @@ intervals defined in a BED/GFF/VCF file.
     2. You can use the UNIX ``fold`` command to set the line width of the 
     FASTA output.  For example, ``fold -w 60`` will make each line of the FASTA
     file have at most 60 nucleotides for easy viewing.
+    
+    3. BED files containing a single region require a newline character at the end of
+    the line, otherwise a blank output file is produced.
 
 .. seealso::
 
