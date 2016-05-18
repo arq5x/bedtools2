@@ -404,9 +404,6 @@ public:
     // dump the header, which is collected as part of Open()
     void PrintHeader(void);
 
-    // get the next line in the file. splits a line in _bedFields
-    void GetLine(void);
-
     // Get the next BED entry in an opened BED file.
     bool GetNextBed (BED &bed, bool forceSorted = false);
     
