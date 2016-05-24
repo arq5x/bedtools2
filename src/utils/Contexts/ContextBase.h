@@ -201,6 +201,7 @@ protected:
     bool _printHeader;
     bool _printable;
     bool _explicitBedOutput;
+    bool _runToQueryEnd;
     int _queryFileIdx;
     vector<int> _dbFileIdxs;
     vector<QuickString> _dbNameTags;

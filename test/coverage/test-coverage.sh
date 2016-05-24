@@ -29,6 +29,8 @@ echo \
 "chr1	0	50	three_blocks	40	-	0	50	0,0,0	3	10,10,10,	0,20,40,	1	40	50	0.8000000" > exp
 $BT coverage -abam three_blocks.bam -b three_blocks_nomatch.bed > obs
 check obs exp
+$BT coverage -abam three_blocks.bam -b three_blocks_nomatch.bed -sorted > obs
+check obs exp
 rm obs exp
 
 
@@ -45,6 +47,8 @@ chr2	150	200	4	25	+	7	50	50	1.0000000
 chr2	180	230	2	25	-	6	50	50	1.0000000" > exp
 $BT coverage -a a.bed -b b.bed > obs
 check exp obs
+$BT coverage -a a.bed -b b.bed -sorted > obs
+check exp obs
 rm exp obs
 
 
@@ -60,6 +64,8 @@ chr2	80	130	5	25	-	6
 chr2	150	200	4	25	+	7
 chr2	180	230	2	25	-	6" > exp
 $BT coverage -a a.bed -b b.bed -counts > obs
+check exp obs
+$BT coverage -a a.bed -b b.bed -counts -sorted > obs
 check exp obs
 rm exp obs
 
@@ -96,6 +102,8 @@ all	4	11	300	0.0366667
 all	5	35	300	0.1166667
 all	6	37	300	0.1233333" > exp
 $BT coverage -a a.bed -b b.bed -hist > obs
+check exp obs
+$BT coverage -a a.bed -b b.bed -hist -sorted > obs
 check exp obs
 rm exp obs
 
@@ -406,6 +414,8 @@ chr2	180	230	2	25	-	49	1
 chr2	180	230	2	25	-	50	1" > exp
 $BT coverage -a a.bed -b b.bed -d > obs
 check exp obs
+$BT coverage -a a.bed -b b.bed -d -sorted > obs
+check exp obs
 rm exp obs
 
 
@@ -421,6 +431,8 @@ chr2	80	130	5	25	-	3.0799999
 chr2	150	200	4	25	+	5.5599999
 chr2	180	230	2	25	-	3.4600000" > exp
 $BT coverage -a a.bed -b b.bed -mean > obs
+check exp obs
+$BT coverage -a a.bed -b b.bed -mean -sorted > obs
 check exp obs
 rm exp obs
 
@@ -438,6 +450,8 @@ chr2	150	200	4	25	+	3	50	50	1.0000000
 chr2	180	230	2	25	-	4	34	50	0.6800000" > exp
 $BT coverage -a a.bed -b b.bed -s > obs
 check exp obs
+$BT coverage -a a.bed -b b.bed -s -sorted > obs
+check exp obs
 rm exp obs
 
 
@@ -454,6 +468,8 @@ chr2	150	200	4	25	+	4	50	50	1.0000000
 chr2	180	230	2	25	-	2	50	50	1.0000000" > exp
 $BT coverage -a a.bed -b b.bed -S > obs
 check exp obs
+$BT coverage -a a.bed -b b.bed -S -sorted > obs
+check exp obs
 rm exp obs
 
 ##################################################################
@@ -469,6 +485,8 @@ chr2	150	200	4	25	+	4	50	50	1.0000000
 chr2	180	230	2	25	-	2	50	50	1.0000000" > exp
 $BT coverage -a a.bed -b b.bed -S > obs
 check exp obs
+$BT coverage -a a.bed -b b.bed -S -sorted > obs
+check exp obs
 rm exp obs
 
 
@@ -481,6 +499,8 @@ echo \
 chr1	12	20	0	0	8	0.0000000" > exp
 $BT coverage -a c.bed -b three_blocks_match.bam -split > obs
 check exp obs
+$BT coverage -a c.bed -b three_blocks_match.bam -split -sorted > obs
+check exp obs
 rm exp obs
 
 ##################################################################
@@ -491,6 +511,8 @@ echo \
 "chr1	0	50	1	50	50	1.0000000
 chr1	12	20	1	8	8	1.0000000" > exp
 $BT coverage -a c.bed -b three_blocks_match.bam  > obs
+check exp obs
+$BT coverage -a c.bed -b three_blocks_match.bam -sorted > obs
 check exp obs
 rm exp obs
 
@@ -559,6 +581,8 @@ chr1	12	20	7	0
 chr1	12	20	8	0" > exp
 $BT coverage -a c.bed -b three_blocks_match.bam -split -d > obs
 check exp obs
+$BT coverage -a c.bed -b three_blocks_match.bam -split -d -sorted > obs
+check exp obs
 rm exp obs
 
 ##################################################################
@@ -573,6 +597,8 @@ all	0	28	58	0.4827586
 all	1	30	58	0.5172414" > exp
 $BT coverage -a c.bed -b three_blocks_match.bam -split -hist > obs
 check exp obs
+$BT coverage -a c.bed -b three_blocks_match.bam -split -hist -sorted > obs
+check exp obs
 rm exp obs
 
 
@@ -584,6 +610,8 @@ echo \
 "***** ERROR: -counts, -d, -mean, and -hist are all mutually exclusive options. *****" > exp
 $BT coverage -a a.bed -b b.bed -counts -hist 2>&1 > /dev/null | head -2 | tail -1 | cat - > obs
 check exp obs
+$BT coverage -a a.bed -b b.bed -counts -sorted -hist 2>&1 > /dev/null | head -2 | tail -1 | cat - > obs
+check exp obs
 rm exp obs
 
 ##################################################################
@@ -593,6 +621,8 @@ echo "    coverage.t15...\c"
 echo \
 "***** ERROR: -counts, -d, -mean, and -hist are all mutually exclusive options. *****" > exp
 $BT coverage -a a.bed -b b.bed -counts -d 2>&1 > /dev/null | head -2 | tail -1 | cat - > obs
+check exp obs
+$BT coverage -a a.bed -b b.bed -sorted -counts -d 2>&1 > /dev/null | head -2 | tail -1 | cat - > obs
 check exp obs
 rm exp obs
 
@@ -604,6 +634,8 @@ echo \
 "***** ERROR: -counts, -d, -mean, and -hist are all mutually exclusive options. *****" > exp
 $BT coverage -a a.bed -b b.bed -hist -d 2>&1 > /dev/null | head -2 | tail -1 | cat - > obs
 check exp obs
+$BT coverage -a a.bed -b b.bed -sorted -hist -d 2>&1 > /dev/null | head -2 | tail -1 | cat - > obs
+check exp obs
 rm exp obs
 
 
@@ -614,6 +646,55 @@ echo "    coverage.t17...\c"
 echo \
 "***** ERROR: -counts, -d, -mean, and -hist are all mutually exclusive options. *****" > exp
 $BT coverage -a a.bed -b b.bed -mean -d 2>&1 > /dev/null | head -2 | tail -1 | cat - > obs
+check exp obs
+$BT coverage -a a.bed -b b.bed -sorted -mean -d 2>&1 > /dev/null | head -2 | tail -1 | cat - > obs
+check exp obs
+rm exp obs
+
+##################################################################
+#  Test the last record in file with no overlaps is reported
+##################################################################
+echo "    coverage.t18...\c"
+echo \
+"chr1	0	10	1	0
+chr1	0	10	2	0
+chr1	0	10	3	0
+chr1	0	10	4	1
+chr1	0	10	5	1
+chr1	0	10	6	1
+chr1	0	10	7	1
+chr1	0	10	8	1
+chr1	0	10	9	1
+chr1	0	10	10	1
+chr1	15	20	1	0
+chr1	15	20	2	0
+chr1	15	20	3	0
+chr1	15	20	4	0
+chr1	15	20	5	0
+chr1	21	25	1	0
+chr1	21	25	2	0
+chr1	21	25	3	0
+chr1	21	25	4	0" > exp
+$BT coverage -a x.bed -b y.bed -d > obs
+check exp obs
+$BT coverage -a x.bed -b y.bed -d -sorted > obs
+check exp obs
+rm exp obs
+
+##################################################################
+#  Test the last record in file with no overlaps is reported
+##################################################################
+echo "    coverage.t19...\c"
+echo \
+"chr1	0	10	0	3	10	0.3000000
+chr1	0	10	1	7	10	0.7000000
+chr1	15	20	0	5	5	1.0000000
+chr1	21	25	0	4	4	1.0000000
+all	0	12	19	0.6315789
+all	1	7	19	0.3684210" > exp
+$BT coverage -a x.bed -b y.bed -hist > obs
+check exp obs
+$BT coverage -a x.bed -b y.bed -hist -sorted > obs
 check exp obs
 rm exp obs
 

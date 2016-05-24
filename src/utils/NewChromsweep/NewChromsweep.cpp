@@ -21,11 +21,11 @@ NewChromSweep::NewChromSweep(ContextIntersect *context)
      _numFiles(_context->getNumInputFiles()),
      _queryRecordsTotalLength(0),
      _databaseRecordsTotalLength(0),
-    _queryTotalRecords(0),
-    _databaseTotalRecords(0),
+     _queryTotalRecords(0),
+     _databaseTotalRecords(0),
      _wasInitialized(false),
      _currQueryRec(NULL),
-     _runToQueryEnd(false),
+     _runToQueryEnd(_context->getRunToQueryEnd()),
      _lexicoDisproven(false),
      _lexicoAssumed(false),
      _lexicoAssumedFileIdx(-1),
@@ -47,13 +47,14 @@ bool NewChromSweep::init() {
     }
 
     _currDbRecs.resize(_numDBs, NULL);
-    if (!_context->hasGenomeFile()) {
+    if (!_context->hasGenomeFile()) 
+    {
         _fileTracks.resize(_numFiles, NULL);
-        for (int i=0; i < _numFiles; i++) {
+        for (int i=0; i < _numFiles; i++) 
+        {
             _fileTracks[i] = new _orderTrackType;
         }
     }
-
 
     for (int i=0; i < _numDBs; i++) {
         nextRecord(false, i);
@@ -61,13 +62,6 @@ bool NewChromSweep::init() {
     }
 
     _caches.resize(_numDBs);
-
-    //determine whether to stop when the database end is hit, or keep going until the
-    //end of the query file is hit as well.
-
-    if (_context->getNoHit() || _context->getWriteCount() || _context->getWriteOverlap() || _context->getWriteAllOverlap() || _context->getLeftJoin()) {
-    _runToQueryEnd = true;
-    }
     _wasInitialized = true;
     return true;
  }

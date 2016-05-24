@@ -53,7 +53,7 @@ bool ContextIntersect::parseCmdArgs(int argc, char **argv, int skipFirstArgs) {
         else if (strcmp(_argv[_i], "-wao") == 0) {
 			if (!handle_wao()) return false;
         }
-       else if (strcmp(_argv[_i], "-wb") == 0) {
+        else if (strcmp(_argv[_i], "-wb") == 0) {
 			if (!handle_wb()) return false;
         }
         else if (strcmp(_argv[_i], "-wo") == 0) {
@@ -187,6 +187,13 @@ bool ContextIntersect::isValidState()
 	if (getAnyHit() || getNoHit() || getWriteCount()) {
 		setPrintable(false);
 	}
+
+	if (getNoHit() || getWriteCount() || getWriteOverlap() 
+		|| getWriteAllOverlap() || getLeftJoin())
+	{
+		setRunToQueryEnd(true);
+	}
+
 	if (_files.size()  < 2 ) {
 		return false;
 	}

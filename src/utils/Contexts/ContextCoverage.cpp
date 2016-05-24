@@ -14,6 +14,7 @@ ContextCoverage::ContextCoverage()
   _coverageType(DEFAULT)
 {
 	setExplicitBedOutput(true); //do not allow BAM output
+	setRunToQueryEnd(true);
 }
 
 ContextCoverage::~ContextCoverage() {
