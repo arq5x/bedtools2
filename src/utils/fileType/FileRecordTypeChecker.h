@@ -15,6 +15,7 @@
 #include <cstdlib>
 #include <vector>
 #include <map>
+#include <algorithm>
 #include "PushBackStreamBuf.h"
 #include "Tokenizer.h"
 
