@@ -65,13 +65,6 @@ bool SingleLineDelimTextFileReader::readEntry()
 		return false;
 	}
 
-	//trim off any white space from end of line.
-	int currPos = lineLen-1;
-	while (isspace(_sLine[currPos])) {
-		currPos--;
-	}
-	_sLine.resize(currPos +1);
-
 	if (wasHeader) {
 		return true;
 	}
@@ -134,6 +127,12 @@ bool SingleLineDelimTextFileReader::findDelimiters() {
 		}
 	}
 	_delimPositions[currField] = len;
+	if (_sLine[len] == '\t')
+	{
+		currField++;		
+	}
+
+	// count the number of fields allow for lines ending in \t\n
 	if (currField != _numFields) {
 		cerr << "Error: line number " 
 			 << _lineNum << " of file " 
