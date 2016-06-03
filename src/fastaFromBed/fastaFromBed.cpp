@@ -104,9 +104,32 @@ void Bed2Fa::ReportDNA(const BED &bed, string &dna) {
         }
         else {
             if (_useFasta == true)
-                *_faOut  << ">" << bed.name << endl << dna << endl;
+                if(_useStrand == true)
+        		{
+				*_faOut << ">" << bed.name << "::" << bed.chrom << ":" 
+                        << bed.start << "-" << bed.end   
+                        << "(" << bed.strand << ")" << endl << dna << endl;
+            	}
+            	else
+            	{
+            	*_faOut << ">" << bed.name << "::" << bed.chrom << ":" 
+                        << bed.start << "-" << bed.end   
+                        << endl << dna << endl;
+            	}
             else
-                *_faOut  << bed.name << "\t" << dna << endl;
+            	if(_useStrand == true)
+        		{
+					*_faOut << bed.name << "::" << bed.chrom << ":" 
+                        << bed.start << "-" << bed.end   
+                        << "(" << bed.strand << ")" << "\t" << dna << endl;
+            	}
+            	else
+            	{
+            		*_faOut << bed.name << "::" << bed.chrom << ":" 
+                        << bed.start << "-" << bed.end   
+                        << "\t" << dna << endl;
+            	}
+                
         }
     }
 }
