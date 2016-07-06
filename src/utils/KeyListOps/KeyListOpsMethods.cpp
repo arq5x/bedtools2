@@ -236,6 +236,7 @@ uint32_t KeyListOpsMethods::getCountDistinct() {
 	makeFreqMap();
 	return _freqMap.size();
 }
+
 // return a delimiter-separated list of elements
 const QuickString &KeyListOpsMethods::getCollapse(const QuickString &delimiter) {
 	if (empty()) return _nullVal;
@@ -249,8 +250,8 @@ const QuickString &KeyListOpsMethods::getCollapse(const QuickString &delimiter) 
 		i++;
 	}
 	return _retStr;
-
 }
+
 // return a concatenation of all elements in the vector
 const QuickString &KeyListOpsMethods::getConcat() {
 	if (empty()) return _nullVal;
