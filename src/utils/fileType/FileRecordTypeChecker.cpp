@@ -318,11 +318,13 @@ bool FileRecordTypeChecker::isTextDelimtedFormat(const char *buffer, size_t len)
 	int emptyLines = 0;
 	for (int i=0; i < numLines; i++ ) {
 
+
 		if (validLinesFound >=4) {
 			break; //really only need to look at like 4 lines of data, max.
 		}
 
 		const string line = _tokenizer.getElem(i);
+
 		//skip over any empty line
 		if (line.size() == 0) {
 			emptyLines++;
@@ -368,7 +370,7 @@ bool FileRecordTypeChecker::isTextDelimtedFormat(const char *buffer, size_t len)
 
 		int tab_count = std::count(line.begin(), line.end(), '\t');
 		int comma_count = std::count(line.begin(), line.end(), ',');
-		int semicolon_count = std::count(line.begin(), line.end(), ',');
+		int semicolon_count = std::count(line.begin(), line.end(), ';');
 
 		tabCounts.push_back(tab_count);
 		commaCounts.push_back(comma_count);
@@ -385,6 +387,7 @@ bool FileRecordTypeChecker::isTextDelimtedFormat(const char *buffer, size_t len)
 	_insufficientData = false;
 
 	if (delimiterTesting(tabCounts, '\t')) {
+
 		return true;
 	}
 	else if (validLinesFound) {

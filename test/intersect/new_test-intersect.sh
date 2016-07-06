@@ -751,10 +751,8 @@ rm obs
 ############################################################
 echo "    intersect.new.t63...\c"
 echo \
-"chr1	11323785	11617177
-chr1	12645605	13926923
-chr1	14750216	15119039" >exp
-$BT intersect -a dosLineChar_a.bed -b dosLineCharWithExtraTab_b.bed -v > obs
+"Error: Type checker found wrong number of fields while tokenizing data line."   >exp
+$BT intersect -a dosLineChar_a.bed -b dosLineCharWithExtraTab_b.bed -v 2>&1 > /dev/null | cat - > obs
 check exp obs
 rm exp obs
 

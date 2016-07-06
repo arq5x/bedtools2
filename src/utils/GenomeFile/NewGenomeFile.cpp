@@ -55,7 +55,7 @@ void NewGenomeFile::loadGenomeFileIntoMap() {
 	string sLine;
 	Tokenizer fieldTokens;
 	CHRPOS chrSize = 0;
-	QuickString chrName;
+	string chrName;
 	while (!genFile.eof()) {
 		sLine.clear();
 		chrSize = 0;
