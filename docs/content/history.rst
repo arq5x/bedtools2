@@ -20,6 +20,7 @@ Version 2.26.0 (7-July-2016)
 14. Allow ``-s`` and ``-w`` to be used in any order for ``makewindows``.
 15. Added new ``-bedOut`` option to ``getfasta``.
 16. The ``-r`` option forces the ``-F`` value for ``intersect``.
+17. Add ``-pc`` option to the ``genomecov`` tool, allowing coverage to be calculated based upon paired-end fragments.
 
 
 Version 2.25.0 (3-Sept-2015)
