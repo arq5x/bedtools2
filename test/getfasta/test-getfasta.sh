@@ -75,7 +75,6 @@ echo "WARNING. chromosome (chr1 assembled by consortium X) was not found in the 
 echo $'chr1 assembled by consortium X\t1\t10' | $BT getfasta -fi t_fH.fa -bed - 2> obs
 
 check obs exp
-
 rm obs exp
 
 
@@ -120,3 +119,38 @@ echo "Warning: the index file is older than the FASTA file." > exp
 check obs exp
 rm obs exp test.fa test.fa.fai
 
+
+echo "    getfasta.t11...\c"
+echo ">chr1:0-40
+agggggggggcgggggggggtgggggggggaggggggggg
+>chr1:0-40
+agggggggggcgggggggggtgggggggggaggggggggg" > exp
+$BT getfasta -fi t.fa -bed blocks.bed > obs
+check obs exp
+rm obs exp
+
+echo "    getfasta.t12...\c"
+echo ">three_blocks_match::chr1:0-40
+agggggggggcgggggggggtgggggggggaggggggggg
+>three_blocks_match::chr1:0-40
+agggggggggcgggggggggtgggggggggaggggggggg" > exp
+$BT getfasta -fi t.fa -bed blocks.bed -name > obs
+check obs exp
+rm obs exp
+
+echo "    getfasta.t13...\c"
+echo ">three_blocks_match::chr1:0-40(+)
+agggggggggcgggggggggtgggggggggaggggggggg
+>three_blocks_match::chr1:0-40(-)
+ccccccccctcccccccccacccccccccgccccccccct" > exp
+$BT getfasta -fi t.fa -bed blocks.bed -name -s > obs
+check obs exp
+rm obs exp
+
+
+echo "    getfasta.t134..\c"
+echo ">chr1:0-1
+a" > exp
+$BT getfasta -fi t.fa -bed <(echo -e "chr1\t0\t1") > obs
+check obs exp
+rm obs exp
