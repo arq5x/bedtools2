@@ -7,6 +7,7 @@
 #include "Tokenizer.h"
 #include <cstring>
 #include <cstdio>
+#include <iostream>
 Tokenizer::Tokenizer()
 : _numExpectedElems(0),
   _keepFinalIncElem(USE_NOW),
@@ -42,7 +43,24 @@ int Tokenizer::tokenize(const QuickString &str, char delimiter, bool eofHit, boo
     std::string item;
     _elems.clear();
     while(getline(ss, item, delimiter)) {
-        _elems.push_back(item);  
+    	// when dealing with compressed input, we can sometimes token lines such
+    	// that we capture a partial line (i.e., it didn't end in '\n'). Only
+    	// sample the complete lines.
+    	if (isCompressed)
+    	{
+    		if (delimiter == '\n' && ss.eof() == false)
+    		{  
+    			_elems.push_back(item);
+    		}
+    		else if (delimiter != '\n')
+    		{
+    			_elems.push_back(item);
+    		}
+    	}
+    	else
+    	{
+    		_elems.push_back(item);
+    	}
     }
     return _elems.size();
 
