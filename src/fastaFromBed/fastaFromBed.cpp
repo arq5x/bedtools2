@@ -104,19 +104,22 @@ void Bed2Fa::ReportDNA(const BED &bed, string &dna) {
         }
         else {
             if (_useFasta == true)
+            {
                 if(_useStrand == true)
         		{
-				*_faOut << ">" << bed.name << "::" << bed.chrom << ":" 
-                        << bed.start << "-" << bed.end   
-                        << "(" << bed.strand << ")" << endl << dna << endl;
+    				*_faOut << ">" << bed.name << "::" << bed.chrom << ":" 
+                            << bed.start << "-" << bed.end   
+                            << "(" << bed.strand << ")" << endl << dna << endl;
             	}
             	else
             	{
-            	*_faOut << ">" << bed.name << "::" << bed.chrom << ":" 
-                        << bed.start << "-" << bed.end   
-                        << endl << dna << endl;
+                	*_faOut << ">" << bed.name << "::" << bed.chrom << ":" 
+                            << bed.start << "-" << bed.end   
+                            << endl << dna << endl;
             	}
+            }
             else
+            {
             	if(_useStrand == true)
         		{
 					*_faOut << bed.name << "::" << bed.chrom << ":" 
@@ -129,7 +132,7 @@ void Bed2Fa::ReportDNA(const BED &bed, string &dna) {
                         << bed.start << "-" << bed.end   
                         << "\t" << dna << endl;
             	}
-                
+            }   
         }
     }
 }
