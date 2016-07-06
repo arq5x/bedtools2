@@ -120,7 +120,7 @@ bool ContextBase::errorEncountered() {
 	if (_argc == 1) {    // just a subcommand was given with no options.
 		return true;
 	} 
-	return !_errorMsg.empty();
+	return !_errorMsg.empty() || getShowHelp();
 }
 
 bool ContextBase::determineOutputType() {
