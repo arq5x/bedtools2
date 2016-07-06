@@ -2,6 +2,26 @@
 Release History
 ###############
 
+Version 2.26.0 (7-July-2016)
+============================
+1. Fixed a major memory leak when using ``-sorted``. Thanks to Emily Tsang and Steohen Montgomery.
+2. Fixed a bug for BED files containing a single record with no newline. Thanks to @jmarshall.
+3. The ``getfasta`` tool includes name, chromosome and position in fasta headers when the ``-name`` option is used. Thanks to @rishavray.
+4. Fixed a bug that now forces the ``coverage`` tool to process every record in the ``-a`` file.
+5. Fixed a bug preventing proper processing of BED files with consecutive tabs.
+6. VCF files containing structural variants now infer SV length from either the SVLEN or END INFO fields. Thanks to Zev Kronenberg.
+7. Resolve off by one bugs when intersecting GFF or VCF files with BED files.
+8. The ``shuffle`` tool now uses roulette wheel sampling to shuffle to ``-incl`` regions based upon the size of the interval. Thanks to Zev Kronenberg and Michael Imbeault.
+9. Fixed a bug in ``coverage`` that prevented correct calculation of depth when using the ``-split`` option.
+10. The ``shuffle`` tool warns when an interval exceeds the maximum chromosome length.
+11. The ``complement`` tool better checks intervals against the chromosome lengths.
+12. Fixes for ``stddev``, ``min``, and ``max`` operations. Thanks to @jmarshall.
+13. Enabled ``stdev``, ``sstdev``, ``freqasc``, and ``freqdesc`` options for ``groupby``.
+14. Allow ``-s`` and ``-w`` to be used in any order for ``makewindows``.
+15. Added new ``-bedOut`` option to ``getfasta``.
+16. The ``-r`` option forces the ``-F`` value for ``intersect``.
+
+
 Version 2.25.0 (3-Sept-2015)
 ============================
 1. Added new `-F` option that allows one to set the minimum fraction of overlap required for the B interval. This complements the functionality of the `-f` option.Available for `intersect`, `coverage`, `map`, `subtract`, and `jaccard`.
