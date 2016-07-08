@@ -113,3 +113,14 @@ chr1	999	1000	a2	2	-" > exp
 $BT shift -i a.bed -s 3000000000 -g tiny.genome > obs
 check obs exp
 rm obs exp
+
+###########################################################
+# test shift huge genome
+###########################################################
+echo "    shift.t9...\c"
+echo \
+"chr1	67000638	67217822	NM_032291	0	+
+chr1	92146899	92352836	NR_036634	0	-" > exp
+$BT shift -i b.bed -s 1000 -g huge.genome > obs
+check obs exp
+rm obs exp
