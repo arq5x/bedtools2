@@ -190,8 +190,12 @@ int main(int argc, char *argv[])
 
 int bedtools_help(void)
 {
-    cout  << PROGRAM_NAME  << ": flexible tools for genome arithmetic and DNA sequence analysis.\n";
-    cout << "usage:    bedtools <subcommand> [options]" << endl << endl;
+    cout  << PROGRAM_NAME  << " is a powerful toolset for genome arithmetic.\n";
+    cout << "About:     developed in the quinlanlab.org at the University of Utah." << endl;
+    cout << "Docs:      http://bedtools.readthedocs.io/" << endl;
+    cout << "Code:      https://github.com/arq5x/bedtools2" << endl;
+    cout << "Mail:      https://groups.google.com/forum/#!forum/bedtools-discuss" << endl << endl;
+    cout << "Usage:     bedtools <subcommand> [options]" << endl << endl;
 
     cout  << "The bedtools sub-commands include:" << endl;
     
