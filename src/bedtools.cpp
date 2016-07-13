@@ -190,8 +190,9 @@ int main(int argc, char *argv[])
 
 int bedtools_help(void)
 {
-    cout  << PROGRAM_NAME  << " is a powerful toolset for genome arithmetic.\n";
-    cout << "About:     developed in the quinlanlab.org at the University of Utah." << endl;
+    cout  << PROGRAM_NAME  << " is a powerful toolset for genome arithmetic." << endl << endl;
+    cout << "Version:   " << VERSION << endl;
+    cout << "About:     developed in the quinlanlab.org and by many contributors worldwide." << endl;
     cout << "Docs:      http://bedtools.readthedocs.io/" << endl;
     cout << "Code:      https://github.com/arq5x/bedtools2" << endl;
     cout << "Mail:      https://groups.google.com/forum/#!forum/bedtools-discuss" << endl << endl;
