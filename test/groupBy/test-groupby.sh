@@ -293,9 +293,8 @@ rm obs exp
 # non-positional records
 ###########################################################
 echo "    groupby.t15...\c"
-echo \
-"ERROR: file noPosvalues.header.bed has non positional records, which are only valid for the groupBy tool." > exp
-$BT merge  -i noPosvalues.header.bed 2>&1 >/dev/null | cat - > obs
+echo "ERROR: file noPosvalues.header.bed has non positional records, which are only valid for the groupBy tool." > exp
+$BT merge  -i noPosvalues.header.bed 2>&1 | head -n 1 > obs
 check obs exp
 rm obs exp
 

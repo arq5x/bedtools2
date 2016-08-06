@@ -29,8 +29,8 @@ bool GroupBy::init()
 	for (int i=0; i < numElems; i++) {
 		//if the item is a range, such as 3-5,
 		//must split that as well.
-		const QuickString &elem = groupColsTokens.getElem(i);
 
+		const QuickString &elem = groupColsTokens.getElem(i);
 		if (strchr(elem.c_str(), '-')) {
 			Tokenizer rangeElems;
 			rangeElems.tokenize(elem, '-');
@@ -59,14 +59,19 @@ bool GroupBy::findNext(RecordKeyVector &hits)
 	assignPrevFields();
 	hits.setKey(_prevRecord);
 	hits.push_back(_prevRecord); //key should also be part of group for calculations
-	while (1) {
-		const Record *newRecord = getNextRecord();
-		if (newRecord == NULL) {
+	while (1) 
+	{
+		Record *newRecord = getNextRecord();
+		if (newRecord == NULL) 
+		{
 			_prevRecord = NULL;
 			break;
-		} else if (canGroup(newRecord)) {
+		} else if (canGroup(newRecord)) 
+		{
 			hits.push_back(newRecord);
-		} else {
+		} 
+		else 
+		{
 			_prevRecord = newRecord;
 			break;
 		}
@@ -77,13 +82,17 @@ bool GroupBy::findNext(RecordKeyVector &hits)
 void GroupBy::processHits(RecordOutputMgr *outputMgr, RecordKeyVector &hits)
 {
 
-	const Record *rec = hits.getKey();
+	Record *rec = hits.getKey();
 	const QuickString &opVal  = _context->getColumnOpsVal(hits);
-	if (upCast(_context)->printFullCols()) {
+	if (upCast(_context)->printFullCols()) 
+	{
 		outputMgr->printRecord(rec, opVal);
-	} else {
+	} 
+	else 
+	{
 		QuickString outBuf;
-		for (int i=0; i < (int)_groupCols.size(); i++) {
+		for (int i = 0; i < (int)_groupCols.size(); i++) 
+		{
 			outBuf.append(rec->getField(_groupCols[i]));
 			outBuf.append('\t');
 		}
@@ -95,7 +104,7 @@ void GroupBy::processHits(RecordOutputMgr *outputMgr, RecordKeyVector &hits)
 
 void GroupBy::cleanupHits(RecordKeyVector &hits)
 {
-	RecordKeyVector::const_iterator_type iter = hits.begin();
+	RecordKeyVector::iterator_type iter = hits.begin();
 	for (; iter != hits.end(); iter = hits.next()) 
 	{
 		_queryFRM->deleteRecord(*iter);	
@@ -103,12 +112,16 @@ void GroupBy::cleanupHits(RecordKeyVector &hits)
 	hits.clearAll();
 }
 
-const Record *GroupBy::getNextRecord() {
-	while (!_queryFRM->eof()) {
+Record *GroupBy::getNextRecord() {
+	while (!_queryFRM->eof()) 
+	{
 		Record *queryRecord = _queryFRM->getNextRecord();
-		if (queryRecord == NULL) {
+		if (queryRecord == NULL) 
+		{
 			continue;
-		} else {
+		} 
+		else 
+		{
 			return queryRecord;
 		}
 	}
@@ -121,19 +134,22 @@ void GroupBy::assignPrevFields() {
 	}
 }
 
-bool GroupBy::canGroup(const Record *newRecord) {
-
-	for (int i=0; i < (int)_groupCols.size(); i++) {
+bool GroupBy::canGroup(Record *newRecord) 
+{
+	for (int i = 0; i < (int)_groupCols.size(); i++) 
+	{
 		int fieldNum = _groupCols[i];
 		const QuickString &newField = newRecord->getField(fieldNum);
 		const QuickString &oldField = _prevFields[i];
-		if (upCast(_context)->ignoreCase()) {
+		if (upCast(_context)->ignoreCase()) 
+		{
 			if (oldField.stricmp(newField)) return false;
-		} else {
+		} 
+		else 
+		{
 			if (oldField != newField) return false;
 		}
 	}
 	return true;
-
 }
 

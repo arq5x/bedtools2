@@ -33,8 +33,7 @@ const QuickString &PlusFields::getField(int fieldNum) const
 
 void PlusFields::printFields(QuickString &outBuf) const {
 	for (size_t i=0; i < size(); i++) {
-		outBuf.append('\t');
 		outBuf.append(_fields[i]);
+		if (i < size() - 1) outBuf.append('\t');
 	}
-
 }
