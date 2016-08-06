@@ -38,6 +38,7 @@ void BedPlusInterval::clear() {
 void BedPlusInterval::print(QuickString &outBuf) const
 {
 	Bed3Interval::print(outBuf);
+	outBuf.append('\t');
 	printBed6PlusFields(outBuf);
 	_plusFields.printFields(outBuf);
 }
@@ -45,6 +46,7 @@ void BedPlusInterval::print(QuickString &outBuf) const
 void BedPlusInterval::print(QuickString &outBuf, int start, int end) const
 {
 	Bed3Interval::print(outBuf, start, end);
+	outBuf.append('\t');
 	printBed6PlusFields(outBuf);
 	_plusFields.printFields(outBuf);
 }
@@ -52,6 +54,7 @@ void BedPlusInterval::print(QuickString &outBuf, int start, int end) const
 void BedPlusInterval::print(QuickString &outBuf, const QuickString & start, const QuickString & end) const
 {
 	Bed3Interval::print(outBuf, start, end);
+	outBuf.append('\t');
 	printBed6PlusFields(outBuf);
 	_plusFields.printFields(outBuf);
 }
@@ -96,14 +99,13 @@ bool BedPlusInterval::isNumericField(int fieldNum) {
 
 void BedPlusInterval::printBed6PlusFields(QuickString &outBuf) const {
 	if (_numFixedFields != defaultNumFixedFields) {
-		outBuf.append('\t');
 		outBuf.append(_name);
 		outBuf.append('\t');
 		outBuf.append(_score);
 		outBuf.append('\t');
 		outBuf.append(_strand);
+		outBuf.append('\t');
 	}
-
 }
 
 void BedPlusInterval::printBed6PlusNullFields(QuickString &outBuf) const {

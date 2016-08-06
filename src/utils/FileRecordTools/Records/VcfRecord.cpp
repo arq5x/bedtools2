@@ -86,6 +86,7 @@ void VcfRecord::printOtherFields(QuickString &outBuf) const {
 	outBuf.append(_varAlt);
 	outBuf.append('\t');
 	outBuf.append(_score);
+	outBuf.append('\t');
 	_plusFields.printFields(outBuf);
 }
 

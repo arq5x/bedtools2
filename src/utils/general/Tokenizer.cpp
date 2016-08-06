@@ -62,7 +62,8 @@ int Tokenizer::tokenize(const QuickString &str, char delimiter, bool eofHit, boo
     		_elems.push_back(item);
     	}
     }
-    return _elems.size();
+    _numValidElems = _elems.size();
+    return _numValidElems;
 
 
 	// int strLen = (int)str.size();
