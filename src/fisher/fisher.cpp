@@ -91,7 +91,7 @@ void Fisher::giveFinalReport(RecordOutputMgr *outputMgr)
 unsigned long Fisher::getTotalIntersection(RecordKeyVector &recList)
 {
     unsigned long intersection = 0;
-    const Record *key = recList.getKey();
+    Record *key = recList.getKey();
     int keyStart = key->getStartPos();
     int keyEnd = key->getEndPos();
 
@@ -99,7 +99,7 @@ unsigned long Fisher::getTotalIntersection(RecordKeyVector &recList)
     _qsizes.push_back((keyEnd - keyStart));
 
     int hitIdx = 0;
-    for (RecordKeyVector::const_iterator_type iter = recList.begin(); iter != recList.end(); iter = recList.next()) {
+    for (RecordKeyVector::iterator_type iter = recList.begin(); iter != recList.end(); iter = recList.next()) {
         int maxStart = max((*iter)->getStartPos(), keyStart);
         int minEnd = min((*iter)->getEndPos(), keyEnd);
         _qsizes.push_back((int)(minEnd - maxStart));

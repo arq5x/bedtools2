@@ -13,6 +13,7 @@
 ContextBase::ContextBase()
 :
   _program(UNSPECIFIED_PROGRAM),
+  _files(NULL),
   _allFilesOpened(false),
   _genomeFile(NULL),
   _outputFileType(FileRecordTypeChecker::UNKNOWN_FILE_TYPE),
@@ -45,7 +46,7 @@ ContextBase::ContextBase()
   _reportDBfileNames(false),
   _printHeader(false),
   _printable(true),
-   _explicitBedOutput(false),
+  _explicitBedOutput(false),
   _queryFileIdx(-1),
   _bamHeaderAndRefIdx(-1),
   _maxNumDatabaseFields(0),
@@ -95,14 +96,12 @@ ContextBase::~ContextBase()
 {
 	delete _genomeFile;
 	_genomeFile = NULL;
-
 	delete _splitBlockInfo;
 	_splitBlockInfo = NULL;
 
 	if (_nameConventionWarningTripped) {
 		cerr << _nameConventionWarningMsg << endl;
 	}
-
 
 	//close all files and delete FRM objects.
 	for (int i=0; i < (int)_files.size(); i++) {
@@ -149,7 +148,7 @@ bool ContextBase::determineOutputType() {
 
 }
 
-void ContextBase::openGenomeFile(const QuickString &genomeFilename)
+void ContextBase::openGenomeFile(const string &genomeFilename)
 {
 	_genomeFile = new NewGenomeFile(genomeFilename.c_str());
 }
@@ -619,14 +618,14 @@ void ContextBase::setColumnOpsMethods(bool val)
 	_hasColumnOpsMethods = val;
 }
 
-const QuickString &ContextBase::getColumnOpsVal(RecordKeyVector &keyList) const {
+const string &ContextBase::getColumnOpsVal(RecordKeyVector &keyList) const {
 	if (!hasColumnOpsMethods()) {
 		return _nullStr;
 	}
 	return _keyListOps->getOpVals(keyList);
 }
 
-FileRecordMgr *ContextBase::getNewFRM(const QuickString &filename, int fileIdx) {
+FileRecordMgr *ContextBase::getNewFRM(const string &filename, int fileIdx) {
 
 	if (_useMergedIntervals) {
 		FileRecordMergeMgr *frm = new FileRecordMergeMgr(filename);
@@ -641,7 +640,7 @@ FileRecordMgr *ContextBase::getNewFRM(const QuickString &filename, int fileIdx) 
 	}
 }
 
-bool ContextBase::parseIoBufSize(QuickString bufStr)
+bool ContextBase::parseIoBufSize(string bufStr)
 {
 	char lastChar = bufStr[bufStr.size()-1];
 	int multiplier = 1;
@@ -741,20 +740,20 @@ ContextBase::testType ContextBase::fileHasLeadingZeroInChromNames(int fileIdx) {
 
 
 
-void ContextBase::warn(const Record *record, const QuickString str1, const QuickString str2, const QuickString str3) {
-	QuickString msg;
+void ContextBase::warn(const Record *record, const string str1, const string str2, const string str3) {
+	string msg;
 	setErrorMsg(msg, true, record, str1, str2, str3);
 	cerr << msg << endl;
 }
 
-void ContextBase::die(const Record *record, const QuickString str1, const QuickString str2, const QuickString str3) {
-	QuickString msg;
+void ContextBase::die(const Record *record, const string str1, const string str2, const string str3) {
+	string msg;
 	setErrorMsg(msg, false, record, str1, str2, str3);
 	cerr << msg << endl;
 	exit(1);
 }
 
-void ContextBase::setErrorMsg(QuickString &msg, bool onlyWarn, const Record * record, QuickString str1, const QuickString str2, const QuickString str3) {
+void ContextBase::setErrorMsg(string &msg, bool onlyWarn, const Record * record, string str1, const string str2, const string str3) {
 	if (onlyWarn) {
 		msg = "\n***** WARNING: ";
 	} else {
@@ -769,7 +768,7 @@ void ContextBase::setErrorMsg(QuickString &msg, bool onlyWarn, const Record * re
 	}
 }
 
-void ContextBase::nameConventionWarning(const Record *record, const QuickString &filename, const QuickString &message)
+void ContextBase::nameConventionWarning(const Record *record, const string &filename, const string &message)
 {
 	 _nameConventionWarningMsg = "***** WARNING: File ";
 	 _nameConventionWarningMsg.append(filename);

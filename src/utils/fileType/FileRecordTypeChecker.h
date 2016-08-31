@@ -35,7 +35,7 @@ public:
 		BED6_RECORD_TYPE, BED12_RECORD_TYPE, BED_PLUS_RECORD_TYPE, BED6_PLUS_RECORD_TYPE, BAM_RECORD_TYPE, VCF_RECORD_TYPE, GFF_RECORD_TYPE,
 		GFF_PLUS_RECORD_TYPE, NO_POS_PLUS_RECORD_TYPE} RECORD_TYPE;
 
-	void setFilename(const QuickString & filename) { _filename = filename; }
+	void setFilename(const string & filename) { _filename = filename; }
 	bool scanBuffer(const char *buf, size_t len, bool eofHit, bool isCompressed = false);
 	bool needsMoreData() const { return _insufficientData; }
 
@@ -89,7 +89,7 @@ private:
 	FILE_TYPE _fileType;
 	RECORD_TYPE _recordType;
 
-	QuickString _filename; //useful for reporting errors with file.
+	string _filename; //useful for reporting errors with file.
 	Tokenizer _tokenizer;
 
 	int _firstValidDataLineIdx;

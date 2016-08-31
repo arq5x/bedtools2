@@ -8,6 +8,7 @@
 #ifndef COVERAGEFILE_H_
 #define COVERAGEFILE_H_
 
+#include <stdio.h> // for asprintf
 #include "intersectFile.h"
 #include "ContextCoverage.h"
 
@@ -21,12 +22,13 @@ public:
 
 
 protected:
-	QuickString _finalOutput;
+	string _finalOutput;
 
 	size_t *_depthArray;
 	size_t _depthArrayCapacity;
 	size_t _queryLen;
 	size_t _totalQueryLen;
+	size_t _hitCount;
 	int _queryOffset;
 	static const int DEFAULT_DEPTH_CAPACITY = 1024;
 	char *_floatValBuf;
@@ -47,9 +49,6 @@ protected:
 	void doMean(RecordOutputMgr *outputMgr, RecordKeyVector &hits);
 	void doHist(RecordOutputMgr *outputMgr, RecordKeyVector &hits);
 	void doDefault(RecordOutputMgr *outputMgr, RecordKeyVector &hits);
-
-	void format(float val);
-
 };
 
 

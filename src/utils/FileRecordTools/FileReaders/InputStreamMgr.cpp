@@ -12,7 +12,7 @@
 
 const char *InputStreamMgr::FIFO_STRING_LITERAL = "/dev/fd";
 
-InputStreamMgr::InputStreamMgr(const QuickString &filename, bool buildScanBuffer)
+InputStreamMgr::InputStreamMgr(const string &filename, bool buildScanBuffer)
 :
  _filename(filename),
  _pushBackStreamBuf(NULL),
@@ -110,8 +110,8 @@ int InputStreamMgr::read(char *data, size_t dataSize)
 			//This part is tricky. They want less data than we saved. Give them what they
 			//requested, then delete from the front of the saveDataStr by using it's substr method.
 			memcpy(data, _saveDataStr.c_str(), dataSize);
-			QuickString newDataStr;
-			_saveDataStr.substr(newDataStr, dataSize, _saveDataStr.size() - dataSize);
+			string newDataStr;
+			newDataStr = _saveDataStr.substr(dataSize, _saveDataStr.size() - dataSize);
 			_saveDataStr = newDataStr;
 			return dataSize;
 		}
@@ -162,12 +162,10 @@ bool InputStreamMgr::populateScanBuffer()
 		}
 	}
 	_numBytesInBuffer = _scanBuffer.size();
-
 	//append it to the savedDataStr.
-	_scanBuffer.toStr(_saveDataStr, true);
+ 	_scanBuffer.toStr(_saveDataStr, true);
 	if (_numBytesInBuffer == 0) return false;
 	return true;
-
 }
 
 bool InputStreamMgr::detectBamOrBgzip(int &numChars, int currChar)

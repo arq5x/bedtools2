@@ -9,7 +9,7 @@
 #define BAMFILEREADER_H_
 
 #include "FileReader.h"
-#include "QuickString.h"
+#include "string.h"
 #include "api/BamReader.h"
 #include "api/BamAux.h"
 
@@ -33,20 +33,20 @@ public:
 	virtual bool readEntry();
 
 	virtual bool hasHeader() const { return _bamReader->IsOpen(); } //any open Bam file automatically has a header
-	virtual const QuickString &getHeader() const { return _bamHeader; }
+	virtual const string &getHeader() const { return _bamHeader; }
 	const BamTools::RefVector &getReferences() const { return _references; }
 
 	const BamTools::BamAlignment &getAlignment() const { return _bamAlignment; }
 
 
-	void getChrName(QuickString &) const;
+	void getChrName(string &) const;
 	int getBamChrId() const;
 	int getStartPos() const;
 	int getEndPos() const;
-	void getName(QuickString &) const;
-	void getScore(QuickString &) const;
+	void getName(string &) const;
+	void getScore(string &) const;
 	char getStrand() const;
-	void getMateChrName(QuickString &str) const;
+	void getMateChrName(string &str) const;
 	virtual int getNumFields() const { return MINIMUM_VALID_BAM_FIELDS; }
 
 protected:
@@ -54,7 +54,7 @@ protected:
 	BamTools::BamReader *_bamReader;
 	BamTools::BamAlignment _bamAlignment;
 	bool _eof;
-	QuickString _bamHeader;
+	string _bamHeader;
 	BamTools::RefVector _references;
 	bool _useTags;
 

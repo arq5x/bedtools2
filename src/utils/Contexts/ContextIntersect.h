@@ -27,8 +27,8 @@ public:
 	void setQueryFileIdx(int idx) { _queryFileIdx = idx; }
 	int getNumDatabaseFiles() { return (int)_dbFileIdxs.size(); }
 	const vector<int> &getDbFileIdxs() const { return _dbFileIdxs; }
-	const QuickString &getQueryFileName() const { return _files[_queryFileIdx]->getFileName(); }
-	const QuickString &getDatabaseFileName(int idx) const { return _files[_dbFileIdxs[idx]]->getFileName(); }
+	const string &getQueryFileName() const { return _files[_queryFileIdx]->getFileName(); }
+	const string &getDatabaseFileName(int idx) const { return _files[_dbFileIdxs[idx]]->getFileName(); }
 	ContextFileType getQueryFileType() const { return _files[_queryFileIdx]->getFileType(); }
 	ContextFileType getDatabaseFileType(int idx) const { return _files[_dbFileIdxs[idx]]->getFileType(); }
 	ContextRecordType getQueryRecordType() const { return _files[_queryFileIdx]->getRecordType(); }
@@ -36,8 +36,8 @@ public:
 	int getMaxNumDatabaseFields() const { return _maxNumDatabaseFields; }
 	void setMaxNumDatabaseFields(int val) { _maxNumDatabaseFields = val; }
 	int getDbIdx(int fileId) { return _fileIdsToDbIdxs.find(fileId)->second; }
-	void addDatabaseNameTag(const QuickString &tag) { _dbNameTags.push_back(tag); }
-	const QuickString &getDatabaseNameTag(int dbIdx) const { return _dbNameTags[dbIdx]; }
+	void addDatabaseNameTag(const string &tag) { _dbNameTags.push_back(tag); }
+	const string &getDatabaseNameTag(int dbIdx) const { return _dbNameTags[dbIdx]; }
 
 	bool getAnyHit() const {return _anyHit; }
 	void setAnyHit(bool val) { _anyHit = val; }

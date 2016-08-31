@@ -34,8 +34,8 @@ using namespace std;
 // define our parameter checking macro
 #define PARAMETER_CHECK(param, paramLen, actualLen) (strncmp(argv[i], param, min(actualLen, paramLen))== 0) && (actualLen == paramLen)
 
-bool sub_main(const QuickString &subCmd);
-void showHelp(const QuickString &subCmd);
+bool sub_main(const string &subCmd);
+void showHelp(const string &subCmd);
 
 int annotate_main(int argc, char* argv[]);//
 int bamtobed_main(int argc, char* argv[]);//
@@ -92,7 +92,7 @@ int main(int argc, char *argv[])
     // make sure the user at least entered a sub_command
     if (argc < 2) return bedtools_help();
 
-    QuickString subCmd(argv[1]);
+    string subCmd(argv[1]);
     BedtoolsDriver btDriver;
     if (btDriver.supports(subCmd)) {
 
@@ -292,7 +292,7 @@ int bedtools_faq(void)
     return 0;
 }
 
-void showHelp(const QuickString &subCmd) {
+void showHelp(const string &subCmd) {
 	if (subCmd == "intersect") {
 		intersect_help();
 	} else if (subCmd == "map") {

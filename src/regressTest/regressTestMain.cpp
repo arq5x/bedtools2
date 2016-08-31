@@ -3,7 +3,7 @@
 #include <cstring>
 #include <cstdlib>
 #include <cstdio>
-#include "QuickString.h"
+#include "string.h"
 
 void usage()  {
 	printf("Usage: bedtools regressTest sub-prog targetVersion configFile [optionsToTest]\n");
@@ -31,7 +31,7 @@ int regress_test_main(int argc, char **argv) {
 		usage();
 		exit(1);
 	}
-	QuickString program(argv[2]);
+	string program(argv[2]);
 
 	RegressTest *regressTest = new RegressTest();
 

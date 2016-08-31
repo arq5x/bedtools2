@@ -74,14 +74,14 @@ bool KeyListOps::isNumericOp(OP_TYPES op) const {
 	return (iter == _isNumericOp.end() ? false : iter->second);
 }
 
-bool KeyListOps::isNumericOp(const QuickString &op) const {
+bool KeyListOps::isNumericOp(const string &op) const {
 	return isNumericOp(getOpCode(op));
 }
 
-KeyListOps::OP_TYPES KeyListOps::getOpCode(const QuickString &operation) const {
+KeyListOps::OP_TYPES KeyListOps::getOpCode(const string &operation) const {
 	//If the operation does not exist, return INVALID.
 	//otherwise, return code for given operation.
-	map<QuickString, OP_TYPES>::const_iterator iter = _opCodes.find(operation);
+	map<string, OP_TYPES>::const_iterator iter = _opCodes.find(operation);
 	if (iter == _opCodes.end()) {
 		return INVALID;
 	}
@@ -132,7 +132,7 @@ bool KeyListOps::isValidColumnOps(FileRecordMgr *dbFile) {
 					 << dbFile->getFileName() << " only has fields 1 - " << dbFile->getNumFields() << "." << endl;
 			 return false;
 		}
-		const QuickString &operation = opsTokens.getElem(numOps > 1 ? i : 0);
+		const string &operation = opsTokens.getElem(numOps > 1 ? i : 0);
 		OP_TYPES opCode = getOpCode(operation);
 		if (opCode == INVALID) {
 			cerr << endl << "*****" << endl
@@ -160,7 +160,7 @@ bool KeyListOps::isValidColumnOps(FileRecordMgr *dbFile) {
     return true;
 }
 
-const QuickString & KeyListOps::getOpVals(RecordKeyVector &hits)
+const string & KeyListOps::getOpVals(RecordKeyVector &hits)
 {
 	//loop through all requested columns, and for each one, call the method needed
 	//for the operation specified.
@@ -168,6 +168,7 @@ const QuickString & KeyListOps::getOpVals(RecordKeyVector &hits)
 	_outVals.clear();
 	double val = 0.0;
 	for (int i=0; i < (int)_colOps.size(); i++) {
+		ostringstream s;
 		int col = _colOps[i].first;
 		OP_TYPES opCode = _colOps[i].second;
 
@@ -176,138 +177,138 @@ const QuickString & KeyListOps::getOpVals(RecordKeyVector &hits)
 		case SUM:
 			val = _methods.getSum();
 			if (isnan(val)) {
-				_outVals.append(_methods.getNullValue());
+				s << _methods.getNullValue();
 			} else {
-				_outVals.append(format(val));
+				s << format(val);
 			}
 			break;
 
 		case MEAN:
 			val = _methods.getMean();
 			if (isnan(val)) {
-				_outVals.append(_methods.getNullValue());
+				s << _methods.getNullValue();
 			} else {
-				_outVals.append(format(val));
+				s << format(val);
 			}
 			break;
 
 		case STDDEV:
 			val = _methods.getStddev();
 			if (isnan(val)) {
-				_outVals.append(_methods.getNullValue());
+				s << _methods.getNullValue();
 			} else {
-				_outVals.append(format(val));
+				s << format(val);
 			}
 			break;
 
 		case SAMPLE_STDDEV:
 			val = _methods.getSampleStddev();
 			if (isnan(val)) {
-				_outVals.append(_methods.getNullValue());
+				s << _methods.getNullValue();
 			} else {
-				_outVals.append(format(val));
+				s << format(val);
 			}
 			break;
 
 		case MEDIAN:
 			val = _methods.getMedian();
 			if (isnan(val)) {
-				_outVals.append(_methods.getNullValue());
+				s << _methods.getNullValue();
 			} else {
-				_outVals.append(format(val));
+				s << format(val);
 			}
 			break;
 
 		case MODE:
-			_outVals.append(_methods.getMode());
+			s << _methods.getMode();
 			break;
 
 		case ANTIMODE:
-			_outVals.append(_methods.getAntiMode());
+			s << _methods.getAntiMode();
 			break;
 
 		case MIN:
 			val = _methods.getMin();
 			if (isnan(val)) {
-				_outVals.append(_methods.getNullValue());
+				s << _methods.getNullValue();
 			} else {
-				_outVals.append(format(val));
+				s << format(val);
 			}
 			break;
 
 		case MAX:
 			val = _methods.getMax();
 			if (isnan(val)) {
-				_outVals.append(_methods.getNullValue());
+				s << _methods.getNullValue();
 			} else {
-				_outVals.append(format(val));
+				s << format(val);
 			}
 			break;
 
 		case ABSMIN:
 			val = _methods.getAbsMin();
 			if (isnan(val)) {
-				_outVals.append(_methods.getNullValue());
+				s << _methods.getNullValue();
 			} else {
-				_outVals.append(format(val));
+				s << format(val);
 			}
 			break;
 
 		case ABSMAX:
 			val = _methods.getAbsMax();
 			if (isnan(val)) {
-				_outVals.append(_methods.getNullValue());
+				s << _methods.getNullValue();
 			} else {
-				_outVals.append(format(val));
+				s << format(val);
 			}
 			break;
 
 		case COUNT:
-			_outVals.append(_methods.getCount());
+			s << _methods.getCount();
 			break;
 
 		case DISTINCT:
-			_outVals.append(_methods.getDistinct());
+			s << _methods.getDistinct();
 			break;
 
 		case DISTINCT_SORT_NUM:
-			_outVals.append(_methods.getDistinctSortNum());
+			s << _methods.getDistinctSortNum();
 			break;
 
 		case DISTINCT_SORT_NUM_DESC:
-			_outVals.append(_methods.getDistinctSortNum(false));
+			s << _methods.getDistinctSortNum(false);
 			break;
 
 		case COUNT_DISTINCT:
-			_outVals.append(_methods.getCountDistinct());
+			s << _methods.getCountDistinct();
 			break;
 
 		case DISTINCT_ONLY:
-			_outVals.append(_methods.getDistinctOnly());
+			s << _methods.getDistinctOnly();
 			break;
 
 		case COLLAPSE:
-			_outVals.append(_methods.getCollapse());
+			s << _methods.getCollapse();
 			break;
 
 		case CONCAT:
-			_outVals.append(_methods.getConcat());
+			s << _methods.getConcat();
 			break;
 
 		case FREQ_ASC:
-			_outVals.append(_methods.getFreqAsc());
+			s << _methods.getFreqAsc();
 			break;
 
 		case FREQ_DESC:
-			_outVals.append(_methods.getFreqDesc());
+			s << _methods.getFreqDesc();
 			break;
 
 		case FIRST:
-			_outVals.append(_methods.getFirst());
+			s << _methods.getFirst();
 			break;
 
 		case LAST:
-			_outVals.append(_methods.getLast());
+			s << _methods.getLast();
 			break;
 
 		case INVALID:
@@ -318,9 +319,10 @@ const QuickString & KeyListOps::getOpVals(RecordKeyVector &hits)
 			cerr << "ERROR: Invalid operation given for column " << col << ". Exiting..." << endl;
 			break;
 		}
+		_outVals.append(s.str());
 		//if this isn't the last column, add a tab.
 		if (i < (int)_colOps.size() -1) {
-			_outVals.append('\t');
+			_outVals.append("\t");
 		}
 	}
 	if (_methods.nonNumErrFlagSet()) {
@@ -331,7 +333,7 @@ const QuickString & KeyListOps::getOpVals(RecordKeyVector &hits)
 	return _outVals;
 }
 
-const QuickString &KeyListOps::format(double val)
+const string &KeyListOps::format(double val)
 {
    std::stringstream strmBuf;
    strmBuf << std::setprecision (_precision) << val;

@@ -1,12 +1,12 @@
 /*
- * QuickString.h
+ * string.h
  *
  *  Created on: Dec 3, 2012
  *      Author: nek3d
  */
 
-#ifndef QUICKSTRING_H_
-#define QUICKSTRING_H_
+#ifndef string_H_
+#define string_H_
 
 #include <string>
 #include <stdint.h>
@@ -15,16 +15,16 @@
 
 using namespace std;
 
-class QuickString {
+class string {
 public:
-	QuickString(size_t capacity = DEFAULT_CAPACITY);
-	QuickString(const QuickString &); //need explicit copy constructor
-	//so address of _buffer member is not copied! Each QuickString object
+	string(size_t capacity = DEFAULT_CAPACITY);
+	string(const string &); //need explicit copy constructor
+	//so address of _buffer member is not copied! Each string object
 	//needs to build it's own buffer.
-	QuickString(const char *);
-	QuickString(const string &);
-	QuickString(char c);
-	~QuickString();
+	string(const char *);
+	string(const string &);
+	string(char c);
+	~string();
 	size_t size() const { return _currSize; }
 	size_t capacity() const { return _currCapacity; }
 	void reserve(size_t newCapacity=0);
@@ -32,40 +32,40 @@ public:
 
 	void clear(); //only clears buffer, doesn't delete it.
 	void release(); //will deallocate current buffer, reallocate it at default size.
-	QuickString &operator = (const string &);
-	QuickString &operator = (const char *);
-	QuickString &operator = (const QuickString &);
-	QuickString &operator = (char);
-	QuickString &operator = (int);
-	QuickString &operator = (uint32_t);
-	//QuickString &operator = (size_t);
-	QuickString &operator = (float);
-	QuickString &operator = (double);
-	QuickString &operator += (const QuickString &);
-	QuickString &operator += (const string &);
-	QuickString &operator += (const char *);
-	QuickString &operator += (char);
-	QuickString &operator += (int);
-	QuickString &operator += (uint32_t);
-	//QuickString &operator += (size_t);
-	QuickString &operator += (float);
-	QuickString &operator += (double);
+	string &operator = (const string &);
+	string &operator = (const char *);
+	string &operator = (const string &);
+	string &operator = (char);
+	string &operator = (int);
+	string &operator = (uint32_t);
+	//string &operator = (size_t);
+	string &operator = (float);
+	string &operator = (double);
+	string &operator += (const string &);
+	string &operator += (const string &);
+	string &operator += (const char *);
+	string &operator += (char);
+	string &operator += (int);
+	string &operator += (uint32_t);
+	//string &operator += (size_t);
+	string &operator += (float);
+	string &operator += (double);
 
-	friend ostream &operator << (ostream &out, const QuickString &str);
-	bool operator == (const QuickString &) const;
+	friend ostream &operator << (ostream &out, const string &str);
+	bool operator == (const string &) const;
 	bool operator == (const string &) const;
 	bool operator == (const char *) const;
-	bool operator != (const QuickString &) const;
-	bool operator < (const QuickString &) const;
-	bool operator > (const QuickString &) const;
+	bool operator != (const string &) const;
+	bool operator < (const string &) const;
+	bool operator > (const string &) const;
 	const char *c_str() const { return _buffer; }
 	const string str() const { return _buffer; }
 	const char &operator [] (int pos) const { return _buffer[pos]; }
 	char &operator [] (int pos) { return _buffer[pos]; }
 	char &at(size_t pos) { return _buffer[pos]; }
-	bool stricmp(const QuickString &str) const; //case insensitive compare. False if same aside from case, true if different aside from case.
+	bool stricmp(const string &str) const; //case insensitive compare. False if same aside from case, true if different aside from case.
 
-	void append(const QuickString &str) { append(str.c_str(), str.size()); }
+	void append(const string &str) { append(str.c_str(), str.size()); }
 	void append(const char *buf, size_t bufLen);
 	void append(char c);
 
@@ -80,9 +80,9 @@ public:
 
 
 
-	QuickString &assign(const char *str, size_t n);
+	string &assign(const char *str, size_t n);
 	void resize(size_t n, char c = '\0');
-	void substr(QuickString &newStr, size_t pos = 0, size_t len = UINT_MAX) const;
+	void substr(string &newStr, size_t pos = 0, size_t len = UINT_MAX) const;
 
 private:
 	char *_buffer;
@@ -95,4 +95,4 @@ private:
 };
 
 
-#endif /* QUICKSTRING_H_ */
+#endif /* string_H_ */

@@ -13,15 +13,15 @@
 
 class RecordKeyList {
 public:
-	typedef const Record * elemType;
+	typedef Record * elemType;
 	typedef RecordList listType;
 	typedef const RecordListNode *const_iterator_type;
 	RecordKeyList();
     RecordKeyList(elemType item);
-    RecordKeyList(elemType item, const listType &list);
+    RecordKeyList(elemType item, listType &list);
     ~RecordKeyList();
 
-    const RecordKeyList &operator=(const RecordKeyList &other);
+    RecordKeyList &operator=(RecordKeyList &other);
     const_iterator_type begin();
     const_iterator_type next();
     const_iterator_type end();

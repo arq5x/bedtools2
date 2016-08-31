@@ -21,7 +21,7 @@ SOURCES= FileReader.h FileReader.cpp SingleLineDelimTransferBuffer.h SingleLineD
 		SingleLineDelimTextFileReader.h SingleLineDelimTextFileReader.cpp BamFileReader.h BamFileReader.cpp \
 		BufferedStreamMgr.h BufferedStreamMgr.cpp InputStreamMgr.h InputStreamMgr.cpp
 OBJECTS= FileReader.o SingleLineDelimTransferBuffer.o SingleLineDelimTextFileReader.o BamFileReader.o BufferedStreamMgr.o InputStreamMgr.o 
-_EXT_OBJECTS=ParseTools.o QuickString.o CompressionTools.o
+_EXT_OBJECTS=ParseTools.o string.o CompressionTools.o
 EXT_OBJECTS=$(patsubst %,$(OBJ_DIR)/%,$(_EXT_OBJECTS))
 BUILT_OBJECTS= $(patsubst %,$(OBJ_DIR)/%,$(OBJECTS))
 

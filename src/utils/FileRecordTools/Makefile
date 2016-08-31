@@ -5,14 +5,14 @@ UTILITIES_DIR = ../../utils/
 # define our includes
 # -------------------
 INCLUDES = -I$(UTILITIES_DIR)/fileType/ \
-			-I$(UTILITIES_DIR)/FileRecordTools/FileReaders/ \
-           -I$(UTILITIES_DIR)/FileRecordTools/Records/ \
-           -I$(UTILITIES_DIR)/GenomeFile/ \
-           -I$(UTILITIES_DIR)/general/ \
-			-I$(UTILITIES_DIR)/lineFileUtilities/ \
- 			-I$(UTILITIES_DIR)/BamTools/include \
-			-I$(UTILITIES_DIR)/BamTools/src/ \
-           -I$(UTILITIES_DIR)/version/
+	-I$(UTILITIES_DIR)/FileRecordTools/FileReaders/ \
+	-I$(UTILITIES_DIR)/FileRecordTools/Records/ \
+	-I$(UTILITIES_DIR)/GenomeFile/ \
+	-I$(UTILITIES_DIR)/general/ \
+	-I$(UTILITIES_DIR)/lineFileUtilities/ \
+	-I$(UTILITIES_DIR)/BamTools/include \
+	-I$(UTILITIES_DIR)/BamTools/src/ \
+	-I$(UTILITIES_DIR)/version/
 			
 
 SUBDIRS = ./FileReaders \
@@ -25,7 +25,7 @@ SUBDIRS = ./FileReaders \
 SOURCES= FileRecordMgr.cpp FileRecordMgr.h FileRecordMergeMgr.cpp FileRecordMergeMgr.h
 OBJECTS= FileRecordMgr.o FileRecordMergeMgr.o
 _EXT_OBJECTS=SingleLineDelimTextFileReader.o BamFileReader.o Bed3Interval.o Bed6Interval.o BedPlusInterval.o Bed12Interval.o BamRecord.o \
-	SingleLineDelimTransferBuffer.o FileRecordTypeChecker.o QuickString.o ParseTools.o RecordKeyList.o BufferedStreamMgr.o
+	SingleLineDelimTransferBuffer.o FileRecordTypeChecker.o string.o ParseTools.o RecordKeyList.o BufferedStreamMgr.o
 EXT_OBJECTS=$(patsubst %,$(OBJ_DIR)/%,$(_EXT_OBJECTS))
 BUILT_OBJECTS= $(patsubst %,$(OBJ_DIR)/%,$(OBJECTS))
 

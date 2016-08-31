@@ -4,7 +4,7 @@
 #include <string>
 #include <fstream>
 #include <map>
-#include "QuickString.h"
+#include "string.h"
 //#include "ContextBase.h"
 
 #include "BufferedStreamMgr.h"
@@ -31,7 +31,7 @@ public:
 	virtual bool readEntry() =0; // this is an abstract base class.
 	virtual int getCurrChromdId() const { return _currChromId; }
 	virtual bool hasHeader() const = 0;
-	virtual const QuickString &getHeader() const =0;
+	virtual const string &getHeader() const =0;
 	virtual int getNumFields() const = 0;
 protected:
 	int _fileIdx;

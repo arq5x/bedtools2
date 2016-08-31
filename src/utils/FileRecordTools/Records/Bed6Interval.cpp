@@ -23,48 +23,48 @@ bool Bed6Interval::initFromFile(SingleLineDelimTextFileReader *fileReader)
 	return baseRetFlag;
 }
 
-void Bed6Interval::print(QuickString &outBuf) const
+void Bed6Interval::print(string &outBuf) const
 {
 	Bed3Interval::print(outBuf);
 
-	outBuf.append('\t');
+	outBuf.append("\t");
 	outBuf.append(_name);
-	outBuf.append('\t');
+	outBuf.append("\t");
 	outBuf.append(_score);
-	outBuf.append('\t');
+	outBuf.append("\t");
 	outBuf.append(_strand);
 }
 
-void Bed6Interval::print(QuickString &outBuf, int start, int end) const
+void Bed6Interval::print(string &outBuf, int start, int end) const
 {
 	Bed3Interval::print(outBuf, start, end);
-	outBuf.append('\t');
+	outBuf.append("\t");
 	outBuf.append(_name);
-	outBuf.append('\t');
+	outBuf.append("\t");
 	outBuf.append(_score);
-	outBuf.append('\t');
+	outBuf.append("\t");
 	outBuf.append(_strand);
 }
 
-void Bed6Interval::print(QuickString &outBuf, const QuickString & start, const QuickString & end) const
+void Bed6Interval::print(string &outBuf, const string & start, const string & end) const
 {
 	Bed3Interval::print(outBuf, start, end);
-	outBuf.append('\t');
+	outBuf.append("\t");
 	outBuf.append(_name);
-	outBuf.append('\t');
+	outBuf.append("\t");
 	outBuf.append(_score);
-	outBuf.append('\t');
+	outBuf.append("\t");
 	outBuf.append(_strand);
 }
 
 
-void Bed6Interval::printNull(QuickString &outBuf) const
+void Bed6Interval::printNull(string &outBuf) const
 {
 	Bed3Interval::printNull(outBuf);
 	outBuf.append("\t.\t-1\t.", 7);
 }
 
-const QuickString &Bed6Interval::getField(int fieldNum) const
+const string &Bed6Interval::getField(int fieldNum) const
 {
 	switch (fieldNum) {
 	case 4:

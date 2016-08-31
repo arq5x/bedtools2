@@ -139,7 +139,7 @@ bool ContextClosest::handle_D() {
         _reportDistance = true;
         _signDistance = true;
         _haveStrandedDistMode = true;
-        QuickString modeStr(_argv[_i + 1]);
+        string modeStr(_argv[_i + 1]);
         if (modeStr == "ref") {
         	_strandedDistMode = REF_DIST;
         } else if (modeStr == "a") {
@@ -203,7 +203,7 @@ bool ContextClosest::handle_t()
 	bool tieError = false;
     if ((_i+1) < _argc) {
         _haveTieMode = true;
-        QuickString tieStr(_argv[_i+1]);
+        string tieStr(_argv[_i+1]);
         if (tieStr == "all") {
         	_tieMode = ALL_TIES;
         } else if (tieStr == "first") {
@@ -230,7 +230,7 @@ bool ContextClosest::handle_mdb()
 {
 	bool mdbError = false;
     if ((_i+1) < _argc) {
-        QuickString mdbStr(_argv[_i+1]);
+        string mdbStr(_argv[_i+1]);
         if (mdbStr == "each") {
         	_multiDbMode = EACH_DB;
         } else if (mdbStr == "all") {

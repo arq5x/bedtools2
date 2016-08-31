@@ -8,7 +8,7 @@
 #ifndef TOKENIZER_H_
 #define TOKENIZER_H_
 
-#include "QuickString.h"
+#include "string.h"
 #include <vector>
 #include <sstream>
 
@@ -23,7 +23,7 @@ public:
 	// If not, don't worry about it.
 	void setNumExpectedItems(int val);
 
-	int tokenize(const QuickString &str, char delimiter = '\t', bool eofHit = false, bool isCompressed = true);
+	int tokenize(const string &str, char delimiter = '\t', bool eofHit = false, bool isCompressed = true);
 
 	// If the final element ends before a delim char, that means
 	// the buffer passed in ends mid-element. The last, incomplete

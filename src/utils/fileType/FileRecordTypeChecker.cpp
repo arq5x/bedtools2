@@ -181,12 +181,12 @@ bool FileRecordTypeChecker::handleTextFormat(const char *buffer, size_t len)
 		//Tokenize the first line of valid data into fields.
 		//Need to make a copy so next call to tokenizer doesn't overwrite the line.
 
-		QuickString line(_tokenizer.getElem(_firstValidDataLineIdx));
+		string line(_tokenizer.getElem(_firstValidDataLineIdx));
 
 		_tokenizer.setKeepFinalIncompleteElem(Tokenizer::USE_NOW);
 		_tokenizer.setNumExpectedItems(_numFields);
 		_tokenizer.tokenize(line, _delimChar);
-		if (_tokenizer.getNumFields(line.str(), _delimChar) != _numFields) {
+		if (_tokenizer.getNumFields(line, _delimChar) != _numFields) {
 			cerr << "Error: Type checker found wrong number of fields while tokenizing data line." << endl;
 			exit(1);
 		}
@@ -293,7 +293,7 @@ bool FileRecordTypeChecker::isGFFformat()
 
 bool FileRecordTypeChecker::isTextDelimtedFormat(const char *buffer, size_t len)
 {
-	//Break single string buffer into vector of QuickStrings. Delimiter is newline.
+	//Break single string buffer into vector of strings. Delimiter is newline.
 	_tokenizer.setKeepFinalIncompleteElem(Tokenizer::IGNORE);
 	int numLines = _tokenizer.tokenize(buffer, '\n', _eofHit, _isCompressed);
 
@@ -455,6 +455,6 @@ bool FileRecordTypeChecker::passesBed12() {
 }
 
 bool FileRecordTypeChecker::isStrandField(int field) {
-	const QuickString &strandChar = _tokenizer.getElem(field);
+	const string &strandChar = _tokenizer.getElem(field);
 	return (strandChar == "+" || strandChar == "-" || strandChar == ".");
 }

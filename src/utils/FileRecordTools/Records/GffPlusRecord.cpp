@@ -25,26 +25,26 @@ void GffPlusRecord::clear() {
 	_plusFields.clear();
 }
 
-void GffPlusRecord::print(QuickString &outBuf) const
+void GffPlusRecord::print(string &outBuf) const
 {
 	GffRecord::print(outBuf);
 	_plusFields.printFields(outBuf);
 }
 
-void GffPlusRecord::print(QuickString &outBuf, int start, int end) const
+void GffPlusRecord::print(string &outBuf, int start, int end) const
 {
 	GffRecord::print(outBuf, start, end);
 	_plusFields.printFields(outBuf);
 }
 
-void GffPlusRecord::print(QuickString &outBuf, const QuickString & start, const QuickString & end) const
+void GffPlusRecord::print(string &outBuf, const string & start, const string & end) const
 {
 	GffRecord::print(outBuf, start, end);
 	_plusFields.printFields(outBuf);
 }
 
 
-void GffPlusRecord::printNull(QuickString &outBuf) const
+void GffPlusRecord::printNull(string &outBuf) const
 {
 	GffRecord::printNull(outBuf);
 	for (int i=_numFields; i < _numPrintFields; i++) {
@@ -52,7 +52,7 @@ void GffPlusRecord::printNull(QuickString &outBuf) const
 	}
 }
 
-const QuickString &GffPlusRecord::getField(int fieldNum) const
+const string &GffPlusRecord::getField(int fieldNum) const
 {
 	if (fieldNum > _numFields) {
 		return _plusFields.getField(fieldNum);

@@ -20,35 +20,35 @@ bool Bed4Interval::initFromFile(SingleLineDelimTextFileReader *fileReader)
 	return baseRetFlag;
 }
 
-void Bed4Interval::print(QuickString &outBuf) const
+void Bed4Interval::print(string &outBuf) const
 {
 	Bed3Interval::print(outBuf);
-	outBuf.append('\t');
+	outBuf.append("\t");
 	outBuf.append(_name);
 }
 
-void Bed4Interval::print(QuickString &outBuf, int start, int end) const
+void Bed4Interval::print(string &outBuf, int start, int end) const
 {
 	Bed3Interval::print(outBuf, start, end);
-	outBuf.append('\t');
+	outBuf.append("\t");
 	outBuf.append(_name);
 }
 
-void Bed4Interval::print(QuickString &outBuf, const QuickString & start, const QuickString & end) const
+void Bed4Interval::print(string &outBuf, const string & start, const string & end) const
 {
 	Bed3Interval::print(outBuf, start, end);
-	outBuf.append('\t');
+	outBuf.append("\t");
 	outBuf.append(_name);
 }
 
-void Bed4Interval::printNull(QuickString &outBuf) const
+void Bed4Interval::printNull(string &outBuf) const
 {
 	Bed3Interval::printNull(outBuf);
-	outBuf.append('\t');
+	outBuf.append("\t");
 	outBuf.append(".");
 }
 
-const QuickString &Bed4Interval::getField(int fieldNum) const
+const string &Bed4Interval::getField(int fieldNum) const
 {
 	switch (fieldNum) {
 	case 4:

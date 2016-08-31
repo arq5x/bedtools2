@@ -13,7 +13,7 @@
 #include "ParseTools.h"
 #include "Tokenizer.h"
 
-NewGenomeFile::NewGenomeFile(const QuickString &genomeFilename)
+NewGenomeFile::NewGenomeFile(const string &genomeFilename)
 : _maxId(-1)
 {
     _genomeFileName = genomeFilename;
@@ -25,7 +25,7 @@ NewGenomeFile::NewGenomeFile(const BamTools::RefVector &refVector)
 {
 	size_t i = 0;
     for (; i < refVector.size(); ++i) {
-        QuickString chrom = refVector[i].RefName;
+        string chrom = refVector[i].RefName;
         CHRPOS length = refVector[i].RefLength;
         _maxId++;
         _chromSizeIds[chrom] = pair<CHRPOS, CHRPOS>(length, _maxId);
@@ -89,7 +89,7 @@ void NewGenomeFile::loadGenomeFileIntoMap() {
 	genFile.close();
 }
 
-bool NewGenomeFile::projectOnGenome(CHRPOS genome_pos, QuickString &chrom, CHRPOS &start) {
+bool NewGenomeFile::projectOnGenome(CHRPOS genome_pos, string &chrom, CHRPOS &start) {
     // search for the chrom that the position belongs on.
     // add 1 to genome position b/c of zero-based, half open.
     vector<CHRPOS>::const_iterator low =
@@ -106,7 +106,7 @@ bool NewGenomeFile::projectOnGenome(CHRPOS genome_pos, QuickString &chrom, CHRPO
     return true;
 }
     
-CHRPOS NewGenomeFile::getChromSize(const QuickString &chrom) {
+CHRPOS NewGenomeFile::getChromSize(const string &chrom) {
 	if (chrom == _currChromName) {
 		return _currChromSize;
 	}
@@ -121,7 +121,7 @@ CHRPOS NewGenomeFile::getChromSize(const QuickString &chrom) {
     return INT_MAX;
 }
 
-CHRPOS NewGenomeFile::getChromSize(const QuickString &chrom) const {
+CHRPOS NewGenomeFile::getChromSize(const string &chrom) const {
 	if (chrom == _currChromName) {
 		return _currChromSize;
 	}
@@ -133,7 +133,7 @@ CHRPOS NewGenomeFile::getChromSize(const QuickString &chrom) const {
     return INT_MAX;
 }
 
-CHRPOS NewGenomeFile::getChromId(const QuickString &chrom) {
+CHRPOS NewGenomeFile::getChromId(const string &chrom) {
 	if (chrom == _currChromName) {
 		return _currChromId;
 	}

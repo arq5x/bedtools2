@@ -48,7 +48,7 @@ void RecDistList::clear() {
 	_totalRecs = 0;
 }
 
-bool RecDistList::addRec(int dist, const Record *record, chromDirType chromDir) {
+bool RecDistList::addRec(int dist, Record *record, chromDirType chromDir) {
 	int newPos = 0;
 	bool mustAppend = false;
 	int useElemIdx = 0;
@@ -313,7 +313,7 @@ void CloseSweep::scanCache(int dbIdx, RecordKeyVector &retList) {
 	recListIterType cacheIter = _caches[dbIdx].begin();
     while (cacheIter != _caches[dbIdx].end())
     {
-    	const Record *cacheRec = cacheIter->value();
+        Record *cacheRec = cacheIter->value();
     	bool stopScanning = false;
     	if (considerRecord(cacheRec, dbIdx, stopScanning) == DELETE) {
             cacheIter = _caches[dbIdx].deleteCurrent();
@@ -326,7 +326,7 @@ void CloseSweep::scanCache(int dbIdx, RecordKeyVector &retList) {
 }
 
 
-CloseSweep::rateOvlpType CloseSweep::considerRecord(const Record *cacheRec, int dbIdx, bool &stopScanning) {
+CloseSweep::rateOvlpType CloseSweep::considerRecord(Record *cacheRec, int dbIdx, bool &stopScanning) {
 
 	// Determine whether the hit and query intersect, and if so, what to do about it.
 	_dbForward = cacheRec->getStrandVal() == Record::FORWARD;
@@ -466,7 +466,7 @@ void CloseSweep::finalizeSelections(int dbIdx, RecordKeyVector &retList) {
 
 
 
-int CloseSweep::addRecsToRetList(const RecDistList::elemsType *recs, int currDist, RecordKeyVector &retList) {
+int CloseSweep::addRecsToRetList(RecDistList::elemsType *recs, int currDist, RecordKeyVector &retList) {
 
 	int hitsUsed = 0;
 	int numRecs = (int)recs->size(); //just to clean the code some.
@@ -489,7 +489,7 @@ int CloseSweep::addRecsToRetList(const RecDistList::elemsType *recs, int currDis
 	}
 }
 
-void CloseSweep::addSingleRec(const Record *rec, int currDist, int &hitsUsed, RecordKeyVector &retList) {
+void CloseSweep::addSingleRec(Record *rec, int currDist, int &hitsUsed, RecordKeyVector &retList) {
 	retList.push_back(rec);
 	_finalDistances.push_back(currDist);
 	hitsUsed++;
@@ -511,7 +511,7 @@ void CloseSweep::checkMultiDbs(RecordKeyVector &retList) {
 	int numHits = (int)retList.size();
 	copyDists.resize(numHits);
 	int i=0;
-	for (RecordKeyVector::const_iterator_type iter = retList.begin(); iter != retList.end(); iter++) {
+	for (RecordKeyVector::iterator_type iter = retList.begin(); iter != retList.end(); iter++) {
 		int dist = _finalDistances[i];
 		copyDists[i]._dist = abs(dist);
 		copyDists[i]._rec = *iter;
@@ -575,7 +575,7 @@ void CloseSweep::checkMultiDbs(RecordKeyVector &retList) {
 
 bool CloseSweep::chromChange(int dbIdx, RecordKeyVector &retList, bool wantScan)
 {
-	const Record *dbRec = _currDbRecs[dbIdx];
+	Record *dbRec = _currDbRecs[dbIdx];
 
 	bool haveQuery = _currQueryRec != NULL;
 	bool haveDB = dbRec != NULL;
@@ -615,14 +615,14 @@ bool CloseSweep::chromChange(int dbIdx, RecordKeyVector &retList, bool wantScan)
 
 	// the query is ahead of the database. fast-forward the database to catch-up.
 	if (queryChromAfterDbRec(dbRec)) {
-		QuickString oldDbChrom(dbRec->getChrName());
+		string oldDbChrom(dbRec->getChrName());
 
 		while (dbRec != NULL &&
 				queryChromAfterDbRec(dbRec)) {
 			_dbFRMs[dbIdx]->deleteRecord(dbRec);
 			if (!nextRecord(false, dbIdx)) break;
 			dbRec =  _currDbRecs[dbIdx];
-			const QuickString &newDbChrom = dbRec->getChrName();
+			const string &newDbChrom = dbRec->getChrName();
 			if (newDbChrom != oldDbChrom) {
 				testChromOrder(dbRec);
 				oldDbChrom = newDbChrom;
@@ -683,7 +683,7 @@ void CloseSweep::setLeftClosestEndPos(int dbIdx)
 	}
 }
 
-bool CloseSweep::beforeLeftClosestEndPos(int dbIdx, const Record *rec)
+bool CloseSweep::beforeLeftClosestEndPos(int dbIdx, Record *rec)
 {
 	int recEndPos = rec->getEndPos();
 	int prevPos = _maxPrevLeftClosestEndPos[dbIdx];
@@ -708,7 +708,7 @@ void CloseSweep::clearClosestEndPos(int dbIdx)
 	_maxPrevLeftClosestEndPosReverse[dbIdx] = 0;
 }
 
-CloseSweep::rateOvlpType CloseSweep::tryToAddRecord(const Record *cacheRec, int dist, int dbIdx, bool &stopScanning, chromDirType chromDir, streamDirType streamDir) {
+CloseSweep::rateOvlpType CloseSweep::tryToAddRecord(Record *cacheRec, int dist, int dbIdx, bool &stopScanning, chromDirType chromDir, streamDirType streamDir) {
 
 	//
 	// Decide whether to ignore hit
