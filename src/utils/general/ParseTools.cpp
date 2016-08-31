@@ -7,7 +7,7 @@
 #include <sstream>
 
 //This functions recognizes only numbers with digits, plus sign, minus sign, decimal point, e, or E. Hexadecimal and pointers not currently supported.
-bool isNumeric(const QuickString &str) {
+bool isNumeric(const string &str) {
 	for (int i=0; i < (int)str.size(); i++) {
 		char currChar = str[i];
 		if (!(isdigit(currChar) || currChar == '-' || currChar == '.' || currChar == '+' || currChar == 'e' || currChar == 'E')) {
@@ -18,7 +18,7 @@ bool isNumeric(const QuickString &str) {
 }
 
 //As above, but does not allow decimal points
-bool isInteger(const QuickString &str) {
+bool isInteger(const string &str) {
 	for (int i=0; i < (int)str.size(); i++) {
 		char currChar = str[i];
 		if (!(isdigit(currChar) || currChar == '-' || currChar == '+' || currChar == 'e' || currChar == 'E')) {
@@ -30,7 +30,7 @@ bool isInteger(const QuickString &str) {
 
 
 
-int str2chrPos(const QuickString &str) {
+int str2chrPos(const string &str) {
 	return str2chrPos(str.c_str(), str.size());
 }
 
@@ -128,7 +128,7 @@ string vectorIntToStr(const vector<int> &vec) {
 	return str;
 }
 
-bool isHeaderLine(const QuickString &line) {
+bool isHeaderLine(const string &line) {
 	if (line[0] == '>') {
 		return true;
 	}

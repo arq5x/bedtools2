@@ -22,10 +22,10 @@ public:
 	bool initFromFile(FileReader *);
 	virtual bool initFromFile(SingleLineDelimTextFileReader *);
 	virtual void clear();
-	virtual void print(QuickString &outBuf) const;
+	virtual void print(string &outBuf) const;
 	virtual FileRecordTypeChecker::RECORD_TYPE getType() const { return FileRecordTypeChecker::NO_POS_PLUS_RECORD_TYPE; }
 
-	virtual const QuickString &getField(int fieldNum) const;
+	virtual const string &getField(int fieldNum) const;
 	virtual int getNumFields() const  { return defaultNumFixedFields + (int)_plusFields.size(); }
 
 	static bool isNumericField(int fieldNum);

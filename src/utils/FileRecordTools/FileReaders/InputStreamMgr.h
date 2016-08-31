@@ -10,7 +10,7 @@
 
 #include "PushBackStreamBuf.h"
 #include "InflateStreamBuf.h"
-#include "QuickString.h"
+#include "string.h"
 #include "api/BamReader.h"
 #include "api/internal/io/BgzfStream_p.h"
 
@@ -21,7 +21,7 @@ using namespace std;
 class InputStreamMgr {
 public:
 	 //Contsructor: 1st arg can be "-" for stdin. set 2nd arg false if fileType already known.
-	InputStreamMgr(const QuickString &filename, bool buildScanBuffer = true);
+	InputStreamMgr(const string &filename, bool buildScanBuffer = true);
 	~InputStreamMgr();
 	bool init();
 	int read(char *data, size_t dataSize);
@@ -31,24 +31,24 @@ public:
 	const BTlist<int> &getScanBuffer() const { return _scanBuffer; }
 	int getBufferLength() const { return _numBytesInBuffer; }
 	bool populateScanBuffer();
-	const QuickString &getSavedData() const { return _saveDataStr; }
+	const string &getSavedData() const { return _saveDataStr; }
 	bool isGzipped() const { return _isGzipped; }
 	bool isBGzipped() const { return _isBgzipped; }
 	bool isBam() const { return _isBam; }
 
 	bool isCompressed() const { return _isGzipped || _isBgzipped || _isBam; }
 	PushBackStreamBuf *getPushBackStreamBuf() const {return _pushBackStreamBuf; }
-//	void getSavedData(QuickString &str) const { str = _saveDataStr; }
+//	void getSavedData(string &str) const { str = _saveDataStr; }
 	BamTools::BamReader *getBamReader() { return _bamReader; }
 	bool resetStream();
 	bool getEofHit() { return _eofHit; }
 
 private:
-	QuickString _filename;
+	string _filename;
 	PushBackStreamBuf *_pushBackStreamBuf;
 	ifstream *_inputFileStream;
 	BTlist<int> _scanBuffer;
-	QuickString _saveDataStr;
+	string _saveDataStr;
 	InflateStreamBuf *_infStreamBuf;
 	istream * _finalInputStream;
 	istream *_oldInputStream;

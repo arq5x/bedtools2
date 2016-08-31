@@ -17,7 +17,7 @@ using namespace std;
 #include <cstring>
 #include <cstdio>
 #include <iostream>
-#include "QuickString.h"
+#include "string.h"
 
 //STL headers
 #include <utility> //include pair and make_pair

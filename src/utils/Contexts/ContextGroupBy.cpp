@@ -122,16 +122,18 @@ bool ContextGroupBy::handle_ignorecase() {
 	return true;
 }
 
-const QuickString &ContextGroupBy::getDefaultHeader() {
+const string &ContextGroupBy::getDefaultHeader() {
 	//groupBy does not support multiple databases.
 	FileRecordMgr *frm = _files[0];
 	int numFields = frm->getNumFields();
 	_defaultHeader.clear();
+	ostringstream s;
 	for (int i=1; i <= numFields; i++) {
-		_defaultHeader.append("col_");
-		_defaultHeader.append(i);
-		_defaultHeader.append('\t');
+		s << "col_";
+		s << i;
+		s << "\t";
 	}
+	_defaultHeader.append(s.str());
 	//change last tab into newline
 	_defaultHeader[_defaultHeader.size()-1] = '\n';
 	return _defaultHeader;

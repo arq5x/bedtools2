@@ -121,16 +121,20 @@ void NewChromSweep::scanCache(int dbIdx, RecordKeyVector &retList) {
     recListIterType cacheIter = _caches[dbIdx].begin();
     while (cacheIter != _caches[dbIdx].end())
     {
-        const Record *cacheRec = cacheIter->value();
-        if (_currQueryRec->sameChrom(cacheRec) && !_currQueryRec->after(cacheRec)) {
-            if (intersects(_currQueryRec, cacheRec)) {
+        Record *cacheRec = cacheIter->value();
+        if (_currQueryRec->sameChrom(cacheRec) && !_currQueryRec->after(cacheRec)) 
+        {
+            if (intersects(_currQueryRec, cacheRec)) 
+            {
                 retList.push_back(cacheRec);
-            } else if (cacheRec->after(_currQueryRec)) break; // cacheRec is after the query rec, stop scanning.
+            } 
+            else if (cacheRec->after(_currQueryRec)) break; // cacheRec is after the query rec, stop scanning.
             cacheIter = _caches[dbIdx].next();
         }
-        else {
-            cacheIter = _caches[dbIdx].deleteCurrent();
+        else 
+        {
             _dbFRMs[dbIdx]->deleteRecord(cacheRec);
+            cacheIter = _caches[dbIdx].deleteCurrent();
         }
     }
 }
@@ -139,7 +143,8 @@ void NewChromSweep::clearCache(int dbIdx)
 {
     //delete all objects pointed to by cache
     recListType &cache = _caches[dbIdx];
-    for (recListIterType iter = cache.begin(); iter != cache.end(); iter = cache.next()) {
+    for (recListIterType iter = cache.begin(); iter != cache.end(); iter = cache.next()) 
+    {
         _dbFRMs[dbIdx]->deleteRecord(iter->value());
     }
     cache.clear();
@@ -147,10 +152,14 @@ void NewChromSweep::clearCache(int dbIdx)
 
 void NewChromSweep::masterScan(RecordKeyVector &retList) {
 
-    for (int i=0; i < _numDBs; i++) {
-        if (dbFinished(i) || chromChange(i, retList, true)) {
+    for (int i=0; i < _numDBs; i++) 
+    {
+        if (dbFinished(i) || chromChange(i, retList, true)) 
+        {
             continue;
-        } else {
+        } 
+        else 
+        {
 
             // scan the database cache for hits
             scanCache(i, retList);
@@ -198,13 +207,13 @@ bool NewChromSweep::chromChange(int dbIdx, RecordKeyVector &retList, bool wantSc
 
     if (queryChromAfterDbRec(dbRec)) {
         // the query is ahead of the database. fast-forward the database to catch-up.
-        QuickString oldDbChrom(dbRec->getChrName());
-        while (dbRec != NULL &&
-                queryChromAfterDbRec(dbRec)) {
-                _dbFRMs[dbIdx]->deleteRecord(dbRec);
+        string oldDbChrom(dbRec->getChrName());
+        while (dbRec != NULL && queryChromAfterDbRec(dbRec)) 
+        {
+            _dbFRMs[dbIdx]->deleteRecord(dbRec);
             if (!nextRecord(false, dbIdx)) break;
             dbRec =  _currDbRecs[dbIdx];
-            const QuickString &newDbChrom = dbRec->getChrName();
+            const string &newDbChrom = dbRec->getChrName();
             if (newDbChrom != oldDbChrom) {
                 testChromOrder(dbRec);
                 oldDbChrom = newDbChrom;
@@ -324,17 +333,17 @@ void NewChromSweep::testChromOrder(const Record *rec)
 
     int fileIdx = rec->getFileIdx();
 
-    const QuickString &chrom = rec->getChrName();
+    const string &chrom = rec->getChrName();
 
     findChromOrder(rec);
 
     //determine what the previous chrom was for this file.
-    map<int, QuickString>::iterator prevIter = _filePrevChrom.find(fileIdx);
+    map<int, string>::iterator prevIter = _filePrevChrom.find(fileIdx);
     if (prevIter == _filePrevChrom.end()) {
         _filePrevChrom[fileIdx] = chrom;
         return; //no previously stored chrom for this file.
     }
-    const QuickString prevChrom(prevIter->second);
+    const string prevChrom(prevIter->second);
     _filePrevChrom[fileIdx] = chrom;
 
     if (chrom == prevChrom) return;
@@ -365,8 +374,8 @@ bool NewChromSweep::queryChromAfterDbRec(const Record *dbRec)
         return (_currQueryRec->getChromId() > dbRec->getChromId()) ;
     }
     //see if query has both
-    const QuickString &qChrom = _currQueryRec->getChrName();
-    const QuickString &dbChrom = dbRec->getChrName();
+    const string &qChrom = _currQueryRec->getChrName();
+    const string &dbChrom = dbRec->getChrName();
     const _orderTrackType *track = _fileTracks[_currQueryRec->getFileIdx()];
     _orderTrackType::const_iterator iter = track->find(qChrom);
 
@@ -385,7 +394,7 @@ bool NewChromSweep::queryChromAfterDbRec(const Record *dbRec)
 
 
 int NewChromSweep::findChromOrder(const Record *rec) {
-    const QuickString &chrom = rec->getChrName();
+    const string &chrom = rec->getChrName();
     int fileIdx = rec->getFileIdx();
     _orderTrackType *track = _fileTracks[fileIdx];
 
@@ -393,14 +402,14 @@ int NewChromSweep::findChromOrder(const Record *rec) {
     if (iter == track->end()) {
         //chrom never seen before. Enter into map.
         int val = (int)track->size();
-        track->insert(pair<QuickString, int>(chrom, val));
+        track->insert(pair<string, int>(chrom, val));
         return val;
     } else {
         return iter->second;
     }
 }
 
-bool NewChromSweep::verifyChromOrderMismatch(const QuickString & chrom, const QuickString &prevChrom, int skipFile) {
+bool NewChromSweep::verifyChromOrderMismatch(const string & chrom, const string &prevChrom, int skipFile) {
     //for every file except the one being checked,
     //find the current and previous chrom. If a given file
     //is missing either, skip it and go on. If it has both,
@@ -434,7 +443,7 @@ void NewChromSweep::testThatAllDbChromsExistInQuery()
         if (i == queryIdx) continue;
         const _orderTrackType *dbTrack = _fileTracks[i];
         for (_orderTrackType::const_iterator iter = dbTrack->begin(); iter != dbTrack->end(); iter++) {
-            const QuickString &chrom = iter->first;
+            const string &chrom = iter->first;
             if (qTrack->find(chrom) == qTrack->end()
                 && !chrom.empty())  // don't raise an error if the chrom is unknown (e.g., unmapped BAM)
             {

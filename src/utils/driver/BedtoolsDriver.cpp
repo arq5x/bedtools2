@@ -43,7 +43,7 @@ BedtoolsDriver::BedtoolsDriver()
 }
 
 
-bool BedtoolsDriver::supports(const QuickString &tool) {
+bool BedtoolsDriver::supports(const string &tool) {
 	supportType::iterator iter = _supported.find(tool);
 	return (iter != _supported.end());
 }

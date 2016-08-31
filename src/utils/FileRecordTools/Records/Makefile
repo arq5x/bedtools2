@@ -5,14 +5,14 @@ UTILITIES_DIR = ../../../utils/
 # define our includes
 # -------------------
 INCLUDES = -I$(UTILITIES_DIR)/lineFileUtilities/ \
-           -I$(UTILITIES_DIR)/FileRecordTools/FileReaders/ \
-			-I$(UTILITIES_DIR)/general/ \
-			-I$(UTILITIES_DIR)/fileType/ \
-			-I$(UTILITIES_DIR)/Contexts/ \
-			-I$(UTILITIES_DIR)/GenomeFile/ \
-			-I$(UTILITIES_DIR)/BamTools/include \
-			-I$(UTILITIES_DIR)/BamTools/src/ \
-           -I$(UTILITIES_DIR)/version/
+		-I$(UTILITIES_DIR)/FileRecordTools/FileReaders/ \
+		-I$(UTILITIES_DIR)/general/ \
+		-I$(UTILITIES_DIR)/fileType/ \
+		-I$(UTILITIES_DIR)/Contexts/ \
+		-I$(UTILITIES_DIR)/GenomeFile/ \
+		-I$(UTILITIES_DIR)/BamTools/include \
+		-I$(UTILITIES_DIR)/BamTools/src/ \
+		-I$(UTILITIES_DIR)/version/
 			
 
 # ----------------------------------
@@ -27,7 +27,7 @@ SOURCES = Record.cpp EmptyRecord.cpp Bed3Interval.cpp \
 	RecordMgr.cpp RecordList.cpp RecordKeyList.cpp RecordKeyVector.cpp
 OBJECTS= Record.o EmptyRecord.o Bed3Interval.o Bed4Interval.o BedGraphInterval.o Bed5Interval.o Bed6Interval.o PlusFields.o BedPlusInterval.o Bed12Interval.o BamRecord.o \
 	GffRecord.o GffPlusRecord.o VcfRecord.o  NoPosPlusRecord.o BlockMgr.o StrandQueue.o RecordMgr.o RecordList.o RecordKeyList.o RecordKeyVector.o
-_EXT_OBJECTS=ParseTools.o QuickString.o ChromIdLookup.o
+_EXT_OBJECTS=ParseTools.o string.o ChromIdLookup.o
 EXT_OBJECTS=$(patsubst %,$(OBJ_DIR)/%,$(_EXT_OBJECTS))
 BUILT_OBJECTS= $(patsubst %,$(OBJ_DIR)/%,$(OBJECTS))
 

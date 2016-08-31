@@ -7,6 +7,8 @@
 #include "groupBy.h"
 #include "Tokenizer.h"
 #include "ParseTools.h"
+#include "stringUtilities.h"
+#include <utility>
 
 GroupBy::GroupBy(ContextGroupBy *context)
 : ToolBase(context),
@@ -30,7 +32,7 @@ bool GroupBy::init()
 		//if the item is a range, such as 3-5,
 		//must split that as well.
 
-		const QuickString &elem = groupColsTokens.getElem(i);
+		const string &elem = groupColsTokens.getElem(i);
 		if (strchr(elem.c_str(), '-')) {
 			Tokenizer rangeElems;
 			rangeElems.tokenize(elem, '-');
@@ -83,18 +85,18 @@ void GroupBy::processHits(RecordOutputMgr *outputMgr, RecordKeyVector &hits)
 {
 
 	Record *rec = hits.getKey();
-	const QuickString &opVal  = _context->getColumnOpsVal(hits);
+	const string &opVal  = _context->getColumnOpsVal(hits);
 	if (upCast(_context)->printFullCols()) 
 	{
 		outputMgr->printRecord(rec, opVal);
 	} 
 	else 
 	{
-		QuickString outBuf;
+		string outBuf;
 		for (int i = 0; i < (int)_groupCols.size(); i++) 
 		{
 			outBuf.append(rec->getField(_groupCols[i]));
-			outBuf.append('\t');
+			outBuf.append("\t");
 		}
 		outBuf.append(opVal);
 		outputMgr->printRecord(NULL, outBuf);
@@ -139,11 +141,11 @@ bool GroupBy::canGroup(Record *newRecord)
 	for (int i = 0; i < (int)_groupCols.size(); i++) 
 	{
 		int fieldNum = _groupCols[i];
-		const QuickString &newField = newRecord->getField(fieldNum);
-		const QuickString &oldField = _prevFields[i];
+		const string &newField = newRecord->getField(fieldNum);
+		const string &oldField = _prevFields[i];
 		if (upCast(_context)->ignoreCase()) 
 		{
-			if (oldField.stricmp(newField)) return false;
+			if (toLower(oldField) != toLower(newField)) return false;
 		} 
 		else 
 		{

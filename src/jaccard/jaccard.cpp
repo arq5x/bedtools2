@@ -57,13 +57,13 @@ void  Jaccard::giveFinalReport(RecordOutputMgr *outputMgr) {
 unsigned long Jaccard::getTotalIntersection(RecordKeyVector &hits)
 {
 	unsigned long intersection = 0;
-	const Record *key = hits.getKey();
+	Record *key = hits.getKey();
 	int keyStart = key->getStartPos();
 	int keyEnd = key->getEndPos();
 
 	int hitIdx = 0;
-	for (RecordKeyVector::const_iterator_type iter = hits.begin(); iter != hits.end(); iter = hits.next()) {
-		const Record *currRec = *iter;
+	for (RecordKeyVector::iterator_type iter = hits.begin(); iter != hits.end(); iter = hits.next()) {
+		Record *currRec = *iter;
 		int maxStart = max(currRec->getStartPos(), keyStart);
 		int minEnd = min(currRec->getEndPos(), keyEnd);
 		if (_context->getObeySplits()) {

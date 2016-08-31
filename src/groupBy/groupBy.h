@@ -27,7 +27,7 @@ protected:
 	virtual ContextGroupBy *upCast(ContextBase *context) { return static_cast<ContextGroupBy *>(context); }
 
 	vector<int> _groupCols;
-	vector<QuickString> _prevFields;
+	vector<string> _prevFields;
 	FileRecordMgr *_queryFRM;
 	Record *_prevRecord;
 	Record *getNextRecord();

@@ -10,7 +10,7 @@
 #include "InputStreamMgr.h"
 #include <fstream>
 
-BufferedStreamMgr::BufferedStreamMgr(const QuickString &filename)
+BufferedStreamMgr::BufferedStreamMgr(const string &filename)
 : 	_inputStreamMgr(NULL),
 	_mainBuf(NULL),
    	_filename(filename),
@@ -92,7 +92,7 @@ bool BufferedStreamMgr::getTypeData()
 	return true;
 }
 
-bool BufferedStreamMgr::getLine(QuickString &line)
+bool BufferedStreamMgr::getLine(string &line)
 {
 	line.clear();
 

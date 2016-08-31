@@ -8,7 +8,7 @@
 #ifndef PLUSFIELDS_H_
 #define PLUSFIELDS_H_
 
-#include "QuickString.h"
+#include "string.h"
 #include <vector>
 
 using namespace std;
@@ -23,14 +23,14 @@ public:
 	void setNumOffsetFields(int numOffsetFields) { _numOffsetFields = numOffsetFields; }
 	virtual bool initFromFile(SingleLineDelimTextFileReader *);
 	virtual void clear();
-	virtual void printFields(QuickString &outBuf) const;
+	virtual void printFields(string &outBuf) const;
 
-	virtual const QuickString &getField(int fieldNum) const;
+	virtual const string &getField(int fieldNum) const;
 	virtual size_t size() const { return _fields.size(); }
 
 
 protected:
-	vector<QuickString> _fields;
+	vector<string> _fields;
 	int _numOffsetFields; //could be 3 for BedPlus, but GFF has 8 or 9
 };
 

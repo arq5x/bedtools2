@@ -48,8 +48,6 @@ void BlockMgr::getBlocks(RecordKeyVector &keyList, bool &mustDelete)
 	}
 }
 
-
-
 void BlockMgr::getBlocksFromBed12(RecordKeyVector &keyList, bool &mustDelete)
 {
 	const Bed12Interval *keyRecord = static_cast<const Bed12Interval *>(keyList.getKey());
@@ -72,7 +70,7 @@ void BlockMgr::getBlocksFromBed12(RecordKeyVector &keyList, bool &mustDelete)
     	int startPos = keyRecord->getStartPos() + str2chrPos(_blockStartTokens.getElem(i).c_str());
     	int endPos = startPos + str2chrPos(_blockSizeTokens.getElem(i).c_str());
 
-    	const Record *record = allocateAndAssignRecord(keyRecord, startPos, endPos);
+    	Record *record = allocateAndAssignRecord(keyRecord, startPos, endPos);
     	keyList.push_back(record);
     }
     mustDelete = true;
@@ -128,22 +126,12 @@ Record *BlockMgr::allocateAndAssignRecord(const Record *keyRecord, int startPos,
 	record->setChromId(keyRecord->getChromId());
 	record->setStartPos(startPos);
 	record->setEndPos(endPos);
-	QuickString startPosStr;
-	QuickString endPosStr;
-	startPosStr.append(startPos);
-	endPosStr.append(endPos);
-	record->setStartPosStr(startPosStr);
-	record->setEndPosStr(endPosStr);
-	record->setName(keyRecord->getName());
-	record->setScore(keyRecord->getScore());
-	record->setStrand(keyRecord->getStrand());
-
 	return record;
 }
 
 int BlockMgr::getTotalBlockLength(RecordKeyVector &keyList) {
 	int sum = 0;
-	for (RecordKeyVector::const_iterator_type iter = keyList.begin(); iter != keyList.end(); iter = keyList.next()) {
+	for (RecordKeyVector::iterator_type iter = keyList.begin(); iter != keyList.end(); iter = keyList.next()) {
 		const Record *record = *iter;
 		sum += record->getEndPos() - record->getStartPos();
 	}
@@ -152,28 +140,25 @@ int BlockMgr::getTotalBlockLength(RecordKeyVector &keyList) {
 
 void BlockMgr::deleteBlocks(RecordKeyVector &keyList)
 {
-	for (RecordKeyVector::const_iterator_type iter = keyList.begin(); iter != keyList.end(); iter = keyList.next()) {
+	for (RecordKeyVector::iterator_type iter = keyList.begin(); iter != keyList.end(); iter = keyList.next()) {
 		_blockRecordsMgr->deleteRecord(*iter);
 	}
 	keyList.clearVector();
-
 }
 
 
-int BlockMgr::findBlockedOverlaps(RecordKeyVector &keyList, RecordKeyVector &hitList, 
-	                              RecordKeyVector &resultList, RecordKeyVector &overlapList)
+int BlockMgr::findBlockedOverlaps(RecordKeyVector &hitList, bool useOverlappingSubBlocks)
 {
-	bool deleteKeyBlocks = false;
-	if (keyList.empty()) {
-		//get all the blocks for the query record, put them in it's list.
-		getBlocks(keyList, deleteKeyBlocks);
-	}
+	RecordKeyVector keyList(hitList.getKey());
+	bool deleteKeyBlocks = true;
+	getBlocks(keyList, deleteKeyBlocks);
+	
 	_overlapBases.clear();
 	int keyBlocksSumLength = getTotalBlockLength(keyList);
 
 	//Loop through every database record the query intersected with
-	RecordKeyVector::const_iterator_type hitListIter = hitList.begin();
-	for (; hitListIter != hitList.end(); hitListIter = hitList.next()) 
+	RecordKeyVector::iterator_type hitListIter = hitList.begin();
+	for (; hitListIter != hitList.end();) 
 	{
 		RecordKeyVector hitBlocks(*hitListIter);
 		bool deleteHitBlocks = false;
@@ -183,46 +168,78 @@ int BlockMgr::findBlockedOverlaps(RecordKeyVector &keyList, RecordKeyVector &hit
 		bool hitHasOverlap = false;
 
 		//loop through every block of the database record.
-		RecordKeyVector::const_iterator_type hitBlockIter = hitBlocks.begin();
+		RecordKeyVector::iterator_type hitBlockIter = hitBlocks.begin();
 		for (; hitBlockIter != hitBlocks.end(); hitBlockIter = hitBlocks.next()) 
 		{
 			//loop through every block of the query record.
-			RecordKeyVector::const_iterator_type keyListIter = keyList.begin();
+			RecordKeyVector::iterator_type keyListIter = keyList.begin();
 			for (; keyListIter != keyList.end(); keyListIter = keyList.next()) 
 			{
 				const Record *keyBlock = *keyListIter;
 				const Record *hitBlock = *hitBlockIter;
-
 				int maxStart = max(keyBlock->getStartPos(), hitBlock->getStartPos());
-				int minEnd = min(keyBlock->getEndPos(), hitBlock->getEndPos());
+				int minEnd   = min(keyBlock->getEndPos(), hitBlock->getEndPos());
 				int overlap  = minEnd - maxStart;
-				if (overlap > 0) {
+				if (overlap > 0) 
+				{
 					hitHasOverlap = true;
-					overlapList.push_back(allocateAndAssignRecord(keyList.getKey(), maxStart, minEnd));
 					totalHitOverlap += overlap;
+					if (useOverlappingSubBlocks == true)
+					{
+						(*hitListIter)->block_starts.push_back(maxStart);
+						(*hitListIter)->block_ends.push_back(minEnd);
+					}
 				}
 			}
 		}
-		if (hitHasOverlap) {
-			if ((float) totalHitOverlap / (float)keyBlocksSumLength >= _overlapFraction) {
-				if (_hasReciprocal &&
-						((float)totalHitOverlap / (float)hitBlockSumLength >= _overlapFraction)) {
+		if (hitHasOverlap && useOverlappingSubBlocks == false) 
+		{
+			bool enoughKeyOverlap = (float) totalHitOverlap / (float) keyBlocksSumLength >= _overlapFraction;
+			bool enoughHitOverlap = (float) totalHitOverlap / (float) hitBlockSumLength  >= _overlapFraction;
+
+			if (enoughKeyOverlap) 
+			{
+				if (_hasReciprocal && enoughHitOverlap)
+				{
+					//(*hitListIter)->setValid(true);
 					_overlapBases.push_back(totalHitOverlap);
-					resultList.push_back(*hitListIter);
-				} else if (!_hasReciprocal) {
+					hitListIter = hitList.next();
+				} 
+				else if (_hasReciprocal && !enoughHitOverlap)
+				{
+					hitList.erase();
+					//(*hitListIter)->setValid(false);
+				} 
+				else if (!_hasReciprocal) 
+				{
+					//(*hitListIter)->setValid(true);
 					_overlapBases.push_back(totalHitOverlap);
-					resultList.push_back(*hitListIter);
+					hitListIter = hitList.next();
 				}
 			}
+			else 
+			{
+				hitList.erase();
+				//(*hitListIter)->setValid(false);
+			}
 		}
-		if (deleteHitBlocks) {
+		else if (!hitHasOverlap && useOverlappingSubBlocks == false) 
+		{
+			hitList.erase();
+			//(*hitListIter)->setValid(false);
+		}
+		else {
+			hitListIter = hitList.next();
+		}
+		if (deleteHitBlocks)
+		{
 			deleteBlocks(hitBlocks);
 		}
-	}
-	if (deleteKeyBlocks) {
+	} // end for loop through main hits
+	if (deleteKeyBlocks) 
+	{
 		deleteBlocks(keyList);
 	}
-	resultList.setKey(keyList.getKey());
-	return (int)resultList.size();
+	return (int)hitList.size();
 }
 

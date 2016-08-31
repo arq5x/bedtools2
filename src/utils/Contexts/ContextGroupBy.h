@@ -18,13 +18,13 @@ public:
 	virtual bool isValidState();
 
 	bool printFullCols() const { return _printFullCols; }
-	const QuickString &getGroupCols() const { return _groupStr; }
+	const string &getGroupCols() const { return _groupStr; }
 	bool ignoreCase() const { return _ignoreCase; }
-	const QuickString &getDefaultHeader();
+	const string &getDefaultHeader();
 
 protected:
-	QuickString _groupStr;
-	QuickString _defaultHeader;
+	string _groupStr;
+	string _defaultHeader;
 	bool _printFullCols;
 	bool _ignoreCase;
 

@@ -35,11 +35,11 @@ int Tokenizer::getNumFields(const string &str, char delimiter)
     return tmp.size();
 }
 
-int Tokenizer::tokenize(const QuickString &str, char delimiter, bool eofHit, bool isCompressed) {
+int Tokenizer::tokenize(const string &str, char delimiter, bool eofHit, bool isCompressed) {
 
     // http://stackoverflow.com/questions/236129/how-to-split-a-string-in-c/236803#236803
     // NOTE: this approach intentionally allows consecutive delimiters
-    std::stringstream ss(str.str());
+    std::stringstream ss(str);
     std::string item;
     _elems.clear();
     while(getline(ss, item, delimiter)) {
@@ -83,7 +83,7 @@ int Tokenizer::tokenize(const QuickString &str, char delimiter, bool eofHit, boo
 	// 			currIdx--; //make sure it's not included in the final count of valid elems.
 
 	// 		} else {
-	// 			QuickString *newStr = fetchElem(currIdx);
+	// 			string *newStr = fetchElem(currIdx);
 	// 			newStr->assign(str.c_str() + startPos, min(currPos, strLen) - startPos);
 
 	// 			// If splitting lines, strip any white space from the end of the line

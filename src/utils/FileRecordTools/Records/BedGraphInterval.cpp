@@ -20,35 +20,35 @@ bool BedGraphInterval::initFromFile(SingleLineDelimTextFileReader *fileReader)
 	return baseRetFlag;
 }
 
-void BedGraphInterval::print(QuickString &outBuf) const
+void BedGraphInterval::print(string &outBuf) const
 {
 	Bed3Interval::print(outBuf);
-	outBuf.append('\t');
+	outBuf.append("\t");
 	outBuf.append(_name);
 }
 
-void BedGraphInterval::print(QuickString &outBuf, int start, int end) const
+void BedGraphInterval::print(string &outBuf, int start, int end) const
 {
 	Bed3Interval::print(outBuf, start, end);
-	outBuf.append('\t');
+	outBuf.append("\t");
 	outBuf.append(_name);
 }
 
-void BedGraphInterval::print(QuickString &outBuf, const QuickString & start, const QuickString & end) const
+void BedGraphInterval::print(string &outBuf, const string & start, const string & end) const
 {
 	Bed3Interval::print(outBuf, start, end);
-	outBuf.append('\t');
+	outBuf.append("\t");
 	outBuf.append(_name);
 }
 
 
-void BedGraphInterval::printNull(QuickString &outBuf) const
+void BedGraphInterval::printNull(string &outBuf) const
 {
 	Bed3Interval::printNull(outBuf);
 	outBuf.append("\t.", 2);
 }
 
-const QuickString &BedGraphInterval::getField(int fieldNum) const
+const string &BedGraphInterval::getField(int fieldNum) const
 {
 	switch (fieldNum) {
 	case 4:
