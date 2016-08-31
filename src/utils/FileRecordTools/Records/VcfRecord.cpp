@@ -72,7 +72,7 @@ void VcfRecord::print(string &outBuf, const string & start, const string & end) 
 
 void VcfRecord::printNull(string &outBuf) const {
 	outBuf.append(".\t-1\t.");
-	for (int i= 2; i < _numPrintFields; i++) {
+	for (int i=3; i < _numPrintFields; i++) {
 		outBuf.append("\t.");
 	}
 }
