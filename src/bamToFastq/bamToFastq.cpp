@@ -86,10 +86,10 @@ void BamToFastq::PairedFastq() {
     while (!finishedBam) {
         // rip in all entries from this mate pair including multimappers
         while(nextRead.Name == bam1.Name) {
-            if (nextRead.isPaired() && nextRead.IsFirstMate()) {
+            if (nextRead.IsPaired() && nextRead.IsFirstMate()) {
                 bam1 = nextRead;
             }
-            else if (nextRead.isPaired() && nextRead.IsSecondMate()) {
+            else if (nextRead.IsPaired() && nextRead.IsSecondMate()) {
                 bam2 = nextRead;
             }
             if (!reader.GetNextAlignment(nextRead)) {
