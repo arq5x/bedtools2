@@ -64,7 +64,10 @@ bool byChromThenStart(BED const &a, BED const &b) {
     return false;
 };
 
-
+bool sortByWeight(const BED &a, const BED &b) {
+    if (a.weight > b.weight) return true;
+    else return false;
+};
 /*******************************************
 Class methods
 *******************************************/
@@ -766,4 +769,33 @@ void BedFile::loadBedFileIntoVector() {
     }
     Close();
 }
+
+void BedFile::assignWeightsBasedOnSize() {
+    sort(bedList.begin(), bedList.end(), sortBySizeAsc);
+    // report the entries in ascending order
+    size_t totalSize = 0;
+    for (unsigned int i = 0; i < bedList.size(); ++i) {
+        totalSize += bedList[i].size();
+    }
+    double totalWeight = 0.0;
+    for (unsigned int i = 0; i < bedList.size(); ++i) {
+
+        totalWeight += (double) bedList[i].size() / (double) totalSize;
+        bedList[i].weight = totalWeight;
+    }
+}
+
+struct CompareByWeight {
+    bool operator()(double const val, BED const& bed) const 
+    {
+        return bed.weight > val;
+    }
+};
+
+BED * BedFile::sizeWeightedSearch(double val) {
+    // binary search for first interval with weight greater than search val
+    vector<BED>::iterator up = upper_bound(bedList.begin(), bedList.end(), val, CompareByWeight());
+    return &(*up);
+}
+
 

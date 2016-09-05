@@ -91,6 +91,7 @@ struct BED {
     vector<uint16_t> other_idxs;
     // is this a zero length feature: i.e., start == end
     bool   zeroLength;
+    double weight;
 
 public:
     // constructors
@@ -105,7 +106,8 @@ public:
       strand(""),
       fields(),
       other_idxs(),
-      zeroLength(false)
+      zeroLength(false),
+      weight(0.0)
     {}
 
     // BED3
@@ -118,7 +120,8 @@ public:
       strand(""),
       fields(),
       other_idxs(),
-      zeroLength(false)
+      zeroLength(false),
+      weight(0.0)
     {}
 
     // BED4
@@ -131,7 +134,8 @@ public:
       strand(strand),
       fields(),
       other_idxs(),
-      zeroLength(false)
+      zeroLength(false),
+      weight(0.0)
     {}
 
     // BED6
@@ -145,7 +149,8 @@ public:
       strand(strand),
       fields(),
       other_idxs(),
-      zeroLength(false)
+      zeroLength(false),
+      weight(0.0)
     {}
 
     // BEDALL
@@ -160,7 +165,8 @@ public:
       strand(strand),
       fields(fields),
       other_idxs(other_idxs),
-      zeroLength(false)
+      zeroLength(false),
+      weight(0.0)
     {}
     
     int size() const {
@@ -434,6 +440,11 @@ public:
     // load a BED file into a vector of BEDs
     void loadBedFileIntoVector();
 
+    // load a BED file into a vector ordered in decreasing order by size
+    void assignWeightsBasedOnSize();
+
+    BED * sizeWeightedSearch(double val);
+
     // Given a chrom, start, end and strand for a single feature,
     // search for all overlapping features in another BED file.
     // Searches through each relevant genome bin on the same chromosome
@@ -484,7 +495,7 @@ public:
     bool isBed12;          // is it file of true blocked BED12 records?
     bool isZeroBased;
 
-    // Main data structires used by BEDTools
+    // Main data structures used by BEDTools
     masterBedCovMap      bedCovMap;
     masterBedCovListMap  bedCovListMap;
     masterBedMap         bedMap;
