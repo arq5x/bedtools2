@@ -458,8 +458,10 @@ void BedShuffle::ChooseLocusFromInclusionFile(BED &bedEntry)
     size_t length = (bedEntry.end - bedEntry.start);
     double runif =((double)rand()/(double)RAND_MAX);
     BED *includeInterval = _include->sizeWeightedSearch(runif);
-    bedEntry.chrom = includeInterval->chrom;
+    
+    // choose a random start within the -incl interval and reconstruct shuffled record
     CHRPOS randomStart = includeInterval->start + (rand() % (includeInterval->size()));
+    bedEntry.chrom = includeInterval->chrom;
     bedEntry.start = randomStart;
     bedEntry.end   = randomStart + length;
 }
