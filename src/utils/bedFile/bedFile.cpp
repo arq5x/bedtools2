@@ -771,15 +771,18 @@ void BedFile::loadBedFileIntoVector() {
 }
 
 void BedFile::assignWeightsBasedOnSize() {
+    // sort by size
     sort(bedList.begin(), bedList.end(), sortBySizeAsc);
-    // report the entries in ascending order
+    // then assign a weight to each interval based on the
+    // proportion of the total interval length of the file
     size_t totalSize = 0;
-    for (unsigned int i = 0; i < bedList.size(); ++i) {
+    for (unsigned int i = 0; i < bedList.size(); ++i) 
+    {
         totalSize += bedList[i].size();
     }
     double totalWeight = 0.0;
-    for (unsigned int i = 0; i < bedList.size(); ++i) {
-
+    for (unsigned int i = 0; i < bedList.size(); ++i) 
+    {
         totalWeight += (double) bedList[i].size() / (double) totalSize;
         bedList[i].weight = totalWeight;
     }
