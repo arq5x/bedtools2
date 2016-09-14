@@ -9,6 +9,7 @@
 #define PLUSFIELDS_H_
 
 #include "string.h"
+#include <string>
 #include <vector>
 
 using namespace std;

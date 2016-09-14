@@ -1,5 +1,6 @@
 #include "SingleLineDelimTextFileReader.h"
 #include <iostream>
+#include <limits.h>
 #include "BufferedStreamMgr.h"
 #include "ParseTools.h"
 

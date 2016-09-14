@@ -79,7 +79,7 @@ public:
 	void push_back(Record * &val);
 
 	void clear();
-	const RecordList &operator=(RecordList &other);
+	RecordList &operator=(const RecordList &other);
 	void assignNoCopy(RecordList &other);
 
 	void sort() { mergeSort(&_begin); }
