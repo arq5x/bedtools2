@@ -8,6 +8,7 @@
 #include "KeyListOpsMethods.h"
 #include <cmath>
 #include <algorithm>
+#include <limits.h>
 #include "ParseTools.h" //to get the isNumeric function
 
 KeyListOpsMethods::KeyListOpsMethods()
