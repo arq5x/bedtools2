@@ -277,5 +277,16 @@ $BT merge -i c.bed.gz > obs
 echo -n "" > exp
 check obs exp
 
+# allow header lines to start with chr or chrom
+echo "    general.t43...\c"
+echo "chrom	chromStart	chromEnd	name	score	strand
+chr14	24800000	24810000	blarg	0	.
+chr11	64610000	64620000	blarg	0	.
+chr14	24710000	24720000	blarg	0	.
+chr11	111230000	111240000	blarg	0	." > exp
+$BT intersect -a t.bed -b t.bed -header > obs
+check obs exp
+
+
 rm a.bed.gz b.bed.gz c.bed.gz a.bed b.bed c.bed genome.txt exp obs
 
