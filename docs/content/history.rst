@@ -4,7 +4,7 @@ Release History
 
 Version 2.26.0 (7-July-2016)
 ============================
-1. Fixed a major memory leak when using ``-sorted``. Thanks to Emily Tsang and Steohen Montgomery.
+1. Fixed a major memory leak when using ``-sorted``. Thanks to Emily Tsang and Stephen Montgomery.
 2. Fixed a bug for BED files containing a single record with no newline. Thanks to @jmarshall.
 3. Fixed a bug in the contigency table values for thr ``fisher`` tool.
 4. The ``getfasta`` tool includes name, chromosome and position in fasta headers when the ``-name`` option is used. Thanks to @rishavray.
