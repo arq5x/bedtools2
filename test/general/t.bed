@@ -1,0 +1,5 @@
+chrom	chromStart	chromEnd	name	score	strand
+chr14	24800000	24810000	blarg	0	.
+chr11	64610000	64620000	blarg	0	.
+chr14	24710000	24720000	blarg	0	.
+chr11	111230000	111240000	blarg	0	.

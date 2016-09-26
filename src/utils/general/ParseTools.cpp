@@ -138,7 +138,15 @@ bool isHeaderLine(const string &line) {
 	if (line[0] == '#') {
 		return true;
 	}
-	//GFF file headers can also start with the words "browser" or "track", followed by a whitespace character.
+	//allow chr chrom to start a header line
+	if (memcmp(line.c_str(), "chrom", 5) == 0 && isspace(line[5])) {
+		return true;
+	}
+	//allow chr chrom to start a header line
+	if (memcmp(line.c_str(), "chr", 3) == 0 && isspace(line[3])) {
+		return true;
+	}
+	//UCSC file headers can also start with the words "browser" or "track", followed by a whitespace character.
 	if (memcmp(line.c_str(), "browser", 7) == 0 && isspace(line[7])) {
 		return true;
 	}
