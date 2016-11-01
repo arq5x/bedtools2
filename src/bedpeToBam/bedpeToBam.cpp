@@ -9,10 +9,12 @@
 
   Licenced under the GNU General Public License 2.0 license.
 ******************************************************************************/
+
+#include <config.h>
+
 #include "lineFileUtilities.h"
 #include "bedFilePE.h"
 #include "GenomeFile.h"
-#include "version.h"
 
 
 #include "api/BamReader.h"

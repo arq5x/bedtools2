@@ -1,4 +1,4 @@
-BT=${BT-../../bin/bedtools}
+BT=${BT-../../bedtools}
 check()
 {
 	if diff $1 $2; then

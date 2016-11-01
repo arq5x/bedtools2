@@ -9,8 +9,10 @@ aaronquinlan@gmail.com
 
 Licenced under the GNU General Public License 2.0 license.
 ******************************************************************************/
+
+#include <config.h>
+
 #include "windowMaker.h"
-#include "version.h"
 
 using namespace std;
 

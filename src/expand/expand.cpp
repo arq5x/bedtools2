@@ -8,6 +8,9 @@ aaronquinlan@gmail.com
 
 Licenced under the MIT license.
 ******************************************************************************/
+
+#include <config.h>
+
 #include <vector>
 #include <map>
 #include <numeric>
@@ -24,7 +27,6 @@ Licenced under the MIT license.
 #include <exception>
 #include <stdexcept> // out_of_range exception
 
-#include "version.h"
 #include "lineFileUtilities.h"
 #include "tabFile.h"
 #include "VectorOps.h"

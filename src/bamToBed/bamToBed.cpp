@@ -9,11 +9,13 @@
 
   Licenced under the GNU General Public License 2.0 license.
 ******************************************************************************/
+
+#include <config.h>
+
 #include "api/BamReader.h"
 #include "api/BamAux.h"
 #include "BlockedIntervals.h"
 #include "bedFile.h"
-#include "version.h"
 using namespace BamTools;
 
 #include <vector>

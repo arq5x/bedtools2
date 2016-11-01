@@ -9,8 +9,10 @@
 
   Licenced under the GNU General Public License 2.0 license.
 ******************************************************************************/
+
+#include <config.h>
+
 #include "multiBamCov.h"
-#include "version.h"
 
 using namespace std;
 

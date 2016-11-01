@@ -14,10 +14,12 @@
   
   Licenced under the GNU General Public License 2.0 license.
 ******************************************************************************/
+
+#include <config.h>
+
 #include <iostream>
 #include <fstream>
 #include <stdlib.h>
-#include "version.h"
 #include "BedtoolsDriver.h"
 
 using namespace std;

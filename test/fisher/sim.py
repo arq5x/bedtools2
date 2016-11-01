@@ -28,4 +28,4 @@ with open('taa.bed', 'w') as fh:
 print >> open('tgg.genome', 'w'), ("chr1\t%i" % genome_size)
 
 # NOTE: add -m here to make merged output
-print check_output("../../bin/bedtools fisher -a taa.bed -b tbb.bed -g tgg.genome", shell=True).strip()
+print check_output("../../bedtools fisher -a taa.bed -b tbb.bed -g tgg.genome", shell=True).strip()

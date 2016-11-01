@@ -1,3 +1,5 @@
+set -e
+
 echo " Performing general tests:"
 cd general; bash test-general.sh; cd ..
 
@@ -32,7 +34,7 @@ echo " Testing bedtools getfasta:"
 cd getfasta; bash test-getfasta.sh; cd ..
 
 echo " Testing bedtools groupby:"
-cd groupby; bash test-groupby.sh; cd ..
+cd groupBy; bash test-groupby.sh; cd ..
 
 echo " Testing bedtools intersect:"
 cd intersect; bash test-intersect.sh; bash new_test-intersect.sh; cd ..
@@ -59,7 +61,7 @@ echo " Testing bedtools slop:"
 cd slop; bash test-slop.sh; cd ..
 
 echo " Testing bedtools sort:"
-cd slop; bash test-sort.sh; cd ..
+cd sort; bash test-sort.sh; cd ..
 
 echo " Testing bedtools shuffle:"
 cd shuffle; bash test-shuffle.sh; cd ..

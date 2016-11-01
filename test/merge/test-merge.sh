@@ -1,4 +1,4 @@
-BT=${BT-../../bin/bedtools}
+BT=${BT-../../bedtools}
 
 check()
 {
@@ -445,7 +445,7 @@ chr1	30	100	.,.,.
 chr2	10	20	.
 chr2	30	40	.
 chr2	42	100	.,." >exp
-../../bin/bedtools merge -i a.full.bam  -c 7 -o collapse > obs
+../../bedtools merge -i a.full.bam  -c 7 -o collapse > obs
 check exp obs
 rm obs exp
 

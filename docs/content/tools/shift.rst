@@ -6,11 +6,6 @@
 
 |
 
-.. image:: ../images/tool-glyphs/shift-glyph.png 
-    :width: 600pt 
-
-|
-
 ``bedtools shift`` will move each feature in a feature file by a 
 user-defined number of bases. While something like this could be done with an 
 ``awk '{OFS="\t" print $1,$2+<shift>,$3+<shift>}'``,

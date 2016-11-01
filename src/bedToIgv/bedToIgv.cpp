@@ -9,10 +9,12 @@
 
   Licenced under the GNU General Public License 2.0 license.
 ******************************************************************************/
+
+#include <config.h>
+
 #include "lineFileUtilities.h"
 #include "bedFile.h"
 #include "GenomeFile.h"
-#include "version.h"
 
 #include <vector>
 #include <iostream>

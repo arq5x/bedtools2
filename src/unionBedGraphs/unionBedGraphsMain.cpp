@@ -10,6 +10,9 @@
 
   Licenced under the GNU General Public License 2.0 license.
 ******************************************************************************/
+
+#include <config.h>
+
 #include <climits>
 #include <cstring>
 #include <cstdlib>
@@ -21,7 +24,6 @@
 
 #include "GenomeFile.h"
 #include "unionBedGraphs.h"
-#include "version.h"
 
 using namespace std;
 

@@ -16,8 +16,9 @@
 // files, file types (if explicitly provided), genome files,
 // run options, output format, etc.
 
+#include <config.h>
+
 #include <cstdlib>
-#include "version.h"
 #include "BedtoolsTypes.h"
 #include "FileRecordTypeChecker.h"
 #include "FileRecordMergeMgr.h"

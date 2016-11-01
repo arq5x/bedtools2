@@ -7,6 +7,9 @@
 
   Licenced under the GNU General Public License 2.0 license.
 ******************************************************************************/
+
+#include <config.h>
+
 #include <cmath>
 #include <climits>
 #include <sstream>
@@ -14,7 +17,6 @@
 #include <inttypes.h>
 #include <getopt.h>
 #include "lineFileUtilities.h"
-#include "version.h"
 #include "splitBed.h"
 
 using namespace std;

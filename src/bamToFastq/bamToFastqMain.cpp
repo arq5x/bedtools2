@@ -10,6 +10,8 @@
  ***************************************************************************
 */
 
+#include <config.h>
+
 #define PROGRAM_NAME "bamToFastq"
 // define our parameter checking macro
 #define PARAMETER_CHECK(param, paramLen, actualLen) (strncmp(argv[i], param, min(actualLen, paramLen))== 0) && (actualLen == paramLen)
@@ -20,7 +22,6 @@
 #include <vector>
 #include <string>
 #include "bamToFastq.h"
-#include "version.h"
 using namespace std;
 
 

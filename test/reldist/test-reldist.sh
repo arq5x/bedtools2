@@ -1,4 +1,4 @@
-BT=${BT-../../bin/bedtools}
+BT=${BT-../../bedtools}
 DATA=${DATA-../../data}
 
 check()

@@ -6,7 +6,7 @@
 # aggggggggg
 # cggggggggg
 
-BT=${BT-../../bin/bedtools}
+BT=${BT-../../bedtools}
 
 check()
 {

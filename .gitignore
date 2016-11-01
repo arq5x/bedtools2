@@ -12,3 +12,20 @@ src/utils/version/version_git.h
 .cproject
 nbproject
 sandbox
+
+# autoconf + automake
+ar-lib
+compile
+Makefile.in
+aclocal.m4
+autom4te.cache/
+config.guess
+config.h.in
+config.h.in~
+config.sub
+configure
+depcomp
+install-sh
+missing
+test-driver
+/.version
