@@ -130,23 +130,40 @@ check obs exp
 rm obs exp
 
 echo "    getfasta.t12...\c"
-echo ">three_blocks_match::chr1:0-40
+echo ">three_blocks_match
 agggggggggcgggggggggtgggggggggaggggggggg
->three_blocks_match::chr1:0-40
+>three_blocks_match
 agggggggggcgggggggggtgggggggggaggggggggg" > exp
 $BT getfasta -fi t.fa -bed blocks.bed -name > obs
 check obs exp
 rm obs exp
 
 echo "    getfasta.t13...\c"
-echo ">three_blocks_match::chr1:0-40(+)
+echo ">three_blocks_match(+)
 agggggggggcgggggggggtgggggggggaggggggggg
->three_blocks_match::chr1:0-40(-)
+>three_blocks_match(-)
 ccccccccctcccccccccacccccccccgccccccccct" > exp
 $BT getfasta -fi t.fa -bed blocks.bed -name -s > obs
 check obs exp
 rm obs exp
 
+echo "    getfasta.t14...\c"
+echo ">three_blocks_match::chr1:0-40
+agggggggggcgggggggggtgggggggggaggggggggg
+>three_blocks_match::chr1:0-40
+agggggggggcgggggggggtgggggggggaggggggggg" > exp
+$BT getfasta -fi t.fa -bed blocks.bed -name+ > obs
+check obs exp
+rm obs exp
+
+echo "    getfasta.t15...\c"
+echo ">three_blocks_match::chr1:0-40(+)
+agggggggggcgggggggggtgggggggggaggggggggg
+>three_blocks_match::chr1:0-40(-)
+ccccccccctcccccccccacccccccccgccccccccct" > exp
+$BT getfasta -fi t.fa -bed blocks.bed -name+ -s > obs
+check obs exp
+rm obs exp
 
 echo "    getfasta.t134..\c"
 echo ">chr1:0-1
