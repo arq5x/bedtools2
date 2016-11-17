@@ -150,10 +150,11 @@ void fastafrombed_help(void) {
 
     cerr << "Options: " << endl;
     cerr << "\t-fi\tInput FASTA file" << endl;
+    cerr << "\t-fo\tOutput file (opt., default is STDOUT" << endl;
     cerr << "\t-bed\tBED/GFF/VCF file of ranges to extract from -fi" << endl;
     cerr << "\t-name\tUse the name field for the FASTA header" << endl;
     cerr << "\t-split\tgiven BED12 fmt., extract and concatenate the sequences"
-         << "from the BED \"blocks\" (e.g., exons)" << endl;
+         << "\n\t\tfrom the BED \"blocks\" (e.g., exons)" << endl;
     cerr << "\t-tab\tWrite output in TAB delimited format." << endl;
     cerr << "\t\t- Default is FASTA format." << endl << endl;
 
@@ -163,7 +164,7 @@ void fastafrombed_help(void) {
     cerr << "\t\t- By default, strand information is ignored." << endl << endl;
     cerr << "\t-fullHeader\tUse full fasta header." << endl;
     cerr << "\t\t- By default, only the word before the first space or tab "
-	 << "is used." << endl << endl;
+	     << "\n\t\tis used." << endl << endl;
 
     // end the program here
     exit(1);
