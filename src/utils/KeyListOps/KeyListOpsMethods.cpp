@@ -217,6 +217,8 @@ const string &KeyListOpsMethods::getDistinctOnly() {
 }
 
 const string &KeyListOpsMethods::getDistinctSortNum(bool asc) {
+	if (empty()) return _nullVal;
+	
 	toArray(true, asc ? ASC : DESC);
 	vector<double>::iterator endIter = std::unique(_numArray.begin(), _numArray.end());
 
