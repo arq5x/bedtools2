@@ -40,7 +40,8 @@ int fastafrombed_main(int argc, char* argv[]) {
     bool haveFastaDb = false;
     bool haveBed = false;
     bool haveFastaOut = false;
-    bool useNameOnly = false;
+    bool useName = false;
+    bool useNamePlus = false;
     bool useFasta = true;
     bool useStrand = false;
     bool useBlocks = false;
@@ -88,7 +89,10 @@ int fastafrombed_main(int argc, char* argv[]) {
             }
         }
         else if(PARAMETER_CHECK("-name", 5, parameterLength)) {
-            useNameOnly = true;
+            useName = true;
+        }
+        else if(PARAMETER_CHECK("-name+", 6, parameterLength)) {
+            useNamePlus = true;
         }
         else if(PARAMETER_CHECK("-split", 6, parameterLength)) {
             useBlocks = true;
@@ -125,11 +129,11 @@ int fastafrombed_main(int argc, char* argv[]) {
     
     if (!showHelp) {
 
-        Bed2Fa *b2f = new Bed2Fa(useNameOnly, fastaDbFile, 
+        Bed2Fa *b2f = new Bed2Fa(fastaDbFile, 
                                  bedFile, fastaOutFile,
                                  useFasta, useStrand, 
                                  useBlocks, useFullHeader,
-                                 useBedOut);
+                                 useBedOut, useName, useNamePlus);
         delete b2f;
     }
     else {
@@ -153,6 +157,7 @@ void fastafrombed_help(void) {
     cerr << "\t-fo\tOutput file (opt., default is STDOUT" << endl;
     cerr << "\t-bed\tBED/GFF/VCF file of ranges to extract from -fi" << endl;
     cerr << "\t-name\tUse the name field for the FASTA header" << endl;
+    cerr << "\t-name+\tUse the name field and coordinates for the FASTA header" << endl;
     cerr << "\t-split\tgiven BED12 fmt., extract and concatenate the sequences"
          << "\n\t\tfrom the BED \"blocks\" (e.g., exons)" << endl;
     cerr << "\t-tab\tWrite output in TAB delimited format." << endl;
