@@ -1,3 +1,6 @@
+# In the event of a test failing, exit with non-zero status:
+set -e;
+
 echo " Performing general tests:"
 cd general; bash test-general.sh; cd ..
 
