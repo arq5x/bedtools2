@@ -27,11 +27,11 @@ protected:
 	virtual ContextGroupBy *upCast(ContextBase *context) { return static_cast<ContextGroupBy *>(context); }
 
 	vector<int> _groupCols;
-	vector<QuickString> _prevFields;
+	vector<string> _prevFields;
 	FileRecordMgr *_queryFRM;
-	const Record *_prevRecord;
-	const Record *getNextRecord();
-	bool canGroup(const Record *);
+	Record *_prevRecord;
+	Record *getNextRecord();
+	bool canGroup(Record *);
 	void assignPrevFields();
 };
 

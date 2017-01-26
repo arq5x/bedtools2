@@ -26,7 +26,8 @@
 
 
 #include "FreeList.h"
-#include "QuickString.h"
+#include "string.h"
+#include <sstream>
 #include <stack>
 #include <cstring> //for memset
 
@@ -65,9 +66,9 @@ public:
 		_dontDelete(false)
 	{
 	}
-	//This version of the constructor will convert a QuickString into a BTlist.
+	//This version of the constructor will convert a string into a BTlist.
 	//It is effectively the opposite of the toStr method.
-	BTlist(const QuickString &str) :
+	BTlist(const string &str) :
 		_begin(NULL),
 		_currEnd(NULL),
 		_prevCursor(NULL),
@@ -230,18 +231,19 @@ public:
 		_dontDelete = true;
 	}
 
-	//this method will convert the contents of the list into a QuickString.
+	//this method will convert the contents of the list into a string.
 	//It assumes that the templated type of the listNode can be converted to a
 	//char using the (char) cast. The user must ensure that this is the case.
 	//The 2nd parameter needs only be true if you wish to append the data
-	//to the QuickString's existing contents. Otherwise, it will be cleared first.
-	void toStr(QuickString &str, bool append = false) const {
+	//to the string's existing contents. Otherwise, it will be cleared first.
+	void toStr(string &str, bool append = false) const 
+	{
 		if (!append) {
 			str.clear();
 		}
 		str.reserve(_size + str.size());
 		for (const BTlistNode<T> *iter = begin(); iter != end(); iter = iter->next()) {
-			str.append((char)iter->value());
+			str += iter->value();
 		}
 	}
 

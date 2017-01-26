@@ -73,7 +73,7 @@ RecordListNode *RecordList::deleteCurrent() {
 	return returnNode;
 }
 
-void RecordList::push_back(const Record * &val) {
+void RecordList::push_back(Record * &val) {
 	RecordListNode *newNode = new RecordListNode(val);
 	if (empty()) {
 		_begin = newNode;
@@ -89,6 +89,7 @@ void RecordList::push_back(const Record * &val) {
 
 
 void RecordList::clear() {
+        _size = 0;
 	if (_dontDelete) {
 		return;
 	}
@@ -105,7 +106,7 @@ void RecordList::clear() {
 	_size = 0;
 }
 
-const RecordList &RecordList::operator=(const RecordList &other) {
+RecordList &RecordList::operator=(const RecordList &other) {
 	//need to make copies of all nodes and assign values
 	clear();
 

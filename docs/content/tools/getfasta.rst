@@ -21,6 +21,9 @@ intervals defined in a BED/GFF/VCF file.
     2. You can use the UNIX ``fold`` command to set the line width of the 
     FASTA output.  For example, ``fold -w 60`` will make each line of the FASTA
     file have at most 60 nucleotides for easy viewing.
+    
+    3. BED files containing a single region require a newline character at the end of
+    the line, otherwise a blank output file is produced.
 
 .. seealso::
 
@@ -47,9 +50,10 @@ Usage and option summary
 ===========================      ===============================================================================================================================================================================================================
  Option                           Description
 ===========================      ===============================================================================================================================================================================================================
-**-fo**                  Specify an output file name. By default, output goes to stdout.
-**-name**				         Use the "name" column in the BED file for the FASTA headers in the output FASTA file.								 
-**-tab**					     Report extract sequences in a tab-delimited format instead of in FASTA format.
+**-fo**                          Specify an output file name. By default, output goes to stdout.
+**-name**				                 Use the "name" column in the BED file for the FASTA headers in the output FASTA file.								 
+**-tab**					               Report extract sequences in a tab-delimited format instead of in FASTA format.
+**-bedOut**                      Report extract sequences in a tab-delimited BED format instead of in FASTA format.
 **-s**                           Force strandedness. If the feature occupies the antisense strand, the sequence will be reverse complemented. *Default: strand information is ignored*.
 **-split**	                     Given BED12 input, extract and concatenate the sequences from the BED "blocks" (e.g., exons)
 ===========================      ===============================================================================================================================================================================================================
@@ -125,7 +129,25 @@ instead of in FASTA format.
   $ bedtools getfasta -fi test.fa -bed test.bed -name -tab
   myseq AAACC
   
-  
+
+==========================================================================
+``-bedOut`` Creating a tab-delimited BED file in lieu of FASTA output.
+==========================================================================
+Using the ``-tab`` option, the ``-fo`` output file will be tab-delimited 
+instead of in FASTA format.
+
+.. code-block:: bash
+
+  $ cat test.fa
+  >chr1
+  AAAAAAAACCCCCCCCCCCCCGCTACTGGGGGGGGGGGGGGGGGG
+
+  $ cat test.bed
+  chr1 5 10 myseq
+
+  $ bedtools getfasta -fi test.fa -bed test.bed -tab
+  chr1 5 10 AAACC
+
   
 ==========================================================================
 ``-s`` Forcing the extracted sequence to reflect the requested strand 

@@ -10,7 +10,7 @@
 #include "InputStreamMgr.h"
 #include <fstream>
 
-BufferedStreamMgr::BufferedStreamMgr(const QuickString &filename)
+BufferedStreamMgr::BufferedStreamMgr(const string &filename)
 : 	_inputStreamMgr(NULL),
 	_mainBuf(NULL),
    	_filename(filename),
@@ -92,7 +92,7 @@ bool BufferedStreamMgr::getTypeData()
 	return true;
 }
 
-bool BufferedStreamMgr::getLine(QuickString &line)
+bool BufferedStreamMgr::getLine(string &line)
 {
 	line.clear();
 
@@ -125,7 +125,7 @@ bool BufferedStreamMgr::getLine(QuickString &line)
 	//strip any whitespace characters, such as DOS newline characters or extra tabs,
 	//from the end of the line
 	int lastPos = line.size();
-	while (isspace(line[lastPos-1])) lastPos--;
+	while (line[lastPos-1] == '\n') lastPos--;
 	line.resize(lastPos);
 
 	return retVal;

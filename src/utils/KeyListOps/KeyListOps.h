@@ -21,24 +21,24 @@ public:
 
 	KeyListOps();
 
-	void setColumns(const QuickString &columns) { _columns = columns; }
-	void addColumns(const QuickString &newCols) {
+	void setColumns(const string &columns) { _columns = columns; }
+	void addColumns(const string &newCols) {
 		if (!_columns.empty()) _columns += ",";
 		_columns += newCols;
 	}
-	void setOperations(const QuickString & operation) { _operations = operation; }
-	void addOperations(const QuickString &newOps) {
+	void setOperations(const string & operation) { _operations = operation; }
+	void addOperations(const string &newOps) {
 		if (!_operations.empty()) _operations += ",";
 		_operations += newOps;
 	}
 
-	void setNullValue(const QuickString & nullValue) { _methods.setNullValue(nullValue); }
-	void setDelimStr(const QuickString & delimStr) { _methods.setDelimStr(delimStr); }
+	void setNullValue(const string & nullValue) { _methods.setNullValue(nullValue); }
+	void setDelimStr(const string & delimStr) { _methods.setDelimStr(delimStr); }
 
-	const QuickString &getColumns() { return _columns; }
-	const QuickString &getOperations() { return _operations; }
-	const QuickString &getNullValue() { return _methods.getNullValue(); }
-	const QuickString &getDelimStr() { return _methods.getDelimStr(); }
+	const string &getColumns() { return _columns; }
+	const string &getOperations() { return _operations; }
+	const string &getNullValue() { return _methods.getNullValue(); }
+	const string &getDelimStr() { return _methods.getDelimStr(); }
 
 	void setKeyList(RecordKeyVector *keyList) { _methods.setKeyList(keyList); }
 
@@ -48,32 +48,32 @@ public:
 	void setDBfileType(FileRecordTypeChecker::FILE_TYPE type) { _dbFileType = type; }
 	bool isValidColumnOps(FileRecordMgr *dbFile);
 
-	const QuickString &getOpVals(RecordKeyVector &hits);
+	const string &getOpVals(RecordKeyVector &hits);
 	void setPrecision(int val) { _precision = val; }
 
 private:
     void init();
     FileRecordTypeChecker::FILE_TYPE _dbFileType;
 
-    QuickString _operations;
-    QuickString _columns;
+    string _operations;
+    string _columns;
 
 	KeyListOpsMethods _methods;
-	map<QuickString, OP_TYPES> _opCodes;
+	map<string, OP_TYPES> _opCodes;
 	map<OP_TYPES, bool> _isNumericOp;
 
     typedef vector<pair<int, OP_TYPES> > colOpsType;
     colOpsType _colOps;
-    QuickString _outVals;
+    string _outVals;
 
-    QuickString _formatStr;
+    string _formatStr;
     int _precision;
 
     static const int DEFAULT_PRECISION = 10;
-    OP_TYPES getOpCode(const QuickString &operation) const;
+    OP_TYPES getOpCode(const string &operation) const;
     bool isNumericOp(OP_TYPES op) const;
-    bool isNumericOp(const QuickString &op) const;
-    const QuickString &format(double val);
+    bool isNumericOp(const string &op) const;
+    const string &format(double val);
 
 };
 

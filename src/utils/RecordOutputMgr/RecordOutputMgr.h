@@ -24,15 +24,15 @@ public:
 	//The init method must be called after all the input files are open.
 	void init(ContextBase *context);
 
-	void printRecord(const Record *record);
+	void printRecord(Record *record);
 	void printRecord(RecordKeyVector &keyList);
-	void printRecord(const Record *record, const QuickString & value);
+	void printRecord(Record *record, const string & value);
 	void checkForHeader();
 
 	void printClosest(RecordKeyVector &keyList, const vector<int> *dists = NULL);
 
-	void tab() { _outBuf.append('\t'); }
-	void newline() { _outBuf.append('\n'); }
+	void tab() { _outBuf.append("\t"); }
+	void newline() { _outBuf.append("\n"); }
 
 private:
 	typedef enum { NOT_BAM, BAM_AS_BAM, BAM_AS_BED} printBamType;
@@ -42,16 +42,16 @@ private:
 	BamTools::BamWriter *_bamWriter;
 	RecordKeyVector *_currBamBlockList;
 
-	QuickString _outBuf;
+	string _outBuf;
 
 	BlockMgr *_bamBlockMgr;
-	QuickString _afterVal; //to store values to be printed after record, such as column operations.
+	string _afterVal; //to store values to be printed after record, such as column operations.
 	//some helper functions to neaten the code.
 	void null(bool queryType, bool dbType);
 
 	void printRecord(RecordKeyVector &keyList, RecordKeyVector *blockList);
 	void printKey(const Record *key);
-	void printKey(const Record *key, const QuickString & start, const QuickString & end);
+	void printKey(const Record *key, const string & start, const string & end);
 	void printKey(const Record *key, int start, int end);
 	void addDbFileId(int fileId);
 	bool printKeyAndTerminate(RecordKeyVector &keyList);

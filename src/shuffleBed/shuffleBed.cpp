@@ -73,14 +73,15 @@ BedShuffle::BedShuffle(string &bedFile, string &genomeFile,
         _haveExclude = true;
     }
     
-    if (_haveInclude) {
+    if (_haveInclude) 
+    {
         _include = new BedFile(includeFile);
-	_include->loadBedFileIntoVector();
-
-	for(std::vector<BED>::iterator it = _include->bedList.begin();
-	    it != _include->bedList.end(); it++){
-	  _cumLen += (*it).end - (*it).start;
-	}	
+        _include->loadBedFileIntoVector();
+        _include->assignWeightsBasedOnSize();
+        // for(std::vector<BED>::iterator it = _include->bedList.begin(); it != _include->bedList.end(); it++)
+        // {
+        //     _cumLen += (*it).end - (*it).start;
+        // }	
     }
 
     if (_haveExclude == true && _haveInclude == false)
@@ -451,37 +452,16 @@ void BedShuffle::ChoosePairedLocus(BEDPE &b) {
 }
 
 
-void BedShuffle::ChooseLocusFromInclusionFile(BED &bedEntry) {
-
-    string chrom    = bedEntry.chrom;
-    CHRPOS length   = bedEntry.end - bedEntry.start;
-
-    string randomChrom;
-    CHRPOS randomStart;
-    BED includeInterval;
+void BedShuffle::ChooseLocusFromInclusionFile(BED &bedEntry) 
+{
+    // choose an -incl interval randomly, yet weighted by the size of the incl interval.
+    size_t length = (bedEntry.end - bedEntry.start);
+    double runif =((double)rand()/(double)RAND_MAX);
+    BED *includeInterval = _include->sizeWeightedSearch(runif);
     
-    // choose an -incl interval randomly.
-    
-    bool nohit = true;
-    while(nohit){
-      
-      includeInterval = _include->bedList[rand() % _include->bedList.size()];
-      
-      double prop = double(includeInterval.end
-			   - includeInterval.start) / _cumLen;
-      double runif =((double)rand()/(double)RAND_MAX);
-
-      if(runif < prop){
-	nohit = false;
-      }
-      if(_sameChrom == true && (includeInterval.chrom != chrom)){
-	nohit = true;
-      }
-           
-    }
-
-    bedEntry.chrom = includeInterval.chrom;
-    randomStart    = includeInterval.start + rand() % (includeInterval.size());
+    // choose a random start within the -incl interval and reconstruct shuffled record
+    CHRPOS randomStart = includeInterval->start + (rand() % (includeInterval->size()));
+    bedEntry.chrom = includeInterval->chrom;
     bedEntry.start = randomStart;
     bedEntry.end   = randomStart + length;
 }

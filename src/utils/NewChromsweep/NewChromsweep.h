@@ -20,7 +20,7 @@
 #include <iostream>
 #include <fstream>
 #include <stdlib.h>
-#include "QuickString.h"
+#include "string.h"
 
 using namespace std;
 
@@ -83,12 +83,12 @@ protected:
 //    recListType _hits;
 
     // the current query and db features.
-    const Record * _currQueryRec;
-    vector<const Record *> _currDbRecs;
+    Record * _currQueryRec;
+    vector<Record *> _currDbRecs;
 
     // a cache of the current chrom from the query. used to handle chrom changes.
-    QuickString _currQueryChromName;
-    QuickString _prevQueryChromName;
+    string _currQueryChromName;
+    string _prevQueryChromName;
     bool _runToQueryEnd;
 
 
@@ -113,19 +113,19 @@ protected:
     // sorted files without a genome file.
     //
 
-    typedef map<QuickString, int> _orderTrackType;
+    typedef map<string, int> _orderTrackType;
     vector<_orderTrackType *> _fileTracks;
-    map<int, QuickString> _filePrevChrom;
+    map<int, string> _filePrevChrom;
     bool _lexicoDisproven; //whether we've established that any file ISN'T in lexicographical order
     bool _lexicoAssumed; //whether we've had to try to guess that any file might be in lexicographical order.
-    QuickString _lexicoAssumedChromName; //which chromosome we had to make that guess for. Used in error reporting.
+    string _lexicoAssumedChromName; //which chromosome we had to make that guess for. Used in error reporting.
     int _lexicoAssumedFileIdx; //which file we had to make the guess for. Also for error reporting.
     bool _testLastQueryRec;
 
     void testChromOrder(const Record *rec);
     bool queryChromAfterDbRec(const Record *dbRec);
     int findChromOrder(const Record *rec);
-    bool verifyChromOrderMismatch(const QuickString & chrom, const QuickString &prevChrom, int skipFile);
+    bool verifyChromOrderMismatch(const string & chrom, const string &prevChrom, int skipFile);
     void testThatAllDbChromsExistInQuery();
     bool testLexicoQueryAfterDb(const Record *queryRec, const Record *dbRec);
 

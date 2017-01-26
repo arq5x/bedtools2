@@ -14,7 +14,7 @@
 class FileRecordMergeMgr : public FileRecordMgr {
 
 public:
-	FileRecordMergeMgr(const QuickString & filename);
+	FileRecordMergeMgr(const string & filename);
 
 	//////////////////////////////////////////////////////////////////////////////////
 	//

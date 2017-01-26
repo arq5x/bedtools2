@@ -12,7 +12,7 @@ INCLUDES = -I$(UTILITIES_DIR)/BamTools/include/ \
 # ----------------------------------
 SOURCES= fileType.cpp fileType.h FileRecordTypeChecker.cpp FileRecordTypeChecker.h
 OBJECTS= fileType.o FileRecordTypeChecker.o
-#_EXT_OBJECTS=ParseTools.o QuickString.o
+#_EXT_OBJECTS=ParseTools.o string.o
 #EXT_OBJECTS=$(patsubst %,$(OBJ_DIR)/%,$(_EXT_OBJECTS))
 BUILT_OBJECTS= $(patsubst %,$(OBJ_DIR)/%,$(OBJECTS))
 

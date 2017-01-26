@@ -1,5 +1,6 @@
 #include "SingleLineDelimTextFileReader.h"
 #include <iostream>
+#include <limits.h>
 #include "BufferedStreamMgr.h"
 #include "ParseTools.h"
 
@@ -65,13 +66,6 @@ bool SingleLineDelimTextFileReader::readEntry()
 		return false;
 	}
 
-	//trim off any white space from end of line.
-	int currPos = lineLen-1;
-	while (isspace(_sLine[currPos])) {
-		currPos--;
-	}
-	_sLine.resize(currPos +1);
-
 	if (wasHeader) {
 		return true;
 	}
@@ -83,23 +77,24 @@ bool SingleLineDelimTextFileReader::readEntry()
 }
 
 
-void SingleLineDelimTextFileReader::getField(int fieldNum, QuickString &str) const {
+void SingleLineDelimTextFileReader::getField(int fieldNum, string &str) const {
 	int startPos = _delimPositions[fieldNum] +1;
 	int endPos = _delimPositions[fieldNum+1];
 	str.assign(_sLine.c_str() + startPos, endPos - startPos);
 }
 
 
-void SingleLineDelimTextFileReader::getField(int fieldNum, int &val) {
-	getField(fieldNum, _tempChrPosStr);
-	val = str2chrPos(_tempChrPosStr.c_str());
+void SingleLineDelimTextFileReader::getField(int fieldNum, int &val) const {
+	string temp;
+	getField(fieldNum, temp);
+	val = str2chrPos(temp.c_str());
 }
 
 void SingleLineDelimTextFileReader::getField(int fieldNum, char &val) const {
 	val = _sLine[_delimPositions[fieldNum] +1];
 }
 
-void SingleLineDelimTextFileReader::appendField(int fieldNum, QuickString &str) const {
+void SingleLineDelimTextFileReader::appendField(int fieldNum, string &str) const {
 	int startPos = _delimPositions[fieldNum] +1;
 	int endPos = _delimPositions[fieldNum+1];
 	str.append(_sLine.c_str() + startPos, endPos - startPos);
@@ -108,9 +103,9 @@ void SingleLineDelimTextFileReader::appendField(int fieldNum, QuickString &str) 
 bool SingleLineDelimTextFileReader::detectAndHandleHeader()
 {
 	//not sure why the linker is giving me a hard time about
-	//passing a non-const QuickString to isHeaderLine, but
+	//passing a non-const string to isHeaderLine, but
 	//this const ref is a workaround.
-	const QuickString &sLine2 = _sLine;
+	const string &sLine2 = _sLine;
 	if (!isHeaderLine(sLine2) && (!(_inheader && _lineNum==1))) {
 		return false;
 	}
@@ -134,6 +129,12 @@ bool SingleLineDelimTextFileReader::findDelimiters() {
 		}
 	}
 	_delimPositions[currField] = len;
+	if (_sLine[len] == '\t')
+	{
+		currField++;		
+	}
+
+	// count the number of fields allow for lines ending in \t\n
 	if (currField != _numFields) {
 		cerr << "Error: line number " 
 			 << _lineNum << " of file " 
@@ -149,10 +150,10 @@ bool SingleLineDelimTextFileReader::findDelimiters() {
 
 int SingleLineDelimTextFileReader::getVcfSVlen() {
 	// tokenize the INFO field
-	QuickString info_str;
+	string info_str;
 	vector<string> infofields;
 	getField(VCF_TAG_FIELD, info_str);
-	Tokenize(info_str.str(), infofields, ';');
+	Tokenize(info_str, infofields, ';');
 
 	// FOO=BAR;BIZ=BAM;SVLEN=100;END=200
 	for (vector<string>::iterator f = infofields.begin(); f != infofields.end(); ++f) {
@@ -178,7 +179,7 @@ int SingleLineDelimTextFileReader::getVcfSVlen() {
         		}
         	}
         	else if (keytoval.at(0) == "END") {
-        		QuickString start_str;
+        		string start_str;
         		getField(1, start_str);
         		// length is END - POS + 1
         		return str2chrPos(keytoval.at(1)) - str2chrPos(start_str) + 1;

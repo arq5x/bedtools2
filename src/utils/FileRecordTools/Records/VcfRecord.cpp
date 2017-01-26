@@ -44,52 +44,53 @@ bool VcfRecord::initFromFile(SingleLineDelimTextFileReader *fileReader)
 void VcfRecord::clear()
 {
 	BedPlusInterval::clear();
-	_varRef.release();
-	_varAlt.release();
+	_varRef.clear();
+	_varAlt.clear();
 }
 
-void VcfRecord::print(QuickString &outBuf) const {
+void VcfRecord::print(string &outBuf) const {
 	outBuf.append(_chrName);
-	outBuf.append('\t');
+	outBuf.append("\t");
 	outBuf.append(_startPosStr);
 	printOtherFields(outBuf);
 }
 
-void VcfRecord::print(QuickString &outBuf, int start, int end) const {
+void VcfRecord::print(string &outBuf, int start, int end) const {
 	outBuf.append(_chrName);
-	outBuf.append('\t');
+	outBuf.append("\t");
 	outBuf.append(_startPosStr);
 	printOtherFields(outBuf);
 }
 
-void VcfRecord::print(QuickString &outBuf, const QuickString & start, const QuickString & end) const {
+void VcfRecord::print(string &outBuf, const string & start, const string & end) const {
 	outBuf.append(_chrName);
-	outBuf.append('\t');
+	outBuf.append("\t");
 	outBuf.append(_startPosStr);
 	printOtherFields(outBuf);
 
 }
 
-void VcfRecord::printNull(QuickString &outBuf) const {
+void VcfRecord::printNull(string &outBuf) const {
 	outBuf.append(".\t-1\t.");
-	for (int i= 2; i < _numPrintFields; i++) {
+	for (int i=3; i < _numPrintFields; i++) {
 		outBuf.append("\t.");
 	}
 }
 
-void VcfRecord::printOtherFields(QuickString &outBuf) const {
-	outBuf.append('\t');
+void VcfRecord::printOtherFields(string &outBuf) const {
+	outBuf.append("\t");
 	outBuf.append(_name);
-	outBuf.append('\t');
+	outBuf.append("\t");
 	outBuf.append(_varRef);
-	outBuf.append('\t');
+	outBuf.append("\t");
 	outBuf.append(_varAlt);
-	outBuf.append('\t');
+	outBuf.append("\t");
 	outBuf.append(_score);
+	outBuf.append("\t");
 	_plusFields.printFields(outBuf);
 }
 
-const QuickString &VcfRecord::getField(int fieldNum) const
+const string &VcfRecord::getField(int fieldNum) const
 {
 	//a request for any of the first six fields will retrieve
 	//chrom, start, name, varRef, varAlt, score,  in that order.

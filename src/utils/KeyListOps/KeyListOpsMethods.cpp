@@ -8,6 +8,7 @@
 #include "KeyListOpsMethods.h"
 #include <cmath>
 #include <algorithm>
+#include <limits.h>
 #include "ParseTools.h" //to get the isNumeric function
 
 KeyListOpsMethods::KeyListOpsMethods()
@@ -100,7 +101,7 @@ double KeyListOpsMethods::getMedian() {
 }
 
 // return the most common value in the vector
-const QuickString &KeyListOpsMethods::getMode() {
+const string &KeyListOpsMethods::getMode() {
 	if (empty()) return _nullVal;
 
 	makeFreqMap();
@@ -118,7 +119,7 @@ const QuickString &KeyListOpsMethods::getMode() {
 	return _retStr;
 }
 // return the least common value in the vector
-const QuickString &KeyListOpsMethods::getAntiMode() {
+const string &KeyListOpsMethods::getAntiMode() {
 	if (empty()) return _nullVal;
 
 	makeFreqMap();
@@ -190,7 +191,7 @@ uint32_t KeyListOpsMethods::getCount() {
 	return _keyList->size();
 }
 // return a delimited list of the unique elements
-const QuickString &KeyListOpsMethods::getDistinct() {
+const string &KeyListOpsMethods::getDistinct() {
 	if (empty()) return _nullVal;
 	// separated list of unique values. If something repeats, only report once.
 	makeFreqMap();
@@ -202,7 +203,7 @@ const QuickString &KeyListOpsMethods::getDistinct() {
 	return _retStr;
 }
 
-const QuickString &KeyListOpsMethods::getDistinctOnly() {
+const string &KeyListOpsMethods::getDistinctOnly() {
 	if (empty()) return _nullVal;
 	// separated list of unique values. If something repeats, don't report.
 	makeFreqMap();
@@ -215,15 +216,19 @@ const QuickString &KeyListOpsMethods::getDistinctOnly() {
 	return _retStr;
 }
 
-const QuickString &KeyListOpsMethods::getDistinctSortNum(bool asc) {
+const string &KeyListOpsMethods::getDistinctSortNum(bool asc) {
+	if (empty()) return _nullVal;
+	
 	toArray(true, asc ? ASC : DESC);
 	vector<double>::iterator endIter = std::unique(_numArray.begin(), _numArray.end());
 
 	_retStr.clear();
+	ostringstream s;
 	for (vector<double>::iterator iter = _numArray.begin(); iter != endIter; iter++) {
 		if (iter != _numArray.begin()) _retStr += _delimStr;
-		_retStr.append(*iter);
+		s << *iter;
 	}
+	_retStr.append(s.str());
 	return  _retStr;
 
 }
@@ -236,8 +241,9 @@ uint32_t KeyListOpsMethods::getCountDistinct() {
 	makeFreqMap();
 	return _freqMap.size();
 }
+
 // return a delimiter-separated list of elements
-const QuickString &KeyListOpsMethods::getCollapse(const QuickString &delimiter) {
+const string &KeyListOpsMethods::getCollapse(const string &delimiter) {
 	if (empty()) return _nullVal;
 
 	//just put all items in one big separated list.
@@ -249,16 +255,16 @@ const QuickString &KeyListOpsMethods::getCollapse(const QuickString &delimiter) 
 		i++;
 	}
 	return _retStr;
-
 }
+
 // return a concatenation of all elements in the vector
-const QuickString &KeyListOpsMethods::getConcat() {
+const string &KeyListOpsMethods::getConcat() {
 	if (empty()) return _nullVal;
 
 	//like collapse but w/o commas. Just a true concat of all vals.
 	//just swap out the delimChar with '' and call collapse, then
 	//restore the delimChar.
-	QuickString oldDelimStr(_delimStr);
+	string oldDelimStr(_delimStr);
 	_delimStr = "";
 	getCollapse(); //this will store it's results in the _retStr method.
 	_delimStr = oldDelimStr;
@@ -266,7 +272,7 @@ const QuickString &KeyListOpsMethods::getConcat() {
 }
 
 // return a histogram of values and their freqs. in desc. order of frequency
-const QuickString &KeyListOpsMethods::getFreqDesc() {
+const string &KeyListOpsMethods::getFreqDesc() {
 	if (empty()) return _nullVal;
 
 	//for each uniq val, report # occurances, in desc order.
@@ -274,20 +280,22 @@ const QuickString &KeyListOpsMethods::getFreqDesc() {
 	//put freq map into multimap where key is the freq and val is the item. In other words, basically a reverse freq map.
 	histDescType hist;
 	for (; _freqIter != _freqMap.end(); _freqIter++) {
-		hist.insert(pair<int, QuickString>(_freqIter->second, _freqIter->first));
+		hist.insert(pair<int, string>(_freqIter->second, _freqIter->first));
 	}
 	//now iterate through the reverse map we just made and output it's pairs in val:key format.
 	_retStr.clear();
+	ostringstream s;
 	for (histDescType::iterator histIter = hist.begin(); histIter != hist.end(); histIter++) {
 		if (histIter != hist.begin()) _retStr += _delimStr;
-		_retStr.append(histIter->second);
-		_retStr += ":";
-		_retStr.append(histIter->first);
+		s << histIter->second;
+		s << ":";
+		s << histIter->first;
 	}
+	_retStr.append(s.str());
 	return _retStr;
 }
 // return a histogram of values and their freqs. in asc. order of frequency
-const QuickString &KeyListOpsMethods::getFreqAsc() {
+const string &KeyListOpsMethods::getFreqAsc() {
 	if (empty()) return _nullVal;
 
 	//for each uniq val, report # occurances, in asc order.
@@ -295,21 +303,23 @@ const QuickString &KeyListOpsMethods::getFreqAsc() {
 	//put freq map into multimap where key is the freq and val is the item. In other words, basically a reverse freq map.
 	histAscType hist;
 	for (; _freqIter != _freqMap.end(); _freqIter++) {
-		hist.insert(pair<int, QuickString>(_freqIter->second, _freqIter->first));
+		hist.insert(pair<int, string>(_freqIter->second, _freqIter->first));
 //		hist[*(_freqIter->second)] = _freqIter->first;
 	}
 	//now iterate through the reverse map we just made and output it's pairs in val:key format.
 	_retStr.clear();
+	ostringstream s;
 	for (histAscType::iterator histIter = hist.begin(); histIter != hist.end(); histIter++) {
 		if (histIter != hist.begin()) _retStr += _delimStr;
-		_retStr.append(histIter->second);
-		_retStr += ":";
-		_retStr.append(histIter->first);
+		s << histIter->second;
+		s << ":";
+		s << histIter->first;
 	}
+	_retStr.append(s.str());
 	return _retStr;
 }
 // return the first value in the list
-const QuickString &KeyListOpsMethods::getFirst() {
+const string &KeyListOpsMethods::getFirst() {
 	if (empty()) return _nullVal;
 
 	//just the first item.
@@ -317,7 +327,7 @@ const QuickString &KeyListOpsMethods::getFirst() {
 	return getColVal();
 }
 // return the last value in the list
-const QuickString &KeyListOpsMethods::getLast() {
+const string &KeyListOpsMethods::getLast() {
 	if (empty()) return _nullVal;
 
 	//just the last item.
@@ -328,21 +338,23 @@ const QuickString &KeyListOpsMethods::getLast() {
 	return getColVal();
 }
 
-const QuickString &KeyListOpsMethods::getColVal() {
-	const QuickString &retVal = (*_iter)->getField(_column);
+const string &KeyListOpsMethods::getColVal() {
+	const string &retVal = (*_iter)->getField(_column);
 	if (_isBam && retVal.empty()) return _nullVal;
 	return retVal;
 }
 
 double KeyListOpsMethods::getColValNum() {
-	const QuickString &strVal = (*_iter)->getField(_column);
+	const string &strVal = (*_iter)->getField(_column);
 	if (!isNumeric(strVal)) {
 		_nonNumErrFlag = true;
+		ostringstream s;
 		_errMsg = " ***** WARNING: Non numeric value ";
-		_errMsg.append(strVal);
-		_errMsg.append(" in ");
-		_errMsg.append(_column);
-		_errMsg.append(".");
+		s << strVal;
+		s << " in ";
+		s << _column;
+		s << ".";
+		_errMsg.append(s.str());
 		return NAN;
 	}
 	return atof(strVal.c_str());
@@ -381,9 +393,9 @@ void KeyListOpsMethods::sortArray(bool useNum, bool ascOrder)
 		}
 	} else {
 		if (ascOrder) {
-			sort(_qsArray.begin(), _qsArray.end(), less<QuickString>());
+			sort(_qsArray.begin(), _qsArray.end(), less<string>());
 		} else {
-			sort(_qsArray.begin(), _qsArray.end(), greater<QuickString>());
+			sort(_qsArray.begin(), _qsArray.end(), greater<string>());
 		}
 	}
 }

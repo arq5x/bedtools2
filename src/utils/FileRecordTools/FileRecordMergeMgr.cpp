@@ -8,7 +8,7 @@
 
 #include "FileRecordMergeMgr.h"
 
-FileRecordMergeMgr::FileRecordMergeMgr(const QuickString & filename)
+FileRecordMergeMgr::FileRecordMergeMgr(const string & filename)
 : FileRecordMgr(filename),
   _desiredStrand(ANY_STRAND),
   _maxDistance(0)
@@ -64,7 +64,7 @@ Record *FileRecordMergeMgr::getNextRecord(RecordKeyVector *recList)
 	_mustBeReverse = _desiredStrand == SAME_STRAND_REVERSE || (_desiredStrand == SAME_STRAND_EITHER && (startRecord->getStrandVal() == Record::REVERSE));
 	bool mustKeepOpposite = (_desiredStrand == SAME_STRAND_EITHER);
 
-	const QuickString &currChrom = startRecord->getChrName();
+	const string &currChrom = startRecord->getChrName();
 	_foundChroms.insert(currChrom);
 
 	bool madeComposite = false;
@@ -97,7 +97,7 @@ Record *FileRecordMergeMgr::getNextRecord(RecordKeyVector *recList)
 		bool mustDelete = (mustMatchStrand && nextRecord->getStrandVal() == Record::UNKNOWN);
 
 		//check that we are still on the same chromosome.
-		const QuickString &newChrom = nextRecord->getChrName();
+		const string &newChrom = nextRecord->getChrName();
 		if (newChrom != currChrom) { //hit a different chromosome.
 			//haven't seen this chromosome before, sort order is already enforced in the base class method.
 			if (!mustDelete) {
@@ -205,7 +205,7 @@ bool FileRecordMergeMgr::eof(){
 
 void FileRecordMergeMgr::deleteAllMergedItemsButKey(RecordKeyVector &recList) {
 	//if the key is also in the list, this method won't delete it.
-	for (RecordKeyVector::const_iterator_type iter = recList.begin(); iter != recList.end(); iter = recList.next()) {
+	for (RecordKeyVector::iterator_type iter = recList.begin(); iter != recList.end(); iter = recList.next()) {
 		if (*iter == recList.getKey()) {
 			continue;
 		}

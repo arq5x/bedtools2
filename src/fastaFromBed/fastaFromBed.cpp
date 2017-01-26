@@ -14,20 +14,21 @@
 #include "bedFile.h"
 
 
-Bed2Fa::Bed2Fa(bool useName, const string &dbFile, 
+Bed2Fa::Bed2Fa(const string &dbFile, 
                const string &bedFile, const string &fastaOutFile,
                bool useFasta, bool useStrand, 
                bool useBlocks, bool useFullHeader,
-               bool useBedOut) :
-    _useName(useName),
+               bool useBedOut, bool useName, bool useNamePlus) :
     _dbFile(dbFile),
     _bedFile(bedFile),
     _fastaOutFile(fastaOutFile),
     _useFasta(useFasta),
-    _useBedOut(useBedOut),
     _useStrand(useStrand),
     _useBlocks(useBlocks),
-    _useFullHeader(useFullHeader)
+    _useFullHeader(useFullHeader),
+    _useBedOut(useBedOut),
+    _useName(useName),
+    _useNamePlus(useNamePlus)
 {
     _bed = new BedFile(_bedFile);
 
@@ -72,42 +73,31 @@ void Bed2Fa::ReportDNA(const BED &bed, string &dna) {
         *_faOut  << dna << endl;
     }
     else {
-        if (!(_useName)) {
-            if (_useFasta == true) {
-                if (_useStrand == true)
-                    *_faOut  << ">" << bed.chrom << ":" 
-                            << bed.start << "-" << bed.end   
-                            << "(" << bed.strand << ")" 
-                            << endl 
-                            << dna
-                            << endl;
-                else
-                    *_faOut  << ">" << bed.chrom << ":" 
-                            << bed.start << "-" << bed.end 
-                            << endl 
-                            << dna
-                            << endl;
-            }
-            else {
-                if (_useStrand == true)
-                    *_faOut  << bed.chrom << ":" 
-                            << bed.start << "-" << bed.end
-                            << "(" << bed.strand << ")" << "\t" 
-                            << dna 
-                            << endl;
-                else
-                    *_faOut  << bed.chrom << ":" 
-                            << bed.start << "-" << bed.end << "\t" 
-                            << dna 
-                            << endl;
-            }
+        ostringstream header;
+        if (_useName)
+        {
+            header << bed.name;
         }
-        else {
-            if (_useFasta == true)
-                *_faOut  << ">" << bed.name << endl << dna << endl;
-            else
-                *_faOut  << bed.name << "\t" << dna << endl;
+        else if (_useNamePlus) 
+        {
+            header << bed.name << "::" << bed.chrom << ":" 
+                   << bed.start << "-" << bed.end;
         }
+        else 
+        {
+            header << bed.chrom << ":" 
+                   << bed.start << "-" << bed.end;
+        }
+        
+        if (_useStrand)
+        {
+            header << "(" << bed.strand << ")";
+        }
+        
+        if (_useFasta)
+            *_faOut << ">" << header.str() << endl << dna << endl;
+        else
+            *_faOut << header.str() << "\t" << dna << endl;
     }
 }
 

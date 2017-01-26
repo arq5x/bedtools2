@@ -7,96 +7,111 @@
 #include "Tokenizer.h"
 #include <cstring>
 #include <cstdio>
+#include <iostream>
 Tokenizer::Tokenizer()
 : _numExpectedElems(0),
   _keepFinalIncElem(USE_NOW),
   _numValidElems(0) {
-
-	_elems.resize(INITIAL_NUM_ELEMS, NULL);
-	for (int i = 0; i < INITIAL_NUM_ELEMS; i++) {
-		_elems[i] = new QuickString();
-	}
 }
 
 Tokenizer::~Tokenizer() {
-	resize(0); //easy way to delete elems without repeating code.
 }
 
 void Tokenizer::setNumExpectedItems(int newSize) {
 	_numExpectedElems = newSize;
-	resize(newSize);
 }
 
-int Tokenizer::tokenize(const QuickString &str, char delimiter, bool eofHit, bool isCompressed) {
+// tokenize into a list of strings.
+int Tokenizer::getNumFields(const string &str, char delimiter) 
+{
+    // http://stackoverflow.com/questions/236129/how-to-split-a-string-in-c/236803#236803
+    // NOTE: this approach intentionally allows consecutive delimiters
+    std::stringstream ss(str);
+    std::string item;
+    vector<string> tmp;
+    while(getline(ss, item, delimiter)) {
+        tmp.push_back(item);  
+    }
+    return tmp.size();
+}
 
-	int strLen = (int)str.size();
+int Tokenizer::tokenize(const string &str, char delimiter, bool eofHit, bool isCompressed) {
 
-	int startPos = 0;
-	int currPos = 0;
+    // http://stackoverflow.com/questions/236129/how-to-split-a-string-in-c/236803#236803
+    // NOTE: this approach intentionally allows consecutive delimiters
+    std::stringstream ss(str);
+    std::string item;
+    _elems.clear();
+    while(getline(ss, item, delimiter)) {
+    	// when dealing with compressed input, we can sometimes token lines such
+    	// that we capture a partial line (i.e., it didn't end in '\n'). Only
+    	// sample the complete lines.
+    	if (isCompressed)
+    	{
+    		if (delimiter == '\n' && ss.eof() == false)
+    		{  
+    			_elems.push_back(item);
+    		}
+    		else if (delimiter != '\n')
+    		{
+    			_elems.push_back(item);
+    		}
+    	}
+    	else
+    	{
+    		_elems.push_back(item);
+    	}
+    }
+    _numValidElems = _elems.size();
+    return _numValidElems;
 
-	int currIdx = 0;
 
-	while (startPos < strLen) {
-		while (str[currPos] != delimiter && currPos < strLen) {
-			currPos++;
-		}
-		if (currPos > startPos) {
-			if ((currPos == strLen && _keepFinalIncElem != USE_NOW) &&
-					( (!(delimiter == '\n' && eofHit)) || isCompressed)) {
-				//we found an incomplete final element.
-				// if we're ignoring incomplete elems, do nothing with it.
-				currIdx--; //make sure it's not included in the final count of valid elems.
+	// int strLen = (int)str.size();
 
-			} else {
-				QuickString *newStr = fetchElem(currIdx);
-				newStr->assign(str.c_str() + startPos, min(currPos, strLen) - startPos);
+	// int startPos = 0;
+	// int currPos = 0;
+	// int currIdx = 0;
+	// while (startPos < strLen) {
+	// 	while (str[currPos] != delimiter && currPos < strLen) {
+	// 		currPos++;
+	// 	}
+	// 	if (currPos > startPos) {
+	// 		if ((currPos == strLen && _keepFinalIncElem != USE_NOW) &&
+	// 				( (!(delimiter == '\n' && eofHit)) || isCompressed)) {
+	// 			//we found an incomplete final element.
+	// 			// if we're ignoring incomplete elems, do nothing with it.
+	// 			currIdx--; //make sure it's not included in the final count of valid elems.
 
-				// If splitting lines, strip any white space from the end of the line
-				// including DOS newline characters and excess tabs.
-				if (delimiter == '\n') {
-					int lastPos = newStr->size();
-					while (isspace(newStr->at(lastPos-1))) lastPos--;
-					newStr->resize(lastPos);
-				}
-			}
-		}
-		startPos = currPos +1;
-		currPos = startPos;
-		currIdx++;
-	}
-	_numValidElems = currIdx;
-	return currIdx;
+	// 		} else {
+	// 			string *newStr = fetchElem(currIdx);
+	// 			newStr->assign(str.c_str() + startPos, min(currPos, strLen) - startPos);
+
+	// 			// If splitting lines, strip any white space from the end of the line
+	// 			// including DOS newline characters and excess tabs.
+	// 			if (delimiter == '\n') {
+	// 				int lastPos = newStr->size();
+	// 				while (isspace(newStr->at(lastPos-1))) 
+	// 				{
+	// 					lastPos--;
+	// 				}
+	// 				newStr->resize(lastPos);
+	// 			}
+	// 		}
+	// 	}
+	// 	startPos = currPos +1;
+	// 	currPos = startPos;
+	// 	currIdx++;
+	// }
+	// _numValidElems = currIdx;
+	// return currIdx;
 }
 
 void Tokenizer::setKeepFinalIncompleteElem(lastElemCode code) {
 	_keepFinalIncElem = code;
 }
 
-QuickString *Tokenizer::fetchElem(int idx)
+string Tokenizer::fetchElem(int idx)
 {
-	if (idx >= (int)_elems.size()) {
-		resize(idx +1);
-	}
 	return _elems[idx];
-}
-
-
-void Tokenizer::resize(int newSize) {
-	int oldSize = (int)_elems.size();
-
-	if (newSize > oldSize) { //need to add items.
-		_elems.resize(newSize);
-		for (int i=oldSize; i < newSize; i++) {
-			_elems[i] = new QuickString();
-		}
-	} else if (oldSize > newSize) {
-		//need to remove items.
-		for (int i = oldSize - 1; i >= newSize; i--) {
-			delete _elems[i];
-			_elems[i] = NULL;
-		}
-		_elems.resize(newSize);
-	}
-	//if oldSize is the same as newSize, do nothing.
 }
 

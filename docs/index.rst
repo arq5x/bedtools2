@@ -11,6 +11,7 @@ genomic file formats such as BAM, BED, GFF/GTF, VCF. While each individual tool 
 *intersect* two interval files), quite sophisticated analyses can be conducted
 by combining multiple bedtools operations on the UNIX command line.
 
+**bedtools** is developed in the `Quinlan laboratory <http://quinlanlab.org>`_ at the `University of Utah <http://www.utah.edu/>`_ and benefits from fantastic contributions made by scientists worldwide.
 
 ==========================
 Tutorial

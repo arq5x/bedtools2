@@ -1,3 +1,4 @@
+
 /*
  * BamRecord.cpp
  *
@@ -117,78 +118,82 @@ void BamRecord::clear()
 
 }
 
-void BamRecord::print(QuickString &outBuf, RecordKeyVector *keyList) const
+void BamRecord::print(string &outBuf, RecordKeyVector *keyList) const
 {
-        Bed6Interval::print(outBuf);
+	Bed6Interval::print(outBuf);
     printRemainingBamFields(outBuf, keyList);
 }
 
-void BamRecord::print(QuickString &outBuf, int start, int end, RecordKeyVector *keyList) const
+void BamRecord::print(string &outBuf, int start, int end, RecordKeyVector *keyList) const
 {
-        Bed6Interval::print(outBuf, start, end);
+	Bed6Interval::print(outBuf, start, end);
     printRemainingBamFields(outBuf, keyList);
 }
 
-void BamRecord::print(QuickString &outBuf, const QuickString & start, const QuickString & end, RecordKeyVector *keyList) const
+void BamRecord::print(string &outBuf, const string & start, const string & end, RecordKeyVector *keyList) const
 {
-        Bed6Interval::print(outBuf, start, end);
+	Bed6Interval::print(outBuf, start, end);
     printRemainingBamFields(outBuf, keyList);
 }
 
-void BamRecord::printNull(QuickString &outBuf) const
+void BamRecord::printNull(string &outBuf) const
 {
         Bed6Interval::printNull(outBuf);
         outBuf.append("\t.\t.\t.\t.\t.\t.", 12);
 }
 
-void BamRecord::printRemainingBamFields(QuickString &outBuf, RecordKeyVector *keyList) const
+void BamRecord::printRemainingBamFields(string &outBuf, RecordKeyVector *keyList) const
 {
-        outBuf.append('\t');
-        outBuf.append(_startPosStr);
-        outBuf.append('\t');
-        outBuf.append(_endPos);
-        outBuf.append("\t0,0,0", 6);
-        outBuf.append('\t');
+	ostringstream s;
+    s << "\t";
+    s << _startPosStr;
+    s << "\t";
+    s << _endPos;
+    s << "\t0,0,0";
+    s << "\t";
 
-        int numBlocks = (int)keyList->size();
+    int numBlocks = (int)keyList->size();
 
-        if (numBlocks > 0) {
-                outBuf.append(numBlocks);
+    if (numBlocks > 0) {
+            s << numBlocks;
 
-                vector<int> blockLengths;
-                vector<int> blockStarts;
-                for (RecordKeyVector::const_iterator_type iter = keyList->begin(); iter != keyList->end(); iter = keyList->next()) {
-                        const Record *block = *iter;
-                        blockLengths.push_back(block->getEndPos() - block->getStartPos());
-                        blockStarts.push_back(block->getStartPos() - _startPos);
-                }
+            vector<int> blockLengths;
+            vector<int> blockStarts;
+            for (RecordKeyVector::iterator_type iter = keyList->begin(); iter != keyList->end(); iter = keyList->next()) {
+                    const Record *block = *iter;
+                    blockLengths.push_back(block->getEndPos() - block->getStartPos());
+                    blockStarts.push_back(block->getStartPos() - _startPos);
+            }
 
-                outBuf.append('\t');
-                for (int i=0; i < (int)blockLengths.size(); i++) {
-                        outBuf.append(blockLengths[i]);
-                        outBuf.append(',');
-                }
-                outBuf.append('\t');
-                for (int i=0; i < (int)blockStarts.size(); i++) {
-                        outBuf.append( blockStarts[i]);
-                        outBuf.append(',');
-                }
-        }
-        else {
-                outBuf.append("1\t0,\t0,");
-        }
+            s << "\t";
+            for (int i=0; i < (int)blockLengths.size(); i++) {
+                    s << blockLengths[i];
+                    s << ',';
+            }
+            s << "\t";
+            for (int i=0; i < (int)blockStarts.size(); i++) {
+                    s <<  blockStarts[i];
+                    s << ',';
+            }
+    }
+    else {
+            s << "1\t0,\t0,";
+    }
+    outBuf.append(s.str());
 }
 
-void BamRecord::printUnmapped(QuickString &outBuf) const {
-        outBuf.append(_chrName.empty() ? "." : _chrName);
-        outBuf.append("\t-1\t-1\t");
-        outBuf.append(_name.empty() ? "." : _name);
-        outBuf.append('\t');
-        outBuf.append(_score.empty() ? "." : _score);
-        outBuf.append("\t.\t-1\t-1\t-1\t0,0,0\t0\t.\t."); // dot for strand, -1 for blockStarts and blockEnd
+void BamRecord::printUnmapped(string &outBuf) const {
+	ostringstream s;
+    s << (_chrName.empty() ? "." : _chrName);
+    s << "\t-1\t-1\t";
+    s << (_name.empty() ? "." : _name);
+    s << "\t";
+    s << (_score.empty() ? "." : _score);
+    s << "\t.\t-1\t-1\t-1\t0,0,0\t0\t.\t."; // dot for strand, -1 for blockStarts and blockEnd
+    outBuf.append(s.str());
 }
 
-const QuickString &BamRecord::getField(int fieldNum) const
+const string &BamRecord::getField(int fieldNum) const
 {
 	// Unlike other records, Bam records should return the fields specified in
 	// in the BAM spec. In order, they are:
@@ -265,10 +270,13 @@ void BamRecord::buildCigarStr() {
 	_cigarStr.clear();
 	_cigarStr.reserve(2 * cigarVecLen);
 
+	std::ostringstream tmp;
 	for (size_t i=0; i < cigarVecLen; i++) {
-		_cigarStr.append(cigarData[i].Type);
-		_cigarStr.append(cigarData[i].Length);
+		tmp << cigarData[i].Type;
+		tmp << cigarData[i].Length;
 	}
+	_cigarStr = tmp.str();
+
 }
 
 

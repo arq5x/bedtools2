@@ -7,7 +7,7 @@
 #include <sstream>
 
 //This functions recognizes only numbers with digits, plus sign, minus sign, decimal point, e, or E. Hexadecimal and pointers not currently supported.
-bool isNumeric(const QuickString &str) {
+bool isNumeric(const string &str) {
 	for (int i=0; i < (int)str.size(); i++) {
 		char currChar = str[i];
 		if (!(isdigit(currChar) || currChar == '-' || currChar == '.' || currChar == '+' || currChar == 'e' || currChar == 'E')) {
@@ -18,7 +18,7 @@ bool isNumeric(const QuickString &str) {
 }
 
 //As above, but does not allow decimal points
-bool isInteger(const QuickString &str) {
+bool isInteger(const string &str) {
 	for (int i=0; i < (int)str.size(); i++) {
 		char currChar = str[i];
 		if (!(isdigit(currChar) || currChar == '-' || currChar == '+' || currChar == 'e' || currChar == 'E')) {
@@ -30,7 +30,7 @@ bool isInteger(const QuickString &str) {
 
 
 
-int str2chrPos(const QuickString &str) {
+int str2chrPos(const string &str) {
 	return str2chrPos(str.c_str(), str.size());
 }
 
@@ -128,7 +128,7 @@ string vectorIntToStr(const vector<int> &vec) {
 	return str;
 }
 
-bool isHeaderLine(const QuickString &line) {
+bool isHeaderLine(const string &line) {
 	if (line[0] == '>') {
 		return true;
 	}
@@ -138,7 +138,15 @@ bool isHeaderLine(const QuickString &line) {
 	if (line[0] == '#') {
 		return true;
 	}
-	//GFF file headers can also start with the words "browser" or "track", followed by a whitespace character.
+	//allow chr chrom to start a header line
+	if (memcmp(line.c_str(), "chrom", 5) == 0 && isspace(line[5])) {
+		return true;
+	}
+	//allow chr chrom to start a header line
+	if (memcmp(line.c_str(), "chr", 3) == 0 && isspace(line[3])) {
+		return true;
+	}
+	//UCSC file headers can also start with the words "browser" or "track", followed by a whitespace character.
 	if (memcmp(line.c_str(), "browser", 7) == 0 && isspace(line[7])) {
 		return true;
 	}

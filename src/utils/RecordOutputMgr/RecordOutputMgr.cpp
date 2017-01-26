@@ -125,13 +125,13 @@ RecordOutputMgr::printBamType RecordOutputMgr::printBamRecord(RecordKeyVector &k
 	return NOT_BAM;
 }
 
-void RecordOutputMgr::printRecord(const Record *record)
+void RecordOutputMgr::printRecord(Record *record)
 {
 	RecordKeyVector keyList(record);
 	printRecord(keyList);
 }
 
-void RecordOutputMgr::printRecord(const Record *record, const QuickString & value)
+void RecordOutputMgr::printRecord(Record *record, const string & value)
 {	
 	checkForHeader();
 
@@ -158,7 +158,7 @@ void RecordOutputMgr::printClosest(RecordKeyVector &keyList, const vector<int> *
 
 	const ContextClosest *context = static_cast<const ContextClosest *>(_context);
 	bool deleteBlocks = false;
-	const Record *keyRec = keyList.getKey();
+	Record *keyRec = keyList.getKey();
 	RecordKeyVector blockList(keyRec);
 	if (keyRec->getType() == FileRecordTypeChecker::BAM_RECORD_TYPE) {
 		_bamBlockMgr->getBlocks(blockList, deleteBlocks);
@@ -166,7 +166,7 @@ void RecordOutputMgr::printClosest(RecordKeyVector &keyList, const vector<int> *
 	}
 	if (!keyList.empty()) {
 		int distCount = 0;
-		for (RecordKeyVector::const_iterator_type iter = keyList.begin(); iter != keyList.end(); iter = keyList.next()) {
+		for (RecordKeyVector::iterator_type iter = keyList.begin(); iter != keyList.end(); iter = keyList.next()) {
 			const Record *hitRec = *iter;
 			printKey(keyRec, keyRec->getStartPosStr(), keyRec->getEndPosStr());
 			tab();
@@ -177,7 +177,9 @@ void RecordOutputMgr::printClosest(RecordKeyVector &keyList, const vector<int> *
 				int dist = (*dists)[distCount];
 				//if not using sign distance, use absolute value instead.
 				dist = context->signDistance() ? dist : abs(dist);
-				_outBuf.append(dist);
+				ostringstream s;
+				s << dist;
+				_outBuf.append(s.str());
 				distCount++;
 			}
 			newline();
@@ -188,13 +190,14 @@ void RecordOutputMgr::printClosest(RecordKeyVector &keyList, const vector<int> *
 		tab();
 		// need to add a dummy file id if multiple DB files are used
 		if (_context->getNumInputFiles() > 2) {
-			_outBuf.append('.');
+			_outBuf.append(".");
 			tab();
 		}		
 		null(false, true);
 		if (context->reportDistance()) {
 			tab();
-			_outBuf.append(-1);
+
+			_outBuf.append("-1");
 		}
 		newline();
 	}
@@ -249,12 +252,12 @@ void RecordOutputMgr::printRecord(RecordKeyVector &keyList, RecordKeyVector *blo
 					tab();
 					// need to add a dummy file id if multiple DB files are used
 					if (_context->getNumInputFiles() > 2) {
-						_outBuf.append('.');
+						_outBuf.append(".");
 						tab();
 					}
 					null(false, true);
 					tab();
-					_outBuf.append('0');
+					_outBuf.append("0");
 					newline();
 					if (needsFlush()) flush();
 				}
@@ -269,7 +272,7 @@ void RecordOutputMgr::printRecord(RecordKeyVector &keyList, RecordKeyVector *blo
 					tab();
 					// need to add a dummy file id if multiple DB files are used
 					if (_context->getNumInputFiles() > 2) {
-						_outBuf.append('.');
+						_outBuf.append(".");
 						tab();
 					}
 					null(false, true);
@@ -279,7 +282,9 @@ void RecordOutputMgr::printRecord(RecordKeyVector &keyList, RecordKeyVector *blo
 
 					return;
 				}
-			} else {
+			} 
+			else 
+			{
 				if (printBamRecord(keyList, true) == BAM_AS_BAM) {
 					_currBamBlockList = NULL;
 
@@ -287,9 +292,14 @@ void RecordOutputMgr::printRecord(RecordKeyVector &keyList, RecordKeyVector *blo
 					return;
 				}
 				int hitIdx = 0;
-				for (RecordKeyVector::const_iterator_type iter = keyList.begin(); iter != keyList.end(); iter = keyList.next()) {
-					reportOverlapDetail(keyList.getKey(), *iter, hitIdx);
-					hitIdx++;
+				for (RecordKeyVector::iterator_type iter = keyList.begin(); iter != keyList.end(); iter = keyList.next()) 
+				{
+					// a hit can be invalid if there was no enough overlap, etc.
+					//if ((*iter)->isValid())
+					//{
+						reportOverlapDetail(keyList.getKey(), *iter, hitIdx);
+						hitIdx++;
+					//}
 				}
 			}
 		} else { // not printable
@@ -315,9 +325,9 @@ void RecordOutputMgr::checkForHeader() {
 	//If the tool is groupBy, and outheader was set,  but the header is empty, we need to print groupBy's
 	//default header
 	if (_context->getProgram() == ContextBase::GROUP_BY) {
-		const QuickString &header = _context->getFile(0)->getHeader();
+		const string &header = _context->getFile(0)->getHeader();
 		if (header.empty()) {
-			const QuickString &defaultHeader = (static_cast<ContextGroupBy *>(_context))->getDefaultHeader();
+			const string &defaultHeader = (static_cast<ContextGroupBy *>(_context))->getDefaultHeader();
 			_outBuf.append(defaultHeader);
 		} else {
 			_outBuf.append(header);
@@ -326,7 +336,7 @@ void RecordOutputMgr::checkForHeader() {
 		//if the tool is based on intersection, we want the header from the query file.
 
 		int queryIdx = (static_cast<ContextIntersect *>(_context))->getQueryFileIdx();
-		const QuickString &header  = _context->getFile(queryIdx)->getHeader();
+		const string &header  = _context->getFile(queryIdx)->getHeader();
 		_outBuf.append(header);
 	} else {
 		_outBuf.append(_context->getFile(0)->getHeader());
@@ -428,14 +438,16 @@ void RecordOutputMgr::reportOverlapSummary(RecordKeyVector &keyList)
 }
 
 void RecordOutputMgr::addDbFileId(int fileId) {
+	ostringstream s;
 	if ((static_cast<ContextIntersect *>(_context))->getNumDatabaseFiles()  == 1) return;
 	if (!_context->getUseDBnameTags() && (!_context->getUseDBfileNames())) {
-		_outBuf.append(fileId);
+		s << fileId;
 	} else if (_context->getUseDBnameTags()){
-		_outBuf.append((static_cast<ContextIntersect *>(_context))->getDatabaseNameTag((static_cast<ContextIntersect *>(_context))->getDbIdx(fileId)));
+		s << (static_cast<ContextIntersect *>(_context))->getDatabaseNameTag((static_cast<ContextIntersect *>(_context))->getDbIdx(fileId));
 	} else {
-		_outBuf.append(_context->getInputFileName(fileId));
+		s << _context->getInputFileName(fileId);
 	}
+	_outBuf.append(s.str());
 	tab();
 }
 
@@ -502,7 +514,7 @@ void RecordOutputMgr::null(bool queryType, bool dbType)
 	delete dummyRecord;
 }
 
-void RecordOutputMgr::printKey(const Record *key, const QuickString & start, const QuickString & end)
+void RecordOutputMgr::printKey(const Record *key, const string & start, const string & end)
 {
 	if (key->getType() != FileRecordTypeChecker::BAM_RECORD_TYPE) {
 		key->print(_outBuf, start, end);
