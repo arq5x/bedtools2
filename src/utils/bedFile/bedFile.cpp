@@ -21,7 +21,14 @@ bool sortByChrom(BED const &a, BED const &b) {
 };
 
 bool sortByStart(const BED &a, const BED &b) {
-    if (a.start < b.start) return true;
+    CHRPOS a_corrected = a.start;
+    if(a.zeroLength)
+        a_corrected++;
+    CHRPOS b_corrected = b.start;
+    if(b.zeroLength)
+        b_corrected++;
+    
+    if (a_corrected < b_corrected) return true;
     else return false;
 };
 
