@@ -8,69 +8,78 @@
 
 BT=${BT-../../bin/bedtools}
 
+FAILURES=0;
+
 check()
 {
     if diff $1 $2; then
         echo ok
     else
-        echo fail
+        FAILURES=$(expr $FAILURES + 1);
+		echo fail
     fi
 }
 
-echo "    getfasta.t01...\c"
+echo -e "    getfasta.t01...\c"
 LINES=$(echo $'chr1\t1\t10' | $BT getfasta -fi t.fa -bed stdin | awk 'END{ print NR }')
 if [ "$LINES" != "2" ]; then
-    echo fail
+    FAILURES=$(expr $FAILURES + 1);
+		echo fail
 else
     echo ok
 fi
 
-echo "    getfasta.t02...\c"
+echo -e "    getfasta.t02...\c"
 LEN=$($BT getfasta -split -fi t.fa -bed blocks.bed | awk '(NR == 2){ print length($0) }')
 if [ "$LINES" != "2" ]; then
-    echo fail
+    FAILURES=$(expr $FAILURES + 1);
+		echo fail
 else
     echo ok
 fi
 
-echo "    getfasta.t03...\c"
+echo -e "    getfasta.t03...\c"
 SEQ=$($BT getfasta -split -fi t.fa -bed blocks.bed | awk '(NR == 4){ print $0 }')
 if [ "$SEQ" != "cta" ]; then
-    echo fail
+    FAILURES=$(expr $FAILURES + 1);
+		echo fail
 else
     echo ok
 fi
 
 # test -fo -
-echo "    getfasta.t04...\c"
+echo -e "    getfasta.t04...\c"
 SEQ=$($BT getfasta -split -fi t.fa -bed blocks.bed | awk '(NR == 4){ print $0 }')
 if [ "$SEQ" != "cta" ]; then
-    echo fail
+    FAILURES=$(expr $FAILURES + 1);
+		echo fail
 else
     echo ok
 fi
 
 
 # test -split with -s -
-echo "    getfasta.t05...\c"
+echo -e "    getfasta.t05...\c"
 SEQ=$($BT getfasta -split -s -fi t.fa -bed blocks.bed | awk '(NR == 4){ print $0 }')
 if [ "$SEQ" != "tag" ]; then
-    echo fail
+    FAILURES=$(expr $FAILURES + 1);
+		echo fail
 else
     echo ok
 fi
 
 # test -fullHeader
-echo "    getfasta.t06...\c"
+echo -e "    getfasta.t06...\c"
 LINES=$(echo $'chr1 assembled by consortium X\t1\t10' | $BT getfasta -fullHeader -fi t_fH.fa -bed stdin | awk 'END{ print NR }')
 if [ "$LINES" != "2" ]; then
-    echo fail
+    FAILURES=$(expr $FAILURES + 1);
+		echo fail
 else
     echo ok
 fi
 
 # test without -fullHeader
-echo "    getfasta.t07...\c"
+echo -e "    getfasta.t07...\c"
 echo "WARNING. chromosome (chr1 assembled by consortium X) was not found in the FASTA file. Skipping." > exp
 echo $'chr1 assembled by consortium X\t1\t10' | $BT getfasta -fi t_fH.fa -bed - 2> obs
 
@@ -79,7 +88,7 @@ rm obs exp
 
 
 # test IUPAC
-echo "    getfasta.t08...\c"
+echo -e "    getfasta.t08...\c"
 echo \
 ">1:0-16
 AGCTYRWSKMDVHBXN
@@ -91,7 +100,7 @@ rm obs exp test.iupac.fa.fai
 
 
 # test IUPAC revcomp
-echo "    getfasta.t09...\c"
+echo -e "    getfasta.t09...\c"
 echo \
 ">1:0-16(-)
 NXVDBHKMSWYRAGCT
@@ -102,7 +111,7 @@ check obs exp
 rm obs exp test.iupac.fa.fai
 
 # test the warning about an outdated FASTA index file
-echo "    getfasta.t10...\c"
+echo -e "    getfasta.t10...\c"
 echo \
 ">chr1
 cggggggggg
@@ -120,7 +129,7 @@ check obs exp
 rm obs exp test.fa test.fa.fai
 
 
-echo "    getfasta.t11...\c"
+echo -e "    getfasta.t11...\c"
 echo ">chr1:0-40
 agggggggggcgggggggggtgggggggggaggggggggg
 >chr1:0-40
@@ -129,7 +138,7 @@ $BT getfasta -fi t.fa -bed blocks.bed > obs
 check obs exp
 rm obs exp
 
-echo "    getfasta.t12...\c"
+echo -e "    getfasta.t12...\c"
 echo ">three_blocks_match
 agggggggggcgggggggggtgggggggggaggggggggg
 >three_blocks_match
@@ -138,7 +147,7 @@ $BT getfasta -fi t.fa -bed blocks.bed -name > obs
 check obs exp
 rm obs exp
 
-echo "    getfasta.t13...\c"
+echo -e "    getfasta.t13...\c"
 echo ">three_blocks_match(+)
 agggggggggcgggggggggtgggggggggaggggggggg
 >three_blocks_match(-)
@@ -147,7 +156,7 @@ $BT getfasta -fi t.fa -bed blocks.bed -name -s > obs
 check obs exp
 rm obs exp
 
-echo "    getfasta.t14...\c"
+echo -e "    getfasta.t14...\c"
 echo ">three_blocks_match::chr1:0-40
 agggggggggcgggggggggtgggggggggaggggggggg
 >three_blocks_match::chr1:0-40
@@ -156,7 +165,7 @@ $BT getfasta -fi t.fa -bed blocks.bed -name+ > obs
 check obs exp
 rm obs exp
 
-echo "    getfasta.t15...\c"
+echo -e "    getfasta.t15...\c"
 echo ">three_blocks_match::chr1:0-40(+)
 agggggggggcgggggggggtgggggggggaggggggggg
 >three_blocks_match::chr1:0-40(-)
@@ -165,9 +174,10 @@ $BT getfasta -fi t.fa -bed blocks.bed -name+ -s > obs
 check obs exp
 rm obs exp
 
-echo "    getfasta.t134..\c"
+echo -e "    getfasta.t134..\c"
 echo ">chr1:0-1
 a" > exp
 $BT getfasta -fi t.fa -bed <(echo -e "chr1\t0\t1") > obs
 check obs exp
 rm obs exp
+[[ $FAILURES -eq 0 ]] || exit 1;

@@ -1,11 +1,14 @@
 BT=${BT-../../bin/bedtools}
+FAILURES=0;
+
 check()
 {
 	if diff $1 $2; then
     	echo ok
 		return 1
 	else
-    	echo fail
+    	FAILURES=$(expr $FAILURES + 1);
+		echo fail
 		return 0
 	fi
 }
@@ -14,7 +17,7 @@ check()
 ###########################################################
 # test basic shuffle
 ###########################################################
-echo "    shuffle.t1...\c"
+echo -e "    shuffle.t1...\c"
 echo \
 "chr9	108600879	108601347	trf	789
 chr12	9186177	9186350	trf	346
@@ -35,7 +38,7 @@ rm obs exp
 ###########################################################
 # test basic shuffle with -incl (choose intervals randomly)
 ###########################################################
-echo "    shuffle.t2...\c"
+echo -e "    shuffle.t2...\c"
 echo \
 "chr3	542223	542691	trf	789
 chr5	444343	444516	trf	346
@@ -65,7 +68,7 @@ rm obs exp
 ##############################################################
 # test basic shuffle with -incl (choose chroms randomly first)
 ##############################################################
-echo "    shuffle.t3...\c"
+echo -e "    shuffle.t3...\c"
 echo \
 "chr5	310009	310477	trf	789
 chr4	520601	520774	trf	346
@@ -96,7 +99,7 @@ rm obs exp
 ##############################################################
 # test basic shuffle with -excl
 ##############################################################
-echo "    shuffle.t4...\c"
+echo -e "    shuffle.t4...\c"
 echo -n "" > exp
 $BT shuffle -seed 42 -i simrep.bed  \
             -g ../../genomes/human.hg19.genome \
@@ -108,7 +111,7 @@ rm obs exp
 ##############################################################
 # test basic shuffle with 
 ##############################################################
-echo "    shuffle.t5...\c"
+echo -e "    shuffle.t5...\c"
 echo \
 "chr1	150415830	150415862	trf	64
 chr1	150415830	150415862	trf	64
@@ -129,8 +132,9 @@ rm obs exp
 ###############################################################
 # test an interval that is bigger than the max chrom length
 ###############################################################
-echo "    shuffle.t6...\c"
+echo -e "    shuffle.t6...\c"
 echo "Error, line 1: tried 1000 potential loci for entry, but could not avoid excluded regions.  Ignoring entry and moving on." > exp
 $BT shuffle -i <(echo -e "chr1\t0\t110") -g <(echo -e "chr1\t100") &> obs
 check obs exp
 rm obs exp
+[[ $FAILURES -eq 0 ]] || exit 1;

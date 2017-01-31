@@ -1,12 +1,15 @@
 BT=${BT-../../bin/bedtools}
 
+FAILURES=0;
+
 check()
 {
 	if diff $1 $2; then
     	echo ok
 		return 1
 	else
-    	echo fail
+    	FAILURES=$(expr $FAILURES + 1);
+		echo fail
 		return 0
 	fi
 }
@@ -26,7 +29,7 @@ check()
 ###########################################################
 #  basic cluster.
 ###########################################################
-echo "    cluster.t1...\c"
+echo -e "    cluster.t1...\c"
 echo \
 "chr1	72017	884436	a	1	+	1
 chr1	72017	844113	b	2	+	1
@@ -45,7 +48,7 @@ rm obs exp
 ###########################################################
 #  stranded cluster.
 ###########################################################
-echo "    cluster.t2...\c"
+echo -e "    cluster.t2...\c"
 echo \
 "chr1	72017	884436	a	1	+	1
 chr1	72017	844113	b	2	+	1
@@ -60,3 +63,4 @@ chr1	1844181	1931789	j	10	-	6" > exp
 $BT cluster -i in.bed -s > obs
 check obs exp
 rm obs exp
+[[ $FAILURES -eq 0 ]] || exit 1;

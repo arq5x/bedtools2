@@ -1,11 +1,14 @@
 BT=${BT-../../bin/bedtools}
 
+FAILURES=0;
+
 check()
 {
 	if diff $1 $2; then
     	echo ok
 	else
-    	echo fail
+    	FAILURES=$(expr $FAILURES + 1);
+		echo fail
 	fi
 }
 
@@ -18,3 +21,4 @@ check test.fq2 golden.fq2
 
 rm test.bam test.fq test.fq2
 
+[[ $FAILURES -eq 0 ]] || exit 1;

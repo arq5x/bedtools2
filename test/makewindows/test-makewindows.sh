@@ -1,11 +1,14 @@
 BT=${BT-../../bin/bedtools}
 
+FAILURES=0;
+
 check()
 {
 	if diff $1 $2; then
     	echo ok
 	else
-    	echo fail
+    	FAILURES=$(expr $FAILURES + 1);
+		echo fail
 	fi
 }
 
@@ -13,7 +16,7 @@ check()
 ###########################################################
 #  Test window size / forward window numbering 
 ############################################################
-echo "    makewindows.t01...\c"
+echo -e "    makewindows.t01...\c"
 echo \
 "chr5	60000	65000	1
 chr5	65000	70000	2
@@ -29,7 +32,7 @@ rm obs exp
 ###########################################################
 #  Test window size / reverse window numbering 
 ############################################################
-echo "    makewindows.t02...\c"
+echo -e "    makewindows.t02...\c"
 echo \
 "chr5	60000	65000	2
 chr5	65000	70000	1
@@ -45,7 +48,7 @@ rm obs exp
 ###########################################################
 #  Test window+step size / forward window numbering 
 ############################################################
-echo "    makewindows.t03...\c"
+echo -e "    makewindows.t03...\c"
 echo \
 "chr5	60000	65000	1
 chr5	62000	67000	2
@@ -69,7 +72,7 @@ rm obs exp
 ###########################################################
 #  Test window size / reverse window numbering 
 ############################################################
-echo "    makewindows.t04...\c"
+echo -e "    makewindows.t04...\c"
 echo \
 "chr5	60000	65000	5
 chr5	62000	67000	4
@@ -94,7 +97,7 @@ rm obs exp
 ###########################################################
 #  Test fixed size / forward window numbering 
 ############################################################
-echo "    makewindows.t05...\c"
+echo -e "    makewindows.t05...\c"
 echo \
 "chr5	60000	63333	1
 chr5	63333	66666	2
@@ -112,7 +115,7 @@ rm obs exp
 ###########################################################
 #  Test fixed size / reverse window numbering 
 ############################################################
-echo "    makewindows.t06...\c"
+echo -e "    makewindows.t06...\c"
 echo \
 "chr5	60000	63333	3
 chr5	63333	66666	2
@@ -130,7 +133,7 @@ rm obs exp
 ###########################################################
 #  Test that we alway get the number of requested windows
 ###########################################################
-echo "    makewindows.t07...\c"
+echo -e "    makewindows.t07...\c"
 echo \
 "1	11	14	A_1
 1	14	17	A_2
@@ -149,7 +152,7 @@ rm obs exp
 ###########################################################
 #  Test that we alway get the number of requested windows
 ###########################################################
-echo "    makewindows.t08...\c"
+echo -e "    makewindows.t08...\c"
 echo \
 "1	10	12	B_1
 1	12	14	B_2
@@ -168,9 +171,10 @@ rm obs exp
 ###########################################################
 #  interval is smaller than n
 ###########################################################
-echo "    makewindows.t09...\c"
+echo -e "    makewindows.t09...\c"
 echo \
 "WARNING: Interval 1:10-19 is smaller than the number of windows requested. Skipping." > exp
 $BT makewindows -b a.19bp.bed -n 10 -i srcwinnum 2> obs
 check obs exp
 rm obs exp
+[[ $FAILURES -eq 0 ]] || exit 1;

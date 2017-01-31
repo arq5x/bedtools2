@@ -1,12 +1,15 @@
 BT=${BT-../../bin/bedtools}
 
+FAILURES=0;
+
 check()
 {
 	if diff $1 $2; then
     	echo ok
 		return 1
 	else
-    	echo fail
+    	FAILURES=$(expr $FAILURES + 1);
+		echo fail
 		return 0
 	fi
 }
@@ -21,7 +24,7 @@ check()
 #  Test a basic merge; one interval should be un-merged, 
 #  the other two should be merged.
 ###########################################################
-echo "    merge.t1...\c"
+echo -e "    merge.t1...\c"
 echo \
 "chr1	10	20
 chr1	30	100" > exp
@@ -32,7 +35,7 @@ rm obs exp
 ###########################################################
 #  Test that -n option is shown as deperecated
 ###########################################################
-echo "    merge.t2...\c"
+echo -e "    merge.t2...\c"
 echo "***** ERROR: -n option is deprecated. Please see the documentation for the -c and -o column operation options. *****" > exp
 $BT merge -i a.bed -n 2>&1 > /dev/null | head -2 | tail -1 > obs
 check obs exp
@@ -42,7 +45,7 @@ rm obs exp
 ###########################################################
 #  Test the counting of merged intervals. (-n)
 ###########################################################
-echo "    merge.t3...\c"
+echo -e "    merge.t3...\c"
 echo \
 "chr1	10	20	1
 chr1	30	100	3" > exp
@@ -54,7 +57,7 @@ rm obs exp
 ###########################################################
 #  Test that -nms option is deprecated
 ###########################################################
-echo "    merge.t4...\c"
+echo -e "    merge.t4...\c"
 echo "***** ERROR: -nms option is deprecated. Please see the documentation for the -c and -o column operation options. *****" > exp
 $BT merge -i a.bed -nms 2>&1 > /dev/null | head -2 | tail -1 > obs
 check obs exp
@@ -63,7 +66,7 @@ rm obs exp
 ###########################################################
 #  Test the listing of names from merged intervals.
 ###########################################################
-echo "    merge.t5...\c"
+echo -e "    merge.t5...\c"
 echo \
 "chr1	10	20	a1
 chr1	30	100	a2,a3,a4" > exp
@@ -74,7 +77,7 @@ rm obs exp
 ###########################################################
 # collapsed list of the names, and sum of the scores
 ###########################################################
-echo "    merge.t6...\c"
+echo -e "    merge.t6...\c"
 echo \
 "chr1	10	20	a1	1
 chr1	30	100	a2,a3,a4	9
@@ -88,7 +91,7 @@ rm obs exp
 ###########################################################
 # count intervals and sum of scores
 ###########################################################
-echo "    merge.t7...\c"
+echo -e "    merge.t7...\c"
 echo \
 "chr1	10	20	1	1
 chr1	30	100	3	9
@@ -102,7 +105,7 @@ rm obs exp
 ###########################################################
 # count, collapsed names, and sum of scores
 ###########################################################
-echo "    merge.t8...\c"
+echo -e "    merge.t8...\c"
 echo \
 "chr1	10	20	a1	1	1
 chr1	30	100	a2,a3,a4	9	3
@@ -117,7 +120,7 @@ rm obs exp
 # stranded merge, show sign, collapsed names, sum of
 # scores, and count
 ###########################################################
-echo "    merge.t9...\c"
+echo -e "    merge.t9...\c"
 echo \
 "chr1	10	20	+	a1	1	1
 chr1	30	40	+	a2	2	1
@@ -134,7 +137,7 @@ rm obs exp
 ###########################################################
 #  Test the use of a custom delimiter for -delim option
 ###########################################################
-echo "    merge.t10...\c"
+echo -e "    merge.t10...\c"
 echo \
 "chr1	10	20	a1
 chr1	30	100	a2|a3|a4" > exp
@@ -146,7 +149,7 @@ rm obs exp
 #  Test that stranded merge not allowed with VCF
 ###########################################################
 VCF_FILE=testA.vcf
-echo "    merge.t11...\c"
+echo -e "    merge.t11...\c"
 echo "***** ERROR: stranded merge not supported for VCF file $VCF_FILE. *****" >exp
 $BT merge -i $VCF_FILE -s 2>&1 > /dev/null | head -2 | tail -1 > obs
 check exp obs
@@ -159,7 +162,7 @@ rm obs exp
 # EDIT: This test has been moved to test #35, after the 
 # other bam column tests. 
 ###########################################################
-echo "    merge.t12...\c"
+echo -e "    merge.t12...\c"
 #echo "***** ERROR: Requested column 12, but database file fullFields.bam only has fields 1 - 11." > exp
 #$BT merge -i fullFields.bam -c 12 -o sum 2>&1 > /dev/null | head -3 | tail -1 > obs
 #check exp obs
@@ -169,7 +172,7 @@ echo ok
 ###########################################################
 #  Test that VCF input gives BED3 output
 ###########################################################
-echo "    merge.t13...\c"
+echo -e "    merge.t13...\c"
 echo \
 "chr1	30859	30860
 chr1	69269	69270
@@ -186,7 +189,7 @@ rm obs exp
 ###########################################################
 #  Test that GFF input gives BED3 output
 ###########################################################
-echo "    merge.t14...\c"
+echo -e "    merge.t14...\c"
 echo \
 "chr22	9999999	10001000
 chr22	10009999	10010100
@@ -199,7 +202,7 @@ rm obs exp
 #  Test that stranded merge where some records have
 #  unknown strand works correctly
 ###########################################################
-echo "    merge.t15...\c"
+echo -e "    merge.t15...\c"
 echo \
 "chr1	10	80	+
 chr1	20	90	-
@@ -213,7 +216,7 @@ rm obs exp
 #  Test that stranded merge with unknown records works
 #  correctly, forward strand only
 ###########################################################
-echo "    merge.t16...\c"
+echo -e "    merge.t16...\c"
 echo \
 "chr1	10	80	+
 chr2	20	60	+" > exp
@@ -225,7 +228,7 @@ rm obs exp
 #  Test that stranded merge with unknown records works
 #  correctly, reverse strand only
 ###########################################################
-echo "    merge.t17...\c"
+echo -e "    merge.t17...\c"
 echo \
 "chr1	20	90	-
 chr2	25	80	-" > exp
@@ -237,7 +240,7 @@ rm obs exp
 #  Test that merge with specified strand does not allowed
 #  other characters besides + or -.
 ###########################################################
-echo "    merge.t18...\c"
+echo -e "    merge.t18...\c"
 echo "***** ERROR: -S option must be followed by + or -. *****" > exp
 $BT merge -i mixedStrands.bed -S . -c 6 -o distinct 2>&1 > /dev/null | head -2 | tail -1 >obs
 check exp obs
@@ -247,7 +250,7 @@ rm obs exp
 ###########################################################
 #  Test that sort order is enforced
 ###########################################################
-echo "    merge.t19...\c"
+echo -e "    merge.t19...\c"
 echo \
 "Error: Sorted input specified, but the file unsorted.bed has the following out of order record
 chr1	9	30	2" > exp
@@ -258,7 +261,7 @@ rm obs exp
 ###########################################################
 #  Test that chrom change is handled correctly
 ###########################################################
-echo "    merge.t20...\c"
+echo -e "    merge.t20...\c"
 echo \
 "chr1	9	30
 chr1	100	110
@@ -270,7 +273,7 @@ rm exp obs
 ###########################################################
 #  Test that a merged BAM file only gives BED3 output
 ###########################################################
-echo "    merge.t21...\c"
+echo -e "    merge.t21...\c"
 echo \
 "chr1	10	20
 chr1	30	100
@@ -284,7 +287,7 @@ rm exp obs
 ###########################################################
 #  Test that precision is correct
 ###########################################################
-echo "    merge.t22...\c"
+echo -e "    merge.t22...\c"
 echo \
 "chr2L	1	54	0.05
 chr2L	65	128	0.33
@@ -304,7 +307,7 @@ rm obs exp
 #  are allowed, but produce a warning and null
 #  value result. 
 ###########################################################
-echo "    merge.t23a...\c"
+echo -e "    merge.t23a...\c"
 echo \
 "chr1	10	20	.
 chr1	30	100	." > expOut
@@ -317,7 +320,7 @@ rm expOut obsOut
 #  Just check that the warning message from the previous
 #  test was correct.
 ###########################################################
-echo "    merge.t23b...\c"
+echo -e "    merge.t23b...\c"
 echo \
 " ***** WARNING: Non numeric value a1 in 4.
  ***** WARNING: Non numeric value a4 in 4." > expErr
@@ -334,7 +337,7 @@ rm obsErr expErr
 ###########################################################
 #  Test bam column 1
 ###########################################################
-echo "    merge.t24...\c"
+echo -e "    merge.t24...\c"
 $BT merge -i fullFields.bam -c 1 -o collapse > obs
 check obs bamCol1Collapse.txt
 rm obs
@@ -342,7 +345,7 @@ rm obs
 ###########################################################
 #  Test bam column 2 gives an error
 ###########################################################
-echo "    merge.t25...\c"
+echo -e "    merge.t25...\c"
 echo \
 "***** ERROR: Requested column 2 of a BAM file, which is the Flags field." > exp
 $BT merge -i fullFields.bam -c 2 -o collapse 2>&1 > /dev/null | head -3 | tail -1 > obs
@@ -352,7 +355,7 @@ rm obs exp
 ###########################################################
 #  Test bam column 3
 ###########################################################
-echo "    merge.t26...\c"
+echo -e "    merge.t26...\c"
 $BT merge -i fullFields.bam -c 3 -o collapse > obs
 check obs bamCol3Collapse.txt
 rm obs
@@ -360,7 +363,7 @@ rm obs
 ###########################################################
 #  Test bam column 4
 ###########################################################
-echo "    merge.t27...\c"
+echo -e "    merge.t27...\c"
 $BT merge -i fullFields.bam -c 4 -o mean > obs
 check obs bamCol4Mean.txt
 rm obs
@@ -370,7 +373,7 @@ rm obs
 ###########################################################
 #  Test bam column 5
 ###########################################################
-echo "    merge.t28...\c"
+echo -e "    merge.t28...\c"
 $BT merge -i fullFields.bam -c 5 -o mean > obs
 check obs bamCol5Mean.txt
 rm obs
@@ -378,7 +381,7 @@ rm obs
 ###########################################################
 #  Test bam column 6
 ###########################################################
-echo "    merge.t29...\c"
+echo -e "    merge.t29...\c"
 $BT merge -i fullFields.bam -c 6 -o collapse > obs
 check obs bamCol6Collapse.txt
 rm obs
@@ -386,7 +389,7 @@ rm obs
 ###########################################################
 #  Test bam column 7
 ###########################################################
-echo "    merge.t30...\c"
+echo -e "    merge.t30...\c"
 $BT merge -i fullFields.bam -c 7 -o collapse > obs
 check obs bamCol7Collapse.txt
 rm obs
@@ -394,7 +397,7 @@ rm obs
 ###########################################################
 #  Test bam column 8
 ###########################################################
-echo "    merge.t31...\c"
+echo -e "    merge.t31...\c"
 $BT merge -i fullFields.bam -c 8 -o mean > obs
 check obs bamCol8Mean.txt
 rm obs
@@ -402,7 +405,7 @@ rm obs
 ###########################################################
 #  Test bam column 9
 ###########################################################
-echo "    merge.t32...\c"
+echo -e "    merge.t32...\c"
 $BT merge -i fullFields.bam -c 9 -o mean > obs
 check obs bamCol9Mean.txt
 rm obs
@@ -410,7 +413,7 @@ rm obs
 ###########################################################
 #  Test bam column 10
 ###########################################################
-echo "    merge.t33...\c"
+echo -e "    merge.t33...\c"
 $BT merge -i fullFields.bam -c 10 -o collapse > obs
 check obs bamCol10Collapse.txt
 rm obs
@@ -418,7 +421,7 @@ rm obs
 ###########################################################
 #  Test bam column 11
 ###########################################################
-echo "    merge.t34...\c"
+echo -e "    merge.t34...\c"
 $BT merge -i fullFields.bam -c 11 -o collapse > obs
 check obs bamCol11Collapse.txt
 rm obs
@@ -427,7 +430,7 @@ rm obs
 #  Test that column ops not allowed with BAM if col greater
 #  than 11.
 ###########################################################
-echo "    merge.t35...\c"
+echo -e "    merge.t35...\c"
 echo "***** ERROR: Requested column 12, but database file fullFields.bam only has fields 1 - 11." > exp
 $BT merge -i fullFields.bam -c 12 -o sum 2>&1 > /dev/null | head -3 | tail -1 > obs
 check exp obs
@@ -438,7 +441,7 @@ rm obs exp
 #  i.e, getting the mate reference when there is no mate.
 #  Be sure null value is printed
 ###########################################################
-echo "    merge.t36...\c"
+echo -e "    merge.t36...\c"
 echo \
 "chr1	10	20	.
 chr1	30	100	.,.,.
@@ -462,7 +465,7 @@ rm obs exp
 ###########################################################
 #  Test -iobuf expects an argument
 ###########################################################
-echo "    merge.t37...\c"
+echo -e "    merge.t37...\c"
 echo "***** ERROR: -iobuf option given, but size of input buffer not specified. *****" >exp
 $BT merge -i a.bed -iobuf 2>&1 > /dev/null | head -2 | tail -1 > obs
 check obs exp
@@ -471,7 +474,7 @@ rm obs exp
 ###########################################################
 #  Test -iobuf allows only suffixes K/M/G
 ###########################################################
-echo "    merge.t38...\c"
+echo -e "    merge.t38...\c"
 echo \
 "***** ERROR: Unrecognized memory buffer size suffix 'L' given. *****" > exp
 $BT merge -i a.bed -iobuf 20L 2>&1 > /dev/null | head -2 | tail -1 > obs
@@ -481,7 +484,7 @@ rm obs exp
 ###########################################################
 #  Test -iobuf doesn't allow a buffer size below 8 bytes.
 ###########################################################
-echo "    merge.t39...\c"
+echo -e "    merge.t39...\c"
 echo \
 "***** ERROR: specified buffer size is too small. *****" > exp
 $BT merge -i a.bed -iobuf 7 2>&1 > /dev/null | head -2 | tail -1 > obs
@@ -491,7 +494,7 @@ rm exp obs
 ###########################################################
 #  Test -iobuf doesn't allow non-numeric arguments
 ###########################################################
-echo "    merge.t40...\c"
+echo -e "    merge.t40...\c"
 echo \
 "***** ERROR: argument passed to -iobuf is not numeric. *****" > exp
 $BT merge -i a.bed -iobuf beerM 2>&1 > /dev/null | head -2 | tail -1 > obs
@@ -501,7 +504,7 @@ rm exp obs
 ###########################################################
 #  Test -iobuf allows correct argument with suffix
 ###########################################################
-echo "    merge.t41...\c"
+echo -e "    merge.t41...\c"
 echo \
 "chr1	10	20
 chr1	30	100" > exp
@@ -512,7 +515,7 @@ rm exp obs
 ###########################################################
 #  Test -iobuf allows correct argument without suffix
 ###########################################################
-echo "    merge.t42...\c"
+echo -e "    merge.t42...\c"
 echo \
 "chr1	10	20
 chr1	30	100" > exp
@@ -523,7 +526,7 @@ rm exp obs
 ###########################################################
 #  Test that scientific notation is allowed for coordinates
 ###########################################################
-echo "    merge.t43...\c"
+echo -e "    merge.t43...\c"
 echo \
 "chr1	800	830" > exp
 $BT merge -i expFormat.bed > obs
@@ -534,7 +537,7 @@ rm obs exp
 ###########################################################
 #  Test that struct vars in VCF get correct length
 ###########################################################
-echo "    merge.t44a...\c"
+echo -e "    merge.t44a...\c"
 echo \
 "19	252805	257416
 19	260364	261044
@@ -547,7 +550,7 @@ rm obs exp
 ###########################################################
 #  Test that struct vars in VCF get correct length
 ###########################################################
-echo "    merge.t44b...\c"
+echo -e "    merge.t44b...\c"
 echo \
 "19	252805	297416" > exp
 $BT merge -i vcfSVtest.2.vcf > obs
@@ -557,7 +560,7 @@ rm obs exp
 ###########################################################
 #  Test that stdin is used by default
 ###########################################################
-echo "    merge.t45...\c"
+echo -e "    merge.t45...\c"
 echo \
 "chr1	10	20
 chr1	30	100" >exp
@@ -570,7 +573,7 @@ rm obs exp
 #  Test that precision default is high enough for 
 #  formatting not to give scientific notation
 ###########################################################
-echo "    merge.t46...\c"
+echo -e "    merge.t46...\c"
 echo \
 "chr1	5333587	5344172	5344172
 chr1	5481008	5484749	16454247
@@ -583,7 +586,7 @@ rm obs exp
 ###########################################################
 #  Test that user can specify a lower precision
 ###########################################################
-echo "    merge.t47...\c"
+echo -e "    merge.t47...\c"
 echo \
 "chr1	5333587	5344172	5.3442e+06
 chr1	5481008	5484749	1.6454e+07
@@ -595,7 +598,7 @@ rm obs exp
 ###########################################################
 #  Test stranded merge with bedPlus files that have strand
 ###########################################################
-echo "    merge.t48...\c"
+echo -e "    merge.t48...\c"
 echo \
 "chr1	10000	25000	-" > exp
 $BT merge -i bug254_d.bed -s -d 200 > obs
@@ -605,7 +608,7 @@ rm obs exp
 ###########################################################
 #  Test stranded merge with bedPlus files that have strand
 ###########################################################
-echo "    merge.t49...\c"
+echo -e "    merge.t49...\c"
 echo \
 "chr1	10000	20000	-
 chr1	20100	25000	+" > exp
@@ -613,3 +616,4 @@ $BT merge -i bug254_e.bed -s -d 200 > obs
 check exp obs
 rm obs exp
 
+[[ $FAILURES -eq 0 ]] || exit 1;

@@ -8,12 +8,15 @@ echo -e \
 
 BT=${BT-../../../bin/bedtools}
 
+FAILURES=0;
+
 check()
 {
 	if diff $1 $2; then
     	echo ok
 	else
-    	echo fail
+    	FAILURES=$(expr $FAILURES + 1);
+		echo fail
 	fi
 }
 
@@ -25,7 +28,7 @@ check()
 #  First make sure the 3 seperate intersections are correct.
 #
 ############################################################
-echo "    intersect.t01...\c"
+echo -e "    intersect.t01...\c"
 echo \
 "chr1	5	20
 chr1	70	75
@@ -37,7 +40,7 @@ $BT intersect -a query.bed -b d1.bed > obs
 check obs exp1
 rm obs
 
-echo "    intersect.t02...\c"
+echo -e "    intersect.t02...\c"
 echo \
 "chr1	40	45
 chr1	110	120
@@ -49,7 +52,7 @@ $BT intersect -a query.bed -b d2.bed > obs
 check obs exp2
 rm obs
 
-echo "    intersect.t03...\c"
+echo -e "    intersect.t03...\c"
 echo \
 "chr1	85	90
 chr1	105	115
@@ -65,7 +68,7 @@ rm obs
 #  Now test that the R-tree (unsorted input) with sorted
 #  output will give the correct result
 ###########################################################
-echo "    intersect.t04...\c"
+echo -e "    intersect.t04...\c"
 cat exp1 exp2 exp3 | sort -k1,1 -k2,2n > exp
 $BT intersect -a query.bed -b d1.bed d2.bed d3.bed -sortout > obs
 check exp obs
@@ -76,7 +79,7 @@ rm obs exp1 exp2 exp3
 #  And then test that sorted input with sorted
 #  output will give the correct result
 ###########################################################
-echo "    intersect.t05...\c"
+echo -e "    intersect.t05...\c"
 $BT intersect -a query.bed -b d1.bed d2.bed d3.bed -sorted -sortout > obs
 check exp obs
 rm obs exp
@@ -88,7 +91,7 @@ rm obs exp
 #
 ###########################################################
 
-echo "    intersect.t06...\c"
+echo -e "    intersect.t06...\c"
 echo \
 "chr1	5	20
 chr1	70	75
@@ -100,7 +103,7 @@ $BT intersect -a query2.bed -b d4.bed > obs
 check obs exp1
 rm obs
 
-echo "    intersect.t07...\c"
+echo -e "    intersect.t07...\c"
 echo \
 "chr1	40	45
 chr1	110	120
@@ -112,7 +115,7 @@ $BT intersect -a query2.bed -b d5.bed > obs
 check obs exp2
 rm obs
 
-echo "    intersect.t08...\c"
+echo -e "    intersect.t08...\c"
 echo \
 "chr1	85	90
 chr1	105	115
@@ -128,7 +131,7 @@ rm obs
 #  Now test that the R-tree (unsorted input) with sorted
 #  output will give the correct result
 ###########################################################
-echo "    intersect.t09...\c"
+echo -e "    intersect.t09...\c"
 cat exp1 exp2 exp3 | sort -k1.4,1n -k2,2n > exp
 $BT intersect -a query2.bed -b d4.bed d5.bed d6.bed -g g.bed -sortout > obs
 check exp obs
@@ -139,7 +142,7 @@ rm obs exp1 exp2 exp3
 #  And then test that sorted input with sorted
 #  output will give the correct result
 ###########################################################
-echo "    intersect.t10...\c"
+echo -e "    intersect.t10...\c"
 $BT intersect -a query2.bed -b d4.bed d5.bed d6.bed -sorted -g g.bed -sortout > obs
 check exp obs
 rm obs exp
@@ -156,7 +159,7 @@ rm obs exp
 ###########################################################
 #  Test -c option
 ###########################################################
-echo "    intersect.t11...\c"
+echo -e "    intersect.t11...\c"
 echo \
 "chr1	1	20	1
 chr1	40	45	1
@@ -178,7 +181,7 @@ rm exp obs
 ###########################################################
 #  Test -f option
 ###########################################################
-echo "    intersect.t12...\c"
+echo -e "    intersect.t12...\c"
 echo \
 "chr1	5	20
 chr1	40	45
@@ -199,7 +202,7 @@ check exp obs
 ###########################################################
 #  Test -s option
 ###########################################################
-echo "    intersect.t13...\c"
+echo -e "    intersect.t13...\c"
 echo \
 "chr1	5	20	q1	100	+
 chr1	85	90	q3	100	+
@@ -217,7 +220,7 @@ rm exp obs
 ###########################################################
 #  Test -s option
 ###########################################################
-echo "    intersect.t13...\c"
+echo -e "    intersect.t13...\c"
 echo \
 "chr1	40	45	q2	100	+
 chr1	70	75	q3	100	+
@@ -235,7 +238,7 @@ rm exp obs
 ###########################################################
 #  Test -wo option
 ###########################################################
-echo "    intersect.t14...\c"
+echo -e "    intersect.t14...\c"
 echo \
 "chr1	1	20	1	chr1	5	25	15
 chr1	40	45	2	chr1	40	50	5
@@ -264,7 +267,7 @@ rm exp obs
 ###########################################################
 #  Test -wa -wb -header option
 ###########################################################
-echo "    intersect.t15...\c"
+echo -e "    intersect.t15...\c"
 echo \
 "# Query 3 Header Line.
 chr1	1	20	q1	100	+	1	chr1	5	25	d7_1	100	+
@@ -294,7 +297,7 @@ rm exp obs
 ###########################################################
 #  Test the -filenames option, before db listing
 ###########################################################
-echo "    intersect.t16...\c"
+echo -e "    intersect.t16...\c"
 echo \
 "chr1	1	20	q1	100	+	d7.bed	chr1	5	25	d7_1	100	+
 chr1	40	45	q2	100	+	d8.bed	chr1	40	50	d8_1	100	-
@@ -321,7 +324,7 @@ rm exp obs
 ###########################################################
 #  Test the -filenames option, after db listing
 ###########################################################
-echo "    intersect.t17...\c"
+echo -e "    intersect.t17...\c"
 echo \
 "chr1	1	20	q1	100	+	d7.bed	chr1	5	25	d7_1	100	+
 chr1	40	45	q2	100	+	d8.bed	chr1	40	50	d8_1	100	-
@@ -349,7 +352,7 @@ rm exp obs
 ###########################################################
 #  Test the -names option, before db listing
 ###########################################################
-echo "    intersect.t18...\c"
+echo -e "    intersect.t18...\c"
 echo \
 "chr1	1	20	q1	100	+	blue	chr1	5	25	d7_1	100	+
 chr1	40	45	q2	100	+	red	chr1	40	50	d8_1	100	-
@@ -376,7 +379,7 @@ rm exp obs
 ###########################################################
 #  Test the -names option, after db listing
 ###########################################################
-echo "    intersect.t19...\c"
+echo -e "    intersect.t19...\c"
 echo \
 "chr1	1	20	q1	100	+	blue	chr1	5	25	d7_1	100	+
 chr1	40	45	q2	100	+	red	chr1	40	50	d8_1	100	-
@@ -402,3 +405,4 @@ rm exp obs
 
 
 
+[[ $FAILURES -eq 0 ]] || exit 1;

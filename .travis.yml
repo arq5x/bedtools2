@@ -2,4 +2,8 @@ language: cpp
 compiler:
   - gcc
   - clang
+addons:
+  apt:
+    packages:
+    - samtools
 script: make test
