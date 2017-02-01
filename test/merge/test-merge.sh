@@ -551,11 +551,15 @@ rm obs exp
 #  Test that struct vars in VCF get correct length
 ###########################################################
 echo -e "    merge.t44b...\c"
-echo \
-"19	252805	297416" > exp
-$BT merge -i vcfSVtest.2.vcf > obs
-check exp obs
-rm obs exp
+if [[ -f vcfSVtest.2.vcf ]]; then
+    echo \
+        "19	252805	297416" > exp
+    $BT merge -i vcfSVtest.2.vcf > obs
+    check exp obs
+    rm obs exp
+else
+    echo "skipped - could not find vcfSVtest.2.vcf";
+fi
 
 ###########################################################
 #  Test that stdin is used by default

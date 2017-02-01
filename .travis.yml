@@ -6,4 +6,5 @@ addons:
   apt:
     packages:
     - samtools
+    - htslib
 script: make test
