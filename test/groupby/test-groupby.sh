@@ -162,7 +162,7 @@ rm obs exp
 ###########################################################
 echo -e "    groupby.t8...\c"
 echo \
-"chrom	start	end	B
+"Chrom	start	end	B
 chr1	0	10	10
 chr1	10	20	5
 chr1	11	21	5
@@ -182,7 +182,7 @@ rm obs exp
 echo -e "    groupby.t9...\c"
 echo \
 "col_1	col_2	col_3	col_4	col_5	col_6
-chrom	start	end	B
+Chrom	start	end	B
 chr1	0	10	10
 chr1	10	20	5
 chr1	11	21	5
@@ -201,7 +201,7 @@ rm obs exp
 ###########################################################
 echo -e "    groupby.t10...\c"
 echo \
-"chrom	start	end	A	B	C
+"Chrom	start	end	A	B	C
 chr1	0	10	10
 chr1	10	20	5
 chr1	11	21	5
