@@ -6,5 +6,5 @@ addons:
   apt:
     packages:
     - samtools
-    - htslib
+    - tabix
 script: make test
