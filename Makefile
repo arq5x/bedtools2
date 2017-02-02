@@ -18,9 +18,9 @@ export SRC_DIR	= src
 export UTIL_DIR	= src/utils
 export CXX		= g++
 ifeq ($(DEBUG),1)
-export CXXFLAGS = -Wall -Wextra -DDEBUG -D_DEBUG -g -O0 -D_FILE_OFFSET_BITS=64 -fPIC $(INCLUDES)
+export CXXFLAGS = -std=gnu++0x -Wall -Wextra -DDEBUG -D_DEBUG -g -O0 -D_FILE_OFFSET_BITS=64 -fPIC $(INCLUDES)
 else
-export CXXFLAGS = -Wall -O2 -D_FILE_OFFSET_BITS=64 -fPIC $(INCLUDES)
+export CXXFLAGS = -std=gnu++0x -Wall -O2 -D_FILE_OFFSET_BITS=64 -fPIC $(INCLUDES)
 endif
 export LIBS		= -lz
 export BT_ROOT  = src/utils/BamTools/
