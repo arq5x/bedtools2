@@ -22,6 +22,12 @@ export CXXFLAGS = -std=gnu++0x -Wall -Wextra -DDEBUG -D_DEBUG -g -O0 -D_FILE_OFF
 else
 export CXXFLAGS = -std=gnu++0x -Wall -O2 -D_FILE_OFFSET_BITS=64 -fPIC $(INCLUDES)
 endif
+
+# If the user has specified to do so, tell the compile to use rand() (instead of mt19937).
+ifeq ($(USE_RAND),1)
+export CXXFLAGS = -DUSE_RAND
+endif 
+
 export LIBS		= -lz
 export BT_ROOT  = src/utils/BamTools/
 
