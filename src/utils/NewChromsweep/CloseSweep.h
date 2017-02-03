@@ -18,7 +18,6 @@ class distanceTuple {
 public:
 	distanceTuple() : _dist(0), _rec(NULL), _isNeg(false) {}
 	distanceTuple(int dist, Record *rec, bool isNeg = false) : _dist(dist), _rec(rec), _isNeg(isNeg) {}
-//	bool operator < (const distanceTuple & other) const { return (_dist < other._dist); }
 	int _dist;
 	Record *_rec;
 	bool _isNeg;
@@ -27,17 +26,7 @@ public:
 class DistanceTupleSortAscFunctor {
 public:
 	bool operator()(const distanceTuple & d1, const distanceTuple & d2) const {
-//		return ((d1._dist < d2._dist) ? true : (d1._dist == d2._dist ? (d1._rec->lessThan(d2._rec)) :  false)); }
-
 		return (d1._dist < d2._dist ? true : (d1._dist == d2._dist ? d1._rec->lessThan(d2._rec) : false));
-//		if (d1._dist < d2._dist) {
-//			return true;
-//		} else if (d1._dist == d2._dist) {
-//			if () {
-//				return true;
-//			}
-//		}
-//		return false;
 	}
 };
 
@@ -162,7 +151,7 @@ private:
     int addRecsToRetList(RecDistList::elemsType *recs, int currDist, RecordKeyVector &retList);
     void addSingleRec(Record *rec, int currDist, int &hitsUsed, RecordKeyVector &retList);
     rateOvlpType tryToAddRecord(Record *cacheRec, int dist, int dbIdx, bool &stopScanning, chromDirType chromDir, streamDirType streamDir);
-    purgeDirectionType purgePointException(int dbIdx);
+    purgeDirectionType purgePointException();
 
 };
 
