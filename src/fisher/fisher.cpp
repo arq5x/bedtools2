@@ -82,10 +82,19 @@ void Fisher::giveFinalReport(RecordOutputMgr *outputMgr)
 
     kt_fisher_exact(n11, n12, n21, n22, &left, &right, &two);
     double ratio = ((double)n11 / (double)n12) / ((double)n21 / (double)n22);
-
+    
     printf("# p-values for fisher's exact test\n");
     printf("left\tright\ttwo-tail\tratio\n");
-    printf("%.5g\t%.5g\t%.5g\t%.3f\n", left, right, two, ratio);
+    
+    /* Some implementations report NAN as negative, some as positive. To ensure
+     * we get consistent output from each compiler, we should do our own test.
+     * Since the test script assumes "-nan", let's setle on that.
+     */
+    if(std::isnan(ratio)) {
+        printf("%.5g\t%.5g\t%.5g\t-nan\n", left, right, two);
+    } else {
+        printf("%.5g\t%.5g\t%.5g\t%.3f\n", left, right, two, ratio);
+    }
 }
 
 unsigned long Fisher::getTotalIntersection(RecordKeyVector &recList)
