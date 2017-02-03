@@ -27,7 +27,8 @@ endif
 ifeq ($(USE_RAND),1)
 export CXXFLAGS = -DUSE_RAND
 else
-export CXXFLAGS = -std=c++11
+# Although we really want c++11, g++ 4.6.3 (as used by Travis) uses 'gnu++0x'
+export CXXFLAGS = -std=gnu++0x
 endif 
 
 export LIBS		= -lz
