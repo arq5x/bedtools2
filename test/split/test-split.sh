@@ -13,8 +13,13 @@ check()
 	fi
 }
 
+# randData.bed was generated on OSX Sierra using the command below. Different
+# systems may generate different results, so the file required for the tests is
+# stored in the repo.
+cat > /dev/null << EOCOMMENT
 cat /dev/zero |tr "\0" "\n" | head -n 10000 |\
 awk '{S=int(rand()*1000.0);E=S+int(rand()*100000); printf("chrX\t%d\t%d\n",S,E);}' > tmp.bed
+EOCOMMENT
 
 echo -e "    split.01.size...\c"
 rm -f _tmp.*.bed
@@ -28,7 +33,7 @@ _tmp.00007.bed	9943468	200
 _tmp.00008.bed	9943487	200
 _tmp.00009.bed	9943539	200
 _tmp.00010.bed	9943531	200" > exp
-${BT} split -i tmp.bed -p _tmp -n 50 -a size | head > _tmp.size.tsv
+${BT} split -i randData.bed -p _tmp -n 50 -a size | head > _tmp.size.tsv
 check exp _tmp.size.tsv
 
 
@@ -44,7 +49,7 @@ _tmp.00007.bed	10043102	200
 _tmp.00008.bed	9781861	200
 _tmp.00009.bed	9502188	200
 _tmp.00010.bed	9991229	200" > exp
-${BT} split -i tmp.bed -p _tmp -n 50 -a simple | head > _tmp.simple.tsv
+${BT} split -i randData.bed -p _tmp -n 50 -a simple | head > _tmp.simple.tsv
 check exp _tmp.simple.tsv
 
 echo -e "    spliit.03.simple...\c"
@@ -59,10 +64,12 @@ _tmp.00007.bed	698581	10
 _tmp.00008.bed	555258	10
 _tmp.00009.bed	474511	10
 _tmp.00010.bed	633012	10" > exp
-${BT} split -i tmp.bed -p _tmp -n 1000 -a simple | head > _tmp.simple.tsv
+${BT} split -i randData.bed -p _tmp -n 1000 -a simple | head > _tmp.simple.tsv
 check exp _tmp.simple.tsv
 
 
 
-rm -f _tmp.*.bed jeter.bed tmp.bed  _tmp.simple.tsv  _tmp.size.tsv
+rm -f _tmp.*.bed jeter.bed _tmp.simple.tsv  _tmp.size.tsv
+[[ ! -f tmp.bed ]] || rm tmp.bed
+
 [[ $FAILURES -eq 0 ]] || exit 1;
