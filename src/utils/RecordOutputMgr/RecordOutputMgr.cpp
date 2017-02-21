@@ -510,8 +510,10 @@ void RecordOutputMgr::null(bool queryType, bool dbType)
 	default:
 		break;
 	}
-	dummyRecord->printNull(_outBuf);
-	delete dummyRecord;
+	if (dummyRecord) {
+		dummyRecord->printNull(_outBuf);
+		delete dummyRecord;
+	}
 }
 
 void RecordOutputMgr::printKey(const Record *key, const string & start, const string & end)
