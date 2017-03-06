@@ -225,7 +225,7 @@ const string &KeyListOpsMethods::getDistinctSortNum(bool asc) {
 	_retStr.clear();
 	ostringstream s;
 	for (vector<double>::iterator iter = _numArray.begin(); iter != endIter; iter++) {
-		if (iter != _numArray.begin()) _retStr += _delimStr;
+		if (iter != _numArray.begin()) s << _delimStr;
 		s << *iter;
 	}
 	_retStr.append(s.str());
@@ -286,7 +286,7 @@ const string &KeyListOpsMethods::getFreqDesc() {
 	_retStr.clear();
 	ostringstream s;
 	for (histDescType::iterator histIter = hist.begin(); histIter != hist.end(); histIter++) {
-		if (histIter != hist.begin()) _retStr += _delimStr;
+		if (histIter != hist.begin()) s << _delimStr;
 		s << histIter->second;
 		s << ":";
 		s << histIter->first;
@@ -310,7 +310,7 @@ const string &KeyListOpsMethods::getFreqAsc() {
 	_retStr.clear();
 	ostringstream s;
 	for (histAscType::iterator histIter = hist.begin(); histIter != hist.end(); histIter++) {
-		if (histIter != hist.begin()) _retStr += _delimStr;
+		if (histIter != hist.begin()) s << _delimStr;
 		s << histIter->second;
 		s << ":";
 		s << histIter->first;
