@@ -44,6 +44,8 @@ Compiling with a specific zlib library
 --------------------------------------------------
 If you need to override the location of the zlib lbrary used to cmpile bedtools, you can run `make` and specify the `LIBS` argument. For example:
 
+.. code-block:: bash
+
     make LIBS='/PATH/TO/ZLIB/lib/libz.a'
 
 ====================
