@@ -511,8 +511,7 @@ rm exp obs
 echo -e "    intersect.t41...\c"
 echo \
 "22" > exp
-$BT intersect -a bug167_strandSweep.bed -b bug167_strandSweep.bed -sorted -s -wa -wb | wc -l > obs
-sed -i 's/^\s*//' obs
+$BT intersect -a bug167_strandSweep.bed -b bug167_strandSweep.bed -sorted -s -wa -wb | wc -l | sed 's/^[ \t]*//' > obs
 check exp obs
 rm exp obs
 
@@ -522,8 +521,7 @@ rm exp obs
 echo -e "    intersect.t42...\c"
 echo \
 "20" > exp
-$BT intersect -a bug167_strandSweep.bed -b bug167_strandSweep.bed -sorted -S -wa -wb | wc -l > obs
-sed -i 's/^\s*//' obs
+$BT intersect -a bug167_strandSweep.bed -b bug167_strandSweep.bed -sorted -S -wa -wb | wc -l | sed 's/^[ \t]*//' > obs
 check exp obs
 rm exp obs
 
@@ -727,34 +725,34 @@ rm exp obs
 ##################################################################
 echo -e "    intersect.t63...\c"
 echo -n "" > exp
-$BT intersect -a x.bam -b y.bed -f 0.21 -F 0.21 -wa -wb | samtools view - > obs
+$BT intersect -a x.bam -b y.bed -f 0.21 -F 0.21 -wa | samtools view - > obs
 check exp obs
 rm exp obs
 
 echo -e "    intersect.t64...\c"
 echo "a1	0	chr1	11	255	10M	*	0	0	*	*
 a2	16	chr2	11	255	10M	*	0	0	*	*" > exp
-$BT intersect -a x.bam -b y.bed -f 0.19 -F 0.21 -wa -wb | samtools view - > obs
+$BT intersect -a x.bam -b y.bed -f 0.19 -F 0.21 -wa | samtools view - > obs
 check exp obs
 rm exp obs
 
 echo -e "    intersect.t65...\c"
 echo "a1	0	chr1	11	255	10M	*	0	0	*	*
 a2	16	chr2	11	255	10M	*	0	0	*	*" > exp
-$BT intersect -a x.bam -b y.bed -f 0.19 -F 0.21 -wa -wb | samtools view - > obs
+$BT intersect -a x.bam -b y.bed -f 0.19 -F 0.21 -wa | samtools view - > obs
 check exp obs
 rm exp obs
 
 echo -e "    intersect.t66...\c"
 echo "a1	0	chr1	11	255	10M	*	0	0	*	*
 a2	16	chr2	11	255	10M	*	0	0	*	*" > exp
-$BT intersect -a x.bam -b y.bed -f 0.19 -F 0.50 -wa -wb | samtools view - > obs
+$BT intersect -a x.bam -b y.bed -f 0.19 -F 0.50 -wa | samtools view - > obs
 check exp obs
 rm exp obs
 
 echo -e "    intersect.t67...\c"
 echo -n "" > exp
-$BT intersect -a x.bam -b y.bed -f 0.19 -F 0.51 -wa -wb | samtools view - > obs
+$BT intersect -a x.bam -b y.bed -f 0.19 -F 0.51 -wa | samtools view - > obs
 check exp obs
 rm exp obs
 

@@ -659,7 +659,7 @@ rm obs exp
 # Bug 471: K-closest with same strand, -D a
 ###########################################################
 
-echo " 	kclosest.t39...\c"
+echo -e "    kclosest.t39...\c"
 echo \
 "chr1	52476	52477	locus1	.	-	chr1	52426	53416	CDS6	.	-	0
 chr1	52476	52477	locus1	.	-	chr1	51608	52430	CDS5	.	-	47
@@ -684,7 +684,7 @@ rm obs exp
 # Bug 471: K-closest with same strand, -d
 ###########################################################
 
-echo " 	kclosest.t40...\c"
+echo -e "    kclosest.t40...\c"
 echo \
 "chr1	52476	52477	locus1	.	-	chr1	52426	53416	CDS6	.	-	0
 chr1	52476	52477	locus1	.	-	chr1	51608	52430	CDS5	.	-	47
@@ -711,7 +711,7 @@ rm obs exp
 # Bug 471: K-closest with same strand, -D b
 ###########################################################
 
-echo " 	kclosest.t41...\c"
+echo -e "    kclosest.t41...\c"
 echo \
 "chr1	52476	52477	locus1	.	-	chr1	52426	53416	CDS6	.	-	0
 chr1	52476	52477	locus1	.	-	chr1	51608	52430	CDS5	.	-	-47
@@ -737,7 +737,7 @@ rm obs exp
 # Bug 471: K-closest with different strand, -d
 ###########################################################
 
-echo " 	kclosest.t42...\c"
+echo -e "    kclosest.t42...\c"
 echo \
 "chr1	52476	52477	locus1	.	-	chr1	49822	50302	CDS2	.	+	2175
 chr1	52476	52477	locus1	.	-	chr1	47768	49631	CSD1	.	+	2846
@@ -763,7 +763,7 @@ rm obs exp
 # Bug 471: K-closest with different strand, -d
 ###########################################################
 
-echo " 	kclosest.t43...\c"
+echo -e "    kclosest.t43...\c"
 echo \
 "chr1	52476	52477	locus1	.	-	chr1	49822	50302	CDS2	.	+	2175
 chr1	52476	52477	locus1	.	-	chr1	47768	49631	CSD1	.	+	2846
@@ -788,7 +788,7 @@ rm obs exp
 # Bug 471: K-closest with different strand, -D a
 ###########################################################
 
-echo " 	kclosest.t44...\c"
+echo -e "    kclosest.t44...\c"
 echo \
 "chr1	52476	52477	locus1	.	-	chr1	49822	50302	CDS2	.	+	2175
 chr1	52476	52477	locus1	.	-	chr1	47768	49631	CSD1	.	+	2846
@@ -813,8 +813,7 @@ rm obs exp
 # Bug 471: K-closest with different strand, -D b
 ###########################################################
 
-<<<<<<< 36e3fe1ad7c9ea42d9e6135343c94b1a04eed455
-echo " 	kclosest.t45...\c"
+echo -e "    kclosest.t45...\c"
 echo \
 "chr1	52476	52477	locus1	.	-	chr1	49822	50302	CDS2	.	+	2175
 chr1	52476	52477	locus1	.	-	chr1	47768	49631	CSD1	.	+	2846

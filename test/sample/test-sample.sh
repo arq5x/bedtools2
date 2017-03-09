@@ -95,8 +95,8 @@ rm obs exp
 ############################################################
 echo -e "    sample.new.t07...\c"
 echo "10" > exp
-$BT sample -i mainFile.bed -n 10 | wc -l > obs
-sed -i 's/^\s*//' obs
+# BSD wc adds leading whitespace, and BSD sed -i param requires extension
+$BT sample -i mainFile.bed -n 10 | wc -l | sed 's/^[ \t]*//' > obs
 check obs exp
 rm obs exp
 
