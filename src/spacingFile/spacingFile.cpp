@@ -49,7 +49,7 @@ bool SpacingFile::findNext(RecordKeyVector &hits)
 			{
 				// do _currRec and _prevRec overlap?
 				if (_currRec->sameChromIntersects(_prevRec, false, false, 1E-9, 1E-9, false, false))
-					_distance.append("0");
+					_distance.append("-1");
 				else
 				{
 					int distance = _currRec->getStartPos() - _prevRec->getEndPos();

@@ -56,7 +56,6 @@ bool RecDistList::addRec(int dist, Record *record, chromDirType chromDir) {
 	if (dist > getMaxDist()) {
 		//dist is bigger than any currently contained.
 		if (_currNumIdxs == _kVal) {
-			//already full with smaller distances
 			return false;
 		}
 		mustAppend = true;
@@ -101,56 +100,6 @@ bool RecDistList::addRec(int dist, Record *record, chromDirType chromDir) {
 	_totalRecs++;
 	return true;
 }
-
-//bool RecDistList::addRec(int dist, const Record *record, chromDirType chromDir) {
-//	//if unique size is >= maxRecNum, that means the collection is
-//	//full. In that case, if the new rec has greater distance than
-//	// any in the collection, ignore it. If the distance isn't
-//	// greater, add it, removing the previously greater one
-//	// if need be.
-//	// If the collection isn't full, just the new.
-//
-//	if (uniqueSize() < _kVal || exists(dist)) {
-//		insert(dist, record, chromDir);
-//		return true;
-//	} else {
-//		//find previous greatest distance
-//		revIterType rIter = _recs.rbegin();
-//		int currMaxDist = rIter->first;
-//		if (dist > currMaxDist) {
-//			return false;
-//		}
-//		//Now we know dist is less than currMax.
-//		//new dist is smaller. Erase old max.
-//		delete rIter->second;
-//
-//		//apparently you can't erase a reverse iterator, so we'll
-//		//make a normal one pointing at the end, then back it  up.
-//		iterType delIter = _recs.end();
-//		delIter--;
-//		_recs.erase(delIter);
-//		insert(dist, record, chromDir);
-//		return true;
-//	}
-//
-//}
-
-//void RecDistList::insert(int dist, const Record *record, chromDirType chromDir) {
-//	if ()
-//	elemsType *elems = NULL;
-//	distRecsType::iterator iter = _recs.find(dist);
-//	if (iter == _recs.end()) {
-//		//dist didn't exist before. Add it by
-//		// creating new elems container, then
-//		//putting this in the map.
-//		elems = new elemsType();
-//		_recs[dist] = elems;
-//	} else {
-//		elems = iter->second;
-//	}
-//	elems->push_back(pair<chromDirType, const Record *>(chromDir, record));
-//	_totalRecs++;
-//}
 
 //if true, pos will be the idx the distance is at.
 //if false, pos will be the idx to insert at.
@@ -228,7 +177,6 @@ CloseSweep::CloseSweep(ContextClosest *context)
 		_minDownstreamRecs[i] = new RecDistList(_kClosest);
 		_overlapRecs[i] = new RecDistList(_kClosest);
 	}
-
 }
 
 CloseSweep::~CloseSweep(void) {
@@ -654,7 +602,7 @@ void CloseSweep::setLeftClosestEndPos(int dbIdx)
 
   //no records found to left of query,
   //can't set purge point, except for some special cases.
-  purgeDirectionType purgeDir = purgePointException(dbIdx);
+  purgeDirectionType purgeDir = purgePointException();
   if (purgeDir == BOTH || purgeDir == FORWARD_ONLY) {
     _maxPrevLeftClosestEndPos[dbIdx] = max(_currQueryRec->getStartPos(), _maxPrevLeftClosestEndPos[dbIdx]);
   }
@@ -664,7 +612,7 @@ void CloseSweep::setLeftClosestEndPos(int dbIdx)
   if (purgeDir != NEITHER) return;
 
   RecDistList *upRecs = _minUpstreamRecs[dbIdx];
-	RecDistList *downRecs = _minDownstreamRecs[dbIdx];
+  RecDistList *downRecs = _minDownstreamRecs[dbIdx];
 
 	int upDist = upRecs->getMaxLeftEndPos();
 	int downDist = downRecs->getMaxLeftEndPos();
@@ -692,15 +640,14 @@ bool CloseSweep::beforeLeftClosestEndPos(int dbIdx, Record *rec)
 	if (!_sameStrand && !_diffStrand) {
 		return recEndPos < prevPos;
 	} else {
-			if (rec->getStrandVal() == Record::FORWARD) {
-				return recEndPos < prevPos;
-			} else {
- 				return recEndPos < prevPosReverse;
-			}
+		if (rec->getStrandVal() == Record::FORWARD) {
+			return recEndPos < prevPos;
+		} else {
+			return recEndPos < prevPosReverse;
+		}
   }
 	return false;
 }
-
 
 void CloseSweep::clearClosestEndPos(int dbIdx)
 {
@@ -770,17 +717,6 @@ CloseSweep::rateOvlpType CloseSweep::tryToAddRecord(Record *cacheRec, int dist, 
 			}
 		}
 	}
-
-
-//	else if (chromDir == RIGHT && (shouldIgnore || !useList->addRec(dist, cacheRec, RecDistList::RIGHT))) {
-//	// Stop scanning here, UNLESS we only ignored the hit
-//	// because the strand or name was bad, or if
-//	//the stream was bad and have a non-ref DIST mode
-//		if  (!badStrand && !badNames &&
-//			 (!(badStream && _bDist))) { //&& cacheRec->getStartPos() <= _currQueryRec->getEndPos() && ((int)useList->totalSize() <= _kClosest)))) {
-//		  stopScanning = true;
-//		}
-//	}
 	return IGNORE;
 }
 
@@ -792,46 +728,51 @@ bool CloseSweep::allHitsRightOfQueryIgnored() {
 }
 
 
-CloseSweep::purgeDirectionType CloseSweep::purgePointException(int dbIdx) {
+CloseSweep::purgeDirectionType CloseSweep::purgePointException() {
 
-  // Normally, we can't set a cache purge point if there are no
-  // records to the left of the query.
+	// Normally, we can't set a cache purge point if there are no
+	// records to the left of the query.
 
-  // This method will detect use cases that cause all of the left side
-  // hits to have been rejected, and tell us whether to purge the forward
-  // cache, reverse cache, both, or neither.
+	// This method will detect use cases that cause all of the left side
+	// hits to have been rejected, and tell us whether to purge the forward
+	// cache, reverse cache, both, or neither.
 
-  purgeDirectionType purgeDir = NEITHER;
+	purgeDirectionType purgeDir = NEITHER;
 
-  if (_ignoreUpstream && _ignoreDownstream) purgeDir = BOTH;
+	if (_ignoreUpstream && _ignoreDownstream) {
+		purgeDir = BOTH;
+	}
+	else if (_ignoreUpstream) {
+		if (_refDist) {
+			purgeDir = BOTH;
+		}
+		else if (_aDist && _qForward) {
+			if (_sameStrand) {
+				purgeDir = FORWARD_ONLY;
+			}
+			else if (_diffStrand) {
+				purgeDir = REVERSE_ONLY;
+			}
+		}
+		else if (_bDist) {
+			  if (_qForward && _diffStrand) purgeDir = REVERSE_ONLY;
+			  else if (_qReverse && _sameStrand) purgeDir = REVERSE_ONLY;
+		}
+	}
+	else if (_ignoreDownstream) {
+		 // if refDist, do nothing. left hits can't be downstream.
+		 if (_aDist) {
+			//if qForward, do nothing. left hits can't be downstream.
+			if (_qReverse) {
+				if (_sameStrand) purgeDir = REVERSE_ONLY;
+				else if (_diffStrand) purgeDir = FORWARD_ONLY;
+			}
+		} else if (_bDist) {
+			if (_qForward && _sameStrand) purgeDir = FORWARD_ONLY;
+			else if (_qReverse && _diffStrand) purgeDir = FORWARD_ONLY;
+		}
+	}
 
-   else if (_ignoreUpstream) {
-    if (_refDist) {
-      purgeDir = BOTH;
-    } else if (_aDist && _qForward) {
-      if (_sameStrand) {
-        purgeDir = FORWARD_ONLY;
-      } else if (_diffStrand) {
-        purgeDir = REVERSE_ONLY;
-      }
-    } else if (_bDist) {
-      if (_qForward && _diffStrand) purgeDir = REVERSE_ONLY;
-      else if (_qReverse && _sameStrand) purgeDir = REVERSE_ONLY;
-    }
-   } else { //ignoreDownstream
-     // if refDist, do nothing. left hits can't be downstream.
-     if (_aDist) {
-       //if qForward, do nothing. left hits can't be downstream.
-       if (_qReverse) {
-         if (_sameStrand) purgeDir = REVERSE_ONLY;
-         else if (_diffStrand) purgeDir = FORWARD_ONLY;
-       }
-     } else if (_bDist) {
-       if (_qForward && _sameStrand) purgeDir = FORWARD_ONLY;
-       else if (_qReverse && _diffStrand) purgeDir = FORWARD_ONLY;
-     }
-   }
-
-  return purgeDir;
+	return purgeDir;
 
 }

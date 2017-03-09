@@ -56,7 +56,7 @@ int bed12tobed6_main(int argc, char* argv[]) {
 
     if(showHelp) bed12tobed6_help();
 
-    // do some parsing (all of these parameters require 2 strings)
+    // do some parsing (-i requires 2 strings, -n requires 1)
     for(int i = 1; i < argc; i++) {
 
         int parameterLength = (int)strlen(argv[i]);
@@ -69,7 +69,6 @@ int bed12tobed6_main(int argc, char* argv[]) {
         }
         else if(PARAMETER_CHECK("-n", 2, parameterLength)) {
             addBlockNums = true;
-            i++;
         }
         else {
             cerr << endl << "*****ERROR: Unrecognized parameter: " << argv[i] << " *****" << endl << endl;

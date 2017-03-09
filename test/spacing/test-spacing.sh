@@ -15,12 +15,13 @@ check()
 echo "    spacing.t01...\c"
 echo \
 "chr1	20	30	.
-chr1	25	40	0
-chr1	50	80	10
-chr1	75	100	0
+chr1	25	40	-1
+chr1	40	50	0
+chr1	60	80	10
+chr1	75	100	-1
 chr1	105	110	5
 chr2	115	130	.
-chr2	120	160	0
+chr2	120	160	-1
 chr2	170	180	10" > exp
 $BT spacing -i a.bed  > obs
 check obs exp

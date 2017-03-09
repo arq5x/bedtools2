@@ -762,8 +762,8 @@ bool BamMultiReaderPrivate::ValidateReaders(void) const {
                  (firstRef.RefLength != currentRef.RefLength) )
             {
                 stringstream s("");
-                s << "mismatched references found in" << reader->GetFilename()
-                  << "expected: " << endl;
+                s << "mismatched references found in " << reader->GetFilename()
+                  << " expected: " << endl;
 
                 // print first reader's reference data
                 RefVector::const_iterator refIter = firstReaderRefData.begin();

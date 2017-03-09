@@ -652,5 +652,181 @@ $BT closest -a q2.bed -b d3.bed -k 5  -D b -t first -fd > obs
 check obs exp
 rm obs exp
 
+###########################################################
+# Bug 471: K-closest with same strand, -D a
+###########################################################
+
+echo " 	kclosest.t39...\c"
+echo \
+"chr1	52476	52477	locus1	.	-	chr1	52426	53416	CDS6	.	-	0
+chr1	52476	52477	locus1	.	-	chr1	51608	52430	CDS5	.	-	47
+chr1	52476	52477	locus1	.	-	chr1	51228	51606	CDS4	.	-	871
+chr1	52594	52595	locus2	.	-	chr1	52426	53416	CDS6	.	-	0
+chr1	52594	52595	locus2	.	-	chr1	51608	52430	CDS5	.	-	165
+chr1	52594	52595	locus2	.	-	chr1	53415	54702	CDS7	.	-	-821
+chr1	52653	52654	locus3	.	-	chr1	52426	53416	CDS6	.	-	0
+chr1	52653	52654	locus3	.	-	chr1	51608	52430	CDS5	.	-	224
+chr1	52653	52654	locus3	.	-	chr1	53415	54702	CDS7	.	-	-762
+chr1	53557	53558	locus4	.	-	chr1	53415	54702	CDS7	.	-	0
+chr1	53557	53558	locus4	.	-	chr1	52426	53416	CDS6	.	-	142
+chr1	53557	53558	locus4	.	-	chr1	51608	52430	CDS5	.	-	1128
+chr1	53570	53571	locus5	.	-	chr1	53415	54702	CDS7	.	-	0
+chr1	53570	53571	locus5	.	-	chr1	52426	53416	CDS6	.	-	155
+chr1	53570	53571	locus5	.	-	chr1	51608	52430	CDS5	.	-	1141" > exp
+$BT closest -k 3 -s -D a -a bug471_a.bed -b bug471_b.bed > obs
+check obs exp
+rm obs exp
+
+###########################################################
+# Bug 471: K-closest with same strand, -d
+###########################################################
+
+echo " 	kclosest.t40...\c"
+echo \
+"chr1	52476	52477	locus1	.	-	chr1	52426	53416	CDS6	.	-	0
+chr1	52476	52477	locus1	.	-	chr1	51608	52430	CDS5	.	-	47
+chr1	52476	52477	locus1	.	-	chr1	51228	51606	CDS4	.	-	871
+chr1	52594	52595	locus2	.	-	chr1	52426	53416	CDS6	.	-	0
+chr1	52594	52595	locus2	.	-	chr1	51608	52430	CDS5	.	-	165
+chr1	52594	52595	locus2	.	-	chr1	53415	54702	CDS7	.	-	821
+chr1	52653	52654	locus3	.	-	chr1	52426	53416	CDS6	.	-	0
+chr1	52653	52654	locus3	.	-	chr1	51608	52430	CDS5	.	-	224
+chr1	52653	52654	locus3	.	-	chr1	53415	54702	CDS7	.	-	762
+chr1	53557	53558	locus4	.	-	chr1	53415	54702	CDS7	.	-	0
+chr1	53557	53558	locus4	.	-	chr1	52426	53416	CDS6	.	-	142
+chr1	53557	53558	locus4	.	-	chr1	51608	52430	CDS5	.	-	1128
+chr1	53570	53571	locus5	.	-	chr1	53415	54702	CDS7	.	-	0
+chr1	53570	53571	locus5	.	-	chr1	52426	53416	CDS6	.	-	155
+chr1	53570	53571	locus5	.	-	chr1	51608	52430	CDS5	.	-	1141" > exp
+$BT closest -k 3 -s -d -a bug471_a.bed -b bug471_b.bed > obs
+check obs exp
+rm obs exp
 
 
+
+###########################################################
+# Bug 471: K-closest with same strand, -D b
+###########################################################
+
+echo " 	kclosest.t41...\c"
+echo \
+"chr1	52476	52477	locus1	.	-	chr1	52426	53416	CDS6	.	-	0
+chr1	52476	52477	locus1	.	-	chr1	51608	52430	CDS5	.	-	-47
+chr1	52476	52477	locus1	.	-	chr1	51228	51606	CDS4	.	-	-871
+chr1	52594	52595	locus2	.	-	chr1	52426	53416	CDS6	.	-	0
+chr1	52594	52595	locus2	.	-	chr1	51608	52430	CDS5	.	-	-165
+chr1	52594	52595	locus2	.	-	chr1	53415	54702	CDS7	.	-	821
+chr1	52653	52654	locus3	.	-	chr1	52426	53416	CDS6	.	-	0
+chr1	52653	52654	locus3	.	-	chr1	51608	52430	CDS5	.	-	-224
+chr1	52653	52654	locus3	.	-	chr1	53415	54702	CDS7	.	-	762
+chr1	53557	53558	locus4	.	-	chr1	53415	54702	CDS7	.	-	0
+chr1	53557	53558	locus4	.	-	chr1	52426	53416	CDS6	.	-	-142
+chr1	53557	53558	locus4	.	-	chr1	51608	52430	CDS5	.	-	-1128
+chr1	53570	53571	locus5	.	-	chr1	53415	54702	CDS7	.	-	0
+chr1	53570	53571	locus5	.	-	chr1	52426	53416	CDS6	.	-	-155
+chr1	53570	53571	locus5	.	-	chr1	51608	52430	CDS5	.	-	-1141" > exp
+$BT closest -k 3 -s -D b -a bug471_a.bed -b bug471_b.bed > obs
+check obs exp
+rm obs exp
+
+
+###########################################################
+# Bug 471: K-closest with different strand, -d
+###########################################################
+
+echo " 	kclosest.t42...\c"
+echo \
+"chr1	52476	52477	locus1	.	-	chr1	49822	50302	CDS2	.	+	2175
+chr1	52476	52477	locus1	.	-	chr1	47768	49631	CSD1	.	+	2846
+chr1	52476	52477	locus1	.	-	chr1	57363	58179	CDS9	. 	+	4887
+chr1	52594	52595	locus2	.	-	chr1	49822	50302	CDS2	.	+	2293
+chr1	52594	52595	locus2	.	-	chr1	47768	49631	CSD1	.	+	2964
+chr1	52594	52595	locus2	.	-	chr1	57363	58179	CDS9	. 	+	4769
+chr1	52653	52654	locus3	.	-	chr1	49822	50302	CDS2	.	+	2352
+chr1	52653	52654	locus3	.	-	chr1	47768	49631	CSD1	.	+	3023
+chr1	52653	52654	locus3	.	-	chr1	57363	58179	CDS9	. 	+	4710
+chr1	53557	53558	locus4	.	-	chr1	49822	50302	CDS2	.	+	3256
+chr1	53557	53558	locus4	.	-	chr1	57363	58179	CDS9	. 	+	3806
+chr1	53557	53558	locus4	.	-	chr1	47768	49631	CSD1	.	+	3927
+chr1	53570	53571	locus5	.	-	chr1	49822	50302	CDS2	.	+	3269
+chr1	53570	53571	locus5	.	-	chr1	57363	58179	CDS9	. 	+	3793
+chr1	53570	53571	locus5	.	-	chr1	47768	49631	CSD1	.	+	3940" > exp
+$BT closest -k 3 -S -d -a bug471_a.bed -b bug471_b.bed > obs
+check obs exp
+rm obs exp
+
+
+###########################################################
+# Bug 471: K-closest with different strand, -d
+###########################################################
+
+echo " 	kclosest.t43...\c"
+echo \
+"chr1	52476	52477	locus1	.	-	chr1	49822	50302	CDS2	.	+	2175
+chr1	52476	52477	locus1	.	-	chr1	47768	49631	CSD1	.	+	2846
+chr1	52476	52477	locus1	.	-	chr1	57363	58179	CDS9	. 	+	4887
+chr1	52594	52595	locus2	.	-	chr1	49822	50302	CDS2	.	+	2293
+chr1	52594	52595	locus2	.	-	chr1	47768	49631	CSD1	.	+	2964
+chr1	52594	52595	locus2	.	-	chr1	57363	58179	CDS9	. 	+	4769
+chr1	52653	52654	locus3	.	-	chr1	49822	50302	CDS2	.	+	2352
+chr1	52653	52654	locus3	.	-	chr1	47768	49631	CSD1	.	+	3023
+chr1	52653	52654	locus3	.	-	chr1	57363	58179	CDS9	. 	+	4710
+chr1	53557	53558	locus4	.	-	chr1	49822	50302	CDS2	.	+	3256
+chr1	53557	53558	locus4	.	-	chr1	57363	58179	CDS9	. 	+	3806
+chr1	53557	53558	locus4	.	-	chr1	47768	49631	CSD1	.	+	3927
+chr1	53570	53571	locus5	.	-	chr1	49822	50302	CDS2	.	+	3269
+chr1	53570	53571	locus5	.	-	chr1	57363	58179	CDS9	. 	+	3793
+chr1	53570	53571	locus5	.	-	chr1	47768	49631	CSD1	.	+	3940" > exp
+$BT closest -k 3 -S -d -a bug471_a.bed -b bug471_b.bed > obs
+check obs exp
+rm obs exp
+
+###########################################################
+# Bug 471: K-closest with different strand, -D a
+###########################################################
+
+echo " 	kclosest.t44...\c"
+echo \
+"chr1	52476	52477	locus1	.	-	chr1	49822	50302	CDS2	.	+	2175
+chr1	52476	52477	locus1	.	-	chr1	47768	49631	CSD1	.	+	2846
+chr1	52476	52477	locus1	.	-	chr1	57363	58179	CDS9	. 	+	-4887
+chr1	52594	52595	locus2	.	-	chr1	49822	50302	CDS2	.	+	2293
+chr1	52594	52595	locus2	.	-	chr1	47768	49631	CSD1	.	+	2964
+chr1	52594	52595	locus2	.	-	chr1	57363	58179	CDS9	. 	+	-4769
+chr1	52653	52654	locus3	.	-	chr1	49822	50302	CDS2	.	+	2352
+chr1	52653	52654	locus3	.	-	chr1	47768	49631	CSD1	.	+	3023
+chr1	52653	52654	locus3	.	-	chr1	57363	58179	CDS9	. 	+	-4710
+chr1	53557	53558	locus4	.	-	chr1	49822	50302	CDS2	.	+	3256
+chr1	53557	53558	locus4	.	-	chr1	57363	58179	CDS9	. 	+	-3806
+chr1	53557	53558	locus4	.	-	chr1	47768	49631	CSD1	.	+	3927
+chr1	53570	53571	locus5	.	-	chr1	49822	50302	CDS2	.	+	3269
+chr1	53570	53571	locus5	.	-	chr1	57363	58179	CDS9	. 	+	-3793
+chr1	53570	53571	locus5	.	-	chr1	47768	49631	CSD1	.	+	3940" > exp
+$BT closest -k 3 -S -D a -a bug471_a.bed -b bug471_b.bed > obs
+check obs exp
+rm obs exp
+
+###########################################################
+# Bug 471: K-closest with different strand, -D b
+###########################################################
+
+echo " 	kclosest.t45...\c"
+echo \
+"chr1	52476	52477	locus1	.	-	chr1	49822	50302	CDS2	.	+	2175
+chr1	52476	52477	locus1	.	-	chr1	47768	49631	CSD1	.	+	2846
+chr1	52476	52477	locus1	.	-	chr1	57363	58179	CDS9	. 	+	-4887
+chr1	52594	52595	locus2	.	-	chr1	49822	50302	CDS2	.	+	2293
+chr1	52594	52595	locus2	.	-	chr1	47768	49631	CSD1	.	+	2964
+chr1	52594	52595	locus2	.	-	chr1	57363	58179	CDS9	. 	+	-4769
+chr1	52653	52654	locus3	.	-	chr1	49822	50302	CDS2	.	+	2352
+chr1	52653	52654	locus3	.	-	chr1	47768	49631	CSD1	.	+	3023
+chr1	52653	52654	locus3	.	-	chr1	57363	58179	CDS9	. 	+	-4710
+chr1	53557	53558	locus4	.	-	chr1	49822	50302	CDS2	.	+	3256
+chr1	53557	53558	locus4	.	-	chr1	57363	58179	CDS9	. 	+	-3806
+chr1	53557	53558	locus4	.	-	chr1	47768	49631	CSD1	.	+	3927
+chr1	53570	53571	locus5	.	-	chr1	49822	50302	CDS2	.	+	3269
+chr1	53570	53571	locus5	.	-	chr1	57363	58179	CDS9	. 	+	-3793
+chr1	53570	53571	locus5	.	-	chr1	47768	49631	CSD1	.	+	3940" > exp
+$BT closest -k 3 -S -D b -a bug471_a.bed -b bug471_b.bed > obs
+check obs exp
+rm obs exp
