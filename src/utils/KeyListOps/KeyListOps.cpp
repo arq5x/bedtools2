@@ -6,7 +6,7 @@
  */
 #include "KeyListOps.h"
 #include "FileRecordMgr.h"
-#include <cmath> //for isnan
+#include <cmath> //for std::isnan
 #include <sstream>
 #include <iomanip>
 
@@ -176,7 +176,7 @@ const string & KeyListOps::getOpVals(RecordKeyVector &hits)
 		switch (opCode) {
 		case SUM:
 			val = _methods.getSum();
-			if (isnan(val)) {
+			if (std::isnan(val)) {
 				s << _methods.getNullValue();
 			} else {
 				s << format(val);
@@ -185,7 +185,7 @@ const string & KeyListOps::getOpVals(RecordKeyVector &hits)
 
 		case MEAN:
 			val = _methods.getMean();
-			if (isnan(val)) {
+			if (std::isnan(val)) {
 				s << _methods.getNullValue();
 			} else {
 				s << format(val);
@@ -194,7 +194,7 @@ const string & KeyListOps::getOpVals(RecordKeyVector &hits)
 
 		case STDDEV:
 			val = _methods.getStddev();
-			if (isnan(val)) {
+			if (std::isnan(val)) {
 				s << _methods.getNullValue();
 			} else {
 				s << format(val);
@@ -203,7 +203,7 @@ const string & KeyListOps::getOpVals(RecordKeyVector &hits)
 
 		case SAMPLE_STDDEV:
 			val = _methods.getSampleStddev();
-			if (isnan(val)) {
+			if (std::isnan(val)) {
 				s << _methods.getNullValue();
 			} else {
 				s << format(val);
@@ -212,7 +212,7 @@ const string & KeyListOps::getOpVals(RecordKeyVector &hits)
 
 		case MEDIAN:
 			val = _methods.getMedian();
-			if (isnan(val)) {
+			if (std::isnan(val)) {
 				s << _methods.getNullValue();
 			} else {
 				s << format(val);
@@ -229,7 +229,7 @@ const string & KeyListOps::getOpVals(RecordKeyVector &hits)
 
 		case MIN:
 			val = _methods.getMin();
-			if (isnan(val)) {
+			if (std::isnan(val)) {
 				s << _methods.getNullValue();
 			} else {
 				s << format(val);
@@ -238,7 +238,7 @@ const string & KeyListOps::getOpVals(RecordKeyVector &hits)
 
 		case MAX:
 			val = _methods.getMax();
-			if (isnan(val)) {
+			if (std::isnan(val)) {
 				s << _methods.getNullValue();
 			} else {
 				s << format(val);
@@ -247,7 +247,7 @@ const string & KeyListOps::getOpVals(RecordKeyVector &hits)
 
 		case ABSMIN:
 			val = _methods.getAbsMin();
-			if (isnan(val)) {
+			if (std::isnan(val)) {
 				s << _methods.getNullValue();
 			} else {
 				s << format(val);
@@ -256,7 +256,7 @@ const string & KeyListOps::getOpVals(RecordKeyVector &hits)
 
 		case ABSMAX:
 			val = _methods.getAbsMax();
-			if (isnan(val)) {
+			if (std::isnan(val)) {
 				s << _methods.getNullValue();
 			} else {
 				s << format(val);

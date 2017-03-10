@@ -1,80 +1,91 @@
 # In the event of a test failing, exit with non-zero status:
 set -e;
 
+STARTWD=$(pwd);
+FAILURES=0;
+
 echo " Performing general tests:"
-cd general; bash test-general.sh; cd ..
+(cd $STARTWD/general && bash test-general.sh) || FAILURES=$(expr $FAILURES + 1);
 
 echo " Testing bedtools bed12tobed6:"
-cd bed12tobed6; bash test-bed12tobed6.sh; cd ..
+(cd $STARTWD/bed12tobed6 && bash test-bed12tobed6.sh) || FAILURES=$(expr $FAILURES + 1);
 
 echo " Testing bedtools bamtobed:"
-cd bamtobed; bash test-bamtobed.sh; cd ..
+(cd $STARTWD/bamtobed && bash test-bamtobed.sh) || FAILURES=$(expr $FAILURES + 1);
 
 echo " Testing bedtools closest:"
-cd closest; bash test-closest.sh; cd ..
+(cd $STARTWD/closest && bash test-closest.sh) || FAILURES=$(expr $FAILURES + 1);
 
 echo " Testing bedtools cluster:"
-cd cluster; bash test-cluster.sh; cd ..
+(cd $STARTWD/cluster && bash test-cluster.sh) || FAILURES=$(expr $FAILURES + 1);
 
 echo " Testing bedtools coverage:"
-cd coverage; bash test-coverage.sh; cd ..
+(cd $STARTWD/coverage && bash test-coverage.sh) || FAILURES=$(expr $FAILURES + 1);
 
 echo " Testing bedtools expand:"
-cd expand; bash test-expand.sh; cd ..
+(cd $STARTWD/expand && bash test-expand.sh) || FAILURES=$(expr $FAILURES + 1);
 
 echo " Testing bedtools flank:"
-cd flank; bash test-flank.sh; cd ..
+(cd $STARTWD/flank && bash test-flank.sh) || FAILURES=$(expr $FAILURES + 1);
 
 echo " Testing bedtools fisher:"
-cd fisher; bash test-fisher.sh; cd ..
+(cd $STARTWD/fisher && bash test-fisher.sh) || FAILURES=$(expr $FAILURES + 1);
 
 echo " Testing bedtools genomecov:"
-cd genomecov; bash test-genomecov.sh; cd ..
+(cd $STARTWD/genomecov && bash test-genomecov.sh) || FAILURES=$(expr $FAILURES + 1);
 
 echo " Testing bedtools getfasta:"
-cd getfasta; bash test-getfasta.sh; cd ..
+(cd $STARTWD/getfasta && bash test-getfasta.sh) || FAILURES=$(expr $FAILURES + 1);
 
 echo " Testing bedtools groupby:"
-cd groupby; bash test-groupby.sh; cd ..
+(cd $STARTWD/groupby && bash test-groupby.sh) || FAILURES=$(expr $FAILURES + 1);
 
 echo " Testing bedtools intersect:"
-cd intersect; bash test-intersect.sh; bash new_test-intersect.sh; cd ..
+(cd $STARTWD/intersect && bash test-intersect.sh; bash new_test-intersect.sh) || FAILURES=$(expr $FAILURES + 1);
 
 echo " Testing bedtools jaccard:"
-cd jaccard; bash test-jaccard.sh; cd ..
+(cd $STARTWD/jaccard && bash test-jaccard.sh) || FAILURES=$(expr $FAILURES + 1);
 
 echo " Testing bedtools map:"
-cd map; bash test-map.sh; cd ..
+(cd $STARTWD/map && bash test-map.sh) || FAILURES=$(expr $FAILURES + 1);
 
 echo " Testing bedtools merge:"
-cd merge; bash test-merge.sh; cd ..
+(cd $STARTWD/merge && bash test-merge.sh) || FAILURES=$(expr $FAILURES + 1);
 
 echo " Testing bedtools multicov:"
-cd multicov; bash test-multicov.sh; cd ..
+(cd $STARTWD/multicov && bash test-multicov.sh) || FAILURES=$(expr $FAILURES + 1);
 
 echo " Testing bedtools reldist:"
-cd reldist; bash test-reldist.sh; cd ..
+(cd $STARTWD/reldist && bash test-reldist.sh) || FAILURES=$(expr $FAILURES + 1);
 
 echo " Testing bedtools shift:"
-cd shift; bash test-shift.sh; cd ..
+(cd $STARTWD/shift && bash test-shift.sh) || FAILURES=$(expr $FAILURES + 1);
 
 echo " Testing bedtools slop:"
-cd slop; bash test-slop.sh; cd ..
+(cd $STARTWD/slop && bash test-slop.sh) || FAILURES=$(expr $FAILURES + 1);
 
 echo " Testing bedtools sort:"
-cd sort; bash test-sort.sh; cd ..
+(cd $STARTWD/sort && bash test-sort.sh) || FAILURES=$(expr $FAILURES + 1);
 
 echo " Testing bedtools shuffle:"
-cd shuffle; bash test-shuffle.sh; cd ..
+(cd $STARTWD/shuffle && bash test-shuffle.sh) || FAILURES=$(expr $FAILURES + 1);
 
 echo " Testing bedtools subtract:"
-cd subtract; bash test-subtract.sh; cd ..
+(cd $STARTWD/subtract && bash test-subtract.sh) || FAILURES=$(expr $FAILURES + 1);
 
 echo " Testing bedtools sample:"
-cd sample; bash test-sample.sh; cd ..
+(cd $STARTWD/sample && bash test-sample.sh) || FAILURES=$(expr $FAILURES + 1);
 
 echo " Testing bedtools split:"
-cd split; bash test-split.sh; cd ..
+(cd $STARTWD/split && bash test-split.sh) || FAILURES=$(expr $FAILURES + 1);
 
 echo " Testing bedtools spacing:"
-cd spacing; bash test-spacing.sh; cd ..
+(cd $STARTWD/spacing && bash test-spacing.sh) || FAILURES=$(expr $FAILURES + 1);
+
+if [[ $FAILURES -gt 0 ]]; then
+    >&2 echo "$FAILURES tests failed";
+    exit 1;
+fi
+
+
+

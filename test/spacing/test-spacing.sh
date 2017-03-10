@@ -1,18 +1,21 @@
 BT=${BT-../../bin/bedtools}
 
+FAILURES=0;
+
 check()
 {
 	if diff $1 $2; then
     	echo ok
 	else
-    	echo fail
+    	FAILURES=$(expr $FAILURES + 1);
+		echo fail
 	fi
 }
 
 ###########################################################
 #  Test a basic file
 ###########################################################
-echo "    spacing.t01...\c"
+echo -e "    spacing.t01...\c"
 echo \
 "chr1	20	30	.
 chr1	25	40	-1
@@ -27,3 +30,4 @@ $BT spacing -i a.bed  > obs
 check obs exp
 rm obs exp
 
+[[ $FAILURES -eq 0 ]] || exit 1;

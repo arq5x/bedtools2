@@ -1,11 +1,14 @@
 BT=${BT-../../bin/bedtools}
 
+FAILURES=0;
+
 check()
 {
 	if diff $1 $2; then
     	echo ok
 	else
-    	echo fail
+    	FAILURES=$(expr $FAILURES + 1);
+		echo fail
 	fi
 }
 
@@ -187,3 +190,4 @@ $BT sort -i b.bed > obs
 check obs exp
 rm obs exp
 
+[[ $FAILURES -eq 0 ]] || exit 1;

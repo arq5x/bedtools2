@@ -23,6 +23,9 @@
 #include <unistd.h>
 #include <sys/types.h>
 #include <algorithm>  // for binary search
+#ifndef USE_RAND
+#include <random> // for the cross-platform-reproducible mersenne twister
+#endif
 using namespace std;
 
 //************************************************
@@ -63,6 +66,9 @@ private:
     size_t _maxTries;
     bool _noOverlapping;
     bool _preventExceedingChromEnd;
+#ifndef USE_RAND
+    mt19937 mt_rand;
+#endif
 
 
     // The BED file from which to compute coverage.

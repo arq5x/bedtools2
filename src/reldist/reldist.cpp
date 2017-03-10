@@ -84,7 +84,7 @@ void RelativeDistance::UpdateDistanceSummary(float rel_dist)
 }
 
 
-void RelativeDistance::CalculateRelativeDistance() 
+void RelativeDistance::CalculateRelativeDistance()
 {
     LoadMidpoints();
     
@@ -111,12 +111,18 @@ void RelativeDistance::CalculateRelativeDistance()
         
         // grab the indicies for the database midpoints that are left and
         // right of the query's midpoint.
-        low_idx = low - chrom_mids->begin() - 1;
+        if(low == chrom_mids->begin())
+        {
+            low_idx = low - chrom_mids->begin();
+        }
+        else {
+            low_idx = low - chrom_mids->begin() - 1;
+        }
         high_idx = low_idx + 1;
         
         // make sure we don't run off the boundaries of the database's
         // midpoint vector
-        if (low_idx != chrom_mids->size() - 1) 
+        if (low_idx != chrom_mids->size() - 1)
         {
             // grab the database midpoints that are left and right of
             // the query's midpoint.
