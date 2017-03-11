@@ -40,6 +40,9 @@ echo " Testing bedtools getfasta:"
 echo " Testing bedtools groupby:"
 (cd $STARTWD/groupby && bash test-groupby.sh) || FAILURES=$(expr $FAILURES + 1);
 
+echo " Testing innerSubtractBed:"
+cd innerSubtractBed; bash test-innersubtract.sh; cd ..
+
 echo " Testing bedtools intersect:"
 (cd $STARTWD/intersect && bash test-intersect.sh; bash new_test-intersect.sh) || FAILURES=$(expr $FAILURES + 1);
 

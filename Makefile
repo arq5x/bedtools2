@@ -53,6 +53,7 @@ SUBDIRS = $(SRC_DIR)/annotateBed \
 		  $(SRC_DIR)/genomeCoverageBed \
 		  $(SRC_DIR)/getOverlap \
 		  $(SRC_DIR)/groupBy \
+		  $(SRC_DIR)/innerSubtractBed \
 		  $(SRC_DIR)/intersectFile \
 		  $(SRC_DIR)/fisher \
 		  $(SRC_DIR)/jaccard \

@@ -1,0 +1,5 @@
+chr1	100	200	regionA
+chr1	10	400	regionB
+chr1	40	60	regionC
+chr1	50	1000	regionA
+chr2	100	500	regionD
