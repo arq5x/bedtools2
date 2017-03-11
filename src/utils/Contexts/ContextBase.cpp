@@ -135,7 +135,8 @@ bool ContextBase::determineOutputType() {
 	}
 
 	//Otherwise, if the input is BAM, then the output is BAM
-	if (getFile(0)->getFileType() == FileRecordTypeChecker::BAM_FILE_TYPE) {
+	int fileIdx = hasIntersectMethods() ? _queryFileIdx : 0;
+	if (_files[fileIdx]->getFileType() == FileRecordTypeChecker::BAM_FILE_TYPE) {
 		setOutputFileType(FileRecordTypeChecker::BAM_FILE_TYPE);
 		return true;
 	}

@@ -212,16 +212,7 @@ bool ContextIntersect::determineOutputType() {
 			_maxNumDatabaseFields = numFields;
 		}
 	}
-
-	//If the query is BAM, and bed output wasn't specified, then the output is BAM.
-	if (getQueryFileType() == FileRecordTypeChecker::BAM_FILE_TYPE && !getExplicitBedOutput()) {
-		setOutputFileType(FileRecordTypeChecker::BAM_FILE_TYPE);
-		_outputTypeDetermined = true;
-		return true;
-
-	}
 	return ContextBase::determineOutputType();
-
 }
 
 bool ContextIntersect::handle_a()
