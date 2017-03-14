@@ -26,7 +26,7 @@ Usage and option summary
 
 **(or)**:
 ::
-  
+
   bedtools window [OPTIONS] [-a|-abam] -b <BED/GFF/VCF>
 
   

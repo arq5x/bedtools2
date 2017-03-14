@@ -149,6 +149,7 @@ the entire span of a spliced/split BAM alignment. However, when using the
 created for each aligned portion of the sequencing read.
 
 ::
+
   Chromosome  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
              
   Exons       ***************                                    **********

@@ -15,6 +15,7 @@ Usage and option summary
 **Usage:**
 
 ::
+
   pairToPair [OPTIONS] -a <BEDPE> -b <BEDPE>
   
   
@@ -50,6 +51,7 @@ locations) F/R alignment will not be matched with a R/R alignment.
 Default: Report A if *both* ends overlaps B.
 
 ::
+
   Chromosome  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   
   BEDPE/BAM A         *****.................................*****
@@ -63,6 +65,7 @@ Default when strand information is present in both BEDPE files: Report A if *bot
 the same strands*.
 
 ::
+
   Chromosome  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   
   BEDPE A         >>>>>.................................>>>>>
@@ -90,6 +93,7 @@ feature in B.
 **-type neither**: Report A only if *neither* end overlaps B.
 
 ::
+
   Chromosome  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   
   BEDPE/BAM A         *****.................................*****

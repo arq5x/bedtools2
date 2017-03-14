@@ -14,7 +14,7 @@
 intervals defined in a BED/GFF/VCF file. 
 
 .. tip::
-    
+
     1. The headers in the input FASTA file must *exactly* match the chromosome 
     column in the BED file.
     
