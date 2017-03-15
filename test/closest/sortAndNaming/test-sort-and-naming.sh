@@ -302,7 +302,7 @@ rm exp obs
 echo -e "    closest.22...\c"
 echo \
 "ERROR: Sort order was unspecified, and file num_all.bed is not sorted lexicographically.
-       Please re-reun with the -g option for a genome file.
+       Please rerun with the -g option for a genome file.
        See documentation for details." > exp
 $BT closest -a num_missing.bed -b num_all.bed 2>&1 > /dev/null | cat - > obs
 check exp obs
