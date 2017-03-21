@@ -12,6 +12,7 @@ Usage and option summary
 Usage:
 
 ::
+
   bedToBam [OPTIONS] -i <BED/GFF/VCF> -g <GENOME> > <BAM>
   
 ===========================      ===============================================================================================================================================================================================================
@@ -31,6 +32,7 @@ Default behavior
 The default behavior is to assume that the input file is in unblocked format. For example:
 
 ::
+
   head -5 rmsk.hg18.chr21.bed
   chr21 9719768  9721892  ALR/Alpha  1004  +
   chr21 9721905  9725582  ALR/Alpha  1010  +
@@ -59,6 +61,7 @@ bedToBam) of a BED file of UCSC genes.
 For example:
 
 ::
+
   bedToBam -i knownGene.hg18.chr21.bed -g human.hg18.genome -bed12 > knownGene.bam
   
   samtools view knownGene.bam | head -2

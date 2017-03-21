@@ -51,7 +51,7 @@ Usage and option summary
 
 **(or)**:
 ::
-  
+
   intersectBed [OPTIONS] -a <FILE> \
                          -b <FILE1, FILE2, ..., FILEN>
 
@@ -712,6 +712,7 @@ are reported as overlapping with the "split" BAM alignment, but in addition, a t
 overlaps the "split" portion of the alignment is also reported.
 
 ::
+
   Chromosome  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   
   Exons       ---------------                                       ----------
@@ -726,6 +727,7 @@ overlaps the "split" portion of the alignment is also reported.
 In contrast, when using the **-split** option, only the exon overlaps are reported.
 
 ::
+
   Chromosome  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   
   Exons       ---------------                                       ----------

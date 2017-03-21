@@ -27,7 +27,7 @@ Usage and option summary
 
 **(or)**:
 ::
-  
+
   subtractBed [OPTIONS] -a <BED/GFF/VCF> -b <BED/GFF/VCF>
 
 

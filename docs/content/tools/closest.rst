@@ -50,7 +50,7 @@ Usage and option summary
 
 **(or)**:
 ::
-  
+
   closestBed [OPTIONS] -a <FILE> \
                        -b <FILE1, FILE2, ..., FILEN>
   

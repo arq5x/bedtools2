@@ -44,7 +44,7 @@ Usage and option summary
 
 **(or)**:
 ::
-  
+
   coverageBed [OPTIONS] -a <FILE> \
                          -b <FILE1, FILE2, ..., FILEN>
 

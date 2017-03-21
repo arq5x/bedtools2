@@ -232,6 +232,7 @@ The GFF format is described on the Sanger Institute's website (http://www.sanger
 An entry from an example GFF file :
 
 ::
+
   seq1 BLASTX similarity 101 235 87.1 + 0 Target "HBA_HUMAN" 11 55 ;
   E_value 0.0003 dJ102G20 GD_mRNA coding_exon 7105 7201 . - 2 Sequence
   "dJ102G20.C1.1"
@@ -251,6 +252,7 @@ the chromosomes (or scaffolds, etc.) and their size (in basepairs).
 Genome files must be **tab-delimited** and are structured as follows (this is an example for *C. elegans*):
 
 ::
+
   chrI  15072421
   chrII 15279323 
   ...
