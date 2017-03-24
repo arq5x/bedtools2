@@ -359,7 +359,7 @@ void NewChromSweep::testChromOrder(const Record *rec)
             // ERROR.
             fprintf(stderr, "ERROR: Sort order was unspecified, and file %s is not sorted lexicographically.\n",
                     _context->getInputFileName(fileIdx).c_str());
-            fprintf(stderr, "       Please re-reun with the -g option for a genome file.\n       See documentation for details.\n");
+            fprintf(stderr, "       Please rerun with the -g option for a genome file.\n       See documentation for details.\n");
             exit(1);
         }
         _lexicoDisproven = true;
@@ -449,7 +449,7 @@ void NewChromSweep::testThatAllDbChromsExistInQuery()
             {
                 fprintf(stderr, "ERROR: Database file %s contains chromosome %s, but the query file does not.\n",
                         _context->getInputFileName(i).c_str(), chrom.c_str());
-                fprintf(stderr, "       Please re-reun with the -g option for a genome file.\n       See documentation for details.\n");
+                fprintf(stderr, "       Please rerun with the -g option for a genome file.\n       See documentation for details.\n");
                 exit(1);
             }
         }
