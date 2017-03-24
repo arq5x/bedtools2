@@ -49,9 +49,14 @@ bool SpacingFile::findNext(RecordKeyVector &hits)
 			{
 				// do _currRec and _prevRec overlap?
 				if (_currRec->sameChromIntersects(_prevRec, false, false, 1E-9, 1E-9, false, false))
-					_distance.append(0);
+					_distance.append("-1");
 				else
-					_distance.append(_currRec->getStartPos() - _prevRec->getEndPos());
+				{
+					int distance = _currRec->getStartPos() - _prevRec->getEndPos();
+					ostringstream s;
+					s << distance;
+					_distance.append(s.str());
+				}
 			}
 			// we have changed chromosomes
 			else if (_currRec->getChrName() != _prevRec->getChrName())

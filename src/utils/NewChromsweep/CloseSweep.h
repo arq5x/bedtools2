@@ -17,27 +17,16 @@
 class distanceTuple {
 public:
 	distanceTuple() : _dist(0), _rec(NULL), _isNeg(false) {}
-	distanceTuple(int dist, const Record *rec, bool isNeg = false) : _dist(dist), _rec(rec), _isNeg(isNeg) {}
-//	bool operator < (const distanceTuple & other) const { return (_dist < other._dist); }
+	distanceTuple(int dist, Record *rec, bool isNeg = false) : _dist(dist), _rec(rec), _isNeg(isNeg) {}
 	int _dist;
-	const Record *_rec;
+	Record *_rec;
 	bool _isNeg;
 };
 
 class DistanceTupleSortAscFunctor {
 public:
 	bool operator()(const distanceTuple & d1, const distanceTuple & d2) const {
-//		return ((d1._dist < d2._dist) ? true : (d1._dist == d2._dist ? (d1._rec->lessThan(d2._rec)) :  false)); }
-
 		return (d1._dist < d2._dist ? true : (d1._dist == d2._dist ? d1._rec->lessThan(d2._rec) : false));
-//		if (d1._dist < d2._dist) {
-//			return true;
-//		} else if (d1._dist == d2._dist) {
-//			if () {
-//				return true;
-//			}
-//		}
-//		return false;
 	}
 };
 
@@ -51,12 +40,12 @@ public:
 	void clear();
 	int uniqueSize() const { return _currNumIdxs; }
 	size_t totalSize() const { return _totalRecs; }
-	bool addRec(int dist, const Record *, chromDirType chromDir);
+	bool addRec(int dist, Record *, chromDirType chromDir);
 	bool exists(int dist) const {
 		int dummyVal = 0;
 		return find(dist, dummyVal);
 	}
-	typedef pair<chromDirType, const Record *> elemPairType;
+	typedef pair<chromDirType, Record *> elemPairType;
 	typedef vector<elemPairType> elemsType;
 	typedef pair<int, int> indexType;
 
@@ -66,12 +55,12 @@ public:
 	constIterType end() const { return _currNumIdxs; }
 	int currDist(constIterType iter) const { return _distIndex[iter].first; }
 	size_t currNumElems(constIterType iter) const { return allElems(iter)->size(); }
-	const elemsType *allElems(constIterType iter) const { return _allRecs[_distIndex[iter].second]; }
+	elemsType *allElems(constIterType iter) const { return _allRecs[_distIndex[iter].second]; }
 	int getMaxLeftEndPos() const;
 
 private:
 
-	void insert(int dist, const Record *, chromDirType chromDir);
+	void insert(int dist, Record *, chromDirType chromDir);
 
 
 	//if true, pos will be the idx the distance is at.
@@ -148,7 +137,7 @@ private:
 
 
  	typedef enum { IGNORE, DELETE } rateOvlpType;
-    rateOvlpType considerRecord(const Record *cacheRec, int dbIdx, bool &stopScanning);
+    rateOvlpType considerRecord(Record *cacheRec, int dbIdx, bool &stopScanning);
     void finalizeSelections(int dbIdx, RecordKeyVector &retList);
     void checkMultiDbs(RecordKeyVector &retList);
 
@@ -157,12 +146,12 @@ private:
     typedef enum { NEITHER, FORWARD_ONLY, REVERSE_ONLY, BOTH } purgeDirectionType;
 
     void setLeftClosestEndPos(int dbIdx);
-    bool beforeLeftClosestEndPos(int dbIdx, const Record *rec);
+    bool beforeLeftClosestEndPos(int dbIdx, Record *rec);
     void clearClosestEndPos(int dbIdx);
-    int addRecsToRetList(const RecDistList::elemsType *recs, int currDist, RecordKeyVector &retList);
-    void addSingleRec(const Record *rec, int currDist, int &hitsUsed, RecordKeyVector &retList);
-    rateOvlpType tryToAddRecord(const Record *cacheRec, int dist, int dbIdx, bool &stopScanning, chromDirType chromDir, streamDirType streamDir);
-    purgeDirectionType purgePointException(int dbIdx);
+    int addRecsToRetList(RecDistList::elemsType *recs, int currDist, RecordKeyVector &retList);
+    void addSingleRec(Record *rec, int currDist, int &hitsUsed, RecordKeyVector &retList);
+    rateOvlpType tryToAddRecord(Record *cacheRec, int dist, int dbIdx, bool &stopScanning, chromDirType chromDir, streamDirType streamDir);
+    purgeDirectionType purgePointException();
 
 };
 

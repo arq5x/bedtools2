@@ -31,38 +31,42 @@ bool Bed3Interval::initFromFile(SingleLineDelimTextFileReader *fileReader)
 	return true;
 }
 
-void Bed3Interval::print(QuickString &outBuf) const
+void Bed3Interval::print(string &outBuf) const
 {
-	outBuf.append(_chrName);
-	outBuf.append('\t');
-	outBuf.append(_startPos);
-	outBuf.append('\t');
-	outBuf.append(_endPos);
+	ostringstream s;
+	s << _chrName;
+	s << "\t";
+	s << _startPos;
+	s << "\t";
+	s << _endPos;
+	outBuf.append(s.str());
 }
 
-void Bed3Interval::print(QuickString &outBuf, int start, int end) const
+void Bed3Interval::print(string &outBuf, int start, int end) const
+{
+	ostringstream s;
+	s << _chrName;
+	s << "\t";
+	s << start;
+	s << "\t";
+	s << end;
+	outBuf.append(s.str());
+}
+
+void Bed3Interval::print(string &outBuf, const string & start, const string & end) const
 {
 	outBuf.append(_chrName);
-	outBuf.append('\t');
+	outBuf.append("\t");
 	outBuf.append(start);
-	outBuf.append('\t');
+	outBuf.append("\t");
 	outBuf.append(end);
 }
 
-void Bed3Interval::print(QuickString &outBuf, const QuickString & start, const QuickString & end) const
-{
-	outBuf.append(_chrName);
-	outBuf.append('\t');
-	outBuf.append(start);
-	outBuf.append('\t');
-	outBuf.append(end);
-}
-
-void Bed3Interval::printNull(QuickString &outBuf) const {
+void Bed3Interval::printNull(string &outBuf) const {
 	outBuf.append(".\t-1\t-1", 7);
 }
 
-const QuickString &Bed3Interval::getField(int fieldNum) const
+const string &Bed3Interval::getField(int fieldNum) const
 {
 	switch (fieldNum) {
 	case 1:

@@ -9,13 +9,13 @@
 #define BUFFEREDSTREAMMGR_H_
 
 #include <iostream>
-#include "QuickString.h"
+#include "string.h"
 #include "FileRecordTypeChecker.h"
 #include "InputStreamMgr.h"
 
 class BufferedStreamMgr {
 public:
-	BufferedStreamMgr(const QuickString &filename);
+	BufferedStreamMgr(const string &filename);
 	~BufferedStreamMgr();
 
 	bool init();
@@ -23,7 +23,7 @@ public:
 	FileRecordTypeChecker & getTypeChecker() { return _typeChecker; }
 
 	bool eof() const { return _eof; }
-	bool getLine(QuickString &line);
+	bool getLine(string &line);
 	BamTools::BamReader *getBamReader() { return _inputStreamMgr->getBamReader(); }
 	static const int DEFAULT_MAIN_BUF_READ_SIZE = 1023;
 	void setIoBufSize(int val) { _useBufSize = val; }
@@ -33,14 +33,14 @@ private:
 	bufType *_mainBuf;
 
 	FileRecordTypeChecker _typeChecker;
-	QuickString _filename;
+	string _filename;
 
 	int _mainBufCurrStartPos;
 	int _mainBufCurrLen;
 	bool _eof;
 	int _useBufSize;
 	bool _streamFinished;
-	QuickString _currScanBuffer;
+	string _currScanBuffer;
 
 	//The minus ones in these constants are for leaving room for a null terminator after reading into buffers.
 	static const int GZIP_LINE_BUF_SIZE = 8191; // 8K

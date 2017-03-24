@@ -181,12 +181,12 @@ bool FileRecordTypeChecker::handleTextFormat(const char *buffer, size_t len)
 		//Tokenize the first line of valid data into fields.
 		//Need to make a copy so next call to tokenizer doesn't overwrite the line.
 
-		QuickString line(_tokenizer.getElem(_firstValidDataLineIdx));
+		string line(_tokenizer.getElem(_firstValidDataLineIdx));
 
 		_tokenizer.setKeepFinalIncompleteElem(Tokenizer::USE_NOW);
 		_tokenizer.setNumExpectedItems(_numFields);
-
-		if (_tokenizer.tokenize(line, _delimChar) != _numFields) {
+		_tokenizer.tokenize(line, _delimChar);
+		if (_tokenizer.getNumFields(line, _delimChar) != _numFields) {
 			cerr << "Error: Type checker found wrong number of fields while tokenizing data line." << endl;
 			exit(1);
 		}
@@ -293,7 +293,7 @@ bool FileRecordTypeChecker::isGFFformat()
 
 bool FileRecordTypeChecker::isTextDelimtedFormat(const char *buffer, size_t len)
 {
-	//Break single string buffer into vector of QuickStrings. Delimiter is newline.
+	//Break single string buffer into vector of strings. Delimiter is newline.
 	_tokenizer.setKeepFinalIncompleteElem(Tokenizer::IGNORE);
 	int numLines = _tokenizer.tokenize(buffer, '\n', _eofHit, _isCompressed);
 
@@ -318,17 +318,18 @@ bool FileRecordTypeChecker::isTextDelimtedFormat(const char *buffer, size_t len)
 	int emptyLines = 0;
 	for (int i=0; i < numLines; i++ ) {
 
+
 		if (validLinesFound >=4) {
 			break; //really only need to look at like 4 lines of data, max.
 		}
-		const QuickString &line = _tokenizer.getElem(i);
-		int len =line.size();
+
+		const string line = _tokenizer.getElem(i);
+
 		//skip over any empty line
-		if (len == 0) {
+		if (line.size() == 0) {
 			emptyLines++;
 			continue;
 		}
-
 		//
 		//skip over any header line
 		//
@@ -349,8 +350,6 @@ bool FileRecordTypeChecker::isTextDelimtedFormat(const char *buffer, size_t len)
 			continue;
 		}
 
-
-
 		//a line must have some alphanumeric characters in order to be valid.
 		bool hasAlphaNum = false;
 		for (int j=0; j < len; j++) {
@@ -364,25 +363,20 @@ bool FileRecordTypeChecker::isTextDelimtedFormat(const char *buffer, size_t len)
 		}
 
 		validLinesFound++;
+
 		if (_firstValidDataLineIdx == -1) {
 			_firstValidDataLineIdx = i;
 		}
 
-		int lineTabCount = 0, lineCommaCount=0, lineSemicolonCount =0;
-		for (int j=0; j < len; j++) {
-			char currChar = line[j];
-			if (currChar == '\t') {
-				lineTabCount++;
-			} else if (currChar == ',') {
-				lineCommaCount++;
-			} else if (currChar == ';') {
-				lineSemicolonCount++;
-			}
-		}
-		tabCounts.push_back(lineTabCount);
-		commaCounts.push_back(lineCommaCount);
-		semicolonCounts.push_back(lineSemicolonCount);
+		int tab_count = std::count(line.begin(), line.end(), '\t');
+		int comma_count = std::count(line.begin(), line.end(), ',');
+		int semicolon_count = std::count(line.begin(), line.end(), ';');
+
+		tabCounts.push_back(tab_count);
+		commaCounts.push_back(comma_count);
+		semicolonCounts.push_back(semicolon_count);
 	}
+
 
 	if (headerCount + emptyLines == numLines) {
 		_insufficientData = true;
@@ -393,6 +387,7 @@ bool FileRecordTypeChecker::isTextDelimtedFormat(const char *buffer, size_t len)
 	_insufficientData = false;
 
 	if (delimiterTesting(tabCounts, '\t')) {
+
 		return true;
 	}
 	else if (validLinesFound) {
@@ -424,7 +419,7 @@ bool FileRecordTypeChecker::delimiterTesting(vector<int> &counts, char suspectCh
 			//Hurray!! We have successfully found a delimited file.
 			_isDelimited = true;
 			_delimChar = suspectChar;
-			_numFields = numDelims +1;
+			_numFields = numDelims + 1;
 			return true;
 		} else {
 			return false;
@@ -460,6 +455,6 @@ bool FileRecordTypeChecker::passesBed12() {
 }
 
 bool FileRecordTypeChecker::isStrandField(int field) {
-	const QuickString &strandChar = _tokenizer.getElem(field);
+	const string &strandChar = _tokenizer.getElem(field);
 	return (strandChar == "+" || strandChar == "-" || strandChar == ".");
 }

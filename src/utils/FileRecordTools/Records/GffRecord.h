@@ -20,27 +20,28 @@ public:
 	virtual ~GffRecord();
 	virtual bool initFromFile(SingleLineDelimTextFileReader *);
 	virtual void clear();
-	virtual void print(QuickString &outBuf) const;
-	virtual void print(QuickString &outBuf, int start, int end) const;
-	virtual void print(QuickString &outBuf, const QuickString & start, const QuickString & end) const;
-	virtual void printNull(QuickString &outBuf) const;
+	virtual void print(string &outBuf) const;
+	virtual void print(string &outBuf, int start, int end) const;
+	virtual void print(string &outBuf, const string & start, const string & end) const;
+	virtual void printNull(string &outBuf) const;
 	virtual FileRecordTypeChecker::RECORD_TYPE getType() const { return FileRecordTypeChecker::GFF_RECORD_TYPE; }
-	virtual const QuickString &getSource() const { return _source; }
-	virtual const QuickString &getFrame() const { return _frame; }
-	virtual const QuickString &getGroup() const { return _group; }
+	virtual const string &getSource() const { return _source; }
+	virtual const string &getFrame() const { return _frame; }
+	virtual const string &getGroup() const { return _group; }
 	virtual int getNumFields() const { return _numFields; }
 	virtual void setNumFields(int val) { _numFields = val; }
 
-	virtual const QuickString &getField(int fieldNum) const;
+	virtual const string &getField(int fieldNum) const;
 	static bool isNumericField(int fieldNum);
+	virtual bool isZeroBased() const {return false;};
 
 protected:
-	void printRemainingFields(QuickString &outbuf) const;
+	void printRemainingFields(string &outbuf) const;
 
 	int _numFields;
-	QuickString _source;
-	QuickString _frame;
-	QuickString _group;
+	string _source;
+	string _frame;
+	string _group;
 
 };
 

@@ -13,7 +13,7 @@
 #include <set>
 #include <map>
 
-#include "QuickString.h"
+#include "string.h"
 #include "RecordKeyList.h"
 #include "ContextIntersect.h"
 
@@ -56,18 +56,18 @@ private:
 //	typedef const RecordListNode * innerListIterType;
 //	typedef innerListType * binType;
 //	typedef binType * allBinsType;
-//	typedef QuickString mainKeyType;
+//	typedef string mainKeyType;
 //	typedef map<mainKeyType, allBinsType> mainMapType;
 //	mainMapType _mainMap;
 
-	typedef vector<const Record *> binType;
+	typedef vector<Record *> binType;
 	typedef map<binNumType, binType> allBinsType; //for each bin number, have a RecordList
-	typedef map<QuickString, allBinsType> mainMapType; //for each chrom, a map of bin num to RecordLists.
+	typedef map<string, allBinsType> mainMapType; //for each chrom, a map of bin num to RecordLists.
 	mainMapType _mainMap;
 
 	map<binNumType, int> _binsHit;
 
-	bool addRecordToTree(const Record *);
+	bool addRecordToTree(Record *);
 	binNumType getBin(binNumType start, binNumType end) const;
 	binNumType getBin(const Record *record) const;
 

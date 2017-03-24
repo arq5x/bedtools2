@@ -27,8 +27,8 @@ public:
 	void setQueryFileIdx(int idx) { _queryFileIdx = idx; }
 	int getNumDatabaseFiles() { return (int)_dbFileIdxs.size(); }
 	const vector<int> &getDbFileIdxs() const { return _dbFileIdxs; }
-	const QuickString &getQueryFileName() const { return _files[_queryFileIdx]->getFileName(); }
-	const QuickString &getDatabaseFileName(int idx) const { return _files[_dbFileIdxs[idx]]->getFileName(); }
+	const string &getQueryFileName() const { return _files[_queryFileIdx]->getFileName(); }
+	const string &getDatabaseFileName(int idx) const { return _files[_dbFileIdxs[idx]]->getFileName(); }
 	ContextFileType getQueryFileType() const { return _files[_queryFileIdx]->getFileType(); }
 	ContextFileType getDatabaseFileType(int idx) const { return _files[_dbFileIdxs[idx]]->getFileType(); }
 	ContextRecordType getQueryRecordType() const { return _files[_queryFileIdx]->getRecordType(); }
@@ -36,8 +36,8 @@ public:
 	int getMaxNumDatabaseFields() const { return _maxNumDatabaseFields; }
 	void setMaxNumDatabaseFields(int val) { _maxNumDatabaseFields = val; }
 	int getDbIdx(int fileId) { return _fileIdsToDbIdxs.find(fileId)->second; }
-	void addDatabaseNameTag(const QuickString &tag) { _dbNameTags.push_back(tag); }
-	const QuickString &getDatabaseNameTag(int dbIdx) const { return _dbNameTags[dbIdx]; }
+	void addDatabaseNameTag(const string &tag) { _dbNameTags.push_back(tag); }
+	const string &getDatabaseNameTag(int dbIdx) const { return _dbNameTags[dbIdx]; }
 
 	bool getAnyHit() const {return _anyHit; }
 	void setAnyHit(bool val) { _anyHit = val; }
@@ -88,6 +88,16 @@ public:
 
 	bool getDiffStrand() const {return _diffStrand; }
 	void setDiffStrand(bool val) { _diffStrand = val; }
+
+	// should every record in the query file be processed when
+	// using -sorted? This is relevant when we know that all database
+	// records have been processed but there are more query records.
+	// For example, the default behaviour of intersect would be to stop in this
+	// case, as there are no more intersections to report.
+	// However, the coverage tool needs to process every record, as does
+	//
+	bool getRunToQueryEnd() const {return _runToQueryEnd; }
+	void setRunToQueryEnd(bool val) { _runToQueryEnd = val; }
 
     virtual bool hasIntersectMethods() const { return true; }
 

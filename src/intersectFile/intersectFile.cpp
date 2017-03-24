@@ -51,12 +51,14 @@ bool IntersectFile::init() {
 
 bool IntersectFile::findNext(RecordKeyVector &hits)
 {
-	bool retVal = false;
+	 bool retVal = false;
 	 if (upCast(_context)->getSortedInput()) {
 		retVal = nextSortedFind(hits);
-	 } else {
+	 } 
+	 else {
 		retVal = nextUnsortedFind(hits);
 	 }
+
 	 if (retVal) {
 		 checkSplits(hits);
 	 }
@@ -65,6 +67,7 @@ bool IntersectFile::findNext(RecordKeyVector &hits)
 
 void IntersectFile::processHits(RecordOutputMgr *outputMgr, RecordKeyVector &hits)
 {
+	RecordKeyVector::iterator_type hitListIter = hits.begin();
 	outputMgr->printRecord(hits);
 }
 
@@ -118,9 +121,16 @@ void IntersectFile::makeSweep() {
 void IntersectFile::checkSplits(RecordKeyVector &hitSet)
 {
 	if (upCast(_context)->getObeySplits()) {
-		RecordKeyVector keySet(hitSet.getKey());
-		RecordKeyVector resultSet(hitSet.getKey());
-		upCast(_context)->getSplitBlockInfo()->findBlockedOverlaps(keySet, hitSet, resultSet);
-		hitSet.swap(resultSet);
+
+		// when using coverage, we need a list of the sub-intervals of coverage
+		// so that per-base depth can be properly calculated when obeying splits
+		if (_context->getProgram() == ContextBase::COVERAGE)
+		{
+			upCast(_context)->getSplitBlockInfo()->findBlockedOverlaps(hitSet, true);
+		}
+		else
+		{
+			upCast(_context)->getSplitBlockInfo()->findBlockedOverlaps(hitSet, false);
+		}
 	}
 }

@@ -10,7 +10,7 @@
 
 #include <string>
 #include "FreeList.h"
-#include "QuickString.h"
+#include "string.h"
 #include "FileRecordTypeChecker.h"
 
 using namespace std;
@@ -26,21 +26,27 @@ public:
 
 	friend class FreeList<Record>;
 
+	virtual ~Record(); //by making the destructor protected, only the friend class(es) can actually delete Record objects, or objects derived from Record.
+
 	typedef enum { FORWARD, REVERSE, UNKNOWN } strandType;
 	Record();
 	virtual bool initFromFile(FileReader *) =0;
 	virtual void clear();
-	virtual void print(QuickString &outBuf) const {}
-	virtual void print(QuickString &outBuf, int start, int end) const {}
-	virtual void print(QuickString &outBuf, const QuickString & start, const QuickString & end) const {}
+	virtual void print(string &) const {}
+	virtual void print(string &, int, int ) const {}
+	virtual void print(string &, const string &, const string &) const {}
 	virtual void print(FILE *fp, bool newline = false) const;
-	virtual void printNull(QuickString &outBuf) const {}
+	virtual void printNull(string &) const {}
 	friend ostream &operator << (ostream &out, const Record &record);
 
 	virtual const Record & operator=(const Record &);
 
-	virtual const QuickString &getChrName() const { return _chrName; }
-	virtual void setChrName(const QuickString &chr) { _chrName = chr; }
+	virtual bool isZeroBased() const {return true;};
+
+	virtual void setValid(const bool valid)  { _isValidHit = valid; }
+	virtual bool isValid() const { return _isValidHit; }
+
+	virtual const string &getChrName() const { return _chrName; }
 	virtual void setChrName(const string &chr) { _chrName = chr; }
 	virtual void setChrName(const char *chr) { _chrName = chr; }
 
@@ -52,19 +58,19 @@ public:
 
 	virtual int getStartPos() const { return _startPos; }
 	virtual void setStartPos(int startPos) { _startPos = startPos; }
-	virtual const QuickString &getStartPosStr() const { return _startPosStr; }
-	virtual void setStartPosStr(const QuickString &str) { _startPosStr = str; }
+	virtual const string &getStartPosStr() const { return _startPosStr; }
+	virtual void setStartPosStr(const string &str) { _startPosStr = str; }
 
 	virtual int getEndPos() const { return _endPos; }
 	virtual void setEndPos(int endPos) { _endPos = endPos; }
-	virtual const QuickString &getEndPosStr() const { return _endPosStr; }
-	virtual void setEndPosStr(const QuickString &str) { _endPosStr = str; }
+	virtual const string &getEndPosStr() const { return _endPosStr; }
+	virtual void setEndPosStr(const string &str) { _endPosStr = str; }
 
 	virtual bool getZeroLength() const { return _zeroLength; }
 	virtual void setZeroLength(bool val) { _zeroLength = val; }
 
-	virtual const QuickString &getStrand() const { return _strand; }
-	virtual void setStrand(const QuickString &val) { _strand = val;
+	virtual const string &getStrand() const { return _strand; }
+	virtual void setStrand(const string &val) { _strand = val;
 		_strandVal = (val == "+" ? FORWARD : (val == "-" ? REVERSE : UNKNOWN));
 	}
 	virtual void setStrand(char val) { _strand = val;
@@ -76,17 +82,15 @@ public:
 
 	virtual strandType getStrandVal() const {return _strandVal; }
 
-	virtual const QuickString &getName() const { return _name; }
-	virtual void setName(const QuickString &chr) { _name = chr; }
-	virtual void setName(const string &chr) { _name = chr; }
+	virtual const string &getName() const { return _name; }
+	virtual void setName(const string &name) { _name = name; }
 	virtual void setName(const char *chr) { _name = chr; }
 
-	virtual const QuickString &getScore() const { return _score; }
-	virtual void setScore(const QuickString &chr) { _score = chr; }
-	virtual void setScore(const string &chr) { _score = chr; }
+	virtual const string &getScore() const { return _score; }
+	virtual void setScore(const string &score) { _score = score; }
 	virtual void setScore(const char *chr) { _score = chr; }
 
-	virtual const QuickString &getField(int fieldNum) const;
+	virtual const string &getField(int fieldNum) const;
 	virtual int getNumFields() const  = 0;
 
 	virtual FileRecordTypeChecker::RECORD_TYPE getType() const { return FileRecordTypeChecker::UNKNOWN_RECORD_TYPE; }
@@ -107,7 +111,7 @@ public:
 	// Bam record.
 	bool isUnmapped() const { return _isUnmapped; }
 	bool isMateUnmapped() const { return _isMateUnmapped; }
-	virtual void printUnmapped(QuickString &outBuf) const {}
+	virtual void printUnmapped(string &) const {}
 
 
 
@@ -150,26 +154,32 @@ public:
 	bool hasLeadingZeroInChromName(bool chrKnown = false) const;
 	virtual int getLength(bool obeySplits) const;
 
+	void setFileRecordManager(FileRecordMgr *frm);
+	FileRecordMgr * getFileRecordManager();
+
+	vector<int> block_starts;
+	vector<int> block_ends;
 
 protected:
-	virtual ~Record(); //by making the destructor protected, only the friend class(es) can actually delete Record objects, or objects derived from Record.
 
 	int _fileIdx; //associated file the record came from
-	QuickString _chrName;
+	string _chrName;
 	int _chrId;
 	int _startPos;
 	int _endPos;
 	//It is actually faster to also store the start and end positions as their original strings than to
 	//have to convert their integer representations back to strings when printing them.
-	QuickString _startPosStr;
-	QuickString _endPosStr;
-	QuickString _name;
-	QuickString _score;
-	QuickString _strand;
+	string _startPosStr;
+	string _endPosStr;
+	string _name;
+	string _score;
+	string _strand;
 	strandType _strandVal;
 	bool _zeroLength;
 	bool _isUnmapped;
 	bool _isMateUnmapped;
+	bool _isValidHit;
+	FileRecordMgr *_frm;
 };
 
 class RecordPtrSortAscFunctor {

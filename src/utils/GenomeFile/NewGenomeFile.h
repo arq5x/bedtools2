@@ -25,32 +25,32 @@ class NewGenomeFile {
 
 public:
 
-     NewGenomeFile(const QuickString &genomeFileName);
+     NewGenomeFile(const string &genomeFileName);
      NewGenomeFile(const BamTools::RefVector &genome);
     ~NewGenomeFile(void);
 
     // load a GENOME file into a map keyed by chrom. value is a pair<int, int> of id and size.
     void loadGenomeFileIntoMap();
     
-    bool projectOnGenome(CHRPOS genome_pos, QuickString &chrom, CHRPOS &start);
+    bool projectOnGenome(CHRPOS genome_pos, string &chrom, CHRPOS &start);
     
     CHRPOS getGenomeSize(void) const { return _genomeLength; }                // return the total size of the genome
-    CHRPOS getChromSize(const QuickString &chrom);  // return the size of a chromosome
-    CHRPOS getChromSize(const QuickString &chrom) const;  // return the size of a chromosome
-    CHRPOS getChromId(const QuickString &chrom); // return chromosome's sort order
-    const vector<QuickString> &getChromList() const { return _chromList; }  // return a list of chrom names
+    CHRPOS getChromSize(const string &chrom);  // return the size of a chromosome
+    CHRPOS getChromSize(const string &chrom) const;  // return the size of a chromosome
+    CHRPOS getChromId(const string &chrom); // return chromosome's sort order
+    const vector<string> &getChromList() const { return _chromList; }  // return a list of chrom names
     CHRPOS getNumberOfChroms() const { return _chromList.size() -1; }//the -1 excludes the blank chrom added for unmapped reads
-    const QuickString &getGenomeFileName() const { return _genomeFileName; }
-    bool hasChrom(const QuickString &chrom) const { return _chromSizeIds.find(chrom) != _chromSizeIds.end(); }
+    const string &getGenomeFileName() const { return _genomeFileName; }
+    bool hasChrom(const string &chrom) const { return _chromSizeIds.find(chrom) != _chromSizeIds.end(); }
 
 
 
 
 private:
-    QuickString  _genomeFileName;
-    typedef map<QuickString, pair<CHRPOS, int> > lookupType;
+    string  _genomeFileName;
+    typedef map<string, pair<CHRPOS, int> > lookupType;
     lookupType _chromSizeIds;
-    vector<QuickString> _chromList;
+    vector<string> _chromList;
     int _maxId;
 
     // projecting chroms onto a single coordinate system
@@ -58,7 +58,7 @@ private:
     vector<CHRPOS> _startOffsets;
     
     //cache members for quick lookup
-    QuickString _currChromName;
+    string _currChromName;
     CHRPOS _currChromSize;
     int _currChromId;
 

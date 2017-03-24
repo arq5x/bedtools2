@@ -38,7 +38,7 @@ void ComplementFile::processHits(RecordOutputMgr *outputMgr, RecordKeyVector &hi
 	const Record *rec = hits.getKey();
 
 	//test for chrom change.
-	const QuickString &newChrom = rec->getChrName();
+	const string &newChrom = rec->getChrName();
 	if (_currChrom != newChrom) {
 
 		outPutLastRecordInPrevChrom();
@@ -54,30 +54,48 @@ void ComplementFile::processHits(RecordOutputMgr *outputMgr, RecordKeyVector &hi
 		_outRecord.setChrName(newChrom);
 	}
 
-	// safegaurd agains the first record for the chrom
+	// warn if the record's interval is beyond the 
+	// length of the chromosome
+	checkCoordinatesAgainstChromLength(rec);
+	
+	// safe guard against the first record for the chrom
 	// starting with 0.
 	if (rec->getStartPos() != 0)
 	{
 		int endPos = rec->getStartPos();
-		printRecord(endPos);		
+		printRecord(endPos);
 	}
 	_currStartPos = rec->getEndPos();
 }
+
+void ComplementFile::checkCoordinatesAgainstChromLength(const Record *rec)
+{
+	int maxChromSize = _genomeFile->getChromSize(_currChrom);	
+	if (rec->getStartPos() > maxChromSize || rec->getEndPos() > maxChromSize)
+	{
+		cerr << "***** WARNING: " 
+		     << rec->getChrName() << ":" << rec->getStartPos() << "-" << rec->getEndPos() 
+		     << " exceeds the length of chromosome (" 
+		     << _currChrom
+		     << ")"
+             << endl;
+	}
+} 
 
 void ComplementFile::cleanupHits(RecordKeyVector &hits)
 {
 	_frm->deleteMergedRecord(hits);
 }
 
-bool ComplementFile::finalizeCalculations() {
+void ComplementFile::giveFinalReport(RecordOutputMgr *outputMgr) {
+  	_outputMgr = outputMgr;
 	outPutLastRecordInPrevChrom();
 	fastForward("");
-	return true;
 }
 
 void ComplementFile::outPutLastRecordInPrevChrom()
 {
-	const QuickString &chrom = _outRecord.getChrName();
+	const string &chrom = _outRecord.getChrName();
 
 	//do nothing if triggered by first record in DB. At this point,
 	//there was no prev chrom, so nothing is stored in the output Record yet.
@@ -88,7 +106,7 @@ void ComplementFile::outPutLastRecordInPrevChrom()
 	printRecord(maxChromSize);
 }
 
-bool ComplementFile::fastForward(const QuickString &newChrom) {
+bool ComplementFile::fastForward(const string &newChrom) {
 	if (!newChrom.empty() && !_genomeFile->hasChrom(newChrom)) return false;
 
 	int i= _currPosInGenomeList +1;
@@ -115,18 +133,16 @@ bool ComplementFile::fastForward(const QuickString &newChrom) {
 void ComplementFile::printRecord(int endPos)
 {
 	_outRecord.setStartPos(_currStartPos);
-	QuickString startStr;
-	startStr.append(_currStartPos);
-	_outRecord.setStartPosStr(startStr);
+	stringstream startStr;
+	startStr << _currStartPos;
+	_outRecord.setStartPosStr(startStr.str());
 
 	_outRecord.setEndPos(endPos);
-	QuickString endStr;
-	endStr.append(endPos);
-	_outRecord.setEndPosStr(endStr);
+	stringstream endStr;
+	endStr << endPos;
+	_outRecord.setEndPosStr(endStr.str());
 
 	_outputMgr->printRecord(&_outRecord);
 	_outputMgr->newline();
 
 }
-
-

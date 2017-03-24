@@ -17,7 +17,7 @@ RecordKeyVector::RecordKeyVector()
 	_mustDeleteVec = true;
 }
 
-RecordKeyVector::RecordKeyVector(const Record * item)
+RecordKeyVector::RecordKeyVector(Record * item)
 : _key(item),
   _currPos(0)
 {
@@ -25,7 +25,7 @@ RecordKeyVector::RecordKeyVector(const Record * item)
 	_mustDeleteVec = true;
 }
 
-RecordKeyVector::RecordKeyVector(const Record * item, const vecType *vec)
+RecordKeyVector::RecordKeyVector(Record * item, vecType *vec)
 : _key(item),
   _currPos(0)
 {
@@ -33,8 +33,10 @@ RecordKeyVector::RecordKeyVector(const Record * item, const vecType *vec)
 	_mustDeleteVec = true;
 }
 
-RecordKeyVector::~RecordKeyVector() {
-	if (_mustDeleteVec) {
+RecordKeyVector::~RecordKeyVector() 
+{
+	if (_mustDeleteVec) 
+	{
 		delete _recVec;
 		_recVec = NULL;
 		_mustDeleteVec = false;
@@ -48,19 +50,25 @@ const RecordKeyVector &RecordKeyVector::operator=(const RecordKeyVector &other)
 	return *this;
 }
 
-const RecordKeyVector::const_iterator_type RecordKeyVector::begin()  {
+RecordKeyVector::iterator_type RecordKeyVector::begin()  {
 	_currPos = 0;
 	return _recVec->begin();
 }
 
-const RecordKeyVector::const_iterator_type RecordKeyVector::next()  {
+RecordKeyVector::iterator_type RecordKeyVector::next()  {
 	_currPos++;
 	return _recVec->begin() + _currPos;
 }
 
 
-const RecordKeyVector::const_iterator_type RecordKeyVector::end() {
+RecordKeyVector::iterator_type RecordKeyVector::end() {
 	return _recVec->end();
+}
+
+void RecordKeyVector::erase()  
+{
+	delete _recVec->at(_currPos);
+	_recVec->erase (_recVec->begin() + _currPos);
 }
 
 size_t RecordKeyVector::size() const {
@@ -75,7 +83,7 @@ void RecordKeyVector::push_back(elemType item) {
 	_recVec->push_back(item);
 }
 
-const Record *RecordKeyVector::getKey() const {
+Record * RecordKeyVector::getKey() const {
 	return _key;
 }
 
@@ -90,6 +98,10 @@ void RecordKeyVector::setVector(vecType *vec) {
 
 void RecordKeyVector::clearVector() {
 	_currPos = 0;
+	//for (vecType::iterator it = _recVec->begin() ; it != _recVec->end(); ++it)
+    //{
+    //	delete *it;
+    //}
 	_recVec->clear();
 }
 

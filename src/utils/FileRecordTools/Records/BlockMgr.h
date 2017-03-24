@@ -34,9 +34,12 @@ public:
 	// Determine which hits in the hitList intersect the hits in the keyList by comparing all blocks in each
 	// and checking that their total intersection meets any overlapFraction and reciprocal criteria compared to
 	// the total block lengths of the hitList and keyList. All hits that pass will be in the resultList.
+	//
+	// If useOverlappingSubBlocks is true, resultList will contain the sub-intervals of the hit blocks 
+	// that overlap the query blocks.
+	//
 	// Return value is the number of hits in the result set.
-
-	int findBlockedOverlaps(RecordKeyVector &keyList, RecordKeyVector &hitList, RecordKeyVector &resultList);
+	int findBlockedOverlaps(RecordKeyVector &hitList, bool useOverlappingSubBlocks);
 
 	//these are setting options for splitting BAM records
 	void setBreakOnDeletionOps(bool val) { _breakOnDeletionOps = val; }

@@ -33,10 +33,15 @@ int fastafrombed_main(int argc, char* argv[]) {
     string fastaDbFile;
     string bedFile;
 
+    // output files
+    string fastaOutFile = "stdout";
+
     // checks for existence of parameters
     bool haveFastaDb = false;
     bool haveBed = false;
-    bool useNameOnly = false;
+    bool haveFastaOut = false;
+    bool useName = false;
+    bool useNamePlus = false;
     bool useFasta = true;
     bool useStrand = false;
     bool useBlocks = false;
@@ -76,8 +81,18 @@ int fastafrombed_main(int argc, char* argv[]) {
                 i++;
             }
         }
+        else if(PARAMETER_CHECK("-fo", 3, parameterLength)) {
+            if ((i+1) < argc) {
+                haveFastaOut = true;
+                fastaOutFile = argv[i + 1];
+                i++;
+            }
+        }
         else if(PARAMETER_CHECK("-name", 5, parameterLength)) {
-            useNameOnly = true;
+            useName = true;
+        }
+        else if(PARAMETER_CHECK("-name+", 6, parameterLength)) {
+            useNamePlus = true;
         }
         else if(PARAMETER_CHECK("-split", 6, parameterLength)) {
             useBlocks = true;
@@ -108,12 +123,17 @@ int fastafrombed_main(int argc, char* argv[]) {
         showHelp = true;
     }
 
+    if (!haveFastaOut) {
+        fastaOutFile = "stdout";
+    }
+    
     if (!showHelp) {
 
-        Bed2Fa *b2f = new Bed2Fa(useNameOnly, fastaDbFile, 
-                                 bedFile, useFasta, useStrand, 
+        Bed2Fa *b2f = new Bed2Fa(fastaDbFile, 
+                                 bedFile, fastaOutFile,
+                                 useFasta, useStrand, 
                                  useBlocks, useFullHeader,
-                                 useBedOut);
+                                 useBedOut, useName, useNamePlus);
         delete b2f;
     }
     else {
@@ -134,10 +154,12 @@ void fastafrombed_help(void) {
 
     cerr << "Options: " << endl;
     cerr << "\t-fi\tInput FASTA file" << endl;
+    cerr << "\t-fo\tOutput file (opt., default is STDOUT" << endl;
     cerr << "\t-bed\tBED/GFF/VCF file of ranges to extract from -fi" << endl;
     cerr << "\t-name\tUse the name field for the FASTA header" << endl;
+    cerr << "\t-name+\tUse the name field and coordinates for the FASTA header" << endl;
     cerr << "\t-split\tgiven BED12 fmt., extract and concatenate the sequences"
-         << "from the BED \"blocks\" (e.g., exons)" << endl;
+         << "\n\t\tfrom the BED \"blocks\" (e.g., exons)" << endl;
     cerr << "\t-tab\tWrite output in TAB delimited format." << endl;
     cerr << "\t\t- Default is FASTA format." << endl << endl;
 
@@ -147,7 +169,7 @@ void fastafrombed_help(void) {
     cerr << "\t\t- By default, strand information is ignored." << endl << endl;
     cerr << "\t-fullHeader\tUse full fasta header." << endl;
     cerr << "\t\t- By default, only the word before the first space or tab "
-	 << "is used." << endl << endl;
+	     << "\n\t\tis used." << endl << endl;
 
     // end the program here
     exit(1);

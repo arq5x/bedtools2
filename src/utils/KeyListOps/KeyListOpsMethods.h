@@ -10,7 +10,7 @@
 
 #include <map>
 #include <utility> //for pair
-#include "QuickString.h"
+#include "string.h"
 #include <stdint.h>
 #include "RecordKeyVector.h"
 
@@ -25,10 +25,10 @@ public:
 	void setIsBam(bool isBam) { _isBam = isBam; }
 	void setKeyList(RecordKeyVector *keyList) { _keyList = keyList; }
 	void setColumn(int col) { _column = col; }
-	void setNullValue(const QuickString & nullVal) { _nullVal = nullVal; }
-	const QuickString &getNullValue() const { return _nullVal; }
-	void setDelimStr(const QuickString &delimStr) { _delimStr = delimStr; }
-	const QuickString &getDelimStr() const { return _delimStr; }
+	void setNullValue(const string & nullVal) { _nullVal = nullVal; }
+	const string &getNullValue() const { return _nullVal; }
+	void setDelimStr(const string &delimStr) { _delimStr = delimStr; }
+	const string &getDelimStr() const { return _delimStr; }
 
     // return the total of the values in the vector
     double getSum();
@@ -41,9 +41,9 @@ public:
     // return the median value in the vector
     double getMedian();
     // return the most common value in the vector
-    const QuickString &getMode();
+    const string &getMode();
     // return the least common value in the vector
-    const QuickString &getAntiMode();
+    const string &getAntiMode();
     // return the minimum element of the vector
     double getMin();
     // return the maximum element of the vector
@@ -57,29 +57,29 @@ public:
     // return a the count of _unique_ elements in the vector
     uint32_t getCountDistinct();
     // return only those elements that occur once
-    const QuickString &getDistinctOnly();
+    const string &getDistinctOnly();
     // as distinct, but sorted numerically.
-    const QuickString &getDistinctSortNum(bool ascending = true);
+    const string &getDistinctSortNum(bool ascending = true);
     // as distinct, but sorted numerically, descending
 
 
      // return a delimiter-separated list of elements
-    const QuickString & getCollapse(const QuickString & delimiter = ",");
+    const string & getCollapse(const string & delimiter = ",");
     // return a concatenation of all elements in the vector
-    const QuickString & getConcat();
+    const string & getConcat();
     // return a comma-separated list of the _unique_ elements
-    const QuickString & getDistinct();
+    const string & getDistinct();
     // return a histogram of values and their freqs. in desc. order of frequency
-    const QuickString & getFreqDesc();
+    const string & getFreqDesc();
     // return a histogram of values and their freqs. in asc. order of frequency
-    const QuickString & getFreqAsc();
+    const string & getFreqAsc();
     // return the first value in the list
-    const QuickString & getFirst();
+    const string & getFirst();
     // return the last value in the list
-    const QuickString & getLast();
+    const string & getLast();
 
     bool nonNumErrFlagSet() const { return _nonNumErrFlag; }
-    const QuickString &getErrMsg() const { return _errMsg; }
+    const string &getErrMsg() const { return _errMsg; }
     void resetNonNumErrFlag() {
     	_nonNumErrFlag = false;
     	_errMsg.clear();
@@ -88,31 +88,31 @@ public:
 private:
 	RecordKeyVector *_keyList;
 	int _column;
-	QuickString _nullVal;
-	QuickString _delimStr;
-	QuickString _retStr;
+	string _nullVal;
+	string _delimStr;
+	string _retStr;
 
 	RecordKeyVector _nullKeyList; //this has to exist just so we can initialize _iter, below.
-	RecordKeyVector::const_iterator_type _iter;
+	RecordKeyVector::iterator_type _iter;
 
 	// Some methods need to put values into a vector, mostly for sorting.
 	vector<double> _numArray;
-	vector<QuickString> _qsArray;
+	vector<string> _qsArray;
 
-	typedef map<QuickString, int> freqMapType;
+	typedef map<string, int> freqMapType;
 	freqMapType _freqMap;
 	freqMapType::iterator _freqIter;
 
 	typedef enum { UNSORTED, ASC, DESC} SORT_TYPE;
 
 	bool _nonNumErrFlag;
-	QuickString _errMsg;
+	string _errMsg;
 	bool _isBam;
 
-	typedef multimap<int, QuickString, less<int> > histAscType;
-	typedef multimap<int, QuickString, greater<int> > histDescType;
+	typedef multimap<int, string, less<int> > histAscType;
+	typedef multimap<int, string, greater<int> > histDescType;
 	void init();
-	const QuickString &getColVal();
+	const string &getColVal();
 	double getColValNum();
 	bool empty() { return _keyList->empty(); }
 	void begin() { _iter = _keyList->begin(); }

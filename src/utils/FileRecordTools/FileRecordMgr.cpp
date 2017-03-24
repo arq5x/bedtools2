@@ -4,7 +4,7 @@
 #include "Record.h"
 #include "NewGenomeFile.h"
 
-FileRecordMgr::FileRecordMgr(const QuickString &filename)
+FileRecordMgr::FileRecordMgr(const string &filename)
 : _fileIdx(-1),
   _filename(filename),
   _bufStreamMgr(NULL),
@@ -31,16 +31,10 @@ FileRecordMgr::FileRecordMgr(const QuickString &filename)
  {
 }
 
-FileRecordMgr::~FileRecordMgr(){
-
-	delete _bufStreamMgr;
-	_bufStreamMgr = NULL;
-
-	close(); //just make sure file was closed.
-	delete _fileReader;
-	_fileReader = NULL;
-
-	delete _recordMgr;
+FileRecordMgr::~FileRecordMgr()
+{
+	close(); 
+	//delete _recordMgr;
 	_recordMgr = NULL;
 }
 
@@ -137,11 +131,12 @@ Record *FileRecordMgr::getNextRecord(RecordKeyVector *keyList)
 	if (keyList != NULL) {
 		keyList->setKey(record);
 	}
+	record->setFileRecordManager(this);
 	return record;
 }
 
 void FileRecordMgr::assignChromId(Record *record) {
-	const QuickString &currChrom = record->getChrName();
+	const string &currChrom = record->getChrName();
 	if (currChrom != _prevChrom  && _hasGenomeFile) {
 		_prevChromId = _genomeFile->getChromId(currChrom);
 		record->setChromId(_prevChromId);
@@ -160,7 +155,7 @@ void FileRecordMgr::testInputSortOrder(Record *record)
 	}
 
 
-	const QuickString &currChrom = record->getChrName();
+	const string &currChrom = record->getChrName();
 	int currStart = record->getStartPos();
 	if (record->isZeroLength()) {
 		currStart++;

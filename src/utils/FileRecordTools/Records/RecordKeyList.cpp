@@ -5,12 +5,12 @@ RecordKeyList::RecordKeyList()
 {
 }
 
-RecordKeyList::RecordKeyList(const Record * item)
+RecordKeyList::RecordKeyList(Record * item)
 : _key(item)
 {
 }
 
-RecordKeyList::RecordKeyList(const Record * item, const listType &list)
+RecordKeyList::RecordKeyList(Record * item, listType &list)
 : _key(item)
 {
 	_list = list;
@@ -19,23 +19,23 @@ RecordKeyList::RecordKeyList(const Record * item, const listType &list)
 RecordKeyList::~RecordKeyList() {
 }
 
-const RecordKeyList &RecordKeyList::operator=(const RecordKeyList &other)
+RecordKeyList &RecordKeyList::operator=(RecordKeyList &other)
 {
 	setKey(other._key);
 	_list = other._list;
 	return *this;
 }
 
-const RecordKeyList::const_iterator_type RecordKeyList::begin()  {
+RecordKeyList::const_iterator_type RecordKeyList::begin()  {
 	return _list.begin();
 }
 
-const RecordKeyList::const_iterator_type RecordKeyList::next()  {
+RecordKeyList::const_iterator_type RecordKeyList::next()  {
 	return _list.next();
 }
 
 
-const RecordKeyList::const_iterator_type RecordKeyList::end() {
+RecordKeyList::const_iterator_type RecordKeyList::end() {
 	return _list.end();
 }
 
@@ -51,7 +51,7 @@ void RecordKeyList::push_back(elemType item) {
 	_list.push_back(item);
 }
 
-const Record *RecordKeyList::getKey() const {
+Record *RecordKeyList::getKey() const {
 	return _key;
 }
 

@@ -50,68 +50,70 @@ bool GffRecord::initFromFile(SingleLineDelimTextFileReader *fileReader)
 	return true;
 }
 
-void GffRecord::print(QuickString &outBuf) const
+void GffRecord::print(string &outBuf) const
 {
-	outBuf.append(_chrName);
-	outBuf.append('\t');
-	outBuf.append(_source);
-	outBuf.append('\t');
-	outBuf.append(_name);
-	outBuf.append('\t');
-	outBuf.append(_startPosStr);
-	outBuf.append('\t');
-	outBuf.append(_endPosStr);
-	outBuf.append('\t');
-
+	ostringstream s;	
+	s << _chrName;
+	s << "\t";
+	s << _source;
+	s << "\t";
+	s << _name;
+	s << "\t";
+	s << _startPosStr;
+	s << "\t";
+	s << _endPosStr;
+	s << "\t";
+	outBuf.append(s.str());
 	printRemainingFields(outBuf);
 }
 
-void GffRecord::print(QuickString &outBuf, int start, int end) const
+void GffRecord::print(string &outBuf, int start, int end) const
 {
-	outBuf.append(_chrName);
-	outBuf.append('\t');
-	outBuf.append(_source);
-	outBuf.append('\t');
-	outBuf.append(_name);
-	outBuf.append('\t');
-	outBuf.append(start +1);
-	outBuf.append('\t');
-	outBuf.append(end);
-	outBuf.append('\t');
-
+	ostringstream s;	
+	s << _chrName;
+	s << "\t";
+	s << _source;
+	s << "\t";
+	s << _name;
+	s << "\t";
+	s << start;
+	s << "\t";
+	s << end;
+	s << "\t";
+	outBuf.append(s.str());
 	printRemainingFields(outBuf);
 }
 
-void GffRecord::print(QuickString &outBuf, const QuickString & start, const QuickString & end) const
+void GffRecord::print(string &outBuf, const string & start, const string & end) const
 {
 	outBuf.append(_chrName);
-	outBuf.append('\t');
+	outBuf.append("\t");
 	outBuf.append(_source);
-	outBuf.append('\t');
+	outBuf.append("\t");
 	outBuf.append(_name);
-	outBuf.append('\t');
+	outBuf.append("\t");
 	outBuf.append(start);
-	outBuf.append('\t');
+	outBuf.append("\t");
 	outBuf.append(end);
-	outBuf.append('\t');
+	outBuf.append("\t");
 
 	printRemainingFields(outBuf);
 }
 
-void GffRecord::printRemainingFields(QuickString &outBuf) const
+void GffRecord::printRemainingFields(string &outBuf) const
 {
 	outBuf.append(_score);
-	outBuf.append('\t');
+	outBuf.append("\t");
 	outBuf.append(_strand);
-	outBuf.append('\t');
+	outBuf.append("\t");
 	outBuf.append(_frame);
 	if (_numFields == 9) {
-		outBuf.append('\t');
+		outBuf.append("\t");
 		outBuf.append(_group);
 	}
 }
 
-void GffRecord::printNull(QuickString &outBuf) const
+void GffRecord::printNull(string &outBuf) const
 {
 	outBuf.append(".\t.\t.\t-1\t-1\t.\t.\t.", 17);
 	if (_numFields > 8) {
@@ -119,7 +121,7 @@ void GffRecord::printNull(QuickString &outBuf) const
 	}
 }
 
-const QuickString &GffRecord::getField(int fieldNum) const
+const string &GffRecord::getField(int fieldNum) const
 {
 	if (fieldNum == 9 && _numFields == 9) {
 		return _group;

@@ -1,4 +1,4 @@
-chrom	start	end	A	B	C
+Chrom	start	end	A	B	C
 chr1	0	10	a1	10	+
 chr1	10	20	a2	5	+
 chr1	11	21	a3	5	+

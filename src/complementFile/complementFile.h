@@ -25,25 +25,26 @@ public:
 	virtual bool init();
 	virtual bool findNext(RecordKeyVector &hits);
 	virtual void processHits(RecordOutputMgr *outputMgr, RecordKeyVector &hits);
+    virtual void checkCoordinatesAgainstChromLength(const Record *rec);
 	virtual void cleanupHits(RecordKeyVector &hits);
-	virtual bool finalizeCalculations();
-	virtual void  giveFinalReport(RecordOutputMgr *outputMgr) {}
+	virtual bool finalizeCalculations() {return true;}
+	virtual void giveFinalReport(RecordOutputMgr *outputMgr);
 
 
 protected:
 	FileRecordMergeMgr *_frm;
 	Bed3Interval _outRecord;
-	QuickString _currChrom;
+	string _currChrom;
 	const NewGenomeFile *_genomeFile;
 	int _currStartPos;
 	RecordOutputMgr *_outputMgr;
-	const vector<QuickString> &_chromList;
+	const vector<string> &_chromList;
 	int _currPosInGenomeList;
 
 	virtual ContextComplement *upCast(ContextBase *context) { return static_cast<ContextComplement *>(context); }
 
 	void outPutLastRecordInPrevChrom();
-	bool fastForward(const QuickString &newChrom);
+	bool fastForward(const string &newChrom);
 	void printRecord(int endPos);
 
 };

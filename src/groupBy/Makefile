@@ -10,6 +10,7 @@ INCLUDES = -I$(UTILITIES_DIR)/Contexts/ \
 			-I$(UTILITIES_DIR)/general/ \
 			-I$(UTILITIES_DIR)/fileType/ \
 			-I$(UTILITIES_DIR)/lineFileUtilities/ \
+			-I$(UTILITIES_DIR)/stringUtilities/ \
 			-I$(UTILITIES_DIR)/gzstream/ \
            -I$(UTILITIES_DIR)/GenomeFile/ \
            -I$(UTILITIES_DIR)/BamTools/include \

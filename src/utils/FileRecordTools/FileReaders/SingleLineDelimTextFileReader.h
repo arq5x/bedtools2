@@ -8,8 +8,10 @@
 #ifndef SINGLELINETEXTFILEREADER_H_
 #define SINGLELINETEXTFILEREADER_H_
 
+#include <algorithm>
 #include "FileReader.h"
-#include "QuickString.h"
+#include "string.h"
+#include "lineFileUtilities.h"
 
 class SingleLineDelimTextFileReader : public FileReader {
 public:
@@ -22,24 +24,24 @@ public:
 
 	virtual bool readEntry();
 	virtual int getNumFields() const { return _numFields; }
-	virtual void getField(int numField, QuickString &val) const;
-	virtual void getField(int numField, int &val); //this signaiture isn't const because it operates on an internal QuickString for speed.
+	virtual void getField(int numField, string &val) const;
+	virtual void getField(int numField, int &val) const; //this signaiture isn't const because it operates on an internal string for speed.
 	virtual void getField(int fieldNum, char &val) const;
-	virtual void appendField(int fieldNum, QuickString &str) const;
-	virtual const QuickString &getHeader() const { return _header; }
+	virtual void appendField(int fieldNum, string &str) const;
+	virtual const string &getHeader() const { return _header; }
 	virtual bool hasHeader() const { return _fullHeaderFound; }
 	virtual void setInHeader(bool val) { _inheader = val; }
 
 protected:
 	int _numFields;
 	char _delimChar;
-	QuickString _header;
+	string _header;
 	bool _fullHeaderFound;
 	int _currDataPos;
-	QuickString _sLine;
+	string _sLine;
 	int *_delimPositions;
-	QuickString _currChromStr;
-	QuickString _tempChrPosStr;
+	string _currChromStr;
+	string _tempChrPosStr;
 	int _lineNum;
 	bool _inheader;
 	bool detectAndHandleHeader();

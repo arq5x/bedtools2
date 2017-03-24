@@ -49,7 +49,7 @@ void BinTree::getHits(Record *record, RecordKeyVector &hitSet)
 	if (record->isUnmapped()) {
 		return;
 	}
-    const QuickString &chr = record->getChrName();
+    const string &chr = record->getChrName();
 	mainMapType::iterator mainIter = _mainMap.find(chr);
 	if (mainIter == _mainMap.end()) {
 		//given chrom not even in map.
@@ -63,31 +63,31 @@ void BinTree::getHits(Record *record, RecordKeyVector &hitSet)
     binNumType endBin = ((endPos-1) >> _binFirstShift);
 
 
-	const allBinsType &bins = mainIter->second;
+	allBinsType &bins = mainIter->second;
 
     /* SYNOPSIS:
          1. We loop through each UCSC BIN level for feature A's chrom.
          2. For each BIN, we loop through each B feature and add it to
             hits if it meets all of the user's requests, which include:
-               (a) overlap fractio, (b) strandedness, (c) reciprocal overlap
+               (a) overlap fraction, (b) strandedness, (c) reciprocal overlap
     */
     for (binNumType i = 0; i < NUM_BIN_LEVELS; i++) {
         binNumType offset = _binOffsetsExtended[i];
         for (binNumType j = (startBin+offset); j <= (endBin+offset); j++)  {
 
         	// move to the next bin if this one is empty
-        	allBinsType::const_iterator allBinsIter = bins.find(j);
+        	allBinsType::iterator allBinsIter = bins.find(j);
         	if (allBinsIter == bins.end()) {
         		continue;
         	}
-        	const binType &bin = allBinsIter->second;
+        	binType &bin = allBinsIter->second;
 
-        	for (binType::const_iterator iter = bin.begin(); iter != bin.end(); iter++) {
-            	const Record *dbRec = *iter;
+        	for (binType::iterator iter = bin.begin(); iter != bin.end(); iter++) {
+            	Record *dbRec = *iter;
             	if (record->intersects(dbRec,
                                        _context->getSameStrand(),
                                        _context->getDiffStrand(),
-            			                     _context->getOverlapFractionA(),
+            			               _context->getOverlapFractionA(),
                                        _context->getOverlapFractionB(),
                                        _context->getReciprocalFraction(),
                                        _context->getEitherFraction()
@@ -106,10 +106,10 @@ void BinTree::getHits(Record *record, RecordKeyVector &hitSet)
 	}
 }
 
-bool BinTree::addRecordToTree(const Record *record)
+bool BinTree::addRecordToTree(Record *record)
 {
 	// Get chr, bin.
-	const QuickString &chr = record->getChrName();
+	const string &chr = record->getChrName();
 	binNumType startPos = (binNumType)(record->getStartPos());
 	binNumType endPos = (binNumType)(record->getEndPos());
 	binNumType binNum = getBin(startPos, endPos);

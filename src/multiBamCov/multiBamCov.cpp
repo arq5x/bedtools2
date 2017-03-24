@@ -110,6 +110,7 @@ void MultiCovBam::CollectCoverage()
     if ( !reader.Open(_bam_files) )
     {
         cerr << "Could not open input BAM files." << endl;
+        cerr << reader.GetErrorString() << endl;
         exit(1);
     }
     else
@@ -207,7 +208,8 @@ void MultiCovBam::CollectCoverage()
             _bed->Close();
         }
         else {
-            cerr << "Could not find indexes." << endl;
+            cerr << "Could not find/load indexes." << endl;
+            cerr << reader.GetErrorString() << endl;
             reader.Close();
             exit(1);
         }

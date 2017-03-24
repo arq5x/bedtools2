@@ -17,18 +17,19 @@ using namespace std;
 
 class RecordKeyVector {
 public:
-	typedef const Record * elemType;
-	typedef vector<const Record *> vecType;
-	typedef vecType::const_iterator const_iterator_type;
+	typedef Record * elemType;
+	typedef vector<Record *> vecType;
+	typedef vecType::iterator iterator_type;
 	RecordKeyVector();
     RecordKeyVector(elemType item);
-    RecordKeyVector(elemType item, const vecType *vector);
+    RecordKeyVector(elemType item, vecType *vector);
     ~RecordKeyVector();
 
     const RecordKeyVector &operator=(const RecordKeyVector &other);
-    const const_iterator_type begin();
-    const const_iterator_type next();
-    const const_iterator_type end();
+    iterator_type begin();
+    iterator_type next();
+    iterator_type end();
+    void erase();
     size_t size() const ;
     bool empty() const ; //only checks whether list is empty. Doesn't check key.
     void push_back(elemType item);

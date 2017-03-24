@@ -13,18 +13,18 @@
 
 class RecordKeyList {
 public:
-	typedef const Record * elemType;
+	typedef Record * elemType;
 	typedef RecordList listType;
 	typedef const RecordListNode *const_iterator_type;
 	RecordKeyList();
     RecordKeyList(elemType item);
-    RecordKeyList(elemType item, const listType &list);
+    RecordKeyList(elemType item, listType &list);
     ~RecordKeyList();
 
-    const RecordKeyList &operator=(const RecordKeyList &other);
-    const const_iterator_type begin();
-    const const_iterator_type next();
-    const const_iterator_type end();
+    RecordKeyList &operator=(RecordKeyList &other);
+    const_iterator_type begin();
+    const_iterator_type next();
+    const_iterator_type end();
     size_t size() const ;
     bool empty() const ; //only checks whether list is empty. Doesn't check key.
     void push_back(elemType item);

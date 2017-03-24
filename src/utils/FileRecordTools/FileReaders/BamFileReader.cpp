@@ -47,7 +47,7 @@ bool BamFileReader::readEntry()
 	return false;
 }
 
-void BamFileReader::getChrName(QuickString &str) const
+void BamFileReader::getChrName(string &str) const
 {
 	int refId = _bamAlignment.RefID;
 	if (refId < 0) {
@@ -71,7 +71,7 @@ int BamFileReader::getEndPos() const
 	return _bamAlignment.GetEndPosition(false, false);
 }
 
-void BamFileReader::getName(QuickString &str) const
+void BamFileReader::getName(string &str) const
 {
 	if (!_useTags) {
 		str = _bamAlignment.SupportData.AllCharData.c_str();
@@ -86,7 +86,7 @@ void BamFileReader::getName(QuickString &str) const
     }
 }
 
-void BamFileReader::getScore(QuickString &str) const
+void BamFileReader::getScore(string &str) const
 {
 	int2str(_bamAlignment.MapQuality, str);
 }
@@ -99,7 +99,7 @@ char BamFileReader::getStrand() const
 	return '+';
 }
 
-void BamFileReader::getMateChrName(QuickString &str) const
+void BamFileReader::getMateChrName(string &str) const
 {
 	int refId = _bamAlignment.MateRefID;
 	if (refId < 0) {

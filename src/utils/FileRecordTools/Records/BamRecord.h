@@ -10,7 +10,7 @@
 
 #include "Bed6Interval.h"
 #include "ParseTools.h"
-#include "QuickString.h"
+#include "string.h"
 #include "api/BamAlignment.h"
 
 class FileReader;
@@ -42,21 +42,21 @@ public:
 	using Bed6Interval::print;
 
 
-	virtual void print(QuickString &outBuf, int start, int end, RecordKeyVector *keyList) const;
-	virtual void print(QuickString &outBuf, RecordKeyVector *keyList) const;
-	virtual void print(QuickString &outBuf, const QuickString & start, const QuickString & end, RecordKeyVector *keyList) const;
-	virtual void printNull(QuickString &outBuf) const;
-	virtual void printRemainingBamFields(QuickString &outBuf, RecordKeyVector *keyList) const;
-	virtual void printUnmapped(QuickString &outBuf) const;
+	virtual void print(string &outBuf, int start, int end, RecordKeyVector *keyList) const;
+	virtual void print(string &outBuf, RecordKeyVector *keyList) const;
+	virtual void print(string &outBuf, const string & start, const string & end, RecordKeyVector *keyList) const;
+	virtual void printNull(string &outBuf) const;
+	virtual void printRemainingBamFields(string &outBuf, RecordKeyVector *keyList) const;
+	virtual void printUnmapped(string &outBuf) const;
 
 	virtual FileRecordTypeChecker::RECORD_TYPE getType() const { return FileRecordTypeChecker::BAM_RECORD_TYPE; }
-	const QuickString &getCigarStr() const { return _cigarStr; }
+	const string &getCigarStr() const { return _cigarStr; }
 	const vector<BamTools::CigarOp> &getCigarData() const { return _bamAlignment.CigarData; }
 
 	const BamTools::BamAlignment &getAlignment() const { return _bamAlignment; }
 	int getBamChromId() const { return _bamChromId; }
 
-	virtual const QuickString &getField(int fieldNum) const;
+	virtual const string &getField(int fieldNum) const;
 	virtual int getNumFields() const  { return 12; }
 	static bool isNumericField(int fieldNum);
 
@@ -67,12 +67,12 @@ protected:
 	int _bamChromId; //different from chromId, because BAM file may be in different order
 	//than the genomeFile.
 
-	QuickString _cigarStr; //stored for fast retrieval in column ops
-	QuickString _mateChrName;
-	QuickString _matePos;
-	QuickString _insertSize;
-	QuickString _queryBases;
-	QuickString _qualities;
+	string _cigarStr; //stored for fast retrieval in column ops
+	string _mateChrName;
+	string _matePos;
+	string _insertSize;
+	string _queryBases;
+	string _qualities;
 
 	virtual ~BamRecord();
 	void printRemainingBamFields();

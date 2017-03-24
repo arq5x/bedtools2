@@ -26,7 +26,7 @@
 
 
 #include "FreeList.h"
-#include "QuickString.h"
+#include "string.h"
 #include <cstring> //for memset
 #include "Record.h"
 
@@ -35,8 +35,8 @@ public:
 	friend class RecordList;
 
 	RecordListNode() : _next(NULL){}
-	RecordListNode(const Record * val) : _val(val), _next(NULL) {}
-	const Record * value() const { return _val; }
+	RecordListNode(Record * val) : _val(val), _next(NULL) {}
+	Record * value() const { return _val; }
 	const RecordListNode *next() const { return _next; }
 	RecordListNode *next() { return _next; }
 	bool hasNext() const { return _next != NULL; }
@@ -48,7 +48,7 @@ public:
 
 private:
 
-	const Record * _val;
+	Record * _val;
 	RecordListNode *_next;
 };
 
@@ -76,10 +76,10 @@ public:
 	const RecordListNode *end() const { return NULL; }
 
 	RecordListNode * deleteCurrent();
-	void push_back(const Record * &val);
+	void push_back(Record * &val);
 
 	void clear();
-	const RecordList &operator=(const RecordList &other);
+	RecordList &operator=(const RecordList &other);
 	void assignNoCopy(RecordList &other);
 
 	void sort() { mergeSort(&_begin); }

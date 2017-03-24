@@ -1,12 +1,15 @@
 BT=${BT-../../bin/bedtools}
 
+FAILURES=0;
+
 check()
 {
 	if diff $1 $2; then
     	echo ok
 		return 1
 	else
-    	echo fail
+    	FAILURES=$(expr $FAILURES + 1);
+		echo fail
 		return 0
 	fi
 }
@@ -14,7 +17,7 @@ check()
 ###########################################################
 #  Test that -n option is shown as deperecated
 ###########################################################
-#echo "    merge.t2...\c"
+#echo -e "    merge.t2...\c"
 #echo "***** ERROR: -n option is deprecated. Please see the documentation for the -c and -o column operation options. *****" > exp
 #$BT merge -i a.bed -n 2>&1 > /dev/null | head -2 | tail -1 > obs
 #check obs exp
@@ -24,7 +27,7 @@ check()
 ###########################################################
 #  Test basic grouping
 ###########################################################
-echo "    groupby.t1...\c"
+echo -e "    groupby.t1...\c"
 echo \
 "chr1	0	10	10
 chr1	10	20	5
@@ -42,7 +45,7 @@ rm obs exp
 ###########################################################
 #  Test case insensitive grouping works
 ###########################################################
-echo "    groupby.t2...\c"
+echo -e "    groupby.t2...\c"
 echo \
 "chr1	0	10	10
 cHr1	10	20	5
@@ -62,7 +65,7 @@ rm obs exp
 #  Test -full option (print all columns, not just grouped
 #  ones)
 ###########################################################
-echo "    groupby.t3...\c"
+echo -e "    groupby.t3...\c"
 echo \
 "chr1	0	10	a1	10	+	10
 chr1	10	20	a2	5	+	5
@@ -82,7 +85,7 @@ rm obs exp
 ###########################################################
 #  Test -inheader option
 ###########################################################
-echo "    groupby.t4...\c"
+echo -e "    groupby.t4...\c"
 echo \
 "chr1	0	10	10
 chr1	10	20	5
@@ -101,7 +104,7 @@ rm obs exp
 #  Test -inheader option when header not marked by
 #  recognized char
 ###########################################################
-echo "    groupby.t5...\c"
+echo -e "    groupby.t5...\c"
 echo \
 "chr1	0	10	10
 chr1	10	20	5
@@ -120,7 +123,7 @@ rm obs exp
 #  Test -inheader option when no header present will skip
 # first line
 ###########################################################
-echo "    groupby.t6...\c"
+echo -e "    groupby.t6...\c"
 echo \
 "chr1	10	20	5
 chr1	11	21	5
@@ -138,7 +141,7 @@ rm obs exp
 #  Test -outheader option will work automatically, even
 # without -inheader, if header has normally marked start char.
 ###########################################################
-echo "    groupby.t7...\c"
+echo -e "    groupby.t7...\c"
 echo \
 "#chrom	start	end	A	B	C
 chr1	0	10	10
@@ -157,9 +160,9 @@ rm obs exp
 ###########################################################
 #  Test that unmarked header will be included by default.
 ###########################################################
-echo "    groupby.t8...\c"
+echo -e "    groupby.t8...\c"
 echo \
-"chrom	start	end	B
+"Chrom	start	end	B
 chr1	0	10	10
 chr1	10	20	5
 chr1	11	21	5
@@ -176,10 +179,10 @@ rm obs exp
 ###########################################################
 #  Test that -outheader does nothing with unmarked header
 ###########################################################
-echo "    groupby.t9...\c"
+echo -e "    groupby.t9...\c"
 echo \
 "col_1	col_2	col_3	col_4	col_5	col_6
-chrom	start	end	B
+Chrom	start	end	B
 chr1	0	10	10
 chr1	10	20	5
 chr1	11	21	5
@@ -196,9 +199,9 @@ rm obs exp
 ###########################################################
 #  Test that -header works with unmarked header
 ###########################################################
-echo "    groupby.t10...\c"
+echo -e "    groupby.t10...\c"
 echo \
-"chrom	start	end	A	B	C
+"Chrom	start	end	A	B	C
 chr1	0	10	10
 chr1	10	20	5
 chr1	11	21	5
@@ -215,7 +218,7 @@ rm obs exp
 ###########################################################
 #  Test that -header works normally with normal header
 ###########################################################
-echo "    groupby.t11...\c"
+echo -e "    groupby.t11...\c"
 echo \
 "#chrom	start	end	A	B	C
 chr1	0	10	10
@@ -235,7 +238,7 @@ rm obs exp
 ###########################################################
 #  Test a BedPlus file (7 fields)
 ###########################################################
-echo "    groupby.t12...\c"
+echo -e "    groupby.t12...\c"
 echo \
 "chr1	0	10	10
 chr1	10	20	5
@@ -255,7 +258,7 @@ rm obs exp
 #  Test noPosPlus file (8 fields, not starting with 
 # chr, starte, end
 ###########################################################
-echo "    groupby.t13...\c"
+echo -e "    groupby.t13...\c"
 echo \
 "chr1	0	10	10
 chr1	10	20	5
@@ -273,7 +276,7 @@ rm obs exp
 ###########################################################
 #  Test noPosPlus file with mof columns (iterated and range)
 ###########################################################
-echo "    groupby.t14...\c"
+echo -e "    groupby.t14...\c"
 echo \
 "0	10	chr1	10
 10	20	chr1	5
@@ -292,17 +295,16 @@ rm obs exp
 #  Test that only the groupBy tool may use 
 # non-positional records
 ###########################################################
-echo "    groupby.t15...\c"
-echo \
-"ERROR: file noPosvalues.header.bed has non positional records, which are only valid for the groupBy tool." > exp
-$BT merge  -i noPosvalues.header.bed 2>&1 >/dev/null | cat - > obs
+echo -e "    groupby.t15...\c"
+echo "ERROR: file noPosvalues.header.bed has non positional records, which are only valid for the groupBy tool." > exp
+$BT merge  -i noPosvalues.header.bed 2>&1 | head -n 1 > obs
 check obs exp
 rm obs exp
 
 ###########################################################
 #  Test a VCF file
 ###########################################################
-echo "    groupby.t16...\c"
+echo -e "    groupby.t16...\c"
 echo \
 "19	G	70.9
 19	C	33.71
@@ -315,7 +317,7 @@ rm obs exp
 ###########################################################
 #  Test a BAM file
 ###########################################################
-echo "    groupby.t17...\c"
+echo -e "    groupby.t17...\c"
 echo \
 "None	chr2L	118.75" > exp
 $BT groupby -i gdc.bam -g 1,3 -c 4 -o mean > obs
@@ -325,9 +327,10 @@ rm obs exp
 ###########################################################
 #  Test a single column of data
 ###########################################################
-echo "    groupby.t18...\c"
+echo -e "    groupby.t18...\c"
 echo \
 "chr1	chr1,chr1,chr1" > exp
 cut -f 1 test.bed | $BT groupby -g 1 -i - -c 1 -o collapse > obs
 check obs exp
 rm obs exp
+[[ $FAILURES -eq 0 ]] || exit 1;

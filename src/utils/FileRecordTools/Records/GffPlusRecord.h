@@ -21,19 +21,19 @@ public:
 	virtual ~GffPlusRecord();
 	virtual bool initFromFile(SingleLineDelimTextFileReader *);
 	virtual void clear();
-	virtual void print(QuickString &outBuf) const;
-	virtual void print(QuickString &outBuf, int start, int end) const;
-	virtual void print(QuickString &outBuf, const QuickString & start, const QuickString & end) const;
-	virtual void printNull(QuickString &outBuf) const;
+	virtual void print(string &outBuf) const;
+	virtual void print(string &outBuf, int start, int end) const;
+	virtual void print(string &outBuf, const string & start, const string & end) const;
+	virtual void printNull(string &outBuf) const;
 	virtual FileRecordTypeChecker::RECORD_TYPE getType() const { return FileRecordTypeChecker::GFF_PLUS_RECORD_TYPE; }
 
-	virtual const QuickString &getField(int fieldNum) const;
+	virtual const string &getField(int fieldNum) const;
 	virtual int getNumFields() const  { return GffRecord::getNumFields() + _plusFields.size(); }
 
 	virtual void setNumPrintFields(int num) { _numPrintFields = num; }
 	virtual int getNumPrintFields() const { return _numPrintFields; }
 	static bool isNumericField(int fieldNum);
-
+	virtual bool isZeroBased() const {return false;};
 
 protected:
 	PlusFields _plusFields;

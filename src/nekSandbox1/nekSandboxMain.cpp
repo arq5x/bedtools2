@@ -67,7 +67,7 @@ int nek_sandbox1_main(int argc,char** argv)
 //		printf("%s", sLine);
 //	}
 //	return 0;
-//	QuickString filename(argv[1]);
+//	string filename(argv[1]);
 //	istream *inputStream = NULL;
 //	if (filename  == "-") {
 //		inputStream = &cin;
@@ -91,7 +91,7 @@ int nek_sandbox1_main(int argc,char** argv)
 ////		exit(1);
 ////	}
 ////	}
-//    QuickString _bamHeader = _bamReader.GetHeaderText();
+//    string _bamHeader = _bamReader.GetHeaderText();
 //    BamTools::RefVector _references = _bamReader.GetReferenceData();
 //
 //    if (_bamHeader.empty() || _references.empty()) {
@@ -107,10 +107,10 @@ int nek_sandbox1_main(int argc,char** argv)
 //		exit(1);
 //	}
 //	string sLine;
-//	vector<QuickString> fields;
-//	QuickString chrName;
+//	vector<string> fields;
+//	string chrName;
 //
-//	vector<QuickString> chroms;
+//	vector<string> chroms;
 //	chroms.push_back("1");
 //	chroms.push_back("2");
 //	chroms.push_back("10");
@@ -127,7 +127,7 @@ int nek_sandbox1_main(int argc,char** argv)
 //			continue;
 //		}
 //		Tokenize(sLine.c_str(), fields);
-//		const QuickString &currChrom = fields[2];
+//		const string &currChrom = fields[2];
 //		if (currChrom == chroms[chromIdx]) {
 //			cout << sLine << endl;
 //			chromCounts[chromIdx]++;
@@ -157,7 +157,7 @@ int nek_sandbox1_main(int argc,char** argv)
 //	cout << "RecordType is : " << frm.getRecordType() << ", " << frm.getRecordTypeName() << "."  << endl;
 //
 //	bool headerFound = false;
-//	QuickString outbuf;
+//	string outbuf;
 //	while (!frm.eof()) {
 //		Record *record = frm.getNextRecord();
 //		if (!headerFound && frm.hasHeader()) {

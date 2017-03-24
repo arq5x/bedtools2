@@ -256,7 +256,7 @@ void window_help(void) {
 
     cerr << "\t-c\t"            << "For each entry in A, report the number of overlaps with B." << endl;
     cerr                        << "\t\t- Reports 0 for A entries that have no overlap with B." << endl;
-    cerr                        << "\t\t- Overlaps restricted by -f." << endl << endl;
+    cerr                        << "\t\t- Overlaps restricted by -w, -l, and -r." << endl << endl;
 
     cerr << "\t-v\t"            << "Only report those entries in A that have _no overlaps_ with B." << endl;
     cerr                        << "\t\t- Similar to \"grep -v.\"" << endl << endl;

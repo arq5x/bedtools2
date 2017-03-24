@@ -43,11 +43,11 @@ void SubtractFile::cleanupHits(RecordKeyVector &hits)
 
 void SubtractFile::subtractHits(RecordKeyVector &hits) {
 	if (hits.empty()) {
-		// no intersection, nothing to subtract.
-		// just copy key to hits as if it were a
-		// self-intersection. This is just for reporting
-		// purposes.
-		hits.push_back(hits.getKey());
+        // no intersection, nothing to subtract.
+        // just copy key to hits as if it were a
+        // self-intersection. This is just for reporting
+        // purposes.
+        hits.push_back(hits.getKey());
 		return;
 	}
 
@@ -59,7 +59,7 @@ void SubtractFile::subtractHits(RecordKeyVector &hits) {
 	}
 
 	//loop through hits. Track which bases in query were covered
-	const Record *keyRec = hits.getKey();
+	Record *keyRec = hits.getKey();
 	int keyStart = keyRec->getStartPos();
 	int keyEnd = keyRec->getEndPos();
 
@@ -71,8 +71,8 @@ void SubtractFile::subtractHits(RecordKeyVector &hits) {
 	//now loop through the hits, and cover corresponding query bases
 	//by setting them to false.
 	bool basesRemoved = false;
-	for (RecordKeyVector::const_iterator_type iter = hits.begin(); iter != hits.end(); iter = hits.next()) {
-		const Record *hitRec = *iter;
+	for (RecordKeyVector::iterator_type iter = hits.begin(); iter != hits.end(); iter = hits.next()) {
+		Record *hitRec = *iter;
 		int hitStart = hitRec->getStartPos();
 		int hitEnd = hitRec->getEndPos();
 
@@ -110,9 +110,9 @@ void SubtractFile::subtractHits(RecordKeyVector &hits) {
 			_dontReport = true;
 			return;
 		} else {
-			hits.clearVector();
-			hits.push_back(hits.getKey());
-		}
+            hits.clearVector();
+            hits.push_back(hits.getKey());
+        }
 		return;
 	}
 

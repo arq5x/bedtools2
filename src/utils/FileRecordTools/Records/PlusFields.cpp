@@ -26,15 +26,14 @@ void PlusFields::clear() {
 	}
 }
 
-const QuickString &PlusFields::getField(int fieldNum) const
+const string &PlusFields::getField(int fieldNum) const
 {
 	return _fields[fieldNum - _numOffsetFields - 1];
 }
 
-void PlusFields::printFields(QuickString &outBuf) const {
+void PlusFields::printFields(string &outBuf) const {
 	for (size_t i=0; i < size(); i++) {
-		outBuf.append('\t');
 		outBuf.append(_fields[i]);
+		if (i < size() - 1) outBuf.append("\t");
 	}
-
 }

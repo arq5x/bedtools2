@@ -1,12 +1,15 @@
 BT=${BT-../../bin/bedtools}
 
+FAILURES=0;
+
 check()
 {
 	if diff $1 $2; then
     	echo ok
 		return 1
 	else
-    	echo fail
+    	FAILURES=$(expr $FAILURES + 1);
+		echo fail
 		return 0
 	fi
 }
@@ -23,7 +26,7 @@ check()
 ###########################################################
 # test 1bp apart; checking for off-by-one errors
 ###########################################################
-echo "    closest.t1...\c"
+echo -e "    closest.t1...\c"
 echo \
 "chr1	10	20	chr1	20	21	1" > exp
 $BT closest -a a.bed -b b.bed -d > obs
@@ -33,7 +36,7 @@ rm obs exp
 ###########################################################
 # test reciprocal of t1
 ###########################################################
-echo "    closest.t2...\c"
+echo -e "    closest.t2...\c"
 echo \
 "chr1	20	21	chr1	10	20	1" > exp
 $BT closest -a b.bed -b a.bed -d > obs
@@ -43,7 +46,7 @@ rm obs exp
 ###########################################################
 # test 0bp apart; checking for off-by-one errors
 ###########################################################
-echo "    closest.t3...\c"
+echo -e "    closest.t3...\c"
 echo \
 "chr1	10	20	chr1	19	21	0" > exp
 $BT closest -a a.bed -b b-one-bp-closer.bed -d > obs
@@ -53,7 +56,7 @@ rm obs exp
 ###########################################################
 # test reciprocal of t3
 ###########################################################
-echo "    closest.t4...\c"
+echo -e "    closest.t4...\c"
 echo \
 "chr1	19	21	chr1	10	20	0" > exp
 $BT closest -a b-one-bp-closer.bed -b a.bed -d > obs
@@ -63,7 +66,7 @@ rm obs exp
 ###########################################################
 # test closest without forcing different names ( -N )
 ###########################################################
-echo "    closest.t5...\c"
+echo -e "    closest.t5...\c"
 echo \
 "chr1	10	20	break1	chr1	40	50	break1	21
 chr1	55	58	break2	chr1	60	70	break2	3" > exp
@@ -74,7 +77,7 @@ rm obs exp
 ###########################################################
 # test closest with forcing different names ( -N )
 ###########################################################
-echo "    closest.t6...\c"
+echo -e "    closest.t6...\c"
 echo \
 "chr1	10	20	break1	chr1	60	70	break2	41
 chr1	55	58	break2	chr1	40	50	break1	6" > exp
@@ -85,7 +88,7 @@ rm obs exp
 ###########################################################
 # test closest forcing -s yet no matching strands on chrom
 ###########################################################
-echo "    closest.t7...\c"
+echo -e "    closest.t7...\c"
 echo \
 "chr1	100	200	a	10	+	.	-1	-1	.	-1	." > exp
 $BT closest -a strand-test-a.bed -b strand-test-b.bed -s > obs
@@ -95,7 +98,7 @@ rm obs exp
 ###########################################################
 # test closest forcing -S with only an opp strands on chrom
 ###########################################################
-echo "    closest.t8...\c"
+echo -e "    closest.t8...\c"
 echo \
 "chr1	100	200	a	10	+	chr1	90	120	b	1	-" > exp
 $BT closest -a strand-test-a.bed -b strand-test-b.bed -S > obs
@@ -106,7 +109,7 @@ rm obs exp
 ###########################################################
 # test reproting of all overlapping features
 ###########################################################
-echo "    closest.t9...\c"
+echo -e "    closest.t9...\c"
 echo \
 "chr1	100	101	chr1	100	101
 chr1	200	201	chr1	150	201
@@ -123,7 +126,7 @@ rm obs exp
 ###########################################################
 # test reproting of first overlapping feature
 ###########################################################
-echo "    closest.t10...\c"
+echo -e "    closest.t10...\c"
 echo \
 "chr1	100	101	chr1	100	101
 chr1	200	201	chr1	150	201
@@ -139,7 +142,7 @@ rm obs exp
 ###########################################################
 # test reproting of last overlapping feature
 ###########################################################
-echo "    closest.t11...\c"
+echo -e "    closest.t11...\c"
 echo \
 "chr1	100	101	chr1	100	101
 chr1	200	201	chr1	175	375
@@ -164,7 +167,7 @@ rm obs exp
 ###########################################################
 # test 3 dbs, -each mode, which is the default
 ###########################################################
-echo "    closest.t13...\c"
+echo -e "    closest.t13...\c"
 echo \
 "chr1	80	100	q1	1	+	1	chr1	20	60	d1.2	2	-
 chr1	80	100	q1	1	+	2	chr1	120	170	db2.2	2	-
@@ -177,7 +180,7 @@ rm obs exp
 ###########################################################
 # test 3 dbs with -names option
 ###########################################################
-echo "    closest.t14...\c"
+echo -e "    closest.t14...\c"
 echo \
 "chr1	80	100	q1	1	+	a	chr1	20	60	d1.2	2	-
 chr1	80	100	q1	1	+	b	chr1	120	170	db2.2	2	-
@@ -190,7 +193,7 @@ rm obs exp
 ###########################################################
 # test 3 dbs with -filenames option
 ###########################################################
-echo "    closest.t15...\c"
+echo -e "    closest.t15...\c"
 echo \
 "chr1	80	100	q1	1	+	mdb1.bed	chr1	20	60	d1.2	2	-
 chr1	80	100	q1	1	+	mdb2.bed	chr1	120	170	db2.2	2	-
@@ -202,7 +205,7 @@ rm obs exp
 ###########################################################
 # test 3 dbs, -all mode
 ###########################################################
-echo "    closest.t16...\c"
+echo -e "    closest.t16...\c"
 echo \
 "chr1	80	100	q1	1	+	3	chr1	70	90	d3.1	3	-" > exp
 $BT closest -a mq1.bed -b mdb1.bed mdb2.bed mdb3.bed -mdb all > obs
@@ -213,7 +216,7 @@ rm obs exp
 ###########################################################
 # test 2 dbs, tie mode = all
 ###########################################################
-echo "    closest.t17...\c"
+echo -e "    closest.t17...\c"
 echo \
 "chr1	80	100	q1	1	+	1	chr1	20	60	d1.2	2	-
 chr1	80	100	q1	1	+	2	chr1	120	170	db2.2	2	-" > exp
@@ -224,7 +227,7 @@ rm obs exp
 ###########################################################
 # test 2 dbs, tie mode = first
 ###########################################################
-echo "    closest.t18...\c"
+echo -e "    closest.t18...\c"
 echo \
 "chr1	80	100	q1	1	+	1	chr1	20	60	d1.2	2	-" > exp
 $BT closest -a mq1.bed -b mdb1.bed mdb2.bed -mdb all -t first > obs
@@ -234,7 +237,7 @@ rm obs exp
 ###########################################################
 # test 2 dbs, tie mode = last
 ###########################################################
-echo "    closest.t19...\c"
+echo -e "    closest.t19...\c"
 echo \
 "chr1	80	100	q1	1	+	2	chr1	120	170	db2.2	2	-" > exp
 $BT closest -a mq1.bed -b mdb1.bed mdb2.bed -mdb all -t last > obs
@@ -244,7 +247,7 @@ rm obs exp
 ###########################################################
 # test same strand 
 ###########################################################
-echo "    closest.t20...\c"
+echo -e "    closest.t20...\c"
 echo \
 "chr1	80	100	q1	1	+	chr1	5	15	d1.1	1	+" > exp
 $BT closest -a mq1.bed -b mdb1.bed -s> obs
@@ -254,7 +257,7 @@ rm obs exp
 ###########################################################
 # test diff strand 
 ###########################################################
-echo "    closest.t21...\c"
+echo -e "    closest.t21...\c"
 echo \
 "chr1	80	100	q1	1	+	chr1	20	60	d1.2	2	-" > exp
 $BT closest -a mq1.bed -b mdb1.bed -S> obs
@@ -265,7 +268,7 @@ rm obs exp
 ###########################################################
 # test 2 dbs, tie mode = all, same strand
 ###########################################################
-echo "    closest.t22...\c"
+echo -e "    closest.t22...\c"
 echo \
 "chr1	80	100	q1	1	+	1	chr1	5	15	d1.1	1	+" > exp
 $BT closest -a mq1.bed -b mdb1.bed mdb2.bed -t all -mdb all -s > obs
@@ -276,7 +279,7 @@ rm obs exp
 ###########################################################
 # test 2 dbs, tie mode = all, diff strand
 ###########################################################
-echo "    closest.t23...\c"
+echo -e "    closest.t23...\c"
 echo \
 "chr1	80	100	q1	1	+	1	chr1	20	60	d1.2	2	-
 chr1	80	100	q1	1	+	2	chr1	120	170	db2.2	2	-" > exp
@@ -299,7 +302,7 @@ rm obs exp
 ###########################################################
 # hit on left, forward query, forward hit, ref mode
 ###########################################################
-echo "    closest.t24...\c"
+echo -e "    closest.t24...\c"
 echo \
 "chr1	80	100	d_q1.1	5	+	chr1	40	60	d1F.1	10	+	-21" > exp
 $BT closest -a d_q1.bed -b d_d1F.bed -D ref > obs
@@ -310,7 +313,7 @@ rm obs exp
 ###########################################################
 # hit on left, forward query, forward hit, a mode
 ###########################################################
-echo "    closest.t25...\c"
+echo -e "    closest.t25...\c"
 echo \
 "chr1	80	100	d_q1.1	5	+	chr1	40	60	d1F.1	10	+	-21" > exp
 $BT closest -a d_q1.bed -b d_d1F.bed -D a > obs
@@ -320,7 +323,7 @@ rm obs exp
 ###########################################################
 # hit on left, forward query, forward hit, b mode
 ###########################################################
-echo "    closest.t26...\c"
+echo -e "    closest.t26...\c"
 echo \
 "chr1	80	100	d_q1.1	5	+	chr1	40	60	d1F.1	10	+	21" > exp
 $BT closest -a d_q1.bed -b d_d1F.bed -D b > obs
@@ -330,7 +333,7 @@ rm obs exp
 ###########################################################
 # hit on left, forward query, reverse hit, ref mode
 ###########################################################
-echo "    closest.t27...\c"
+echo -e "    closest.t27...\c"
 echo \
 "chr1	80	100	d_q1.1	5	+	chr1	40	60	d1R.1	10	-	-21" > exp
 $BT closest -a d_q1.bed -b d_d1R.bed -D ref > obs
@@ -341,7 +344,7 @@ rm obs exp
 ###########################################################
 # hit on left, forward query, reverse hit, a mode
 ###########################################################
-echo "    closest.t28...\c"
+echo -e "    closest.t28...\c"
 echo \
 "chr1	80	100	d_q1.1	5	+	chr1	40	60	d1R.1	10	-	-21" > exp
 $BT closest -a d_q1.bed -b d_d1R.bed -D a > obs
@@ -351,7 +354,7 @@ rm obs exp
 ###########################################################
 # hit on left, forward query, reverse hit, b mode
 ###########################################################
-echo "    closest.t29...\c"
+echo -e "    closest.t29...\c"
 echo \
 "chr1	80	100	d_q1.1	5	+	chr1	40	60	d1R.1	10	-	-21" > exp
 $BT closest -a d_q1.bed -b d_d1R.bed -D b > obs
@@ -361,7 +364,7 @@ rm obs exp
 ###########################################################
 # hit on left, reverse query, forward hit, ref mode
 ###########################################################
-echo "    closest.t30...\c"
+echo -e "    closest.t30...\c"
 echo \
 "chr1	80	100	d_q2.1	5	-	chr1	40	60	d1F.1	10	+	-21" > exp
 $BT closest -a d_q2.bed -b d_d1F.bed -D ref > obs
@@ -371,7 +374,7 @@ rm obs exp
 ###########################################################
 # hit on left, reverse query, forward hit, a mode
 ###########################################################
-echo "    closest.t31...\c"
+echo -e "    closest.t31...\c"
 echo \
 "chr1	80	100	d_q2.1	5	-	chr1	40	60	d1F.1	10	+	21" > exp
 $BT closest -a d_q2.bed -b d_d1F.bed -D a > obs
@@ -382,7 +385,7 @@ rm obs exp
 ###########################################################
 # hit on left, reverse query, forward hit, b mode
 ###########################################################
-echo "    closest.t32...\c"
+echo -e "    closest.t32...\c"
 echo \
 "chr1	80	100	d_q2.1	5	-	chr1	40	60	d1F.1	10	+	21" > exp
 $BT closest -a d_q2.bed -b d_d1F.bed -D b > obs
@@ -395,7 +398,7 @@ rm obs exp
 ###########################################################
 # hit on left, reverse query, reverse hit, ref mode
 ###########################################################
-echo "    closest.t33...\c"
+echo -e "    closest.t33...\c"
 echo \
 "chr1	80	100	d_q2.1	5	-	chr1	40	60	d1R.1	10	-	-21" > exp
 $BT closest -a d_q2.bed -b d_d1R.bed -D ref > obs
@@ -405,7 +408,7 @@ rm obs exp
 ###########################################################
 # hit on left, reverse query, reverse hit, a mode
 ###########################################################
-echo "    closest.t34...\c"
+echo -e "    closest.t34...\c"
 echo \
 "chr1	80	100	d_q2.1	5	-	chr1	40	60	d1R.1	10	-	21" > exp
 $BT closest -a d_q2.bed -b d_d1R.bed -D a > obs
@@ -416,7 +419,7 @@ rm obs exp
 ###########################################################
 # hit on left, reverse query, reverse hit, b mode
 ###########################################################
-echo "    closest.t35...\c"
+echo -e "    closest.t35...\c"
 echo \
 "chr1	80	100	d_q2.1	5	-	chr1	40	60	d1R.1	10	-	-21" > exp
 $BT closest -a d_q2.bed -b d_d1R.bed -D b > obs
@@ -428,7 +431,7 @@ rm obs exp
 ###########################################################
 # hit on right, forward query, forward hit, ref mode
 ###########################################################
-echo "    closest.t36...\c"
+echo -e "    closest.t36...\c"
 echo \
 "chr1	80	100	d_q1.1	5	+	chr1	140	160	d2F.1	10	+	41" > exp
 $BT closest -a d_q1.bed -b d_d2F.bed -D ref > obs
@@ -438,7 +441,7 @@ rm obs exp
 ###########################################################
 # hit on right, forward query, forward hit, a mode
 ###########################################################
-echo "    closest.t37...\c"
+echo -e "    closest.t37...\c"
 echo \
 "chr1	80	100	d_q1.1	5	+	chr1	140	160	d2F.1	10	+	41" > exp
 $BT closest -a d_q1.bed -b d_d2F.bed -D a > obs
@@ -448,7 +451,7 @@ rm obs exp
 ###########################################################
 # hit on right, forward query, forward hit, b mode
 ###########################################################
-echo "    closest.t38...\c"
+echo -e "    closest.t38...\c"
 echo \
 "chr1	80	100	d_q1.1	5	+	chr1	140	160	d2F.1	10	+	-41" > exp
 $BT closest -a d_q1.bed -b d_d2F.bed -D b > obs
@@ -459,7 +462,7 @@ rm obs exp
 ###########################################################
 # hit on right, forward query, reverse hit, ref mode
 ###########################################################
-echo "    closest.t39...\c"
+echo -e "    closest.t39...\c"
 echo \
 "chr1	80	100	d_q1.1	5	+	chr1	140	160	d2R.1	10	-	41" > exp
 $BT closest -a d_q1.bed -b d_d2R.bed -D ref > obs
@@ -469,7 +472,7 @@ rm obs exp
 ###########################################################
 # hit on right, forward query, reverse hit, a mode
 ###########################################################
-echo "    closest.t40...\c"
+echo -e "    closest.t40...\c"
 echo \
 "chr1	80	100	d_q1.1	5	+	chr1	140	160	d2R.1	10	-	41" > exp
 $BT closest -a d_q1.bed -b d_d2R.bed -D a > obs
@@ -479,7 +482,7 @@ rm obs exp
 ###########################################################
 # hit on right, forward query, reverse hit, b mode
 ###########################################################
-echo "    closest.t41...\c"
+echo -e "    closest.t41...\c"
 echo \
 "chr1	80	100	d_q1.1	5	+	chr1	140	160	d2R.1	10	-	41" > exp
 $BT closest -a d_q1.bed -b d_d2R.bed -D b > obs
@@ -489,7 +492,7 @@ rm obs exp
 ###########################################################
 # hit on right, reverse query, forward hit, ref mode
 ###########################################################
-echo "    closest.t42...\c"
+echo -e "    closest.t42...\c"
 echo \
 "chr1	80	100	d_q2.1	5	-	chr1	140	160	d2F.1	10	+	41" > exp
 $BT closest -a d_q2.bed -b d_d2F.bed -D ref > obs
@@ -499,7 +502,7 @@ rm obs exp
 ###########################################################
 # hit on right, reverse query, forward hit, a mode
 ###########################################################
-echo "    closest.t43...\c"
+echo -e "    closest.t43...\c"
 echo \
 "chr1	80	100	d_q2.1	5	-	chr1	140	160	d2F.1	10	+	-41" > exp
 $BT closest -a d_q2.bed -b d_d2F.bed -D a > obs
@@ -509,7 +512,7 @@ rm obs exp
 ###########################################################
 # hit on right, reverse query, forward hit, b mode
 ###########################################################
-echo "    closest.t44...\c"
+echo -e "    closest.t44...\c"
 echo \
 "chr1	80	100	d_q2.1	5	-	chr1	140	160	d2F.1	10	+	-41" > exp
 $BT closest -a d_q2.bed -b d_d2F.bed -D b > obs
@@ -519,7 +522,7 @@ rm obs exp
 ###########################################################
 # hit on right, reverse query, reverse hit, ref mode
 ###########################################################
-echo "    closest.t45...\c"
+echo -e "    closest.t45...\c"
 echo \
 "chr1	80	100	d_q2.1	5	-	chr1	140	160	d2R.1	10	-	41" > exp
 $BT closest -a d_q2.bed -b d_d2R.bed -D ref > obs
@@ -529,7 +532,7 @@ rm obs exp
 ###########################################################
 # hit on right, reverse query, reverse hit, a mode
 ###########################################################
-echo "    closest.t46...\c"
+echo -e "    closest.t46...\c"
 echo \
 "chr1	80	100	d_q2.1	5	-	chr1	140	160	d2R.1	10	-	-41" > exp
 $BT closest -a d_q2.bed -b d_d2R.bed -D a > obs
@@ -539,7 +542,7 @@ rm obs exp
 ###########################################################
 # hit on right, reverse query, reverse hit, b mode
 ###########################################################
-echo "    closest.t47...\c"
+echo -e "    closest.t47...\c"
 echo \
 "chr1	80	100	d_q2.1	5	-	chr1	140	160	d2R.1	10	-	41" > exp
 $BT closest -a d_q2.bed -b d_d2R.bed -D b > obs
@@ -549,7 +552,7 @@ rm obs exp
 ############################################################
 # Make sure non-overlapping ties are reported 
 ############################################################
-echo "    closest.t48...\c"
+echo -e "    closest.t48...\c"
 echo \
 "chr1	10	20	a1	1	-	chr1	8	9	b1	1	+
 chr1	10	20	a1	1	-	chr1	21	22	b2	1	-" > exp
@@ -560,7 +563,7 @@ rm obs exp
 ############################################################
 # Make sure non-overlapping ties are reported, but with -s
 ############################################################
-echo "    closest.t49...\c"
+echo -e "    closest.t49...\c"
 echo \
 "chr1	10	20	a1	1	-	chr1	21	22	b2	1	-" > exp
 $BT closest -a a2.bed -b b2.bed -s > obs
@@ -570,7 +573,7 @@ rm obs exp
 ############################################################
 # Make sure non-overlapping ties are reported, but with -S
 ############################################################
-echo "    closest.t50...\c"
+echo -e "    closest.t50...\c"
 echo \
 "chr1	10	20	a1	1	-	chr1	8	9	b1	1	+" > exp
 $BT closest -a a2.bed -b b2.bed -S > obs
@@ -578,7 +581,7 @@ check obs exp
 rm obs exp
 
 
-echo "    closest.t51...\c"
+echo -e "    closest.t51...\c"
 echo \
 "chr1	80	100	d_q2.1	5	-	chr1	140	160	d2R.1	10	-	41" > exp
 $BT closest -a d_q2.bed -b d_d2R.bed -D b > obs
@@ -590,7 +593,7 @@ rm obs exp
 # see that stranded sweep doesn't prematurely purge 
 # records from the cache
 ###########################################################
-echo "    closest.t52...\c"
+echo -e "    closest.t52...\c"
 echo \
 "chr1	80	100	c1	20	+	chr1	50	60	d2	20	+
 chr1	110	130	c2	20	-	chr1	20	40	d1	20	-" > exp
@@ -601,7 +604,7 @@ rm obs exp
 ###########################################################
 # check oppostite stranded sweep 
 ###########################################################
-echo "    closest.t53...\c"
+echo -e "    closest.t53...\c"
 echo \
 "chr1	80	100	c1	20	+	chr1	20	40	d1	20	-
 chr1	110	130	c2	20	-	chr1	50	60	d2	20	+" > exp
@@ -613,7 +616,7 @@ rm obs exp
 ###########################################################
 # check -iu
 ###########################################################
-echo "    closest.t54...\c"
+echo -e "    closest.t54...\c"
 echo \
 "chr1	100	120	chr1	200	210	81" > exp
 $BT closest -a d.bed -b d_iu.bed -D ref -iu > obs
@@ -624,7 +627,7 @@ rm exp obs
 ##########################################################
 # check -id
 ###########################################################
-echo "    closest.t55...\c"
+echo -e "    closest.t55...\c"
 echo \
 "chr1	100	120	chr1	10	20	-81" > exp
 $BT closest -a d.bed -b d_id.bed -D ref -id > obs
@@ -634,7 +637,7 @@ rm exp obs
 ##########################################################
 # check ties, single db
 ###########################################################
-echo "    closest.t56...\c"
+echo -e "    closest.t56...\c"
 echo \
 "chr1	10	20	a1	1	-	chr1	8	9	b1	1	+
 chr1	10	20	a1	1	-	chr1	21	22	b2	1	-" > exp
@@ -646,7 +649,7 @@ rm exp obs
 ##########################################################
 # check ties, single db, -iu
 ###########################################################
-echo "    closest.t57...\c"
+echo -e "    closest.t57...\c"
 echo \
 "chr1	10	20	a1	1	-	chr1	21	22	b2	1	-	2" > exp
 $BT closest -a bug157_a.bed -b bug157_b.bed -D ref -iu > obs
@@ -656,7 +659,7 @@ rm exp obs
 ##########################################################
 # check ties, single db, -id
 ###########################################################
-echo "    closest.t58...\c"
+echo -e "    closest.t58...\c"
 echo \
 "chr1	10	20	a1	1	-	chr1	8	9	b1	1	+	-2" > exp
 $BT closest -a bug157_a.bed -b bug157_b.bed -D ref -id > obs 
@@ -666,7 +669,7 @@ rm exp obs
 ##########################################################
 # check -header
 ###########################################################
-echo "    closest.t59...\c"
+echo -e "    closest.t59...\c"
 echo \
 "#Header for file a.bed
 chr1	10	20	chr1	20	21" > exp
@@ -685,7 +688,7 @@ rm exp obs
 ###########################################################
 # a_med vs b, -s
 ###########################################################
-echo "    closest.t60...\c"
+echo -e "    closest.t60...\c"
 echo \
 "chr1	249120154	249120155	21176	0	-	chr1	247242115	247242116	551	0	-
 chr1	249132529	249132530	6425	0	+	chr1	247495324	247495325	510	0	+" > exp
@@ -697,7 +700,7 @@ rm exp obs
 ###########################################################
 # a_med vs b, -S
 ###########################################################
-echo "    closest.t61...\c"
+echo -e "    closest.t61...\c"
 echo \
 "chr1	249120154	249120155	21176	0	-	chr1	247495324	247495325	510	0	+
 chr1	249132529	249132530	6425	0	+	chr1	247242115	247242116	551	0	-" > exp
@@ -708,7 +711,7 @@ rm exp obs
 ###########################################################
 # a_med.flip vs b, -s
 ###########################################################
-echo "    closest.t62...\c"
+echo -e "    closest.t62...\c"
 echo \
 "chr1	249120154	249120155	21176	0	+	chr1	247495324	247495325	510	0	+
 chr1	249132529	249132530	6425	0	-	chr1	247242115	247242116	551	0	-" > exp
@@ -719,7 +722,7 @@ rm exp obs
 ###########################################################
 # a_med.flip vs b, -S
 ###########################################################
-echo "    closest.t63...\c"
+echo -e "    closest.t63...\c"
 echo \
 "chr1	249120154	249120155	21176	0	+	chr1	247242115	247242116	551	0	-
 chr1	249132529	249132530	6425	0	-	chr1	247495324	247495325	510	0	+" > exp
@@ -730,7 +733,7 @@ rm exp obs
 ###########################################################
 # a_med vs b.flip, -s
 ###########################################################
-echo "    closest.t64...\c"
+echo -e "    closest.t64...\c"
 echo \
 "chr1	249120154	249120155	21176	0	-	chr1	247495324	247495325	510	0	-
 chr1	249132529	249132530	6425	0	+	chr1	247242115	247242116	551	0	+" > exp
@@ -741,7 +744,7 @@ rm exp obs
 ###########################################################
 # a_med vs b.flip, -S
 ###########################################################
-echo "    closest.t65...\c"
+echo -e "    closest.t65...\c"
 echo \
 "chr1	249120154	249120155	21176	0	-	chr1	247242115	247242116	551	0	+
 chr1	249132529	249132530	6425	0	+	chr1	247495324	247495325	510	0	-" > exp
@@ -752,7 +755,7 @@ rm exp obs
 ###########################################################
 # a_med.flip vs b.flip, -s
 ###########################################################
-echo "    closest.t66...\c"
+echo -e "    closest.t66...\c"
 echo \
 "chr1	249120154	249120155	21176	0	+	chr1	247242115	247242116	551	0	+
 chr1	249132529	249132530	6425	0	-	chr1	247495324	247495325	510	0	-" > exp
@@ -763,7 +766,7 @@ rm exp obs
 ###########################################################
 # a_med.flip vs b.flip, -S
 ###########################################################
-echo "    closest.t67...\c"
+echo -e "    closest.t67...\c"
 echo \
 "chr1	249120154	249120155	21176	0	+	chr1	247495324	247495325	510	0	-
 chr1	249132529	249132530	6425	0	-	chr1	247242115	247242116	551	0	+" > exp
@@ -774,7 +777,7 @@ rm exp obs
 ###########################################################
 #  Test intersect -wao with multiple databases and -names
 ############################################################
-echo "    closest.t68...\c"
+echo -e "    closest.t68...\c"
 echo \
 "1	100	200	a1	ax	b	1	100	200	b1	bx
 1	100	200	a1	ax	c	1	500	600	c4	cq
@@ -787,6 +790,41 @@ $BT closest -a null_a.bed -b null_b.bed null_c.bed -names b c > obs
 check exp obs
 rm exp obs
 
+###########################################################
+#  Test -mdb all
+############################################################
+echo -e "    closest.t69...\c"
+echo \
+"chr10	21805001	21805500	shores.bed	chr10	21803197	21805197	0	0
+chr10	21805001	21805500	tfbs.bed	chr10	21805031	21805041	V	931	-	0	0
+chr10	21805001	21805500	islands.bed	chr10	21805197	21805759	CpG:_22	0	0" > exp
+$BT closest -a dmr.bed -b islands.bed tfbs.bed shores.bed -filenames -d -mdb all > obs
+check exp obs
+rm exp obs
+
+###########################################################
+#  Test -mdb all with the islands record having no overlap
+############################################################
+echo -e "    closest.t70...\c"
+echo \
+"chr10	21805001	21805500	shores.bed	chr10	21803197	21805197	0	0
+chr10	21805001	21805500	tfbs.bed	chr10	21805031	21805041	V	931	-	0	0" > exp
+$BT closest -a dmr.bed -b islands.2.bed tfbs.bed shores.bed -filenames -d -mdb all > obs
+check exp obs
+rm exp obs
+
+###########################################################
+#  Test -mdb each with the islands record having no overlap
+############################################################
+echo -e "    closest.t71...\c"
+echo \
+"chr10	21805001	21805500	islands.2.bed	chr10	21805597	21805759	CpG:_22	0	98
+chr10	21805001	21805500	tfbs.bed	chr10	21805031	21805041	V	931	-	0	0
+chr10	21805001	21805500	shores.bed	chr10	21803197	21805197	0	0" > exp
+$BT closest -a dmr.bed -b islands.2.bed tfbs.bed shores.bed -filenames -d -mdb each > obs
+check exp obs
+rm exp obs
+
 cd sortAndNaming
 bash test-sort-and-naming.sh
 cd ..
@@ -795,3 +833,4 @@ cd kclosest
 bash test-kclosest.sh
 cd ..
 
+[[ $FAILURES -eq 0 ]] || exit 1;

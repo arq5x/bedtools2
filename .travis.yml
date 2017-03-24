@@ -2,4 +2,9 @@ language: cpp
 compiler:
   - gcc
   - clang
+addons:
+  apt:
+    packages:
+    - samtools
+    - tabix
 script: make test

@@ -26,12 +26,12 @@ void NoPosPlusRecord::clear() {
 	_plusFields.clear();
 }
 
-void NoPosPlusRecord::print(QuickString &outBuf) const
+void NoPosPlusRecord::print(string &outBuf) const
 {
 	_plusFields.printFields(outBuf);
 }
 
-const QuickString &NoPosPlusRecord::getField(int fieldNum) const
+const string &NoPosPlusRecord::getField(int fieldNum) const
 {
 	return _plusFields.getField(fieldNum);
 }

@@ -293,7 +293,7 @@ to
 ==========================================================================
 ``-scale`` Scaling coverage by a constant factor.
 ==========================================================================
-The ``-strand`` option allows one to scale the coverage observed in an interval
+The ``-scale`` option allows one to scale the coverage observed in an interval
 file by a constant factor. Each coverage value is multiplied by this factor 
 before being reported. This can be useful for normalizing coverage by, 
 e.g., metrics such as reads per million (RPM). 

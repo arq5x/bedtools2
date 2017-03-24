@@ -19,13 +19,13 @@ public:
 
 	BedGraphInterval();
 	virtual bool initFromFile(SingleLineDelimTextFileReader *);
-	virtual void print(QuickString &outBuf) const;
-	virtual void print(QuickString &outBuf, int start, int end) const;
-	virtual void print(QuickString &outBuf, const QuickString & start, const QuickString & end) const;
-	virtual void printNull(QuickString &outBuf) const;
+	virtual void print(string &outBuf) const;
+	virtual void print(string &outBuf, int start, int end) const;
+	virtual void print(string &outBuf, const string & start, const string & end) const;
+	virtual void printNull(string &outBuf) const;
 	virtual FileRecordTypeChecker::RECORD_TYPE getType() const { return FileRecordTypeChecker::BEDGRAPH_RECORD_TYPE; }
 
-	virtual const QuickString &getField(int fieldNum) const;
+	virtual const string &getField(int fieldNum) const;
 	virtual int getNumFields() const  { return 4; }
 
 	static bool isNumericField(int fieldNum);

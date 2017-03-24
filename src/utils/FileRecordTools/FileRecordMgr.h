@@ -9,7 +9,7 @@
 #define FILERECORDMGR_H_
 
 #include <string>
-#include "QuickString.h"
+#include "string.h"
 #include <set>
 //#include "DualQueue.h"
 
@@ -32,7 +32,7 @@ class NewGenomeFile;
 
 class FileRecordMgr {
 public:
-	FileRecordMgr(const QuickString & filename);
+	FileRecordMgr(const string & filename);
 	virtual ~FileRecordMgr();
 	bool open(bool inheader=false);
 	void close();
@@ -51,9 +51,9 @@ public:
 
 
 
-	const QuickString &getFileName() const { return _filename;}
+	const string &getFileName() const { return _filename;}
 	bool hasHeader() const { return _fileReader->hasHeader(); }
-	const QuickString &getHeader() const { return _fileReader->getHeader(); }
+	const string &getHeader() const { return _fileReader->getHeader(); }
 
 	bool recordsHaveName() const {
 		return _bufStreamMgr->getTypeChecker().recordTypeHasName(_recordType);
@@ -111,7 +111,7 @@ public:
 
 protected:
 	int _fileIdx;
-	QuickString _filename;
+	string _filename;
 	BufferedStreamMgr *_bufStreamMgr;
 
 	FileReader *_fileReader;
@@ -123,8 +123,8 @@ protected:
 	bool _useFullBamTags;
 
 	//members for enforcing sorted order.
-	set<QuickString> _foundChroms;
-	QuickString _prevChrom;
+	set<string> _foundChroms;
+	string _prevChrom;
 	int _prevStart;
 	int _prevChromId;
 

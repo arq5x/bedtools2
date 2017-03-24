@@ -22,13 +22,13 @@ public:
     virtual void processHits(RecordOutputMgr *outputMgr, RecordKeyVector &hits);
     virtual void cleanupHits(RecordKeyVector &hits);
     virtual bool finalizeCalculations() { return true; }
-    virtual void  giveFinalReport(RecordOutputMgr *outputMgr) {}
+    virtual void  giveFinalReport(RecordOutputMgr *) {}
 
 
 protected:
-    const Record *_prevRec;
-    const Record *_currRec;
-    QuickString _distance;
+    Record *_prevRec;
+    Record *_currRec;
+    string _distance;
 
     FileRecordMgr *_inputFile;
     virtual ContextSpacing *upCast(ContextBase *context) { return static_cast<ContextSpacing *>(context); }

@@ -1,7 +1,10 @@
 #include "SingleLineDelimTextFileReader.h"
 #include <iostream>
+#include <limits.h>
 #include "BufferedStreamMgr.h"
 #include "ParseTools.h"
+
+bool abs_cmp(int i, int j) { return abs(i)<abs(j); }
 
 SingleLineDelimTextFileReader::SingleLineDelimTextFileReader(int numFields, char delimChar)
 : _numFields(numFields),
@@ -63,13 +66,6 @@ bool SingleLineDelimTextFileReader::readEntry()
 		return false;
 	}
 
-	//trim off any white space from end of line.
-	int currPos = lineLen-1;
-	while (isspace(_sLine[currPos])) {
-		currPos--;
-	}
-	_sLine.resize(currPos +1);
-
 	if (wasHeader) {
 		return true;
 	}
@@ -81,23 +77,24 @@ bool SingleLineDelimTextFileReader::readEntry()
 }
 
 
-void SingleLineDelimTextFileReader::getField(int fieldNum, QuickString &str) const {
+void SingleLineDelimTextFileReader::getField(int fieldNum, string &str) const {
 	int startPos = _delimPositions[fieldNum] +1;
 	int endPos = _delimPositions[fieldNum+1];
 	str.assign(_sLine.c_str() + startPos, endPos - startPos);
 }
 
 
-void SingleLineDelimTextFileReader::getField(int fieldNum, int &val) {
-	getField(fieldNum, _tempChrPosStr);
-	val = str2chrPos(_tempChrPosStr.c_str());
+void SingleLineDelimTextFileReader::getField(int fieldNum, int &val) const {
+	string temp;
+	getField(fieldNum, temp);
+	val = str2chrPos(temp.c_str());
 }
 
 void SingleLineDelimTextFileReader::getField(int fieldNum, char &val) const {
 	val = _sLine[_delimPositions[fieldNum] +1];
 }
 
-void SingleLineDelimTextFileReader::appendField(int fieldNum, QuickString &str) const {
+void SingleLineDelimTextFileReader::appendField(int fieldNum, string &str) const {
 	int startPos = _delimPositions[fieldNum] +1;
 	int endPos = _delimPositions[fieldNum+1];
 	str.append(_sLine.c_str() + startPos, endPos - startPos);
@@ -106,9 +103,9 @@ void SingleLineDelimTextFileReader::appendField(int fieldNum, QuickString &str) 
 bool SingleLineDelimTextFileReader::detectAndHandleHeader()
 {
 	//not sure why the linker is giving me a hard time about
-	//passing a non-const QuickString to isHeaderLine, but
+	//passing a non-const string to isHeaderLine, but
 	//this const ref is a workaround.
-	const QuickString &sLine2 = _sLine;
+	const string &sLine2 = _sLine;
 	if (!isHeaderLine(sLine2) && (!(_inheader && _lineNum==1))) {
 		return false;
 	}
@@ -132,50 +129,63 @@ bool SingleLineDelimTextFileReader::findDelimiters() {
 		}
 	}
 	_delimPositions[currField] = len;
+	if (_sLine[len] == '\t')
+	{
+		currField++;		
+	}
+
+	// count the number of fields allow for lines ending in \t\n
 	if (currField != _numFields) {
-		cerr << "Error: line number " << _lineNum << " of file " << _filename << " has " << currField << " fields, but " << _numFields << " were expected." << endl;
+		cerr << "Error: line number " 
+			 << _lineNum << " of file " 
+			 << _filename << " has " 
+			 << currField << " fields, but " 
+			 << _numFields 
+			 << " were expected." 
+			 << endl;
 		exit(1);
 	}
 	return true;
 }
 
 int SingleLineDelimTextFileReader::getVcfSVlen() {
+	// tokenize the INFO field
+	string info_str;
+	vector<string> infofields;
+	getField(VCF_TAG_FIELD, info_str);
+	Tokenize(info_str, infofields, ';');
 
-	// The SVLEN field can appear anywhere in the info tag, and may be followed by a semi-colon, tab, newline, or end in NULL.
-	// it can contain one, two, or more numbers, which would be separated by a comma.
-	// We want the minimum number.
-
-	int startPos = _delimPositions[VCF_TAG_FIELD] +1;
-	const char *startPtr = strstr(_sLine.c_str() + startPos, "SVLEN=");
-	if (startPtr == NULL) {
-		cerr << "WARNING: line number " << _lineNum << " of file " << _filename << " has an imprecise variant, but no SVLEN specified. Defaulting to length 1." << endl;
-		return 1;
-	}
-	startPtr +=6; // length of label "SVLEN="
-	const char *currPtr = startPtr;
-	const char *endPtr = _sLine.c_str() + _sLine.size();
-
-	int maxVal = INT_MIN;
-	int currVal = 0;
-	QuickString currValStr;
-	while (1) {
-		if (currPtr == endPtr || *currPtr == ';' || *currPtr == '\t' || *currPtr == '\n' || *currPtr == ',') {
-			if (currPtr > startPtr) {
-				currValStr.assign(startPtr, currPtr - startPtr);
-				currVal = abs(str2chrPos(currValStr));
-				if (currVal > maxVal) maxVal = currVal;
-				startPtr = currPtr;
-			}
-
-			if (currPtr == endPtr || *currPtr != ',') {
-				//if end of line or non-comma delimiter, break.
-				break;
-			} else {
-				//skip the comma
-				startPtr++;
-			}
+	// FOO=BAR;BIZ=BAM;SVLEN=100;END=200
+	for (vector<string>::iterator f = infofields.begin(); f != infofields.end(); ++f) {
+    	if (*f == ".") {
+    		continue;
+        }
+        vector<string> keytoval;
+        Tokenize(*f, keytoval, '=');
+        //hey->val
+        //SVLEN->100
+        if (keytoval.size() == 2) {
+        	if (keytoval.at(0) == "SVLEN") {
+        		vector<int> svlens;
+        		Tokenize(keytoval.at(1), svlens, ',');
+        		// are the multiple SVLENS?
+        		if (svlens.size() == 1) {
+        			return abs(svlens[0]);
+        		}
+        		else {
+        			// return the abs_max SVLEN
+        			int max_len = *max_element(svlens.begin(),svlens.end(), abs_cmp);
+        			return abs(max_len);
+        		}
+        	}
+        	else if (keytoval.at(0) == "END") {
+        		string start_str;
+        		getField(1, start_str);
+        		// length is END - POS + 1
+        		return str2chrPos(keytoval.at(1)) - str2chrPos(start_str) + 1;
+        	}
 		}
-		currPtr++;
-	};
-	return maxVal;
+    }
+    // not found
+    return INT_MIN;
 }
