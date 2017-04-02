@@ -49,3 +49,7 @@ Citation
 Also, if you use *pybedtools*, please cite the following.
   * Dale RK, Pedersen BS, and Quinlan AR. Pybedtools: a flexible Python library for manipulating genomic datasets and annotations. Bioinformatics (2011). doi:10.1093/bioinformatics/btr539
 
+
+
+[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/arq5x/bedtools2/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
+
