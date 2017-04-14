@@ -38,7 +38,7 @@ void intersect_help(void) {
 
     cerr << "Notes: " << endl;
     cerr << "\t(1) When a BAM file is used for the A file, the alignment is retained if overlaps exist," << endl;
-    cerr << "\tand exlcuded if an overlap cannot be found.  If multiple overlaps exist, they are not" << endl;
+    cerr << "\tand excluded if an overlap cannot be found.  If multiple overlaps exist, they are not" << endl;
     cerr << "\treported, as we are only testing for one or more overlaps." << endl << endl;
 
     // end the program here
