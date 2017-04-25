@@ -13,14 +13,16 @@
 #include "maskFastaFromBed.h"
 
 
-MaskFastaFromBed::MaskFastaFromBed(const string &fastaInFile,  const string &bedFile, 
-                                   const string &fastaOutFile, bool softMask, char maskChar) {
-    _softMask     = softMask;
-    _fastaInFile  = fastaInFile;
-    _bedFile      = bedFile;
-    _fastaOutFile = fastaOutFile;
-    _maskChar     = maskChar;
-    _bed          = new BedFile(_bedFile);
+MaskFastaFromBed::MaskFastaFromBed(const string &fastaInFile,  const string &bedFile,
+                                   const string &fastaOutFile, bool softMask, char maskChar,
+                                   bool useFullHeader) {
+    _softMask      = softMask;
+    _fastaInFile   = fastaInFile;
+    _bedFile       = bedFile;
+    _fastaOutFile  = fastaOutFile;
+    _maskChar      = maskChar;
+    _useFullHeader = useFullHeader;
+    _bed           = new BedFile(_bedFile);
 
     _bed->loadBedFileIntoMapNoBin();
     // start masking.
@@ -56,6 +58,7 @@ void MaskFastaFromBed::MaskFasta() {
 
     /* Read the fastaDb chromosome by chromosome*/
     string fastaInLine;
+    string currChromFull;
     string currChrom;
     string currDNA = "";
     currDNA.reserve(500000000);
@@ -103,11 +106,12 @@ void MaskFastaFromBed::MaskFasta() {
                     }
                 }
                 // write the masked chrom to the output file
-                PrettyPrintChrom(faOut, currChrom, currDNA, fastaWidth);
+                PrettyPrintChrom(faOut, _useFullHeader ? currChromFull : currChrom, currDNA, fastaWidth);
             }
 
             // reset for the next chromosome.
-            currChrom = fastaInLine.substr(1, fastaInLine.find_first_of(" ")-1);
+            currChromFull = fastaInLine.substr(1);
+            currChrom = split(currChromFull, " \t").at(0);
             currDNA = "";
         }
     }
@@ -133,7 +137,7 @@ void MaskFastaFromBed::MaskFasta() {
                 currDNA.replace(start, length, hardmask);
             }
         }
-        PrettyPrintChrom(faOut, currChrom, currDNA, fastaWidth);
+        PrettyPrintChrom(faOut, _useFullHeader ? currChromFull : currChrom, currDNA, fastaWidth);
     }
 
     // closed for business.

@@ -37,11 +37,12 @@ int maskfastafrombed_main(int argc, char* argv[]) {
     string fastaOutFile;
 
     // defaults for parameters
-    bool haveFastaIn  = false;
-    bool haveBed      = false;
-    bool haveFastaOut = false;
-    bool softMask     = false;
-    char maskChar     = 'N';
+    bool haveFastaIn   = false;
+    bool haveBed       = false;
+    bool haveFastaOut  = false;
+    bool softMask      = false;
+    char maskChar      = 'N';
+    bool useFullHeader = false;
 
     // check to see if we should print out some help
     if(argc <= 1) showHelp = true;
@@ -99,6 +100,9 @@ int maskfastafrombed_main(int argc, char* argv[]) {
                 i++;
             }
         }
+        else if(PARAMETER_CHECK("-fullHeader", 11, parameterLength)) {
+            useFullHeader = true;
+        }
         else {
             cerr << "*****ERROR: Unrecognized parameter: " << argv[i] << " *****" << endl << endl;
             showHelp = true;
@@ -111,7 +115,7 @@ int maskfastafrombed_main(int argc, char* argv[]) {
 
     if (!showHelp) {
 
-        MaskFastaFromBed *maskFasta = new MaskFastaFromBed(fastaInFile, bedFile, fastaOutFile, softMask, maskChar);
+        MaskFastaFromBed *maskFasta = new MaskFastaFromBed(fastaInFile, bedFile, fastaOutFile, softMask, maskChar, useFullHeader);
         delete maskFasta;
     }
     else {
@@ -129,13 +133,16 @@ void maskfastafrombed_help(void) {
     cerr << "Usage:   " << PROGRAM_NAME << " [OPTIONS] -fi <fasta> -fo <fasta> -bed <bed/gff/vcf>" << endl << endl;
 
     cerr << "Options:" << endl;
-    cerr << "\t-fi\tInput FASTA file" << endl;
-    cerr << "\t-bed\tBED/GFF/VCF file of ranges to mask in -fi" << endl;
-    cerr << "\t-fo\tOutput FASTA file" << endl;
-    cerr << "\t-soft\tEnforce \"soft\" masking.  That is, instead of masking with Ns," << endl;
-    cerr << "\t\tmask with lower-case bases." << endl;
-    cerr << "\t-mc\tReplace masking character.  That is, instead of masking" << endl;
-    cerr << "\t\twith Ns, use another character." << endl << endl;
+    cerr << "\t-fi\t\tInput FASTA file" << endl;
+    cerr << "\t-bed\t\tBED/GFF/VCF file of ranges to mask in -fi" << endl;
+    cerr << "\t-fo\t\tOutput FASTA file" << endl;
+    cerr << "\t-soft\t\tEnforce \"soft\" masking." << endl;
+    cerr << "\t\t\tMask with lower-case bases, instead of masking with Ns." << endl;
+    cerr << "\t-mc\t\tReplace masking character." << endl;
+    cerr << "\t\t\tUse another character, instead of masking with Ns." << endl;
+    cerr << "\t-fullHeader\tUse full fasta header." << endl;
+    cerr << "\t\t\tBy default, only the word before the first space or tab" << endl;
+    cerr << "\t\t\tis used." << endl << endl;
     // end the program here
     exit(1);
 
