@@ -11,6 +11,7 @@ Usage and option summary
 Usage:
 
 ::
+
   sortBed [OPTIONS] -i <BED/GFF/VCF>
 
 ===========================      ===============================================================================================================================================================================================================
@@ -34,6 +35,7 @@ By default, **sortBed** sorts a BED file by chromosome and then by start positio
 For example:
 
 ::
+
   cat A.bed
   chr1 800 1000
   chr1 80  180
@@ -57,6 +59,7 @@ Optional sorting behavior
 For example, to sort by chromosome and then by feature size (in descending order):
 
 ::
+
   cat A.bed
   chr1 800 1000
   chr1 80  180
@@ -75,6 +78,7 @@ will sort BED files more quickly while using less memory. For example, UNIX sort
 by chromosome then by start position in the following manner:
 
 ::
+
   sort -k 1,1 -k2,2n a.bed
   chr1 1   10
   chr1 80  180

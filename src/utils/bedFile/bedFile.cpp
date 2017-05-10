@@ -38,7 +38,9 @@ bool sortBySizeAsc(const BED &a, const BED &b) {
     CHRPOS bLen = b.end - b.start;
 
     if (aLen < bLen) return true;
-    else return false;
+    else if (aLen > bLen) return false;
+    // If they're the same size, sort by position (as expected by tests)
+    else return byChromThenStart(a, b);
 };
 
 bool sortBySizeDesc(const BED &a, const BED &b) {

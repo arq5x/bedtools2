@@ -13,6 +13,7 @@ Usage and option summary
 Usage:
 
 ::
+
   linksBed [OPTIONS] -i <BED/GFF/VCF> > <HTML file>
   
 ===========================      ===============================================================================================================================================================================================================
@@ -34,6 +35,7 @@ By default, **linksBed** creates links to the public UCSC Genome Browser.
 For example:
 
 ::
+
   head genes.bed
   chr21 9928613  10012791  uc002yip.1 0  -
   chr21 9928613  10012791  uc002yiq.1 0  -
@@ -63,6 +65,7 @@ Optionally, **linksBed** will create links to a local copy of the UCSC Genome Br
 For example:
 
 ::
+
   head -3 genes.bed
   chr21 9928613 10012791 uc002yip.1 0 -
   chr21 9928613 10012791 uc002yiq.1 0 -
@@ -72,6 +75,7 @@ For example:
 One can point the links to the appropriate organism and genome build as well:
 
 ::
+
   head -3 genes.bed
   chr21 9928613 10012791 uc002yip.1 0 -
   chr21 9928613 10012791 uc002yiq.1 0 -

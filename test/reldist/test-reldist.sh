@@ -1,12 +1,15 @@
 BT=${BT-../../bin/bedtools}
 DATA=${DATA-../../data}
 
+FAILURES=0;
+
 check()
 {
 	if diff $1 $2; then
     	echo ok
 	else
-    	echo fail
+    	FAILURES=$(expr $FAILURES + 1);
+		echo fail
 	fi
 }
 
@@ -14,7 +17,7 @@ check()
 #  Test a basic self intersection. The relative distances
 # should all be 0 in this case.
 ############################################################
-echo "    reldist.t01...\c"
+echo -e "    reldist.t01...\c"
 echo \
 "reldist	count	total	fraction
 0.00	43424	43424	1.000" > exp
@@ -27,7 +30,7 @@ rm obs exp
 #  Test intervaks that are randomly distributed. 
 # The relative distances should equally represented .
 ############################################################
-echo "    reldist.t02...\c"
+echo -e "    reldist.t02...\c"
 echo \
 "reldist	count	total	fraction
 0.00	164	43408	0.004
@@ -90,7 +93,7 @@ rm obs exp
 #  Test intervaks that are consistently closer to one another
 # than expected.  The distances should be biased towards 0.=
 ############################################################
-echo "    reldist.t03...\c"
+echo -e "    reldist.t03...\c"
 echo \
 "reldist	count	total	fraction
 0.00	20629	43422	0.475
@@ -148,3 +151,4 @@ $BT reldist -a $DATA/refseq.chr1.exons.bed.gz \
             -b $DATA/gerp.chr1.bed.gz > obs
 check obs exp
 rm obs exp
+[[ $FAILURES -eq 0 ]] || exit 1;

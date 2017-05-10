@@ -1,11 +1,14 @@
 BT=${BT-../../bin/bedtools}
 
+FAILURES=0;
+
 check()
 {
 	if diff $1 $2; then
     	echo ok
 	else
-    	echo fail
+    	FAILURES=$(expr $FAILURES + 1);
+		echo fail
 	fi
 }
 
@@ -24,11 +27,12 @@ samtools view -Sb sam-w-del.sam > sam-w-del.bam 2>/dev/null
 ##################################################################
 #  Test three blocks without -split
 ##################################################################
-echo "    coverage.t1...\c"
+echo -e "    coverage.t1...\c"
 echo \
 "chr1	0	50	three_blocks	40	-	0	50	0,0,0	3	10,10,10,	0,20,40,	1	40	50	0.8000000" > exp
 $BT coverage -abam three_blocks.bam -b three_blocks_nomatch.bed > obs
 check obs exp
+echo -e "    coverage.t1b...\c"
 $BT coverage -abam three_blocks.bam -b three_blocks_nomatch.bed -sorted > obs
 check obs exp
 rm obs exp
@@ -37,7 +41,7 @@ rm obs exp
 ##################################################################
 #  Test default
 ##################################################################
-echo "    coverage.t2...\c"
+echo -e "    coverage.t2...\c"
 echo \
 "chr1	20	70	6	25	+	2	50	50	1.0000000
 chr1	50	100	1	25	-	5	50	50	1.0000000
@@ -47,6 +51,7 @@ chr2	150	200	4	25	+	7	50	50	1.0000000
 chr2	180	230	2	25	-	6	50	50	1.0000000" > exp
 $BT coverage -a a.bed -b b.bed > obs
 check exp obs
+echo -e "    coverage.t2b...\c"
 $BT coverage -a a.bed -b b.bed -sorted > obs
 check exp obs
 rm exp obs
@@ -55,7 +60,7 @@ rm exp obs
 ##################################################################
 #  Test counts
 ##################################################################
-echo "    coverage.t3...\c"
+echo -e "    coverage.t3...\c"
 echo \
 "chr1	20	70	6	25	+	2
 chr1	50	100	1	25	-	5
@@ -65,6 +70,7 @@ chr2	150	200	4	25	+	7
 chr2	180	230	2	25	-	6" > exp
 $BT coverage -a a.bed -b b.bed -counts > obs
 check exp obs
+echo -e "    coverage.t3b...\c"
 $BT coverage -a a.bed -b b.bed -counts -sorted > obs
 check exp obs
 rm exp obs
@@ -74,7 +80,7 @@ rm exp obs
 ##################################################################
 #  Test -hist
 ##################################################################
-echo "    coverage.t4...\c"
+echo -e "    coverage.t4...\c"
 echo \
 "chr1	20	70	6	25	+	2	50	50	1.0000000
 chr1	50	100	1	25	-	2	40	50	0.8000000
@@ -103,6 +109,7 @@ all	5	35	300	0.1166667
 all	6	37	300	0.1233333" > exp
 $BT coverage -a a.bed -b b.bed -hist > obs
 check exp obs
+echo -e "    coverage.t4b...\c"
 $BT coverage -a a.bed -b b.bed -hist -sorted > obs
 check exp obs
 rm exp obs
@@ -110,7 +117,7 @@ rm exp obs
 ##################################################################
 #  Test -d
 ##################################################################
-echo "    coverage.t5...\c"
+echo -e "    coverage.t5...\c"
 echo \
 "chr1	20	70	6	25	+	1	2
 chr1	20	70	6	25	+	2	2
@@ -414,6 +421,7 @@ chr2	180	230	2	25	-	49	1
 chr2	180	230	2	25	-	50	1" > exp
 $BT coverage -a a.bed -b b.bed -d > obs
 check exp obs
+echo -e "    coverage.t5b...\c"
 $BT coverage -a a.bed -b b.bed -d -sorted > obs
 check exp obs
 rm exp obs
@@ -422,7 +430,7 @@ rm exp obs
 ##################################################################
 #  Test mean
 ##################################################################
-echo "    coverage.t6...\c"
+echo -e "    coverage.t6...\c"
 echo \
 "chr1	20	70	6	25	+	2.0000000
 chr1	50	100	1	25	-	2.2000000
@@ -432,6 +440,7 @@ chr2	150	200	4	25	+	5.5599999
 chr2	180	230	2	25	-	3.4600000" > exp
 $BT coverage -a a.bed -b b.bed -mean > obs
 check exp obs
+echo -e "    coverage.t6b...\c"
 $BT coverage -a a.bed -b b.bed -mean -sorted > obs
 check exp obs
 rm exp obs
@@ -440,7 +449,7 @@ rm exp obs
 ##################################################################
 #  Test -s
 ##################################################################
-echo "    coverage.t7...\c"
+echo -e "    coverage.t7...\c"
 echo \
 "chr1	20	70	6	25	+	2	50	50	1.0000000
 chr1	50	100	1	25	-	1	23	50	0.4600000
@@ -450,6 +459,7 @@ chr2	150	200	4	25	+	3	50	50	1.0000000
 chr2	180	230	2	25	-	4	34	50	0.6800000" > exp
 $BT coverage -a a.bed -b b.bed -s > obs
 check exp obs
+echo -e "    coverage.t7b...\c"
 $BT coverage -a a.bed -b b.bed -s -sorted > obs
 check exp obs
 rm exp obs
@@ -458,7 +468,7 @@ rm exp obs
 ##################################################################
 #  Test -S
 ##################################################################
-echo "    coverage.t8...\c"
+echo -e "    coverage.t8...\c"
 echo \
 "chr1	20	70	6	25	+	0	0	50	0.0000000
 chr1	50	100	1	25	-	4	50	50	1.0000000
@@ -475,7 +485,7 @@ rm exp obs
 ##################################################################
 #  Test -S
 ##################################################################
-echo "    coverage.t9...\c"
+echo -e "    coverage.t9...\c"
 echo \
 "chr1	20	70	6	25	+	0	0	50	0.0000000
 chr1	50	100	1	25	-	4	50	50	1.0000000
@@ -485,6 +495,7 @@ chr2	150	200	4	25	+	4	50	50	1.0000000
 chr2	180	230	2	25	-	2	50	50	1.0000000" > exp
 $BT coverage -a a.bed -b b.bed -S > obs
 check exp obs
+echo -e "    coverage.t9b...\c"
 $BT coverage -a a.bed -b b.bed -S -sorted > obs
 check exp obs
 rm exp obs
@@ -493,12 +504,13 @@ rm exp obs
 ##################################################################
 #  Test -split
 ##################################################################
-echo "    coverage.t10...\c"
+echo -e "    coverage.t10...\c"
 echo \
 "chr1	0	50	1	30	50	0.6000000
 chr1	12	20	0	0	8	0.0000000" > exp
 $BT coverage -a c.bed -b three_blocks_match.bam -split > obs
 check exp obs
+echo -e "    coverage.t10b...\c"
 $BT coverage -a c.bed -b three_blocks_match.bam -split -sorted > obs
 check exp obs
 rm exp obs
@@ -506,12 +518,13 @@ rm exp obs
 ##################################################################
 #  Test w/o -split
 ##################################################################
-echo "    coverage.t11...\c"
+echo -e "    coverage.t11...\c"
 echo \
 "chr1	0	50	1	50	50	1.0000000
 chr1	12	20	1	8	8	1.0000000" > exp
 $BT coverage -a c.bed -b three_blocks_match.bam  > obs
 check exp obs
+echo -e "    coverage.t11b...\c"
 $BT coverage -a c.bed -b three_blocks_match.bam -sorted > obs
 check exp obs
 rm exp obs
@@ -519,7 +532,7 @@ rm exp obs
 ##################################################################
 #  Test -split and -d
 ##################################################################
-echo "    coverage.t12...\c"
+echo -e "    coverage.t12...\c"
 echo \
 "chr1	0	50	1	1
 chr1	0	50	2	1
@@ -581,6 +594,7 @@ chr1	12	20	7	0
 chr1	12	20	8	0" > exp
 $BT coverage -a c.bed -b three_blocks_match.bam -split -d > obs
 check exp obs
+echo -e "    coverage.t12b...\c"
 $BT coverage -a c.bed -b three_blocks_match.bam -split -d -sorted > obs
 check exp obs
 rm exp obs
@@ -588,7 +602,7 @@ rm exp obs
 ##################################################################
 #  Test -split and -hist
 ##################################################################
-echo "    coverage.t13...\c"
+echo -e "    coverage.t13...\c"
 echo \
 "chr1	0	50	0	20	50	0.4000000
 chr1	0	50	1	30	50	0.6000000
@@ -597,6 +611,7 @@ all	0	28	58	0.4827586
 all	1	30	58	0.5172414" > exp
 $BT coverage -a c.bed -b three_blocks_match.bam -split -hist > obs
 check exp obs
+echo -e "    coverage.t13b...\c"
 $BT coverage -a c.bed -b three_blocks_match.bam -split -hist -sorted > obs
 check exp obs
 rm exp obs
@@ -605,11 +620,12 @@ rm exp obs
 ##################################################################
 #  Test that -counts, -hist are mutually exclusive options
 ##################################################################
-echo "    coverage.t14...\c"
+echo -e "    coverage.t14...\c"
 echo \
 "***** ERROR: -counts, -d, -mean, and -hist are all mutually exclusive options. *****" > exp
 $BT coverage -a a.bed -b b.bed -counts -hist 2>&1 > /dev/null | head -2 | tail -1 | cat - > obs
 check exp obs
+echo -e "    coverage.t14b...\c"
 $BT coverage -a a.bed -b b.bed -counts -sorted -hist 2>&1 > /dev/null | head -2 | tail -1 | cat - > obs
 check exp obs
 rm exp obs
@@ -617,11 +633,12 @@ rm exp obs
 ##################################################################
 #  Test that -counts, -d are mutually exclusive options
 ##################################################################
-echo "    coverage.t15...\c"
+echo -e "    coverage.t15...\c"
 echo \
 "***** ERROR: -counts, -d, -mean, and -hist are all mutually exclusive options. *****" > exp
 $BT coverage -a a.bed -b b.bed -counts -d 2>&1 > /dev/null | head -2 | tail -1 | cat - > obs
 check exp obs
+echo -e "    coverage.t15b...\c"
 $BT coverage -a a.bed -b b.bed -sorted -counts -d 2>&1 > /dev/null | head -2 | tail -1 | cat - > obs
 check exp obs
 rm exp obs
@@ -629,11 +646,12 @@ rm exp obs
 ##################################################################
 #  Test that -hist, -d are mutually exclusive options
 ##################################################################
-echo "    coverage.t16...\c"
+echo -e "    coverage.t16...\c"
 echo \
 "***** ERROR: -counts, -d, -mean, and -hist are all mutually exclusive options. *****" > exp
 $BT coverage -a a.bed -b b.bed -hist -d 2>&1 > /dev/null | head -2 | tail -1 | cat - > obs
 check exp obs
+echo -e "    coverage.t16b...\c"
 $BT coverage -a a.bed -b b.bed -sorted -hist -d 2>&1 > /dev/null | head -2 | tail -1 | cat - > obs
 check exp obs
 rm exp obs
@@ -642,11 +660,12 @@ rm exp obs
 ##################################################################
 #  Test that -mean, -d are mutually exclusive options
 ##################################################################
-echo "    coverage.t17...\c"
+echo -e "    coverage.t17...\c"
 echo \
 "***** ERROR: -counts, -d, -mean, and -hist are all mutually exclusive options. *****" > exp
 $BT coverage -a a.bed -b b.bed -mean -d 2>&1 > /dev/null | head -2 | tail -1 | cat - > obs
 check exp obs
+echo -e "    coverage.t17b...\c"
 $BT coverage -a a.bed -b b.bed -sorted -mean -d 2>&1 > /dev/null | head -2 | tail -1 | cat - > obs
 check exp obs
 rm exp obs
@@ -654,7 +673,7 @@ rm exp obs
 ##################################################################
 #  Test the last record in file with no overlaps is reported
 ##################################################################
-echo "    coverage.t18...\c"
+echo -e "    coverage.t18...\c"
 echo \
 "chr1	0	10	1	0
 chr1	0	10	2	0
@@ -677,6 +696,7 @@ chr1	21	25	3	0
 chr1	21	25	4	0" > exp
 $BT coverage -a x.bed -b y.bed -d > obs
 check exp obs
+echo -e "    coverage.t18b...\c"
 $BT coverage -a x.bed -b y.bed -d -sorted > obs
 check exp obs
 rm exp obs
@@ -684,7 +704,7 @@ rm exp obs
 ##################################################################
 #  Test the last record in file with no overlaps is reported
 ##################################################################
-echo "    coverage.t19...\c"
+echo -e "    coverage.t19...\c"
 echo \
 "chr1	0	10	0	3	10	0.3000000
 chr1	0	10	1	7	10	0.7000000
@@ -694,8 +714,10 @@ all	0	12	19	0.6315789
 all	1	7	19	0.3684210" > exp
 $BT coverage -a x.bed -b y.bed -hist > obs
 check exp obs
+echo -e "    coverage.t19b...\c"
 $BT coverage -a x.bed -b y.bed -hist -sorted > obs
 check exp obs
 rm exp obs
 
 
+[[ $FAILURES -eq 0 ]] || exit 1;

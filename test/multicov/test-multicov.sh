@@ -1,11 +1,14 @@
 BT=${BT-../../bin/bedtools}
 
+FAILURES=0;
+
 check()
 {
 	if diff $1 $2; then
     	echo ok
 	else
-    	echo fail
+    	FAILURES=$(expr $FAILURES + 1);
+		echo fail
 	fi
 }
 
@@ -17,7 +20,7 @@ samtools index two_blocks.bam
 ##################################################################
 #  Test one block matches all BEDs
 ##################################################################
-echo "    multicov.t1...\c"
+echo -e "    multicov.t1...\c"
 echo \
 "chr1	15	20	a1	1	+	1
 chr1	15	27	a2	2	+	1
@@ -30,7 +33,7 @@ rm obs exp
 ##################################################################
 #  Test one block matches based on _same_ strand
 ##################################################################
-echo "    multicov.t2...\c"
+echo -e "    multicov.t2...\c"
 echo \
 "chr1	15	20	a1	1	+	0
 chr1	15	27	a2	2	+	0
@@ -43,7 +46,7 @@ rm obs exp
 ##################################################################
 #  Test one block matches based on _different_ strands
 ##################################################################
-echo "    multicov.t3...\c"
+echo -e "    multicov.t3...\c"
 echo \
 "chr1	15	20	a1	1	+	1
 chr1	15	27	a2	2	+	1
@@ -56,7 +59,7 @@ rm obs exp
 ##################################################################
 #  Test split alignment matches 
 ##################################################################
-echo "    multicov.t4...\c"
+echo -e "    multicov.t4...\c"
 echo \
 "chr1	15	20	a1	1	+	1
 chr1	15	27	a2	2	+	1
@@ -69,7 +72,7 @@ rm obs exp
 ##################################################################
 #  Test split alignment matches with -split
 ##################################################################
-echo "    multicov.t5...\c"
+echo -e "    multicov.t5...\c"
 echo \
 "chr1	15	20	a1	1	+	0
 chr1	15	27	a2	2	+	1
@@ -82,7 +85,7 @@ rm obs exp
 ##################################################################
 #  Test split alignment matches with -split and -s
 ##################################################################
-echo "    multicov.t6...\c"
+echo -e "    multicov.t6...\c"
 echo \
 "chr1	15	20	a1	1	+	0
 chr1	15	27	a2	2	+	0
@@ -95,7 +98,7 @@ rm obs exp
 ##################################################################
 #  Test split alignment matches with -split and -S
 ##################################################################
-echo "    multicov.t7...\c"
+echo -e "    multicov.t7...\c"
 echo \
 "chr1	15	20	a1	1	+	0
 chr1	15	27	a2	2	+	1
@@ -108,7 +111,7 @@ rm obs exp
 ##################################################################
 #  Test split alignment matches with -split and -f
 ##################################################################
-echo "    multicov.t8...\c"
+echo -e "    multicov.t8...\c"
 echo \
 "chr1	15	20	a1	1	+	0
 chr1	15	27	a2	2	+	1
@@ -121,7 +124,7 @@ rm obs exp
 ##################################################################
 #  Test split alignment matches with -split and -f
 ##################################################################
-echo "    multicov.t9...\c"
+echo -e "    multicov.t9...\c"
 echo \
 "chr1	15	20	a1	1	+	0
 chr1	15	27	a2	2	+	0
@@ -134,3 +137,4 @@ rm obs exp
 
 
 rm *.bam
+[[ $FAILURES -eq 0 ]] || exit 1;

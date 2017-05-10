@@ -26,7 +26,7 @@ Usage and option summary
 
 **(or)**:
 ::
-  
+
   bedtools window [OPTIONS] [-a|-abam] -b <BED/GFF/VCF>
 
   
@@ -44,7 +44,7 @@ Option                           Description
 **-sm** 				         Only report hits in B that overlap A on the same strand. *By default, overlaps are reported without respect to strand*.
 **-Sm** 				         Only report hits in B that overlap A on the opposite strand. *By default, overlaps are reported without respect to strand*.
 **-u**					         Write original A entry once if any overlaps found in B. In other words, just report the fact at least one overlap was found in B.
-**-c**                           For each entry in A, report the number of hits in B while restricting to -f. Reports 0 for A entries that have no overlap with B.							
+**-c**                           For each entry in A, report the number of hits in B while restricting to -w, -l, and -r. Reports 0 for A entries that have no overlap with B.							
 **-v**                           Only report those entries in A that have *no overlaps* with B.
 **-header**	                     Print the header from the A file prior to results.
 ===========================      =========================================================================================================================================================
