@@ -1,3 +1,4 @@
+set -e;
 echo -e \
 "\n###########################################################
 #  
@@ -38,7 +39,7 @@ rm obs
 echo -e "    closest.t02...\c"
 echo \
 "ERROR: Sort order was unspecified, and file q1a_num.bed is not sorted lexicographically.
-       Please re-reun with the -g option for a genome file.
+       Please rerun with the -g option for a genome file.
        See documentation for details." > exp
 $BT closest -a q1a_num.bed -b db1_num.bed db2_numBackwards.bed 2>&1 > /dev/null | cat - > obs
 check obs exp
@@ -51,7 +52,7 @@ rm obs
 echo -e "    closest.t03...\c"
 echo \
 "ERROR: Sort order was unspecified, and file db3_numBackwards.bed is not sorted lexicographically.
-       Please re-reun with the -g option for a genome file.
+       Please rerun with the -g option for a genome file.
        See documentation for details." > exp
 $BT closest -a q1a_num.bed -b db1_num.bed db2_num.bed db3_numBackwards.bed 2>&1 > /dev/null | cat - > obs
 check obs exp
@@ -65,7 +66,7 @@ rm obs
 echo -e "    closest.t04...\c"
 echo \
 "ERROR: Database file db1_num.bed contains chromosome chr3, but the query file does not.
-       Please re-reun with the -g option for a genome file.
+       Please rerun with the -g option for a genome file.
        See documentation for details." >exp
 $BT closest -a q1_num.bed -b db1_num.bed db2_num.bed 2>&1 > /dev/null | cat - > obs
 check obs exp
@@ -164,7 +165,7 @@ rm exp obs
 echo -e "    closest.t11...\c"
 echo \
 "ERROR: Database file num_missing.bed contains chromosome chr3, but the query file does not.
-       Please re-reun with the -g option for a genome file.
+       Please rerun with the -g option for a genome file.
        See documentation for details." > exp
 $BT closest -a alpha_all.bed -b num_missing.bed 2>&1 > /dev/null | cat - > obs
 check exp obs
@@ -202,7 +203,7 @@ rm exp obs
 echo -e "    closest.t14...\c"
 echo \
 "ERROR: Sort order was unspecified, and file num_all.bed is not sorted lexicographically.
-       Please re-reun with the -g option for a genome file.
+       Please rerun with the -g option for a genome file.
        See documentation for details." > exp
 $BT closest -a alpha_missing.bed -b num_all.bed 2>&1 > /dev/null | cat - > obs
 check exp obs
@@ -239,7 +240,7 @@ rm exp obs
 echo -e "    closest.t17...\c"
 echo \
 "ERROR: Sort order was unspecified, and file num_all.bed is not sorted lexicographically.
-       Please re-reun with the -g option for a genome file.
+       Please rerun with the -g option for a genome file.
        See documentation for details." > exp
 $BT closest -a num_all.bed -b alpha_missing.bed 2>&1 > /dev/null | cat - > obs
 check exp obs
@@ -266,7 +267,7 @@ check exp obs
 echo -e "    closest.t19...\c"
 echo \
 "ERROR: Database file num_missing.bed contains chromosome chr3, but the query file does not.
-       Please re-reun with the -g option for a genome file.
+       Please rerun with the -g option for a genome file.
        See documentation for details." > exp
 $BT closest -a num_all.bed -b num_missing.bed 2>&1 > /dev/null | cat - > obs
 check exp obs
@@ -278,7 +279,7 @@ rm exp obs
 echo -e "    closest.20...\c"
 echo \
 "ERROR: Sort order was unspecified, and file num_missing.bed is not sorted lexicographically.
-       Please re-reun with the -g option for a genome file.
+       Please rerun with the -g option for a genome file.
        See documentation for details." > exp
 $BT closest -a num_missing.bed -b alpha_all.bed 2>&1 > /dev/null | cat - > obs
 check exp obs

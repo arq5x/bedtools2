@@ -1,3 +1,4 @@
+set -e;
 BT=${BT-../../bin/bedtools}
 DATA=${DATA-../../data}
 
