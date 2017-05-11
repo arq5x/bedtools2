@@ -449,7 +449,7 @@ void NewChromSweep::testThatAllDbChromsExistInQuery()
             {
                 fprintf(stderr, "ERROR: Database file %s contains chromosome %s, but the query file does not.\n",
                         _context->getInputFileName(i).c_str(), chrom.c_str());
-                fprintf(stderr, "       Please re-reun with the -g option for a genome file.\n       See documentation for details.\n");
+                fprintf(stderr, "       Please rerun with the -g option for a genome file.\n       See documentation for details.\n");
                 exit(1);
             }
         }

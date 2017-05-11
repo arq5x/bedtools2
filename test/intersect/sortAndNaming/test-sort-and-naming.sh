@@ -51,7 +51,7 @@ rm obs
 echo -e "    intersect.t03...\c"
 echo \
 "ERROR: Sort order was unspecified, and file db3_numBackwards.bed is not sorted lexicographically.
-       Please re-reun with the -g option for a genome file.
+       Please rerun with the -g option for a genome file.
        See documentation for details." > exp
 $BT intersect -a q1a_num.bed -b db1_num.bed db2_num.bed db3_numBackwards.bed -sorted 2>&1 > /dev/null | cat - > obs
 check obs exp
@@ -65,7 +65,7 @@ rm obs
 echo -e "    intersect.t04...\c"
 echo \
 "ERROR: Database file db1_num.bed contains chromosome chr3, but the query file does not.
-       Please re-reun with the -g option for a genome file.
+       Please rerun with the -g option for a genome file.
        See documentation for details." >exp
 $BT intersect -a q1_num.bed -b db1_num.bed db2_num.bed -sorted 2>&1 > /dev/null | cat - > obs
 check obs exp
@@ -161,7 +161,7 @@ rm exp obs
 echo -e "    intersect.t11...\c"
 echo \
 "ERROR: Database file num_missing.bed contains chromosome chr3, but the query file does not.
-       Please re-reun with the -g option for a genome file.
+       Please rerun with the -g option for a genome file.
        See documentation for details." > exp
 $BT intersect -a alpha_all.bed -b num_missing.bed -sorted 2>&1 > /dev/null | cat - > obs
 check exp obs
@@ -198,7 +198,7 @@ rm exp obs
 echo -e "    intersect.t14...\c"
 echo \
 "ERROR: Sort order was unspecified, and file num_all.bed is not sorted lexicographically.
-       Please re-reun with the -g option for a genome file.
+       Please rerun with the -g option for a genome file.
        See documentation for details." > exp
 $BT intersect -a alpha_missing.bed -b num_all.bed -sorted 2>&1 > /dev/null | cat - > obs
 check exp obs
@@ -235,7 +235,7 @@ rm exp obs
 echo -e "    intersect.t17...\c"
 echo \
 "ERROR: Sort order was unspecified, and file num_all.bed is not sorted lexicographically.
-       Please re-reun with the -g option for a genome file.
+       Please rerun with the -g option for a genome file.
        See documentation for details." > exp
 $BT intersect -a num_all.bed -b alpha_missing.bed -sorted 2>&1 > /dev/null | cat - > obs
 check exp obs
@@ -262,7 +262,7 @@ check exp obs
 echo -e "    intersect.t19...\c"
 echo \
 "ERROR: Database file num_missing.bed contains chromosome chr3, but the query file does not.
-       Please re-reun with the -g option for a genome file.
+       Please rerun with the -g option for a genome file.
        See documentation for details." > exp
 $BT intersect -a num_all.bed -b num_missing.bed -sorted 2>&1 > /dev/null | cat - > obs
 check exp obs
@@ -274,7 +274,7 @@ rm exp obs
 echo -e "    intersect.20...\c"
 echo \
 "ERROR: Sort order was unspecified, and file num_missing.bed is not sorted lexicographically.
-       Please re-reun with the -g option for a genome file.
+       Please rerun with the -g option for a genome file.
        See documentation for details." > exp
 $BT intersect -a num_missing.bed -b alpha_all.bed -sorted 2>&1 > /dev/null | cat - > obs
 check exp obs
@@ -298,7 +298,7 @@ rm exp obs
 echo -e "    intersect.22...\c"
 echo \
 "ERROR: Sort order was unspecified, and file num_all.bed is not sorted lexicographically.
-       Please re-reun with the -g option for a genome file.
+       Please rerun with the -g option for a genome file.
        See documentation for details." > exp
 $BT intersect -a num_missing.bed -b num_all.bed -sorted 2>&1 > /dev/null | cat - > obs
 check exp obs
