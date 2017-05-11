@@ -20,5 +20,6 @@ echo " Test Results             "
 echo "--------------------------"
 echo "Tools passing: $TOOL_PASSES"
 echo "Tools failing: $TOOL_FAILURES"
-
-[ "$TOOL_FAILURES" = "" ] || exit 1;
+echo "NB: the 'negativecontrol' test is supposed to fail. If it wasn't caught, "
+echo "something went wrong with this test script."
+[ "$TOOL_FAILURES" = " negativecontrol" ] || exit 1;
