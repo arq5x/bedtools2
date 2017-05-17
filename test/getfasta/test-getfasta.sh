@@ -1,3 +1,4 @@
+set -e;
 # t.fa
 # >chr1
 # aggggggggg

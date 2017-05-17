@@ -1,19 +1,16 @@
-set -e;
+set -e; # Alert user to any uncaught error
 
 STARTWD=$(pwd);
-FAILURES=0;
-TOOL_PASSES=""
-TOOL_FAILURES=""
+TOOL_PASSES="";
+TOOL_FAILURES="";
 
 for tool in $(ls); do
-    [ -d $tool ] || continue
-    echo "Testing bedtools $tool:"
-    (cd $tool bash && bash test-$tool.sh) || FAILURES=$(expr $FAILURES + 1);
-    if [ $FAILURES -eq 0 ]; then
-        TOOL_PASSES="$TOOL_PASSES $tool"
-    else
-        TOOL_FAILURES="$TOOL_FAILURES $tool"
-    fi
+    [ -d "${STARTWD}/${tool}" ] || continue;
+    echo "Testing bedtools $tool:";
+    cd "${STARTWD}/${tool}";
+    bash "test-${tool}.sh" \
+        && TOOL_PASSES="$TOOL_PASSES $tool" \
+        || TOOL_FAILURES="$TOOL_FAILURES $tool";
 done
 
 echo
@@ -23,7 +20,6 @@ echo " Test Results             "
 echo "--------------------------"
 echo "Tools passing: $TOOL_PASSES"
 echo "Tools failing: $TOOL_FAILURES"
-
-if [[ $FAILURES -gt 0 ]]; then
-    exit 1;
-fi
+echo "NB: the 'negativecontrol' test is supposed to fail. If it wasn't caught, "
+echo "something went wrong with this test script."
+[ "$TOOL_FAILURES" = " negativecontrol" ] || exit 1;

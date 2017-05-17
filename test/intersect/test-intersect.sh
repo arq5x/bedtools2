@@ -1,3 +1,4 @@
+set -e;
 BT=${BT-../../bin/bedtools}
 
 FAILURES=0;
@@ -902,13 +903,16 @@ $BT intersect -a a -b b > obs
 check exp obs
 rm exp obs a b
 
+STARTWD=$(pwd);
+for ADDITIONAL_TEST in \
+    new_test-intersect.sh \
+    multi_intersect/test-multi_intersect.sh \
+    sortAndNaming/test-sort-and-naming.sh \
+; do
+    # In case the cd operation fails, combine it with the script execution
+    cd $(dirname "${STARTWD}/${ADDITIONAL_TEST}") \
+        && $SHELL $(basename "${STARTWD}/${ADDITIONAL_TEST}") \
+        || FAILURES=$(expr $FAILURES + 1);
+done
 
-
-cd multi_intersect
-bash test-multi_intersect.sh
-cd ..
-
-cd sortAndNaming
-bash test-sort-and-naming.sh
-cd ..
 [[ $FAILURES -eq 0 ]] || exit 1;

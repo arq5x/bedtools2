@@ -1,3 +1,4 @@
+set -e;
 BT=${BT-../../bin/bedtools}
 
 FAILURES=0;
@@ -6,12 +7,19 @@ check()
 {
 	if diff $1 $2; then
     	echo ok
-		return 1
 	else
     	FAILURES=$(expr $FAILURES + 1);
 		echo fail
-		return 0
 	fi
+}
+
+# Tools that are expected to fail should exit non-zero. If they don't, that is a
+# failure.
+
+failedtofail()
+{
+    FAILURES=$(expr $FAILURES + 1);
+    echo "Expected non-zero exit status but didn't get one";
 }
 
 ###########################################################
@@ -20,7 +28,8 @@ check()
 echo -e "    general.t01...\c"
 echo \
 "chr1	1	10
-chr1	-1	10" | $BT merge -i - 2> obs
+chr1	-1	10" | $BT merge -i - 2> obs \
+    && failedtofail || true;
 echo "Error: Invalid record in file -. Record is 
 chr1	-1	10" > exp
 check obs exp
@@ -32,7 +41,8 @@ rm obs exp
 echo -e "    general.t02...\c"
 echo \
 "chr1	1	2
-chr1	10	5" | $BT merge -i - 2> obs
+chr1	10	5" | $BT merge -i - 2> obs \
+    && failedtofail || true;
 echo "Error: Invalid record in file -. Record is 
 chr1	10	5" > exp
 check obs exp
@@ -44,7 +54,8 @@ rm obs exp
 echo -e "    general.t03...\c"
 echo \
 "ERROR: file - has non positional records, which are only valid for the groupBy tool." > exp
-echo "chr1	.	2" | $BT merge -i - 2> o
+echo "chr1	.	2" | $BT merge -i - 2> o \
+    && failedtofail || true;
 head -n 1 o > obs
 check obs exp
 rm obs exp
@@ -56,7 +67,8 @@ rm obs exp
 ###########################################################
 echo -e "    general.t05...\c"
 echo \
-"chr1 1 2" | $BT merge -i - 2> obs
+"chr1 1 2" | $BT merge -i - 2> obs \
+    && failedtofail || true;
 echo \
 "ERROR: file - has non positional records, which are only valid for the groupBy tool." > exp
 head -n 1 o > obs
@@ -68,7 +80,8 @@ rm obs exp
 #  Fail on non-existent files.
 ###########################################################
 echo -e "    general.t06...\c"
-$BT merge -i idontexist.bed 2> obs
+$BT merge -i idontexist.bed 2> obs \
+    && failedtofail || true;
 echo "Error: Unable to open file idontexist.bed. Exiting." > exp
 check obs exp
 rm obs exp

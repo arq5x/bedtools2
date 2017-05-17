@@ -1,3 +1,4 @@
+set -e;
 BT=${BT-../../bin/bedtools}
 
 FAILURES=0;
@@ -6,11 +7,9 @@ check()
 {
 	if diff $1 $2; then
     	echo ok
-		return 1
 	else
     	FAILURES=$(expr $FAILURES + 1);
 		echo fail
-		return 0
 	fi
 }
 
@@ -825,12 +824,15 @@ $BT closest -a dmr.bed -b islands.2.bed tfbs.bed shores.bed -filenames -d -mdb e
 check exp obs
 rm exp obs
 
-cd sortAndNaming
-bash test-sort-and-naming.sh
-cd ..
-
-cd kclosest
-bash test-kclosest.sh
-cd ..
+STARTWD=$(pwd);
+for ADDITIONAL_TEST in \
+    sortAndNaming/test-sort-and-naming.sh \
+    kclosest/test-kclosest.sh \
+; do
+    # In case the cd operation fails, combine it with the script execution
+    cd $(dirname "${STARTWD}/${ADDITIONAL_TEST}") \
+        && $SHELL $(basename "${STARTWD}/${ADDITIONAL_TEST}") \
+        || FAILURES=$(expr $FAILURES + 1);
+done
 
 [[ $FAILURES -eq 0 ]] || exit 1;

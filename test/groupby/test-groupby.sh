@@ -1,3 +1,4 @@
+set -e;
 BT=${BT-../../bin/bedtools}
 
 FAILURES=0;
@@ -6,11 +7,11 @@ check()
 {
 	if diff $1 $2; then
     	echo ok
-		return 1
+
 	else
     	FAILURES=$(expr $FAILURES + 1);
 		echo fail
-		return 0
+
 	fi
 }
 

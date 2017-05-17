@@ -1,3 +1,4 @@
+set -e;
 BT=${BT-../../bin/bedtools}
 
 FAILURES=0;
@@ -20,7 +21,7 @@ check()
 samtools view -Sb one_block.sam > one_block.bam 2>/dev/null
 samtools view -Sb two_blocks.sam > two_blocks.bam 2>/dev/null
 samtools view -Sb three_blocks.sam > three_blocks.bam 2>/dev/null
-samtools view -Sb sam-w-del.sam > sam-w-del.bam 2>/dev/null
+#samtools view -Sb sam-w-del.sam > sam-w-del.bam 2>/dev/null
 samtools view -Sb two_blocks_w_D.sam > two_blocks_w_D.bam 2>/dev/null
 
 
