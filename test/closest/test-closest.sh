@@ -831,7 +831,7 @@ for ADDITIONAL_TEST in \
 ; do
     # In case the cd operation fails, combine it with the script execution
     cd $(dirname "${STARTWD}/${ADDITIONAL_TEST}") \
-        && $SHELL $(basename "${STARTWD}/${ADDITIONAL_TEST}") \
+        && bash $(basename "${STARTWD}/${ADDITIONAL_TEST}") \
         || FAILURES=$(expr $FAILURES + 1);
 done
 
