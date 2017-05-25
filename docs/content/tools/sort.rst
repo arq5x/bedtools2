@@ -3,13 +3,17 @@
 ###############
 *sort*
 ###############
-**sortBed** sorts a feature file by chromosome and other criteria.
+The ``bedtools sort`` tool sorts a feature file by chromosome and other criteria.
 
 ==========================================================================
 Usage and option summary
 ==========================================================================
-Usage:
+**Usage**:
+::
 
+  bedtools sort [OPTIONS] -i <BED/GFF/VCF>
+
+**(or)**:
 ::
 
   sortBed [OPTIONS] -i <BED/GFF/VCF>
@@ -17,12 +21,13 @@ Usage:
 ===========================      ===============================================================================================================================================================================================================
  Option                           Description
 ===========================      ===============================================================================================================================================================================================================
-**-sizeA**				         Sort by feature size in ascending order.					 
-**-sizeD**					     Sort by feature size in descending order.
-**-chrThenSizeA**                Sort by chromosome, then by feature size (asc).
-**-chrThenSizeD**                Sort by chromosome, then by feature size (desc).
-**-chrThenScoreA**               Sort by chromosome, then by score (asc).
-**-chrThenScoreD**               Sort by chromosome, then by score (desc).
+**-sizeA**                       Sort by feature size in ascending order.
+**-sizeD**                       Sort by feature size in descending order.
+**-chrThenSizeA**                Sort by chromosome (asc), then by feature size (asc).
+**-chrThenSizeD**                Sort by chromosome (asc), then by feature size (desc).
+**-chrThenScoreA**               Sort by chromosome (asc), then by score (asc).
+**-chrThenScoreD**               Sort by chromosome (asc), then by score (desc).
+**-faidx**                       Tab-delimited file with chromosome names in the first column. Sort by specified chromosome order.
 ===========================      ===============================================================================================================================================================================================================
 
 
@@ -30,7 +35,7 @@ Usage:
 ==========================================================================
 Default behavior
 ==========================================================================
-By default, **sortBed** sorts a BED file by chromosome and then by start position in ascending order.
+By default, ``bedtools sort`` sorts a BED file by chromosome and then by start position in ascending order.
 
 For example:
 
@@ -49,12 +54,12 @@ For example:
   chr1 800 1000
 
 
-  
-  
+
+
 ==========================================================================
 Optional sorting behavior
 ==========================================================================
-**sortBed** will also sorts a BED file by chromosome and then by other criteria.
+``bedtools sort`` will also sort a BED file by chromosome and then by other criteria.
 
 For example, to sort by chromosome and then by feature size (in descending order):
 
@@ -71,9 +76,9 @@ For example, to sort by chromosome and then by feature size (in descending order
   chr1 800 1000
   chr1 80  180
   chr1 1   10
-  
 
-**Disclaimer:** it should be noted that **sortBed** is merely a convenience utility, as the UNIX sort utility
+
+**Disclaimer:** it should be noted that ``bedtools sort`` is merely a convenience utility, as the UNIX sort utility
 will sort BED files more quickly while using less memory. For example, UNIX sort will sort a BED file
 by chromosome then by start position in the following manner:
 
@@ -84,4 +89,3 @@ by chromosome then by start position in the following manner:
   chr1 80  180
   chr1 750 10000
   chr1 800 1000
-
