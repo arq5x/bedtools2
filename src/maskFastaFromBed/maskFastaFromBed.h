@@ -13,6 +13,7 @@
 
 #include "bedFile.h"
 #include "sequenceUtils.h"
+#include "split.h"
 #include <vector>
 #include <iostream>
 #include <fstream>
@@ -28,8 +29,9 @@ class MaskFastaFromBed {
 public:
 
     // constructor
-    MaskFastaFromBed(const string &fastaInFile,  const string &bedFile, 
-                     const string &fastaOutFile, bool softMask, char maskChar);
+    MaskFastaFromBed(const string &fastaInFile,  const string &bedFile,
+                     const string &fastaOutFile, bool softMask, char maskChar,
+                     bool useFullHeader);
 
     // destructor
     ~MaskFastaFromBed(void);
@@ -38,6 +40,7 @@ public:
 private:
 
     bool _softMask;
+    bool _useFullHeader;
 
     string _fastaInFile;
     string _bedFile;
