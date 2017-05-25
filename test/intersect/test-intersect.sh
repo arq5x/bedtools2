@@ -873,11 +873,18 @@ $BT intersect -a <(echo -e "1\t10\t25") -b <(echo -e "1\t.\t.\t15\t20\t.\t-\t.\t
 check exp obs
 rm exp obs
 
+# Make sure 1bp of overlap is reported for a VCF SNP and 1-bp overlapping BED.
+echo -e "    intersect.t80...\c"
+echo "chr1	1	.	G	C	.	.	RS=797045043	chr1	0	1	1" > exp
+$BT intersect -a jim.vcf -b jim.bed -wo  > obs
+check exp obs
+rm exp obs
+
 
 ##################################################################
 # Issue 316. SVLEN and END
 ##################################################################
-echo -e "    intersect.t72...\c"
+echo -e "    intersect.t81...\c"
 
 echo "##fileformat=VCF4.1
 #CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO
@@ -890,7 +897,7 @@ $BT intersect -a a -b b > obs
 check exp obs
 rm exp obs a b
 
-echo -e "    intersect.t73...\c"
+echo -e "    intersect.t82...\c"
 
 echo "##fileformat=VCF4.1
 #CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO

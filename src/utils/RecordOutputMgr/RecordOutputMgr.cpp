@@ -351,6 +351,7 @@ void RecordOutputMgr::reportOverlapDetail(const Record *keyRecord, const Record 
 
 	// overlap interval is defined by min(e1,e2) - max(s1,s2)
 	int maxStart = max(keyRecord->getStartPos(), hitRecord->getStartPos());
+	//cout << keyRecord->getStartPos() << "," << hitRecord->getStartPos();
 	int minEnd = min(keyRecord->getEndPos(), hitRecord->getEndPos());
 
 	// need to undo our conversion of 1-based start coordinates to 0-based
@@ -384,18 +385,22 @@ void RecordOutputMgr::reportOverlapDetail(const Record *keyRecord, const Record 
 		hitRecord->print(_outBuf);
 	}
 	else if ((static_cast<ContextIntersect *>(_context))->getWriteOverlap()) {
-		int printOverlapBases = 0;
+		int overlapBases = 0;
 		if (_context->getObeySplits()) {
-			printOverlapBases = _context->getSplitBlockInfo()->getOverlapBases(hitIdx);
+			overlapBases = _context->getSplitBlockInfo()->getOverlapBases(hitIdx);
 		} else {
 			// if one of the records was zerolength, the number of
 			// overlapping bases needs to be corrected 
-			if (keyRecord->isZeroLength() || hitRecord->isZeroLength	())
+			if (keyRecord->isZeroLength() || hitRecord->isZeroLength())
 			{
 				maxStart++;
 				minEnd--;
 			}
-			printOverlapBases = minEnd - maxStart;
+			overlapBases = minEnd - maxStart;
+			// add one to overlapBases since we decremented minStart
+			// for 1-based records.
+			if (!keyRecord->isZeroBased())
+				overlapBases++;
 		}
 		const_cast<Record *>(keyRecord)->undoZeroLength();
 		printKey(keyRecord);
@@ -404,7 +409,7 @@ void RecordOutputMgr::reportOverlapDetail(const Record *keyRecord, const Record 
 		const_cast<Record *>(hitRecord)->undoZeroLength();
 		hitRecord->print(_outBuf);
 		tab();
-		int2str(printOverlapBases, _outBuf, true);
+		int2str(overlapBases, _outBuf, true);
 	}
 	newline();
     if (needsFlush()) flush();
