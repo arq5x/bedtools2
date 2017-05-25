@@ -178,4 +178,69 @@ chr1	90	210" > exp
 echo -e "chr1\t160\t170\nchr1\t100\t200"| $BT slop -b 0.1 -pct -i - -g ../../genomes/human.hg19.genome > obs
 check obs exp
 rm obs exp
+###########################################################
+# test negative slop on l with strand
+###########################################################
+
+echo -e "    slop.t16...\c"
+echo \
+"chr1	360	380" > exp
+echo -e "chr1\t300\t320" | $BT slop -l -60 -r 60 -i - -g tiny.genome > obs
+check obs exp
+rm obs exp
+
+echo -e "    slop.t17...\c"
+echo \
+"chr1	240	260	a1	5	-" > exp
+echo -e "chr1\t300\t320\ta1\t5\t-" | $BT slop -s -l -60 -r 60 -i - -g tiny.genome > obs
+check obs exp
+rm obs exp
+
+###########################################################
+# test negative slop on r with strand
+###########################################################
+
+echo -e "    slop.t18...\c"
+echo \
+"chr1	240	260" > exp
+echo -e "chr1\t300\t320" | $BT slop -l 60 -r -60 -i - -g tiny.genome > obs
+check obs exp
+rm obs exp
+
+echo -e "    slop.t19...\c"
+echo \
+"chr1	360	380	a1	5	-" > exp
+echo -e "chr1\t300\t320\ta1\t5\t-" | $BT slop -s -l 60 -r -60 -i - -g tiny.genome > obs
+check obs exp
+rm obs exp
+
+###########################################################
+# test crossover during negative slop
+###########################################################
+
+echo -e "    slop.t20...\c"
+echo \
+"chr1	260	360	a1	5	-" > exp
+echo -e "chr1\t300\t320\ta1\t5\t-" | $BT slop -s -l -60 -r -60 -i - -g tiny.genome > obs
+check obs exp
+rm obs exp
+
+###########################################################
+# test edge cases
+###########################################################
+
+echo -e "    slop.t21...\c"
+echo \
+"chr1	999	1000	a1	5	-" > exp
+echo -e "chr1\t950\t970\ta1\t5\t-" | $BT slop -s -l 60 -r -60 -i - -g tiny.genome > obs
+check obs exp
+rm obs exp
+
+echo -e "    slop.t22...\c"
+echo \
+"chr1	0	1	a1	5	-" > exp
+echo -e "chr1\t50\t60\ta1\t5\t-" | $BT slop -s -l -60 -r 60 -i - -g tiny.genome > obs
+check obs exp
+rm obs exp
+
 [[ $FAILURES -eq 0 ]] || exit 1;
