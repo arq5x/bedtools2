@@ -98,6 +98,14 @@ int sort_main(int argc, char* argv[]) {
            	sortByFaidx = true;
             sortChoices++;
         }
+        else if(PARAMETER_CHECK("-g", 2, parameterLength)) {
+             if ((i+1) < argc) {
+                faidxFile = argv[i + 1];
+                i++;
+                  }
+            sortByFaidx = true;
+            sortChoices++;
+        }
         else if(PARAMETER_CHECK("-header", 7, parameterLength)) {
             printHeader = true;
         }
@@ -167,6 +175,7 @@ void sort_help(void) {
     cerr << "\t" << "-chrThenSizeD\t\t"   << "Sort by chrom (asc), then feature size (desc)." << endl;
     cerr << "\t" << "-chrThenScoreA\t\t"  << "Sort by chrom (asc), then score (asc)." << endl;
     cerr << "\t" << "-chrThenScoreD\t\t"  << "Sort by chrom (asc), then score (desc)." << endl;
+    cerr << "\t" << "-g (names.txt)\t"    << "Sort according to the chromosomes declared in \"genome.txt\"" << endl;
     cerr << "\t" << "-faidx (names.txt)\t"  << "Sort according to the chromosomes declared in \"names.txt\"" << endl;
     
     cerr << "\t-header\t"       << "Print the header from the A file prior to results." << endl << endl;

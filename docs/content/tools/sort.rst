@@ -27,7 +27,8 @@ Usage and option summary
 **-chrThenSizeD**                Sort by chromosome (asc), then by feature size (desc).
 **-chrThenScoreA**               Sort by chromosome (asc), then by score (asc).
 **-chrThenScoreD**               Sort by chromosome (asc), then by score (desc).
-**-faidx**                       Tab-delimited file with chromosome names in the first column. Sort by specified chromosome order.
+**-g**                           Define sort order by order of tab-delimited file with chromosome names in the first column.
+**-faidx**                       Define sort order by order of tab-delimited file with chromosome names in the first column. Sort by specified chromosome order.
 ===========================      ===============================================================================================================================================================================================================
 
 
