@@ -47,6 +47,4 @@ void coverage_help(void) {
     cerr << "\t   2) The number of bases in A that had non-zero coverage." << endl;
     cerr << "\t   3) The length of the entry in A." << endl;
     cerr << "\t   4) The fraction of bases in A that had non-zero coverage." << endl << endl;
-
-    exit(1);
 }

@@ -624,10 +624,10 @@ rm exp obs
 echo -e "    coverage.t14...\c"
 echo \
 "***** ERROR: -counts, -d, -mean, and -hist are all mutually exclusive options. *****" > exp
-$BT coverage -a a.bed -b b.bed -counts -hist 2>&1 > /dev/null | head -2 | tail -1 | cat - > obs
+$BT coverage -a a.bed -b b.bed -counts -hist 2>&1 > /dev/null | tail -1 | cat - > obs
 check exp obs
 echo -e "    coverage.t14b...\c"
-$BT coverage -a a.bed -b b.bed -counts -sorted -hist 2>&1 > /dev/null | head -2 | tail -1 | cat - > obs
+$BT coverage -a a.bed -b b.bed -counts -sorted -hist 2>&1 > /dev/null | tail -1 | cat - > obs
 check exp obs
 rm exp obs
 
@@ -637,10 +637,10 @@ rm exp obs
 echo -e "    coverage.t15...\c"
 echo \
 "***** ERROR: -counts, -d, -mean, and -hist are all mutually exclusive options. *****" > exp
-$BT coverage -a a.bed -b b.bed -counts -d 2>&1 > /dev/null | head -2 | tail -1 | cat - > obs
+$BT coverage -a a.bed -b b.bed -counts -d 2>&1 > /dev/null | tail -1 | cat - > obs
 check exp obs
 echo -e "    coverage.t15b...\c"
-$BT coverage -a a.bed -b b.bed -sorted -counts -d 2>&1 > /dev/null | head -2 | tail -1 | cat - > obs
+$BT coverage -a a.bed -b b.bed -sorted -counts -d 2>&1 > /dev/null | tail -1 | cat - > obs
 check exp obs
 rm exp obs
 
@@ -650,10 +650,10 @@ rm exp obs
 echo -e "    coverage.t16...\c"
 echo \
 "***** ERROR: -counts, -d, -mean, and -hist are all mutually exclusive options. *****" > exp
-$BT coverage -a a.bed -b b.bed -hist -d 2>&1 > /dev/null | head -2 | tail -1 | cat - > obs
+$BT coverage -a a.bed -b b.bed -hist -d 2>&1 > /dev/null | tail -1 | cat - > obs
 check exp obs
 echo -e "    coverage.t16b...\c"
-$BT coverage -a a.bed -b b.bed -sorted -hist -d 2>&1 > /dev/null | head -2 | tail -1 | cat - > obs
+$BT coverage -a a.bed -b b.bed -sorted -hist -d 2>&1 > /dev/null | tail -1 | cat - > obs
 check exp obs
 rm exp obs
 
@@ -664,10 +664,10 @@ rm exp obs
 echo -e "    coverage.t17...\c"
 echo \
 "***** ERROR: -counts, -d, -mean, and -hist are all mutually exclusive options. *****" > exp
-$BT coverage -a a.bed -b b.bed -mean -d 2>&1 > /dev/null | head -2 | tail -1 | cat - > obs
+$BT coverage -a a.bed -b b.bed -mean -d 2>&1 > /dev/null | tail -1 | cat - > obs
 check exp obs
 echo -e "    coverage.t17b...\c"
-$BT coverage -a a.bed -b b.bed -sorted -mean -d 2>&1 > /dev/null | head -2 | tail -1 | cat - > obs
+$BT coverage -a a.bed -b b.bed -sorted -mean -d 2>&1 > /dev/null | tail -1 | cat - > obs
 check exp obs
 rm exp obs
 

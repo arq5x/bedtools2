@@ -152,6 +152,8 @@ public:
     void testNameConventions(const Record *);
     BlockMgr *getSplitBlockInfo() { return _splitBlockInfo; }
 
+    string getErrorMessages() const { return _errorMsg; }
+
 protected:
 	PROGRAM_TYPE _program;
 

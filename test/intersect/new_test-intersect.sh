@@ -630,7 +630,7 @@ rm obs exp dummy.txt
 ############################################################
 echo -e "    intersect.new.t52...\c"
 echo "***** ERROR: Unrecognized parameter: -wrongArg *****" > exp
-$BT intersect -a a.bed -b b.bed -wrongArg 2>&1 > /dev/null | head -2 | tail -1 > obs
+$BT intersect -a a.bed -b b.bed -wrongArg 2>&1 > /dev/null | tail -1 > obs
 check obs exp
 rm obs exp
 
@@ -651,7 +651,7 @@ rm obs
 ############################################################
 echo -e "    intersect.new.t54...\c"
 echo "***** ERROR: writeAllOverlap option is not valid with BAM query input, unless bed output is specified with -bed option. *****" > exp
-$BT intersect -a a.bam -b b.bed  -wao 2>&1 > /dev/null  | head -2 | tail -1 > obs
+$BT intersect -a a.bam -b b.bed  -wao 2>&1 > /dev/null  | tail -1 > obs
 check obs exp
 rm obs exp
 

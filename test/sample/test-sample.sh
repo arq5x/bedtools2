@@ -36,7 +36,7 @@ $BT random -l 1000 -n 1000 -g human.hg19.genome >> mainFile.bed
 echo -e "    sample.t01...\c"
 echo \
 "***** ERROR: No input file given. Exiting. *****" > exp
-$BT sample 2>&1 > /dev/null | head -2 | tail -1 > obs
+$BT sample 2>&1 > /dev/null | tail -1 > obs
 check obs exp
 rm obs
 
@@ -46,7 +46,7 @@ rm obs
 ############################################################
 echo -e "    sample.new.t02...\c"
 echo "***** ERROR: Unrecognized parameter: -wrongArg *****" > exp
-$BT sample -i mainFile.bed -wrongArg 2>&1 > /dev/null | head -2 | tail -1 > obs
+$BT sample -i mainFile.bed -wrongArg 2>&1 > /dev/null |  tail -1 > obs
 check obs exp
 rm obs exp
 
@@ -55,7 +55,7 @@ rm obs exp
 ############################################################
 echo -e "    sample.new.t03...\c"
 echo "***** ERROR: No input file given. Exiting. *****" > exp;
-$BT sample -n 10 2>&1 > /dev/null | head -2 | tail -1 > obs
+$BT sample -n 10 2>&1 > /dev/null | tail -1 > obs
 check obs exp
 rm obs exp
 
@@ -64,7 +64,7 @@ rm obs exp
 ############################################################
 echo -e "    sample.new.t04...\c"
 echo "***** ERROR: -i option given, but no input file specified. *****" > exp
-$BT sample -i 2>&1 > /dev/null | head -2 | tail -1 > obs
+$BT sample -i 2>&1 > /dev/null | tail -1 > obs
 check obs exp
 rm obs exp
 
@@ -75,7 +75,7 @@ rm obs exp
 ############################################################
 echo -e "    sample.new.t05...\c"
 echo "***** ERROR: -n option given, but no number of output records specified. *****" > exp
-$BT sample -n 2>&1 > /dev/null | head -2 | tail -1 > obs
+$BT sample -n 2>&1 > /dev/null | tail -1 > obs
 check obs exp
 rm obs exp
 

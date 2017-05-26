@@ -36,8 +36,4 @@ void subtract_help(void) {
     IntersectCommonHelp();
     sortedHelp();
     allToolsCommonHelp();
-
-    // end the program here
-    exit(1);
-
 }

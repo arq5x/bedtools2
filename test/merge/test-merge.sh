@@ -38,7 +38,7 @@ rm obs exp
 ###########################################################
 echo -e "    merge.t2...\c"
 echo "***** ERROR: -n option is deprecated. Please see the documentation for the -c and -o column operation options. *****" > exp
-$BT merge -i a.bed -n 2>&1 > /dev/null | head -2 | tail -1 > obs
+$BT merge -i a.bed -n 2>&1 > /dev/null | tail -1 > obs
 check obs exp
 rm obs exp
 
@@ -60,7 +60,7 @@ rm obs exp
 ###########################################################
 echo -e "    merge.t4...\c"
 echo "***** ERROR: -nms option is deprecated. Please see the documentation for the -c and -o column operation options. *****" > exp
-$BT merge -i a.bed -nms 2>&1 > /dev/null | head -2 | tail -1 > obs
+$BT merge -i a.bed -nms 2>&1 > /dev/null  | tail -1 > obs
 check obs exp
 rm obs exp
 
@@ -152,7 +152,7 @@ rm obs exp
 VCF_FILE=testA.vcf
 echo -e "    merge.t11...\c"
 echo "***** ERROR: stranded merge not supported for VCF file $VCF_FILE. *****" >exp
-$BT merge -i $VCF_FILE -s 2>&1 > /dev/null | head -2 | tail -1 > obs
+$BT merge -i $VCF_FILE -s 2>&1 > /dev/null | tail -1 > obs
 check exp obs
 rm obs exp
 
@@ -243,7 +243,7 @@ rm obs exp
 ###########################################################
 echo -e "    merge.t18...\c"
 echo "***** ERROR: -S option must be followed by + or -. *****" > exp
-$BT merge -i mixedStrands.bed -S . -c 6 -o distinct 2>&1 > /dev/null | head -2 | tail -1 >obs
+$BT merge -i mixedStrands.bed -S . -c 6 -o distinct 2>&1 > /dev/null | tail -1 >obs
 check exp obs
 rm obs exp
 
@@ -255,7 +255,7 @@ echo -e "    merge.t19...\c"
 echo \
 "Error: Sorted input specified, but the file unsorted.bed has the following out of order record
 chr1	9	30	2" > exp
-$BT merge -i unsorted.bed 2>&1 > /dev/null | head -2  >obs
+$BT merge -i unsorted.bed 2>&1 > /dev/null | tail -2  >obs
 check exp obs
 rm obs exp
 
@@ -468,7 +468,7 @@ rm obs exp
 ###########################################################
 echo -e "    merge.t37...\c"
 echo "***** ERROR: -iobuf option given, but size of input buffer not specified. *****" >exp
-$BT merge -i a.bed -iobuf 2>&1 > /dev/null | head -2 | tail -1 > obs
+$BT merge -i a.bed -iobuf 2>&1 > /dev/null |  tail -1 > obs
 check obs exp
 rm obs exp
 
@@ -478,7 +478,7 @@ rm obs exp
 echo -e "    merge.t38...\c"
 echo \
 "***** ERROR: Unrecognized memory buffer size suffix 'L' given. *****" > exp
-$BT merge -i a.bed -iobuf 20L 2>&1 > /dev/null | head -2 | tail -1 > obs
+$BT merge -i a.bed -iobuf 20L 2>&1 > /dev/null | tail -1 > obs
 check obs exp
 rm obs exp
 
@@ -488,7 +488,7 @@ rm obs exp
 echo -e "    merge.t39...\c"
 echo \
 "***** ERROR: specified buffer size is too small. *****" > exp
-$BT merge -i a.bed -iobuf 7 2>&1 > /dev/null | head -2 | tail -1 > obs
+$BT merge -i a.bed -iobuf 7 2>&1 > /dev/null | tail -1 > obs
 check exp obs
 rm exp obs
 
@@ -498,7 +498,7 @@ rm exp obs
 echo -e "    merge.t40...\c"
 echo \
 "***** ERROR: argument passed to -iobuf is not numeric. *****" > exp
-$BT merge -i a.bed -iobuf beerM 2>&1 > /dev/null | head -2 | tail -1 > obs
+$BT merge -i a.bed -iobuf beerM 2>&1 > /dev/null | tail -1 > obs
 check exp obs
 rm exp obs
 

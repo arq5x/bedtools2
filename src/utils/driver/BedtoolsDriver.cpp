@@ -48,7 +48,8 @@ bool BedtoolsDriver::supports(const string &tool) {
 	return (iter != _supported.end());
 }
 
-bool BedtoolsDriver::subMain(int argc, char **argv) {
+bool BedtoolsDriver::subMain(int argc, char **argv) 
+{
 	_subCmd = argv[1];
 	ContextBase *context = getContext();
 
@@ -56,6 +57,7 @@ bool BedtoolsDriver::subMain(int argc, char **argv) {
 	//show help and error messages if needed.
 	if (!context->testCmdArgs(argc - 1, argv + 1)) {
 		_hadError = context->errorEncountered();
+		_errors = context->getErrorMessages();
 		delete context;
 		return false;
 	}

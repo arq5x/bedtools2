@@ -116,7 +116,9 @@ ContextBase::~ContextBase()
 }
 
 bool ContextBase::errorEncountered() {
-	if (_argc == 1) {    // just a subcommand was given with no options.
+	// just a subcommand was given with no options.
+	if (_argc == 1) 
+	{
 		return true;
 	} 
 	return !_errorMsg.empty() || getShowHelp();
@@ -168,9 +170,6 @@ bool ContextBase::testCmdArgs(int argc, char **argv) {
 	_argsProcessed.resize(_argc - _skipFirstArgs, false);
 
 	if (!parseCmdArgs(argc, argv, 1) || getShowHelp() || !isValidState()) {
-		if (!_errorMsg.empty()) {
-			cerr <<_errorMsg << endl;
-		}
 		return false;
 	}
 	return true;
@@ -267,7 +266,7 @@ bool ContextBase::isValidState()
 		_errorMsg.append(_files[0]->getFileName());
 		_errorMsg.append(" has non positional records, which are only valid for \n");
 		_errorMsg.append(" the groupBy tool. Perhaps you are using a header");
-		_errorMsg.append(" line(s) that starts with  \n");
+		_errorMsg.append(" line(s) that starts with \n");
 		_errorMsg.append(" something other than \"#\", \"chrom\", or \"chr\" (any case)?");
 		return false;
 	}

@@ -41,7 +41,4 @@ void intersect_help(void) {
     cerr << "\tand excluded if an overlap cannot be found.  If multiple overlaps exist, they are not" << endl;
     cerr << "\treported, as we are only testing for one or more overlaps." << endl << endl;
 
-    // end the program here
-    exit(1);
-
 }

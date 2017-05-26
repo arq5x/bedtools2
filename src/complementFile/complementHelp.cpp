@@ -31,6 +31,4 @@ void complement_help(void) {
     cerr << "\tmysql --user=genome --host=genome-mysql.cse.ucsc.edu -A -e \\" << endl;
     cerr << "\t\"select chrom, size from hg19.chromInfo\"  > hg19.genome" << endl << endl;
 
-    exit(1);
-
 }

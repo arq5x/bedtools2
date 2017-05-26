@@ -81,7 +81,5 @@ void closest_help(void) {
     cerr << "\tis not found in B on the same chromosome as the feature in A." << endl;
     cerr << "\tE.g. none\t-1\t-1" << endl << endl;
 
-    // end the program here
-    exit(1);
 }
 

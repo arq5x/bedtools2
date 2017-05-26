@@ -22,8 +22,4 @@ void fisher_help(void) {
     cerr << "Notes: " << endl;
     cerr << "\t(1) Input files must be sorted by chrom, then start position."
          << endl << endl;
-
-    // end the program here
-    exit(1);
-
 }

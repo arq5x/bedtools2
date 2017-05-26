@@ -55,12 +55,12 @@ echo -e "    general.t03...\c"
 echo "ERROR: file - has non positional records, which are only valid for " >> exp
 echo " the groupBy tool. Perhaps you are using a header line(s) that starts with " >> exp
 echo " something other than \"#\", \"chrom\", or \"chr\" (any case)?" >> exp
-echo >> exp
 
 echo "chr1	.	2" | $BT merge -i - 2> o \
     && failedtofail || true;
-head -n 4 o > obs
+tail -n 3 o > obs
 check obs exp
+exit
 rm obs exp
 
 
@@ -75,8 +75,7 @@ echo \
 echo "ERROR: file - has non positional records, which are only valid for " >> exp
 echo " the groupBy tool. Perhaps you are using a header line(s) that starts with " >> exp
 echo " something other than \"#\", \"chrom\", or \"chr\" (any case)?" >> exp
-echo >> exp
-head -n 4 o > obs
+tail -n 3 o > obs
 check obs exp
 rm obs exp
 

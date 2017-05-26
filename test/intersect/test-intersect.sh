@@ -492,7 +492,7 @@ rm obs exp
 echo -e "    intersect.t39...\c"
 echo \
 "***** ERROR: -f must be in the range (0.0, 1.0]. *****" > exp
-$BT intersect -a a.bed -b b.bed -f 0.0 2>&1 > /dev/null | cat - | head -2 | tail -1 > obs
+$BT intersect -a a.bed -b b.bed -f 0.0 2>&1 > /dev/null | cat - |  tail -1 > obs
 check exp obs
 rm exp obs
 
@@ -502,7 +502,7 @@ rm exp obs
 echo -e "    intersect.t40...\c"
 echo \
 "***** ERROR: -f must be in the range (0.0, 1.0]. *****" > exp
-$BT intersect -a a.bed -b b.bed -f 1.00001 2>&1 > /dev/null | cat - | head -2 | tail -1 > obs
+$BT intersect -a a.bed -b b.bed -f 1.00001 2>&1 > /dev/null | cat - |  tail -1 > obs
 check exp obs
 rm exp obs
 

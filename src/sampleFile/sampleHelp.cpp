@@ -40,11 +40,6 @@ void sample_help(void) {
     allToolsCommonHelp();
 
     cerr << "Notes: " << endl;
-//    cerr << "\tTBD: Enter other usage notes here." << endl << endl;
-
-    // end the program here
-    exit(1);
-
 }
 
 

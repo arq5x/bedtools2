@@ -26,10 +26,6 @@ void map_help(void) {
 
     cerr << "Notes: " << endl;
     cerr << "\t(1) Both input files must be sorted by chrom, then start." << endl << endl;
-
-    // end the program here
-    exit(1);
-
 }
 
 

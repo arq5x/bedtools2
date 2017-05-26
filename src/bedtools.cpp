@@ -36,6 +36,7 @@ using namespace std;
 
 bool sub_main(const string &subCmd);
 void showHelp(const string &subCmd);
+void showErrors(const string &errors);
 
 int annotate_main(int argc, char* argv[]);//
 int bamtobed_main(int argc, char* argv[]);//
@@ -96,10 +97,14 @@ int main(int argc, char *argv[])
     BedtoolsDriver btDriver;
     if (btDriver.supports(subCmd)) {
 
-		if (btDriver.subMain(argc, argv)) {
-			return 0;
-		} else if (btDriver.hadError()) {
+		if (btDriver.subMain(argc, argv)) 
+        {
+            return 0;
+		} 
+        else if (btDriver.hadError()) 
+        {
 			showHelp(subCmd);
+            showErrors(btDriver.getErrors());
 			return 1;
 		}
 	}
@@ -318,6 +323,9 @@ void showHelp(const string &subCmd) {
 	} else if (subCmd == "groupby") {
 		groupby_help();
 	}
+}
 
-
+void showErrors(const string &errors) 
+{
+    cerr << endl << endl << errors << endl;
 }
