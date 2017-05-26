@@ -6,6 +6,7 @@
 #include <cstdlib>
 #include <sstream>
 
+
 //This functions recognizes only numbers with digits, plus sign, minus sign, decimal point, e, or E. Hexadecimal and pointers not currently supported.
 bool isNumeric(const string &str) {
 	for (int i=0; i < (int)str.size(); i++) {
@@ -138,22 +139,25 @@ bool isHeaderLine(const string &line) {
 	if (line[0] == '#') {
 		return true;
 	}
+	
+	string tmp = line;
+	transform(tmp.begin(), tmp.end(), tmp.begin(), ::tolower);
 	//allow chr chrom to start a header line
-	if (memcmp(line.c_str(), "chrom", 5) == 0 && isspace(line[5])) {
+	if (memcmp(tmp.c_str(), "chrom", 5) == 0 && isspace(tmp[5])) {
 		return true;
 	}
 	//allow chr chrom to start a header line
-	if (memcmp(line.c_str(), "chr", 3) == 0 && isspace(line[3])) {
+	if (memcmp(tmp.c_str(), "chr", 3) == 0 && isspace(tmp[3])) {
 		return true;
 	}
 	//UCSC file headers can also start with the words "browser" or "track", followed by a whitespace character.
-	if (memcmp(line.c_str(), "browser", 7) == 0 && isspace(line[7])) {
+	if (memcmp(tmp.c_str(), "browser", 7) == 0 && isspace(tmp[7])) {
 		return true;
 	}
-	if (memcmp(line.c_str(), "track", 5) == 0 && isspace(line[5])) {
+	if (memcmp(tmp.c_str(), "track", 5) == 0 && isspace(tmp[5])) {
 		return true;
 	}
-	if (memcmp(line.c_str(), "visibility", 10) == 0) {
+	if (memcmp(tmp.c_str(), "visibility", 10) == 0) {
 		return true;
 	}
 	return false;

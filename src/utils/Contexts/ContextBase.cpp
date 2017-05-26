@@ -260,10 +260,15 @@ bool ContextBase::isValidState()
 	if (!determineOutputType()) {
 		return false;
 	}
-	if (_program != GROUP_BY && _files[0]->getRecordType() == FileRecordTypeChecker::NO_POS_PLUS_RECORD_TYPE) {
+	if (_program != GROUP_BY && 
+		_files[0]->getRecordType() == FileRecordTypeChecker::NO_POS_PLUS_RECORD_TYPE) 
+	{
 		_errorMsg = "ERROR: file ";
 		_errorMsg.append(_files[0]->getFileName());
-		_errorMsg.append(" has non positional records, which are only valid for the groupBy tool.");
+		_errorMsg.append(" has non positional records, which are only valid for \n");
+		_errorMsg.append(" the groupBy tool. Perhaps you are using a header");
+		_errorMsg.append(" line(s) that starts with  \n");
+		_errorMsg.append(" something other than \"#\", \"chrom\", or \"chr\" (any case)?");
 		return false;
 	}
 	if (getObeySplits()) {

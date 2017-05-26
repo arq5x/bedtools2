@@ -11,6 +11,7 @@
 #include <cstring> //for memset
 #include <limits>
 #include <string>
+#include <algorithm>
 #include <vector>
 #include "string.h"
 #include <cstdio>
