@@ -52,11 +52,14 @@ rm obs exp
 #  Enforce integer coordinates
 ###########################################################
 echo -e "    general.t03...\c"
-echo \
-"ERROR: file - has non positional records, which are only valid for the groupBy tool." > exp
+echo "ERROR: file - has non positional records, which are only valid for " >> exp
+echo " the groupBy tool. Perhaps you are using a header line(s) that starts with " >> exp
+echo " something other than \"#\", \"chrom\", or \"chr\" (any case)?" >> exp
+echo >> exp
+
 echo "chr1	.	2" | $BT merge -i - 2> o \
     && failedtofail || true;
-head -n 1 o > obs
+head -n 4 o > obs
 check obs exp
 rm obs exp
 
@@ -69,9 +72,11 @@ echo -e "    general.t05...\c"
 echo \
 "chr1 1 2" | $BT merge -i - 2> obs \
     && failedtofail || true;
-echo \
-"ERROR: file - has non positional records, which are only valid for the groupBy tool." > exp
-head -n 1 o > obs
+echo "ERROR: file - has non positional records, which are only valid for " >> exp
+echo " the groupBy tool. Perhaps you are using a header line(s) that starts with " >> exp
+echo " something other than \"#\", \"chrom\", or \"chr\" (any case)?" >> exp
+echo >> exp
+head -n 4 o > obs
 check obs exp
 rm obs exp
 

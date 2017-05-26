@@ -163,7 +163,7 @@ rm obs exp
 ###########################################################
 echo -e "    groupby.t8...\c"
 echo \
-"Chrom	start	end	B
+"Chromz	start	end	B
 chr1	0	10	10
 chr1	10	20	5
 chr1	11	21	5
@@ -173,8 +173,9 @@ chr3	0	10	1
 chr3	10	20	2
 chr3	20	30	3
 chr3	120	130	4" > exp
-$BT groupby -i values3.unmarked_header.bed -c 5 -o distinct > obs
+$BT groupby -i values3.unmarked_header.bed.2 -c 5 -o distinct > obs
 check obs exp
+exit
 rm obs exp
 
 ###########################################################
@@ -183,7 +184,7 @@ rm obs exp
 echo -e "    groupby.t9...\c"
 echo \
 "col_1	col_2	col_3	col_4	col_5	col_6
-Chrom	start	end	B
+Chromz	start	end	B
 chr1	0	10	10
 chr1	10	20	5
 chr1	11	21	5
@@ -193,7 +194,7 @@ chr3	0	10	1
 chr3	10	20	2
 chr3	20	30	3
 chr3	120	130	4" > exp
-$BT groupby -i values3.unmarked_header.bed -c 5 -o distinct -outheader > obs
+$BT groupby -i values3.unmarked_header.bed.2 -c 5 -o distinct -outheader > obs
 check obs exp
 rm obs exp
 
@@ -297,9 +298,13 @@ rm obs exp
 # non-positional records
 ###########################################################
 echo -e "    groupby.t15...\c"
-echo "ERROR: file noPosvalues.header.bed has non positional records, which are only valid for the groupBy tool." > exp
-$BT merge  -i noPosvalues.header.bed 2>&1 | head -n 1 > obs
+echo "ERROR: file noPosvalues.header.bed has non positional records, which are only valid for " >> exp
+echo " the groupBy tool. Perhaps you are using a header line(s) that starts with " >> exp
+echo " something other than \"#\", \"chrom\", or \"chr\" (any case)?" >> exp
+echo >> exp
+$BT merge  -i noPosvalues.header.bed 2>&1 | head -n 4 > obs
 check obs exp
+exit
 rm obs exp
 
 ###########################################################
@@ -312,6 +317,7 @@ echo \
 19	A	21.2" > exp
 $BT groupby -i a_vcfSVtest.vcf -g 1,4 -o mean -c 6 > obs
 check obs exp
+
 rm obs exp
 
 
