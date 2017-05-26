@@ -30,11 +30,11 @@ int cluster_main(int argc, char* argv[]) {
     bool showHelp = false;
 
     // input files
-    string bedFile  = "stdin";
+    string bedFile;
     int maxDistance = 0;
 
     // input arguments
-    bool haveBed         = true;
+    bool haveBed         = false;
     bool haveMaxDistance = false;
     bool forceStrand     = false;
 
@@ -58,6 +58,7 @@ int cluster_main(int argc, char* argv[]) {
             if ((i+1) < argc) {
                 bedFile = argv[i + 1];
                 i++;
+                haveBed = true;
             }
         }
         else if(PARAMETER_CHECK("-d", 2, parameterLength)) {
@@ -76,10 +77,17 @@ int cluster_main(int argc, char* argv[]) {
         }
     }
 
-    // make sure we have both input files
+    // make sure we have input 
     if (!haveBed) {
-        cerr << endl << "*****" << endl << "*****ERROR: Need -i BED file. " << endl << "*****" << endl;
-        showHelp = true;
+        if (!isatty(STDIN_FILENO))
+        {
+            bedFile = "stdin";
+        }
+        else 
+        {
+            cerr << endl << "*****" << endl << "*****ERROR: Need -i BED file. " << endl << "*****" << endl;
+            showHelp = true;
+        }
     }
 
     if (!showHelp) {

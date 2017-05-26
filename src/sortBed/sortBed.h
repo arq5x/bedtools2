@@ -15,6 +15,7 @@
 #include <iostream>
 #include <fstream>
 #include <map>
+#include <unistd.h>
 
 using namespace std;
 

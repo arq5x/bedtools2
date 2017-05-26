@@ -30,9 +30,9 @@ int sort_main(int argc, char* argv[]) {
     bool showHelp = false;
 
     // input files
-    string bedFile  = "stdin";
+    string bedFile;
     string faidxFile; 
-    bool haveBed    = true;
+    bool haveBed    = false;
     int sortChoices = 0;
 
     bool sortBySizeAsc            = false;
@@ -64,6 +64,7 @@ int sort_main(int argc, char* argv[]) {
             if ((i+1) < argc) {
                 bedFile = argv[i + 1];
                 i++;
+                haveBed = true;
             }
         }
         else if(PARAMETER_CHECK("-sizeA", 6, parameterLength)) {
@@ -115,10 +116,17 @@ int sort_main(int argc, char* argv[]) {
         }
     }
 
-    // make sure we have both input files
+    // make sure we have input 
     if (!haveBed) {
-        cerr << endl << "*****" << endl << "*****ERROR: Need -i BED file. " << endl << "*****" << endl;
-        showHelp = true;
+        if (!isatty(STDIN_FILENO))
+        {
+            bedFile = "stdin";
+        }
+        else 
+        {
+            cerr << endl << "*****" << endl << "*****ERROR: Need -i BED file. " << endl << "*****" << endl;
+            showHelp = true;
+        }
     }
     if (sortChoices > 1) {
         cerr << endl << "*****" << endl << "*****ERROR: Sorting options are mutually exclusive.  Please choose just one. " << endl << "*****" << endl;

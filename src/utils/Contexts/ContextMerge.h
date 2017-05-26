@@ -7,7 +7,7 @@
 
 #ifndef CONTEXTMERGE_H_
 #define CONTEXTMERGE_H_
-
+#include <unistd.h>
 #include "ContextBase.h"
 #include "FileRecordMergeMgr.h"
 

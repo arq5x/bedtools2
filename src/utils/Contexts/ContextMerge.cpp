@@ -69,8 +69,12 @@ bool ContextMerge::isValidState()
 	}
 
 	//default to stdin
-	if (getNumInputFiles() == 0) {
-		addInputFile("-");
+	if (getNumInputFiles() == 0) 
+	{
+		if (!isatty(STDIN_FILENO))
+		{
+			addInputFile("-");
+		}
 	}
 	if (!ContextBase::isValidState()) {
 		return false;
