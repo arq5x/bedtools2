@@ -123,7 +123,7 @@ protected:
 	bool _useFullBamTags;
 
 	//members for enforcing sorted order.
-	set<string> _foundChroms;
+        std::set<string> _foundChroms;
 	string _prevChrom;
 	int _prevStart;
 	int _prevChromId;
