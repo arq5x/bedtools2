@@ -25,8 +25,6 @@
 #include "RecordKeyVector.h"
 #include "BlockMgr.h"
 
-using namespace std;
-
 class Record;
 class NewGenomeFile;
 
