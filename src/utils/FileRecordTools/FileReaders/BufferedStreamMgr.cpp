@@ -125,7 +125,7 @@ bool BufferedStreamMgr::getLine(string &line)
 	//strip any whitespace characters, such as DOS newline characters or extra tabs,
 	//from the end of the line
 	int lastPos = line.size();
-	while (line[lastPos-1] == '\n') lastPos--;
+	while (lastPos > 0 && (line[lastPos-1] == '\n' || line[lastPos-1] == '\r')) lastPos--;
 	line.resize(lastPos);
 
 	return retVal;
