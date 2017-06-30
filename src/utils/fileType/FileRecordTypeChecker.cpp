@@ -183,6 +183,11 @@ bool FileRecordTypeChecker::handleTextFormat(const char *buffer, size_t len)
 
 		string line(_tokenizer.getElem(_firstValidDataLineIdx));
 
+		// ditch \r for Windows if necessary.
+		if (line.size() && line[line.size()-1] == '\r') {
+			line.resize(line.size()-1);
+		}
+
 		_tokenizer.setKeepFinalIncompleteElem(Tokenizer::USE_NOW);
 		_tokenizer.setNumExpectedItems(_numFields);
 		_tokenizer.tokenize(line, _delimChar);
