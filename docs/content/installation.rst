@@ -70,12 +70,12 @@ Charles for doing this.
 
     apt-get install bedtools
 
-
 **Homebrew**. Carlos Borroto has made BEDTools available on the bedtools
 package manager for OSX.
 
 .. code-block:: bash
 
+    brew tap homebrew/science
     brew install bedtools
 
 **MacPorts**. Alternatively, the MacPorts ports system can be used to install BEDTools on OSX.
