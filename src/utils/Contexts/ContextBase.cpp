@@ -13,7 +13,6 @@
 ContextBase::ContextBase()
 :
   _program(UNSPECIFIED_PROGRAM),
-  _files(NULL),
   _allFilesOpened(false),
   _genomeFile(NULL),
   _outputFileType(FileRecordTypeChecker::UNKNOWN_FILE_TYPE),
