@@ -125,11 +125,11 @@ const char BAM_DNA_DEL   = '-';
 const char BAM_DNA_PAD   = '*';
 
 // zlib & BGZF constants
-const char GZIP_ID1   = 31;
-const char GZIP_ID2   = 139;
+const char GZIP_ID1   = '\x1F';
+const char GZIP_ID2   = '\x8B';
 const char CM_DEFLATE = 8;
 const char FLG_FEXTRA = 4;
-const char OS_UNKNOWN = 255;
+const char OS_UNKNOWN = '\xFF';
 const char BGZF_XLEN  = 6;
 const char BGZF_ID1   = 66;
 const char BGZF_ID2   = 67;
