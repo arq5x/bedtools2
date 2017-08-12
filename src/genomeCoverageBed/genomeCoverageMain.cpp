@@ -184,6 +184,10 @@ int genomecoverage_main(int argc, char* argv[]) {
       cerr << endl << "*****" << endl << "*****ERROR: Need both a BED (-i) and a genome (-g) file. " << endl << "*****" << endl;
       showHelp = true;
     }
+    // make sure we have both input files
+    if (bamInput && haveGenome) {
+      cerr << endl << "*****" << endl << "*****WARNING: Genome (-g) files are ignored when BAM input is provided. " << endl << "*****" << endl;
+    }
     if (bedGraph && eachBase) {
       cerr << endl << "*****" << endl << "*****ERROR: Use -d/-dz or -bg, not both" << endl << "*****" << endl;
       showHelp = true;
