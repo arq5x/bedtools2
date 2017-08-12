@@ -315,7 +315,7 @@ void BedGenomeCoverage::CoverageBam(string bamFile) {
                 AddCoverage(bam.MatePosition, end);
             }
             else if (bam.IsFirstMate() && bam.IsMateReverseStrand()) { //prolong to the mate to the right
-                AddCoverage(start, start + bam.InsertSize - 1);
+                AddCoverage(start, start + abs(bam.InsertSize) - 1);
             }
         } else if (_haveSize) {
             if(bam.IsReverseStrand()) {
