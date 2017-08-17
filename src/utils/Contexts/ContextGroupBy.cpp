@@ -39,9 +39,6 @@ bool ContextGroupBy::parseCmdArgs(int argc, char **argv, int skipFirstArgs)
 		else if ((strcmp(_argv[_i], "-g") == 0) || (strcmp(_argv[_i], "-grp") == 0)) {
 			if (!handle_g()) return false;
 		}
-		else if (strcmp(_argv[_i], "-inheader") == 0) {
-			if (!handle_inheader()) return false;
-		}
 		else if (strcmp(_argv[_i], "-outheader") == 0) {
 			if (!handle_outheader()) return false;
 		}
@@ -86,13 +83,6 @@ bool ContextGroupBy::handle_g()
 	_groupStr = _argv[_i+1];
 	markUsed(_i - _skipFirstArgs);
 	_i++;
-	markUsed(_i - _skipFirstArgs);
-	return true;
-}
-
-bool ContextGroupBy::handle_inheader()
-{
-	_inheader = true;
 	markUsed(_i - _skipFirstArgs);
 	return true;
 }
