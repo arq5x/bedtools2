@@ -24,7 +24,6 @@ public:
 
 
 private:
-    bool handle_f();
     bool handle_A();
     bool handle_N();
 

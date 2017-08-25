@@ -60,22 +60,6 @@ bool ContextSubtract::isValidState()
 	return true;
 }
 
-bool ContextSubtract::handle_f() {
-    if ((_i+1) < _argc) {
-    	if (isNumeric(_argv[_i+1])) {
-    		_fractionalSubtract = atof(_argv[_i + 1]);
-    		if (_fractionalSubtract > 0 && _fractionalSubtract <= 1.0) {
-				markUsed(_i - _skipFirstArgs);
-				_i++;
-				markUsed(_i - _skipFirstArgs);
-				return true;
-    		}
-    	}
-    }
-	_errorMsg = "\n***** ERROR: -f option must be followed by a decimal value from (0, 1.0]. *****";
-	return false;
-}
-
 bool ContextSubtract::handle_A() {
    _removeAll = true;
 	markUsed(_i - _skipFirstArgs);
