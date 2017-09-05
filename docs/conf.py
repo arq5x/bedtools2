@@ -26,7 +26,7 @@ sys.path.append(os.path.abspath('pyplots'))
 # coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
 extensions = ['sphinx.ext.autodoc', 'sphinx.ext.doctest', 
               'sphinx.ext.intersphinx', 'sphinx.ext.todo', 
-              'sphinx.ext.coverage', 'sphinx.ext.pngmath', 
+              'sphinx.ext.coverage',
               'sphinx.ext.ifconfig', 'sphinx.ext.viewcode',
 			        'matplotlib.sphinxext.plot_directive']
 
@@ -225,7 +225,7 @@ man_pages = [
 # Example configuration for intersphinx: refer to the Python standard library.
 intersphinx_mapping = {'bedtools': ('http://bedtools.readthedocs.org/en/latest/', None)}
 
-class Mock(object):
+class Mock(list):
     def __init__(self, *args, **kwargs):
         pass
 
@@ -240,6 +240,9 @@ class Mock(object):
             return type(name, (), {})
         else:
             return Mock()
+
+    def setup(self, *args, **kargs):
+        pass
 
 MOCK_MODULES = ['numpy', 'matplotlib', 'matplotlib.pyplot', 
                 'matplotlib.sphinxext', 'matplotlib.sphinxext.plot_directive']
