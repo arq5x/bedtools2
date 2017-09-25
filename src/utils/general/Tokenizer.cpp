@@ -10,8 +10,7 @@
 #include <iostream>
 Tokenizer::Tokenizer()
 : _numExpectedElems(0),
-  _keepFinalIncElem(USE_NOW),
-  _numValidElems(0) {
+  _keepFinalIncElem(USE_NOW) {
 }
 
 Tokenizer::~Tokenizer() {
@@ -62,8 +61,7 @@ int Tokenizer::tokenize(const string &str, char delimiter, bool eofHit, bool isC
     		_elems.push_back(item);
     	}
     }
-    _numValidElems = _elems.size();
-    return _numValidElems;
+    return _elems.size();
 
 
 	// int strLen = (int)str.size();

@@ -8,24 +8,28 @@
 
 //This functions recognizes only numbers with digits, plus sign, minus sign, decimal point, e, or E. Hexadecimal and pointers not currently supported.
 bool isNumeric(const string &str) {
+	bool hasDigits = false;
 	for (int i=0; i < (int)str.size(); i++) {
 		char currChar = str[i];
 		if (!(isdigit(currChar) || currChar == '-' || currChar == '.' || currChar == '+' || currChar == 'e' || currChar == 'E')) {
 			return false;
 		}
+		hasDigits |= isdigit(currChar);
 	}
-	return true;
+	return hasDigits;
 }
 
 //As above, but does not allow decimal points
 bool isInteger(const string &str) {
+	bool hasDigits = false;
 	for (int i=0; i < (int)str.size(); i++) {
 		char currChar = str[i];
 		if (!(isdigit(currChar) || currChar == '-' || currChar == '+' || currChar == 'e' || currChar == 'E')) {
 			return false;
 		}
+		hasDigits |= isdigit(currChar);
 	}
-	return true;
+	return hasDigits;
 }
 
 
@@ -63,6 +67,12 @@ int str2chrPos(const char *str, size_t ulen) {
 	//check for negative numbers
 	if (str[0] == '-') {
 		isNegative = true;
+		startPos = 1;
+	}
+
+	//check for explicitly positive numbers
+	if (str[0] == '+') {
+		isNegative = false;
 		startPos = 1;
 	}
 
