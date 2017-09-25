@@ -106,11 +106,11 @@ Record *FileRecordMgr::getNextRecord(RecordKeyVector *keyList)
 	}
 	Record *record = NULL;
 	record = _recordMgr->allocateRecord();
+
 	if (!record->initFromFile(_fileReader)) {
 		_recordMgr->deleteRecord(record);
 		return NULL;
 	}
-
 	// If the record is unmapped, don't test for valid coords or sort order,
 	// but still return it so the -v (noHit) option and the like will still
 	// see it.

@@ -8,6 +8,10 @@ Bed3Interval::Bed3Interval()
 
 }
 
+Bed3Interval::Bed3Interval(int fileIdx, int chrId, int start, int end)
+: Record(fileIdx, chrId, start, end)
+{}
+
 Bed3Interval::~Bed3Interval()
 {
 

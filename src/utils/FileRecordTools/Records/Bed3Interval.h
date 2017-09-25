@@ -21,6 +21,8 @@ public:
 	friend class FreeList<Bed3Interval>;
 
 	Bed3Interval();
+	Bed3Interval(int fileIdx, int chrId, int start, int end);
+	
 	bool initFromFile(FileReader *);
 	virtual bool initFromFile(SingleLineDelimTextFileReader *);
 	virtual void print(string &outBuf) const;

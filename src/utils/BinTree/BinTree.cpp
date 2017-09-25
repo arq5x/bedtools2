@@ -94,7 +94,7 @@ void BinTree::getHits(Record *record, RecordKeyVector &hitSet)
                                       )
                     )
                 {
-            		hitSet.push_back(dbRec);
+            		hitSet.push_back(new Record(*dbRec));
             	}
             }
         }
@@ -118,7 +118,9 @@ bool BinTree::addRecordToTree(Record *record)
 		fprintf(stderr, "ERROR: Received illegal bin number %u from getBin call.\n", binNum);
 		return false;
 	}
-	_mainMap[chr][binNum].push_back(record);
+
+    printf("binrec=%d\n",endPos);
+	_mainMap[chr][binNum].push_back(*record);
 	return true;
 }
 

@@ -26,10 +26,13 @@ public:
 
 	friend class FreeList<Record>;
 
+	Record();
+	Record(int fileIdx, int chrId, int start, int end);
+	virtual Record ( const Record & );
 	virtual ~Record(); //by making the destructor protected, only the friend class(es) can actually delete Record objects, or objects derived from Record.
 
 	typedef enum { FORWARD, REVERSE, UNKNOWN } strandType;
-	Record();
+
 	virtual bool initFromFile(FileReader *) =0;
 	virtual void clear();
 	virtual void print(string &) const {}

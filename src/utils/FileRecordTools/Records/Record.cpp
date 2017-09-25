@@ -14,6 +14,19 @@ Record::Record()
   _frm(NULL)
 {}
 
+Record::Record(int fileIdx, int chrId, int start, int end)
+: _fileIdx(fileIdx),
+  _chrId(chrId),
+  _startPos(start),
+  _endPos(end),
+  _strandVal(UNKNOWN),
+  _zeroLength(false),
+  _isUnmapped(false),
+  _isMateUnmapped(false),
+  _isValidHit(true),
+  _frm(NULL)
+{}
+
 Record::~Record()
 {
 	//_frm->deleteRecord(this);

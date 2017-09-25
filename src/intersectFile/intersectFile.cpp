@@ -51,29 +51,37 @@ bool IntersectFile::init() {
 
 bool IntersectFile::findNext(RecordKeyVector &hits)
 {
-	 bool retVal = false;
-	 if (upCast(_context)->getSortedInput()) {
-		retVal = nextSortedFind(hits);
-	 } 
-	 else {
-		retVal = nextUnsortedFind(hits);
-	 }
 
-	 if (retVal) {
-		 checkSplits(hits);
-	 }
-	 return retVal;
+	cout << "finding hits\n"; 
+	bool retVal = false;
+
+	if (upCast(_context)->getSortedInput()) {
+		retVal = nextSortedFind(hits);
+	} 
+	else {
+		retVal = nextUnsortedFind(hits);	
+	}
+	cout << "hits.size" << hits.size() << endl;
+	cout << "retVal=" << retVal << endl;
+	if (retVal) {
+		checkSplits(hits);
+	}
+	return retVal;
 }
 
 void IntersectFile::processHits(RecordOutputMgr *outputMgr, RecordKeyVector &hits)
 {
-	RecordKeyVector::iterator_type hitListIter = hits.begin();
+	//RecordKeyVector::iterator_type hitListIter = hits.begin();
 	outputMgr->printRecord(hits);
 }
 
 void IntersectFile::cleanupHits(RecordKeyVector &hits)
 {
 	_queryFRM->deleteRecord(hits.getKey());
+	// for (RecordKeyVector::iterator_type it = hits.begin() ; it != hits.end(); ++it)
+ // 	{
+ // 		delete(*it);
+ // 	}
 	hits.clearAll();
 }
 
@@ -105,12 +113,15 @@ bool IntersectFile::nextUnsortedFind(RecordKeyVector &hits)
 		if (queryRecord == NULL) {
 			continue;
 		} else {
+			cout << queryRecord->getChrName() << " " << queryRecord->getStartPos() << endl;
 			_context->testNameConventions(queryRecord);
 			hits.setKey(queryRecord);
 			 _binTree->getHits(queryRecord, hits);
+			 cout << "s=" << hits.size() << endl;
 			return true;
 		}
 	}
+
 	return false;
 }
 

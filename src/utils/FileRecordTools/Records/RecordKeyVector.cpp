@@ -98,10 +98,13 @@ void RecordKeyVector::setVector(vecType *vec) {
 
 void RecordKeyVector::clearVector() {
 	_currPos = 0;
-	//for (vecType::iterator it = _recVec->begin() ; it != _recVec->end(); ++it)
-    //{
-    //	delete *it;
-    //}
+	// for (vecType::iterator it = _recVec->begin() ; it != _recVec->end(); ++it)
+ //    {
+ //    	const Record *h = *it;
+ //    	cout << h->getEndPos() << endl;
+ //    	    	delete *it;
+
+ //    }
 	_recVec->clear();
 }
 

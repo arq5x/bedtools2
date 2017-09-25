@@ -42,6 +42,7 @@ void BlockMgr::getBlocks(RecordKeyVector &keyList, bool &mustDelete)
 		break;
 
 	default:
+		cout << ":(\n";
 		keyList.push_back(keyList.getKey());
 		mustDelete = false;
 		break;
@@ -53,6 +54,7 @@ void BlockMgr::getBlocksFromBed12(RecordKeyVector &keyList, bool &mustDelete)
 	const Bed12Interval *keyRecord = static_cast<const Bed12Interval *>(keyList.getKey());
 	int blockCount = keyRecord->getBlockCount();
 
+	cout << "blockCount =" << blockCount << endl;
     if ( blockCount <= 0 ) {
     	mustDelete = false;
     	return;
@@ -60,6 +62,8 @@ void BlockMgr::getBlocksFromBed12(RecordKeyVector &keyList, bool &mustDelete)
 
     int sizeCount = _blockSizeTokens.tokenize(keyRecord->getBlockSizes(), ',');
     int startCount = _blockStartTokens.tokenize(keyRecord->getBlockStarts(), ',');
+
+    cout << "sizeCount =" << sizeCount << endl;
 
     if (blockCount != sizeCount || sizeCount != startCount) {
     	fprintf(stderr, "Error: found wrong block counts while splitting entry.\n");
@@ -70,7 +74,7 @@ void BlockMgr::getBlocksFromBed12(RecordKeyVector &keyList, bool &mustDelete)
     	int startPos = keyRecord->getStartPos() + str2chrPos(_blockStartTokens.getElem(i).c_str());
     	int endPos = startPos + str2chrPos(_blockSizeTokens.getElem(i).c_str());
 
-    	Record *record = allocateAndAssignRecord(keyRecord, startPos, endPos);
+    	Bed3Interval *record = new Bed3Interval();
     	keyList.push_back(record);
     }
     mustDelete = true;
@@ -141,7 +145,8 @@ int BlockMgr::getTotalBlockLength(RecordKeyVector &keyList) {
 void BlockMgr::deleteBlocks(RecordKeyVector &keyList)
 {
 	for (RecordKeyVector::iterator_type iter = keyList.begin(); iter != keyList.end(); iter = keyList.next()) {
-		_blockRecordsMgr->deleteRecord(*iter);
+		//_blockRecordsMgr->deleteRecord(*iter);
+		delete *iter;
 	}
 	keyList.clearVector();
 }
@@ -151,6 +156,7 @@ int BlockMgr::findBlockedOverlaps(RecordKeyVector &hitList, bool useOverlappingS
 {
 	RecordKeyVector keyList(hitList.getKey());
 	bool deleteKeyBlocks = true;
+	cout << "getting key blocks ";
 	getBlocks(keyList, deleteKeyBlocks);
 	
 	_overlapBases.clear();
@@ -162,6 +168,7 @@ int BlockMgr::findBlockedOverlaps(RecordKeyVector &hitList, bool useOverlappingS
 	{
 		RecordKeyVector hitBlocks(*hitListIter);
 		bool deleteHitBlocks = false;
+		cout << "getting hit blocks ";
 		getBlocks(hitBlocks, deleteHitBlocks); //get all blocks for the hit record.
 		int hitBlockSumLength = getTotalBlockLength(hitBlocks); //get total length of the bocks for the hitRecord.
 		int totalHitOverlap = 0;
@@ -192,6 +199,7 @@ int BlockMgr::findBlockedOverlaps(RecordKeyVector &hitList, bool useOverlappingS
 				}
 			}
 		}
+		cout << "---\n";
 		if (hitHasOverlap && useOverlappingSubBlocks == false) 
 		{
 			bool enoughKeyOverlap = (float) totalHitOverlap / (float) keyBlocksSumLength >= _overlapFraction;
