@@ -62,6 +62,7 @@ public:
 	bool isGzipped() const { return _isGzipped; }
 
 	void setBam(); //call only if you're SURE the file is BAM!
+	void setIsGroupBy(bool val) { _isGroupBy = val; } // When using groupBy,
 
 
 	bool isText() const { return _isText; }
@@ -110,6 +111,7 @@ private:
 	bool _insufficientData; //set to true if scan buffer had only header lines.
 	bool _fourthFieldNumeric; //this is just to distinguish between Bed4 and BedGraph files.
 	bool _givenEmptyBuffer;
+	bool _isGroupBy;
 
 	map<RECORD_TYPE, string> _recordTypeNames;
 	map<FILE_TYPE, string> _fileTypeNames;

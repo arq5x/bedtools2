@@ -50,6 +50,9 @@ bool FileRecordMgr::open(bool inheader){
 		exit(1);
 	}
 
+	if (_isGroupBy) {
+		_bufStreamMgr->getTypeChecker().setIsGroupBy(true);
+	}
 	_fileType = _bufStreamMgr->getTypeChecker().getFileType();
 	_recordType = _bufStreamMgr->getTypeChecker().getRecordType();
 
