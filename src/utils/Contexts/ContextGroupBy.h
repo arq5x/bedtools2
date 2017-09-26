@@ -29,6 +29,7 @@ protected:
 	bool _ignoreCase;
 
 	bool handle_g();
+	bool handle_inheader();
 	bool handle_outheader();
 	bool handle_header();
 	bool handle_full();
