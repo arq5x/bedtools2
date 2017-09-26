@@ -343,7 +343,7 @@ bool ContextBase::openFiles() {
 			return false;
 		}
 		if (_noEnforceCoordSort) {
-			frm->setNoEnforceCoodSort(true);
+			frm->setNoEnforceCoordSort(true);
 		}
 		_files[i] = frm;
 	}
