@@ -175,7 +175,6 @@ chr3	20	30	3
 chr3	120	130	4" > exp
 $BT groupby -i values3.unmarked_header.bed.2 -c 5 -o distinct > obs
 check obs exp
-exit
 rm obs exp
 
 ###########################################################
@@ -291,20 +290,6 @@ echo \
 120	130	chr3	8" > exp
 $BT groupby -g 3-4,2 -i noPosvalues.header.bed -c 6 > obs
 check obs exp
-rm obs exp
-
-###########################################################
-#  Test that only the groupBy tool may use 
-# non-positional records
-###########################################################
-echo -e "    groupby.t15...\c"
-echo "ERROR: file noPosvalues.header.bed has non positional records, which are only valid for " >> exp
-echo " the groupBy tool. Perhaps you are using a header line(s) that starts with " >> exp
-echo " something other than \"#\", \"chrom\", or \"chr\" (any case)?" >> exp
-echo >> exp
-$BT merge  -i noPosvalues.header.bed 2>&1 | head -n 4 > obs
-check obs exp
-exit
 rm obs exp
 
 ###########################################################
