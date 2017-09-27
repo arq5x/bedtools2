@@ -25,7 +25,7 @@ FileRecordTypeChecker::FileRecordTypeChecker()
 	_insufficientData = false;
 	_fourthFieldNumeric = false;
 	_givenEmptyBuffer = false;
-
+	_isGroupBy = false;
 	// TO DO: Bed4, Bed5, and BedGraph are missing from all of these.
 
 	_hasName[UNKNOWN_RECORD_TYPE] = false;
@@ -177,6 +177,10 @@ bool FileRecordTypeChecker::handleTextFormat(const char *buffer, size_t len)
 		//At this point, _isText and _isDelimited are set. _numFields and _delimChar are
 		//set.
 		_fileType = SINGLE_LINE_DELIM_TEXT_FILE_TYPE;
+		if (_isGroupBy) {
+			_recordType = NO_POS_PLUS_RECORD_TYPE;
+			return true;
+		}
 
 		//Tokenize the first line of valid data into fields.
 		//Need to make a copy so next call to tokenizer doesn't overwrite the line.

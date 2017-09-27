@@ -33,10 +33,6 @@ public:
 	typedef enum { USE_NOW, IGNORE } lastElemCode;
 	void setKeepFinalIncompleteElem(lastElemCode code);
 
-	//final number of valid elems may be less than total number of elems,
-	//because elems are not necessarily deleted between subsequent calls
-	//to tokenizer.
-	int getNumValidElems() const { return _numValidElems; }
 	int getNumTotalElems() const { return (int)_elems.size(); }
 	const string getElem(int i) const { return (_elems[i]); }
 	int getNumFields(const string &str, char delimiter);
@@ -48,7 +44,6 @@ private:
 	vector<string> _elems;
 	int _numExpectedElems;
 	lastElemCode _keepFinalIncElem;
-	int _numValidElems;
 
 	string fetchElem(int idx);
 	void resize(int newSize);

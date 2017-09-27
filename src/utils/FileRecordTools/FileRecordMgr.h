@@ -104,7 +104,7 @@ public:
 
 	void setIsSorted(bool val) { _isSortedInput = val; }
 	void setIoBufSize(int val) { _ioBufSize = val; }
-	void setNoEnforceCoodSort(bool val) { _noEnforceCoordSort = val; }
+	void setNoEnforceCoordSort(bool val) { _noEnforceCoordSort = val; }
 	void setIsGroupBy(bool val) { _isGroupBy = val; }
 
 protected:

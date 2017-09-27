@@ -27,7 +27,7 @@ bool GroupBy::init()
 {
 	Tokenizer groupColsTokens;
 	groupColsTokens.tokenize(upCast(_context)->getGroupCols(), ',');
-	int numElems = groupColsTokens.getNumValidElems();
+	int numElems = groupColsTokens.getNumTotalElems();
 	for (int i=0; i < numElems; i++) {
 		//if the item is a range, such as 3-5,
 		//must split that as well.

@@ -340,4 +340,15 @@ echo \
 cut -f 1 test.bed | $BT groupby -g 1 -i - -c 1 -o collapse > obs
 check obs exp
 rm obs exp
+
+###########################################################
+#  Test fix for bug 569
+###########################################################
+echo "    groupby.t19...\c"
+echo \
+"AAAACAATTGGTATTCTTGGAGG	3009041	3009064" > exp
+$BT groupby -i bug569_problem.txt -g 1 -c 3,4 -o distinct,min > obs
+check obs exp
+rm obs exp
+
 [[ $FAILURES -eq 0 ]] || exit 1;
