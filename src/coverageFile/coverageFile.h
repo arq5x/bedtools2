@@ -15,7 +15,7 @@
 class CoverageFile : public IntersectFile {
 public:
 	CoverageFile(ContextCoverage *);
-	~CoverageFile();
+	virtual ~CoverageFile();
 	virtual void processHits(RecordOutputMgr *outputMgr, RecordKeyVector &hits);
 	virtual void cleanupHits(RecordKeyVector &hits);
 	virtual void  giveFinalReport(RecordOutputMgr *outputMgr);
@@ -49,6 +49,8 @@ protected:
 	void doMean(RecordOutputMgr *outputMgr, RecordKeyVector &hits);
 	void doHist(RecordOutputMgr *outputMgr, RecordKeyVector &hits);
 	void doDefault(RecordOutputMgr *outputMgr, RecordKeyVector &hits);
+
+	virtual void checkSplits(RecordKeyVector &hitSet);
 };
 
 
