@@ -197,6 +197,7 @@ bool FileRecordTypeChecker::handleTextFormat(const char *buffer, size_t len)
 		_tokenizer.tokenize(line, _delimChar);
 		if (_tokenizer.getNumFields(line, _delimChar) != _numFields) {
 			cerr << "Error: Type checker found wrong number of fields while tokenizing data line." << endl;
+			cerr << "Perhaps you have extra TAB at the end of your line? Check with \"cat -t\""<< endl;
 			exit(1);
 		}
 

@@ -311,6 +311,18 @@ $BT intersect -a a.bed.gz -b b.bed -g hg19.fa.fai > obs
 echo "chr1	75	100" > exp
 check obs exp
 
+# allow header lines to start with chrom or track
+echo -e "    general.t45...\c"
+echo "chr1	15	20" > exp
+$BT intersect -a a.trackheader.bed -b a.chromheader.bed > obs
+check obs exp
+
+# allow header lines to start with chrom or track
+echo -e "    general.t46...\c"
+echo "track
+chr1	15	20" > exp
+$BT intersect -a a.trackheader.bed -b a.chromheader.bed -header > obs
+check obs exp
 
 
 rm a.bed.gz b.bed.gz c.bed.gz a.bed b.bed c.bed genome.txt exp obs
