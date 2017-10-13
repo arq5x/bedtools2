@@ -6,9 +6,9 @@ FAILURES=0;
 check()
 {
 	if diff $1 $2; then
-    	echo ok
+		echo ok
 	else
-    	FAILURES=$(expr $FAILURES + 1);
+		FAILURES=$(expr $FAILURES + 1);
 		echo fail
 	fi
 }
@@ -18,8 +18,8 @@ check()
 
 failedtofail()
 {
-    FAILURES=$(expr $FAILURES + 1);
-    echo "Expected non-zero exit status but didn't get one";
+	FAILURES=$(expr $FAILURES + 1);
+	echo "Expected non-zero exit status but didn't get one";
 }
 
 ###########################################################
@@ -29,7 +29,7 @@ echo -e "    general.t01...\c"
 echo \
 "chr1	1	10
 chr1	-1	10" | $BT merge -i - 2> obs \
-    && failedtofail || true;
+	&& failedtofail || true;
 echo "Error: Invalid record in file -. Record is 
 chr1	-1	10" > exp
 check obs exp
@@ -42,7 +42,7 @@ echo -e "    general.t02...\c"
 echo \
 "chr1	1	2
 chr1	10	5" | $BT merge -i - 2> obs \
-    && failedtofail || true;
+	&& failedtofail || true;
 echo "Error: Invalid record in file -. Record is 
 chr1	10	5" > exp
 check obs exp
@@ -57,10 +57,9 @@ echo " the groupBy tool. Perhaps you are using a header line(s) that starts with
 echo " something other than \"#\", \"chrom\", or \"chr\" (any case)?" >> exp
 
 echo "chr1	.	2" | $BT merge -i - 2> o \
-    && failedtofail || true;
+	&& failedtofail || true;
 tail -n 3 o > obs
 check obs exp
-exit
 rm obs exp
 
 
@@ -71,7 +70,7 @@ rm obs exp
 echo -e "    general.t05...\c"
 echo \
 "chr1 1 2" | $BT merge -i - 2> obs \
-    && failedtofail || true;
+	&& failedtofail || true;
 echo "ERROR: file - has non positional records, which are only valid for " >> exp
 echo " the groupBy tool. Perhaps you are using a header line(s) that starts with " >> exp
 echo " something other than \"#\", \"chrom\", or \"chr\" (any case)?" >> exp
@@ -85,7 +84,7 @@ rm obs exp
 ###########################################################
 echo -e "    general.t06...\c"
 $BT merge -i idontexist.bed 2> obs \
-    && failedtofail || true;
+	&& failedtofail || true;
 echo "Error: Unable to open file idontexist.bed. Exiting." > exp
 check obs exp
 rm obs exp
@@ -306,6 +305,12 @@ chr14	24710000	24720000	blarg	0	.
 chr11	111230000	111240000	blarg	0	." > exp
 $BT intersect -a t.bed -b t.bed -header > obs
 check obs exp
+
+echo -e "    general.t44...\c"
+$BT intersect -a a.bed.gz -b b.bed -g hg19.fa.fai > obs
+echo "chr1	75	100" > exp
+check obs exp
+
 
 
 rm a.bed.gz b.bed.gz c.bed.gz a.bed b.bed c.bed genome.txt exp obs
