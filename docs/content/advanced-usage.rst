@@ -11,9 +11,12 @@ Step 1. Add 500 bp up and downstream of each probe
 
 .. code-block:: bash
 
-  bedtools slop -i probes.bed -b 500 > probes.500bp.bed
+  bedtools slop -i probes.bed -g hg18.genome -b 500 > probes.500bp.bed
   
+NB genome is two column chromosome size list - i.e. https://genome.ucsc.edu/goldenpath/help/hg18.chrom.sizes
+
 Step 2. Get a BED file of all regions not covered by the probes (+500 bp up/down)
+
 
 .. code-block:: bash
 
@@ -24,8 +27,9 @@ Step 3. Create a masked genome where all bases are masked except for the probes 
 
 .. code-block:: bash
 
-  bedtools maskfasta -in hg18.fa -bed probes.500bp.complement.bed -fo \
-  > hg18.probecomplement.masked.fa
+  bedtools maskfasta -fi hg18.fa -bed probes.500bp.complement.bed \
+  -fo hg18.probecomplement.masked.fa
+
 
 
 ==========================================================================

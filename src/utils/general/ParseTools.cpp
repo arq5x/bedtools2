@@ -161,10 +161,10 @@ bool isHeaderLine(const string &line) {
 		return true;
 	}
 	//UCSC file headers can also start with the words "browser" or "track", followed by a whitespace character.
-	if (memcmp(tmp.c_str(), "browser", 7) == 0 && isspace(tmp[7])) {
+	if (memcmp(tmp.c_str(), "browser", 7) == 0) {
 		return true;
 	}
-	if (memcmp(tmp.c_str(), "track", 5) == 0 && isspace(tmp[5])) {
+	if (memcmp(tmp.c_str(), "track", 5) == 0) {
 		return true;
 	}
 	if (memcmp(tmp.c_str(), "visibility", 10) == 0) {
