@@ -69,5 +69,6 @@ bool ContextSubtract::handle_A() {
 bool ContextSubtract::handle_N() {
 	_removeSum = true;
 	markUsed(_i - _skipFirstArgs);
-	return true;
+    setHaveFractionA(true);
+    return true;
 }

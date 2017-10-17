@@ -8,6 +8,14 @@ SubtractFile::SubtractFile(ContextSubtract *context)
   _dontReport(false)
 {
 	_tmpBlocksMgr = new BlockMgr(upCast(_context)->getOverlapFractionA(), upCast(_context)->getReciprocalFraction());
+	
+	// if using -N, we need to set -f to 1E-9 to collect all
+	// overlaps, then use what was set as -f for the minimum
+	// coverage of A that must be achieved to remove it.
+	if (upCast(_context)->getRemoveSum()) {
+		upCast(_context)->setSubtractFraction(upCast(_context)->getOverlapFractionA());
+    	upCast(_context)->setOverlapFractionA(1E-9);
+    }
 }
 
 SubtractFile::~SubtractFile() {
