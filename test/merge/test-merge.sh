@@ -121,17 +121,35 @@ rm obs exp
 # stranded merge, show sign, collapsed names, sum of
 # scores, and count
 ###########################################################
-echo -e "    merge.t9...\c"
+echo -e "    merge.t9a...\c"
 echo \
-"chr1	10	20	+	a1	1	1
-chr1	30	40	+	a2	2	1
-chr1	40	50	-	a3	3	1
-chr1	45	100	+	a4	4	1
-chr2	10	20	+	a1	5	1
-chr2	30	40	+	a2	6	1
-chr2	42	50	+	a3	7	1
-chr2	45	100	-	a4	8	1" > exp
+"chr1	10	20	a1	1	1
+chr1	30	40	a2	2	1
+chr1	40	50	a3	3	1
+chr1	45	100	a4	4	1
+chr2	10	20	a1	5	1
+chr2	30	40	a2	6	1
+chr2	42	50	a3	7	1
+chr2	45	100	a4	8	1" > exp
 $BT merge -i a.full.bed -s -c 4,5,6 -o collapse,sum,count > obs
+check obs exp
+rm obs exp
+
+###########################################################
+# stranded merge, show sign, collapsed names, sum of
+# scores, and count
+###########################################################
+echo -e "    merge.t9b...\c"
+echo \
+"chr1	10	20	a1	1	+
+chr1	30	40	a2	2	+
+chr1	40	50	a3	3	-
+chr1	45	100	a4	4	+
+chr2	10	20	a1	5	+
+chr2	30	40	a2	6	+
+chr2	42	50	a3	7	+
+chr2	45	100	a4	8	-" > exp
+$BT merge -i a.full.bed -s -c 4,5,6 -o collapse,sum,collapse > obs
 check obs exp
 rm obs exp
 
@@ -205,10 +223,10 @@ rm obs exp
 ###########################################################
 echo -e "    merge.t15...\c"
 echo \
-"chr1	10	80	+
-chr1	20	90	-
-chr2	20	60	+
-chr2	25	80	-" > exp
+"chr1	10	80
+chr1	20	90
+chr2	20	60
+chr2	25	80" > exp
 $BT merge -i mixedStrands.bed -s  > obs
 check exp obs
 rm obs exp
@@ -219,8 +237,8 @@ rm obs exp
 ###########################################################
 echo -e "    merge.t16...\c"
 echo \
-"chr1	10	80	+
-chr2	20	60	+" > exp
+"chr1	10	80
+chr2	20	60" > exp
 $BT merge -i mixedStrands.bed -S + > obs
 check exp obs
 rm obs exp
@@ -231,8 +249,8 @@ rm obs exp
 ###########################################################
 echo -e "    merge.t17...\c"
 echo \
-"chr1	20	90	-
-chr2	25	80	-" > exp
+"chr1	20	90
+chr2	25	80" > exp
 $BT merge -i mixedStrands.bed -S - > obs
 check exp obs
 rm obs exp
@@ -605,7 +623,7 @@ rm obs exp
 ###########################################################
 echo -e "    merge.t48...\c"
 echo \
-"chr1	10000	25000	-" > exp
+"chr1	10000	25000" > exp
 $BT merge -i bug254_d.bed -s -d 200 > obs
 check exp obs
 rm obs exp
@@ -615,8 +633,8 @@ rm obs exp
 ###########################################################
 echo -e "    merge.t49...\c"
 echo \
-"chr1	10000	20000	-
-chr1	20100	25000	+" > exp
+"chr1	10000	20000
+chr1	20100	25000" > exp
 $BT merge -i bug254_e.bed -s -d 200 > obs
 check exp obs
 rm obs exp
