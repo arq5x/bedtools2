@@ -336,4 +336,13 @@ $BT groupby -i bug569_problem.txt -g 1 -c 3,4 -o distinct,min > obs
 check obs exp
 rm obs exp
 
+###########################################################
+#  Test fix for bug 569
+###########################################################
+echo "    groupby.t20...\c"
+echo "a	1253555555355577777777	7.777788889e+15" > exp
+echo "a	1253555555355577777777	7777788888899999" | $BT groupby -i - -g 1 -c 2,3 -o distinct,min > obs
+check obs exp
+rm obs exp
+
 [[ $FAILURES -eq 0 ]] || exit 1;

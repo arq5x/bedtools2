@@ -43,15 +43,16 @@ bool FileRecordMgr::open(bool inheader){
 	_bufStreamMgr->getTypeChecker().setInHeader(inheader);
 
 	if (_ioBufSize > 0) _bufStreamMgr->setIoBufSize(_ioBufSize);
+	
+	if (_isGroupBy) {
+		_bufStreamMgr->getTypeChecker().setIsGroupBy(true);
+	}
+	
 	if (!_bufStreamMgr->init()) {
 		cerr << "Error: unable to open file or unable to determine types for file " << _filename << endl;
 		delete _bufStreamMgr;
 		_bufStreamMgr = NULL;
 		exit(1);
-	}
-
-	if (_isGroupBy) {
-		_bufStreamMgr->getTypeChecker().setIsGroupBy(true);
 	}
 	_fileType = _bufStreamMgr->getTypeChecker().getFileType();
 	_recordType = _bufStreamMgr->getTypeChecker().getRecordType();
