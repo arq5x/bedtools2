@@ -754,7 +754,8 @@ rm obs
 ############################################################
 echo -e "    intersect.new.t63...\c"
 echo \
-"Error: Type checker found wrong number of fields while tokenizing data line."   >exp
+"Error: Type checker found wrong number of fields while tokenizing data line.
+Perhaps you have extra TAB at the end of your line? Check with \"cat -t\""   >exp
 $BT intersect -a dosLineChar_a.bed -b dosLineCharWithExtraTab_b.bed -v 2>&1 > /dev/null | cat - > obs
 check exp obs
 rm exp obs
