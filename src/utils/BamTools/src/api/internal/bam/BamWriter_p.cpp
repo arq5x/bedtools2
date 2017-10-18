@@ -234,6 +234,8 @@ void BamWriterPrivate::WriteAlignment(const BamAlignment& al) {
                                        queryLength +
                                        tagDataLength;
     unsigned int blockSize = Constants::BAM_CORE_SIZE + dataBlockSize;
+    if (numCigarOperations >= 65536)
+        blockSize += 12;
     if ( m_isBigEndian ) BamTools::SwapEndian_32(blockSize);
     m_stream.Write((char*)&blockSize, Constants::BAM_SIZEOF_INT);
 
@@ -242,7 +244,7 @@ void BamWriterPrivate::WriteAlignment(const BamAlignment& al) {
     buffer[0] = al.RefID;
     buffer[1] = al.Position;
     buffer[2] = (alignmentBin << 16) | (al.MapQuality << 8) | nameLength;
-    buffer[3] = (al.AlignmentFlag << 16) | numCigarOperations;
+    buffer[3] = (al.AlignmentFlag << 16) | (numCigarOperations < 65536? numCigarOperations : 1);
     buffer[4] = queryLength;
     buffer[5] = al.MateRefID;
     buffer[6] = al.MatePosition;
@@ -261,18 +263,24 @@ void BamWriterPrivate::WriteAlignment(const BamAlignment& al) {
     m_stream.Write(al.Name.c_str(), nameLength);
 
     // write the packed cigar
-    if ( m_isBigEndian ) {
-        char* cigarData = new char[packedCigarLength]();
-        memcpy(cigarData, packedCigar.data(), packedCigarLength);
+    if (numCigarOperations < 65536) {
         if ( m_isBigEndian ) {
-            for ( size_t i = 0; i < packedCigarLength; ++i )
-                BamTools::SwapEndian_32p(&cigarData[i]);
+            char* cigarData = new char[packedCigarLength]();
+            memcpy(cigarData, packedCigar.data(), packedCigarLength);
+            if ( m_isBigEndian ) {
+                for ( size_t i = 0; i < packedCigarLength; ++i ) // FIXME (lh3): is this a bug? It should be "i += 4", not "++i".
+                    BamTools::SwapEndian_32p(&cigarData[i]);
+            }
+            m_stream.Write(cigarData, packedCigarLength);
+            delete[] cigarData; // TODO: cleanup on Write exception thrown?
         }
-        m_stream.Write(cigarData, packedCigarLength);
-        delete[] cigarData; // TODO: cleanup on Write exception thrown?
+        else
+            m_stream.Write(packedCigar.data(), packedCigarLength);
+    } else {
+        unsigned int cigar1 = queryLength << 4 | 4;
+        if (m_isBigEndian) BamTools::SwapEndian_32(cigar1);
+        m_stream.Write((char*)&cigar1, 4);
     }
-    else
-        m_stream.Write(packedCigar.data(), packedCigarLength);
 
     // write the encoded query sequence
     m_stream.Write(encodedQuery.data(), encodedQueryLength);
@@ -380,12 +388,36 @@ void BamWriterPrivate::WriteAlignment(const BamAlignment& al) {
     }
     else
         m_stream.Write(al.TagData.data(), tagDataLength);
+
+    if (numCigarOperations >= 65536) {
+        m_stream.Write("CGBI", 4);
+        if ( m_isBigEndian ) {
+            unsigned int cigar_len_buf = numCigarOperations;
+            BamTools::SwapEndian_32(cigar_len_buf);
+            m_stream.Write((char*)&cigar_len_buf, 4);
+
+            char* cigarData = new char[packedCigarLength]();
+            memcpy(cigarData, packedCigar.data(), packedCigarLength);
+            if ( m_isBigEndian ) {
+                for ( size_t i = 0; i < packedCigarLength; ++i ) // FIXME: similarly, this should be "i += 4", not "++i"
+                    BamTools::SwapEndian_32p(&cigarData[i]);
+            }
+            m_stream.Write(cigarData, packedCigarLength);
+            delete[] cigarData; // TODO: cleanup on Write exception thrown?
+        }
+        else {
+            m_stream.Write((char*)&numCigarOperations, 4);
+            m_stream.Write(packedCigar.data(), packedCigarLength);
+        }
+    }
 }
 
 void BamWriterPrivate::WriteCoreAlignment(const BamAlignment& al) {
 
     // write the block size
     unsigned int blockSize = al.SupportData.BlockLength;
+    if (al.SupportData.NumCigarOperations >= 65536)
+        blockSize += 12;
     if ( m_isBigEndian ) BamTools::SwapEndian_32(blockSize);
     m_stream.Write((char*)&blockSize, Constants::BAM_SIZEOF_INT);
 
@@ -397,7 +429,7 @@ void BamWriterPrivate::WriteCoreAlignment(const BamAlignment& al) {
     buffer[0] = al.RefID;
     buffer[1] = al.Position;
     buffer[2] = (alignmentBin << 16) | (al.MapQuality << 8) | al.SupportData.QueryNameLength;
-    buffer[3] = (al.AlignmentFlag << 16) | al.SupportData.NumCigarOperations;
+    buffer[3] = (al.AlignmentFlag << 16) | (al.SupportData.NumCigarOperations < 65536? al.SupportData.NumCigarOperations : 1);
     buffer[4] = al.SupportData.QuerySequenceLength;
     buffer[5] = al.MateRefID;
     buffer[6] = al.MatePosition;
@@ -413,8 +445,29 @@ void BamWriterPrivate::WriteCoreAlignment(const BamAlignment& al) {
     m_stream.Write((char*)&buffer, Constants::BAM_CORE_SIZE);
 
     // write the raw char data
-    m_stream.Write((char*)al.SupportData.AllCharData.data(),
-                   al.SupportData.BlockLength-Constants::BAM_CORE_SIZE);
+    if (al.SupportData.NumCigarOperations < 65536) {
+        m_stream.Write((char*)al.SupportData.AllCharData.data(),
+                       al.SupportData.BlockLength-Constants::BAM_CORE_SIZE);
+    } else {
+        const char *data = al.SupportData.AllCharData.c_str();
+        const unsigned data_len = al.SupportData.BlockLength - Constants::BAM_CORE_SIZE;
+        const unsigned cigar_offset = al.SupportData.QueryNameLength;
+        const unsigned seq_offset = cigar_offset + al.SupportData.NumCigarOperations * 4;
+        unsigned fake_cigar = al.SupportData.QuerySequenceLength << 4 | 4;
+        m_stream.Write(data, al.SupportData.QueryNameLength);
+        if (m_isBigEndian) BamTools::SwapEndian_32(fake_cigar);
+        m_stream.Write((char*)&fake_cigar, 4);
+        m_stream.Write(data + seq_offset, data_len - seq_offset);
+        m_stream.Write("CGBI", 4);
+        if (m_isBigEndian) {
+            unsigned cigar_len_buf = al.SupportData.NumCigarOperations;
+            BamTools::SwapEndian_32(cigar_len_buf);
+            m_stream.Write((char*)&cigar_len_buf, 4);
+        } else {
+            m_stream.Write((char*)&al.SupportData.NumCigarOperations, 4);
+        }
+        m_stream.Write(data + cigar_offset, al.SupportData.NumCigarOperations * 4);
+    }
 }
 
 void BamWriterPrivate::WriteMagicNumber(void) {
