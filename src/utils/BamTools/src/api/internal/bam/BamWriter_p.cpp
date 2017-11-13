@@ -235,7 +235,7 @@ void BamWriterPrivate::WriteAlignment(const BamAlignment& al) {
                                        tagDataLength;
     unsigned int blockSize = Constants::BAM_CORE_SIZE + dataBlockSize;
     if (numCigarOperations >= 65536)
-        blockSize += 12;
+        blockSize += 16;
     if ( m_isBigEndian ) BamTools::SwapEndian_32(blockSize);
     m_stream.Write((char*)&blockSize, Constants::BAM_SIZEOF_INT);
 
@@ -244,7 +244,7 @@ void BamWriterPrivate::WriteAlignment(const BamAlignment& al) {
     buffer[0] = al.RefID;
     buffer[1] = al.Position;
     buffer[2] = (alignmentBin << 16) | (al.MapQuality << 8) | nameLength;
-    buffer[3] = (al.AlignmentFlag << 16) | (numCigarOperations < 65536? numCigarOperations : 1);
+    buffer[3] = (al.AlignmentFlag << 16) | (numCigarOperations < 65536? numCigarOperations : 2);
     buffer[4] = queryLength;
     buffer[5] = al.MateRefID;
     buffer[6] = al.MatePosition;
@@ -277,9 +277,14 @@ void BamWriterPrivate::WriteAlignment(const BamAlignment& al) {
         else
             m_stream.Write(packedCigar.data(), packedCigarLength);
     } else {
-        unsigned int cigar1 = queryLength << 4 | 4;
-        if (m_isBigEndian) BamTools::SwapEndian_32(cigar1);
-        m_stream.Write((char*)&cigar1, 4);
+        unsigned int cigar[2];
+        cigar[0] = queryLength << 4 | 4;
+        cigar[1] = (al.GetEndPosition() - al.Position) << 4 | 3;
+        if (m_isBigEndian) {
+            BamTools::SwapEndian_32(cigar[0]);
+            BamTools::SwapEndian_32(cigar[1]);
+        }
+        m_stream.Write((char*)cigar, 8);
     }
 
     // write the encoded query sequence
@@ -417,7 +422,7 @@ void BamWriterPrivate::WriteCoreAlignment(const BamAlignment& al) {
     // write the block size
     unsigned int blockSize = al.SupportData.BlockLength;
     if (al.SupportData.NumCigarOperations >= 65536)
-        blockSize += 12;
+        blockSize += 16;
     if ( m_isBigEndian ) BamTools::SwapEndian_32(blockSize);
     m_stream.Write((char*)&blockSize, Constants::BAM_SIZEOF_INT);
 
@@ -429,7 +434,7 @@ void BamWriterPrivate::WriteCoreAlignment(const BamAlignment& al) {
     buffer[0] = al.RefID;
     buffer[1] = al.Position;
     buffer[2] = (alignmentBin << 16) | (al.MapQuality << 8) | al.SupportData.QueryNameLength;
-    buffer[3] = (al.AlignmentFlag << 16) | (al.SupportData.NumCigarOperations < 65536? al.SupportData.NumCigarOperations : 1);
+    buffer[3] = (al.AlignmentFlag << 16) | (al.SupportData.NumCigarOperations < 65536? al.SupportData.NumCigarOperations : 2);
     buffer[4] = al.SupportData.QuerySequenceLength;
     buffer[5] = al.MateRefID;
     buffer[6] = al.MatePosition;
@@ -453,10 +458,15 @@ void BamWriterPrivate::WriteCoreAlignment(const BamAlignment& al) {
         const unsigned data_len = al.SupportData.BlockLength - Constants::BAM_CORE_SIZE;
         const unsigned cigar_offset = al.SupportData.QueryNameLength;
         const unsigned seq_offset = cigar_offset + al.SupportData.NumCigarOperations * 4;
-        unsigned fake_cigar = al.SupportData.QuerySequenceLength << 4 | 4;
+        unsigned fake_cigar[2];
+        fake_cigar[0] = al.SupportData.QuerySequenceLength << 4 | 4;
+        fake_cigar[1] = (al.GetEndPosition() - al.Position) << 4 | 3;
         m_stream.Write(data, al.SupportData.QueryNameLength);
-        if (m_isBigEndian) BamTools::SwapEndian_32(fake_cigar);
-        m_stream.Write((char*)&fake_cigar, 4);
+        if (m_isBigEndian) {
+            BamTools::SwapEndian_32(fake_cigar[0]);
+            BamTools::SwapEndian_32(fake_cigar[1]);
+        }
+        m_stream.Write((char*)&fake_cigar, 8);
         m_stream.Write(data + seq_offset, data_len - seq_offset);
         m_stream.Write("CGBI", 4);
         if (m_isBigEndian) {

@@ -266,7 +266,7 @@ static inline int hts_reg2bin(int64_t beg, int64_t end, int min_shift, int n_lvl
 
 bool BamReaderPrivate::Tag2Cigar(BamAlignment &a, RaiiBuffer &buf)
 {
-    if (a.RefID < 0 || a.Position < 0 || a.SupportData.NumCigarOperations != 1) return false;
+    if (a.RefID < 0 || a.Position < 0 || a.SupportData.NumCigarOperations == 0) return false;
 
     const unsigned char *data = (const unsigned char*)buf.Buffer;
     const unsigned data_len = a.SupportData.BlockLength - Constants::BAM_CORE_SIZE;
@@ -295,8 +295,9 @@ bool BamReaderPrivate::Tag2Cigar(BamAlignment &a, RaiiBuffer &buf)
     a.Bin = hts_reg2bin(a.Position, alignment_end, 14, 5);
 
     // populate new AllCharData
+    int fake_bytes = a.SupportData.NumCigarOperations * 4;
     std::string new_data;
-    new_data.reserve(data_len - 12 + 1);
+    new_data.reserve(data_len - 8 - fake_bytes + 1);
     new_data.append((char*)data, a.SupportData.QueryNameLength); // query name
     new_data.append((char*)data + tag_cigar_offset, tag_cigar_len * 4); // real CIGAR
     new_data.append((char*)data + seq_offset, tag_cigar_offset - 8 - seq_offset); // seq, qual and tags before CG
@@ -306,8 +307,8 @@ bool BamReaderPrivate::Tag2Cigar(BamAlignment &a, RaiiBuffer &buf)
 
     // update member variables
     a.SupportData.NumCigarOperations = tag_cigar_len;
-    a.SupportData.BlockLength -= 12;
-    memcpy(buf.Buffer, new_data.c_str(), buf.NumBytes - 12);
+    a.SupportData.BlockLength -= 8 + fake_bytes;
+    memcpy(buf.Buffer, new_data.c_str(), buf.NumBytes - 8 - fake_bytes);
     return true;
 }
 
@@ -361,8 +362,8 @@ bool BamReaderPrivate::LoadNextAlignment(BamAlignment& alignment) {
 
     if ( m_stream.Read(allCharData.Buffer, dataLength) == dataLength ) {
 
-        if (Tag2Cigar(alignment, allCharData))
-            dataLength -= 12;
+        int OldNumCigarOperations = alignment.SupportData.NumCigarOperations;
+        if (Tag2Cigar(alignment, allCharData)) dataLength -= 8 + OldNumCigarOperations * 4;
 
         // store 'allCharData' in supportData structure
         alignment.SupportData.AllCharData.assign((const char*)allCharData.Buffer, dataLength);
