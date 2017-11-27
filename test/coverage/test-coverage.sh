@@ -479,6 +479,7 @@ chr2	150	200	4	25	+	4	50	50	1.0000000
 chr2	180	230	2	25	-	2	50	50	1.0000000" > exp
 $BT coverage -a a.bed -b b.bed -S > obs
 check exp obs
+echo -e "    coverage.t8b...\c"
 $BT coverage -a a.bed -b b.bed -S -sorted > obs
 check exp obs
 rm exp obs
@@ -720,5 +721,14 @@ $BT coverage -a x.bed -b y.bed -hist -sorted > obs
 check exp obs
 rm exp obs
 
+################################################################
+# Test that simple chr	0	100 works
+################################################################
+echo -e "    coverage.t20...\c"
+echo \
+"chr	0	100	1	100	100	1.0000000" > exp
+$BT coverage -a chr_0-100.bed -b chr_0-100.bed > obs
+check exp obs
+rm exp obs
 
 [[ $FAILURES -eq 0 ]] || exit 1;
