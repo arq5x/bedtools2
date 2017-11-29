@@ -70,7 +70,7 @@ void BedShift::AddShift(BED &bed) {
 
   if ((bed.end + shift) <= 0)
     bed.end = 1;
-  else if ((bed.start + shift) > chromSize)
+  else if ((bed.end + shift) > chromSize)
     bed.end = chromSize;
   else
     bed.end = bed.end + shift;
