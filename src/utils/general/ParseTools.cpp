@@ -153,11 +153,11 @@ bool isHeaderLine(const string &line) {
 	string tmp = line;
 	transform(tmp.begin(), tmp.end(), tmp.begin(), ::tolower);
 	//allow chr chrom to start a header line
-	if (memcmp(tmp.c_str(), "chrom", 5) == 0 && isspace(tmp[5])) {
+	if (memcmp(tmp.c_str(), "chrom", 5) == 0 && isspace(tmp[5]) && ! isdigit(tmp[6])) {
 		return true;
 	}
 	//allow chr chrom to start a header line
-	if (memcmp(tmp.c_str(), "chr", 3) == 0 && isspace(tmp[3])) {
+	if (memcmp(tmp.c_str(), "chr", 3) == 0 && isspace(tmp[3]) && ! isdigit(tmp[4])) {
 		return true;
 	}
 	//UCSC file headers can also start with the words "browser" or "track", followed by a whitespace character.
