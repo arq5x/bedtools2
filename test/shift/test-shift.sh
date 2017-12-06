@@ -119,9 +119,20 @@ check obs exp
 rm obs exp
 
 ###########################################################
-# test shift huge genome
+# test chrom boundaries
 ###########################################################
 echo -e "    shift.t9...\c"
+echo -e "chrom1\t10" >genome.len; 
+echo -e "chrom1\t5\t10\tcds1\t0\t+" | $BT shift -i - -g genome.len -s 2 > obs
+echo \
+"chrom1	7	10	cds1	0	+" > exp
+check obs exp
+rm obs exp
+
+###########################################################
+# test shift huge genome
+###########################################################
+echo -e "    shift.t10...\c"
 echo \
 "chr1	67000638	67217822	NM_032291	0	+
 chr1	92146899	92352836	NR_036634	0	-" > exp
