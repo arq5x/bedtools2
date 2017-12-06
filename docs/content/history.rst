@@ -2,6 +2,25 @@
 Release History
 ###############
 
+Version 2.27.0 (6-Dec-2017)
+============================
+1. Fixed a big memory leak and algorithmic flaw in the `split` option. Thanks to Neil Kindlon!
+2. Resolved compilation errors on OSX High Sierra. Many thanks to @jonchang! 
+3. Fixed a bug in the `shift` tool that caused some intervals to exceed the end of the chromosome. Thanks to @wlholtz
+4. Fixed major bug in `groupby` that prevented proper functionality.
+5. Speed improvements to the `shuffle` tool.
+6. Bug fixes to the p-value calculation in the `fisher` tool. Thanks to Brent Pedersen.
+7. Allow BED headers to start with chrom or chr
+8. Fixes to the "k-closest" functionality in the `closest` tool. Thanks to Neil Kindlon.
+9. Fixes to the output of the freqasc, freqdesc, distinct_sort_num and distinct_sort, and num_desc operations in the `groupby` tool. Thanks to @ghuls.
+10. Many minor bug fixes and compilation improvements from Luke Goodsell.
+11. Added the `-fullHeader` option to the `maskfasta` tool. Thanks to @ghuls.
+12. Many bug fixes and performance improvements from John Marshall.
+13. Fixed bug in the `-N/-f` behavior in `subtract`.
+14. Full support for .fai files as genome (`-g`) files.
+15. Many other minor bug fixes and functionality improvements.
+
+
 Version 2.26.0 (7-July-2016)
 ============================
 1. Fixed a major memory leak when using ``-sorted``. Thanks to Emily Tsang and Stephen Montgomery.

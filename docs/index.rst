@@ -26,6 +26,7 @@ Important notes
 - Unless you use the `-sorted` option, `bedtools` currently does not support chromosomes larger than 512Mb
 - When using the -sorted option with files whose chromosomes are not lexicographically sorted (e.g., sort -k1,1 -k2,2n for BED files), one must provide a genome file (`-g`) defining the expected chromosome order. 
 - `bedtools` requires that chromosome naming schemes are identical in files that you are comparing (e.g., 'chr1' in one file and '1' in another won't work).
+- .fai files may be used as genome (`-g`) files.
 
 ==========================
 Interesting Usage Examples
