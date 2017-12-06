@@ -19,6 +19,15 @@ Tutorial
 We have developed a fairly comprehensive `tutorial <http://quinlanlab.org/tutorials/bedtools/bedtools.html>`_ that demonstrates both the basics, as well as some more advanced examples of how bedtools can help you in your research. Please have a look.
 
 ==========================
+Important notes
+==========================
+- With the exception of BAM files, `bedtools` assumes all input files are TAB delimited.
+- `bedtools` also assumes that all input files use UNIX line endings.
+- Unless you use the `-sorted` option, `bedtools` currently does not support chromosomes larger than 512Mb
+- When using the -sorted option with files whose chromosomes are not lexicographically sorted (e.g., sort -k1,1 -k2,2n for BED files), one must provide a genome file (`-g`) defining the expected chromosome order. 
+
+
+==========================
 Interesting Usage Examples
 ==========================
 
