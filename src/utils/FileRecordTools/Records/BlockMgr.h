@@ -39,7 +39,8 @@ public:
 	// that overlap the query blocks.
 	//
 	// Return value is the number of hits in the result set.
-	int findBlockedOverlaps(RecordKeyVector &hitList, bool useOverlappingSubBlocks);
+	int findBlockedOverlaps(RecordKeyVector &keyList, RecordKeyVector &hitList,
+							RecordKeyVector &resultList, RecordKeyVector *overlapList = NULL);
 
 	//these are setting options for splitting BAM records
 	void setBreakOnDeletionOps(bool val) { _breakOnDeletionOps = val; }

@@ -121,16 +121,9 @@ void IntersectFile::makeSweep() {
 void IntersectFile::checkSplits(RecordKeyVector &hitSet)
 {
 	if (upCast(_context)->getObeySplits()) {
-
-		// when using coverage, we need a list of the sub-intervals of coverage
-		// so that per-base depth can be properly calculated when obeying splits
-		if (_context->getProgram() == ContextBase::COVERAGE)
-		{
-			upCast(_context)->getSplitBlockInfo()->findBlockedOverlaps(hitSet, true);
-		}
-		else
-		{
-			upCast(_context)->getSplitBlockInfo()->findBlockedOverlaps(hitSet, false);
-		}
+		RecordKeyVector keySet(hitSet.getKey());
+		RecordKeyVector resultSet(hitSet.getKey());
+		upCast(_context)->getSplitBlockInfo()->findBlockedOverlaps(keySet, hitSet, resultSet);
+		hitSet.swap(resultSet);
 	}
 }

@@ -40,7 +40,7 @@ protected:
 
 	virtual bool nextSortedFind(RecordKeyVector &hits);
 	virtual bool nextUnsortedFind(RecordKeyVector &hits);
-	void checkSplits(RecordKeyVector &hits);
+	virtual void checkSplits(RecordKeyVector &hits);
 	virtual void makeSweep();
 	virtual ContextIntersect *upCast(ContextBase *context) { return static_cast<ContextIntersect *>(context); }
 

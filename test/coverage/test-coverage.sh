@@ -508,7 +508,7 @@ rm exp obs
 ##################################################################
 echo -e "    coverage.t10...\c"
 echo \
-"chr1	0	50	1	30	50	0.6000000
+"chr1	0	50	3	30	50	0.6000000
 chr1	12	20	0	0	8	0.0000000" > exp
 $BT coverage -a c.bed -b three_blocks_match.bam -split > obs
 check exp obs

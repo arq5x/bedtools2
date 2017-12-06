@@ -62,6 +62,7 @@ void NewGenomeFile::loadGenomeFileIntoMap() {
 		chrName.clear();
 		getline(genFile, sLine);
 		int numFields = fieldTokens.tokenize(sLine.c_str());
+
 		// allow use of .fai files.
 		if (numFields < 2) {
 			continue;

@@ -146,19 +146,20 @@ void BlockMgr::deleteBlocks(RecordKeyVector &keyList)
 	keyList.clearVector();
 }
 
-
-int BlockMgr::findBlockedOverlaps(RecordKeyVector &hitList, bool useOverlappingSubBlocks)
+int BlockMgr::findBlockedOverlaps(RecordKeyVector &keyList, RecordKeyVector &hitList,
+	                              RecordKeyVector &resultList, RecordKeyVector *overlapList)
 {
-	RecordKeyVector keyList(hitList.getKey());
-	bool deleteKeyBlocks = true;
-	getBlocks(keyList, deleteKeyBlocks);
-	
+	bool deleteKeyBlocks = false;
+	if (keyList.empty()) {
+		//get all the blocks for the query record, put them in it's list.
+		getBlocks(keyList, deleteKeyBlocks);
+	}
 	_overlapBases.clear();
 	int keyBlocksSumLength = getTotalBlockLength(keyList);
 
 	//Loop through every database record the query intersected with
 	RecordKeyVector::iterator_type hitListIter = hitList.begin();
-	for (; hitListIter != hitList.end();) 
+	for (; hitListIter != hitList.end(); hitListIter = hitList.next())
 	{
 		RecordKeyVector hitBlocks(*hitListIter);
 		bool deleteHitBlocks = false;
@@ -177,69 +178,39 @@ int BlockMgr::findBlockedOverlaps(RecordKeyVector &hitList, bool useOverlappingS
 			{
 				const Record *keyBlock = *keyListIter;
 				const Record *hitBlock = *hitBlockIter;
-				int maxStart = max(keyBlock->getStartPos(), hitBlock->getStartPos());
-				int minEnd   = min(keyBlock->getEndPos(), hitBlock->getEndPos());
-				int overlap  = minEnd - maxStart;
-				if (overlap > 0) 
-				{
-					hitHasOverlap = true;
-					totalHitOverlap += overlap;
-					if (useOverlappingSubBlocks == true)
-					{
-						(*hitListIter)->block_starts.push_back(maxStart);
-						(*hitListIter)->block_ends.push_back(minEnd);
-					}
-				}
-			}
-		}
-		if (hitHasOverlap && useOverlappingSubBlocks == false) 
-		{
-			bool enoughKeyOverlap = (float) totalHitOverlap / (float) keyBlocksSumLength >= _overlapFraction;
-			bool enoughHitOverlap = (float) totalHitOverlap / (float) hitBlockSumLength  >= _overlapFraction;
 
-			if (enoughKeyOverlap) 
-			{
-				if (_hasReciprocal && enoughHitOverlap)
-				{
-					//(*hitListIter)->setValid(true);
-					_overlapBases.push_back(totalHitOverlap);
-					hitListIter = hitList.next();
-				} 
-				else if (_hasReciprocal && !enoughHitOverlap)
-				{
-					hitList.erase();
-					//(*hitListIter)->setValid(false);
-				} 
-				else if (!_hasReciprocal) 
-				{
-					//(*hitListIter)->setValid(true);
-					_overlapBases.push_back(totalHitOverlap);
-					hitListIter = hitList.next();
+				int maxStart = max(keyBlock->getStartPos(), hitBlock->getStartPos());
+				int minEnd = min(keyBlock->getEndPos(), hitBlock->getEndPos());
+				int overlap  = minEnd - maxStart;
+				if (overlap > 0) {
+					hitHasOverlap = true;
+					if (overlapList != NULL) {
+						overlapList->push_back(allocateAndAssignRecord(keyList.getKey(), maxStart, minEnd));
+					}
+					totalHitOverlap += overlap;
 				}
 			}
-			else 
-			{
-				hitList.erase();
-				//(*hitListIter)->setValid(false);
+		}
+		if (hitHasOverlap) {
+			if ((float) totalHitOverlap / (float)keyBlocksSumLength >= _overlapFraction) {
+				if (_hasReciprocal &&
+						((float)totalHitOverlap / (float)hitBlockSumLength >= _overlapFraction)) {
+					_overlapBases.push_back(totalHitOverlap);
+					resultList.push_back(*hitListIter);
+				} else if (!_hasReciprocal) {
+					_overlapBases.push_back(totalHitOverlap);
+					resultList.push_back(*hitListIter);
+				}
 			}
 		}
-		else if (!hitHasOverlap && useOverlappingSubBlocks == false) 
-		{
-			hitList.erase();
-			//(*hitListIter)->setValid(false);
-		}
-		else {
-			hitListIter = hitList.next();
-		}
-		if (deleteHitBlocks)
-		{
+		if (deleteHitBlocks) {
 			deleteBlocks(hitBlocks);
 		}
-	} // end for loop through main hits
-	if (deleteKeyBlocks) 
-	{
+	}
+	if (deleteKeyBlocks) {
 		deleteBlocks(keyList);
 	}
-	return (int)hitList.size();
+	resultList.setKey(keyList.getKey());
+	return (int)resultList.size();
 }
 

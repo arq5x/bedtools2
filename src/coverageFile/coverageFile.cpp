@@ -66,7 +66,11 @@ void CoverageFile::processHits(RecordOutputMgr *outputMgr, RecordKeyVector &hits
 }
 
 void CoverageFile::cleanupHits(RecordKeyVector &hits) {
-	IntersectFile::cleanupHits(hits);
+	if (upCast(_context)->getObeySplits()) {
+		upCast(_context)->getSplitBlockInfo()->deleteBlocks(hits);
+	} else {
+		IntersectFile::cleanupHits(hits);
+	}
 	memset(_depthArray, 0, sizeof(size_t) * _queryLen);
 }
 
@@ -114,51 +118,21 @@ void CoverageFile::makeDepthCount(RecordKeyVector &hits) {
 		memset(_depthArray, 0, sizeof(size_t) * _depthArrayCapacity);
 	}
 	_hitCount = 0;
-	// no -split
-	if (!(_context)->getObeySplits())
+	// Here we do not want extra logic for splits, b/c they're already handled in how we're getting hits.
+	//loop through hits, which may not be in sorted order, due to
+	//potential multiple databases, and increment the depth array as needed.
+	for (RecordKeyVector::iterator_type iter = hits.begin(); iter != hits.end(); iter = hits.next())
 	{
-		//loop through hits, which may not be in sorted order, due to
-		//potential multiple databases, and increment the depth array as needed.
-		for (RecordKeyVector::iterator_type iter = hits.begin(); iter != hits.end(); iter = hits.next()) 
-		{
-			const Record *dbRec = *iter;
-			int dbStart = dbRec->getStartPos();
-			int dbEnd = dbRec->getEndPos();
-			int maxStart = max(_queryOffset, dbStart);
-			int minEnd = min(dbEnd, key->getEndPos());
+		const Record *dbRec = *iter;
+		int dbStart = dbRec->getStartPos();
+		int dbEnd = dbRec->getEndPos();
+		int maxStart = max(_queryOffset, dbStart);
+		int minEnd = min(dbEnd, key->getEndPos());
 
-			for (int i=maxStart; i < minEnd; i++) {
-				_depthArray[i - _queryOffset]++;
-			}
-			_hitCount++;
+		for (int i=maxStart; i < minEnd; i++) {
+			_depthArray[i - _queryOffset]++;
 		}
-	}
-	// -split
-	else
-	{
-		for (RecordKeyVector::iterator_type iter = hits.begin(); iter != hits.end(); iter = hits.next()) {
-			const Record *dbRec = *iter;
-			bool count_hit  = false;
-			for (size_t i = 0; i < dbRec->block_starts.size(); ++i)
-			{
-				int block_start = dbRec->block_starts[i];
-				int block_end = dbRec->block_ends[i];
-				int maxStart = max(_queryOffset, block_start);
-				int minEnd = min(block_end, key->getEndPos());
-				if ((minEnd - maxStart) > 0)
-				{
-					for (int i = maxStart; i < minEnd; i++) 
-					{
-						_depthArray[i - _queryOffset]++;
-					}
-					count_hit = true;
-				}
-			}
-			if (count_hit)
-			{
-				_hitCount++;
-			}
-		}
+		_hitCount++;
 	}
 }
 
@@ -257,4 +231,18 @@ void CoverageFile::doDefault(RecordOutputMgr *outputMgr, RecordKeyVector &hits)
 	s << coveredFractionString;
 	_finalOutput = s.str();
 	outputMgr->printRecord(hits.getKey(), _finalOutput);
+}
+
+void CoverageFile::checkSplits(RecordKeyVector &hitSet)
+{
+	// When using coverage, we need a list of the sub-intervals of coverage
+	// so that per-base depth can be properly calculated when obeying splits
+	if (upCast(_context)->getObeySplits()) {
+		RecordKeyVector keySet(hitSet.getKey());
+		RecordKeyVector resultSet(hitSet.getKey());
+		RecordKeyVector overlapSet(hitSet.getKey());
+		upCast(_context)->getSplitBlockInfo()->findBlockedOverlaps(keySet, hitSet, resultSet, &overlapSet);
+		//hitSet.clearAll();
+		hitSet.swap(overlapSet);
+	}
 }
