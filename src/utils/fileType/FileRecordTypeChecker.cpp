@@ -241,7 +241,7 @@ bool FileRecordTypeChecker::handleTextFormat(const char *buffer, size_t len)
 		}
 		//Here the Record must not have positions, so it is the NoPosPlus Type.
 		_recordType = NO_POS_PLUS_RECORD_TYPE;
-		return true;
+		return false;
 	}
 	return false;
 }

@@ -52,13 +52,20 @@ rm obs exp
 #  Enforce integer coordinates
 ###########################################################
 echo -e "    general.t03...\c"
-echo "ERROR: file - has non positional records, which are only valid for " >> exp
-echo " the groupBy tool. Perhaps you are using a header line(s) that starts with " >> exp
-echo " something other than \"#\", \"chrom\", or \"chr\" (any case)?" >> exp
+
+echo "Error: unable to open file or unable to determine types for file -
+
+- Please ensure that your file is TAB delimited (e.g., cat -t FILE).
+- Also ensure that your file has integer chromosome coordinates in the 
+  expected columns (e.g., cols 2 and 3 for BED)." >> exp
+
+#echo "ERROR: file - has non positional records, which are only valid for " >> exp
+#echo " the groupBy tool. Perhaps you are using a header line(s) that starts with " >> exp
+#echo " something other than \"#\", \"chrom\", or \"chr\" (any case)?" >> exp
 
 echo "chr1	.	2" | $BT merge -i - 2> o \
 	&& failedtofail || true;
-tail -n 3 o > obs
+tail -n 5 o > obs
 check obs exp
 rm obs exp
 
@@ -71,13 +78,14 @@ echo -e "    general.t05...\c"
 echo \
 "chr1 1 2" | $BT merge -i - 2> obs \
 	&& failedtofail || true;
-echo "ERROR: file - has non positional records, which are only valid for " >> exp
-echo " the groupBy tool. Perhaps you are using a header line(s) that starts with " >> exp
-echo " something other than \"#\", \"chrom\", or \"chr\" (any case)?" >> exp
-tail -n 3 o > obs
+echo "Error: unable to open file or unable to determine types for file -
+
+- Please ensure that your file is TAB delimited (e.g., cat -t FILE).
+- Also ensure that your file has integer chromosome coordinates in the 
+  expected columns (e.g., cols 2 and 3 for BED)." >> exp
+tail -n 5 o > obs
 check obs exp
 rm obs exp
-
 
 ###########################################################
 #  Fail on non-existent files.

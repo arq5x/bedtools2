@@ -50,6 +50,10 @@ bool FileRecordMgr::open(bool inheader){
 	
 	if (!_bufStreamMgr->init()) {
 		cerr << "Error: unable to open file or unable to determine types for file " << _filename << endl;
+		cerr << endl;
+		cerr << "- Please ensure that your file is TAB delimited (e.g., cat -t FILE)." << endl;
+		cerr << "- Also ensure that your file has integer chromosome coordinates in the " << endl
+		     << "  expected columns (e.g., cols 2 and 3 for BED)." << endl;
 		delete _bufStreamMgr;
 		_bufStreamMgr = NULL;
 		exit(1);
@@ -58,7 +62,8 @@ bool FileRecordMgr::open(bool inheader){
 	_recordType = _bufStreamMgr->getTypeChecker().getRecordType();
 
 	//HACK: If groupBy and not Bam, over-ride file type.
-	if (_isGroupBy && _fileType != FileRecordTypeChecker::BAM_FILE_TYPE) {
+	if (_isGroupBy && _fileType != FileRecordTypeChecker::BAM_FILE_TYPE) 
+	{
 		_bufStreamMgr->getTypeChecker().setFileType(FileRecordTypeChecker::SINGLE_LINE_DELIM_TEXT_FILE_TYPE);
 		_bufStreamMgr->getTypeChecker().setRecordType(FileRecordTypeChecker::NO_POS_PLUS_RECORD_TYPE);
 		_fileType = FileRecordTypeChecker::SINGLE_LINE_DELIM_TEXT_FILE_TYPE;
