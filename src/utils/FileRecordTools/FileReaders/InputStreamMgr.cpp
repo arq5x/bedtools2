@@ -170,6 +170,10 @@ bool InputStreamMgr::populateScanBuffer()
 
 bool InputStreamMgr::detectBamOrBgzip(int &numChars, int currChar)
 {
+
+
+	return true;
+/*
 	//Look for the BAM magic string "BAM\1" in the first fouur characters of the input stream.
 	//In compressed form, the first char is the gzip signifier, which was already found.
 	//The next three are the integers 139, 8, and 4.
@@ -241,6 +245,7 @@ bool InputStreamMgr::detectBamOrBgzip(int &numChars, int currChar)
 		}
 	}
 	return false;
+	*/
 }
 
 bool InputStreamMgr::readZipChunk()

@@ -12,7 +12,7 @@
 #include "InflateStreamBuf.h"
 #include "string.h"
 #include "api/BamReader.h"
-#include "api/internal/io/BgzfStream_p.h"
+//#include "api/internal/io/BgzfStream_p.h"
 
 #include <iostream>
 
@@ -65,7 +65,7 @@ private:
 	static const int MIN_SCAN_BUFFER_SIZE = 2048;
 	int _numBytesInBuffer; //this will hold the length of the buffer after the scan.
 	BamTools::BamReader *_bamReader;
-	BamTools::Internal::BgzfStream *_bgStream;
+	//BamTools::Internal::BgzfStream *_bgStream;
 	bool _eofHit;
 
 	static const char *FIFO_STRING_LITERAL;

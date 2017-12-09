@@ -37,8 +37,10 @@ bool BamFileReader::readEntry()
 		if (_bamReader->GetNextAlignment(_bamAlignment)) {
 			return true;
 		}
+	// TO DO: is there a fast way in htslib to ignore parsing the Tags?
 	} else {
-		if (_bamReader->GetNextAlignmentCore(_bamAlignment)) {
+		//if (_bamReader->GetNextAlignmentCore(_bamAlignment)) {
+		if (_bamReader->GetNextAlignment(_bamAlignment)) {
 			return true;
 		}
 	}
@@ -73,11 +75,15 @@ int BamFileReader::getEndPos() const
 
 void BamFileReader::getName(string &str) const
 {
-	if (!_useTags) {
-		str = _bamAlignment.SupportData.AllCharData.c_str();
-	} else {
-		str = _bamAlignment.Name;
-	}
+
+	// TO DO: how to use htslib for tags, etc.
+	// if (!_useTags) {
+	// 	str = _bamAlignment.SupportData.AllCharData.c_str();
+	// } 
+	// else {
+	// 	str = _bamAlignment.Name;
+	// }
+	str = _bamAlignment.Name;
     if (_bamAlignment.IsFirstMate()) {
     	str += "/1";
     }
