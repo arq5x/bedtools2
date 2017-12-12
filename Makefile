@@ -16,7 +16,7 @@ export OBJ_DIR	= obj
 export BIN_DIR	= bin
 export SRC_DIR	= src
 export UTIL_DIR	= src/utils
-export CXX	?= g++
+export CXX		= g++
 ifeq ($(DEBUG),1)
 export CXXFLAGS = -Wall -Wextra -DDEBUG -D_DEBUG -g -O0 -D_FILE_OFFSET_BITS=64 -fPIC $(INCLUDES)
 else
@@ -25,10 +25,9 @@ endif
 
 # If the user has specified to do so, tell the compile to use rand() (instead of mt19937).
 ifeq ($(USE_RAND),1)
-export CXXFLAGS = -DUSE_RAND
+export CXXFLAGS += -DUSE_RAND
 else
-# Although we really want c++11, g++ 4.6.3 (as used by Travis) uses 'gnu++0x'
-export CXXFLAGS = -std=gnu++0x
+export CXXFLAGS += -std=c++11
 endif 
 
 export LIBS		= -lz
@@ -165,6 +164,7 @@ install: all
 print_banner:
 	@echo "Building BEDTools:"
 	@echo "========================================================="
+	$(info $$CXXFLAGS is [${CXXFLAGS}])
 .PHONY: print_banner
 
 # make the "obj/" and "bin/" directories, if they don't exist
