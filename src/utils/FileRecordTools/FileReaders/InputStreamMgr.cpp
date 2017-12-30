@@ -120,7 +120,10 @@ int InputStreamMgr::read(char *data, size_t dataSize)
 		return origRead;
 	}
 	if (_isBgzipped) {
-		return (int)(origRead + _bgStream->Read(data, dataSize));
+		return 0;
+		/*
+		 * TODO(haohou): Read bzip
+		return (int)(origRead + _bgStream->Read(data, dataSize));*/
 	}
 	_finalInputStream->read(data, dataSize);
 	return origRead + _finalInputStream->gcount();
@@ -198,7 +201,9 @@ bool InputStreamMgr::detectBamOrBgzip(int &numChars, int currChar)
 
 
 			_bamReader = new BamTools::BamReader();
-			if (!_bamReader->OpenStream(_finalInputStream)) {
+			//TODO(haohou): Open with the file name directly
+			if(!_bamReader->Open("xxx")) {
+			//if (!_bamReader->OpenStream(_finalInputStream)) {
 				//This is NOT a bam file, but it is bgzipped.
 				_pushBackStreamBuf->clear();
 				//Put all bytes read so far back onto the scan buffer, then reset
@@ -214,8 +219,11 @@ bool InputStreamMgr::detectBamOrBgzip(int &numChars, int currChar)
 				_bamReader = NULL;
 
 				//Alter the finalInputSream to become a bgzfReader.
-				_bgStream = new BamTools::Internal::BgzfStream();
-				_bgStream->OpenStream(_finalInputStream, BamTools::IBamIODevice::ReadOnly);
+				//_bgStream = new BamTools::Internal::BgzfStream();
+				//_bgStream->OpenStream(_finalInputStream, BamTools::IBamIODevice::ReadOnly);
+
+				//TODO(haohou): open
+				//_bgStream = bgzf_open(_fin
 
 				return false;
 			}
