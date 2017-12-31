@@ -79,6 +79,9 @@ namespace BamTools {
 		PropertyMapping<BamAlignment, int32_t> Position;
 		PropertyMapping<BamAlignment, int32_t> MatePosition;
 		PropertyMapping<BamAlignment, int32_t> MateRefID;
+		PropertyMapping<BamAlignment, int32_t> InsertSize;
+		PropertyMapping<BamAlignment, int32_t> Length; 
+		PropertyMapping<BamAlignment, int16_t> Bin;
 		//PropertyMapping1<BamAlignment, uint8_t, const uint16_t> MapQuality;
 		
 		uint16_t MapQuality;
@@ -117,6 +120,9 @@ namespace BamTools {
 			Position(_bam->bam->core.pos),
 			MatePosition(_bam->bam->core.mpos),
 			MateRefID(_bam->bam->core.mtid),
+			InsertSize(_bam->bam->core.isize),
+			Length(_bam->bam->core.l_qseq),
+			Bin(_bam->bam->core.bin),
 			//MapQuality(_bam->bam->core.qual),
 			Name(bam_get_qname(bam)),
 			Filename(filename),
@@ -131,6 +137,9 @@ namespace BamTools {
 			Position(_bam->bam->core.pos),
 			MatePosition(_bam->bam->core.mpos),
 			MateRefID(_bam->bam->core.mtid),
+			InsertSize(_bam->bam->core.isize),
+			Length(_bam->bam->core.l_qseq),
+			Bin(_bam->bam->core.bin),
 			MapQuality(_bam->bam->core.qual),
 			Name(ba.Name),
 			Filename(ba.Filename),
@@ -146,6 +155,9 @@ namespace BamTools {
 			Position(ba.Position);
 			MateRefID(ba.MateRefID);
 			MatePosition(ba.MatePosition);
+			InsertSize(ba.InsertSize);
+			Length(ba.Length);
+			Bin(ba.Bin);
 			MapQuality = ba.MapQuality;
 			Name = ba.Name;
 			Filename = ba.Filename;
@@ -159,6 +171,9 @@ namespace BamTools {
 			Position(_bam->bam->core.pos);
 			MatePosition(_bam->bam->core.mpos);
 			MateRefID(_bam->bam->core.mtid);
+			InsertSize(_bam->bam->core.isize);
+			Length(_bam->bam->core.l_qseq);
+			Bin(_bam->bam->core.bin);
 			MapQuality = _bam->bam->core.qual;
 			Filename = filename;
 			Name = std::string(bam_get_qname(bam));
