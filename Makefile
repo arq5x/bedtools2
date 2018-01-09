@@ -10,7 +10,7 @@ VERSION_FILE=./src/utils/version/version_git.h
 RELEASED_VERSION_FILE=./src/utils/version/version_release.txt
 
 
-
+DEBUG=1
 # define our object and binary directories
 export OBJ_DIR	= obj
 export BIN_DIR	= bin

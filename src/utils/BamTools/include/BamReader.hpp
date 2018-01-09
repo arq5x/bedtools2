@@ -6,64 +6,94 @@
 #include <hts.h>
 #include <hfile.h>
 #include <stdint.h>
-#include <fcntl.h>
-#include <unistd.h>
 #include <string>
 #include <queue>
+#include <istream>
 
 namespace BamTools {
 #ifdef WITH_HTS_CB_API
-	struct read_buf_t {
-		int     fd; 
-		char*   ahead_buf;
-		size_t  ahead_buf_size;
-		size_t  pos;
+	struct stream_data_t {
+		std::istream& stream;
+		stream_data_t(std::istream& is) : stream(is){}
+		
+		static ssize_t read(void* data, void* resbuf, size_t sz)
+		{
+			stream_data_t *stream_data = static_cast<stream_data_t*>(data);
+			stream_data->stream.read((char*)resbuf, sz);
+			if(!stream_data->stream)
+				sz = (ssize_t)stream_data->stream.gcount();
+			return (ssize_t)sz;
+		}
+		
+		static int close(void* data)
+		{
+			free(data);
+			return 0;
+		}
 	};
-	static ssize_t _buf_read(void* data, void* resbuf, size_t sz)
-	{
-		read_buf_t* buf = (read_buf_t*)data;
-		if(buf->pos >= buf->ahead_buf_size)
-			return read(buf->fd, resbuf, sz);
-		if(sz > buf->ahead_buf_size - buf->pos)
-			sz = buf->ahead_buf_size - buf->pos;
 
-		memmove(resbuf, buf->ahead_buf, sz);
 
-		return (ssize_t)sz;
-	}
 
-	static int _buf_close(void* data)
-	{
-		read_buf_t* buf = (read_buf_t*)data;
-		free(buf->ahead_buf);
-		close(buf->fd);
-		free(data);
-		return 0;
-	}
 #endif
 	class BamReader {
 		struct _SamFile {
-			_SamFile(samFile* fp, uint32_t _idx, hts_idx_t* _ip = NULL) : fp(fp), idx(_idx), ip(_ip) {}
-			void destory() 
+			_SamFile(samFile* fp, uint32_t _idx, BamReader* reader) : fp(fp), idx(_idx), reader(reader), has_range(false) {}
+			~_SamFile() 
 			{
 				if(nullptr != ip) hts_idx_destroy(ip);
 				if(nullptr != fp) sam_close(fp);
 			}
+			
 			bool load_index(const char* filename) 
 			{
 				if(ip == NULL && NULL == (ip = sam_index_load(fp, filename)))
 					return false;
 				return true;
 			}
+
+			bool refresh_idx()
+			{
+				if(NULL != it) 
+					hts_itr_destroy(it);
+				it = NULL;
+				if(tid_l > tid_r || (tid_l == tid_r && ofs_l > ofs_r)) return false;
+				if(NULL == (it = sam_itr_queryi(ip, tid_l, ofs_l, tid_r != tid_l ? reader->GetReferenceData().at(tid_l).RefLength : ofs_r + 1)))
+					return false;
+				return true;
+			}
+			bool set_range(BamRegion& reg)
+			{
+				tid_l = reg.LeftRefID;
+				tid_r = reg.RightRefID;
+				ofs_l = reg.LeftPosition;
+				ofs_r = reg.RightPosition;
+				has_range = true;
+				return refresh_idx();
+			}
+
+			bool update_range()
+			{
+				tid_l ++;
+				ofs_l = 0;
+				return refresh_idx();
+			}
+
 			samFile* fp;
 			uint32_t idx;
 			hts_idx_t* ip;
+			
+			int tid_l, tid_r;
+			int ofs_l, ofs_r;
+			hts_itr_t* it;
+
+			BamReader* reader;
+			bool has_range;
 		};
 
 		struct _MetaData {
-			_SamFile file;
+			_SamFile* file;
 			uint32_t size;
-			_MetaData(_SamFile _file, uint32_t size) : file(_file.fp, _file.idx, _file.ip)
+			_MetaData(_SamFile* _file, uint32_t size) : file(_file)
 			{
 				this->size = size;
 			}
@@ -81,72 +111,66 @@ namespace BamTools {
 			}
 		};
 
-		std::vector<_SamFile> _files;
+		std::vector<_SamFile*> _files;
 		std::vector<SamHeader> _hdrs;
 		std::priority_queue<std::pair<_MetaData, bam1_t*>, std::vector<std::pair<_MetaData, bam1_t*> >, _Comp> _queue;
 
 		hFILE_ops _hops;
+		std::string _error_str;
 
-		bool _read_sam_file(_SamFile file)
+		bool _read_sam_file(_SamFile* file)
 		{
 			bam1_t *rec_ptr = bam_init1();
 			int read_rc;
-			if ((read_rc = sam_read1(file.fp, _hdrs[file.idx].GetHeaderStruct(), rec_ptr)) >= 0)
+			if(file->has_range)
+			{
+				read_rc = file->it != NULL ? sam_itr_next(file->fp, file->it, rec_ptr) : -1;
+				if(file->it != NULL && read_rc == -1) 
+				{
+					file->update_range();
+					read_rc = file->it != NULL ? sam_itr_next(file->fp, file->it, rec_ptr) : -1;
+				}
+			}
+			else 
+				read_rc = sam_read1(file->fp, _hdrs[file->idx].GetHeaderStruct(), rec_ptr);
+
+			_error_str = "";
+
+			if (read_rc >= 0)
 			{
 				_queue.push(std::make_pair(_MetaData(file, (uint32_t)(read_rc - 4)) , rec_ptr));
 				return true;
 			}
+			else if(read_rc < -1)
+			{
+				_error_str = "Htslib error"; 
+			}
+
 			bam_destroy1(rec_ptr);
 			return false;
 		}
 
-		bool _Open_impl(uint32_t idx, const std::string& filename, const char* unread_buf = NULL, size_t buf_size = 0)
+		bool _Open_impl(uint32_t idx, samFile* fp, const std::string& filename = "-")
 		{
-			samFile* fp = NULL;
-			if(unread_buf == NULL)
-				fp = sam_open(filename.empty() || filename == "stdin" ? "-" : filename.c_str(), "rb");
-			else
-			{
-#ifdef WITH_HTS_CB_API
-				_hops.read = _buf_read;
-				_hops.write = NULL;
-				_hops.seek = NULL;
-				_hops.flush = NULL;
-				_hops.close = _buf_close;
-				if(NULL == (_hops.cb_data = malloc(sizeof(read_buf_t))))
-					return false;
-				do {
-					read_buf_t* rb = (read_buf_t*)_hops.cb_data;
-					if(filename == "stdin" || filename.empty())
-						rb->fd = 0;
-					else if((rb->fd = open(filename.c_str(), O_RDONLY)) > 0)
-					{
-						if(NULL != (rb->ahead_buf = (char*)malloc(buf_size)))
-						{
-							rb->ahead_buf_size = buf_size;
-							rb->pos = 0;
-							continue;
-						}
-					}
-					close(rb->fd);
-					free(_hops.cb_data);
-					return false;
-				} while(0);
-				fp = hts_open_cb(&_hops, "rb");
-#else
-				fp = NULL;
-#endif
-			}
 			if(nullptr == fp) return false;
 			bam_hdr_t* hdr = sam_hdr_read(fp);
 			if(nullptr == hdr)
 				return false;
 
-			_files.push_back(_SamFile(fp, idx, NULL));
+			_files.push_back(new _SamFile(fp, idx, this));
 			_hdrs.push_back(SamHeader(filename, hdr));
 
-			_read_sam_file(_files[_files.size() - 1]);
-			return true;
+			if(_read_sam_file(_files[_files.size() - 1]) || GetErrorString() == "")
+				return true;
+
+			return false;
+		}
+
+		bool _Open_impl(uint32_t idx, const std::string& filename)
+		{
+			samFile* fp = NULL;
+			fp = sam_open(filename.empty() || filename == "stdin" ? "-" : filename.c_str(), "rb");
+			return _Open_impl(idx, fp, filename);
 		}
 
 	public:
@@ -163,14 +187,21 @@ namespace BamTools {
 
 		bool Open(const std::string& filename) 
 		{
-			std::vector<std::string> vec;
-			vec.push_back(filename);
-			return Open(vec);
+			return _Open_impl(0, filename);
 		}
+
 #ifdef WITH_HTS_CB_API
-		bool Open(const std::string& filename, const char* unread_buf)
+		bool OpenStream(std::istream* is)
 		{
-			return _Open_impl(0, filename, unread_buf);
+			if(nullptr == is) return false;
+			stream_data_t* cb_data = new stream_data_t(*is);
+			hFILE_ops ops;
+			memset(&ops, 0, sizeof(ops));
+			ops.read = stream_data_t::read;
+			ops.close = stream_data_t::close;
+			ops.cb_data = cb_data;
+			samFile* fp = hts_open_cb(&ops, "rb");
+			return _Open_impl(0, fp);
 		}
 #endif
 
@@ -189,7 +220,7 @@ namespace BamTools {
 			return _hdrs.at(idx);
 		}
 
-		std::string GetHeaderText(int idx = -1) const 
+		std::string GetHeaderText(int idx = 0) const 
 		{
 			return _hdrs.at(idx).GetHeaderText();
 		}
@@ -204,9 +235,9 @@ namespace BamTools {
 
 			auto& top = _queue.top();
 
-			_SamFile fp = top.first.file;
+			_SamFile* fp = top.first.file;
 			
-			alignment(_hdrs[fp.idx].Filename(), top.second, top.first.size);
+			alignment(_hdrs[fp->idx].Filename(), top.second, top.first.size);
 
 			_queue.pop();
 
@@ -224,7 +255,7 @@ namespace BamTools {
 		{
 			for(auto& sam : _files)
 			{
-				sam.destory();
+				delete sam;
 			}
 
 			for(auto& hdr : _hdrs)
@@ -247,7 +278,7 @@ namespace BamTools {
 			bam_hdr_t* bh = _hdrs[0].GetHeaderStruct();
 
 			for(int i = 0; i < bh->n_targets; i ++)
-				if(strncmp(refname.c_str(), bh->target_name[i], bh->target_len[i]) && refname.c_str()[bh->target_len[i]] == 0)
+				if(strcmp(refname.c_str(), bh->target_name[i]) == 0)
 					return i;
 			return -1;
 		}
@@ -256,7 +287,7 @@ namespace BamTools {
 		{
 			for(auto& sam: _files)
 			{
-				if(!sam.load_index(_hdrs[sam.idx].Filename()))
+				if(!sam->load_index(_hdrs[sam->idx].Filename()))
 				{
 					/* TODO(haohou): Load failure */
 				}
@@ -267,7 +298,7 @@ namespace BamTools {
 		{
 			for(auto& sam: _files)
 			{
-				if(NULL == sam.ip)
+				if(NULL == sam->ip)
 					return false;
 			}
 			return true;
@@ -275,10 +306,22 @@ namespace BamTools {
 
 		bool SetRegion(BamRegion& region)
 		{
-			/* TODO(haohou): Implemnet all the index related functions */
-			return false;
-		}
+			for(auto& sam: _files)
+			{
+				if(!sam->set_range(region))
+					return false;
+			}
 
+			_queue = std::priority_queue<std::pair<_MetaData, bam1_t*>, std::vector<std::pair<_MetaData, bam1_t*> >, _Comp>();
+
+			for(auto& sam: _files)
+			{
+				if(!_read_sam_file(sam))
+					return false;
+			}
+
+			return true;
+		}
 
 	};
 }

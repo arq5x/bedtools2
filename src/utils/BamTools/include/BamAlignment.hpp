@@ -93,8 +93,32 @@ namespace BamTools {
 		}
 		
 		/* TODO: fix all this dummy strings What is TagData? Not from file? */
-		std::string QueryBases, AlignedBases, Qualities, ErrorString, TagData;
+		std::string AlignedBases, Qualities, ErrorString, TagData;
 		uint32_t BlockLength;
+
+		std::string QueryBases;
+
+		void InitAdditionalData()
+		{
+			QueryBases = "";
+			Qualities = "";
+			static const char* base2char = "=ACMGRSVTWYHKDBN";
+			const uint8_t* seq = bam_get_seq(_bam->bam);
+			
+			for(unsigned i = 0; i < QuerySequenceLength; i ++)
+			{
+				char cur_base = base2char[bam_seqi(seq, i)];
+				QueryBases.push_back(cur_base);
+			}
+
+			const uint8_t* qual = bam_get_qual(_bam->bam);
+
+			if(qual[0] == 0xffu)
+				Qualities.resize(QuerySequenceLength, -1);
+			else for(unsigned i = 0; i < QuerySequenceLength; i ++)
+				Qualities.push_back((char)(33 + qual[i]));
+			SupportData.AllCharData = std::string(_bam ? (char*)_bam->bam->data : "", _bam ? _bam->bam->l_data : 0);
+		}
 
 #include <BamAlignment.mapping.hpp>
 
@@ -112,7 +136,8 @@ namespace BamTools {
 				NumCigarOperations(parent.NumCigarOperations),
 				BlockLength(parent.BlockLength),
 				HasCoreOnly(false)
-			{}
+			{
+			}
 		} SupportData;
 		
 
@@ -127,6 +152,7 @@ namespace BamTools {
 		{
 			setup(bam);
 			InitCigarData();
+			InitAdditionalData();
 		}
 
 		BamAlignment(const BamAlignment& ba) :
@@ -136,6 +162,7 @@ namespace BamTools {
 		{
 			setup(ba);
 			InitCigarData();
+			InitAdditionalData();
 		}
 
 		const BamAlignment& operator = (const BamAlignment& ba)
@@ -146,6 +173,7 @@ namespace BamTools {
 			setup(ba);
 			BlockLength = ba.BlockLength;
 			InitCigarData();
+			InitAdditionalData();
 			return *this;
 		}
 
@@ -157,6 +185,7 @@ namespace BamTools {
 			setup(bam);
 			BlockLength = size;
 			InitCigarData();
+			InitAdditionalData();
 		}
 
 		inline bool GetAlignmentFlag(uint32_t mask) const

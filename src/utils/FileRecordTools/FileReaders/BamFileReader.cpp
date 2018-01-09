@@ -74,9 +74,7 @@ int BamFileReader::getEndPos() const
 void BamFileReader::getName(string &str) const
 {
 	if (!_useTags) {
-		//str = _bamAlignment.SupportData.AllCharData.c_str();
-		//TODO(haohou): fix this
-		str = "notags";
+		str = _bamAlignment.SupportData.AllCharData.c_str();
 	} else {
 		str = _bamAlignment.Name;
 	}
