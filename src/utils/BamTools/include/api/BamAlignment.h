@@ -1,3 +1,3 @@
-#include <htslib/sam.h>
+#include <sam.h>
 #include <SamHeader.hpp>
 #include <BamAlignment.hpp>

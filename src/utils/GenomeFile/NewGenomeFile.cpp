@@ -12,6 +12,7 @@
 #include "NewGenomeFile.h"
 #include "ParseTools.h"
 #include "Tokenizer.h"
+#include <fstream>
 
 NewGenomeFile::NewGenomeFile(const string &genomeFilename)
 : _maxId(-1)

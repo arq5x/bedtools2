@@ -31,8 +31,8 @@ namespace BamTools {
         if (bam.IsReverseStrand()) strand = "-";
         bool blocksFound = false;
 
-        vector<CigarOp>::const_iterator cigItr = bam.CigarData.begin();
-        vector<CigarOp>::const_iterator cigEnd = bam.CigarData.end();
+        vector<CigarOp>::const_iterator cigItr = ((vector<CigarOp>)bam.CigarData).begin();
+        vector<CigarOp>::const_iterator cigEnd = ((vector<CigarOp>)bam.CigarData).end();
         for ( ; cigItr != cigEnd; ++cigItr ) {
             if (cigItr->Type == 'M') {
                 currPosition += cigItr->Length;

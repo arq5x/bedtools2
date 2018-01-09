@@ -1,7 +1,6 @@
 #ifndef __HTSLIBPP_BAMALIGNEMNT_HPP__
 #define __HTSLIBPP_BAMALIGNEMNT_HPP__
 #include <stdint.h>
-#include <Property.hpp>
 #include <memory>
 #include <cstring>
 namespace BamTools {
@@ -74,130 +73,128 @@ namespace BamTools {
 		{
 			return _bam->bam;
 		}
-
-		PropertyMapping<BamAlignment, int32_t> RefID;
-		PropertyMapping<BamAlignment, int32_t> Position;
-		PropertyMapping<BamAlignment, int32_t> MatePosition;
-		PropertyMapping<BamAlignment, int32_t> MateRefID;
-		PropertyMapping<BamAlignment, int32_t> InsertSize;
-		PropertyMapping<BamAlignment, int32_t> Length; 
-		PropertyMapping<BamAlignment, int16_t> Bin;
-		//PropertyMapping1<BamAlignment, uint8_t, const uint16_t> MapQuality;
-		
-		uint16_t MapQuality;
 		std::string Name;
 		std::string Filename;
+		std::vector<CigarOp> CigarData;
 
-		struct _CigarData {
-			operator std::vector<CigarOp>() const
+		void InitCigarData()
+		{
+			CigarData.clear();
+
+			uint32_t *cigar = bam_get_cigar(_bam->bam);  
+			uint32_t num_cigar_elements = _bam->bam->core.n_cigar;
+
+			for ( uint32_t i = 0; i < num_cigar_elements; ++i )
 			{
-				uint32_t *cigar = bam_get_cigar(_parent._bam->bam);  
-				uint32_t num_cigar_elements = _parent._bam->bam->core.n_cigar;
-				std::vector<CigarOp> cd;
-
-				for ( uint32_t i = 0; i < num_cigar_elements; ++i )
-				{
-					char type = cigar_ops_as_chars[static_cast<int>(bam_cigar_op(cigar[i]))];
-					uint32_t len = bam_cigar_oplen(cigar[i]);
-					cd.push_back(CigarOp(type, len));
-				}
-				return cd;
+				char type = cigar_ops_as_chars[static_cast<int>(bam_cigar_op(cigar[i]))];
+				uint32_t len = bam_cigar_oplen(cigar[i]);
+				CigarData.push_back(CigarOp(type, len));
 			}
-			_CigarData(const BamAlignment& parent) : _parent(parent) {}
-		private:
-			const BamAlignment& _parent;
-		} CigarData;
+		}
 		
-		std::string QueryBases, AlignedBases, Qualities;
+		/* TODO: fix all this dummy strings What is TagData? Not from file? */
+		std::string QueryBases, AlignedBases, Qualities, ErrorString, TagData;
+		uint32_t BlockLength;
 
+#include <BamAlignment.mapping.hpp>
+
+		struct _SupportData {
+			_QueryNameLength_t& QueryNameLength;
+			_QuerySequenceLength_t& QuerySequenceLength;
+			_NumCigarOperations_t& NumCigarOperations;
+			uint32_t& BlockLength;
+			std::string AllCharData; /* TODO(haohou): dealing with this dummy string, probably based on _ptr->data */
+			bool HasCoreOnly;  /* TODO(haohou): populate the string data */
+			/* TODO(haohou): Tag2Cigar?  Real Cigar ? */
+			_SupportData(BamAlignment& parent): 
+				QueryNameLength(parent.QueryNameLength),
+				QuerySequenceLength(parent.QuerySequenceLength),
+				NumCigarOperations(parent.NumCigarOperations),
+				BlockLength(parent.BlockLength),
+				HasCoreOnly(false)
+			{}
+		} SupportData;
 		
 
-		BamAlignment() : _bam(NULL),  CigarData(*this){}
+		BamAlignment() : _bam(NULL),  BlockLength(0), SupportData(*this){}
 
-		BamAlignment(const std::string& filename, bam1_t* bam) : 
+		BamAlignment(const std::string& filename, bam1_t* bam, uint32_t size) : 
 			_bam(new _Bam(bam)), 
-			RefID(_bam->bam->core.tid),
-			Position(_bam->bam->core.pos),
-			MatePosition(_bam->bam->core.mpos),
-			MateRefID(_bam->bam->core.mtid),
-			InsertSize(_bam->bam->core.isize),
-			Length(_bam->bam->core.l_qseq),
-			Bin(_bam->bam->core.bin),
-			//MapQuality(_bam->bam->core.qual),
 			Name(bam_get_qname(bam)),
 			Filename(filename),
-			CigarData(*this)
+			BlockLength(size),
+			SupportData(*this)
 		{
-			MapQuality = _bam->bam->core.qual;
+			setup(bam);
+			InitCigarData();
 		}
 
 		BamAlignment(const BamAlignment& ba) :
 			_bam(ba._bam), 
-			RefID(_bam->bam->core.tid),
-			Position(_bam->bam->core.pos),
-			MatePosition(_bam->bam->core.mpos),
-			MateRefID(_bam->bam->core.mtid),
-			InsertSize(_bam->bam->core.isize),
-			Length(_bam->bam->core.l_qseq),
-			Bin(_bam->bam->core.bin),
-			MapQuality(_bam->bam->core.qual),
-			Name(ba.Name),
 			Filename(ba.Filename),
-			CigarData(*this)
+			SupportData(*this)
 		{
-			MapQuality = _bam->bam->core.qual;
+			setup(ba);
+			InitCigarData();
 		}
 
 		const BamAlignment& operator = (const BamAlignment& ba)
 		{
 			_bam = ba._bam;
-			RefID(ba.RefID);
-			Position(ba.Position);
-			MateRefID(ba.MateRefID);
-			MatePosition(ba.MatePosition);
-			InsertSize(ba.InsertSize);
-			Length(ba.Length);
-			Bin(ba.Bin);
-			MapQuality = ba.MapQuality;
 			Name = ba.Name;
 			Filename = ba.Filename;
+			setup(ba);
+			BlockLength = ba.BlockLength;
+			InitCigarData();
 			return *this;
 		}
 
-		void operator ()(const std::string filename, bam1_t* bam)
+		void operator ()(const std::string filename, bam1_t* bam, uint32_t size)
 		{
 			_bam = std::shared_ptr<_Bam>(new _Bam(bam));
-			RefID(_bam->bam->core.tid);
-			Position(_bam->bam->core.pos);
-			MatePosition(_bam->bam->core.mpos);
-			MateRefID(_bam->bam->core.mtid);
-			InsertSize(_bam->bam->core.isize);
-			Length(_bam->bam->core.l_qseq);
-			Bin(_bam->bam->core.bin);
-			MapQuality = _bam->bam->core.qual;
 			Filename = filename;
 			Name = std::string(bam_get_qname(bam));
+			setup(bam);
+			BlockLength = size;
+			InitCigarData();
 		}
+
+		inline bool GetAlignmentFlag(uint32_t mask) const
+		{
+			return _bam->bam->core.flag & mask;
+		}
+
+		inline void SetAlignmentFlag(uint32_t mask, bool val)
+		{
+			if(val && !(_bam->bam->core.flag & mask))
+				_bam->bam->core.flag |= mask;
+			else if(val && (_bam->bam->core.flag & mask))
+				_bam->bam->core.flag &= ~mask;
+		}
+
+#define FLAG_ACCESSOR(name, mask) \
+		inline bool Is##name() const { return GetAlignmentFlag(mask); }; \
+		inline void SetIs##name(bool val) { SetAlignmentFlag(mask, val); };
 
 		inline bool IsMapped() const
 		{
 			return !(_bam->bam->core.flag & BAM_FUNMAP);
 		}
 
-		inline bool IsFirstMate() const
+		bool IsMateMapped() const
 		{
-			return _bam->bam->core.flag & BAM_FREAD1;
+			return !(_bam->bam->core.flag & BAM_FMUNMAP);
 		}
 
-		inline bool IsSecondMate() const
-		{
-			return _bam->bam->core.flag & BAM_FREAD2;
-		}
 
-		inline bool IsReverseStrand() const
-		{
-			return _bam->bam->core.flag & BAM_FREVERSE;
-		}
+		FLAG_ACCESSOR(FirstMate, BAM_FREAD1);
+		FLAG_ACCESSOR(SecondMate, BAM_FREAD2);
+		FLAG_ACCESSOR(ReverseStrand, BAM_FREVERSE);
+		FLAG_ACCESSOR(MateReverseStrand, BAM_FMREVERSE);
+		FLAG_ACCESSOR(ProperPair, BAM_FPROPER_PAIR);
+		FLAG_ACCESSOR(Paired, BAM_FPAIRED);
+		FLAG_ACCESSOR(Duplicate, BAM_FDUP);
+		FLAG_ACCESSOR(FailedQC, BAM_FQCFAIL);
 
 		int GetEndPosition(bool usePadded = false, bool closedInterval = false) const
 		{
@@ -226,14 +223,9 @@ namespace BamTools {
 				return false;
 			return true;
 		}
-
-		bool IsMateMapped() const
-		{
-			return !(_bam->bam->core.flag & BAM_FMUNMAP);
-		}
-
+		
 		template <typename T>
-		bool AddTag(const std::string& tag, const std::string& type, T& data)
+		bool AddTag(const std::string& tag, const std::string& type, T&& data)
 		{
 			_TagGetter<std::string, T> string_getter(*this, data);
 			if(string_getter && "Z" == type)

@@ -18,9 +18,9 @@ export SRC_DIR	= src
 export UTIL_DIR	= src/utils
 export CXX		= g++
 ifeq ($(DEBUG),1)
-export CXXFLAGS = -Wall -Wextra -DDEBUG -D_DEBUG -g -O0 -D_FILE_OFFSET_BITS=64 -fPIC $(INCLUDES)
+export CXXFLAGS = -Wall -Wextra -DDEBUG -D_DEBUG -g -O0 -D_FILE_OFFSET_BITS=64 -fPIC -DWITH_HTS_CB_API $(INCLUDES) 
 else
-export CXXFLAGS = -Wall -O2 -D_FILE_OFFSET_BITS=64 -fPIC $(INCLUDES)
+export CXXFLAGS = -Wall -O2 -D_FILE_OFFSET_BITS=64 -DWITH_HTS_CB_API -fPIC $(INCLUDES)
 endif
 
 # If the user has specified to do so, tell the compile to use rand() (instead of mt19937).
@@ -136,12 +136,13 @@ INCLUDES =	-I$(SRC_DIR)/utils/bedFile \
 				-I$(SRC_DIR)/utils/RecordOutputMgr \
 				-I$(SRC_DIR)/utils/ToolBase \
 				-I$(SRC_DIR)/utils/driver \
+				-I/home/haohou/base2/htslib/htslib
 
 
 all: print_banner $(OBJ_DIR) $(BIN_DIR) autoversion $(UTIL_SUBDIRS) $(SUBDIRS)
 	@echo "- Building main bedtools binary."
 	$(CXX) $(CXXFLAGS) $(CPPFLAGS) -c src/bedtools.cpp -o obj/bedtools.o $(INCLUDES)
-	$(CXX) $(CXXFLAGS) $(CPPFLAGS) -o $(BIN_DIR)/bedtools $(BUILT_OBJECTS) -lhts $(LIBS) $(LDFLAGS) $(INCLUDES)
+	$(CXX) $(CXXFLAGS) $(CPPFLAGS) -o $(BIN_DIR)/bedtools $(BUILT_OBJECTS) -L/home/haohou/base2/htslib/ -lhts $(LIBS) $(LDFLAGS) $(INCLUDES)
 	@echo "done."
 
 	@echo "- Creating executables for old CLI."

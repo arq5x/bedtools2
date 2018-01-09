@@ -1,4 +1,4 @@
-#include <htslib/sam.h>
+#include <sam.h>
 #include <string>
 #include  <vector>
 #include <BamReader.hpp>

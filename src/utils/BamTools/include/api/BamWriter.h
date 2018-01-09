@@ -1,4 +1,4 @@
-#include <htslib/sam.h>
+#include <sam.h>
 #include <vector>
 #include <string>
 #include <BamAlignment.hpp>
