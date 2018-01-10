@@ -37,11 +37,15 @@ namespace BamTools {
 #endif
 	class BamReader {
 		struct _SamFile {
-			_SamFile(samFile* fp, uint32_t _idx, BamReader* reader) : fp(fp), idx(_idx), reader(reader), has_range(false) {}
+			_SamFile(samFile* fp, uint32_t _idx, BamReader* reader) : 
+				fp(fp), idx(_idx), ip(NULL), it(NULL), 
+				reader(reader), has_range(false)
+			{}
 			~_SamFile() 
 			{
 				if(nullptr != ip) hts_idx_destroy(ip);
 				if(nullptr != fp) sam_close(fp);
+				if(nullptr != it) hts_itr_destroy(it);
 			}
 			
 			bool load_index(const char* filename) 
@@ -114,8 +118,9 @@ namespace BamTools {
 		std::vector<_SamFile*> _files;
 		std::vector<SamHeader> _hdrs;
 		std::priority_queue<std::pair<_MetaData, bam1_t*>, std::vector<std::pair<_MetaData, bam1_t*> >, _Comp> _queue;
-
+#ifdef WITH_HTS_CB_API
 		hFILE_ops _hops;
+#endif
 		std::string _error_str;
 
 		bool _read_sam_file(_SamFile* file)

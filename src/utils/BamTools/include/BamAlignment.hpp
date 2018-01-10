@@ -143,7 +143,7 @@ namespace BamTools {
 
 		BamAlignment() : _bam(NULL),  BlockLength(0), SupportData(*this){}
 
-		BamAlignment(const std::string& filename, bam1_t* bam, uint32_t size) : 
+		BamAlignment(const std::string& filename, bam1_t* bam, uint32_t size = 0) : 
 			_bam(new _Bam(bam)), 
 			Name(bam_get_qname(bam)),
 			Filename(filename),
@@ -177,7 +177,7 @@ namespace BamTools {
 			return *this;
 		}
 
-		void operator ()(const std::string filename, bam1_t* bam, uint32_t size)
+		void operator ()(const std::string filename, bam1_t* bam, uint32_t size = 0)
 		{
 			_bam = std::shared_ptr<_Bam>(new _Bam(bam));
 			Filename = filename;
@@ -254,7 +254,7 @@ namespace BamTools {
 		}
 		
 		template <typename T>
-		bool AddTag(const std::string& tag, const std::string& type, T&& data)
+		bool AddTag(const std::string& tag, const std::string& type, T data)
 		{
 			_TagGetter<std::string, T> string_getter(*this, data);
 			if(string_getter && "Z" == type)
