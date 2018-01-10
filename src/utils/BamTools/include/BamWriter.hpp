@@ -15,7 +15,7 @@ namespace BamTools {
 		};
 		bool Open(const std::string& filename, const std::string& samHeaderText, const RefVector& referenceSequences, bool binary = true)
 		{
-			_fp = sam_open(filename.empty() ? "-" : filename.c_str(), binary ? "wb" : "w");
+			_fp = sam_open(filename.empty() || filename == "stdout"? "-" : filename.c_str(), binary ? "wb" : "w");
 			if(_fp == nullptr) return false;
 
 			_hdr.ParseHeaderText(samHeaderText);

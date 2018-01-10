@@ -158,6 +158,8 @@ namespace BamTools {
 		bool _Open_impl(uint32_t idx, samFile* fp, const std::string& filename = "-")
 		{
 			if(nullptr == fp) return false;
+			if(fp->format.format != htsExactFormat::bam && fp->format.format != htsExactFormat::cram && fp->format.format != htsExactFormat::sam)
+				return false;
 			bam_hdr_t* hdr = sam_hdr_read(fp);
 			if(nullptr == hdr)
 				return false;
