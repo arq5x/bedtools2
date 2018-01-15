@@ -12,6 +12,17 @@ check()
 	fi
 }
 
+bam_check() 
+{
+	if diff <(samtools view $1) <(samtools view $2) 
+	then
+		echo ok
+	else
+		FAILURES$(expr $FAILURES + 1);
+		echo fail
+	fi
+}
+
 ###########################################################
 #  Test intersection of a as bed from file vs b as bed from file
 ############################################################
@@ -161,7 +172,7 @@ rm obs exp
 ############################################################
 echo -e "    intersect.new.t13...\c"
 $BT intersect -a a.bam -b b.bed> obs
-check obs aVSb.bam
+bam_check obs aVSb.bam
 rm obs
 
 
@@ -170,7 +181,7 @@ rm obs
 ############################################################
 echo -e "    intersect.new.t14...\c"
 $BT intersect -a - -b b.bed < a.bam> obs
-check obs aVSb.bam
+bam_check obs aVSb.bam
 rm obs
 
 
@@ -179,7 +190,7 @@ rm obs
 ############################################################
 echo -e "    intersect.new.t15...\c"
 cat a.bam | $BT intersect -a - -b b.bed> obs
-check obs aVSb.bam
+bam_check obs aVSb.bam
 rm obs
 
 
@@ -188,7 +199,7 @@ rm obs
 ############################################################
 echo -e "    intersect.new.t16...\c"
 $BT intersect -a <(cat a.bam) -b b.bed > obs
-check obs aVSb.bam
+bam_check obs aVSb.bam
 rm obs
 
 

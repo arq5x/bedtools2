@@ -216,6 +216,8 @@ bool InputStreamMgr::detectBamOrBgzip(int &numChars, int currChar)
 				_numBytesInBuffer = 0;
 				delete _bamReader;
 				_bamReader = NULL;
+				_finalInputStream->clear();
+
 
 				BamTools::stream_data_t* cb_data = new BamTools::stream_data_t(*_finalInputStream);
 				hFILE_ops ops;

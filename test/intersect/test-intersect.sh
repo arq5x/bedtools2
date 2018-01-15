@@ -1,7 +1,6 @@
 set -e;
 
-#BT=${BT-../../bin/bedtools}
-BT=bedtools
+BT=${BT-../../bin/bedtools}
 
 FAILURES=0;
 
