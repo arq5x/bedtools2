@@ -10,8 +10,12 @@ VERSION_FILE=./src/utils/version/version_git.h
 RELEASED_VERSION_FILE=./src/utils/version/version_release.txt
 
 
-DEBUG=1
 # define our object and binary directories
+ifeq ($(VERBOSE),1)
+export CCPREFIX = 
+else
+export CCPREFIX = @
+endif
 export OBJ_DIR	= obj
 export BIN_DIR	= bin
 export SRC_DIR	= src
@@ -141,8 +145,8 @@ INCLUDES =	-I$(SRC_DIR)/utils/bedFile \
 
 all: print_banner $(OBJ_DIR) $(BIN_DIR) autoversion $(UTIL_SUBDIRS) $(SUBDIRS)
 	@echo "- Building main bedtools binary."
-	$(CXX) $(CXXFLAGS) $(CPPFLAGS) -c src/bedtools.cpp -o obj/bedtools.o $(INCLUDES)
-	$(CXX) $(CXXFLAGS) $(CPPFLAGS) -o $(BIN_DIR)/bedtools $(BUILT_OBJECTS) -L/home/haohou/base2/htslib/ -lhts $(LIBS) $(LDFLAGS) $(INCLUDES)
+	$(CCPREFIX) $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c src/bedtools.cpp -o obj/bedtools.o $(INCLUDES)
+	$(CCPREFIX) $(CXX) $(CXXFLAGS) $(CPPFLAGS) -o $(BIN_DIR)/bedtools $(BUILT_OBJECTS) -L/home/haohou/base2/htslib/ -lhts $(LIBS) $(LDFLAGS) $(INCLUDES)
 	@echo "done."
 
 	@echo "- Creating executables for old CLI."
