@@ -1,0 +1,7 @@
+@SQ	SN:xx	LN:20
+@SQ	SN:yy	LN:20
+a1	67	xx	1	1	10M	=	6	20	AAAAAAAAAA	**********
+a1	35	xx	6	1	10M	=	11	-20	AAAAATTTTT	**********
+a1	147	xx	11	1	10M	=	1	-20	TTTTTTTTTT	**********
+a1	67	yy	1	1	10M	=	6	15	AAAAAAAAAA	**********
+a1	3	yy	6	1	10M	=	1	-15	AAAAATTTTT	**********

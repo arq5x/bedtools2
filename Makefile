@@ -18,13 +18,13 @@ export CCPREFIX = @
 endif
 export OBJ_DIR	= obj
 export BIN_DIR	= bin
-export SRC_DIR	= src
+export SRC_DIR	= $(shell readlink -f src)
 export UTIL_DIR	= src/utils
 export CXX		= g++
 ifeq ($(DEBUG),1)
-export CXXFLAGS = -Wall -Wextra -DDEBUG -D_DEBUG -g -O0 -D_FILE_OFFSET_BITS=64 -fPIC -DWITH_HTS_CB_API $(INCLUDES) 
+export CXXFLAGS = -Wall -Wextra -DDEBUG -D_DEBUG -g -O0 -D_FILE_OFFSET_BITS=64 -DWITH_HTS_CB_API $(INCLUDES) 
 else
-export CXXFLAGS = -Wall -O2 -D_FILE_OFFSET_BITS=64 -DWITH_HTS_CB_API -fPIC $(INCLUDES)
+export CXXFLAGS = -Wall -O2 -D_FILE_OFFSET_BITS=64 -DWITH_HTS_CB_API $(INCLUDES)
 endif
 
 # If the user has specified to do so, tell the compile to use rand() (instead of mt19937).
@@ -34,7 +34,7 @@ else
 export CXXFLAGS += -std=c++11
 endif 
 
-export LIBS		= -lz
+export LIBS		= -lz -lm -lbz2 -llzma -lpthread
 export BT_ROOT  = src/utils/BamTools/
 
 prefix ?= /usr/local
@@ -108,7 +108,8 @@ UTIL_SUBDIRS =	$(SRC_DIR)/utils/FileRecordTools \
 				$(SRC_DIR)/utils/GenomeFile \
 				$(SRC_DIR)/utils/RecordOutputMgr \
 				$(SRC_DIR)/utils/ToolBase \
-				$(SRC_DIR)/utils/driver
+				$(SRC_DIR)/utils/driver \
+				$(SRC_DIR)/utils/htslib
 
 BUILT_OBJECTS = $(OBJ_DIR)/*.o
 
@@ -140,13 +141,13 @@ INCLUDES =	-I$(SRC_DIR)/utils/bedFile \
 				-I$(SRC_DIR)/utils/RecordOutputMgr \
 				-I$(SRC_DIR)/utils/ToolBase \
 				-I$(SRC_DIR)/utils/driver \
-				-I/home/haohou/base2/htslib/htslib
+				-I$(SRC_DIR)/utils/htslib/htslib
 
 
 all: print_banner $(OBJ_DIR) $(BIN_DIR) autoversion $(UTIL_SUBDIRS) $(SUBDIRS)
 	@echo "- Building main bedtools binary."
 	$(CCPREFIX) $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c src/bedtools.cpp -o obj/bedtools.o $(INCLUDES)
-	$(CCPREFIX) $(CXX) $(CXXFLAGS) $(CPPFLAGS) -o $(BIN_DIR)/bedtools $(BUILT_OBJECTS) -L/home/haohou/base2/htslib/ -lhts $(LIBS) $(LDFLAGS) $(INCLUDES)
+	$(CCPREFIX) $(CXX) -o $(BIN_DIR)/bedtools $(BUILT_OBJECTS) $(SRC_DIR)/utils/htslib/libhts.a $(LIBS) $(LDFLAGS)
 	@echo "done."
 
 	@echo "- Creating executables for old CLI."
@@ -185,6 +186,7 @@ $(UTIL_SUBDIRS) $(SUBDIRS): $(OBJ_DIR) $(BIN_DIR)
 clean:
 	@echo " * Cleaning up."
 	@rm -f $(VERSION_FILE) $(OBJ_DIR)/* $(BIN_DIR)/*
+	@cd src/utils/htslib && make clean > /dev/null
 .PHONY: clean
 
 test: all

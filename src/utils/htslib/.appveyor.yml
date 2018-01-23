@@ -1,0 +1,43 @@
+# version format.
+# you can use {branch} name in version format too
+# version: 1.0.{build}-{branch}
+version: 'vers.{build}'
+
+# branches to build
+branches:
+    # Whitelist
+    only:
+      - develop
+
+    # Blacklist
+    except:
+      - gh-pages
+
+# Do not build on tags (GitHub and BitBucket)
+skip_tags: true
+
+# Skipping commits affecting specific files (GitHub only). More details here: /docs/appveyor-yml
+#skip_commits:
+#  files:
+#    - docs/*
+#    - '**/*.html'
+
+# We use Mingw/Msys, so use pacman for installs
+install:
+  - set HOME=.
+  - set MSYSTEM=MINGW64
+  - set PATH=C:/msys64/usr/bin;C:/msys64/mingw64/bin;%PATH%
+  - set MINGWPREFIX=x86_64-w64-mingw32
+  - "sh -lc \"pacman -S --noconfirm --needed base-devel mingw-w64-x86_64-toolchain mingw-w64-x86_64-zlib mingw-w64-x86_64-bzip2 mingw-w64-x86_64-xz mingw-w64-x86_64-curl\""
+
+build_script:
+  - set HOME=.
+  - set MSYSTEM=MINGW64
+  - set PATH=C:/msys64/usr/bin;C:/msys64/mingw64/bin;%PATH%
+  - "sh -lc \"aclocal && autoheader && autoconf && ./configure && make -j2\""
+
+#build_script:
+#  - make
+
+test_script:
+  - "sh -lc \"make test\""

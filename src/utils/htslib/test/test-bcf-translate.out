@@ -1,0 +1,18 @@
+##fileformat=VCFv4.2
+##FILTER=<ID=PASS,Description="All filters passed">
+##contig=<ID=2>
+##contig=<ID=1>
+##FILTER=<ID=FLT4,Description="Filter 4">
+##FILTER=<ID=FLT3,Description="Filter 3">
+##FILTER=<ID=FLT2,Description="Filter 2">
+##INFO=<ID=INF4,Number=.,Type=Integer,Description="Info 4">
+##INFO=<ID=INF3,Number=.,Type=Integer,Description="Info 3">
+##INFO=<ID=INF2,Number=.,Type=Integer,Description="Info 2">
+##FORMAT=<ID=FMT4,Number=.,Type=Integer,Description="FMT 4">
+##FORMAT=<ID=FMT3,Number=.,Type=Integer,Description="FMT 3">
+##FORMAT=<ID=FMT2,Number=.,Type=Integer,Description="FMT 2">
+##FILTER=<ID=FLT1,Description="Filter 1">
+##INFO=<ID=INF1,Number=.,Type=Integer,Description="Info 1">
+##FORMAT=<ID=FMT1,Number=.,Type=Integer,Description="FMT 1">
+#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT	SMPL1	SMPL2
+1	1	.	G	A	0	FLT1;FLT3	INF1=1;INF3=3	FMT1:FMT3	1:3	1:3

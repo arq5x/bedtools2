@@ -220,12 +220,12 @@ bool InputStreamMgr::detectBamOrBgzip(int &numChars, int currChar)
 
 
 				BamTools::stream_data_t* cb_data = new BamTools::stream_data_t(*_finalInputStream);
-				hFILE_ops ops;
+				hFILE_callback_ops ops;
 				memset(&ops, 0, sizeof(ops));
 				ops.read = BamTools::stream_data_t::read;
 				ops.close = BamTools::stream_data_t::close;
 				ops.cb_data = cb_data;
-				hFILE* hp = hcbopen(ops, "rb");
+				hFILE* hp = hopen_callback(ops, "rb");
 				if(nullptr == hp) return false;
 				if(nullptr == (_bgStream = bgzf_hopen(hp, "rb")))
 					return false;

@@ -119,7 +119,7 @@ namespace BamTools {
 		std::vector<SamHeader> _hdrs;
 		std::priority_queue<std::pair<_MetaData, bam1_t*>, std::vector<std::pair<_MetaData, bam1_t*> >, _Comp> _queue;
 #ifdef WITH_HTS_CB_API
-		hFILE_ops _hops;
+		hFILE_callback_ops _hops;
 #endif
 		std::string _error_str;
 
@@ -202,12 +202,12 @@ namespace BamTools {
 		{
 			if(nullptr == is) return false;
 			stream_data_t* cb_data = new stream_data_t(*is);
-			hFILE_ops ops;
+			hFILE_callback_ops ops;
 			memset(&ops, 0, sizeof(ops));
 			ops.read = stream_data_t::read;
 			ops.close = stream_data_t::close;
 			ops.cb_data = cb_data;
-			samFile* fp = hts_open_cb(&ops, "rb");
+			samFile* fp = hts_open_callback(NULL, &ops, "rb");
 			return _Open_impl(0, fp);
 		}
 #endif

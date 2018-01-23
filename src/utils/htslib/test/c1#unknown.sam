@@ -1,0 +1,9 @@
+@SQ	SN:c1	LN:10
+@CO	Tests permuations of seq / qual being present or "*" in mapped
+@CO	and unmapped forms.  Also tests MD/NM tag generation.
+_sqm	0	c1	1	0	2M1I4M1D3M	*	0	0	AACCCTCGTT	IIIIIIIIII	MD:Z:4G1^G3	NM:i:3
+_sm	0	c1	1	0	2M1I4M1D3M	*	0	0	AACCCTCGTT	*	MD:Z:4G1^G3	NM:i:3
+_m	0	c1	1	0	2M1I4M1D3M	*	0	0	*	*	MD:Z:4G1^G3	NM:i:3
+_squ	4	c1	1	0	*	*	0	0	AACCCTCGTT	IIIIIIIIII
+_su	4	c1	1	0	*	*	0	0	AACCCTCGTT	*
+_u	4	c1	1	0	*	*	0	0	*	*

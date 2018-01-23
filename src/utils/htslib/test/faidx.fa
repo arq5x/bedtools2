@@ -1,0 +1,17 @@
+>
+ATGC
+>trailingblank1
+AAATTTGGGCCC
+TTTGGGCCCAAA
+GGGCCCAAA
+
+>trailingblank2 with last dna line the same length
+AAATTTGGGCCCAAATTTGGGCCC
+TTTGGGCCCAAATTTGGGCCCAAA
+GGGCCCAAATTTGGGCCCAAATTT
+
+>  foo
+TGCATG
+CA
+> bar description
+TTTTAAAA
