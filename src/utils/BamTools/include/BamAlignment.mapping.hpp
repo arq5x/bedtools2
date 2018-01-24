@@ -1,8 +1,8 @@
 
 struct _Bin_t {
-    operator uint32_t() const {return (uint32_t)(_ptr() == NULL?0:_ptr()->core.bin);}
+    operator uint32_t() const {return (uint32_t)(_ptr()->core.bin);}
     const uint32_t& operator=(const uint32_t& val) {
-        if(NULL != _ptr()) _ptr()->core.bin = (uint32_t)val;
+        _ptr()->core.bin = (uint32_t)val;
         return val;
     }
     private:
@@ -12,9 +12,9 @@ struct _Bin_t {
 } Bin;
 
 struct _AlignmentFlag_t {
-    operator int32_t() const {return (int32_t)(_ptr() == NULL?0:_ptr()->core.flag);}
+    operator int32_t() const {return (int32_t)(_ptr()->core.flag);}
     const int32_t& operator=(const int32_t& val) {
-        if(NULL != _ptr()) _ptr()->core.flag = (int32_t)val;
+        _ptr()->core.flag = (int32_t)val;
         return val;
     }
     private:
@@ -24,9 +24,9 @@ struct _AlignmentFlag_t {
 } AlignmentFlag;
 
 struct _MapQuality_t {
-    operator int16_t() const {return (int16_t)(_ptr() == NULL?0:_ptr()->core.qual);}
+    operator int16_t() const {return (int16_t)(_ptr()->core.qual);}
     const int16_t& operator=(const int16_t& val) {
-        if(NULL != _ptr()) _ptr()->core.qual = (int16_t)val;
+        _ptr()->core.qual = (int16_t)val;
         return val;
     }
     private:
@@ -36,9 +36,9 @@ struct _MapQuality_t {
 } MapQuality;
 
 struct _Length_t {
-    operator int32_t() const {return (int32_t)(_ptr() == NULL?0:_ptr()->core.l_qseq);}
+    operator int32_t() const {return (int32_t)(_ptr()->core.l_qseq);}
     const int32_t& operator=(const int32_t& val) {
-        if(NULL != _ptr()) _ptr()->core.l_qseq = (int32_t)val;
+        _ptr()->core.l_qseq = (int32_t)val;
         return val;
     }
     private:
@@ -48,9 +48,9 @@ struct _Length_t {
 } Length;
 
 struct _InsertSize_t {
-    operator int32_t() const {return (int32_t)(_ptr() == NULL?0:_ptr()->core.isize);}
+    operator int32_t() const {return (int32_t)(_ptr()->core.isize);}
     const int32_t& operator=(const int32_t& val) {
-        if(NULL != _ptr()) _ptr()->core.isize = (int32_t)val;
+        _ptr()->core.isize = (int32_t)val;
         return val;
     }
     private:
@@ -60,9 +60,9 @@ struct _InsertSize_t {
 } InsertSize;
 
 struct _MatePosition_t {
-    operator int32_t() const {return (int32_t)(_ptr() == NULL?0:_ptr()->core.mpos);}
+    operator int32_t() const {return (int32_t)(_ptr()->core.mpos);}
     const int32_t& operator=(const int32_t& val) {
-        if(NULL != _ptr()) _ptr()->core.mpos = (int32_t)val;
+        _ptr()->core.mpos = (int32_t)val;
         return val;
     }
     private:
@@ -72,9 +72,9 @@ struct _MatePosition_t {
 } MatePosition;
 
 struct _NumCigarOperations_t {
-    operator uint32_t() const {return (uint32_t)(_ptr() == NULL?0:_ptr()->core.n_cigar);}
+    operator uint32_t() const {return (uint32_t)(_ptr()->core.n_cigar);}
     const uint32_t& operator=(const uint32_t& val) {
-        if(NULL != _ptr()) _ptr()->core.n_cigar = (uint32_t)val;
+        _ptr()->core.n_cigar = (uint32_t)val;
         return val;
     }
     private:
@@ -84,9 +84,9 @@ struct _NumCigarOperations_t {
 } NumCigarOperations;
 
 struct _QuerySequenceLength_t {
-    operator uint32_t() const {return (uint32_t)(_ptr() == NULL?0:_ptr()->core.l_qseq);}
+    operator uint32_t() const {return (uint32_t)(_ptr()->core.l_qseq);}
     const uint32_t& operator=(const uint32_t& val) {
-        if(NULL != _ptr()) _ptr()->core.l_qseq = (uint32_t)val;
+        _ptr()->core.l_qseq = (uint32_t)val;
         return val;
     }
     private:
@@ -96,9 +96,9 @@ struct _QuerySequenceLength_t {
 } QuerySequenceLength;
 
 struct _Position_t {
-    operator int32_t() const {return (int32_t)(_ptr() == NULL?0:_ptr()->core.pos);}
+    operator int32_t() const {return (int32_t)(_ptr()->core.pos);}
     const int32_t& operator=(const int32_t& val) {
-        if(NULL != _ptr()) _ptr()->core.pos = (int32_t)val;
+        _ptr()->core.pos = (int32_t)val;
         return val;
     }
     private:
@@ -108,9 +108,9 @@ struct _Position_t {
 } Position;
 
 struct _QueryNameLength_t {
-    operator uint32_t() const {return (uint32_t)(_ptr() == NULL?0:_ptr()->core.l_qname);}
+    operator uint32_t() const {return (uint32_t)(_ptr()->core.l_qname);}
     const uint32_t& operator=(const uint32_t& val) {
-        if(NULL != _ptr()) _ptr()->core.l_qname = (uint32_t)val;
+        _ptr()->core.l_qname = (uint32_t)val;
         return val;
     }
     private:
@@ -120,9 +120,9 @@ struct _QueryNameLength_t {
 } QueryNameLength;
 
 struct _MateRefID_t {
-    operator int32_t() const {return (int32_t)(_ptr() == NULL?0:_ptr()->core.mtid);}
+    operator int32_t() const {return (int32_t)(_ptr()->core.mtid);}
     const int32_t& operator=(const int32_t& val) {
-        if(NULL != _ptr()) _ptr()->core.mtid = (int32_t)val;
+        _ptr()->core.mtid = (int32_t)val;
         return val;
     }
     private:
@@ -132,9 +132,9 @@ struct _MateRefID_t {
 } MateRefID;
 
 struct _RefID_t {
-    operator int32_t() const {return (int32_t)(_ptr() == NULL?0:_ptr()->core.tid);}
+    operator int32_t() const {return (int32_t)(_ptr()->core.tid);}
     const int32_t& operator=(const int32_t& val) {
-        if(NULL != _ptr()) _ptr()->core.tid = (int32_t)val;
+        _ptr()->core.tid = (int32_t)val;
         return val;
     }
     private:

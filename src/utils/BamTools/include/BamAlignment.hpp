@@ -168,8 +168,10 @@ namespace BamTools {
 			SupportData(*this)
 		{
 			bam_copy1(&_bam, ba.HtsObj());
-			InitCigarData();
-			InitAdditionalData();
+			CigarData = ba.CigarData;
+			QueryBases = ba.QueryBases;
+			Qualities = ba.Qualities;
+			AllCharData = ba.AllCharData;
 		}
 
 		const BamAlignment& operator = (const BamAlignment& ba)
@@ -178,8 +180,10 @@ namespace BamTools {
 			Filename = ba.Filename;
 			bam_copy1(&_bam, ba.HtsObj());
 			BlockLength = ba.BlockLength;
-			InitCigarData();
-			InitAdditionalData();
+			CigarData = ba.CigarData;
+			QueryBases = ba.QueryBases;
+			Qualities = ba.Qualities;
+			AllCharData = ba.AllCharData;
 			return *this;
 		}
 

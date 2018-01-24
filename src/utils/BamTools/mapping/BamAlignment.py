@@ -7,9 +7,9 @@ class SimplePropertyMapping:
     def class_def(self):
         return """
 struct _{dest_name}_t {{
-    operator {dest_type}() const {{return ({dest_type})(_ptr() == NULL?0:_ptr()->{src_name});}}
+    operator {dest_type}() const {{return ({dest_type})(_ptr()->{src_name});}}
     const {dest_type}& operator=(const {dest_type}& val) {{
-        if(NULL != _ptr()) _ptr()->{src_name} = ({dest_type})val;
+        _ptr()->{src_name} = ({dest_type})val;
         return val;
     }}
     private:
@@ -28,7 +28,7 @@ class ReadOnlyPropertyMapping:
     def class_def(self):
         return """
 struct _{dest_name}_t {{
-    operator {dest_type}() const {{return ({dest_type})(_ptr() == NULL?0:({src_name});}}
+    operator {dest_type}() const {{return ({dest_type})({src_name});}}
     private:
         bam1_t* _ptr() const {{
            return ((BamAlignment*)(((uintptr_t)this) - ((uintptr_t)&((BamAlignment*)NULL)->{dest_name})))->HtsObj2();
