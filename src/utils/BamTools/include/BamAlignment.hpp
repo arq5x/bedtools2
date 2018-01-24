@@ -71,8 +71,14 @@ namespace BamTools {
 
 		const bam1_t* HtsObj() const 
 		{
-			return _bam->bam;
+			return _bam != NULL ? _bam->bam : NULL;
 		}
+
+		bam1_t* HtsObj2() 
+		{
+			return _bam != NULL ? _bam->bam : NULL;
+		}
+
 		std::string Name;
 		std::string Filename;
 		std::vector<CigarOp> CigarData;
@@ -127,7 +133,7 @@ namespace BamTools {
 			_QuerySequenceLength_t& QuerySequenceLength;
 			_NumCigarOperations_t& NumCigarOperations;
 			uint32_t& BlockLength;
-			std::string AllCharData; /* TODO(haohou): dealing with this dummy string, probably based on _ptr->data */
+			std::string AllCharData;
 			bool HasCoreOnly;  /* TODO(haohou): populate the string data */
 			/* TODO(haohou): Tag2Cigar?  Real Cigar ? */
 			_SupportData(BamAlignment& parent): 

@@ -7,16 +7,15 @@ class SimplePropertyMapping:
     def class_def(self):
         return """
 struct _{dest_name}_t {{
-    _{dest_name}_t() : _ptr(NULL) {{}}
-    void set(bam1_t* ptr) {{_ptr = ptr;}}
-    void set(const _{dest_name}_t& that) {{_ptr = that._ptr;}}
-    operator {dest_type}() const {{return ({dest_type})(_ptr == NULL?0:_ptr->{src_name});}}
+    operator {dest_type}() const {{return ({dest_type})(_ptr() == NULL?0:_ptr()->{src_name});}}
     const {dest_type}& operator=(const {dest_type}& val) {{
-        if(NULL != _ptr) _ptr->{src_name} = ({dest_type})val;
+        if(NULL != _ptr()) _ptr()->{src_name} = ({dest_type})val;
         return val;
     }}
     private:
-        bam1_t* _ptr;
+        bam1_t* _ptr() const {{
+           return ((BamAlignment*)(((uintptr_t)this) - ((uintptr_t)&((BamAlignment*)NULL)->{dest_name})))->HtsObj2();
+        }}
 }} {dest_name};""".format(src_type = self._src_type,
                           dest_type = self._dest_type,
                           src_name = self._src_name,
@@ -29,12 +28,11 @@ class ReadOnlyPropertyMapping:
     def class_def(self):
         return """
 struct _{dest_name}_t {{
-    _{dest_name}_t() : _ptr(NULL) {{}}
-    void set(bam1_t* ptr) {{_ptr = ptr;}}
-    void set(const _{dest_name}_t& that) {{_ptr = that._ptr;}}
-    operator {dest_type}() const {{return ({dest_type})(_ptr == NULL?0:({src_name});}}
+    operator {dest_type}() const {{return ({dest_type})(_ptr() == NULL?0:({src_name});}}
     private:
-        bam1_t* _ptr;
+        bam1_t* _ptr() const {{
+           return ((BamAlignment*)(((uintptr_t)this) - ((uintptr_t)&((BamAlignment*)NULL)->{dest_name})))->HtsObj2();
+        }}
 }} {dest_name};""".format(src_type = self._src_type,
                           dest_type = self._dest_type,
                           src_name = self._src_name,
@@ -61,12 +59,8 @@ for p in props:
 
 print "void setup(bam1_t* bam)"
 print "{"
-for p in props:
-    print "    {name}.set(bam);".format(name = p)
 print "}"
 
 print "void setup(const BamAlignment& bam)"
 print "{"
-for p in props:
-    print "    {name}.set(bam.{name});".format(name = p)
 print "}"
