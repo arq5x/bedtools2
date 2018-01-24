@@ -69,7 +69,7 @@ void int2str(int number, T& buffer, bool appendToBuf = false)
 	}
 
 	if (!appendToBuf) {
-		buffer = tmpBuf;
+		buffer.assign(tmpBuf, (tmpBuffer - tmpBuf));
 	} else {
 		buffer.append(tmpBuf);
 	}
