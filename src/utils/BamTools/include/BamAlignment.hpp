@@ -171,7 +171,7 @@ namespace BamTools {
 			CigarData = ba.CigarData;
 			QueryBases = ba.QueryBases;
 			Qualities = ba.Qualities;
-			AllCharData = ba.AllCharData;
+			SupportData.AllCharData = ba.SupportData.AllCharData;
 		}
 
 		const BamAlignment& operator = (const BamAlignment& ba)
@@ -183,7 +183,7 @@ namespace BamTools {
 			CigarData = ba.CigarData;
 			QueryBases = ba.QueryBases;
 			Qualities = ba.Qualities;
-			AllCharData = ba.AllCharData;
+			SupportData.AllCharData = ba.SupportData.AllCharData;
 			return *this;
 		}
 
