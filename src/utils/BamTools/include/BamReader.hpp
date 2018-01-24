@@ -244,7 +244,6 @@ namespace BamTools {
 		{
 			if(GetNextAlignmentCore(alignment))
 			{
-				alignment.InitCigarData();
 				alignment.InitAdditionalData();
 				return true;
 			}
