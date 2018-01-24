@@ -183,12 +183,15 @@ namespace BamTools {
 			return *this;
 		}
 
-		void operator ()(const std::string filename, const bam1_t* bam, uint32_t size = 0)
+		void operator ()(const std::string filename, const bam1_t* bam, uint32_t size = 0, bool copy = true)
 		{
 			Filename = filename;
 			Name = std::string(bam_get_qname(bam));
 			BlockLength = size;
-			bam_copy1(&_bam, bam);
+			if(copy)
+				bam_copy1(&_bam, bam);
+			else
+				_bam = *bam;
 			InitCigarData();
 			InitAdditionalData();
 		}

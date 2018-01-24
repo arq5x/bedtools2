@@ -92,6 +92,7 @@ namespace BamTools {
 
 			BamReader* reader;
 			bool has_range;
+			bam1_t buffer;
 		};
 
 		struct _MetaData {
@@ -125,7 +126,9 @@ namespace BamTools {
 
 		bool _read_sam_file(_SamFile* file)
 		{
-			bam1_t *rec_ptr = bam_init1();
+			memset(&file->buffer, 0, sizeof(file->buffer));
+			bam1_t* rec_ptr = &file->buffer;
+
 			int read_rc;
 			if(file->has_range)
 			{
@@ -244,7 +247,7 @@ namespace BamTools {
 
 			_SamFile* fp = top.first.file;
 			
-			alignment(_hdrs[fp->idx].Filename(), top.second, top.first.size);
+			alignment(_hdrs[fp->idx].Filename(), top.second, top.first.size, false);
 
 			_queue.pop();
 
@@ -273,7 +276,7 @@ namespace BamTools {
 			while(!_queue.empty())
 			{
 				auto& item = _queue.top();
-				bam_destroy1(item.second);
+				free(item.second->data);
 				_queue.pop();
 			}
 		}
