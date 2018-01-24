@@ -48,8 +48,8 @@ InputStreamMgr::~InputStreamMgr() {
 	delete _infStreamBuf;
 	_infStreamBuf = NULL;
 
+	if(_bamReader) _bamReader->Close();
 	delete _bamReader;
-	_bgStream = NULL;
 
 	delete _bgStream;
 	_bgStream = NULL;

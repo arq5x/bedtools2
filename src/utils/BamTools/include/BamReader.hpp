@@ -27,7 +27,7 @@ namespace BamTools {
 		
 		static int close(void* data)
 		{
-			free(data);
+			delete static_cast<stream_data_t*>(data);
 			return 0;
 		}
 	};
@@ -154,7 +154,6 @@ namespace BamTools {
 				_error_str = "Htslib error"; 
 			}
 
-			bam_destroy1(rec_ptr);
 			return false;
 		}
 
@@ -172,6 +171,8 @@ namespace BamTools {
 
 			if(_read_sam_file(_files[_files.size() - 1]) || GetErrorString() == "")
 				return true;
+
+			Close();
 
 			return false;
 		}

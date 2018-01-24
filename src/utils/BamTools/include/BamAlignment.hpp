@@ -114,7 +114,7 @@ namespace BamTools {
 
 			const uint8_t* qual = bam_get_qual(&_bam);
 
-			if(qual[0] == 0xffu)
+			if(_bam.core.l_qseq == 0 || qual[0] == 0xffu)
 				Qualities.resize(QuerySequenceLength, -1);
 			else for(unsigned i = 0; i < QuerySequenceLength; i ++)
 				Qualities.push_back((char)(33 + qual[i]));
@@ -191,7 +191,10 @@ namespace BamTools {
 			if(copy)
 				bam_copy1(&_bam, bam);
 			else
+			{
+				free(_bam.data);
 				_bam = *bam;
+			}
 			InitCigarData();
 			InitAdditionalData();
 		}
