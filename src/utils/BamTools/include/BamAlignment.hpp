@@ -199,8 +199,6 @@ namespace BamTools {
 				free(_bam.data);
 				_bam = *bam;
 			}
-			InitCigarData();
-			InitAdditionalData();
 		}
 
 		inline bool GetAlignmentFlag(uint32_t mask) const

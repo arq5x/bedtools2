@@ -242,6 +242,17 @@ namespace BamTools {
 
 		bool GetNextAlignment(BamAlignment& alignment)
 		{
+			if(GetNextAlignmentCore(alignment))
+			{
+				alignment.InitCigarData();
+				alignment.InitAdditionalData();
+				return true;
+			}
+			return false;
+		}
+
+		bool GetNextAlignmentCore(BamAlignment& alignment)
+		{
 			if(_queue.empty()) return false;
 
 			auto& top = _queue.top();
@@ -255,11 +266,6 @@ namespace BamTools {
 			_read_sam_file(fp);
 
 			return true;
-		}
-
-		bool GetNextAlignmentCore(BamAlignment& alignment)
-		{
-			return GetNextAlignment(alignment);
 		}
 
 		void Close(void)
