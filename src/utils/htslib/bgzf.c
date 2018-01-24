@@ -464,6 +464,7 @@ static int inflate_block(BGZF* fp, int block_length)
         return -1;
     }
 
+#if 0
     // Check CRC of uncompressed block matches the gzip header.
     // NB: we may wish to switch out the zlib crc32 for something more performant.
     // See PR#361 and issue#467
@@ -473,6 +474,7 @@ static int inflate_block(BGZF* fp, int block_length)
         fp->errcode |= BGZF_ERR_CRC;
         return -1;
     }
+#endif
 
     return dlen;
 }
