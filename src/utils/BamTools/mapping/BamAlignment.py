@@ -56,11 +56,3 @@ for line in file(sys.argv[1]):
 
 for p in props:
     print props[p].class_def()
-
-print "void setup(bam1_t* bam)"
-print "{"
-print "}"
-
-print "void setup(const BamAlignment& bam)"
-print "{"
-print "}"

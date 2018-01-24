@@ -21,11 +21,7 @@ namespace BamTools {
 
 	class BamAlignment {
 
-		struct _Bam {
-			bam1_t* bam;
-			~_Bam() { bam_destroy1(bam); }
-			_Bam(bam1_t* b) : bam(b) {}
-		};
+		bam1_t _bam;
 
 		template <typename Destination>
 		struct _TagGetterBase 
@@ -59,24 +55,23 @@ namespace BamTools {
 			template <class MakeValue>
 			bool operator ()(const std::string& tag, MakeValue make_value)
 			{
-				const uint8_t* data = bam_aux_get(this->_parent._bam->bam, tag.c_str());
+				const uint8_t* data = bam_aux_get(this->_parent.HtsObj(), tag.c_str());
 				if(nullptr == data) return false;
 				this->_dest = make_value(data);
 				return true;
 			}
 		};
 
-		std::shared_ptr<_Bam> _bam;
 	public:
 
 		const bam1_t* HtsObj() const 
 		{
-			return _bam != NULL ? _bam->bam : NULL;
+			return &_bam;
 		}
 
 		bam1_t* HtsObj2() 
 		{
-			return _bam != NULL ? _bam->bam : NULL;
+			return &_bam;
 		}
 
 		std::string Name;
@@ -87,8 +82,8 @@ namespace BamTools {
 		{
 			CigarData.clear();
 
-			uint32_t *cigar = bam_get_cigar(_bam->bam);  
-			uint32_t num_cigar_elements = _bam->bam->core.n_cigar;
+			uint32_t *cigar = bam_get_cigar(&_bam);  
+			uint32_t num_cigar_elements = _bam.core.n_cigar;
 
 			for ( uint32_t i = 0; i < num_cigar_elements; ++i )
 			{
@@ -109,7 +104,7 @@ namespace BamTools {
 			QueryBases = "";
 			Qualities = "";
 			static const char* base2char = "=ACMGRSVTWYHKDBN";
-			const uint8_t* seq = bam_get_seq(_bam->bam);
+			const uint8_t* seq = bam_get_seq(&_bam);
 			
 			for(unsigned i = 0; i < QuerySequenceLength; i ++)
 			{
@@ -117,13 +112,13 @@ namespace BamTools {
 				QueryBases.push_back(cur_base);
 			}
 
-			const uint8_t* qual = bam_get_qual(_bam->bam);
+			const uint8_t* qual = bam_get_qual(&_bam);
 
 			if(qual[0] == 0xffu)
 				Qualities.resize(QuerySequenceLength, -1);
 			else for(unsigned i = 0; i < QuerySequenceLength; i ++)
 				Qualities.push_back((char)(33 + qual[i]));
-			SupportData.AllCharData = std::string(_bam ? (char*)_bam->bam->data : "", _bam ? _bam->bam->l_data : 0);
+			SupportData.AllCharData = std::string((const char*)_bam.data, _bam.l_data);
 		}
 
 #include <BamAlignment.mapping.hpp>
@@ -145,66 +140,70 @@ namespace BamTools {
 			{
 			}
 		} SupportData;
-		
+	
+		~BamAlignment() 
+		{
+			free(_bam.data);
+		}
 
-		BamAlignment() : _bam(NULL),  BlockLength(0), SupportData(*this){}
+		BamAlignment() : BlockLength(0), SupportData(*this)
+		{
+			memset(&_bam, 0, sizeof(_bam));
+		}
 
-		BamAlignment(const std::string& filename, bam1_t* bam, uint32_t size = 0) : 
-			_bam(new _Bam(bam)), 
+
+		BamAlignment(const std::string& filename, const bam1_t* bam, uint32_t size = 0) : 
 			Name(bam_get_qname(bam)),
 			Filename(filename),
 			BlockLength(size),
 			SupportData(*this)
 		{
-			setup(bam);
+			bam_copy1(&_bam, bam);
 			InitCigarData();
 			InitAdditionalData();
 		}
 
 		BamAlignment(const BamAlignment& ba) :
-			_bam(ba._bam), 
 			Filename(ba.Filename),
 			SupportData(*this)
 		{
-			setup(ba);
+			bam_copy1(&_bam, ba.HtsObj());
 			InitCigarData();
 			InitAdditionalData();
 		}
 
 		const BamAlignment& operator = (const BamAlignment& ba)
 		{
-			_bam = ba._bam;
 			Name = ba.Name;
 			Filename = ba.Filename;
-			setup(ba);
+			bam_copy1(&_bam, ba.HtsObj());
 			BlockLength = ba.BlockLength;
 			InitCigarData();
 			InitAdditionalData();
 			return *this;
 		}
 
-		void operator ()(const std::string filename, bam1_t* bam, uint32_t size = 0)
+		void operator ()(const std::string filename, const bam1_t* bam, uint32_t size = 0)
 		{
-			_bam = std::shared_ptr<_Bam>(new _Bam(bam));
 			Filename = filename;
 			Name = std::string(bam_get_qname(bam));
-			setup(bam);
 			BlockLength = size;
+			bam_copy1(&_bam, bam);
 			InitCigarData();
 			InitAdditionalData();
 		}
 
 		inline bool GetAlignmentFlag(uint32_t mask) const
 		{
-			return _bam->bam->core.flag & mask;
+			return _bam.core.flag & mask;
 		}
 
 		inline void SetAlignmentFlag(uint32_t mask, bool val)
 		{
-			if(val && !(_bam->bam->core.flag & mask))
-				_bam->bam->core.flag |= mask;
-			else if(val && (_bam->bam->core.flag & mask))
-				_bam->bam->core.flag &= ~mask;
+			if(val && !(_bam.core.flag & mask))
+				_bam.core.flag |= mask;
+			else if(val && (_bam.core.flag & mask))
+				_bam.core.flag &= ~mask;
 		}
 
 #define FLAG_ACCESSOR(name, mask) \
@@ -213,12 +212,12 @@ namespace BamTools {
 
 		inline bool IsMapped() const
 		{
-			return !(_bam->bam->core.flag & BAM_FUNMAP);
+			return !(_bam.core.flag & BAM_FUNMAP);
 		}
 
 		bool IsMateMapped() const
 		{
-			return !(_bam->bam->core.flag & BAM_FMUNMAP);
+			return !(_bam.core.flag & BAM_FMUNMAP);
 		}
 
 
@@ -238,7 +237,7 @@ namespace BamTools {
 				fprintf(stderr, "FIXME: we current do not support the usePadded and closedInterval param");
 			}
 
-			return bam_endpos(_bam->bam);
+			return bam_endpos(&_bam);
 		}
 
 		template <typename T>
@@ -253,7 +252,7 @@ namespace BamTools {
 
 		bool HasTag(const std::string& tag) const
 		{
-			const uint8_t *aux_ptr = bam_aux_get(_bam->bam, tag.c_str());
+			const uint8_t *aux_ptr = bam_aux_get(&_bam, tag.c_str());
 			if ( aux_ptr == nullptr )
 				return false;
 			return true;
@@ -266,7 +265,7 @@ namespace BamTools {
 			if(string_getter && "Z" == type)
 			{
 				std::string* str = static_cast<std::string*>(&data);
-				bam_aux_append(this->_bam->bam, tag.c_str(), 'Z', str->size() + 1, (uint8_t*)str->c_str());
+				bam_aux_append(&_bam, tag.c_str(), 'Z', str->size() + 1, (uint8_t*)str->c_str());
 				return true;
 			}
 			return false;

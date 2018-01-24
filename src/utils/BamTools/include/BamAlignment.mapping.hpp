@@ -142,9 +142,3 @@ struct _RefID_t {
            return ((BamAlignment*)(((uintptr_t)this) - ((uintptr_t)&((BamAlignment*)NULL)->RefID)))->HtsObj2();
         }
 } RefID;
-void setup(bam1_t* bam)
-{
-}
-void setup(const BamAlignment& bam)
-{
-}
