@@ -102,7 +102,6 @@ namespace BamTools {
 		void InitAdditionalData()
 		{
 			QueryBases = "";
-			Qualities = "";
 			static const char* base2char = "=ACMGRSVTWYHKDBN";
 			const uint8_t* seq = bam_get_seq(&_bam);
 			
@@ -112,13 +111,14 @@ namespace BamTools {
 				QueryBases.push_back(cur_base);
 			}
 
+			Qualities = "";
+			
 			const uint8_t* qual = bam_get_qual(&_bam);
 
 			if(_bam.core.l_qseq == 0 || qual[0] == 0xffu)
 				Qualities.resize(QuerySequenceLength, -1);
 			else for(unsigned i = 0; i < QuerySequenceLength; i ++)
 				Qualities.push_back((char)(33 + qual[i]));
-			SupportData.AllCharData = std::string((const char*)_bam.data, _bam.l_data);
 		}
 
 #include <BamAlignment.mapping.hpp>
@@ -199,6 +199,11 @@ namespace BamTools {
 				free(_bam.data);
 				_bam = *bam;
 			}
+			
+
+			SupportData.AllCharData = std::string((const char*)_bam.data, _bam.l_data);
+
+			InitCigarData();
 		}
 
 		inline bool GetAlignmentFlag(uint32_t mask) const
