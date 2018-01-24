@@ -128,7 +128,13 @@ namespace BamTools {
 			_QuerySequenceLength_t& QuerySequenceLength;
 			_NumCigarOperations_t& NumCigarOperations;
 			uint32_t& BlockLength;
-			std::string AllCharData;
+			struct {
+				const char* begin;
+				size_t      size;
+				const char* c_str() const { return begin; }
+				size_t      length() const { return size; }
+				void clear() { begin = NULL; size = 0; }
+			} AllCharData;
 			bool HasCoreOnly;  /* TODO(haohou): populate the string data */
 			/* TODO(haohou): Tag2Cigar?  Real Cigar ? */
 			_SupportData(BamAlignment& parent): 
@@ -199,9 +205,9 @@ namespace BamTools {
 				free(_bam.data);
 				_bam = *bam;
 			}
-			
 
-			SupportData.AllCharData = std::string((const char*)_bam.data, _bam.l_data);
+			SupportData.AllCharData.begin = (const char*)_bam.data;
+			SupportData.AllCharData.size = _bam.l_data;
 
 			InitCigarData();
 		}
