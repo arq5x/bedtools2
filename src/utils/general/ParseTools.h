@@ -45,12 +45,13 @@ void int2str(int number, T& buffer, bool appendToBuf = false)
 
 	bool neg = number < 0;
 	if(neg) number = -number;
-	uint32_t n,s;
+	uint32_t n,s,t;
 	for(n = 0; number; number /= 10)
 		tmp[n++] = number % 10 + '0';
 	if(neg) tmp[n++] = '-';
-	for(s=0,n--;s<n;swap(tmp[--n], tmp[++s]));
-	buffer.append(tmp, n + neg);
+	t = n;
+	for(s=0,n--;s<n;swap(tmp[n--], tmp[s++]));
+	buffer.append(tmp, t);
 }
 
 bool isHeaderLine(const string &line);
