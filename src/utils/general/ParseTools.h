@@ -40,40 +40,22 @@ int str2chrPos(const string &str);
 template<class T>
 void int2str(int number, T& buffer, bool appendToBuf = false)
 {
-	if (number == 0) {
-		if (appendToBuf) {
-			buffer.append("0");
-		} else {
-			buffer = "0";
-		}
-		return;
-	}
-	//check for negative numbers.
-	bool isNegative = number < 0;
-	unsigned useNum = number;
-	if (isNegative) {
-		useNum = 0 - useNum; //convert to positive.
-	}
+	const static int limit[] = {-1, 10, 100, 1000, 10000, 100000, 1000000, 10000000, 100000000, 1000000000};
+	char tmp[12];
 
-	char tmpBuffer[numeric_limits<int>::digits10 + 3];
-	char *tmpBuf = &tmpBuffer[sizeof tmpBuffer];
-	*--tmpBuf = '\0';
+	if(!appendToBuf) buffer.clear();
 
-	while (useNum > 0) {
-		*--tmpBuf = (useNum % 10) + '0';
-		useNum /= 10;
-	}
+	bool neg = number < 0;
+	if(neg) number = -number;
+	uint32_t n;
+	for(n = 0; limit[n] < number && n < sizeof(limit) / sizeof(int); n ++);
 
-	if (isNegative) {
-		*--tmpBuf = '-';
-	}
+	tmp[n + neg] = 0;
+	
+	for(uint32_t i = 0; i < n; i ++, number /= 10)
+		tmp[n + neg - i - 1] = number % 10;
 
-	if (!appendToBuf) {
-		buffer.assign(tmpBuf, (tmpBuffer + sizeof(tmpBuffer) - tmpBuf));
-	} else {
-		buffer.append(tmpBuf);
-	}
-
+	buffer.append(tmp, n + neg);
 }
 
 bool isHeaderLine(const string &line);
