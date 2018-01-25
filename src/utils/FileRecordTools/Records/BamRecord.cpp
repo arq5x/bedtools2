@@ -268,15 +268,38 @@ void BamRecord::buildCigarStr() {
 	const vector<BamTools::CigarOp> &cigarData = _bamAlignment.CigarData;
 	size_t cigarVecLen = cigarData.size();
 	_cigarStr.clear();
-	_cigarStr.reserve(2 * cigarVecLen);
 
-	std::ostringstream tmp;
-	for (size_t i=0; i < cigarVecLen; i++) {
-		tmp << cigarData[i].Type;
-		tmp << cigarData[i].Length;
+	static char* buffer = NULL;
+	static size_t buffer_size = 0;
+
+	size_t new_buffer_size = buffer_size;
+
+	while(new_buffer_size < cigarVecLen * 11)
+		new_buffer_size = new_buffer_size == 0 ? 128 : new_buffer_size * 2;
+
+	if(new_buffer_size != buffer_size)
+	{
+		free(buffer);
+		buffer = (char*)malloc(new_buffer_size);
+		buffer_size = new_buffer_size;
 	}
-	_cigarStr = tmp.str();
 
+
+	if(cigarVecLen)
+	{
+		char* ptr = buffer + buffer_size - 1;
+		ptr[1] = 0;
+
+		for (size_t i = cigarVecLen ; i > 0; i--) {
+			for(uint32_t val = cigarData[i - 1].Length; val > 0; val /= 10)
+				*ptr-- = (val % 10) + '0';
+			if(cigarData[i - 1].Length == 0)
+				*ptr-- = '0';
+			*ptr-- = cigarData[i - 1].Type;
+		}
+
+		_cigarStr.assign(ptr + 1, buffer + buffer_size - 1 - ptr);
+	}
 }
 
 
