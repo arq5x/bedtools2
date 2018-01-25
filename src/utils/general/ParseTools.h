@@ -40,8 +40,13 @@ int str2chrPos(const string &str);
 template<class T>
 void int2str(int number, T& buffer, bool appendToBuf = false)
 {
-	char tmp[12];
 	if(!appendToBuf) buffer.clear();
+	if(number == 0) 
+	{
+		buffer.append("0");
+		return;
+	}
+	char tmp[12];
 
 	bool neg = number < 0;
 	if(neg) number = -number;
