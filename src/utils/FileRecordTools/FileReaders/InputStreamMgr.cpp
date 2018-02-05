@@ -136,6 +136,7 @@ bool InputStreamMgr::populateScanBuffer()
 	_saveDataStr.clear();
 	int numChars=0;
 	int currChar = 0;
+	char cram_code[4];
 	while (1) {
 		if (_isGzipped && _bamRuledOut) {
 			return readZipChunk();
@@ -158,6 +159,34 @@ bool InputStreamMgr::populateScanBuffer()
 				//is definitely not BAM, and want to start over.
 			}
 		}
+	   else
+	   {
+			if(numChars <= 4) cram_code[numChars-1] = currChar;
+			if(numChars == 4 && memcmp(cram_code, "CRAM", 4) == 0)
+			{
+				for (; numChars < BAM_SCAN_BUFFER_SIZE; numChars++) {
+					currChar = _pushBackStreamBuf->sbumpc();
+					//Stop when EOF hit.
+					if (currChar == EOF) {
+						_eofHit = true;
+						break;
+					}
+					_scanBuffer.push_back(currChar);
+
+				}
+				_pushBackStreamBuf->pushBack(_scanBuffer);
+
+				_bamReader = new BamTools::BamReader();
+				if (_bamReader->OpenStream(_finalInputStream))
+				{
+					_isBam = true;
+					_numBytesInBuffer = _scanBuffer.size();
+					return true;
+				}
+				else return false;
+			}
+		}
+
 
 		//Stop if we have the minimum number of bytes and newline is hit.
 		//For gzip, stop at SCAN_BUFFER_SIZE.
