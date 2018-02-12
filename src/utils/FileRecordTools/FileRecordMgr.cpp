@@ -69,8 +69,11 @@ bool FileRecordMgr::open(bool inheader){
 		_bufStreamMgr->getTypeChecker().setRecordType(FileRecordTypeChecker::NO_POS_PLUS_RECORD_TYPE);
 		_fileType = FileRecordTypeChecker::SINGLE_LINE_DELIM_TEXT_FILE_TYPE;
 		_recordType = FileRecordTypeChecker::NO_POS_PLUS_RECORD_TYPE;
-		_isCram = _bufStreamMgr->getTypeChecker().isCram();
 	}
+
+	if(_fileType == FileRecordTypeChecker::BAM_FILE_TYPE)
+		_isCram = _bufStreamMgr->getTypeChecker().isCram();
+
 	if (_fileType == FileRecordTypeChecker::UNKNOWN_FILE_TYPE || _recordType == FileRecordTypeChecker::UNKNOWN_RECORD_TYPE) {
 		cerr << "Error: Unable to determine type for file " << _filename << endl;
 		delete _bufStreamMgr;
