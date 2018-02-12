@@ -35,6 +35,7 @@ public:
 	bool isGzipped() const { return _isGzipped; }
 	bool isBGzipped() const { return _isBgzipped; }
 	bool isBam() const { return _isBam; }
+	bool isCram() const { return _isCram; }
 
 	bool isCompressed() const { return _isGzipped || _isBgzipped || _isBam; }
 	PushBackStreamBuf *getPushBackStreamBuf() const {return _pushBackStreamBuf; }
@@ -55,6 +56,7 @@ private:
 	bool _isStdin;
 	bool _isGzipped;
 	bool _isBam;
+	bool _isCram;
 	bool _isBgzipped;
 	char *_tmpZipBuf;
 	bool _bamRuledOut;

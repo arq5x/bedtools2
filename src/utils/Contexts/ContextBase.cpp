@@ -139,6 +139,7 @@ bool ContextBase::determineOutputType() {
 	int fileIdx = hasIntersectMethods() ? _queryFileIdx : 0;
 	if (_files[fileIdx]->getFileType() == FileRecordTypeChecker::BAM_FILE_TYPE) {
 		setOutputFileType(FileRecordTypeChecker::BAM_FILE_TYPE);
+		_isCram = _files[fileIdx]->isCram();
 		return true;
 	}
 

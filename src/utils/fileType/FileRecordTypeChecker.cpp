@@ -18,6 +18,7 @@ FileRecordTypeChecker::FileRecordTypeChecker()
 	_firstValidDataLineIdx = -1;
 	_isVCF = false;
 	_isBAM = false;
+	_isCRAM = false;
 	_isGFF = false;
 	_isGFFplus = false;
 	_isGzipped = false;
@@ -448,6 +449,15 @@ void FileRecordTypeChecker::setBam()
 	_recordType = BAM_RECORD_TYPE;
 	_isBinary = true;
 	_isBAM = true;
+}
+
+void FileRecordTypeChecker::setCram()
+{
+	_fileType = BAM_FILE_TYPE;
+	_recordType = BAM_RECORD_TYPE;
+	_isBinary = true;
+	_isBAM = true;
+	_isCRAM = true;
 }
 
 bool FileRecordTypeChecker::passesBed5() {

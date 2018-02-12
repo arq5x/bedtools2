@@ -180,7 +180,9 @@ bool InputStreamMgr::populateScanBuffer()
 				if (_bamReader->OpenStream(_finalInputStream))
 				{
 					_isBam = true;
+					_isCram = true;
 					_numBytesInBuffer = _scanBuffer.size();
+
 					return true;
 				}
 				else return false;
