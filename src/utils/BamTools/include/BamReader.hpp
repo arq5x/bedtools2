@@ -2,6 +2,7 @@
 #define __HTSLIBPP_BAMREADER_HPP__
 #include <BamAlignment.hpp>
 #include <SamHeader.hpp>
+#include <cram.h>
 #include <sam.h>
 #include <hts.h>
 #include <hfile.h>
@@ -80,6 +81,11 @@ namespace BamTools {
 				tid_l ++;
 				ofs_l = 0;
 				return refresh_idx();
+			}
+
+			refs_t* get_reference()
+			{
+				return cram_get_refs(fp);
 			}
 
 			samFile* fp;
@@ -337,6 +343,11 @@ namespace BamTools {
 			}
 
 			return true;
+		}
+
+		refs_t* GetReference(int idx = 0)
+		{
+			return _files.at(idx)->get_reference();
 		}
 
 	};

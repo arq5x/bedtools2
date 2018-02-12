@@ -164,6 +164,7 @@ namespace BamTools {
 			BlockLength(size),
 			SupportData(*this)
 		{
+			memset(&_bam, 0, sizeof(_bam));
 			bam_copy1(&_bam, bam);
 			InitCigarData();
 			InitAdditionalData();
@@ -173,6 +174,7 @@ namespace BamTools {
 			Filename(ba.Filename),
 			SupportData(*this)
 		{
+			memset(&_bam, 0, sizeof(_bam));
 			bam_copy1(&_bam, ba.HtsObj());
 			CigarData = ba.CigarData;
 			QueryBases = ba.QueryBases;
