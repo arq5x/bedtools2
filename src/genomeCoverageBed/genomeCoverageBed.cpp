@@ -80,8 +80,10 @@ void BedGenomeCoverage::PrintTrackDefinitionLine()
 
 
 BedGenomeCoverage::~BedGenomeCoverage(void) {
-    delete _bed;
-    delete _genome;
+    if (_bamInput == false) {
+        delete _bed;
+        delete _genome;
+    }
 }
 
 
