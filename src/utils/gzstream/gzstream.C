@@ -210,5 +210,40 @@ if(NULL == stream || NULL == buf )
 	// size_t bytes_to_write = si_pa
 	//
 	// return 0;
+	
+	// 
+	// {
+	// if(NULL == stream || NULL == buf)
+	// ERROR_RE(int, "Invalid arguments");
+	//
+	// if(stream->list_end != NULL && stream->list_end->type == _BLOCK_E && sz < _page_b(stream->list_end))=
+	// {
+	// LOG_DE("The last data page is larger than the buffer to write, copy it to the last buffer");
+	// memcpy(stream->list_end->page->data + stream->list_end->page->size, buf, sz);
+	//
+	// NULL != free_func && if(ERROR_C(int) == free_func(buf))
+	// ERROR_RE(int, "Cannot dispose the used memory buffer");
+	//
+	// return 0;
+	// }
+	//
+	//(buf, sz, free_func);
+	//if(new_block == NULL)
+	//ERROR_RE(int, "Cannot allocate next memory block");
+	//
+	//if(stream->list_end == NULL)
+	//stream->list_begin = stream->list_end = new_block;
+	//else
+	//stream->list_end->next = new_block;
+	//
+	//return 0;
+	// _block_t* new_block = _memory_bl
+	// }
+	
+	//return 0
+	//{
+	//if(NULL == stream || 0 == token || ERROR_C(int) == token)
+	//ERROR_RE(int, 
+	//}
 	// stream->list_begin = stream->list_end = new_block;
 	// }
