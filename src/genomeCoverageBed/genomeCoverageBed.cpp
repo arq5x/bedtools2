@@ -476,6 +476,10 @@ void BedGenomeCoverage::ReportChromCoverageBedGraph(const vector<DEPTH> &chromCo
             // (1) depth>0 (the default running mode),
             // (2) depth==0 and the user requested to print zero covered regions (_bedGraphAll)
             if ( (lastDepth != -1) && (lastDepth > 0 || _bedGraphAll) ) {
+
+                if (lastDepth >= _max) {
+                    lastDepth = _max;
+                }
                 cout << chrom << "\t" << lastStart << "\t" << pos << "\t" << lastDepth * _scale << endl;
             }
             //Set current position as the new interval start + depth
