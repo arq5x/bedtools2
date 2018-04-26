@@ -14,9 +14,9 @@
 #include "bedFile.h"
 
 
-Bed2Fa::Bed2Fa(const string &dbFile, 
+Bed2Fa::Bed2Fa(const string &dbFile,
                const string &bedFile, const string &fastaOutFile,
-               bool useFasta, bool useStrand, 
+               bool useFasta, bool useStrand,
                bool useBlocks, bool useFullHeader,
                bool useBedOut, bool useName, bool useNamePlus) :
     _dbFile(dbFile),
@@ -40,8 +40,8 @@ Bed2Fa::Bed2Fa(const string &dbFile,
         // Make sure we can open the file.
         ofstream fa(fastaOutFile.c_str(), ios::out);
         if ( !fa ) {
-            cerr << "Error: The requested fasta output file (" 
-                 << fastaOutFile << ") could not be opened. Exiting!" 
+            cerr << "Error: The requested fasta output file ("
+                 << fastaOutFile << ") could not be opened. Exiting!"
                  << endl;
             exit (1);
         }
@@ -78,22 +78,22 @@ void Bed2Fa::ReportDNA(const BED &bed, string &dna) {
         {
             header << bed.name;
         }
-        else if (_useNamePlus) 
+        else if (_useNamePlus)
         {
-            header << bed.name << "::" << bed.chrom << ":" 
+            header << bed.name << "::" << bed.chrom << ":"
                    << bed.start << "-" << bed.end;
         }
-        else 
+        else
         {
-            header << bed.chrom << ":" 
+            header << bed.chrom << ":"
                    << bed.start << "-" << bed.end;
         }
-        
+
         if (_useStrand)
         {
             header << "(" << bed.strand << ")";
         }
-        
+
         if (_useFasta)
             *_faOut << ">" << header.str() << endl << dna << endl;
         else
@@ -113,8 +113,8 @@ void Bed2Fa::ExtractDNA() {
     // open the fasta database for reading
     ifstream faDb(_dbFile.c_str(), ios::in);
     if ( !faDb ) {
-        cerr << "Error: The requested fasta database file (" 
-             << _dbFile << ") could not be opened. Exiting!" 
+        cerr << "Error: The requested fasta database file ("
+             << _dbFile << ") could not be opened. Exiting!"
              << endl;
         exit (1);
     }
@@ -132,19 +132,29 @@ void Bed2Fa::ExtractDNA() {
         if (_bed->_status == BED_VALID) {
             // make sure we are extracting >= 1 bp
             if (bed.zeroLength == false) {
-    
+
                 size_t seqLength = fr->sequenceLength(bed.chrom);
                 // seqLength > 0 means chrom was found in index.
                 // seqLength == 0 otherwise.
                 if (seqLength) {
-                    // make sure this feature will not exceed 
+                    // make sure this feature will not exceed
                     // the end of the chromosome.
-                    if ( (bed.start <= seqLength) && (bed.end <= seqLength) ) 
-                    {
+                    if ( bed.start <= seqLength ) {
+                        if ( bed.end > seqLength ) {
+                            // if bed feature end does not fit onto chromosome,
+                            // truncate instead of skipping
+                            cerr << "Feature (" << bed.chrom << ":"
+                                 << bed.start << "-" << bed.end
+                                << ") beyond the length of "
+                                << bed.chrom
+                                << " size (" << seqLength << " bp).  Truncating."
+                                << endl;
+                            bed.end = seqLength;
+                        }
                         int length = bed.end - bed.start;
                         if(_useBlocks){
                             // vec to store the discrete BED "blocks"
-                            bedVector bedBlocks;  
+                            bedVector bedBlocks;
                             GetBedBlocks(bed, bedBlocks);
                             sequence.clear();
                             for (int i = 0; i < (int) bedBlocks.size(); ++i) {
@@ -160,27 +170,27 @@ void Bed2Fa::ExtractDNA() {
                     }
                     else
                     {
-                        cerr << "Feature (" << bed.chrom << ":" 
-                             << bed.start << "-" << bed.end 
+                        cerr << "Feature (" << bed.chrom << ":"
+                             << bed.start << "-" << bed.end
                             << ") beyond the length of "
-                            << bed.chrom 
-                            << " size (" << seqLength << " bp).  Skipping." 
+                            << bed.chrom
+                            << " size (" << seqLength << " bp).  Skipping."
                             << endl;
                     }
                 }
                 else
                 {
-                    cerr << "WARNING. chromosome (" 
-                         << bed.chrom 
+                    cerr << "WARNING. chromosome ("
+                         << bed.chrom
                          << ") was not found in the FASTA file. Skipping."
                          << endl;
                 }
             }
-            // handle zeroLength 
+            // handle zeroLength
             else {
-                cerr << "Feature (" << bed.chrom << ":" 
-                     << bed.start+1 << "-" << bed.end-1 
-                     << ") has length = 0, Skipping." 
+                cerr << "Feature (" << bed.chrom << ":"
+                     << bed.start+1 << "-" << bed.end-1
+                     << ") has length = 0, Skipping."
                      << endl;
             }
             bed = nullBed;
@@ -188,6 +198,3 @@ void Bed2Fa::ExtractDNA() {
     }
     _bed->Close();
 }
-
-
-
