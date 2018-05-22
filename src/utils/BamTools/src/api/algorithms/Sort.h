@@ -76,7 +76,7 @@ struct API_EXPORT Sort {
         { }
 
         // comparison function
-        bool operator()(const BamTools::BamAlignment& lhs, const BamTools::BamAlignment& rhs) {
+        bool operator()(const BamTools::BamAlignment& lhs, const BamTools::BamAlignment& rhs) const {
             return sort_helper(m_order, lhs.Name, rhs.Name);
         }
 
@@ -112,7 +112,7 @@ struct API_EXPORT Sort {
         { }
 
         // comparison function
-        bool operator()(const BamTools::BamAlignment& lhs, const BamTools::BamAlignment& rhs) {
+        bool operator()(const BamTools::BamAlignment& lhs, const BamTools::BamAlignment& rhs) const {
 
             // force unmapped aligmnents to end
             if ( lhs.RefID == -1 ) return false;
@@ -161,7 +161,7 @@ struct API_EXPORT Sort {
         { }
 
         // comparison function
-        bool operator()(const BamTools::BamAlignment& lhs, const BamTools::BamAlignment& rhs) {
+        bool operator()(const BamTools::BamAlignment& lhs, const BamTools::BamAlignment& rhs) const {
 
             // force alignments without tag to end
             T lhsTagValue;
