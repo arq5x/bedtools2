@@ -46,18 +46,17 @@ typedef uint32_t UINT;
 //*************************************************
 // Genome binning constants
 //*************************************************
-const BIN      _numBins   = 37450;
 const BINLEVEL _binLevels = 7;
 
-// bins range in size from 16kb to 512Mb
-// Bin  0          spans 512Mbp,   # Level 1
-// Bins 1-8        span 64Mbp,     # Level 2
-// Bins 9-72       span 8Mbp,      # Level 3
-// Bins 73-584     span 1Mbp       # Level 4
-// Bins 585-4680   span 128Kbp     # Level 5
-// Bins 4681-37449 span 16Kbp      # Level 6
+// bins range in size from 2kb to 512Mb
+// Bin  0            spans 512Mbp,  # Level 0
+// Bins 1-8          span 64Mbp,    # Level 1
+// Bins 9-72         span 8Mbp,     # Level 2
+// Bins 73-584       span 1Mbp      # Level 3
+// Bins 585-4680     span 128Kbp    # Level 4
+// Bins 4681-37448   span 16Kbp     # Level 5
+// Bins 37449-299592 span 2Kbp      # Level 6
 const BIN _binOffsetsExtended[] = {32678+4096+512+64+8+1, 4096+512+64+8+1, 512+64+8+1, 64+8+1, 8+1, 1, 0};
-//const BIN _binOffsetsExtended[] = {4096+512+64+8+1, 4096+512+64+8+1, 512+64+8+1, 64+8+1, 8+1, 1, 0};
 
 const USHORT _binFirstShift = 14;       /* How much to shift to get to finest bin. */
 const USHORT _binNextShift  = 3;        /* How much to shift to get to next larger bin. */
@@ -434,7 +433,10 @@ public:
     // vector of BEDCOVLISTs
     void loadBedCovListFileIntoMap();
 
-    // load a BED file into a map keyed by chrom. value is vector of BEDs
+    // load a BED file into a vector of BEDCOVLISTs
+    void loadBedCovListFileIntoVector();
+
+    // load and sort a BED file into a map keyed by chrom. value is vector of BEDs
     void loadBedFileIntoMapNoBin();
 
     // load a BED file into a vector of BEDs
@@ -475,8 +477,8 @@ public:
     // Given a chrom, start, end and strand for a single feature,
     // increment a the number of hits for each feature in B file
     // that the feature overlaps
-    void countListHits(const BED &a, int index, 
-                       bool sameStrand, bool diffStrand);
+    void countListHitsWithoutBins(const BED &a, int index,
+                                  bool sameStrand, bool diffStrand);
     
     
     // return the total length of all the intervals in the file.
@@ -501,6 +503,7 @@ public:
     masterBedMap         bedMap;
     bedVector            bedList;
     masterBedMapNoBin    bedMapNoBin;
+    bedCovListVector     bedCovListFlat;
     
     BedLineStatus _status;
     int _lineNum;

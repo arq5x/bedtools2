@@ -587,60 +587,42 @@ void BedFile::countSplitHits(const vector<BED> &bedBlocks, bool sameStrand, bool
 }
 
 
-void BedFile::countListHits(const BED &a, int index, bool sameStrand, bool diffStrand) {
+void BedFile::countListHitsWithoutBins(const BED &a, int index, bool sameStrand, bool diffStrand) {
 
-    BIN startBin, endBin;
-    startBin = (a.start >> _binFirstShift);
-    endBin = ((a.end-1) >> _binFirstShift);
+    // compute and report the observed coverage for each feature
+    vector<BEDCOVLIST>::iterator bedItr = bedCovListFlat.begin();
+    vector<BEDCOVLIST>::iterator bedEnd = bedCovListFlat.end();
+    for (; bedItr != bedEnd; ++bedItr) {
 
-    // loop through each bin "level" in the binning hierarchy
-    for (BINLEVEL i = 0; i < _binLevels; ++i) {
+        bool strands_are_same = (a.strand == bedItr->strand);
+        // skip the hit if not on the same strand (and we care)
+        if ((sameStrand == true && strands_are_same == false) ||
+            (diffStrand == true && strands_are_same == true)
+           )
+        {
+            continue;
+        }
+        else if (overlaps(bedItr->start, bedItr->end,
+                          a.start, a.end) > 0)
+        {
+            bedItr->counts[index]++;
+            if (a.zeroLength == false) {
+                bedItr->depthMapList[index][a.start+1].starts++;
+                bedItr->depthMapList[index][a.end].ends++;
+            }
+            else {
+                // correct for the fact that we artificially expanded
+                // the zeroLength feature
+                bedItr->depthMapList[index][a.start+2].starts++;
+                bedItr->depthMapList[index][a.end-1].ends++;
+            }
 
-        // loop through each bin at this level of the hierarchy
-        BIN offset = _binOffsetsExtended[i];
-        for (BIN j = (startBin+offset); j <= (endBin+offset); ++j) {
-
-            // loop through each feature in this chrom/bin and see if it 
-            // overlaps with the feature that was passed in.  if so, 
-            // add the feature tothe list of hits.
-            vector<BEDCOVLIST>::iterator 
-                bedItr = bedCovListMap[a.chrom][j].begin();
-            vector<BEDCOVLIST>::iterator 
-                bedEnd = bedCovListMap[a.chrom][j].end();
-            for (; bedItr != bedEnd; ++bedItr) {
-
-                bool strands_are_same = (a.strand == bedItr->strand);
-                // skip the hit if not on the same strand (and we care)
-                if ((sameStrand == true && strands_are_same == false) ||
-                    (diffStrand == true && strands_are_same == true)
-                   ) 
-                {
-                    continue;
-                }
-                else if (overlaps(bedItr->start, bedItr->end, 
-                                  a.start, a.end) > 0) 
-                {
-                    bedItr->counts[index]++;
-                    if (a.zeroLength == false) {
-                        bedItr->depthMapList[index][a.start+1].starts++;
-                        bedItr->depthMapList[index][a.end].ends++;
-                    }
-                    else {
-                        // correct for the fact that we artificially expanded 
-                        // the zeroLength feature
-                        bedItr->depthMapList[index][a.start+2].starts++;
-                        bedItr->depthMapList[index][a.end-1].ends++;
-                    }
-
-                    if (a.start < bedItr->minOverlapStarts[index]) {
-                        bedItr->minOverlapStarts[index] = a.start;
-                    }
-                }
+            if (a.start < bedItr->minOverlapStarts[index]) {
+                bedItr->minOverlapStarts[index] = a.start;
             }
         }
-        startBin >>= _binNextShift;
-        endBin >>= _binNextShift;
     }
+
 }
 
 void BedFile::setZeroBased(bool zeroBased) { this->isZeroBased = zeroBased; }
@@ -741,6 +723,31 @@ void BedFile::loadBedCovListFileIntoMap() {
         }
     }
     Close();
+}
+
+void BedFile::loadBedCovListFileIntoVector() {
+
+    BED bedEntry;
+    Open();
+    while (GetNextBed(bedEntry)) {
+        if (_status == BED_VALID) {
+
+            BEDCOVLIST bedCovList;
+            bedCovList.chrom        = bedEntry.chrom;
+            bedCovList.start        = bedEntry.start;
+            bedCovList.end          = bedEntry.end;
+            bedCovList.name         = bedEntry.name;
+            bedCovList.score        = bedEntry.score;
+            bedCovList.strand       = bedEntry.strand;
+            bedCovList.fields       = bedEntry.fields;
+            bedCovList.other_idxs   = bedEntry.other_idxs;
+            bedCovList.zeroLength   = bedEntry.zeroLength;
+
+            bedCovListFlat.push_back(bedCovList);
+        }
+    }
+    Close();
+
 }
 
 
