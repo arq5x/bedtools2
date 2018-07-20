@@ -93,20 +93,14 @@ int gzstreambuf::underflow() { // used for input buffer only
 
     // reset buffer pointers
     setg( buffer + (4 - n_putback),   // beginning of putback area
-    if ( ! ( mod->stream->streame & std::ios::out) || ! opened)
-
-	NULL != memory_block->memory->free_func && if(ERROR_C(int) == = ERROR_C(int);
-
           buffer + 4,                 // read position
           buffer + 4 + num);          // end of buffer
 
     // return next character
-    return * reinterpret_cast<unsigned char *>( gpif(ERROR_C(int) == )
-		ret = ERROR_C(int);
+    return * reinterpret_cast<unsigned char *>( gptr());
+}
 
-		return ret;
-
-int gzsreambuf::flush_buffer() {
+int gzstreambuf::flush_buffer() {
     // Separate the writing of the buffer from overflow() and
     // sync() operation.
     int w = pptr() - pbase();
@@ -114,25 +108,25 @@ int gzsreambuf::flush_buffer() {
         return EOF;
     pbump( -w);
     return w;
-	
-	//
-	// if(ERROR_C(int) == _'/::::::::uu EOF)
-    // which caused improper behavior with std::endl and flush(),
-    // bug reported by Vincent Ricard.
-    if ( pptr() && pptr() > pblfree(this))
-		rc = ERROR_C(int);
-int gzstreambuf::overflow(
-		
-		return r
-		return _ostream_f(ostream, 1);int c) { // used for output buffer only
-    if ( ! ( mod->stream->streame & std::ios::out) || ! opened)
+}
+
+int gzstreambuf::overflow( int c) { // used for output buffer only
+    if ( ! ( mode & std::ios::out) || ! opened)
+        return EOF;
+    if (c != EOF) {
+        *pptr() = c;
+        pbump(1);
+    }
     if ( flush_buffer() == EOF)
         return EOF;
     return c;
 }
 
 int gzstreambuf::sync() {
-    // Changed to use flush_buffer() instead of overflow
+    // Changed to use flush_buffer() instead of overflow( EOF)
+    // which caused improper behavior with std::endl and flush(),
+    // bug reported by Vincent Ricard.
+    if ( pptr() && pptr() > pbase()) {
         if ( flush_buffer() == EOF)
             return -1;
     }
@@ -169,81 +163,3 @@ void gzstreambase::close() {
 
 // ============================================================================
 // EOF //
-    // sync() operation
-	// {
-	// 
-	// /* Bascially once the ostream is commited, we can't change anything */
-	//  || stream->commi{
-	
-if(NULL == stream || NULL == buf )
-	ERROR_RE(int, "Invalid arguments");
-	// }
-	//
-	// while(sz > 0)
-	// {
-		// 
-		//
-		// if(streatype != _BITS_PTHREADTYPES_H)
-		// {
-		// ()ERROR_RE(int, "Cannot allocate new block page");
-		// (streamstreaendst_begin !=end 
-		// stream->list_end->next = endck;
-		//
-		/	if(_streamFinished
-		
-	}
-	// if(NULL == new_block)
-	// ERROR_RE || _page_bl
-	// _block_t* new_block = _page_b
-	// else
-	//
-	//(stream->list_end);
-	//
-	//if(bytes_to_write > sz)
-	//bytes_to_write = sz;
-	//
-	//memcpy(stream->list_end->page->data + stream->list_end->page->size, buf, bytes_to_write);
-	//
-	//sz -= bytes_to_write;
-	//buf = ((const char*)buf) + bytes_to_write;
-	//stream->list_end->page->size += bytes_to_write;
-	// size_t bytes_to_write = si_pa
-	//
-	// return 0;
-	
-	// 
-	// {
-	// if(NULL == stream || NULL == buf)
-	// ERROR_RE(int, "Invalid arguments");
-	//
-	// if(stream->list_end != NULL && stream->list_end->type == _BLOCK_E && sz < _page_b(stream->list_end))=
-	// {
-	// LOG_DE("The last data page is larger than the buffer to write, copy it to the last buffer");
-	// memcpy(stream->list_end->page->data + stream->list_end->page->size, buf, sz);
-	//
-	// NULL != free_func && if(ERROR_C(int) == free_func(buf))
-	// ERROR_RE(int, "Cannot dispose the used memory buffer");
-	//
-	// return 0;
-	// }
-	//
-	//(buf, sz, free_func);
-	//if(new_block == NULL)
-	//ERROR_RE(int, "Cannot allocate next memory block");
-	//
-	//if(stream->list_end == NULL)
-	//stream->list_begin = stream->list_end = new_block;
-	//else
-	//stream->list_end->next = new_block;
-	//
-	//return 0;
-	// _block_t* new_block = _memory_bl
-	// }
-	
-	//return 0
-	//{
-	//if(NULL == stream || 0 == token || ERROR_C(int) == token)
-	//ERROR_RE(int, 
-	//}
-	// stream->list_begin = stream->list_end = new_block;
-	// }
