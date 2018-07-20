@@ -172,7 +172,7 @@ namespace BamTools {
 			if(nullptr == hdr)
 				return false;
 
-			const char* ref_file = secure_getenv("CRAM_REFERENCE");
+			const char* ref_file = getenv("CRAM_REFERENCE");
 			
 			hts_set_fai_filename(fp, ref_file);
 
