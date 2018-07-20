@@ -29,7 +29,8 @@ InputStreamMgr::InputStreamMgr(const string &filename, bool buildScanBuffer)
  _numBytesInBuffer(0),
  _bamReader(NULL),
  _bgStream(NULL),
- _eofHit(false)
+ _eofHit(false),
+_isCram(false)
 {
 	_possibleBamCode.resize(4, 0);
 }

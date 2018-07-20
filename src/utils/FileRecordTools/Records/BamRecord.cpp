@@ -280,7 +280,7 @@ void BamRecord::buildCigarStr() {
 	if(new_buffer_size != buffer_size)
 	{
 		free(buffer);
-		buffer = (char*)malloc(new_buffer_size);
+		buffer = (char*)malloc(new_buffer_size + 1);
 		buffer_size = new_buffer_size;
 	}
 
