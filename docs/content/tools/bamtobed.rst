@@ -43,7 +43,7 @@ Option          Description
                 to BED12. `Forces -split`.
 **-split**      Report each portion of a "split" BAM (i.e., having an "N" CIGAR 
                 operation) alignment as a distinct BED intervals.
-**-splitD**     Report each portion of a "split" BAM while obeying noth "N" CIGAR 
+**-splitD**     Report each portion of a "split" BAM while obeying both "N" CIGAR 
                 and "D" operation. Forces `-split`.
 **-ed**         Use the "edit distance" tag (NM) for the BED score field. 
                 Default for BED is to use mapping quality. Default for BEDPE is 
