@@ -132,11 +132,6 @@ void bamtofastq_help(void) {
     
     cerr << "\t-tags\tCreate FASTQ based on the mate info" << endl;
     cerr << "\t\tin the BAM R2 and Q2 tags." << endl << endl;
-    
-    cerr << "Tips: " << endl;
-    cerr << "\tIf you want to create a single, interleaved FASTQ file " << endl;
-    cerr << "\tfor paired-end data, you can just write both to /dev/stdout:" << endl << endl;
-    cerr << "\tbedtools bamtofastq -i x.bam -fq /dev/stdout -fq2 /dev/stdout > x.ilv.fq" << endl << endl;
     exit(1);    
 }
 
