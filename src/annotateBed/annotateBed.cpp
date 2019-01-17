@@ -75,26 +75,17 @@ void BedAnnotate::PrintHeader() {
 
 
 void BedAnnotate::InitializeMainFile() {
-    // process each chromosome
-    masterBedCovListMap::iterator chromItr = _bed->bedCovListMap.begin();
-    masterBedCovListMap::iterator chromEnd = _bed->bedCovListMap.end();
-    for (; chromItr != chromEnd; ++chromItr) {
-        // for each chrom, process each bin
-        binsToBedCovLists::iterator binItr = chromItr->second.begin();
-        binsToBedCovLists::iterator binEnd = chromItr->second.end();
-        for (; binItr != binEnd; ++binItr) {
-            // initialize BEDCOVLIST in this chrom/bin
-            vector<BEDCOVLIST>::iterator bedItr = binItr->second.begin();
-            vector<BEDCOVLIST>::iterator bedEnd = binItr->second.end();
-            for (; bedItr != bedEnd; ++bedItr) {
-                // initialize the depthMaps, counts, etc. for each anno file.
-                for (size_t i = 0; i < _annoFiles.size(); ++i) {
-                    map<unsigned int, DEPTH> dummy;
-                    bedItr->depthMapList.push_back(dummy);
-                    bedItr->counts.push_back(0);
-                    bedItr->minOverlapStarts.push_back(INT_MAX);
-                }
-            }
+    // compute and report
+    // the observed coverage for each feature
+    vector<BEDCOVLIST>::iterator bedItr = _bed->bedCovListFlat.begin();
+    vector<BEDCOVLIST>::iterator bedEnd = _bed->bedCovListFlat.end();
+    for (; bedItr != bedEnd; ++bedItr) {
+        // initialize the depthMaps, counts, etc. for each anno file.
+        for (size_t i = 0; i < _annoFiles.size(); ++i) {
+            map<unsigned int, DEPTH> dummy;
+            bedItr->depthMapList.push_back(dummy);
+            bedItr->counts.push_back(0);
+            bedItr->minOverlapStarts.push_back(INT_MAX);
         }
     }
 }
@@ -104,7 +95,7 @@ void BedAnnotate::AnnotateBed() {
 
     // load the "main" bed file into a map so
     // that we can easily compare each annoFile to it for overlaps
-    _bed->loadBedCovListFileIntoMap();
+    _bed->loadBedCovListFileIntoVector();
     // open the annotations files for processing;
     OpenAnnoFiles();
     // initialize counters, depths, etc. for the main file
@@ -118,7 +109,7 @@ void BedAnnotate::AnnotateBed() {
         // process each entry in the current anno file
         while (anno->GetNextBed(a)) {
             if (anno->_status == BED_VALID) {
-                _bed->countListHits(a, annoIndex, _sameStrand, _diffStrand);
+                _bed->countListHitsWithoutBins(a, annoIndex, _sameStrand, _diffStrand);
             }
         }
     }
@@ -136,73 +127,64 @@ void BedAnnotate::ReportAnnotations() {
         PrintHeader();
     }
 
-    // process each chromosome
-    masterBedCovListMap::const_iterator chromItr = _bed->bedCovListMap.begin();
-    masterBedCovListMap::const_iterator chromEnd = _bed->bedCovListMap.end();
-    for (; chromItr != chromEnd; ++chromItr) {
-        // for each chrom, process each bin
-        binsToBedCovLists::const_iterator binItr = chromItr->second.begin();
-        binsToBedCovLists::const_iterator binEnd = chromItr->second.end();
-        for (; binItr != binEnd; ++binItr) {
-            // for each chrom & bin, compute and report
-            // the observed coverage for each feature
-            vector<BEDCOVLIST>::const_iterator bedItr = binItr->second.begin();
-            vector<BEDCOVLIST>::const_iterator bedEnd = binItr->second.end();
-            for (; bedItr != bedEnd; ++bedItr) {
-                // print the main BED entry.
-                _bed->reportBedTab(*bedItr);
+    // compute and report
+    // the observed coverage for each feature
+    vector<BEDCOVLIST>::const_iterator bedItr = _bed->bedCovListFlat.begin();
+    vector<BEDCOVLIST>::const_iterator bedEnd = _bed->bedCovListFlat.end();
+    for (; bedItr != bedEnd; ++bedItr) {
+        // print the main BED entry.
+        _bed->reportBedTab(*bedItr);
 
-                // now report the coverage from each annotation file.
-                for (size_t i = 0; i < _annoFiles.size(); ++i) {
-                    unsigned int totalLength = 0;
-                    int zeroDepthCount = 0; // number of bases with zero depth
-                    int depth          = 0; // tracks the depth at the current base
+        // now report the coverage from each annotation file.
+        for (size_t i = 0; i < _annoFiles.size(); ++i) {
+            unsigned int totalLength = 0;
+            int zeroDepthCount = 0; // number of bases with zero depth
+            int depth          = 0; // tracks the depth at the current base
 
-                    // the start is either the first base in the feature OR
-                    // the leftmost position of an overlapping feature. e.g. (s = start):
-                    // A    ----------
-                    // B    s    ------------
-                    int start          = min(bedItr->minOverlapStarts[i], bedItr->start);
+            // the start is either the first base in the feature OR
+            // the leftmost position of an overlapping feature. e.g. (s = start):
+            // A    ----------
+            // B    s    ------------
+            int start          = min(bedItr->minOverlapStarts[i], bedItr->start);
 
-                    map<unsigned int, DEPTH>::const_iterator depthItr;
-                    map<unsigned int, DEPTH>::const_iterator depthEnd;
+            map<unsigned int, DEPTH>::const_iterator depthItr;
+            map<unsigned int, DEPTH>::const_iterator depthEnd;
 
-                    // compute the coverage observed at each base in the feature marching from start to end.
-                    for (CHRPOS pos = start+1; pos <= bedItr->end; pos++) {
-                        // map pointer grabbing the starts and ends observed at this position
-                        depthItr = bedItr->depthMapList[i].find(pos);
-                        depthEnd = bedItr->depthMapList[i].end();
+            // compute the coverage observed at each base in the feature marching from start to end.
+            for (CHRPOS pos = start+1; pos <= bedItr->end; pos++) {
+                // map pointer grabbing the starts and ends observed at this position
+                depthItr = bedItr->depthMapList[i].find(pos);
+                depthEnd = bedItr->depthMapList[i].end();
 
-                        // increment coverage if starts observed at this position.
-                        if (depthItr != depthEnd)
-                            depth += depthItr->second.starts;
-                        // update zero depth
-                        if ((pos > bedItr->start) && (pos <= bedItr->end) && (depth == 0))
-                            zeroDepthCount++;
-                        // decrement coverage if ends observed at this position.
-                        if (depthItr != depthEnd)
-                            depth = depth - depthItr->second.ends;
-                    }
-                    // Summarize the coverage for the current interval,
-                    CHRPOS length     = bedItr->end - bedItr->start;
-                    totalLength       += length;
-                    int nonZeroBases   = (length - zeroDepthCount);
-                    float fractCovered = (float) nonZeroBases / length;
-                    if (_reportCounts == false && _reportBoth == false)
-                        printf("%f", fractCovered);
-                    else if (_reportCounts == true && _reportBoth == false)
-                        printf("%d", bedItr->counts[i]);
-                    else if (_reportCounts == false && _reportBoth == true)
-                        printf("%d\t%f", bedItr->counts[i], fractCovered);
-
-                    if (i != _annoFiles.size() - 1)
-                        printf("\t");
-                }
-                // print newline for next feature.
-                printf("\n");
+                // increment coverage if starts observed at this position.
+                if (depthItr != depthEnd)
+                    depth += depthItr->second.starts;
+                // update zero depth
+                if ((pos > bedItr->start) && (pos <= bedItr->end) && (depth == 0))
+                    zeroDepthCount++;
+                // decrement coverage if ends observed at this position.
+                if (depthItr != depthEnd)
+                    depth = depth - depthItr->second.ends;
             }
+            // Summarize the coverage for the current interval,
+            CHRPOS length     = bedItr->end - bedItr->start;
+            totalLength       += length;
+            int nonZeroBases   = (length - zeroDepthCount);
+            float fractCovered = (float) nonZeroBases / length;
+            if (_reportCounts == false && _reportBoth == false)
+                printf("%f", fractCovered);
+            else if (_reportCounts == true && _reportBoth == false)
+                printf("%d", bedItr->counts[i]);
+            else if (_reportCounts == false && _reportBoth == true)
+                printf("%d\t%f", bedItr->counts[i], fractCovered);
+
+            if (i != _annoFiles.size() - 1)
+                printf("\t");
         }
+        // print newline for next feature.
+        printf("\n");
     }
+
 }
 
 
