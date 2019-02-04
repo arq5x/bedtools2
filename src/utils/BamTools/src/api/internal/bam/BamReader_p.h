@@ -54,6 +54,7 @@ class BamReaderPrivate {
         // access alignment data
         bool GetNextAlignment(BamAlignment& alignment);
         bool GetNextAlignmentCore(BamAlignment& alignment);
+        bool Tag2Cigar(BamAlignment &alignment, RaiiBuffer &buf);
 
         // access auxiliary data
         std::string GetHeaderText(void) const;
