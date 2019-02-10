@@ -11,12 +11,12 @@
 
 Traditional approaches to summarizing the similarity between two sets of genomic intervals 
 are based upon the number or proportion of *intersecting* intervals. However, such measures
-are largely blind to spatial correlations between the two sets where, dpesite consistent spacing
+are largely blind to spatial correlations between the two sets where, despite consistent spacing
 or proximity, intersections are rare (for example, enhancers and transcription start sites rarely overlap,
 yet they are much closer to one another than two sets of random intervals). Favorov et al [1] proposed
 a *relative distance* metric that describes distribution of relative distances between each interval in 
-one set nd the two closest intervals in another set (see figure above). If there is no spatial 
-correlation between the two sets, one would expect the relative distances to be uniformaly distributed 
+one set and the two closest intervals in another set (see figure above). If there is no spatial
+correlation between the two sets, one would expect the relative distances to be uniformly distributed
 among the relative distances ranging from 0 to 0.5. If, however, the intervals tend to be much closer than expected 
 by chance, the distribution of observed relative distances would be shifted towards low relative distance values (e.g., the figure below).
 
@@ -60,7 +60,7 @@ Default behavior
 ===============================
 By default, ``bedtools reldist`` reports the distribution of relative distances between two sets of intervals.
 The output reports the frequency of each relative distance (ranging from 0.0 to 0.5). If the two sets of intervals
-are randomly distributed with respect to one another, eahc relative distance "bin" with be roughly equally represented
+are randomly distributed with respect to one another, each relative distance "bin" with be roughly equally represented
 (i.e., a uniform distribution). For example, consider the relative distance distance distribution for exons and AluY
 elements:
 

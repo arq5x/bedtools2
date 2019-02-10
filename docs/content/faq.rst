@@ -42,7 +42,7 @@ and on Fedora/Centos this would be:
 --------------------------------------------------
 Compiling with a specific zlib library
 --------------------------------------------------
-If you need to override the location of the zlib lbrary used to compile bedtools, you can run `make` and specify the `LIBS` argument. For example:
+If you need to override the location of the zlib library used to compile bedtools, you can run `make` and specify the `LIBS` argument. For example:
 
 .. code-block:: bash
 

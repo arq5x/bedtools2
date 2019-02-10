@@ -50,7 +50,7 @@ Usage and option summary
 **-bedpe**	                     Indicate that the A file is in BEDPE format.
 **-maxTries**                    Max. number of attempts to find a home for a shuffled interval in the presence of -incl or -excl. *Default = 1000.*
 **-noOverlapping**               Don't allow shuffled intervals to overlap.
-**-allowBeyondChromEnd**         Allow the original the length of the original records to extebd beyond the length of the chromosome.
+**-allowBeyondChromEnd**         Allow the original the length of the original records to extend beyond the length of the chromosome.
 ===========================      ===============================================================================================================================================================================================================
 
 
