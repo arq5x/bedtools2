@@ -31,6 +31,7 @@ public:
 		strm.avail_in = 0;
 		strm.next_in = Z_NULL;
 
+		bufsiz=GZBUFSIZ;
 		buffer=(char*)std::malloc(GZBUFSIZ*sizeof(char));
 		if(buffer==NULL) {
 			throw ("out of memory");
@@ -73,7 +74,6 @@ public:
 		strm.next_in=buffin;
 	   /* run inflate() on input until output buffer not full */
 		unsigned int total=0;
-		_currentOutBufSize = 0;
 		do {
 			strm.avail_out = GZBUFSIZ;
 			strm.next_out = buffout;
@@ -99,9 +99,10 @@ public:
 			}
 
 			unsigned int have = GZBUFSIZ - strm.avail_out;
-			if (have > 0) {
+			if (total + have > bufsiz) {
 				buffer=(char*)std::realloc(buffer,sizeof(char)*(total+have));
 				if(buffer==NULL) throw ("out of memory");
+				bufsiz = total + have;
 			}
 			memcpy((void*)&buffer[total], &buffout[0], sizeof(char)*have);
 			total+=have;
@@ -109,7 +110,6 @@ public:
 
 
 		setg(buffer, buffer, &buffer[total]);
-		_currentOutBufSize = total;
 
 		return total==0?EOF:this->buffer[0];
 	}
@@ -119,9 +119,9 @@ protected:
 	unsigned char buffin[GZBUFSIZ];
 	unsigned char buffout[GZBUFSIZ];
 	char* buffer;
+	size_t bufsiz;
 	z_stream strm;
 	int status_flag;
-	int _currentOutBufSize;
 };
 
 
