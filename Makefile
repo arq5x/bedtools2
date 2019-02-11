@@ -64,6 +64,7 @@ SUBDIRS = $(SRC_DIR)/annotateBed \
 		  $(SRC_DIR)/nucBed \
 		  $(SRC_DIR)/pairToBed \
 		  $(SRC_DIR)/pairToPair \
+		  $(SRC_DIR)/qcFile \
 		  $(SRC_DIR)/randomBed \
 		  $(SRC_DIR)/regressTest \
 		  $(SRC_DIR)/reldist \
