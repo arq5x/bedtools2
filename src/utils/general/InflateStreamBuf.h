@@ -99,11 +99,10 @@ public:
 			}
 
 			unsigned int have = GZBUFSIZ - strm.avail_out;
-			buffer=(char*)std::realloc(buffer,sizeof(char)*(total+have));
-			if(buffer==NULL) {
-				throw ("out of memory");
+			if (have > 0) {
+				buffer=(char*)std::realloc(buffer,sizeof(char)*(total+have));
+				if(buffer==NULL) throw ("out of memory");
 			}
-
 			memcpy((void*)&buffer[total], &buffout[0], sizeof(char)*have);
 			total+=have;
 		} while (strm.avail_out == 0 && strm.avail_in > 0);
