@@ -178,7 +178,7 @@ the strand column when the "-s" option is used.
 One can optionally request that FASTA records be extracting and concatenating 
 each block in a BED12 record.  For example, consider a BED12 record describing a 
 transcript.  By default, ``getfasta`` will extract the sequence representing the
-entire transcript (intons, exons, UTRs).  Using the -split option, ``getfasta``
+entire transcript (introns, exons, UTRs).  Using the -split option, ``getfasta``
 will instead produce separate a FASTA record representing a transcript that
 splices together each BED12 block (e.g., exons
 and UTRs in the case of genes described with BED12).

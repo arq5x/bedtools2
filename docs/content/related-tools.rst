@@ -70,7 +70,7 @@ Source code can be obtained on `GitHub <https://github.com/tk2/RetroSeq>`_.
 Intersphinx documentation
 -------------------------
 BEDTools documentation pages are available via Intersphinx (http://sphinx-doc.org/ext/intersphinx.html).
-To enable this, add the following to conf.py in a Sphinx proejct:
+To enable this, add the following to conf.py in a Sphinx project:
 
     intersphinx_mapping = {'bedtools': ('http://bedtools.readthedocs.org/en/latest/', None)}
     
