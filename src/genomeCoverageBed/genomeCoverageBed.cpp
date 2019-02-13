@@ -22,7 +22,8 @@ BedGenomeCoverage::BedGenomeCoverage(string bedFile, string genomeFile,
                                      bool only_5p_end, bool only_3p_end,
                                      bool pair_chip, bool haveSize, int fragmentSize, bool dUTP,
                                      bool eachBaseZeroBased,
-                                     bool add_gb_track_line, string gb_track_line_opts) {
+                                     bool add_gb_track_line, string gb_track_line_opts,
+                                     int extensionSize, bool tn5) {
 
     _bedFile = bedFile;
     _genomeFile = genomeFile;
@@ -45,6 +46,8 @@ BedGenomeCoverage::BedGenomeCoverage(string bedFile, string genomeFile,
     _dUTP = dUTP;
     _add_gb_track_line = add_gb_track_line;
     _gb_track_line_opts = gb_track_line_opts;
+    _extensionSize = extensionSize;
+    _tn5 = tn5;
     _currChromName = "";
     _currChromSize = 0 ;
 
@@ -138,14 +141,47 @@ void BedGenomeCoverage::AddCoverage(int start, int end) {
 }
 
 
-void BedGenomeCoverage::AddBlockedCoverage(const vector<BED> &bedBlocks) {
+void BedGenomeCoverage::AddBlockedCoverage(const vector<BED> &bedBlocks,string strand) {
     vector<BED>::const_iterator bedItr = bedBlocks.begin();
     vector<BED>::const_iterator bedEnd = bedBlocks.end();
+    bool isEmpty=(bedItr==bedEnd);
+    bool isFirst=true;
+    int pos_start=0;
+    int pos_end=0;
     for (; bedItr != bedEnd; ++bedItr) {
+        // I need to Add the Coverage of the previous step as the final step has
+        // additional modifications
+        if(!isFirst){
+            if (pos_start<0) {
+                AddCoverage(0,pos_end);
+            }
+            else
+                AddCoverage(pos_start,pos_end);
+        }
         // the end - 1 must be done because BamAncillary::getBamBlocks
         // returns ends uncorrected for the genomeCoverageBed data structure.
         // ugly, but necessary.
-        AddCoverage(bedItr->start, bedItr->end - 1);
+        pos_start=bedItr->start;
+        pos_end=bedItr->end - 1;
+        if (isFirst) {
+            if (_tn5 && (strand=="+")){
+                pos_start = pos_start+4;
+            }
+            pos_start = pos_start - _extensionSize;
+            isFirst=false;
+        }
+    }
+    if (!isEmpty){
+        // I modify the last block
+        if (_tn5 && (strand=="-")){
+            pos_end = pos_end-5;
+        }
+        pos_end = pos_end + _extensionSize;
+        if (pos_start<0) {
+            AddCoverage(0,pos_end);
+        }
+        else
+            AddCoverage(pos_start,pos_end);
     }
 }
 
@@ -180,18 +216,42 @@ void BedGenomeCoverage::CoverageBed() {
             if (_obeySplits == true) {
                 bedVector bedBlocks; // vec to store the discrete BED "blocks"
                 GetBedBlocks(a, bedBlocks);
-                AddBlockedCoverage(bedBlocks);
+                AddBlockedCoverage(bedBlocks,a.strand);
             }
             else if (_only_5p_end) {
                 int pos = ( a.strand=="+" ) ? a.start : a.end-1;
-                AddCoverage(pos,pos);
+                if (_tn5) {
+                    pos = ( a.strand=="+" ) ? pos+4 : pos-5;
+                }
+                if ( pos<_extensionSize ) { //sometimes extensionSize is bigger :(
+                            AddCoverage(0, pos+_extensionSize);
+                } 
+                else {
+                    AddCoverage(pos-_extensionSize, pos+_extensionSize );
+                }
             }
             else if (_only_3p_end) {
                 int pos = ( a.strand=="-" ) ? a.start : a.end-1;
-                AddCoverage(pos,pos);
+                if ( pos<_extensionSize ) { //sometimes extensionSize is bigger :(
+                            AddCoverage(0, pos+_extensionSize);
+                } 
+                else {
+                    AddCoverage(pos-_extensionSize, pos+_extensionSize );
+                }
             }
-            else
-                AddCoverage(a.start, a.end-1);
+            else {
+                int pos_start=a.start;
+                int pos_end=a.end-1;
+                if (_tn5) {
+                    pos_start = ( a.strand=="+" ) ? pos_start+4 : pos_start;
+                    pos_end = ( a.strand=="-" ) ? pos_end-5 : pos_end;
+                }
+                if ( pos_start<_extensionSize ) {
+                    AddCoverage(0,pos_end+_extensionSize);
+                }
+                else
+                    AddCoverage(pos_start-_extensionSize,pos_end+_extensionSize);
+            }
         }
     }
     _bed->Close();
@@ -314,20 +374,52 @@ void BedGenomeCoverage::CoverageBam(string bamFile) {
             } else */
 
             if (bam.IsFirstMate() && bam.IsReverseStrand()) { //prolong to the mate to the left
-                AddCoverage(bam.MatePosition, end);
+                int pos_start=bam.MatePosition;
+                int pos_end=end;
+                if (_tn5) {
+                    pos_start = pos_start+4;
+                    pos_end = pos_end-5;
+                }
+                if ( pos_start<_extensionSize ) {
+                    AddCoverage(0,pos_end+_extensionSize);
+                }
+                else
+                    AddCoverage(pos_start-_extensionSize,pos_end+_extensionSize);
             }
             else if (bam.IsFirstMate() && bam.IsMateReverseStrand()) { //prolong to the mate to the right
-                AddCoverage(start, start + abs(bam.InsertSize) - 1);
+                int pos_start=start;
+                int pos_end=start + abs(bam.InsertSize) - 1;
+                if (_tn5) {
+                    pos_start = pos_start+4;
+                    pos_end = pos_end-5;
+                }
+                if ( pos_start<_extensionSize ) {
+                    AddCoverage(0,pos_end+_extensionSize);
+                }
+                else
+                    AddCoverage(pos_start-_extensionSize,pos_end+_extensionSize);
             }
         } else if (_haveSize) {
             if(bam.IsReverseStrand()) {
-                if(end<_fragmentSize) { //sometimes fragmentSize is bigger :(
-                    AddCoverage(0, end);
+                int pos=end;
+                if (_tn5){
+                    pos=pos-5;
+                }
+                if(pos<(_fragmentSize+_extensionSize)) { //sometimes fragmentSize is bigger :(
+                    AddCoverage(0, pos);
                 } else {
-                    AddCoverage(end + 1 - _fragmentSize, end );
+                    AddCoverage(pos + 1 - _fragmentSize - _extensionSize, pos + _extensionSize);
                 }
             } else {
-                AddCoverage(start,start+_fragmentSize - 1);
+                int pos=start;
+                if (_tn5){
+                    pos=pos+4;
+                }
+                if(pos<_extensionSize){
+                    AddCoverage(0,pos+_fragmentSize - 1+_extensionSize);
+                }
+                else
+                    AddCoverage(pos-_extensionSize,pos+_fragmentSize - 1+_extensionSize);
             }
         } else
         // add coverage accordingly.
@@ -341,15 +433,29 @@ void BedGenomeCoverage::CoverageBam(string bamFile) {
             else { // "D" true, "N" false
                 GetBamBlocks(bam, refs.at(bam.RefID).RefName, bedBlocks, true, false);
             }
-            AddBlockedCoverage(bedBlocks);
+            string readStrand = ( !bam.IsReverseStrand() ) ? "+" : "-";
+            AddBlockedCoverage(bedBlocks, readStrand);
         }
         else if (_only_5p_end) {
             int pos = ( !bam.IsReverseStrand() ) ? start : end;
-            AddCoverage(pos,pos);
+            if (_tn5) {
+                pos = ( !bam.IsReverseStrand() ) ? pos+4 : pos-5;
+            }
+            if ( pos<_extensionSize ) { //sometimes extensionSize is bigger :(
+                        AddCoverage(0, pos+_extensionSize);
+            } 
+            else {
+                AddCoverage(pos-_extensionSize, pos+_extensionSize );
+            }
         }
         else if (_only_3p_end) {
             int pos = ( bam.IsReverseStrand() ) ? start : end;
-            AddCoverage(pos,pos);
+            if ( pos<_extensionSize ) { //sometimes extensionSize is bigger :(
+                        AddCoverage(0, pos+_extensionSize);
+            } 
+            else {
+                AddCoverage(pos-_extensionSize, pos+_extensionSize );
+            }
         }
     }
     // close the BAM

@@ -33,6 +33,7 @@ int genomecoverage_main(int argc, char* argv[]) {
     string bedFile;
     string genomeFile;
     int max = INT_MAX;
+    int extensionSize = 0;
     float scale = 1.0;
     float fragmentSize = 146; //Nucleosome :)
 
@@ -53,6 +54,7 @@ int genomecoverage_main(int argc, char* argv[]) {
     bool only_5p_end = false;
     bool only_3p_end = false;
     bool add_gb_track_line = false;
+    bool tn5 = false;
     string gb_track_opts;
     string requestedStrand = "X";
 
@@ -173,6 +175,18 @@ int genomecoverage_main(int argc, char* argv[]) {
                     showHelp = true;
                 }
         }
+        else if(PARAMETER_CHECK("-ext", 4, parameterLength)) {
+                if ((i+1) < argc) {
+                    extensionSize = atoi(argv[i+1]);
+                    i++;
+                } else {
+                    cerr << "*****ERROR: -ext options requires an integer value" << endl;
+                    showHelp = true;
+                }
+        }
+        else if(PARAMETER_CHECK("-tn5", 4, parameterLength)) {
+                tn5 = true;
+        }
         else {
           cerr << endl << "*****ERROR: Unrecognized parameter: " << argv[i] << " *****" << endl << endl;
             showHelp = true;
@@ -207,6 +221,16 @@ int genomecoverage_main(int argc, char* argv[]) {
       showHelp = true;
     }
 
+    /*if ( tn5 && obeySplits) {
+      cerr << endl << "*****" << endl << "*****ERROR: Use -split can't be used with -tn5." << endl << "*****" << endl;
+      showHelp = true;
+    }
+
+    if ( (extensionSize>0) && obeySplits) {
+      cerr << endl << "*****" << endl << "*****ERROR: Use -split can't be used with -ext." << endl << "*****" << endl;
+      showHelp = true;
+    }*/
+
     if (add_gb_track_line && !(bedGraph||bedGraphAll)) {
       cerr << endl << "*****" << endl << "*****ERROR: Using -trackline requires bedGraph output (use -bg or -bga)." << endl << "*****" << endl;
       showHelp = true;
@@ -225,7 +249,8 @@ int genomecoverage_main(int argc, char* argv[]) {
                                                       only_5p_end, only_3p_end,
                                                       pair_chip, haveSize, fragmentSize, dUTP,
                                                       eachBaseZeroBased,
-                                                      add_gb_track_line, gb_track_opts);
+                                                      add_gb_track_line, gb_track_opts,
+                                                      extensionSize, tn5);
         delete bc;
     }
     else {
@@ -280,7 +305,7 @@ void genomecoverage_help(void) {
     cerr << "\t-fs\t\t" << "Force to use provided fragment size instead of read length" << endl;
     cerr << "\t\t\tWorks for BAM files only" << endl;
 
-    cerr << "\t-du\t\t" << "Change strand af the mate read (so both reads from the same strand) useful for strand specific" << endl;
+    cerr << "\t-du\t\t" << "Change strand of the mate read (so both reads from the same strand) useful for strand specific" << endl;
     cerr << "\t\t\tWorks for BAM files only" << endl;
 
     cerr << "\t-5\t\t" << "Calculate coverage of 5\" positions (instead of entire interval)." << endl << endl;
@@ -303,13 +328,24 @@ void genomecoverage_help(void) {
     cerr <<"\t\t\t      http://genome.ucsc.edu/goldenPath/help/bedgraph.html" << endl;
     cerr <<"\t\t\t- NOTE: When adding a trackline definition, the output BedGraph can be easily" << endl;
     cerr <<"\t\t\t      uploaded to the Genome Browser as a custom track," << endl;
-    cerr <<"\t\t\t      BUT CAN NOT be converted into a BigWig file (w/o removing the first line)." << endl << endl;
+    //cerr <<"\t\t\t      BUT CAN NOT be converted into a BigWig file (w/o removing the first line)." << endl << endl; 
+    // With v 4 there is no issue.
 
     cerr << "\t-trackopts\t"<<"Writes additional track line definition parameters in the first line." << endl;
     cerr <<"\t\t\t- Example:" << endl;
     cerr <<"\t\t\t   -trackopts 'name=\"My Track\" visibility=2 color=255,30,30'" << endl;
     cerr <<"\t\t\t   Note the use of single-quotes if you have spaces in your parameters." << endl;
     cerr <<"\t\t\t- (TEXT)" << endl << endl;
+
+    cerr << "\t-ext\t\t"<<"Extends the coverage in both directions of the desired number of bases." << endl;
+    cerr << "\t\t\tUseful when you have very sparse data like when you use -5 or -3." << endl;
+    cerr << "\t\t\t- Default is 0; i.e., no extension." << endl;
+    cerr << "\t\t\t- (INT)" << endl << endl;
+
+    cerr << "\t-tn5\t\t"<<"Shifts the 5' to match the insertion site of the Tn5." << endl;
+    cerr << "\t\t\tIt will shift the 5' extremity of 5bp to the left for reverse strand" << endl;
+    cerr << "\t\t\tand 4bp to the right for forward strand." << endl; 
+    cerr << "\t\t\tUseful when you are working with ATAC-seq data and you want to see the footprint." << endl;
 
     cerr << "Notes: " << endl;
     cerr << "\t(1) The genome file should tab delimited and structured as follows:" << endl;
