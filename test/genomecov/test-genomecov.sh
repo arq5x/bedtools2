@@ -260,4 +260,26 @@ $BT genomecov -ibam chip.bam -bg -fs 100 > obs
 check obs exp
 rm obs exp
 
+##################################################################
+#  Test chip with tn5
+##################################################################
+echo -e "    genomecov.t16...\c"
+echo \
+"chr1	5	76	1
+chr1	225	295	1" > exp
+$BT genomecov -ibam chip.bam -bg -tn5 > obs
+check obs exp
+rm obs exp
+
+##################################################################
+#  Test chip with ext
+##################################################################
+echo -e "    genomecov.t17...\c"
+echo \
+"chr1	0	86	1
+chr1	215	310	1" > exp
+$BT genomecov -ibam chip.bam -bg -ext 10 > obs
+check obs exp
+rm obs exp
+
 [[ $FAILURES -eq 0 ]] || exit 1;
