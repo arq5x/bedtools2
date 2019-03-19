@@ -1,7 +1,7 @@
 /*  tabix.c -- Generic indexer for TAB-delimited genome position files.
 
     Copyright (C) 2009-2011 Broad Institute.
-    Copyright (C) 2010-2012, 2014-2017 Genome Research Ltd.
+    Copyright (C) 2010-2012, 2014-2018 Genome Research Ltd.
 
     Author: Heng Li <lh3@sanger.ac.uk>
 
@@ -446,7 +446,7 @@ int main(int argc, char *argv[])
             case 1:
                 printf(
 "tabix (htslib) %s\n"
-"Copyright (C) 2017 Genome Research Ltd.\n", hts_version());
+"Copyright (C) 2018 Genome Research Ltd.\n", hts_version());
                 return EXIT_SUCCESS;
             default: return usage();
         }
@@ -542,5 +542,4 @@ int main(int argc, char *argv[])
         if ( tbx_index_build(fname, min_shift, &conf) ) error("tbx_index_build failed: %s\n", fname);
         return 0;
     }
-    return 0;
 }

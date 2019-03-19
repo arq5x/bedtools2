@@ -600,9 +600,21 @@ int hts_opt_add(hts_opt **opts, const char *c_arg) {
              strcmp(o->arg, "NAME_PREFIX") == 0)
         o->opt = CRAM_OPT_PREFIX, o->val.s = val;
 
+    else if (strcmp(o->arg, "store_md") == 0 ||
+             strcmp(o->arg, "store_md") == 0)
+        o->opt = CRAM_OPT_STORE_MD, o->val.i = atoi(val);
+
+    else if (strcmp(o->arg, "store_nm") == 0 ||
+             strcmp(o->arg, "store_nm") == 0)
+        o->opt = CRAM_OPT_STORE_NM, o->val.i = atoi(val);
+
     else if (strcmp(o->arg, "block_size") == 0 ||
              strcmp(o->arg, "BLOCK_SIZE") == 0)
         o->opt = HTS_OPT_BLOCK_SIZE, o->val.i = strtol(val, NULL, 0);
+
+    else if (strcmp(o->arg, "level") == 0 ||
+             strcmp(o->arg, "LEVEL") == 0)
+        o->opt = HTS_OPT_COMPRESSION_LEVEL, o->val.i = strtol(val, NULL, 0);
 
     else {
         hts_log_error("Unknown option '%s'", o->arg);
@@ -1032,6 +1044,14 @@ int hts_set_opt(htsFile *fp, enum hts_fmt_option opt, ...) {
         return 0;
     }
 
+    case HTS_OPT_COMPRESSION_LEVEL: {
+        va_start(args, opt);
+        int level = va_arg(args, int);
+        va_end(args);
+        if (fp->is_bgzf)
+            fp->fp.bgzf->compress_level = level;
+    }
+
     default:
         break;
     }
@@ -1271,6 +1291,7 @@ int hts_check_EOF(htsFile *fp)
 #define pair64_lt(a,b) ((a).u < (b).u)
 
 KSORT_INIT(_off, hts_pair64_t, pair64_lt)
+KSORT_INIT(_off_max, hts_pair64_max_t, pair64_lt)
 
 typedef struct {
     int32_t m, n;
@@ -1964,6 +1985,115 @@ static inline int reg2bins(int64_t beg, int64_t end, hts_itr_t *itr, int min_shi
     return itr->bins.n;
 }
 
+static inline int reg2intervals(hts_itr_multi_t *iter, const hts_idx_t *idx, int tid, int64_t beg, int64_t end, uint64_t min_off, uint64_t max_off, int min_shift, int n_lvls)
+{
+    int l, t, s;
+    int b, e, i, j;
+    hts_pair64_max_t *off;
+    bidx_t *bidx;
+    khint_t k;
+
+    if (!iter || !idx || (bidx = idx->bidx[tid]) == NULL || beg >= end)
+        return -1;
+
+    s = min_shift + (n_lvls<<1) + n_lvls;
+    if (end >= 1LL<<s)
+        end = 1LL<<s;
+
+    for (--end, l = 0, t = 0; l <= n_lvls; s -= 3, t += 1<<((l<<1)+l), ++l) {
+        b = t + (beg>>s); e = t + (end>>s);
+
+        for (i = b; i <= e; ++i) {
+            if ((k = kh_get(bin, bidx, i)) != kh_end(bidx)) {
+                bins_t *p = &kh_value(bidx, k);
+
+                if (p->n) {
+                    off = (hts_pair64_max_t*)realloc(iter->off, (iter->n_off + p->n) * sizeof(hts_pair64_max_t));
+                    if (!off)
+                        return -2;
+
+                    iter->off = off;
+                    for (j = 0; j < p->n; ++j) {
+                        if (p->list[j].v > min_off && p->list[j].u < max_off) {
+                            iter->off[iter->n_off].u = p->list[j].u;
+                            iter->off[iter->n_off].v = p->list[j].v;
+                            iter->off[iter->n_off].max = ((uint64_t)tid<<32) | (end+1);
+                            iter->n_off++;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    return iter->n_off;
+}
+
+static int compare_regions(const void *r1, const void *r2) {
+    hts_reglist_t *reg1 = (hts_reglist_t *)r1;
+    hts_reglist_t *reg2 = (hts_reglist_t *)r2;
+
+    if (reg1->tid < 0 && reg2->tid >= 0)
+        return 1;
+    else if (reg1->tid >= 0 && reg2->tid < 0)
+        return -1;
+    else
+        return reg1->tid - reg2->tid;
+}
+
+uint64_t hts_itr_off(const hts_idx_t* idx, int tid) {
+
+    int i;
+    bidx_t* bidx;
+    uint64_t off0 = (uint64_t) -1;
+    khint_t k;
+    switch (tid) {
+    case HTS_IDX_START:
+        // Find the smallest offset, note that sequence ids may not be ordered sequentially
+        for (i = 0; i < idx->n; i++) {
+            bidx = idx->bidx[i];
+            k = kh_get(bin, bidx, META_BIN(idx));
+            if (k == kh_end(bidx))
+                continue;
+
+            if (off0 > kh_val(bidx, k).list[0].u)
+                off0 = kh_val(bidx, k).list[0].u;
+        }
+        if (off0 == (uint64_t) -1 && idx->n_no_coor)
+            off0 = 0;
+        // only no-coor reads in this bam
+        break;
+    case HTS_IDX_NOCOOR:
+        /* No-coor reads sort after all of the mapped reads.  The position
+           is not stored in the index itself, so need to find the end
+           offset for the last mapped read.  A loop is needed here in
+           case references at the end of the file have no mapped reads,
+           or sequence ids are not ordered sequentially.
+           See issue samtools#568 and commits b2aab8, 60c22d and cc207d. */
+        for (i = 0; i < idx->n; i++) {
+            bidx = idx->bidx[i];
+            k = kh_get(bin, bidx, META_BIN(idx));
+            if (k != kh_end(bidx)) {
+                if (off0 == (uint64_t) -1 || off0 < kh_val(bidx, k).list[0].v) {
+                    off0 = kh_val(bidx, k).list[0].v;
+                }
+            }
+        }
+        if (off0 == (uint64_t) -1 && idx->n_no_coor)
+            off0 = 0;
+        // only no-coor reads in this bam
+        break;
+    case HTS_IDX_REST:
+        off0 = 0;
+        break;
+    case HTS_IDX_NONE:
+        off0 = 0;
+        break;
+    }
+
+    return off0;
+}
+
 hts_itr_t *hts_itr_query(const hts_idx_t *idx, int tid, int beg, int end, hts_readrec_func *readrec)
 {
     int i, n_off, l, bin;
@@ -1971,148 +2101,381 @@ hts_itr_t *hts_itr_query(const hts_idx_t *idx, int tid, int beg, int end, hts_re
     khint_t k;
     bidx_t *bidx;
     uint64_t min_off, max_off;
-    hts_itr_t *iter = 0;
-    if (tid < 0) {
-        int finished0 = 0;
-        uint64_t off0 = (uint64_t)-1;
-        khint_t k;
-        switch (tid) {
-        case HTS_IDX_START:
-            // Find the smallest offset, note that sequence ids may not be ordered sequentially
-            for (i=0; i<idx->n; i++)
-            {
-                bidx = idx->bidx[i];
-                k = kh_get(bin, bidx, META_BIN(idx));
-                if (k == kh_end(bidx)) continue;
-                if ( off0 > kh_val(bidx, k).list[0].u ) off0 = kh_val(bidx, k).list[0].u;
+    hts_itr_t *iter = (hts_itr_t*)calloc(1, sizeof(hts_itr_t));
+    if (iter) {
+        if (tid < 0) {
+            uint64_t off = hts_itr_off(idx, tid);
+            if (off != (uint64_t) -1) {
+                iter->read_rest = 1;
+                iter->curr_off = off;
+                iter->readrec = readrec;
+                if (tid == HTS_IDX_NONE)
+                    iter->finished = 1;
+            } else {
+                free(iter);
+                iter = NULL;
             }
-            if ( off0==(uint64_t)-1 && idx->n_no_coor ) off0 = 0; // only no-coor reads in this bam
-            break;
+        } else {
+            if (beg < 0) beg = 0;
+            if (end < beg) return 0;
+            if (tid >= idx->n || (bidx = idx->bidx[tid]) == NULL) return 0;
 
-        case HTS_IDX_NOCOOR:
-            /* No-coor reads sort after all of the mapped reads.  The position
-               is not stored in the index itself, so need to find the end
-               offset for the last mapped read.  A loop is needed here in
-               case references at the end of the file have no mapped reads,
-               or sequence ids are not ordered sequentially.
-               See issue samtools#568 and commits b2aab8, 60c22d and cc207d. */
-            for (i = 0; i < idx->n; i++) {
-                bidx = idx->bidx[i];
-                k = kh_get(bin, bidx, META_BIN(idx));
-                if (k != kh_end(bidx)) {
-                    if (off0==(uint64_t)-1 || off0 < kh_val(bidx, k).list[0].v) {
-                        off0 = kh_val(bidx, k).list[0].v;
-                    }
+            iter->tid = tid, iter->beg = beg, iter->end = end; iter->i = -1;
+            iter->readrec = readrec;
+
+            if ( !kh_size(bidx) ) { iter->finished = 1; return iter; }
+
+            // compute min_off
+            bin = hts_bin_first(idx->n_lvls) + (beg>>idx->min_shift);
+            do {
+                int first;
+                k = kh_get(bin, bidx, bin);
+                if (k != kh_end(bidx)) break;
+                first = (hts_bin_parent(bin)<<3) + 1;
+                if (bin > first) --bin;
+                else bin = hts_bin_parent(bin);
+            } while (bin);
+            if (bin == 0) k = kh_get(bin, bidx, bin);
+            min_off = k != kh_end(bidx)? kh_val(bidx, k).loff : 0;
+
+            // compute max_off: a virtual offset from a bin to the right of end
+            bin = hts_bin_first(idx->n_lvls) + ((end-1) >> idx->min_shift) + 1;
+            if (bin >= idx->n_bins) bin = 0;
+            while (1) {
+                // search for an extant bin by moving right, but moving up to the
+                // parent whenever we get to a first child (which also covers falling
+                // off the RHS, which wraps around and immediately goes up to bin 0)
+                while (bin % 8 == 1) bin = hts_bin_parent(bin);
+                if (bin == 0) { max_off = (uint64_t)-1; break; }
+                k = kh_get(bin, bidx, bin);
+                if (k != kh_end(bidx) && kh_val(bidx, k).n > 0) { max_off = kh_val(bidx, k).list[0].u; break; }
+                bin++;
+            }
+
+            // retrieve bins
+            reg2bins(beg, end, iter, idx->min_shift, idx->n_lvls);
+
+            for (i = n_off = 0; i < iter->bins.n; ++i)
+                if ((k = kh_get(bin, bidx, iter->bins.a[i])) != kh_end(bidx))
+                    n_off += kh_value(bidx, k).n;
+            if (n_off == 0) {
+                // No overlapping bins means the iterator has already finished.
+                iter->finished = 1;
+                return iter;
+            }
+            off = (hts_pair64_t*)calloc(n_off, sizeof(hts_pair64_t));
+            for (i = n_off = 0; i < iter->bins.n; ++i) {
+                if ((k = kh_get(bin, bidx, iter->bins.a[i])) != kh_end(bidx)) {
+                    int j;
+                    bins_t *p = &kh_value(bidx, k);
+                    for (j = 0; j < p->n; ++j)
+                        if (p->list[j].v > min_off && p->list[j].u < max_off)
+                            off[n_off++] = p->list[j];
                 }
             }
-            if ( off0==(uint64_t)-1 && idx->n_no_coor ) off0 = 0; // only no-coor reads in this bam
-            break;
 
-        case HTS_IDX_REST:
-            off0 = 0;
-            break;
-
-        case HTS_IDX_NONE:
-            finished0 = 1;
-            off0 = 0;
-            break;
-
-        default:
-            return 0;
-        }
-        if (off0 != (uint64_t)-1) {
-            iter = (hts_itr_t*)calloc(1, sizeof(hts_itr_t));
-            iter->read_rest = 1;
-            iter->finished = finished0;
-            iter->curr_off = off0;
-            iter->readrec = readrec;
-            return iter;
-        } else return 0;
-    }
-
-    if (beg < 0) beg = 0;
-    if (end < beg) return 0;
-    if (tid >= idx->n || (bidx = idx->bidx[tid]) == NULL) return 0;
-
-    iter = (hts_itr_t*)calloc(1, sizeof(hts_itr_t));
-    iter->tid = tid, iter->beg = beg, iter->end = end; iter->i = -1;
-    iter->readrec = readrec;
-
-    if ( !kh_size(bidx) ) { iter->finished = 1; return iter; }
-
-    // compute min_off
-    bin = hts_bin_first(idx->n_lvls) + (beg>>idx->min_shift);
-    do {
-        int first;
-        k = kh_get(bin, bidx, bin);
-        if (k != kh_end(bidx)) break;
-        first = (hts_bin_parent(bin)<<3) + 1;
-        if (bin > first) --bin;
-        else bin = hts_bin_parent(bin);
-    } while (bin);
-    if (bin == 0) k = kh_get(bin, bidx, bin);
-    min_off = k != kh_end(bidx)? kh_val(bidx, k).loff : 0;
-
-    // compute max_off: a virtual offset from a bin to the right of end
-    bin = hts_bin_first(idx->n_lvls) + ((end-1) >> idx->min_shift) + 1;
-    if (bin >= idx->n_bins) bin = 0;
-    while (1) {
-        // search for an extant bin by moving right, but moving up to the
-        // parent whenever we get to a first child (which also covers falling
-        // off the RHS, which wraps around and immediately goes up to bin 0)
-        while (bin % 8 == 1) bin = hts_bin_parent(bin);
-        if (bin == 0) { max_off = (uint64_t)-1; break; }
-        k = kh_get(bin, bidx, bin);
-        if (k != kh_end(bidx) && kh_val(bidx, k).n > 0) { max_off = kh_val(bidx, k).list[0].u; break; }
-        bin++;
-    }
-
-    // retrieve bins
-    reg2bins(beg, end, iter, idx->min_shift, idx->n_lvls);
-    for (i = n_off = 0; i < iter->bins.n; ++i)
-        if ((k = kh_get(bin, bidx, iter->bins.a[i])) != kh_end(bidx))
-            n_off += kh_value(bidx, k).n;
-    if (n_off == 0) {
-        // No overlapping bins means the iterator has already finished.
-        iter->finished = 1;
-        return iter;
-    }
-    off = (hts_pair64_t*)calloc(n_off, sizeof(hts_pair64_t));
-    for (i = n_off = 0; i < iter->bins.n; ++i) {
-        if ((k = kh_get(bin, bidx, iter->bins.a[i])) != kh_end(bidx)) {
-            int j;
-            bins_t *p = &kh_value(bidx, k);
-            for (j = 0; j < p->n; ++j)
-                if (p->list[j].v > min_off && p->list[j].u < max_off)
-                    off[n_off++] = p->list[j];
+            if (n_off == 0) {
+                free(off);
+                iter->finished = 1;
+                return iter;
+            }
+            ks_introsort(_off, n_off, off);
+            // resolve completely contained adjacent blocks
+            for (i = 1, l = 0; i < n_off; ++i)
+                if (off[l].v < off[i].v) off[++l] = off[i];
+            n_off = l + 1;
+            // resolve overlaps between adjacent blocks; this may happen due to the merge in indexing
+            for (i = 1; i < n_off; ++i)
+                if (off[i-1].v >= off[i].u) off[i-1].v = off[i].u;
+            // merge adjacent blocks
+            for (i = 1, l = 0; i < n_off; ++i) {
+                if (off[l].v>>16 == off[i].u>>16) off[l].v = off[i].v;
+                else off[++l] = off[i];
+            }
+            n_off = l + 1;
+            iter->n_off = n_off; iter->off = off;
         }
     }
-    if (n_off == 0) {
-        free(off);
+    return iter;
+}
+
+hts_itr_multi_t *hts_itr_multi_bam(const hts_idx_t *idx, hts_itr_multi_t *iter)
+{
+    int i, j, l, n_off = 0, bin;
+    hts_pair64_max_t *off = NULL;
+    khint_t k;
+    bidx_t *bidx;
+    uint64_t min_off, max_off, t_off = (uint64_t)-1;
+    int tid, beg, end;
+    hts_reglist_t *curr_reg;
+
+    if (iter) {
+        iter->i = -1;
+        for (i=0; i<iter->n_reg; i++) {
+
+            curr_reg = &iter->reg_list[i];
+            tid = curr_reg->tid;
+
+            if (tid < 0) {
+                t_off = hts_itr_off(idx, tid);
+                if (t_off != (uint64_t)-1) {
+                    switch (tid) {
+                        case HTS_IDX_NONE:
+                            iter->finished = 1;
+                        case HTS_IDX_START:
+                        case HTS_IDX_REST:
+                            iter->curr_off = t_off;
+                            iter->n_reg = 0;
+                            iter->reg_list = NULL;
+                            iter->read_rest = 1;
+                            return iter;
+                        case HTS_IDX_NOCOOR:
+                            iter->nocoor = 1;
+                            iter->nocoor_off = t_off;
+                    }
+                }
+            } else {
+                if (tid >= idx->n || (bidx = idx->bidx[tid]) == NULL || !kh_size(bidx))
+                    continue;
+
+                for(j=0; j<curr_reg->count; j++) {
+                    hts_pair32_t *curr_intv = &curr_reg->intervals[j];
+                    if (curr_intv->end < curr_intv->beg)
+                        continue;
+
+                    beg = curr_intv->beg;
+                    end = curr_intv->end;
+
+                    /* Compute 'min_off' by searching the lowest level bin containing 'beg'.
+                       If the computed bin is not in the index, try the next bin to the
+                       left, belonging to the same parent. If it is the first sibling bin,
+                       try the parent bin. */
+                    bin = hts_bin_first(idx->n_lvls) + (beg>>idx->min_shift);
+                    do {
+                        int first;
+                        k = kh_get(bin, bidx, bin);
+                        if (k != kh_end(bidx)) break;
+                        first = (hts_bin_parent(bin)<<3) + 1;
+                        if (bin > first) --bin;
+                        else bin = hts_bin_parent(bin);
+                    } while (bin);
+                    if (bin == 0)
+                        k = kh_get(bin, bidx, bin);
+                    min_off = k != kh_end(bidx)? kh_val(bidx, k).loff : 0;
+
+                    // compute max_off: a virtual offset from a bin to the right of end
+                    bin = hts_bin_first(idx->n_lvls) + ((end-1) >> idx->min_shift) + 1;
+                    if (bin >= idx->n_bins) bin = 0;
+                    while (1) {
+                    // search for an extant bin by moving right, but moving up to the
+                    // parent whenever we get to a first child (which also covers falling
+                    // off the RHS, which wraps around and immediately goes up to bin 0)
+                        while (bin % 8 == 1) bin = hts_bin_parent(bin);
+                        if (bin == 0) { max_off = (uint64_t)-1; break; }
+                        k = kh_get(bin, bidx, bin);
+                        if (k != kh_end(bidx) && kh_val(bidx, k).n > 0) {
+                            max_off = kh_val(bidx, k).list[0].u;
+                            break;
+                        }
+                        bin++;
+                    }
+
+                    //convert coordinates to file offsets
+                    reg2intervals(iter, idx, tid, beg, end, min_off, max_off, idx->min_shift, idx->n_lvls);
+                }
+            }
+        }
+
+        off = iter->off;
+        n_off = iter->n_off;
+
+        if (n_off) {
+            ks_introsort(_off_max, n_off, off);
+            // resolve completely contained adjacent blocks
+            for (i = 1, l = 0; i < n_off; ++i) {
+                if (off[l].v < off[i].v) {
+                    off[++l] = off[i];
+                } else {
+                    off[l].max = (off[i].max > off[l].max ? off[i].max : off[l].max);
+                }
+            }
+            n_off = l + 1;
+            // resolve overlaps between adjacent blocks; this may happen due to the merge in indexing
+            for (i = 1; i < n_off; ++i)
+                if (off[i-1].v >= off[i].u) off[i-1].v = off[i].u;
+            // merge adjacent blocks
+            for (i = 1, l = 0; i < n_off; ++i) {
+                if (off[l].v>>16 == off[i].u>>16) {
+                    off[l].v = off[i].v;
+                    off[l].max = (off[i].max > off[l].max ? off[i].max : off[l].max);
+                } else off[++l] = off[i];
+            }
+            n_off = l + 1;
+            iter->n_off = n_off; iter->off = off;
+        }
+
+        if(!n_off && !iter->nocoor)
+            iter->finished = 1;
+    }
+    return iter;
+}
+
+hts_itr_multi_t *hts_itr_multi_cram(const hts_idx_t *idx, hts_itr_multi_t *iter)
+{
+    const hts_cram_idx_t *cidx = (const hts_cram_idx_t *) idx;
+    int tid, beg, end, i, j, l, n_off = 0;
+    hts_reglist_t *curr_reg;
+    hts_pair32_t *curr_intv;
+    hts_pair64_max_t *off = NULL;
+    cram_index *e = NULL;
+
+    if (!cidx || !iter)
+        return NULL;
+
+    iter->is_cram = 1;
+    iter->read_rest = 0;
+    iter->off = NULL;
+    iter->n_off = 0;
+    iter->curr_off = 0;
+    iter->i = -1;
+
+    for (i=0; i<iter->n_reg; i++) {
+
+        curr_reg = &iter->reg_list[i];
+        tid = curr_reg->tid;
+
+        if (tid >= 0) {
+            off = (hts_pair64_max_t*)realloc(off, (n_off + curr_reg->count) * sizeof(hts_pair64_max_t));
+            if (!off)
+                return NULL;
+
+            for (j=0; j < curr_reg->count; j++) {
+                curr_intv = &curr_reg->intervals[j];
+                if (curr_intv->end < curr_intv->beg)
+                    continue;
+
+                beg = curr_intv->beg;
+                end = curr_intv->end;
+
+/* First, fetch the container overlapping 'beg' and assign its file offset to u, then
+ * find the container overlapping 'end' and assing the relative end of the slice to v.
+ * The cram_ptell function will adjust with the container offset, which is not stored
+ * in the index.
+ */
+                e = cram_index_query(cidx->cram, tid, beg+1, NULL);
+                if (e) {
+                    off[n_off].u = e->offset;
+
+                    if (end == INT_MAX) {
+                       e = cram_index_last(cidx->cram, tid, NULL);
+                    } else {
+                       e = cram_index_query(cidx->cram, tid, end+1, NULL);
+                    }
+
+                    if (e) {
+                        off[n_off].v = e->offset + e->slice + e->len;
+                        off[n_off].max = (uint64_t)tid<<32 | end;
+                        n_off++;
+                    } else {
+                        hts_log_warning("Could not set offset end for region %d(%s):%d-%d. Skipping", tid, curr_reg->reg, beg, end);
+                    }
+                } else {
+                    hts_log_warning("No index entry for region %d:%d-%d", tid, beg, end);
+                }
+            }
+        } else {
+            switch (tid) {
+                case HTS_IDX_NOCOOR:
+                    e = cram_index_query(cidx->cram, tid, 1, NULL);
+                    if (e) {
+                        iter->nocoor = 1;
+                        iter->nocoor_off = e->offset;
+                    } else {
+                        hts_log_warning("No index entry for NOCOOR region");
+                    }
+                    break;
+                case HTS_IDX_START:
+                    e = cram_index_query(cidx->cram, tid, 1, NULL);
+                    if (e) {
+                        iter->read_rest = 1;
+                        off = (hts_pair64_max_t*)realloc(off, sizeof(hts_pair64_max_t));
+                        off[0].u = e->offset;
+                        off[0].v = 0;
+                        off[0].max = 0;
+                        n_off=1;
+                    } else {
+                        hts_log_warning("No index entries");
+                    }
+                    break;
+                case HTS_IDX_REST:
+                    break;
+                case HTS_IDX_NONE:
+                    iter->finished = 1;
+                    break;
+                default:
+                    hts_log_error("Query with tid=%d not implemented for CRAM files", tid);
+            }
+        }
+    }
+
+    if (n_off) {
+        ks_introsort(_off_max, n_off, off);
+        // resolve completely contained adjacent blocks
+        for (i = 1, l = 0; i < n_off; ++i) {
+            if (off[l].v < off[i].v) {
+                off[++l] = off[i];
+            } else {
+                off[l].max = (off[i].max > off[l].max ? off[i].max : off[l].max);
+            }
+        }
+        n_off = l + 1;
+        // resolve overlaps between adjacent blocks; this may happen due to the merge in indexing
+        for (i = 1; i < n_off; ++i)
+            if (off[i-1].v >= off[i].u) off[i-1].v = off[i].u;
+        // merge adjacent blocks
+        for (i = 1, l = 0; i < n_off; ++i) {
+            if (off[l].v>>16 == off[i].u>>16) {
+                off[l].v = off[i].v;
+                off[l].max = (off[i].max > off[l].max ? off[i].max : off[l].max);
+            } else off[++l] = off[i];
+        }
+        n_off = l + 1;
+        iter->n_off = n_off; iter->off = off;
+    }
+
+    if(!n_off && !iter->nocoor)
         iter->finished = 1;
-        return iter;
-    }
-    ks_introsort(_off, n_off, off);
-    // resolve completely contained adjacent blocks
-    for (i = 1, l = 0; i < n_off; ++i)
-        if (off[l].v < off[i].v) off[++l] = off[i];
-    n_off = l + 1;
-    // resolve overlaps between adjacent blocks; this may happen due to the merge in indexing
-    for (i = 1; i < n_off; ++i)
-        if (off[i-1].v >= off[i].u) off[i-1].v = off[i].u;
-    // merge adjacent blocks
-    for (i = 1, l = 0; i < n_off; ++i) {
-        if (off[l].v>>16 == off[i].u>>16) off[l].v = off[i].v;
-        else off[++l] = off[i];
-    }
-    n_off = l + 1;
-    iter->n_off = n_off; iter->off = off;
+
     return iter;
 }
 
 void hts_itr_destroy(hts_itr_t *iter)
 {
     if (iter) { free(iter->off); free(iter->bins.a); free(iter); }
+}
+
+void hts_reglist_free(hts_reglist_t *reglist, int count) {
+
+    int i;
+    if(reglist) {
+        for (i=0;i<count;i++) {
+            if (reglist[i].intervals)
+                free(reglist[i].intervals);
+        }
+        free(reglist);
+    }
+}
+
+void hts_itr_multi_destroy(hts_itr_multi_t *iter) {
+
+    if (iter) {
+        if (iter->reg_list && iter->n_reg)
+            hts_reglist_free(iter->reg_list, iter->n_reg);
+
+        if (iter->off && iter->n_off)
+            free(iter->off);
+        free(iter);
+    }
 }
 
 static inline long long push_digit(long long i, char c)
@@ -2219,6 +2582,46 @@ hts_itr_t *hts_itr_querys(const hts_idx_t *idx, const char *reg, hts_name2id_f g
     return itr_query(idx, tid, beg, end, readrec);
 }
 
+hts_itr_multi_t *hts_itr_regions(const hts_idx_t *idx, hts_reglist_t *reglist, int count, hts_name2id_f getid, void *hdr, hts_itr_multi_query_func *itr_specific, hts_readrec_func *readrec, hts_seek_func *seek, hts_tell_func *tell) {
+
+    int i;
+
+    if (!reglist)
+        return NULL;
+
+    hts_itr_multi_t *itr = (hts_itr_multi_t*)calloc(1, sizeof(hts_itr_multi_t));
+    if (itr) {
+        itr->n_reg = count;
+        itr->readrec = readrec;
+        itr->seek = seek;
+        itr->tell = tell;
+        itr->reg_list = reglist;
+        itr->finished = 0;
+        itr->nocoor = 0;
+
+
+        for (i = 0; i < itr->n_reg; i++) {
+            if (!strcmp(itr->reg_list[i].reg, ".")) {
+                itr->reg_list[i].tid = HTS_IDX_START;
+                continue;
+            }
+
+            if (!strcmp(itr->reg_list[i].reg, "*")) {
+                itr->reg_list[i].tid = HTS_IDX_NOCOOR;
+                continue;
+            }
+
+            itr->reg_list[i].tid = getid(hdr, reglist[i].reg);
+            if (itr->reg_list[i].tid < 0)
+                hts_log_warning("Region '%s' specifies an unknown reference name. Continue anyway", reglist[i].reg);
+        }
+
+        qsort(itr->reg_list, itr->n_reg, sizeof(hts_reglist_t), compare_regions);
+        itr_specific(idx, itr);
+    }
+    return itr;
+}
+
 int hts_itr_next(BGZF *fp, hts_itr_t *iter, void *r, void *data)
 {
     int ret, tid, beg, end;
@@ -2259,6 +2662,108 @@ int hts_itr_next(BGZF *fp, hts_itr_t *iter, void *r, void *data)
         } else break; // end of file or error
     }
     iter->finished = 1;
+    return ret;
+}
+
+int hts_itr_multi_next(htsFile *fd, hts_itr_multi_t *iter, void *r)
+{
+    void *fp;
+    int ret, tid, beg, end, i, cr, ci;
+    hts_reglist_t *found_reg;
+
+    if (iter == NULL || iter->finished) return -1;
+
+    if (iter->is_cram) {
+        fp = fd->fp.cram;
+    } else {
+        fp = fd->fp.bgzf;
+    }
+
+    if (iter->read_rest) {
+        if (iter->curr_off) { // seek to the start
+            if (iter->seek(fp, iter->curr_off, SEEK_SET) < 0) {
+                return -1;
+            }
+            iter->curr_off = 0; // only seek once
+        }
+
+        ret = iter->readrec(fp, fd, r, &tid, &beg, &end);
+        if (ret < 0) {
+            iter->finished = 1;
+        }
+
+        iter->curr_tid = tid;
+        iter->curr_beg = beg;
+        iter->curr_end = end;
+
+        return ret;
+    }
+    // A NULL iter->off should always be accompanied by iter->finished.
+    assert(iter->off != NULL || iter->nocoor != 0);
+
+    for (;;) {
+        if (iter->curr_off == 0 || iter->curr_off >= iter->off[iter->i].v) { // then jump to the next chunk
+            if (iter->i == iter->n_off - 1) { // no more chunks, except NOCOORs
+               if (iter->nocoor) {
+                   iter->read_rest = 1;
+                   iter->curr_off = iter->nocoor_off;
+
+                   return hts_itr_multi_next(fd, iter, r);
+               } else {
+                   ret = -1; break;
+               }
+            }
+
+            if (iter->i < 0 || iter->off[iter->i].v != iter->off[iter->i+1].u) { // not adjacent chunks; then seek
+                if (iter->seek(fp, iter->off[iter->i+1].u, SEEK_SET) < 0) {
+                    return -1;
+                }
+
+                iter->curr_off = iter->tell(fp);
+            }
+            ++iter->i;
+        }
+
+        ret = iter->readrec(fp, fd, r, &tid, &beg, &end);
+        if (ret < 0)
+            break;
+
+        iter->curr_off = iter->tell(fp);
+        if (tid != iter->curr_tid) {
+            hts_reglist_t key;
+            key.tid = tid;
+
+            found_reg = (hts_reglist_t *)bsearch(&key, iter->reg_list, iter->n_reg, sizeof(hts_reglist_t), compare_regions);
+            if (!found_reg)
+                continue;
+
+            iter->curr_reg = (found_reg - iter->reg_list);
+            iter->curr_tid = tid;
+            iter->curr_intv = 0;
+        }
+
+        cr = iter->curr_reg;
+        ci = iter->curr_intv;
+
+        if (beg >  iter->off[iter->i].max) {
+            iter->curr_off = iter->off[iter->i].v;
+            continue;
+        }
+        if (beg >  iter->reg_list[cr].max_end)
+            continue;
+
+        for (i = ci; i < iter->reg_list[cr].count; i++) {
+            if (end > iter->reg_list[cr].intervals[i].beg && iter->reg_list[cr].intervals[i].end > beg) {
+                iter->curr_beg = beg;
+                iter->curr_end = end;
+                iter->curr_intv = i;
+
+                return ret;
+            }
+        }
+    }
+    iter->finished = 1;
+
     return ret;
 }
 

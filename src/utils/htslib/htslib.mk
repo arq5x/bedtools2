@@ -55,6 +55,7 @@ HTSLIB_PUBLIC_HEADERS = \
 	$(HTSDIR)/htslib/hts_defs.h \
 	$(HTSDIR)/htslib/hts_endian.h \
 	$(HTSDIR)/htslib/hts_log.h \
+	$(HTSDIR)/htslib/hts_os.h \
 	$(HTSDIR)/htslib/kbitset.h \
 	$(HTSDIR)/htslib/kfunc.h \
 	$(HTSDIR)/htslib/khash.h \
@@ -89,6 +90,7 @@ HTSLIB_ALL = \
 	$(HTSDIR)/hfile_s3.c \
 	$(HTSDIR)/hts.c \
 	$(HTSDIR)/hts_internal.h \
+	$(HTSDIR)/hts_os.c \
 	$(HTSDIR)/kfunc.c \
 	$(HTSDIR)/knetfile.c \
 	$(HTSDIR)/kstring.c \
@@ -102,6 +104,7 @@ HTSLIB_ALL = \
 	$(HTSDIR)/synced_bcf_reader.c \
 	$(HTSDIR)/tbx.c \
 	$(HTSDIR)/textutils.c \
+	$(HTSDIR)/textutils_internal.h \
 	$(HTSDIR)/thread_pool.c \
 	$(HTSDIR)/thread_pool_internal.h \
 	$(HTSDIR)/vcf.c \
@@ -139,7 +142,9 @@ HTSLIB_ALL = \
 	$(HTSDIR)/cram/sam_header.c \
 	$(HTSDIR)/cram/sam_header.h \
 	$(HTSDIR)/cram/string_alloc.c \
-	$(HTSDIR)/cram/string_alloc.h
+	$(HTSDIR)/cram/string_alloc.h \
+	$(HTSDIR)/os/lzma_stub.h \
+	$(HTSDIR)/os/rand.c
 
 $(HTSDIR)/config.h:
 	+cd $(HTSDIR) && $(MAKE) config.h

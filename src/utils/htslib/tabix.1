@@ -1,7 +1,5 @@
-.TH tabix 1 "28 September 2017" "htslib-1.6" "Bioinformatics tools"
+.TH tabix 1 "18 July 2018" "htslib-1.9" "Bioinformatics tools"
 .SH NAME
-.PP
-bgzip \- Block compression/decompression utility
 .PP
 tabix \- Generic indexer for TAB-delimited genome position files
 .\"
@@ -29,14 +27,6 @@ tabix \- Generic indexer for TAB-delimited genome position files
 .\"
 .SH SYNOPSIS
 .PP
-.B bgzip
-.RB [ -cdhB ]
-.RB [ -b
-.IR virtualOffset ]
-.RB [ -s
-.IR size ]
-.RI [ file ]
-.PP
 .B tabix
 .RB [ -0lf ]
 .RB [ -p
@@ -58,11 +48,11 @@ gff|bed|sam|vcf]
 .PP
 Tabix indexes a TAB-delimited genome position file
 .I in.tab.bgz
-and creates an index file (
-.I in.tab.bgz.tbi
+and creates an index file
+.RI ( in.tab.bgz.tbi
 or 
-.I in.tab.bgz.csi
-) when
+.IR in.tab.bgz.csi )
+when
 .I region
 is absent from the command-line. The input data file must be position
 sorted and compressed by
@@ -131,17 +121,16 @@ Print only the header/meta lines.
 .B "-l, --list-chroms "
 List the sequence names stored in the index file.
 .TP
-.B "-r, --reheader " FILE
+.BI "-r, --reheader " FILE
 Replace the header with the content of FILE
 .TP
-.B "-R, --regions " FILE
+.BI "-R, --regions " FILE
 Restrict to regions listed in the FILE. The FILE can be BED file (requires .bed, .bed.gz, .bed.bgz 
 file name extension) or a TAB-delimited file with CHROM, POS, and,  optionally,
 POS_TO columns, where positions are 1-based and inclusive.  When this option is in use, the input
 file may not be sorted. 
-regions.
 .TP
-.B "-T, --targets" FILE
+.BI "-T, --targets " FILE
 Similar to 
 .B -R
 but the entire input will be read sequentially and regions not listed in FILE will be skipped.
@@ -178,4 +167,5 @@ access and in-memory caching.
 
 .SH SEE ALSO
 .PP
+.BR bgzip (1),
 .BR samtools (1)

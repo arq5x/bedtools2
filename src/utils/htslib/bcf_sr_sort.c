@@ -22,6 +22,8 @@
     THE SOFTWARE.
 */
 
+#include <config.h>
+
 #include <strings.h>
 
 #include "bcf_sr_sort.h"
@@ -327,6 +329,20 @@ char *grp_create_key(sr_sort_t *srt)
     }
     return ret;
 }
+int bcf_sr_sort_set_active(sr_sort_t *srt, int idx)
+{
+    hts_expand(int,idx+1,srt->mactive,srt->active);
+    srt->nactive = 1;
+    srt->active[srt->nactive - 1] = idx;
+    return 0;
+}
+int bcf_sr_sort_add_active(sr_sort_t *srt, int idx)
+{
+    hts_expand(int,idx+1,srt->mactive,srt->active);
+    srt->nactive++;
+    srt->active[srt->nactive - 1] = idx;
+    return 0;
+}
 static void bcf_sr_sort_set(bcf_srs_t *readers, sr_sort_t *srt, const char *chr, int min_pos)
 {
     if ( !srt->grp_str2int )
@@ -357,11 +373,11 @@ static void bcf_sr_sort_set(bcf_srs_t *readers, sr_sort_t *srt, const char *chr,
     memset(&grp,0,sizeof(grp_t));
 
     // group VCFs into groups, each with a unique combination of variants in the duplicate lines
-    int ireader,ivar,irec,igrp,ivset;
-    for (ireader=0; ireader<readers->nreaders; ireader++)
+    int ireader,ivar,irec,igrp,ivset,iact;
+    for (ireader=0; ireader<readers->nreaders; ireader++) srt->vcf_buf[ireader].nrec = 0;
+    for (iact=0; iact<srt->nactive; iact++)
     {
-        srt->vcf_buf[ireader].nrec = 0;
-
+        ireader = srt->active[iact];
         bcf_sr_t *reader = &readers->readers[ireader];
         int rid   = bcf_hdr_name2id(reader->header, chr);
         grp.nvar  = 0;
@@ -546,23 +562,8 @@ static void bcf_sr_sort_set(bcf_srs_t *readers, sr_sort_t *srt, const char *chr,
 int bcf_sr_sort_next(bcf_srs_t *readers, sr_sort_t *srt, const char *chr, int min_pos)
 {
     int i,j;
-    if ( readers->nreaders == 1 )
-    {
-        srt->nsr = 1;
-        if ( !srt->msr )
-        {
-            srt->vcf_buf = (vcf_buf_t*) calloc(1,sizeof(vcf_buf_t));   // first time here
-            srt->msr = 1;
-        }
-        bcf_sr_t *reader = &readers->readers[0];
-        assert( reader->buffer[1]->pos==min_pos );
-        bcf1_t *tmp = reader->buffer[0];
-        for (j=1; j<=reader->nbuffer; j++) reader->buffer[j-1] = reader->buffer[j];
-        reader->buffer[ reader->nbuffer ] = tmp;
-        reader->nbuffer--;
-        readers->has_line[0] = 1;
-        return 1;
-    }
+    assert( srt->nactive>0 );
+
     if ( srt->nsr != readers->nreaders )
     {
         srt->sr = readers;
@@ -574,6 +575,19 @@ int bcf_sr_sort_next(bcf_srs_t *readers, sr_sort_t *srt, const char *chr, int mi
         }
         srt->nsr = readers->nreaders;
         srt->chr = NULL;
+    }
+    if ( srt->nactive == 1 )
+    {
+        if ( readers->nreaders>1 )
+            memset(readers->has_line, 0, readers->nreaders*sizeof(*readers->has_line));
+        bcf_sr_t *reader = &readers->readers[srt->active[0]];
+        assert( reader->buffer[1]->pos==min_pos );
+        bcf1_t *tmp = reader->buffer[0];
+        for (j=1; j<=reader->nbuffer; j++) reader->buffer[j-1] = reader->buffer[j];
+        reader->buffer[ reader->nbuffer ] = tmp;
+        reader->nbuffer--;
+        readers->has_line[srt->active[0]] = 1;
+        return 1;
     }
     if ( !srt->chr || srt->pos!=min_pos || strcmp(srt->chr,chr) ) bcf_sr_sort_set(readers, srt, chr, min_pos);
 
@@ -616,10 +630,16 @@ int bcf_sr_sort_next(bcf_srs_t *readers, sr_sort_t *srt, const char *chr, int mi
 }
 void bcf_sr_sort_remove_reader(bcf_srs_t *readers, sr_sort_t *srt, int i)
 {
-    free(srt->vcf_buf[i].rec);
-    if ( i+1 < srt->nsr )
-        memmove(&srt->vcf_buf[i], &srt->vcf_buf[i+1], (srt->nsr - i - 1)*sizeof(vcf_buf_t));
-    memset(srt->vcf_buf + srt->nsr - 1, 0, sizeof(vcf_buf_t));
+    //vcf_buf is allocated only in bcf_sr_sort_next
+    //So, a call to bcf_sr_add_reader() followed immediately by bcf_sr_remove_reader()
+    //would cause the program to crash in this segment
+    if (srt->vcf_buf)
+    {
+        free(srt->vcf_buf[i].rec);
+        if ( i+1 < srt->nsr )
+            memmove(&srt->vcf_buf[i], &srt->vcf_buf[i+1], (srt->nsr - i - 1)*sizeof(vcf_buf_t));
+        memset(srt->vcf_buf + srt->nsr - 1, 0, sizeof(vcf_buf_t));
+    }
 }
 sr_sort_t *bcf_sr_sort_init(sr_sort_t *srt)
 {
@@ -627,8 +647,13 @@ sr_sort_t *bcf_sr_sort_init(sr_sort_t *srt)
     memset(srt,0,sizeof(sr_sort_t));
     return srt;
 }
+void bcf_sr_sort_reset(sr_sort_t *srt)
+{
+    srt->chr = NULL;
+}
 void bcf_sr_sort_destroy(sr_sort_t *srt)
 {
+    free(srt->active);
     if ( srt->var_str2int ) khash_str2int_destroy_free(srt->var_str2int);
     if ( srt->grp_str2int ) khash_str2int_destroy_free(srt->grp_str2int);
     int i;

@@ -69,7 +69,7 @@ extern int hts_verbose;
 * \param format        Format string with placeholders, like printf.
 */
 void hts_log(enum htsLogLevel severity, const char *context, const char *format, ...)
-HTS_FORMAT(printf, 3, 4);
+HTS_FORMAT(HTS_PRINTF_FMT, 3, 4);
 
 /*! Logs an event with severity HTS_LOG_ERROR and default context. Parameters: format, ... */
 #define hts_log_error(...) hts_log(HTS_LOG_ERROR, __func__, __VA_ARGS__)

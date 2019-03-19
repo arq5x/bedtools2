@@ -2,23 +2,23 @@
 Copyright (c) 2009 Genome Research Ltd.
 Author: Rob Davies <rmd@sanger.ac.uk>
 
-Redistribution and use in source and binary forms, with or without 
+Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
 
-   1. Redistributions of source code must retain the above copyright notice, 
+   1. Redistributions of source code must retain the above copyright notice,
 this list of conditions and the following disclaimer.
 
-   2. Redistributions in binary form must reproduce the above copyright notice, 
-this list of conditions and the following disclaimer in the documentation 
+   2. Redistributions in binary form must reproduce the above copyright notice,
+this list of conditions and the following disclaimer in the documentation
 and/or other materials provided with the distribution.
 
    3. Neither the names Genome Research Ltd and Wellcome Trust Sanger
 Institute nor the names of its contributors may be used to endorse or promote
 products derived from this software without specific prior written permission.
 
-THIS SOFTWARE IS PROVIDED BY GENOME RESEARCH LTD AND CONTRIBUTORS "AS IS" AND 
-ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED 
-WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE 
+THIS SOFTWARE IS PROVIDED BY GENOME RESEARCH LTD AND CONTRIBUTORS "AS IS" AND
+ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
 DISCLAIMED. IN NO EVENT SHALL GENOME RESEARCH LTD OR CONTRIBUTORS BE LIABLE
 FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
 DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
@@ -63,12 +63,12 @@ pool_alloc_t *pool_create(size_t dsize) {
     pool_alloc_t *p;
 
     if (NULL == (p = (pool_alloc_t *)malloc(sizeof(*p))))
-	return NULL;
+        return NULL;
 
     /* Minimum size is a pointer, for free list */
     dsize = (dsize + sizeof(void *) - 1) & ~(sizeof(void *)-1);
     if (dsize < sizeof(void *))
-	dsize = sizeof(void *);
+        dsize = sizeof(void *);
     p->dsize = dsize;
     p->psize = MIN(PSIZE, next_power_2(p->dsize*1024));
 
@@ -82,7 +82,7 @@ pool_alloc_t *pool_create(size_t dsize) {
 static pool_t *new_pool(pool_alloc_t *p) {
     size_t n = p->psize / p->dsize;
     pool_t *pool;
-    
+
     pool = realloc(p->pools, (p->npools + 1) * sizeof(*p->pools));
     if (NULL == pool) return NULL;
     p->pools = pool;
@@ -115,18 +115,18 @@ void *pool_alloc(pool_alloc_t *p) {
     /* Look on free list */
     if (NULL != p->free) {
         ret = p->free;
-	p->free = *((void **)p->free);
-	return ret;
+        p->free = *((void **)p->free);
+        return ret;
     }
 
     /* Look for space in the last pool */
     if (p->npools) {
         pool = &p->pools[p->npools - 1];
         if (pool->used + p->dsize < p->psize) {
-	    ret = ((char *) pool->pool) + pool->used;
-	    pool->used += p->dsize;
-	    return ret;
-	}
+            ret = ((char *) pool->pool) + pool->used;
+            pool->used += p->dsize;
+            return ret;
+        }
     }
 
     /* Need a new pool */
@@ -157,30 +157,30 @@ int main(void) {
     items = (xyz **)malloc(NP * sizeof(*items));
 
     for (i = 0; i < NP; i++) {
-	item = pool_alloc(p);
-	item->x = i;
-	item->y = i+1;
-	item->z = i+2;
-	items[i] = item;
+        item = pool_alloc(p);
+        item->x = i;
+        item->y = i+1;
+        item->z = i+2;
+        items[i] = item;
     }
 
     for (i = 0; i < NP; i++) {
-	item = items[i];
-	if (i % 3)
-	    pool_free(p, item);
+        item = items[i];
+        if (i % 3)
+            pool_free(p, item);
     }
 
     for (i = 0; i < NP; i++) {
-	item = pool_alloc(p);
-	item->x = 1000000+i;
-	item->y = 1000000+i+1;
-	item->z = 1000000+i+2;
+        item = pool_alloc(p);
+        item->x = 1000000+i;
+        item->y = 1000000+i+1;
+        item->z = 1000000+i+2;
     }
 
     for (i = 0; i < NP; i++) {
-	item = items[i];
-	printf("%d\t%d\t%d\t%d\n", i, item->x, item->y, item->z);
-	pool_free(p, item);
+        item = items[i];
+        printf("%d\t%d\t%d\t%d\n", i, item->x, item->y, item->z);
+        pool_free(p, item);
     }
 
     return 0;

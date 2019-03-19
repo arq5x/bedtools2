@@ -708,10 +708,12 @@ static int test_bgzf_getline(Files *f, const char *mode, int nthreads) {
     }
 
     if (try_bgzf_close(&bgz, f->tmp_bgzf, __func__) != 0) goto fail;
+    free(ks_release(&str));
     return 0;
 
  fail:
     if (bgz) bgzf_close(bgz);
+    free(ks_release(&str));
     return -1;
 }
 

@@ -215,6 +215,22 @@ static char token_type(hts_json_token *token)
     }
 }
 
+hts_json_token * hts_json_alloc_token() {
+    return calloc(1, sizeof(hts_json_token));
+}
+
+char hts_json_token_type(hts_json_token *token) {
+    return token->type;
+}
+
+void hts_json_free_token(hts_json_token *token) {
+    free(token);
+}
+
+char *hts_json_token_str(hts_json_token *token) {
+    return token->str;
+}
+
 char hts_json_snext(char *str, size_t *state, hts_json_token *token)
 {
     char *s = &str[*state >> 2];

@@ -32,6 +32,7 @@ DEALINGS IN THE SOFTWARE.  */
 #ifndef _WIN32
 # include <sys/select.h>
 #endif
+#include <assert.h>
 
 #include "hfile_internal.h"
 #ifdef ENABLE_PLUGINS
@@ -39,8 +40,30 @@ DEALINGS IN THE SOFTWARE.  */
 #endif
 #include "htslib/hts.h"  // for hts_version() and hts_verbose
 #include "htslib/kstring.h"
+#include "htslib/khash.h"
 
 #include <curl/curl.h>
+
+// Number of seconds to take off auth_token expiry, to allow for clock skew
+// and slow servers
+#define AUTH_REFRESH_EARLY_SECS 60
+
+// Minimum number of bytes to skip when seeking forward.  Seeks less than
+// this will just read the data and throw it away.  The optimal value
+// depends on how long it takes to make a new connection compared
+// to how fast the data arrives.
+#define MIN_SEEK_FORWARD 1000000
+
+typedef struct {
+    char *path;
+    char *token;
+    time_t expiry;
+    int failed;
+    pthread_mutex_t lock;
+} auth_token;
+
+// For the authorization header cache
+KHASH_MAP_INIT_STR(auth_map, auth_token *)
 
 // Curl-compatible header linked list
 typedef struct {
@@ -54,6 +77,12 @@ typedef struct {
     hdrlist extra;                   // List of headers from callback
     hts_httphdr_callback callback;   // Callback to get more headers
     void *callback_data;             // Data to pass to callback
+    auth_token *auth;                // Authentication token
+    int auth_hdr_num;                // Location of auth_token in hdrlist extra
+                                     // If -1, Authorization header is in fixed
+                                     //    -2, it came from the callback
+                                     //    -3, "auth_token_enabled", "false"
+                                     //        passed to hopen()
 } http_headers;
 
 typedef struct {
@@ -73,9 +102,16 @@ typedef struct {
     unsigned perform_again : 1;
     unsigned is_read : 1;   // Opened in read mode
     unsigned can_seek : 1;  // Can (attempt to) seek on this handle
+    unsigned is_recursive:1; // Opened by hfile_libcurl itself
+    unsigned tried_seek : 1; // At least one seek has been attempted
     int nrunning;
     http_headers headers;
+    off_t delayed_seek;      // Location to seek to before reading
+    off_t last_offset;       // Location we're seeking from
 } hFILE_libcurl;
+
+static off_t libcurl_seek(hFILE *fpv, off_t offset, int whence);
+static int restart_from_position(hFILE_libcurl *fp, off_t pos);
 
 static int http_status_errno(int status)
 {
@@ -198,22 +234,33 @@ static int multi_errno(CURLMcode errm)
     }
 }
 
-
 static struct {
     kstring_t useragent;
     CURLSH *share;
-    pthread_mutex_t lock;
-} curl = { { 0, 0, NULL }, NULL, PTHREAD_MUTEX_INITIALIZER };
+    char *auth_path;
+    khash_t(auth_map) *auth_map;
+    int allow_unencrypted_auth_header;
+    pthread_mutex_t auth_lock;
+    pthread_mutex_t share_lock;
+} curl = { { 0, 0, NULL }, NULL, NULL, NULL, 0, PTHREAD_MUTEX_INITIALIZER,
+           PTHREAD_MUTEX_INITIALIZER };
 
 static void share_lock(CURL *handle, curl_lock_data data,
                        curl_lock_access access, void *userptr) {
-    pthread_mutex_lock(&curl.lock);
+    pthread_mutex_lock(&curl.share_lock);
 }
 
 static void share_unlock(CURL *handle, curl_lock_data data, void *userptr) {
-    pthread_mutex_unlock(&curl.lock);
+    pthread_mutex_unlock(&curl.share_lock);
 }
 
+static void free_auth(auth_token *tok) {
+    if (!tok) return;
+    if (pthread_mutex_destroy(&tok->lock)) abort();
+    free(tok->path);
+    free(tok->token);
+    free(tok);
+}
 
 static void libcurl_exit()
 {
@@ -222,6 +269,22 @@ static void libcurl_exit()
 
     free(curl.useragent.s);
     curl.useragent.l = curl.useragent.m = 0; curl.useragent.s = NULL;
+
+    free(curl.auth_path);
+    curl.auth_path = NULL;
+
+    if (curl.auth_map) {
+        khiter_t i;
+        for (i = kh_begin(curl.auth_map); i != kh_end(curl.auth_map); ++i) {
+            if (kh_exist(curl.auth_map, i)) {
+                free_auth(kh_value(curl.auth_map, i));
+                kh_key(curl.auth_map, i) = NULL;
+                kh_value(curl.auth_map, i) = NULL;
+            }
+        }
+        kh_destroy(auth_map, curl.auth_map);
+        curl.auth_map = NULL;
+    }
 
     curl_global_cleanup();
 }
@@ -268,6 +331,10 @@ static struct curl_slist * get_header_list(hFILE_libcurl *fp) {
     return 0;
 }
 
+static inline int is_authorization(const char *hdr) {
+    return (strncasecmp("authorization:", hdr, 14) == 0);
+}
+
 static int add_callback_headers(hFILE_libcurl *fp) {
     char **hdrs = NULL, **hdr;
 
@@ -289,11 +356,16 @@ static int add_callback_headers(hFILE_libcurl *fp) {
     }
     free_headers(&fp->headers.extra, 0);
 
+    if (fp->headers.auth_hdr_num > 0 || fp->headers.auth_hdr_num == -2)
+        fp->headers.auth_hdr_num = 0; // Just removed it...
+
     // Convert to libcurl-suitable form
     for (hdr = hdrs; *hdr; hdr++) {
         if (append_header(&fp->headers.extra, *hdr, 0) < 0) {
             goto cleanup;
         }
+        if (is_authorization(*hdr) && !fp->headers.auth_hdr_num)
+            fp->headers.auth_hdr_num = -2;
     }
     for (hdr = hdrs; *hdr; hdr++) *hdr = NULL;
 
@@ -309,6 +381,276 @@ static int add_callback_headers(hFILE_libcurl *fp) {
         free(*hdr);
         *hdr = NULL;
     }
+    return -1;
+}
+
+/*
+ * Read an OAUTH2-style Bearer access token (see
+ * https://tools.ietf.org/html/rfc6750#section-4).
+ * Returns 'v' for valid; 'i' for invalid (token missing or wrong sort);
+ * '?' for a JSON parse error; 'm' if it runs out of memory.
+ */
+static int read_auth_json(auth_token *tok, hFILE *auth_fp) {
+    hts_json_token *t = hts_json_alloc_token();
+    kstring_t str = {0, 0, NULL};
+    char *token = NULL, *type = NULL, *expiry = NULL;
+    int ret = 'i';
+
+    if (!t) goto error;
+
+    if ((ret = hts_json_fnext(auth_fp, t, &str)) != '{') goto error;
+    while (hts_json_fnext(auth_fp, t, &str) != '}') {
+        char *key;
+        if (hts_json_token_type(t) != 's') {
+            ret = '?';
+            goto error;
+        }
+        key = hts_json_token_str(t);
+        if (!key) goto error;
+        if (strcmp(key, "access_token") == 0) {
+            if ((ret = hts_json_fnext(auth_fp, t, &str)) != 's') goto error;
+            token = ks_release(&str);
+        } else if (strcmp(key, "token_type") == 0) {
+            if ((ret = hts_json_fnext(auth_fp, t, &str)) != 's') goto error;
+            type = ks_release(&str);
+        } else if (strcmp(key, "expires_in") == 0) {
+            if ((ret = hts_json_fnext(auth_fp, t, &str)) != 'n') goto error;
+            expiry = ks_release(&str);
+        } else if (hts_json_fskip_value(auth_fp, '\0') != 'v') {
+            ret = '?';
+            goto error;
+        }
+    }
+
+    if (!token || (type && strcmp(type, "Bearer") != 0)) {
+        ret = 'i';
+        goto error;
+    }
+
+    ret = 'm';
+    str.l = 0;
+    if (kputs("Authorization: Bearer ", &str) < 0) goto error;
+    if (kputs(token, &str) < 0) goto error;
+    free(tok->token);
+    tok->token = ks_release(&str);
+    if (expiry) {
+        long exp = strtol(expiry, NULL, 10);
+        if (exp < 0) exp = 0;
+        tok->expiry = time(NULL) + exp;
+    } else {
+        tok->expiry = 0;
+    }
+    ret = 'v';
+
+ error:
+    free(token);
+    free(type);
+    free(expiry);
+    free(str.s);
+    hts_json_free_token(t);
+    return ret;
+}
+
+static int read_auth_plain(auth_token *tok, hFILE *auth_fp) {
+    kstring_t line = {0, 0, NULL};
+    kstring_t token = {0, 0, NULL};
+    const char *start, *end;
+
+    if (kgetline(&line, (char * (*)(char *, int, void *)) hgets, auth_fp) < 0) goto error;
+    if (kputc('\0', &line) < 0) goto error;
+
+    for (start = line.s; *start && isspace_c(*start); start++) {}
+    for (end = start; *end && !isspace_c(*end); end++) {}
+
+    if (end > start) {
+        if (kputs("Authorization: Bearer ", &token) < 0) goto error;
+        if (kputsn(start, end - start, &token) < 0) goto error;
+    }
+
+    free(tok->token);
+    tok->token = ks_release(&token);
+    tok->expiry = 0;
+    free(line.s);
+    return 0;
+
+ error:
+    free(line.s);
+    free(token.s);
+    return -1;
+}
+
+static int renew_auth_token(auth_token *tok, int *changed) {
+    hFILE *auth_fp = NULL;
+    char buffer[16];
+    ssize_t len;
+
+    *changed = 0;
+    if (tok->expiry == 0 || time(NULL) + AUTH_REFRESH_EARLY_SECS < tok->expiry)
+        return 0; // Still valid
+
+    if (tok->failed)
+        return -1;
+
+    *changed = 1;
+    auth_fp = hopen(tok->path, "rR");
+    if (!auth_fp) {
+        // Not worried about missing files; other errors are bad.
+        if (errno != ENOENT)
+            goto fail;
+
+        tok->expiry = 0; // Prevent retry
+        free(tok->token); // Just in case it was set
+        return 0;
+    }
+
+    len = hpeek(auth_fp, buffer, sizeof(buffer));
+    if (len < 0)
+        goto fail;
+
+    if (memchr(buffer, '{', len) != NULL) {
+        if (read_auth_json(tok, auth_fp) != 'v')
+            goto fail;
+    } else {
+        if (read_auth_plain(tok, auth_fp) < 0)
+            goto fail;
+    }
+
+    return hclose(auth_fp) < 0 ? -1 : 0;
+
+ fail:
+    tok->failed = 1;
+    if (auth_fp) hclose_abruptly(auth_fp);
+    return -1;
+}
+
+static int add_auth_header(hFILE_libcurl *fp) {
+    int changed = 0;
+
+    if (fp->headers.auth_hdr_num < 0)
+        return 0; // Have an Authorization header from open or header callback
+
+    if (!fp->headers.auth)
+        return 0; // Nothing to add
+
+    pthread_mutex_lock(&fp->headers.auth->lock);
+    if (renew_auth_token(fp->headers.auth, &changed) < 0)
+        goto unlock_fail;
+
+    if (!changed && fp->headers.auth_hdr_num > 0) {
+        pthread_mutex_unlock(&fp->headers.auth->lock);
+        return 0;
+    }
+
+    if (fp->headers.auth_hdr_num > 0) {
+        // Had a previous header, so swap in the new one
+        char *header = fp->headers.auth->token;
+        char *header_copy = header ? strdup(header) : NULL;
+        int idx = fp->headers.auth_hdr_num - 1;
+        if (header && !header_copy)
+            goto unlock_fail;
+
+        if (header_copy) {
+            free(fp->headers.extra.list[idx].data);
+            fp->headers.extra.list[idx].data = header_copy;
+        } else {
+            unsigned int j;
+            // More complicated case - need to get rid of the old header
+            // and tidy up linked lists
+            free(fp->headers.extra.list[idx].data);
+            for (j = idx + 1; j < fp->headers.extra.num; j++) {
+                fp->headers.extra.list[j - 1] = fp->headers.extra.list[j];
+                fp->headers.extra.list[j - 1].next = &fp->headers.extra.list[j];
+            }
+            fp->headers.extra.num--;
+            if (fp->headers.extra.num > 0) {
+                fp->headers.extra.list[fp->headers.extra.num-1].next = NULL;
+            } else if (fp->headers.fixed.num > 0) {
+                fp->headers.fixed.list[fp->headers.fixed.num - 1].next = NULL;
+            }
+            fp->headers.auth_hdr_num = 0;
+        }
+    } else if (fp->headers.auth->token) {
+        // Add new header and remember where it is
+        if (append_header(&fp->headers.extra,
+                          fp->headers.auth->token, 1) < 0) {
+            goto unlock_fail;
+        }
+        fp->headers.auth_hdr_num = fp->headers.extra.num;
+    }
+
+    pthread_mutex_unlock(&fp->headers.auth->lock);
+    return 0;
+
+ unlock_fail:
+    pthread_mutex_unlock(&fp->headers.auth->lock);
+    return -1;
+}
+
+static int get_auth_token(hFILE_libcurl *fp, const char *url) {
+    const char *host = NULL, *p, *q;
+    kstring_t name = {0, 0, NULL};
+    size_t host_len = 0;
+    khiter_t idx;
+    auth_token *tok = NULL;
+
+    // Nothing to do if:
+    //   curl.auth_path has not been set
+    //   fp was made by hfile_libcurl (e.g. auth_path is a http:// url)
+    //   we already have an Authorization header
+    if (!curl.auth_path || fp->is_recursive || fp->headers.auth_hdr_num != 0)
+        return 0;
+
+    // Insist on having a secure connection unless the user insists harder
+    if (!curl.allow_unencrypted_auth_header && strncmp(url, "https://", 8) != 0)
+        return 0;
+
+    host = strstr(url, "://");
+    if (host) {
+        host += 3;
+        host_len = strcspn(host, "/");
+    }
+
+    p = curl.auth_path;
+    while ((q = strstr(p, "%h")) != NULL) {
+        if (q - p > INT_MAX || host_len > INT_MAX) goto error;
+        if (kputsn_(p, q - p, &name) < 0) goto error;
+        if (kputsn_(host, host_len, &name) < 0) goto error;
+        p = q + 2;
+    }
+    if (kputs(p, &name) < 0) goto error;
+
+    pthread_mutex_lock(&curl.auth_lock);
+    idx = kh_get(auth_map, curl.auth_map, name.s);
+    if (idx < kh_end(curl.auth_map)) {
+        tok = kh_value(curl.auth_map, idx);
+    } else {
+        tok = calloc(1, sizeof(*tok));
+        if (tok && pthread_mutex_init(&tok->lock, NULL) != 0) {
+            free(tok);
+            tok = NULL;
+        }
+        if (tok) {
+            int ret = -1;
+            tok->path = ks_release(&name);
+            tok->token = NULL;
+            tok->expiry = 1; // Force refresh
+            idx = kh_put(auth_map, curl.auth_map, tok->path, &ret);
+            if (ret < 0) {
+                free_auth(tok);
+                tok = NULL;
+            }
+            kh_value(curl.auth_map, idx) = tok;
+        }
+    }
+    pthread_mutex_unlock(&curl.auth_lock);
+
+    fp->headers.auth = tok;
+    free(name.s);
+
+    return add_auth_header(fp);
+
+ error:
+    free(name.s);
     return -1;
 }
 
@@ -337,26 +679,29 @@ static int wait_perform(hFILE_libcurl *fp)
     long timeout;
     CURLMcode errm;
 
-    FD_ZERO(&rd);
-    FD_ZERO(&wr);
-    FD_ZERO(&ex);
-    if (curl_multi_fdset(fp->multi, &rd, &wr, &ex, &maxfd) != CURLM_OK)
-        maxfd = -1, timeout = 1000;
-    else if (maxfd < 0)
-        timeout = 100;  // as recommended by curl_multi_fdset(3)
-    else {
-        if (curl_multi_timeout(fp->multi, &timeout) != CURLM_OK)
-            timeout = 1000;
-        else if (timeout < 0)
-            timeout = 10000;  // as recommended by curl_multi_timeout(3)
-    }
+    if (!fp->perform_again) {
+        FD_ZERO(&rd);
+        FD_ZERO(&wr);
+        FD_ZERO(&ex);
+        if (curl_multi_fdset(fp->multi, &rd, &wr, &ex, &maxfd) != CURLM_OK)
+            maxfd = -1, timeout = 1000;
+        else {
+            if (curl_multi_timeout(fp->multi, &timeout) != CURLM_OK)
+                timeout = 1000;
+            else if (timeout < 0) {
+                timeout = 10000;  // as recommended by curl_multi_timeout(3)
+            }
+        }
+        if (maxfd < 0 && timeout > 100)
+            timeout = 100; // as recommended by curl_multi_fdset(3)
 
-    if (timeout > 0 && ! fp->perform_again) {
-        struct timeval tval;
-        tval.tv_sec  = (timeout / 1000);
-        tval.tv_usec = (timeout % 1000) * 1000;
+        if (timeout > 0) {
+            struct timeval tval;
+            tval.tv_sec  = (timeout / 1000);
+            tval.tv_usec = (timeout % 1000) * 1000;
 
-        if (select(maxfd + 1, &rd, &wr, &ex, &tval) < 0) return -1;
+            if (select(maxfd + 1, &rd, &wr, &ex, &tval) < 0) return -1;
+        }
     }
 
     errm = curl_multi_perform(fp->multi, &nrunning);
@@ -387,18 +732,54 @@ static ssize_t libcurl_read(hFILE *fpv, void *bufferv, size_t nbytes)
 {
     hFILE_libcurl *fp = (hFILE_libcurl *) fpv;
     char *buffer = (char *) bufferv;
+    off_t to_skip = -1;
+    ssize_t got = 0;
     CURLcode err;
 
-    fp->buffer.ptr.rd = buffer;
-    fp->buffer.len = nbytes;
-    fp->paused = 0;
-    err = curl_easy_pause(fp->easy, CURLPAUSE_CONT);
-    if (err != CURLE_OK) { errno = easy_errno(fp->easy, err); return -1; }
+    if (fp->delayed_seek >= 0) {
+        assert(fp->base.offset == fp->delayed_seek
+               && fp->base.begin == fp->base.buffer
+               && fp->base.end == fp->base.buffer);
 
-    while (! fp->paused && ! fp->finished)
-        if (wait_perform(fp) < 0) return -1;
+        if (fp->last_offset >= 0
+            && fp->delayed_seek > fp->last_offset
+            && fp->delayed_seek - fp->last_offset < MIN_SEEK_FORWARD) {
+            // If not seeking far, just read the data and throw it away.  This
+            // is likely to be quicker than opening a new stream
+            to_skip = fp->delayed_seek - fp->last_offset;
+        } else {
+            if (restart_from_position(fp, fp->delayed_seek) < 0) {
+                return -1;
+            }
+        }
+        fp->delayed_seek = -1;
+        fp->last_offset = -1;
+    }
 
-    nbytes = fp->buffer.ptr.rd - buffer;
+    do {
+        fp->buffer.ptr.rd = buffer;
+        fp->buffer.len = nbytes;
+        fp->paused = 0;
+        err = curl_easy_pause(fp->easy, CURLPAUSE_CONT);
+        if (err != CURLE_OK) { errno = easy_errno(fp->easy, err); return -1; }
+
+        while (! fp->paused && ! fp->finished)
+            if (wait_perform(fp) < 0) return -1;
+
+        got = fp->buffer.ptr.rd - buffer;
+
+        if (to_skip >= 0) { // Skipping over a small seek
+            if (got < to_skip) { // Need to skip more data
+                to_skip -= got;
+            } else {
+                got -= to_skip;
+                if (got > 0) {  // If enough was skipped, return the rest
+                    memmove(buffer, buffer + to_skip, got);
+                    to_skip = -1;
+                }
+            }
+        }
+    } while (to_skip >= 0 && ! fp->finished);
     fp->buffer.ptr.rd = NULL;
     fp->buffer.len = 0;
 
@@ -407,7 +788,7 @@ static ssize_t libcurl_read(hFILE *fpv, void *bufferv, size_t nbytes)
         return -1;
     }
 
-    return nbytes;
+    return got;
 }
 
 static size_t send_callback(char *ptr, size_t size, size_t nmemb, void *fpv)
@@ -458,9 +839,6 @@ static ssize_t libcurl_write(hFILE *fpv, const void *bufferv, size_t nbytes)
 static off_t libcurl_seek(hFILE *fpv, off_t offset, int whence)
 {
     hFILE_libcurl *fp = (hFILE_libcurl *) fpv;
-    hFILE_libcurl temp_fp;
-    CURLcode err;
-    CURLMcode errm;
     off_t origin, pos;
 
     if (!fp->is_read || !fp->can_seek) {
@@ -494,6 +872,36 @@ static off_t libcurl_seek(hFILE *fpv, off_t offset, int whence)
 
     pos = origin + offset;
 
+    if (fp->tried_seek) {
+        /* Seeking has worked at least once, so now we can delay doing
+           the actual work until the next read.  This avoids lots of pointless
+           http or ftp reconnections if the caller does lots of seeks
+           without any intervening reads. */
+        if (fp->delayed_seek < 0) {
+            fp->last_offset = fp->base.offset + (fp->base.end - fp->base.buffer);
+        }
+        fp->delayed_seek = pos;
+        return pos;
+    }
+
+    if (restart_from_position(fp, pos) < 0) {
+        /* This value for errno may not be entirely true, but the caller may be
+           able to carry on with the existing handle. */
+        errno = ESPIPE;
+        return -1;
+    }
+
+    fp->tried_seek = 1;
+    return pos;
+}
+
+static int restart_from_position(hFILE_libcurl *fp, off_t pos) {
+    hFILE_libcurl temp_fp;
+    CURLcode err;
+    CURLMcode errm;
+    int update_headers = 0;
+    int save_errno = 0;
+
     // TODO If we seem to be doing random access, use CURLOPT_RANGE to do
     // limited reads (e.g. about a BAM block!) so seeking can reuse the
     // existing connection more often.
@@ -503,10 +911,17 @@ static off_t libcurl_seek(hFILE *fpv, off_t offset, int whence)
     // sent by now.
 
     if (fp->headers.callback) {
-        struct curl_slist *list;
         if (add_callback_headers(fp) != 0)
             return -1;
-        list = get_header_list(fp);
+        update_headers = 1;
+    }
+    if (fp->headers.auth_hdr_num > 0 && fp->headers.auth) {
+        if (add_auth_header(fp) != 0)
+            return -1;
+        update_headers = 1;
+    }
+    if (update_headers) {
+        struct curl_slist *list = get_header_list(fp);
         if (list) {
             err = curl_easy_setopt(fp->easy, CURLOPT_HTTPHEADER, list);
             if (err != CURLE_OK) {
@@ -521,10 +936,7 @@ static off_t libcurl_seek(hFILE *fpv, off_t offset, int whence)
       a new request to the server, reading from the location that we want
       to seek to.  If the new request works and returns the correct data,
       the original easy handle in *fp is closed and replaced with the new
-      one.  If not, we close the new handle, leave *fp unchanged, set
-      errno to ESPIPE and return -1 so that the caller knows we can't seek.
-      This allows the caller to decide if it wants to continue reading from
-      fp, in the same way as it would if reading from a pipe.
+      one.  If not, we close the new handle and leave *fp unchanged.
      */
 
     memcpy(&temp_fp, fp, sizeof(temp_fp));
@@ -537,36 +949,52 @@ static off_t libcurl_seek(hFILE *fpv, off_t offset, int whence)
     err = curl_easy_setopt(temp_fp.easy, CURLOPT_RESUME_FROM_LARGE,(curl_off_t)pos);
     err |= curl_easy_setopt(temp_fp.easy, CURLOPT_PRIVATE, &temp_fp);
     err |= curl_easy_setopt(temp_fp.easy, CURLOPT_WRITEDATA, &temp_fp);
-    if (err != CURLE_OK)
+    if (err != CURLE_OK) {
+        save_errno = easy_errno(temp_fp.easy, err);
         goto error;
+    }
 
     temp_fp.buffer.len = 0;  // Ensures we only read the response headers
     temp_fp.paused = temp_fp.finished = 0;
 
     // fp->multi and temp_fp.multi are the same.
     errm = curl_multi_add_handle(fp->multi, temp_fp.easy);
-    if (errm != CURLM_OK) { errno = multi_errno(errm); return -1; }
+    if (errm != CURLM_OK) {
+        save_errno = multi_errno(errm);
+        goto error;
+    }
     temp_fp.nrunning = ++fp->nrunning;
 
     err = curl_easy_pause(temp_fp.easy, CURLPAUSE_CONT);
-    if (err != CURLE_OK)
+    if (err != CURLE_OK) {
+        save_errno = easy_errno(temp_fp.easy, err);
         goto error_remove;
+    }
 
     while (! temp_fp.paused && ! temp_fp.finished)
-        if (wait_perform(&temp_fp) < 0) goto error_remove;
+        if (wait_perform(&temp_fp) < 0) {
+            save_errno = errno;
+            goto error_remove;
+        }
 
-    if (temp_fp.finished && temp_fp.final_result != CURLE_OK)
+    if (temp_fp.finished && temp_fp.final_result != CURLE_OK) {
+        save_errno = easy_errno(temp_fp.easy, temp_fp.final_result);
         goto error_remove;
+    }
 
     // We've got a good response, close the original connection and
     // replace it with the new one.
 
     errm = curl_multi_remove_handle(fp->multi, fp->easy);
     if (errm != CURLM_OK) {
+        // Clean up as much as possible
         curl_easy_reset(temp_fp.easy);
-        curl_multi_remove_handle(fp->multi, temp_fp.easy);
-        errno = multi_errno(errm);
-        return -1;
+        if (curl_multi_remove_handle(fp->multi, temp_fp.easy) == CURLM_OK) {
+            fp->nrunning--;
+            curl_easy_cleanup(temp_fp.easy);
+        }
+        save_errno = multi_errno(errm);
+        goto early_error;
     }
     fp->nrunning--;
 
@@ -575,7 +1003,7 @@ static off_t libcurl_seek(hFILE *fpv, off_t offset, int whence)
     err = curl_easy_setopt(fp->easy, CURLOPT_WRITEDATA, fp);
     err |= curl_easy_setopt(fp->easy, CURLOPT_PRIVATE, fp);
     if (err != CURLE_OK) {
-        int save_errno = easy_errno(fp->easy, err);
+        save_errno = easy_errno(fp->easy, err);
         curl_easy_reset(fp->easy);
         errno = save_errno;
         return -1;
@@ -586,7 +1014,7 @@ static off_t libcurl_seek(hFILE *fpv, off_t offset, int whence)
     fp->perform_again = temp_fp.perform_again;
     fp->final_result = temp_fp.final_result;
 
-    return pos;
+    return 0;
 
  error_remove:
     curl_easy_reset(temp_fp.easy); // Ensure no pointers to on-stack temp_fp
@@ -600,9 +1028,8 @@ static off_t libcurl_seek(hFILE *fpv, off_t offset, int whence)
     curl_easy_cleanup(temp_fp.easy);
  early_error:
     fp->can_seek = 0;  // Don't try to seek again
-    /* This value for errno may not be entirely true, but the caller may be
-       able to carry on with the existing handle. */
-    errno = ESPIPE;
+    if (save_errno)
+        errno = save_errno;
     return -1;
 }
 
@@ -658,7 +1085,9 @@ libcurl_open(const char *url, const char *modes, http_headers *headers)
     const char *s;
     CURLcode err;
     CURLMcode errm;
-    int save;
+    int save, is_recursive;
+
+    is_recursive = strchr(modes, 'R') != NULL;
 
     if ((s = strpbrk(modes, "rwa+")) != NULL) {
         mode = *s;
@@ -676,12 +1105,16 @@ libcurl_open(const char *url, const char *modes, http_headers *headers)
     } else {
         memset(&fp->headers, 0, sizeof(fp->headers));
     }
+
     fp->file_size = -1;
     fp->buffer.ptr.rd = NULL;
     fp->buffer.len = 0;
     fp->final_result = (CURLcode) -1;
     fp->paused = fp->closing = fp->finished = fp->perform_again = 0;
     fp->can_seek = 1;
+    fp->tried_seek = 0;
+    fp->delayed_seek = fp->last_offset = -1;
+    fp->is_recursive = is_recursive;
     fp->nrunning = 0;
     fp->easy = NULL;
 
@@ -693,6 +1126,10 @@ libcurl_open(const char *url, const char *modes, http_headers *headers)
 
     // Make a route to the hFILE_libcurl* given just a CURL* easy handle
     err = curl_easy_setopt(fp->easy, CURLOPT_PRIVATE, fp);
+
+    // Avoid many repeated CWD calls with FTP, instead requesting the filename
+    // by full path (as done in knet, but not strictly compliant with RFC1738).
+    err |= curl_easy_setopt(fp->easy, CURLOPT_FTP_FILEMETHOD, CURLFTPMETHOD_NOCWD);
 
     if (mode == 'r') {
         err |= curl_easy_setopt(fp->easy, CURLOPT_WRITEFUNCTION, recv_callback);
@@ -711,10 +1148,18 @@ libcurl_open(const char *url, const char *modes, http_headers *headers)
 
     err |= curl_easy_setopt(fp->easy, CURLOPT_SHARE, curl.share);
     err |= curl_easy_setopt(fp->easy, CURLOPT_URL, url);
+    {
+        char* env_curl_ca_bundle = getenv("CURL_CA_BUNDLE");
+        if (env_curl_ca_bundle) {
+            err |= curl_easy_setopt(fp->easy, CURLOPT_CAINFO, env_curl_ca_bundle);
+        }
+    }
     err |= curl_easy_setopt(fp->easy, CURLOPT_USERAGENT, curl.useragent.s);
     if (fp->headers.callback) {
         if (add_callback_headers(fp) != 0) goto error;
     }
+    if (get_auth_token(fp, url) < 0)
+        goto error;
     if ((list = get_header_list(fp)) != NULL)
         err |= curl_easy_setopt(fp->easy, CURLOPT_HTTPHEADER, list);
     err |= curl_easy_setopt(fp->easy, CURLOPT_FOLLOWLOCATION, 1L);
@@ -757,15 +1202,12 @@ error:
     save = errno;
     if (fp->easy) curl_easy_cleanup(fp->easy);
     if (fp->multi) curl_multi_cleanup(fp->multi);
-    free_headers(&fp->headers.fixed, 1);
     free_headers(&fp->headers.extra, 1);
     hfile_destroy((hFILE *) fp);
     errno = save;
     return NULL;
 
 early_error:
-    save = errno;
-    errno = save;
     return NULL;
 }
 
@@ -784,6 +1226,8 @@ static int parse_va_list(http_headers *headers, va_list args)
             for (hdr = va_arg(args, const char **); *hdr; hdr++) {
                 if (append_header(&headers->fixed, *hdr, 1) < 0)
                     return -1;
+                if (is_authorization(*hdr))
+                    headers->auth_hdr_num = -1;
             }
         }
         else if (strcmp(argtype, "httphdr:l") == 0) {
@@ -791,6 +1235,8 @@ static int parse_va_list(http_headers *headers, va_list args)
             while ((hdr = va_arg(args, const char *)) != NULL) {
                 if (append_header(&headers->fixed, hdr, 1) < 0)
                     return -1;
+                if (is_authorization(hdr))
+                    headers->auth_hdr_num = -1;
             }
         }
         else if (strcmp(argtype, "httphdr") == 0) {
@@ -798,6 +1244,8 @@ static int parse_va_list(http_headers *headers, va_list args)
             if (hdr) {
                 if (append_header(&headers->fixed, hdr, 1) < 0)
                     return -1;
+                if (is_authorization(hdr))
+                    headers->auth_hdr_num = -1;
             }
         }
         else if (strcmp(argtype, "httphdr_callback") == 0) {
@@ -811,6 +1259,11 @@ static int parse_va_list(http_headers *headers, va_list args)
             if (args2) {
                 if (parse_va_list(headers, *args2) < 0) return -1;
             }
+        }
+        else if (strcmp(argtype, "auth_token_enabled") == 0) {
+            const char *flag = va_arg(args, const char *);
+            if (strcmp(flag, "false") == 0)
+                headers->auth_hdr_num = -3;
         }
         else { errno = EINVAL; return -1; }
 
@@ -891,6 +1344,7 @@ int PLUGIN_GLOBAL(hfile_plugin_init,_libcurl)(struct hFILE_plugin *self)
 #endif
     const curl_version_info_data *info;
     const char * const *protocol;
+    const char *auth;
     CURLcode err;
     CURLSHcode errsh;
 
@@ -907,6 +1361,24 @@ int PLUGIN_GLOBAL(hfile_plugin_init,_libcurl)(struct hFILE_plugin *self)
         curl_global_cleanup();
         errno = EIO;
         return -1;
+    }
+
+    if ((auth = getenv("HTS_AUTH_LOCATION")) != NULL) {
+        curl.auth_path = strdup(auth);
+        curl.auth_map = kh_init(auth_map);
+        if (!curl.auth_path || !curl.auth_map) {
+            int save_errno = errno;
+            free(curl.auth_path);
+            kh_destroy(auth_map, curl.auth_map);
+            curl_share_cleanup(curl.share);
+            curl_global_cleanup();
+            errno = save_errno;
+            return -1;
+        }
+    }
+    if ((auth = getenv("HTS_ALLOW_UNENCRYPTED_AUTHORIZATION_HEADER")) != NULL
+        && strcmp(auth, "I understand the risks") == 0) {
+        curl.allow_unencrypted_auth_header = 1;
     }
 
     info = curl_version_info(CURLVERSION_NOW);

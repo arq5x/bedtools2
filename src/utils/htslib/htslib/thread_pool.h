@@ -68,7 +68,7 @@ extern "C" {
  * growing too large and serial numbers to ensure sequential consumption of
  * the output.
  *
- * The thread pool may have many hetergeneous tasks, each using its own
+ * The thread pool may have many heterogeneous tasks, each using its own
  * process mixed into the same thread pool.
  */
 typedef struct hts_tpool_process hts_tpool_process;
@@ -145,7 +145,7 @@ void hts_tpool_wake_dispatch(hts_tpool_process *q);
 int hts_tpool_process_flush(hts_tpool_process *q);
 
 /*
- * Resets a process to the intial state.
+ * Resets a process to the initial state.
  *
  * This removes any queued up input jobs, disables any notification of
  * new results/output, flushes what is left and then discards any

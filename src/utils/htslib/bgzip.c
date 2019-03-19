@@ -1,7 +1,7 @@
 /* bgzip.c -- Block compression/decompression utility.
 
    Copyright (C) 2008, 2009 Broad Institute / Massachusetts Institute of Technology
-   Copyright (C) 2010, 2013-2017 Genome Research Ltd.
+   Copyright (C) 2010, 2013-2018 Genome Research Ltd.
 
    Permission is hereby granted, free of charge, to any person obtaining a copy
    of this software and associated documentation files (the "Software"), to deal
@@ -32,6 +32,7 @@
 #include <errno.h>
 #include <stdarg.h>
 #include <getopt.h>
+#include <inttypes.h>
 #include <sys/stat.h>
 #include "htslib/bgzf.h"
 #include "htslib/hts.h"
@@ -73,24 +74,26 @@ static int bgzip_main_usage(void)
     fprintf(stderr, "Version: %s\n", hts_version());
     fprintf(stderr, "Usage:   bgzip [OPTIONS] [FILE] ...\n");
     fprintf(stderr, "Options:\n");
-    fprintf(stderr, "   -b, --offset INT        decompress at virtual file pointer (0-based uncompressed offset)\n");
-    fprintf(stderr, "   -c, --stdout            write on standard output, keep original files unchanged\n");
-    fprintf(stderr, "   -d, --decompress        decompress\n");
-    fprintf(stderr, "   -f, --force             overwrite files without asking\n");
-    fprintf(stderr, "   -h, --help              give this help\n");
-    fprintf(stderr, "   -i, --index             compress and create BGZF index\n");
-    fprintf(stderr, "   -I, --index-name FILE   name of BGZF index file [file.gz.gzi]\n");
-    fprintf(stderr, "   -r, --reindex           (re)index compressed file\n");
-    fprintf(stderr, "   -g, --rebgzip           use an index file to bgzip a file\n");
-    fprintf(stderr, "   -s, --size INT          decompress INT bytes (uncompressed size)\n");
-    fprintf(stderr, "   -@, --threads INT       number of compression threads to use [1]\n");
+    fprintf(stderr, "   -b, --offset INT           decompress at virtual file pointer (0-based uncompressed offset)\n");
+    fprintf(stderr, "   -c, --stdout               write on standard output, keep original files unchanged\n");
+    fprintf(stderr, "   -d, --decompress           decompress\n");
+    fprintf(stderr, "   -f, --force                overwrite files without asking\n");
+    fprintf(stderr, "   -h, --help                 give this help\n");
+    fprintf(stderr, "   -i, --index                compress and create BGZF index\n");
+    fprintf(stderr, "   -I, --index-name FILE      name of BGZF index file [file.gz.gzi]\n");
+    fprintf(stderr, "   -l, --compress-level INT   Compression level to use when compressing; 0 to 9, or -1 for default [-1]\n");
+    fprintf(stderr, "   -r, --reindex              (re)index compressed file\n");
+    fprintf(stderr, "   -g, --rebgzip              use an index file to bgzip a file\n");
+    fprintf(stderr, "   -s, --size INT             decompress INT bytes (uncompressed size)\n");
+    fprintf(stderr, "   -@, --threads INT          number of compression threads to use [1]\n");
+    fprintf(stderr, "   -t, --test                 test integrity of compressed file");
     fprintf(stderr, "\n");
     return 1;
 }
 
 int main(int argc, char **argv)
 {
-    int c, compress, pstdout, is_forced, index = 0, rebgzip = 0, reindex = 0;
+    int c, compress, compress_level = -1, pstdout, is_forced, test, index = 0, rebgzip = 0, reindex = 0;
     BGZF *fp;
     void *buffer;
     long start, end, size;
@@ -106,16 +109,18 @@ int main(int argc, char **argv)
         {"force", no_argument, NULL, 'f'},
         {"index", no_argument, NULL, 'i'},
         {"index-name", required_argument, NULL, 'I'},
+        {"compress-level", required_argument, NULL, 'l'},
         {"reindex", no_argument, NULL, 'r'},
         {"rebgzip",no_argument,NULL,'g'},
         {"size", required_argument, NULL, 's'},
         {"threads", required_argument, NULL, '@'},
+        {"test", no_argument, NULL, 't'},
         {"version", no_argument, NULL, 1},
         {NULL, 0, NULL, 0}
     };
 
-    compress = 1; pstdout = 0; start = 0; size = -1; end = -1; is_forced = 0;
-    while((c  = getopt_long(argc, argv, "cdh?fb:@:s:iI:gr",loptions,NULL)) >= 0){
+    compress = 1; pstdout = 0; start = 0; size = -1; end = -1; is_forced = 0; test = 0;
+    while((c  = getopt_long(argc, argv, "cdh?fb:@:s:iI:l:grt",loptions,NULL)) >= 0){
         switch(c){
         case 'd': compress = 0; break;
         case 'c': pstdout = 1; break;
@@ -124,13 +129,15 @@ int main(int argc, char **argv)
         case 'f': is_forced = 1; break;
         case 'i': index = 1; break;
         case 'I': index_fname = optarg; break;
+        case 'l': compress_level = atol(optarg); break;
         case 'g': rebgzip = 1; break;
         case 'r': reindex = 1; compress = 0; break;
         case '@': threads = atoi(optarg); break;
+        case 't': test = 1; compress = 0; reindex = 0; break;
         case 1:
             printf(
 "bgzip (htslib) %s\n"
-"Copyright (C) 2017 Genome Research Ltd.\n", hts_version());
+"Copyright (C) 2018 Genome Research Ltd.\n", hts_version());
             return EXIT_SUCCESS;
         case 'h':
         case '?': return bgzip_main_usage();
@@ -144,6 +151,17 @@ int main(int argc, char **argv)
     if (compress == 1) {
         struct stat sbuf;
         int f_src = fileno(stdin);
+        char out_mode[3] = "w\0";
+        char out_mode_exclusive[4] = "wx\0";
+
+        if (compress_level < -1 || compress_level > 9) {
+            fprintf(stderr, "[bgzip] Invalid compress-level: %d\n", compress_level);
+            return 1;
+        }
+        if (compress_level >= 0) {
+            out_mode[1] = compress_level + '0';
+            out_mode_exclusive[2] = compress_level + '0';
+        }
 
         if ( argc>optind )
         {
@@ -159,15 +177,15 @@ int main(int argc, char **argv)
             }
 
             if (pstdout)
-                fp = bgzf_open("-", "w");
+                fp = bgzf_open("-", out_mode);
             else
             {
                 char *name = malloc(strlen(argv[optind]) + 5);
                 strcpy(name, argv[optind]);
                 strcat(name, ".gz");
-                fp = bgzf_open(name, is_forced? "w" : "wx");
+                fp = bgzf_open(name, is_forced? out_mode : out_mode_exclusive);
                 if (fp == NULL && errno == EEXIST && confirm_overwrite(name))
-                    fp = bgzf_open(name, "w");
+                    fp = bgzf_open(name, out_mode);
                 if (fp == NULL) {
                     fprintf(stderr, "[bgzip] can't create %s: %s\n", name, strerror(errno));
                     free(name);
@@ -184,7 +202,7 @@ int main(int argc, char **argv)
             return 1;
         }
         else
-            fp = bgzf_open("-", "w");
+            fp = bgzf_open("-", out_mode);
 
         if ( index && rebgzip )
         {
@@ -278,7 +296,7 @@ int main(int argc, char **argv)
             }
             char *name;
             int len = strlen(argv[optind]);
-            if ( strcmp(argv[optind]+len-3,".gz") )
+            if ( strcmp(argv[optind]+len-3,".gz") && !test)
             {
                 fprintf(stderr, "[bgzip] %s: unknown suffix -- ignored\n", argv[optind]);
                 return 1;
@@ -289,7 +307,7 @@ int main(int argc, char **argv)
                 return 1;
             }
 
-            if (pstdout) {
+            if (pstdout || test) {
                 f_dst = fileno(stdout);
             }
             else {
@@ -318,6 +336,12 @@ int main(int argc, char **argv)
                 return 1;
             }
         }
+
+        if (!fp->is_compressed) {
+            fprintf(stderr, "[bgzip] Expected compressed file -- ignored\n");
+            return 1;
+        }
+
         if (threads > 1)
             bgzf_mt(fp, threads, 256);
 
@@ -334,9 +358,9 @@ int main(int argc, char **argv)
             if (end < 0) c = bgzf_read(fp, buffer, WINDOW_SIZE);
             else c = bgzf_read(fp, buffer, (end - start > WINDOW_SIZE)? WINDOW_SIZE:(end - start));
             if (c == 0) break;
-            if (c < 0) error("Could not read %d bytes: Error %d\n", (end - start > WINDOW_SIZE)? WINDOW_SIZE:(end - start), fp->errcode);
+            if (c < 0) error("Error %d in block starting at offset %" PRId64 "(%" PRIX64 ")\n", fp->errcode, fp->block_address, fp->block_address);
             start += c;
-            if ( write(f_dst, buffer, c) != c ) {
+            if ( !test && write(f_dst, buffer, c) != c ) {
 #ifdef _WIN32
                 if (GetLastError() != ERROR_NO_DATA)
 #endif
@@ -346,7 +370,7 @@ int main(int argc, char **argv)
         }
         free(buffer);
         if (bgzf_close(fp) < 0) error("Close failed: Error %d\n",fp->errcode);
-        if (!pstdout) unlink(argv[optind]);
+        if (!pstdout && !test) unlink(argv[optind]);
         return 0;
     }
 }

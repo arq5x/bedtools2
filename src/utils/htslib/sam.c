@@ -1,6 +1,6 @@
 /*  sam.c -- SAM and BAM file I/O and manipulation.
 
-    Copyright (C) 2008-2010, 2012-2017 Genome Research Ltd.
+    Copyright (C) 2008-2010, 2012-2018 Genome Research Ltd.
     Copyright (C) 2010, 2012, 2013 Broad Institute.
 
     Author: Heng Li <lh3@sanger.ac.uk>
@@ -227,11 +227,9 @@ bam_hdr_t *bam_hdr_read(BGZF *fp)
 
 int bam_hdr_write(BGZF *fp, const bam_hdr_t *h)
 {
-    char buf[4];
     int32_t i, name_len, x;
     // write "BAM1"
-    strncpy(buf, "BAM\1", 4);
-    if (bgzf_write(fp, buf, 4) < 0) return -1;
+    if (bgzf_write(fp, "BAM\1", 4) < 0) return -1;
     // write plain text and the number of reference sequences
     if (fp->is_be) {
         x = ed_swap_4(h->l_text);
@@ -296,6 +294,40 @@ bam1_t *bam_init1()
     return (bam1_t*)calloc(1, sizeof(bam1_t));
 }
 
+static int do_realloc_bam_data(bam1_t *b, size_t desired)
+{
+    uint32_t new_m_data;
+    uint8_t *new_data;
+    new_m_data = desired;
+    kroundup32(new_m_data);
+    if (new_m_data < desired) {
+        errno = ENOMEM; // Not strictly true but we can't store the size
+        return -1;
+    }
+    new_data = realloc(b->data, new_m_data);
+    if (!new_data) return -1;
+    b->data = new_data;
+    b->m_data = new_m_data;
+    return 0;
+}
+
+static inline int realloc_bam_data(bam1_t *b, size_t desired)
+{
+    if (desired <= b->m_data) return 0;
+    return do_realloc_bam_data(b, desired);
+}
+
+static inline int possibly_expand_bam_data(bam1_t *b, size_t bytes) {
+    uint32_t new_len = b->l_data + bytes;
+
+    if (new_len > INT32_MAX || new_len < b->l_data) {
+        errno = ENOMEM;
+        return -1;
+    }
+    if (new_len <= b->m_data) return 0;
+    return do_realloc_bam_data(b, new_len);
+}
+
 void bam_destroy1(bam1_t *b)
 {
     if (b == 0) return;
@@ -326,6 +358,18 @@ bam1_t *bam_dup1(const bam1_t *bsrc)
     return bam_copy1(bdst, bsrc);
 }
 
+void bam_cigar2rqlens(int n_cigar, const uint32_t *cigar, int *rlen, int *qlen)
+{
+    int k;
+    *rlen = *qlen = 0;
+    for (k = 0; k < n_cigar; ++k) {
+        int type = bam_cigar_type(bam_cigar_op(cigar[k]));
+        int len = bam_cigar_oplen(cigar[k]);
+        if (type & 1) *qlen += len;
+        if (type & 2) *rlen += len;
+    }
+}
+
 int bam_cigar2qlen(int n_cigar, const uint32_t *cigar)
 {
     int k, l;
@@ -350,6 +394,42 @@ int32_t bam_endpos(const bam1_t *b)
         return b->core.pos + bam_cigar2rlen(b->core.n_cigar, bam_get_cigar(b));
     else
         return b->core.pos + 1;
+}
+
+static int bam_tag2cigar(bam1_t *b, int recal_bin, int give_warning) // return 0 if CIGAR is untouched; 1 if CIGAR is updated with CG
+{
+    bam1_core_t *c = &b->core;
+    uint32_t cigar_st, n_cigar4, CG_st, CG_en, ori_len = b->l_data, *cigar0, CG_len, fake_bytes;
+    uint8_t *CG;
+
+    // test where there is a real CIGAR in the CG tag to move
+    if (c->n_cigar == 0 || c->tid < 0 || c->pos < 0) return 0;
+    cigar0 = bam_get_cigar(b);
+    if (bam_cigar_op(cigar0[0]) != BAM_CSOFT_CLIP || bam_cigar_oplen(cigar0[0]) != c->l_qseq) return 0;
+    fake_bytes = c->n_cigar * 4;
+    if ((CG = bam_aux_get(b, "CG")) == 0) return 0; // no CG tag
+    if (CG[0] != 'B' || CG[1] != 'I') return 0; // not of type B,I
+    CG_len = le_to_u32(CG + 2);
+    if (CG_len < c->n_cigar || CG_len >= 1U<<29) return 0; // don't move if the real CIGAR length is shorter than the fake cigar length
+
+    // move from the CG tag to the right position
+    cigar_st = (uint8_t*)cigar0 - b->data;
+    c->n_cigar = CG_len;
+    n_cigar4 = c->n_cigar * 4;
+    CG_st = CG - b->data - 2;
+    CG_en = CG_st + 8 + n_cigar4;
+    if (possibly_expand_bam_data(b, n_cigar4 - fake_bytes) < 0) return -1;
+    b->l_data = b->l_data - fake_bytes + n_cigar4; // we need c->n_cigar-fake_bytes bytes to swap CIGAR to the right place
+    memmove(b->data + cigar_st + n_cigar4, b->data + cigar_st + fake_bytes, ori_len - (cigar_st + fake_bytes)); // insert c->n_cigar-fake_bytes empty space to make room
+    memcpy(b->data + cigar_st, b->data + (n_cigar4 - fake_bytes) + CG_st + 8, n_cigar4); // copy the real CIGAR to the right place; -fake_bytes for the fake CIGAR
+    if (ori_len > CG_en) // move data after the CG tag
+        memmove(b->data + CG_st + n_cigar4 - fake_bytes, b->data + CG_en + n_cigar4 - fake_bytes, ori_len - CG_en);
+    b->l_data -= n_cigar4 + 8; // 8: CGBI (4 bytes) and CGBI length (4)
+    if (recal_bin)
+        b->core.bin = hts_reg2bin(b->core.pos, b->core.pos + bam_cigar2rlen(b->core.n_cigar, bam_get_cigar(b)), 14, 5);
+    if (give_warning)
+        hts_log_error("%s encodes a CIGAR with %d operators at the CG tag", bam_get_qname(b), c->n_cigar);
+    return 1;
 }
 
 static inline int aux_type2size(uint8_t type)
@@ -381,7 +461,7 @@ int bam_read1(BGZF *fp, bam1_t *b)
 {
     bam1_core_t *c = &b->core;
     int32_t block_len, ret, i;
-    uint32_t x[8];
+    uint32_t x[8], new_l_data;
     if ((ret = bgzf_read(fp, &block_len, 4)) != 4) {
         if (ret == 0) return -1; // normal end-of-file
         else return -2; // truncated
@@ -401,21 +481,15 @@ int bam_read1(BGZF *fp, bam1_t *b)
     c->flag = x[3]>>16; c->n_cigar = x[3]&0xffff;
     c->l_qseq = x[4];
     c->mtid = x[5]; c->mpos = x[6]; c->isize = x[7];
-    b->l_data = block_len - 32 + c->l_extranul;
-    if (b->l_data < 0 || c->l_qseq < 0 || c->l_qname < 1) return -4;
+
+    new_l_data = block_len - 32 + c->l_extranul;
+    if (new_l_data > INT_MAX || c->l_qseq < 0 || c->l_qname < 1) return -4;
     if (((uint64_t) c->n_cigar << 2) + c->l_qname + c->l_extranul
-        + (((uint64_t) c->l_qseq + 1) >> 1) + c->l_qseq > (uint64_t) b->l_data)
+        + (((uint64_t) c->l_qseq + 1) >> 1) + c->l_qseq > (uint64_t) new_l_data)
         return -4;
-    if (b->m_data < b->l_data) {
-        uint8_t *new_data;
-        uint32_t new_m = b->l_data;
-        kroundup32(new_m);
-        new_data = (uint8_t*)realloc(b->data, new_m);
-        if (!new_data)
-            return -4;
-        b->data = new_data;
-        b->m_data = new_m;
-    }
+    if (realloc_bam_data(b, new_l_data) < 0) return -4;
+    b->l_data = new_l_data;
+
     if (bgzf_read(fp, b->data, c->l_qname) != c->l_qname) return -4;
     for (i = 0; i < c->l_extranul; ++i) b->data[c->l_qname+i] = '\0';
     c->l_qname += c->l_extranul;
@@ -423,13 +497,20 @@ int bam_read1(BGZF *fp, bam1_t *b)
         bgzf_read(fp, b->data + c->l_qname, b->l_data - c->l_qname) != b->l_data - c->l_qname)
         return -4;
     if (fp->is_be) swap_data(c, b->l_data, b->data, 0);
-
-    // Sanity check for broken CIGAR alignments
-    if (c->n_cigar > 0 && c->l_qseq > 0 && !(c->flag & BAM_FUNMAP)
-        && bam_cigar2qlen(c->n_cigar, bam_get_cigar(b)) != c->l_qseq) {
-        hts_log_error("CIGAR and query sequence lengths differ for %s",
-                      bam_get_qname(b));
+    if (bam_tag2cigar(b, 0, 0) < 0)
         return -4;
+
+    if (c->n_cigar > 0) { // recompute "bin" and check CIGAR-qlen consistency
+        int rlen, qlen;
+        bam_cigar2rqlens(c->n_cigar, bam_get_cigar(b), &rlen, &qlen);
+        if ((b->core.flag & BAM_FUNMAP)) rlen=1;
+        b->core.bin = hts_reg2bin(b->core.pos, b->core.pos + rlen, 14, 5);
+        // Sanity check for broken CIGAR alignments
+        if (c->l_qseq > 0 && !(c->flag & BAM_FUNMAP) && qlen != c->l_qseq) {
+            hts_log_error("CIGAR and query sequence lengths differ for %s",
+                    bam_get_qname(b));
+            return -4;
+        }
     }
 
     return 4 + block_len;
@@ -440,15 +521,12 @@ int bam_write1(BGZF *fp, const bam1_t *b)
     const bam1_core_t *c = &b->core;
     uint32_t x[8], block_len = b->l_data - c->l_extranul + 32, y;
     int i, ok;
-    if (c->n_cigar >= 65536) {
-        hts_log_error("Too many CIGAR operations (%d >= 64K for QNAME \"%s\")", c->n_cigar, bam_get_qname(b));
-        errno = EOVERFLOW;
-        return -1;
-    }
+    if (c->n_cigar > 0xffff) block_len += 16; // "16" for "CGBI", 4-byte tag length and 8-byte fake CIGAR
     x[0] = c->tid;
     x[1] = c->pos;
     x[2] = (uint32_t)c->bin<<16 | c->qual<<8 | (c->l_qname - c->l_extranul);
-    x[3] = (uint32_t)c->flag<<16 | c->n_cigar;
+    if (c->n_cigar > 0xffff) x[3] = (uint32_t)c->flag << 16 | 2;
+    else x[3] = (uint32_t)c->flag << 16 | (c->n_cigar & 0xffff);
     x[4] = c->l_qseq;
     x[5] = c->mtid;
     x[6] = c->mpos;
@@ -464,7 +542,24 @@ int bam_write1(BGZF *fp, const bam1_t *b)
     }
     if (ok) ok = (bgzf_write(fp, x, 32) >= 0);
     if (ok) ok = (bgzf_write(fp, b->data, c->l_qname - c->l_extranul) >= 0);
-    if (ok) ok = (bgzf_write(fp, b->data + c->l_qname, b->l_data - c->l_qname) >= 0);
+    if (c->n_cigar <= 0xffff) { // no long CIGAR; write normally
+        if (ok) ok = (bgzf_write(fp, b->data + c->l_qname, b->l_data - c->l_qname) >= 0);
+    } else { // with long CIGAR, insert a fake CIGAR record and move the real CIGAR to the CG:B,I tag
+        uint8_t buf[8];
+        uint32_t cigar_st, cigar_en, cigar[2];
+        cigar_st = (uint8_t*)bam_get_cigar(b) - b->data;
+        cigar_en = cigar_st + c->n_cigar * 4;
+        cigar[0] = (uint32_t)c->l_qseq << 4 | BAM_CSOFT_CLIP;
+        cigar[1] = (uint32_t)bam_cigar2rlen(c->n_cigar, bam_get_cigar(b)) << 4 | BAM_CREF_SKIP;
+        u32_to_le(cigar[0], buf);
+        u32_to_le(cigar[1], buf + 4);
+        if (ok) ok = (bgzf_write(fp, buf, 8) >= 0); // write cigar: <read_length>S<ref_length>N
+        if (ok) ok = (bgzf_write(fp, &b->data[cigar_en], b->l_data - cigar_en) >= 0); // write data after CIGAR
+        if (ok) ok = (bgzf_write(fp, "CGBI", 4) >= 0); // write CG:B,I
+        u32_to_le(c->n_cigar, buf);
+        if (ok) ok = (bgzf_write(fp, buf, 4) >= 0); // write the true CIGAR length
+        if (ok) ok = (bgzf_write(fp, &b->data[cigar_st], c->n_cigar * 4) >= 0); // write the real CIGAR
+    }
     if (fp->is_be) swap_data(c, b->l_data, b->data, 0);
     return ok? 4 + block_len : -1;
 }
@@ -577,9 +672,77 @@ static int cram_readrec(BGZF *ignored, void *fpv, void *bv, int *tid, int *beg, 
     htsFile *fp = fpv;
     bam1_t *b = bv;
     int ret = cram_get_bam_seq(fp->fp.cram, &b);
-    return ret >= 0
-        ? ret
-        : (cram_eof(fp->fp.cram) ? -1 : -2);
+    if (ret < 0)
+        return cram_eof(fp->fp.cram) ? -1 : -2;
+
+    if (bam_tag2cigar(b, 1, 1) < 0)
+        return -2;
+
+    *tid = b->core.tid;
+    *beg = b->core.pos;
+    *end = bam_endpos(b);
+
+    return ret;
+}
+
+static int cram_pseek(void *fp, int64_t offset, int whence)
+{
+    cram_fd *fd =  (cram_fd *)fp;
+
+    if ((0 != cram_seek(fd, offset, SEEK_SET))
+     && (0 != cram_seek(fd, offset - fd->first_container, SEEK_CUR)))
+        return -1;
+
+    if (fd->ctr) {
+        cram_free_container(fd->ctr);
+        if (fd->ctr_mt && fd->ctr_mt != fd->ctr)
+            cram_free_container(fd->ctr_mt);
+
+        fd->ctr = NULL;
+        fd->ctr_mt = NULL;
+        fd->ooc = 0;
+    }
+
+    return 0;
+}
+
+/*
+ * cram_ptell is a pseudo-tell function, because it matches the position of the disk cursor only
+ *   after a fresh seek call. Otherwise it indicates that the read takes place inside the buffered
+ *   container previously fetched. It was designed like this to integrate with the functionality
+ *   of the iterator stepping logic.
+ */
+
+static int64_t cram_ptell(void *fp)
+{
+    cram_fd *fd = (cram_fd *)fp;
+    cram_container *c;
+    int64_t ret = -1L;
+
+    if (fd && fd->fp) {
+        ret = htell(fd->fp);
+        if ((c = fd->ctr) != NULL) {
+            ret -= ((c->curr_slice < c->max_slice || c->curr_rec < c->num_records) ? c->offset + 1 : 0);
+        }
+    }
+
+    return ret;
+}
+
+static int bam_pseek(void *fp, int64_t offset, int whence)
+{
+    BGZF *fd = (BGZF *)fp;
+
+    return bgzf_seek(fd, offset, whence);
+}
+
+static int64_t bam_ptell(void *fp)
+{
+    BGZF *fd = (BGZF *)fp;
+    if (!fd)
+        return -1L;
+
+    return bgzf_tell(fd);
 }
 
 // This is used only with read_rest=1 iterators, so need not set tid/beg/end.
@@ -591,9 +754,12 @@ static int sam_bam_cram_readrec(BGZF *bgzfp, void *fpv, void *bv, int *tid, int 
     case bam:   return bam_read1(bgzfp, b);
     case cram: {
         int ret = cram_get_bam_seq(fp->fp.cram, &b);
-        return ret >= 0
-            ? ret
-            : (cram_eof(fp->fp.cram) ? -1 : -2);
+        if (ret < 0)
+            return cram_eof(fp->fp.cram) ? -1 : -2;
+
+        if (bam_tag2cigar(b, 1, 1) < 0)
+            return -2;
+        return ret;
     }
     default:
         // TODO Need headers available to implement this for SAM files
@@ -642,8 +808,8 @@ static hts_itr_t *cram_itr_query(const hts_idx_t *idx, int tid, int beg, int end
     iter->bins.a = NULL;
     iter->readrec = readrec;
 
-    if (tid >= 0 || tid == HTS_IDX_NOCOOR) {
-        cram_range r = { tid == HTS_IDX_NOCOOR ? -1 : tid, beg+1, end };
+    if (tid >= 0 || tid == HTS_IDX_NOCOOR || tid == HTS_IDX_START) {
+        cram_range r = { tid, beg+1, end };
         int ret = cram_set_option(cidx->cram, CRAM_OPT_RANGE, &r);
 
         iter->curr_off = 0;
@@ -709,6 +875,17 @@ hts_itr_t *sam_itr_querys(const hts_idx_t *idx, bam_hdr_t *hdr, const char *regi
         return hts_itr_querys(idx, region, cram_name2id, cidx->cram, cram_itr_query, cram_readrec);
     else
         return hts_itr_querys(idx, region, (hts_name2id_f)(bam_name2id), hdr, hts_itr_query, bam_readrec);
+}
+
+hts_itr_multi_t *sam_itr_regions(const hts_idx_t *idx, bam_hdr_t *hdr, hts_reglist_t *reglist, unsigned int regcount)
+{
+    const hts_cram_idx_t *cidx = (const hts_cram_idx_t *) idx;
+    if (cidx->fmt == HTS_FMT_CRAI)
+        return hts_itr_regions(idx, reglist, regcount, cram_name2id, cidx->cram,
+                   hts_itr_multi_cram, cram_readrec, cram_pseek, cram_ptell);
+    else
+        return hts_itr_regions(idx, reglist, regcount, (hts_name2id_f)(bam_name2id), hdr,
+                   hts_itr_multi_bam, bam_readrec, bam_pseek, bam_ptell);
 }
 
 /**********************
@@ -830,6 +1007,11 @@ static bam_hdr_t *sam_hdr_sanitise(bam_hdr_t *h) {
 
 bam_hdr_t *sam_hdr_read(htsFile *fp)
 {
+    if (!fp) {
+        errno = EINVAL;
+        return NULL;
+    }
+
     switch (fp->format.format) {
     case bam:
         return sam_hdr_sanitise(bam_hdr_read(fp->fp.bgzf));
@@ -884,7 +1066,7 @@ bam_hdr_t *sam_hdr_read(htsFile *fp)
 
 int sam_hdr_write(htsFile *fp, const bam_hdr_t *h)
 {
-    if (!h) {
+    if (!fp || !h) {
         errno = EINVAL;
         return -1;
     }
@@ -933,6 +1115,78 @@ int sam_hdr_write(htsFile *fp, const bam_hdr_t *h)
     default:
         abort();
     }
+    return 0;
+}
+
+int sam_hdr_change_HD(bam_hdr_t *h, const char *key, const char *val)
+{
+    char *p, *q, *beg = NULL, *end = NULL, *newtext;
+    if (!h || !key)
+        return -1;
+
+    if (h->l_text > 3) {
+        if (strncmp(h->text, "@HD", 3) == 0) { //@HD line exists
+            if ((p = strchr(h->text, '\n')) == 0) return -1;
+            *p = '\0'; // for strstr call
+
+            char tmp[5] = { '\t', key[0], key[0] ? key[1] : '\0', ':', '\0' };
+
+            if ((q = strstr(h->text, tmp)) != 0) { // key exists
+                *p = '\n'; // change back
+
+                // mark the key:val
+                beg = q;
+                for (q += 4; *q != '\n' && *q != '\t'; ++q);
+                end = q;
+
+                if (val && (strncmp(beg + 4, val, end - beg - 4) == 0)
+                    && strlen(val) == end - beg - 4)
+                     return 0; // val is the same, no need to change
+
+            } else {
+                beg = end = p;
+                *p = '\n';
+            }
+        }
+    }
+    if (beg == NULL) { // no @HD
+        if (h->l_text > UINT32_MAX - strlen(SAM_FORMAT_VERSION) - 9)
+            return -1;
+        h->l_text += strlen(SAM_FORMAT_VERSION) + 8;
+        if (val) {
+            if (h->l_text > UINT32_MAX - strlen(val) - 5)
+                return -1;
+            h->l_text += strlen(val) + 4;
+        }
+        newtext = (char*)malloc(h->l_text + 1);
+        if (!newtext) return -1;
+
+        if (val)
+            snprintf(newtext, h->l_text + 1,
+                    "@HD\tVN:%s\t%s:%s\n%s", SAM_FORMAT_VERSION, key, val, h->text);
+        else
+            snprintf(newtext, h->l_text + 1,
+                    "@HD\tVN:%s\n%s", SAM_FORMAT_VERSION, h->text);
+    } else { // has @HD but different or no key
+        h->l_text = (beg - h->text) + (h->text + h->l_text - end);
+        if (val) {
+            if (h->l_text > UINT32_MAX - strlen(val) - 5)
+                return -1;
+            h->l_text += strlen(val) + 4;
+        }
+        newtext = (char*)malloc(h->l_text + 1);
+        if (!newtext) return -1;
+
+        if (val) {
+            snprintf(newtext, h->l_text + 1, "%.*s\t%s:%s%s",
+                    (int) (beg - h->text), h->text, key, val, end);
+        } else { //delete key
+            snprintf(newtext, h->l_text + 1, "%.*s%s",
+                    (int) (beg - h->text), h->text, end);
+        }
+    }
+    free(h->text);
+    h->text = newtext;
     return 0;
 }
 
@@ -1051,7 +1305,7 @@ int sam_parse1(kstring_t *s, bam_hdr_t *h, bam1_t *b)
         _get_mem(uint8_t, &t, &str, i);
         memset(t, 0, i);
         for (i = 0; i < c->l_qseq; ++i)
-            t[i>>1] |= seq_nt16_table[(int)q[i]] << ((~i&1)<<2);
+            t[i>>1] |= seq_nt16_table[(unsigned char)q[i]] << ((~i&1)<<2);
     } else c->l_qseq = 0;
     // qual
     q = _read_token_aux(p);
@@ -1162,6 +1416,8 @@ int sam_parse1(kstring_t *s, bam_hdr_t *h, bam1_t *b)
         } else _parse_err_param(1, "unrecognized type %c", type);
     }
     b->data = (uint8_t*)str.s; b->l_data = str.l; b->m_data = str.m;
+    if (bam_tag2cigar(b, 1, 1) < 0)
+        return -2;
     return 0;
 
 #undef _parse_warn
@@ -1190,9 +1446,12 @@ int sam_read1(htsFile *fp, bam_hdr_t *h, bam1_t *b)
 
     case cram: {
         int ret = cram_get_bam_seq(fp->fp.cram, &b);
-        return ret >= 0
-            ? ret
-            : (cram_eof(fp->fp.cram) ? -1 : -2);
+        if (ret < 0)
+            return cram_eof(fp->fp.cram) ? -1 : -2;
+
+        if (bam_tag2cigar(b, 1, 1) < 0)
+            return -2;
+        return ret;
     }
 
     case sam: {
@@ -1435,15 +1694,7 @@ int bam_aux_append(bam1_t *b, const char tag[2], char type, int len, const uint8
     new_len = b->l_data + 3 + len;
     if (new_len > INT32_MAX || new_len < b->l_data) goto nomem;
 
-    if (b->m_data < new_len) {
-        uint32_t new_size = new_len;
-        uint8_t *new_data;
-        kroundup32(new_size);
-        new_data = realloc(b->data, new_size);
-        if (new_data == NULL) goto nomem;
-        b->m_data = new_size;
-        b->data = new_data;
-    }
+    if (realloc_bam_data(b, new_len) < 0) return -1;
 
     b->data[b->l_data] = tag[0];
     b->data[b->l_data + 1] = tag[1];
@@ -1566,20 +1817,174 @@ int bam_aux_update_str(bam1_t *b, const char tag[2], int len, const char *data)
     s -= 2;
     int l_aux = bam_get_l_aux(b);
 
+    ptrdiff_t s_offset = s - b->data;
+    if (possibly_expand_bam_data(b, 3 + len) < 0) return -1;
+    s = b->data + s_offset;
     b->l_data += 3 + len;
-    if (b->m_data < b->l_data) {
-        ptrdiff_t s_offset = s - b->data;
-        b->m_data = b->l_data;
-        kroundup32(b->m_data);
-        b->data = (uint8_t*)realloc(b->data, b->m_data);
-        s = b->data + s_offset;
-    }
+
     memmove(s+3+len, s, l_aux - (s - bam_get_aux(b)));
     s[0] = tag[0];
     s[1] = tag[1];
     s[2] = type;
     memmove(s+3,data,len);
     return 0;
+}
+
+int bam_aux_update_int(bam1_t *b, const char tag[2], int64_t val)
+{
+    uint32_t sz, old_sz = 0, new = 0;
+    uint8_t *s, type;
+
+    if (val < INT32_MIN || val > UINT32_MAX) {
+        errno = EOVERFLOW;
+        return -1;
+    }
+    if (val < INT16_MIN)       { type = 'i'; sz = 4; }
+    else if (val < INT8_MIN)   { type = 's'; sz = 2; }
+    else if (val < 0)          { type = 'c'; sz = 1; }
+    else if (val < UINT8_MAX)  { type = 'C'; sz = 1; }
+    else if (val < UINT16_MAX) { type = 'S'; sz = 2; }
+    else                       { type = 'I'; sz = 4; }
+
+    s = bam_aux_get(b, tag);
+    if (s) {  // Tag present - how big was the old one?
+        switch (*s) {
+            case 'c': case 'C': old_sz = 1; break;
+            case 's': case 'S': old_sz = 2; break;
+            case 'i': case 'I': old_sz = 4; break;
+            default: errno = EINVAL; return -1;  // Not an integer
+        }
+    } else {
+        if (errno == ENOENT) {  // Tag doesn't exist - add a new one
+            s = b->data + b->l_data;
+            new = 1;
+        }  else { // Invalid aux data, give up.
+            return -1;
+        }
+    }
+
+    if (new || old_sz < sz) {
+        // Make room for new tag
+        ptrdiff_t s_offset = s - b->data;
+        if (possibly_expand_bam_data(b, (new ? 3 : 0) + sz - old_sz) < 0)
+            return -1;
+        s =  b->data + s_offset;
+        if (new) { // Add tag id
+            *s++ = tag[0];
+            *s++ = tag[1];
+        } else {   // Shift following data so we have space
+            memmove(s + sz, s + old_sz, b->l_data - s_offset - old_sz);
+        }
+    } else {
+        // Reuse old space.  Data value may be bigger than necessary but
+        // we avoid having to move everything else
+        sz = old_sz;
+        type = (val < 0 ? "\0cs\0i" : "\0CS\0I")[old_sz];
+        assert(type > 0);
+    }
+    *s++ = type;
+#ifdef HTS_LITTLE_ENDIAN
+    memcpy(s, &val, sz);
+#else
+    switch (sz) {
+        case 4:  u32_to_le(val, s); break;
+        case 2:  u16_to_le(val, s); break;
+        default: *s = val; break;
+    }
+#endif
+    b->l_data += (new ? 3 : 0) + sz - old_sz;
+    return 0;
+}
+
+int bam_aux_update_float(bam1_t *b, const char tag[2], float val)
+{
+    uint8_t *s = bam_aux_get(b, tag);
+    int shrink = 0, new = 0;
+
+    if (s) { // Tag present - what was it?
+        switch (*s) {
+            case 'f': break;
+            case 'd': shrink = 1; break;
+            default: errno = EINVAL; return -1;  // Not a float
+        }
+    } else {
+        if (errno == ENOENT) {  // Tag doesn't exist - add a new one
+            new = 1;
+        }  else { // Invalid aux data, give up.
+            return -1;
+        }
+    }
+
+    if (new) { // Ensure there's room
+        if (possibly_expand_bam_data(b, 3 + 4) < 0)
+            return -1;
+        s = b->data + b->l_data;
+        *s++ = tag[0];
+        *s++ = tag[1];
+    } else if (shrink) { // Convert non-standard double tag to float
+        memmove(s + 5, s + 9, b->l_data - ((s + 9) - b->data));
+        b->l_data -= 4;
+    }
+    *s++ = 'f';
+    float_to_le(val, s);
+    if (new) b->l_data += 7;
+
+    return 0;
+}
+
+int bam_aux_update_array(bam1_t *b, const char tag[2],
+                         uint8_t type, uint32_t items, void *data)
+{
+    uint8_t *s = bam_aux_get(b, tag);
+    size_t old_sz = 0, new_sz;
+    int new = 0;
+
+    if (s) { // Tag present
+        if (*s != 'B') { errno = EINVAL; return -1; }
+        old_sz = aux_type2size(s[1]);
+        if (old_sz < 1 || old_sz > 4) { errno = EINVAL; return -1; }
+        old_sz *= le_to_u32(s + 2);
+    } else {
+        if (errno == ENOENT) {  // Tag doesn't exist - add a new one
+            s = b->data + b->l_data;
+            new = 1;
+        }  else { // Invalid aux data, give up.
+            return -1;
+        }
+    }
+
+    new_sz = aux_type2size(type);
+    if (new_sz < 1 || new_sz > 4) { errno = EINVAL; return -1; }
+    if (items > INT32_MAX / new_sz) { errno = ENOMEM; return -1; }
+    new_sz *= items;
+
+    if (new || old_sz < new_sz) {
+        // Make room for new tag
+        ptrdiff_t s_offset = s - b->data;
+        if (possibly_expand_bam_data(b, (new ? 8 : 0) + new_sz - old_sz) < 0)
+            return -1;
+        s =  b->data + s_offset;
+    }
+    if (new) { // Add tag id and type
+        *s++ = tag[0];
+        *s++ = tag[1];
+        *s = 'B';
+        b->l_data += 8 + new_sz;
+    } else if (old_sz != new_sz) { // shift following data if necessary
+        memmove(s + 6 + new_sz, s + 6 + old_sz,
+                b->l_data - ((s + 6 + old_sz) - b->data));
+        b->l_data -= old_sz;
+        b->l_data += new_sz;
+    }
+
+    s[1] = type;
+    u32_to_le(items, s + 2);
+#ifdef HTS_LITTLE_ENDIAN
+    memcpy(s + 6, data, new_sz);
+    return 0;
+#else
+    return aux_to_le(type, s + 6, data, new_sz);
+#endif
 }
 
 static inline int64_t get_int_aux_val(uint8_t type, const uint8_t *s,
@@ -1704,9 +2109,12 @@ char *sam_open_mode_opts(const char *fn,
             free(mode_opts);
             return NULL;
         }
-        return sam_open_mode(cp, fn, ext+1)
-            ? (free(mode_opts), NULL)
-            : mode_opts;
+        if (sam_open_mode(cp, fn, ext+1) == 0) {
+            return mode_opts;
+        } else {
+            free(mode_opts);
+            return NULL;
+        }
     }
 
     if ((opts = strchr(format, ','))) {

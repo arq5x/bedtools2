@@ -111,10 +111,14 @@ static int hts_tpool_add_result(hts_tpool_job *j, void *data) {
         q->output_head = q->output_tail = r;
     }
 
-    DBG_OUT(stderr, "%d: Broadcasting result_avail (id %"PRId64")\n",
-            worker_id(j->p), r->serial);
-    pthread_cond_broadcast(&q->output_avail_c);
-    DBG_OUT(stderr, "%d: Broadcast complete\n", worker_id(j->p));
+    assert(r->serial >= q->next_serial    // Or it will never be dequeued ...
+           || q->next_serial == INT_MAX); // ... unless flush in progress.
+    if (r->serial == q->next_serial) {
+        DBG_OUT(stderr, "%d: Broadcasting result_avail (id %"PRId64")\n",
+                worker_id(j->p), r->serial);
+        pthread_cond_broadcast(&q->output_avail_c);
+        DBG_OUT(stderr, "%d: Broadcast complete\n", worker_id(j->p));
+    }
 
     pthread_mutex_unlock(&q->p->pool_m);
 
@@ -155,7 +159,8 @@ static hts_tpool_result *hts_tpool_next_result_locked(hts_tpool_process *q) {
             // Not technically input full, but can guarantee there is
             // room for the input to go somewhere so we still signal.
             // The waiting code will then check the condition again.
-            pthread_cond_signal(&q->input_not_full_c);
+            if (q->n_input < q->qsize)
+                pthread_cond_signal(&q->input_not_full_c);
             if (!q->shutdown)
                 wake_next_worker(q, 1);
         }
@@ -502,7 +507,7 @@ static void *tpool_worker(void *arg) {
             fprintf(stderr, "%d: Shutting down\n", worker_id(p));
 #endif
             pthread_mutex_unlock(&p->pool_m);
-            pthread_exit(NULL);
+            return NULL;
         }
 
         if (!work_to_do) {
@@ -584,8 +589,6 @@ static void *tpool_worker(void *arg) {
 
         pthread_mutex_unlock(&p->pool_m);
     }
-
-    return NULL;
 }
 
 static void wake_next_worker(hts_tpool_process *q, int locked) {
@@ -850,7 +853,7 @@ int hts_tpool_process_flush(hts_tpool_process *q) {
 }
 
 /*
- * Resets a process to the intial state.
+ * Resets a process to the initial state.
  *
  * This removes any queued up input jobs, disables any notification of
  * new results/output, flushes what is left and then discards any
@@ -1084,7 +1087,7 @@ int test_square(int n) {
 
             // Check for results.
             if ((r = hts_tpool_next_result(q))) {
-                printf("RESULT: %d\n", *(int *)r->data);
+                printf("RESULT: %d\n", *(int *)hts_tpool_result_data(r));
                 hts_tpool_delete_result(r, 1);
             }
             if (blk == -1) {
@@ -1100,7 +1103,7 @@ int test_square(int n) {
     hts_tpool_process_flush(q);
 
     while ((r = hts_tpool_next_result(q))) {
-        printf("RESULT: %d\n", *(int *)r->data);
+        printf("RESULT: %d\n", *(int *)hts_tpool_result_data(r));
         hts_tpool_delete_result(r, 1);
     }
 
@@ -1152,7 +1155,7 @@ int test_squareB(int n) {
     // Consume all results until we find the end-of-job marker.
     for(;;) {
         hts_tpool_result *r = hts_tpool_next_result_wait(q);
-        int x = *(int *)r->data;
+        int x = *(int *)hts_tpool_result_data(r);
         hts_tpool_delete_result(r, 1);
         if (x == -1)
             break;
@@ -1175,7 +1178,7 @@ int test_squareB(int n) {
 
 /*-----------------------------------------------------------------------------
  * A simple pipeline test.
- * We use a dediocated input thread that does the initial generation of job
+ * We use a dedicated input thread that does the initial generation of job
  * and dispatch, several execution steps running in a shared pool, and a
  * dedicated output thread that prints up the final result.  It's key that our
  * pipeline execution stages can run independently and don't themselves have
@@ -1253,7 +1256,7 @@ static void *pipe_stage1to2(void *arg) {
     hts_tpool_result *r;
 
     while ((r = hts_tpool_next_result_wait(o->q1))) {
-        pipe_job *j = (pipe_job *)r->data;
+        pipe_job *j = (pipe_job *)hts_tpool_result_data(r);
         hts_tpool_delete_result(r, 0);
         if (hts_tpool_dispatch(j->o->p, j->o->q2, pipe_stage2, j) != 0)
             pthread_exit((void *)1);
@@ -1279,7 +1282,7 @@ static void *pipe_stage2to3(void *arg) {
     hts_tpool_result *r;
 
     while ((r = hts_tpool_next_result_wait(o->q2))) {
-        pipe_job *j = (pipe_job *)r->data;
+        pipe_job *j = (pipe_job *)hts_tpool_result_data(r);
         hts_tpool_delete_result(r, 0);
         if (hts_tpool_dispatch(j->o->p, j->o->q3, pipe_stage3, j) != 0)
             pthread_exit((void *)1);
@@ -1303,7 +1306,7 @@ static void *pipe_output_thread(void *arg) {
     hts_tpool_result *r;
 
     while ((r = hts_tpool_next_result_wait(o->q3))) {
-        pipe_job *j = (pipe_job *)r->data;
+        pipe_job *j = (pipe_job *)hts_tpool_result_data(r);
         int eof = j->eof;
         printf("O  %08x\n", j->x);
         hts_tpool_delete_result(r, 1);

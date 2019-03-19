@@ -102,15 +102,127 @@ static void check_int_B_array(bam1_t *aln, char *tag,
 #define str(x) #x
 #define xstr(x) str(x)
 
+#define NELE(x) (sizeof(x)/sizeof(x[0]))
+
+static int test_update_int(bam1_t *aln,
+                           const char target_id[2], int64_t target_val,
+                           char expected_type,
+                           const char next_id[2], int64_t next_val,
+                           char next_type) {
+    uint8_t *p;
+
+    // Try updating target
+    if (bam_aux_update_int(aln, target_id, target_val) < 0) {
+        fail("update %.2s tag", target_id);
+        return -1;
+    }
+
+    // Check it's there and has the right type and value
+    p = bam_aux_get(aln, target_id);
+    if (!p) {
+        fail("find  %.2s tag", target_id);
+        return -1;
+    }
+    if (*p != expected_type || bam_aux2i(p) != target_val) {
+        fail("%.2s field is %c:%"PRId64"; expected %c:%"PRId64,
+             target_id, *p, bam_aux2i(p), expected_type, target_val);
+        return -1;
+    }
+
+    // If given, check that the next tag hasn't been clobbered by the
+    // update above.
+    if (!*next_id) return 0;
+    p = bam_aux_get(aln, next_id);
+    if (!p) {
+        fail("find  %.2s tag after updating %.2s", next_id, target_id);
+        return -1;
+    }
+    if (*p != next_type || bam_aux2i(p) != next_val) {
+        fail("after updating %.2s to %"PRId64":"
+             " %.2s field is %c:%"PRId64"; expected %c:%"PRId64,
+             target_id, target_val,
+             next_id, *p, bam_aux2i(p), next_type, next_val);
+        return -1;
+    }
+    return 0;
+}
+
+#define CHECK_ARRAY_VALS(T, GET_VAL, FMT1, FMT2) do {                   \
+        T * vals = (T *) data;                                          \
+    uint32_t i;                                                         \
+    for (i = 0; i < nitems; i++) {                                      \
+        if (GET_VAL(p, i) != vals[i]) {                                 \
+            fail("Wrong value from %s for %.2s field index %u, "        \
+                 "got %" FMT1 " expected %" FMT2,                       \
+                 xstr(GET_VAL), target_id, i, GET_VAL(p, i), vals[i]);  \
+            return -1;                                                  \
+        }                                                               \
+    }                                                                   \
+} while (0)
+
+static int test_update_array(bam1_t *aln, const char target_id[2],
+                             uint8_t type, uint32_t nitems, void *data,
+                             const char next_id[2], int64_t next_val,
+                             char next_type)
+{
+    uint8_t *p;
+
+    // Try updating target
+    if (bam_aux_update_array(aln, target_id, type, nitems, data) < 0) {
+        fail("update %2.s tag", target_id);
+        return -1;
+    }
+
+    // Check values
+    p = bam_aux_get(aln, target_id);
+    if (!p) {
+        fail("find  %.2s tag", target_id);
+        return -1;
+    }
+    switch (type) {
+        case 'c':
+            CHECK_ARRAY_VALS(int8_t, bam_auxB2i, PRId64, PRId8); break;
+        case 'C':
+            CHECK_ARRAY_VALS(uint8_t, bam_auxB2i, PRId64, PRIu8); break;
+        case 's':
+            CHECK_ARRAY_VALS(int16_t, bam_auxB2i, PRId64, PRId16); break;
+        case 'S':
+            CHECK_ARRAY_VALS(uint16_t, bam_auxB2i, PRId64, PRIu16); break;
+        case 'i':
+            CHECK_ARRAY_VALS(int32_t, bam_auxB2i, PRId64, PRId32); break;
+        case 'I':
+            CHECK_ARRAY_VALS(uint32_t, bam_auxB2i, PRId64, PRIu32); break;
+        case 'f':
+            CHECK_ARRAY_VALS(float, bam_auxB2f, "e", "e"); break;
+    }
+
+    // If given, check that the next tag hasn't been clobbered by the
+    // update above.
+    if (!*next_id) return 0;
+    p = bam_aux_get(aln, next_id);
+    if (!p) {
+        fail("find  %.2s tag after updating %.2s", next_id, target_id);
+        return -1;
+    }
+    if (*p != next_type || bam_aux2i(p) != next_val) {
+        fail("after updating %.2s:"
+             " %.2s field is %c:%"PRId64"; expected %c:%"PRId64,
+             target_id, next_id, *p, bam_aux2i(p), next_type, next_val);
+        return -1;
+    }
+
+    return 0;
+}
+
 static int aux_fields1(void)
 {
     static const char sam[] = "data:,"
 "@SQ\tSN:one\tLN:1000\n"
 "@SQ\tSN:two\tLN:500\n"
-"r1\t0\tone\t500\t20\t8M\t*\t0\t0\tATGCATGC\tqqqqqqqq\tXA:A:k\tXi:i:37\tXf:f:" xstr(PI) "\tXd:d:" xstr(E) "\tXZ:Z:" HELLO "\tXH:H:" BEEF "\tXB:B:c,-2,0,+2\tB0:B:i,-2147483648,-1,0,1,2147483647\tB1:B:I,0,1,2147483648,4294967295\tB2:B:s,-32768,-1,0,1,32767\tB3:B:S,0,1,32768,65535\tB4:B:c,-128,-1,0,1,127\tB5:B:C,0,1,127,255\tBf:B:f,-3.14159,2.71828\tZZ:i:1000000\tY1:i:-2147483648\tY2:i:-2147483647\tY3:i:-1\tY4:i:0\tY5:i:1\tY6:i:2147483647\tY7:i:2147483648\tY8:i:4294967295\n";
+"r1\t0\tone\t500\t20\t8M\t*\t0\t0\tATGCATGC\tqqqqqqqq\tXA:A:k\tXi:i:37\tXf:f:" xstr(PI) "\tXd:d:" xstr(E) "\tXZ:Z:" HELLO "\tXH:H:" BEEF "\tXB:B:c,-2,0,+2\tB0:B:i,-2147483648,-1,0,1,2147483647\tB1:B:I,0,1,2147483648,4294967295\tB2:B:s,-32768,-1,0,1,32767\tB3:B:S,0,1,32768,65535\tB4:B:c,-128,-1,0,1,127\tB5:B:C,0,1,127,255\tBf:B:f,-3.14159,2.71828\tZZ:i:1000000\tF2:d:2.46801\tY1:i:-2147483648\tY2:i:-2147483647\tY3:i:-1\tY4:i:0\tY5:i:1\tY6:i:2147483647\tY7:i:2147483648\tY8:i:4294967295\n";
 
     // Canonical form of the alignment record above, as output by sam_format1()
-    static const char r1[] = "r1\t0\tone\t500\t20\t8M\t*\t0\t0\tATGCATGC\tqqqqqqqq\tXi:i:37\tXf:f:3.14159\tXd:d:2.71828\tXZ:Z:" NEW_HELLO "\tXH:H:" BEEF "\tXB:B:c,-2,0,2\tB0:B:i,-2147483648,-1,0,1,2147483647\tB1:B:I,0,1,2147483648,4294967295\tB2:B:s,-32768,-1,0,1,32767\tB3:B:S,0,1,32768,65535\tB4:B:c,-128,-1,0,1,127\tB5:B:C,0,1,127,255\tBf:B:f,-3.14159,2.71828\tZZ:i:1000000\tY1:i:-2147483648\tY2:i:-2147483647\tY3:i:-1\tY4:i:0\tY5:i:1\tY6:i:2147483647\tY7:i:2147483648\tY8:i:4294967295\tN0:i:-1234\tN1:i:1234";
+    static const char r1[] = "r1\t0\tone\t500\t20\t8M\t*\t0\t0\tATGCATGC\tqqqqqqqq\tXi:i:37\tXf:f:3.14159\tXd:d:2.71828\tXZ:Z:" NEW_HELLO "\tXH:H:" BEEF "\tXB:B:c,-2,0,2\tB0:B:i,-2147483648,-1,0,1,2147483647\tB1:B:I,0,1,2147483648,4294967295\tB2:B:s,-32768,-1,0,1,32767\tB3:B:S,0,1,32768,65535\tB4:B:c,-128,-1,0,1,127\tB5:B:C,0,1,127,255\tBf:B:f,-3.14159,2.71828\tZZ:i:1000000\tF2:f:9.8765\tY1:i:-2147483648\tY2:i:-2147483647\tY3:i:-1\tY4:i:0\tY5:i:1\tY6:i:2147483647\tY7:i:2147483648\tY8:i:4294967295\tN0:i:-1234\tN1:i:1234\tN2:i:-2\tN3:i:3\tF1:f:4.5678\tN4:B:S,65535,32768,1,0\tN5:i:4242";
 
     samFile *in = sam_open(sam, "r");
     bam_hdr_t *header = sam_hdr_read(in);
@@ -127,8 +239,19 @@ static int aux_fields1(void)
     // See https://randomascii.wordpress.com/2012/06/26/doubles-are-not-floats-so-dont-compare-them/
     float bfvals[2] = { -3.14159f, 2.71828f };
 
+    int8_t n4v1[] = { -128, -64, -32, -16, -8, -4, -2, -1,
+                      0, 1, 2, 4, 8, 16, 32, 64, 127 };
+    uint32_t n4v2[] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 1234, 5678, 1U << 31, 0 };
+    int16_t n4v3[] = { -32768, -1, 0, 1, 32767 };
+    float n4v4[] = { 0, 1, 2, 10, 20, 30, 1.5, -2.5 };
+    uint8_t n4v5[] = { 0, 255 };
+    int32_t n4v6[] = { -2147483647 - 1, 10, -1, 0, 1, 2147483647 };
+    uint16_t n4v7[] = { 65535, 32768, 1, 0 };
+
     int32_t ival = -1234;
     uint32_t uval = 1234;
+    float f1 = 4.5678;
+    float f2 = 9.8765;
 
     size_t nvals, i;
 
@@ -165,20 +288,14 @@ static int aux_fields1(void)
                   && memcmp(p + 2, "\x03\x00\x00\x00\xfe\x00\x02", 7) == 0))
             fail("XB field is %c,..., expected c,-2,0,+2", p[1]);
 
-        check_int_B_array(aln, "B0",
-                          sizeof(b0vals) / sizeof(b0vals[0]), b0vals);
-        check_int_B_array(aln, "B1",
-                          sizeof(b1vals) / sizeof(b1vals[0]), b1vals);
-        check_int_B_array(aln, "B2",
-                          sizeof(b2vals) / sizeof(b2vals[0]), b2vals);
-        check_int_B_array(aln, "B3",
-                          sizeof(b3vals) / sizeof(b3vals[0]), b3vals);
-        check_int_B_array(aln, "B4",
-                          sizeof(b4vals) / sizeof(b4vals[0]), b4vals);
-        check_int_B_array(aln, "B5",
-                          sizeof(b5vals) / sizeof(b5vals[0]), b5vals);
+        check_int_B_array(aln, "B0", NELE(b0vals), b0vals);
+        check_int_B_array(aln, "B1", NELE(b1vals), b1vals);
+        check_int_B_array(aln, "B2", NELE(b2vals), b2vals);
+        check_int_B_array(aln, "B3", NELE(b3vals), b3vals);
+        check_int_B_array(aln, "B4", NELE(b4vals), b4vals);
+        check_int_B_array(aln, "B5", NELE(b5vals), b5vals);
 
-        nvals = sizeof(bfvals) / sizeof(bfvals[0]);
+        nvals = NELE(bfvals);
         if ((p = check_bam_aux_get(aln, "Bf", 'B')) != NULL) {
             if (bam_auxB_len(p) != nvals)
                 fail("Wrong length reported for Bf field, got %d, expected %zd\n",
@@ -233,6 +350,86 @@ static int aux_fields1(void)
         if ((p = bam_aux_get(aln, "N1")) && bam_aux2i(p) != uval)
             fail("N1 field is %"PRId64", expected %u", bam_aux2i(p), uval);
 
+        // Append tags with bam_aux_update_int()
+        if (bam_aux_update_int(aln, "N2", -2) < 0)
+            fail("failed to append N2:c tag");
+
+        if (bam_aux_update_int(aln, "N3", 3) < 0)
+            fail("failed to append N3:C tag");
+
+        p = bam_aux_get(aln, "N2");
+        if (!p)
+            fail("failed to retrieve N2 tag");
+        else if (*p != 'c' || bam_aux2i(p) != -2)
+            fail("N2 field is %c:%"PRId64", expected c:-2", *p, bam_aux2i(p));
+
+        p = bam_aux_get(aln, "N3");
+        if (!p)
+            fail("failed to retrieve N3 tag");
+        else if (*p != 'C' || bam_aux2i(p) != 3)
+            fail("N3 field is %c:%"PRId64", expected C:3", *p, bam_aux2i(p));
+
+        // Try changing values with bam_aux_update_int()
+        i = test_update_int(aln, "N2", 2, 'C', "N3", 3, 'C');
+        if (i == 0) test_update_int(aln, "N2", 1234, 'S', "N3", 3, 'C');
+        if (i == 0) test_update_int(aln, "N2", -1, 's', "N3", 3, 'C');
+        if (i == 0) test_update_int(aln, "N2", 4294967295U, 'I', "N3", 3, 'C');
+        if (i == 0) test_update_int(aln, "N2", -2, 'i', "N3", 3, 'C');
+
+        // Append a value with bam_aux_update_float()
+        if (bam_aux_update_float(aln, "F1", f1) < 0)
+            fail("append F1:f tag");
+
+        p = bam_aux_get(aln, "F1");
+        if (!p)
+            fail("retrieve F1 tag");
+        else if (*p != 'f' || bam_aux2f(p) != f1)
+            fail("F1 field is %c:%e, expected f:%e", *p, bam_aux2f(p), f1);
+
+        // Change a double tag to a float
+        if (bam_aux_update_float(aln, "F2", f2) < 0)
+            fail("update F2 tag");
+
+        p = bam_aux_get(aln, "F2");
+        if (!p)
+            fail("retrieve F2 tag");
+        else if (*p != 'f' || bam_aux2f(p) != f2)
+            fail("F2 field is %c:%e, expected f:%e", *p, bam_aux2f(p), f2);
+
+        // Check the next one is intact too
+        p = bam_aux_get(aln, "Y1");
+        if (!p)
+            fail("retrieve Y1 tag");
+        else if (*p != 'i' && bam_aux2i(p) != -2147483647-1)
+            fail("Y1 field is %"PRId64", expected -2^31", bam_aux2i(p));
+
+        // bam_aux_update_array tests
+        // append a new array
+        i = test_update_array(aln, "N4", 'c', NELE(n4v1), n4v1, "\0\0", 0, 0);
+
+        // Add a sentinal to check resizes work
+        if (i == 0) i = test_update_int(aln, "N5", 4242, 'S', "\0\0", 0, 0);
+
+        // alter the array tag a few times
+        if (i == 0)
+            i = test_update_array(aln, "N4", 'I', NELE(n4v2), n4v2,
+                                  "N5", 4242, 'S');
+        if (i == 0)
+            i = test_update_array(aln, "N4", 's', NELE(n4v3), n4v3,
+                                  "N5", 4242, 'S');
+        if (i == 0)
+            i = test_update_array(aln, "N4", 'f', NELE(n4v4), n4v4,
+                                  "N5", 4242, 'S');
+        if (i == 0)
+            i = test_update_array(aln, "N4", 'c', NELE(n4v5), n4v5,
+                                  "N5", 4242, 'S');
+        if (i == 0)
+            i = test_update_array(aln, "N4", 'i', NELE(n4v6), n4v6,
+                                  "N5", 4242, 'S');
+        if (i == 0)
+            i = test_update_array(aln, "N4", 'S', NELE(n4v7), n4v7,
+                                  "N5", 4242, 'S');
+
         if (sam_format1(header, aln, &ks) < 0)
             fail("can't format record");
 
@@ -262,17 +459,37 @@ static void copy_check_alignment(const char *infname, const char *informat,
     samFile *in = sam_open(infname, "r");
     samFile *out = sam_open(outfname, outmode);
     bam1_t *aln = bam_init1();
-    bam_hdr_t *header;
+    bam_hdr_t *header = NULL;
+    int res;
+
+    if (!in) {
+        fail("couldn't open %s", infname);
+        goto err;
+    }
+    if (!out) {
+        fail("couldn't open %s with mode %s", outfname, outmode);
+        goto err;
+    }
+    if (!aln) {
+        fail("bam_init1() failed");
+        goto err;
+    }
 
     if (outref) {
-        if (hts_set_opt(out, CRAM_OPT_REFERENCE, outref) < 0)
+        if (hts_set_opt(out, CRAM_OPT_REFERENCE, outref) < 0) {
             fail("setting reference %s for %s", outref, outfname);
+            goto err;
+        }
     }
 
     header = sam_hdr_read(in);
+    if (!header) {
+        fail("reading header from %s", infname);
+        goto err;
+    }
     if (sam_hdr_write(out, header) < 0) fail("writing headers to %s", outfname);
 
-    while (sam_read1(in, header, aln) >= 0) {
+    while ((res = sam_read1(in, header, aln)) >= 0) {
         int mod4 = ((intptr_t) bam_get_cigar(aln)) % 4;
         if (mod4 != 0)
             fail("%s CIGAR not 4-byte aligned; offset is 4k+%d for \"%s\"",
@@ -280,11 +497,15 @@ static void copy_check_alignment(const char *infname, const char *informat,
 
         if (sam_write1(out, header, aln) < 0) fail("writing to %s", outfname);
     }
+    if (res < -1) {
+        fail("failed to read alignment from %s", infname);
+    }
 
+ err:
     bam_destroy1(aln);
     bam_hdr_destroy(header);
-    sam_close(in);
-    sam_close(out);
+    if (in) sam_close(in);
+    if (out) sam_close(out);
 }
 
 static void samrecord_layout(void)
@@ -322,26 +543,32 @@ static void samrecord_layout(void)
 
 static void faidx1(const char *filename)
 {
-    int n, n_exp = 0;
+    int n, n_exp = 0, n_fq_exp = 0;
     char tmpfilename[FILENAME_MAX], line[500];
     FILE *fin, *fout;
     faidx_t *fai;
 
-    fin = fopen(filename, "r");
+    fin = fopen(filename, "rb");
     if (fin == NULL) fail("can't open %s\n", filename);
     sprintf(tmpfilename, "%s.tmp", filename);
-    fout = fopen(tmpfilename, "w");
+    fout = fopen(tmpfilename, "wb");
     if (fout == NULL) fail("can't create temporary %s\n", tmpfilename);
     while (fgets(line, sizeof line, fin)) {
         if (line[0] == '>') n_exp++;
+        if (line[0] == '+' && line[1] == '\n') n_fq_exp++;
         fputs(line, fout);
     }
     fclose(fin);
     fclose(fout);
 
+    if (n_exp == 0 && n_fq_exp != 0) {
+        // probably a fastq file
+        n_exp = n_fq_exp;
+    }
+
     if (fai_build(tmpfilename) < 0) fail("can't index %s", tmpfilename);
     fai = fai_load(tmpfilename);
-    if (fai == NULL) fail("can't load faidx file %s", tmpfilename);
+    if (fai == NULL) { fail("can't load faidx file %s", tmpfilename); return; }
 
     n = faidx_fetch_nseq(fai);
     if (n != n_exp)

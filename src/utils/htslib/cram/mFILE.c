@@ -2,23 +2,23 @@
 Copyright (c) 2005-2006, 2008-2009, 2013 Genome Research Ltd.
 Author: James Bonfield <jkb@sanger.ac.uk>
 
-Redistribution and use in source and binary forms, with or without 
+Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
 
-   1. Redistributions of source code must retain the above copyright notice, 
+   1. Redistributions of source code must retain the above copyright notice,
 this list of conditions and the following disclaimer.
 
-   2. Redistributions in binary form must reproduce the above copyright notice, 
-this list of conditions and the following disclaimer in the documentation 
+   2. Redistributions in binary form must reproduce the above copyright notice,
+this list of conditions and the following disclaimer in the documentation
 and/or other materials provided with the distribution.
 
    3. Neither the names Genome Research Ltd and Wellcome Trust Sanger
 Institute nor the names of its contributors may be used to endorse or promote
 products derived from this software without specific prior written permission.
 
-THIS SOFTWARE IS PROVIDED BY GENOME RESEARCH LTD AND CONTRIBUTORS "AS IS" AND 
-ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED 
-WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE 
+THIS SOFTWARE IS PROVIDED BY GENOME RESEARCH LTD AND CONTRIBUTORS "AS IS" AND
+ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
 DISCLAIMED. IN NO EVENT SHALL GENOME RESEARCH LTD OR CONTRIBUTORS BE LIABLE
 FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
 DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
@@ -40,7 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <unistd.h>
 #include <stdarg.h>
 
-#include "hts_internal.h"
+#include "htslib/hts_log.h"
 #include "cram/os.h"
 #include "cram/mFILE.h"
 
@@ -79,27 +79,27 @@ static char *mfload(FILE *fp, const char *fn, size_t *size, int binary) {
 
 #ifdef _WIN32
     if (binary)
-	_setmode(_fileno(fp), _O_BINARY);
-    else 
-	_setmode(_fileno(fp), _O_TEXT);
+        _setmode(_fileno(fp), _O_BINARY);
+    else
+        _setmode(_fileno(fp), _O_TEXT);
 #endif
 
     if (fn && -1 != stat(fn, &sb)) {
-	data = malloc(allocated = sb.st_size);
-	bufsize = sb.st_size;
+        data = malloc(allocated = sb.st_size);
+        bufsize = sb.st_size;
     } else {
-	fn = NULL;
+        fn = NULL;
     }
 
     do {
-	size_t len;
-	if (used + bufsize > allocated) {
-	    allocated += bufsize;
-	    data = realloc(data, allocated);
-	}
-	len = fread(data + used, 1, allocated - used, fp);
-	if (len > 0)
-	    used += len;
+        size_t len;
+        if (used + bufsize > allocated) {
+            allocated += bufsize;
+            data = realloc(data, allocated);
+        }
+        len = fread(data + used, 1, allocated - used, fp);
+        if (len > 0)
+            used += len;
     } while (!feof(fp) && (fn == NULL || used < sb.st_size));
 
     *size = used;
@@ -119,14 +119,14 @@ int mfmmap(mFILE *mf, FILE *fp, const char *fn) {
     struct stat sb;
 
     if (stat(fn, &sb) != 0)
-	return -1;
+        return -1;
 
     mf->size = sb.st_size;
     mf->data = mmap(NULL, mf->size, PROT_READ, MAP_SHARED,
-		    fileno(fp), 0);
+                    fileno(fp), 0);
 
     if (!mf->data)
-	return -1;
+        return -1;
 
     mf->alloced = 0;
     return 0;
@@ -141,7 +141,7 @@ int mfmmap(mFILE *mf, FILE *fp, const char *fn) {
  */
 mFILE *mstdin(void) {
     if (m_channel[0])
-	return m_channel[0];
+        return m_channel[0];
 
     m_channel[0] = mfcreate(NULL, 0);
     if (NULL == m_channel[0]) return NULL;
@@ -152,7 +152,7 @@ mFILE *mstdin(void) {
 static void init_mstdin(void) {
     static int done_stdin = 0;
     if (done_stdin)
-	return;
+        return;
 
     m_channel[0]->data = mfload(stdin, NULL, &m_channel[0]->size, 1);
     m_channel[0]->mode = MF_READ;
@@ -166,7 +166,7 @@ static void init_mstdin(void) {
  */
 mFILE *mstdout(void) {
     if (m_channel[1])
-	return m_channel[1];
+        return m_channel[1];
 
     m_channel[1] = mfcreate(NULL, 0);
     if (NULL == m_channel[1]) return NULL;
@@ -182,7 +182,7 @@ mFILE *mstdout(void) {
  */
 mFILE *mstderr(void) {
     if (m_channel[2])
-	return m_channel[2];
+        return m_channel[2];
 
     m_channel[2] = mfcreate(NULL, 0);
     if (NULL == m_channel[2]) return NULL;
@@ -215,7 +215,7 @@ mFILE *mfcreate(char *data, int size) {
  */
 void mfrecreate(mFILE *mf, char *data, int size) {
     if (mf->data)
-	free(mf->data);
+        free(mf->data);
     mf->data = data;
     mf->size = size;
     mf->alloced = size;
@@ -233,14 +233,14 @@ void mfrecreate(mFILE *mf, char *data, int size) {
  *
  * Returns mFILE * on success
  *         NULL on failure.
- */ 
+ */
 mFILE *mfcreate_from(const char *path, const char *mode_str, FILE *fp) {
-   mFILE *mf; 
+    mFILE *mf;
 
     /* Open using mfreopen() */
     if (NULL == (mf = mfreopen(path, mode_str, fp)))
-	return NULL;
-    
+        return NULL;
+
     /* Disassociate from the input stream */
     mf->fp = NULL;
 
@@ -265,62 +265,62 @@ mFILE *mfreopen(const char *path, const char *mode_str, FILE *fp) {
      * m = mmap (read only)
      */
     if (strchr(mode_str, 'r'))
-	r = 1, mode |= MF_READ;
+        r = 1, mode |= MF_READ;
     if (strchr(mode_str, 'w'))
-	w = 1, mode |= MF_WRITE | MF_TRUNC;
+        w = 1, mode |= MF_WRITE | MF_TRUNC;
     if (strchr(mode_str, 'a'))
-	w = a = 1, mode |= MF_WRITE | MF_APPEND;
+        w = a = 1, mode |= MF_WRITE | MF_APPEND;
     if (strchr(mode_str, 'b'))
-	b = 1, mode |= MF_BINARY;
+        b = 1, mode |= MF_BINARY;
     if (strchr(mode_str, 'x'))
-	x = 1;
+        x = 1;
     if (strchr(mode_str, '+')) {
         w = 1, mode |= MF_READ | MF_WRITE;
-	if (a)
-	    r = 1;
+        if (a)
+            r = 1;
     }
 #ifdef HAVE_MMAP
     if (strchr(mode_str, 'm'))
-	if (!w) mode |= MF_MMAP;
+        if (!w) mode |= MF_MMAP;
 #endif
 
     if (r) {
-	mf = mfcreate(NULL, 0);
-	if (NULL == mf) return NULL;
-	if (!(mode & MF_TRUNC)) {
+        mf = mfcreate(NULL, 0);
+        if (NULL == mf) return NULL;
+        if (!(mode & MF_TRUNC)) {
 #ifdef HAVE_MMAP
-	    if (mode & MF_MMAP) {
-		if (mfmmap(mf, fp, path) == -1) {
-		    mf->data = NULL;
-		    mode &= ~MF_MMAP;
-		}
-	    }
+            if (mode & MF_MMAP) {
+                if (mfmmap(mf, fp, path) == -1) {
+                    mf->data = NULL;
+                    mode &= ~MF_MMAP;
+                }
+            }
 #endif
-	    if (!mf->data) {
-		mf->data = mfload(fp, path, &mf->size, b);
-		mf->alloced = mf->size;
-		if (!a)
-		    fseek(fp, 0, SEEK_SET);
-	    }
-	}
+            if (!mf->data) {
+                mf->data = mfload(fp, path, &mf->size, b);
+                mf->alloced = mf->size;
+                if (!a)
+                    fseek(fp, 0, SEEK_SET);
+            }
+        }
     } else if (w) {
-	/* Write - initialise the data structures */
-	mf = mfcreate(NULL, 0);
-	if (NULL == mf) return NULL;
+        /* Write - initialise the data structures */
+        mf = mfcreate(NULL, 0);
+        if (NULL == mf) return NULL;
     } else {
-	hts_log_error("Must specify either r, w or a for mode");
+        hts_log_error("Must specify either r, w or a for mode");
         return NULL;
     }
     mf->fp = fp;
     mf->mode = mode;
 
     if (x) {
-	mf->mode |= MF_MODEX;
+        mf->mode |= MF_MODEX;
     }
-    
+
     if (a) {
-	mf->flush_pos = mf->size;
-	fseek(fp, 0, SEEK_END);
+        mf->flush_pos = mf->size;
+        fseek(fp, 0, SEEK_END);
     }
 
     return mf;
@@ -335,7 +335,7 @@ mFILE *mfopen(const char *path, const char *mode) {
     FILE *fp;
 
     if (NULL == (fp = fopen(path, mode)))
-	return NULL;
+        return NULL;
     return mfreopen(path, mode, fp);
 }
 
@@ -347,20 +347,20 @@ mFILE *mfopen(const char *path, const char *mode) {
  */
 int mfclose(mFILE *mf) {
     if (!mf)
-	return -1;
+        return -1;
 
     mfflush(mf);
 
 #ifdef HAVE_MMAP
     if ((mf->mode & MF_MMAP) && mf->data) {
-	/* Mmaped */
-	munmap(mf->data, mf->size);
-	mf->data = NULL;
+        /* Mmaped */
+        munmap(mf->data, mf->size);
+        mf->data = NULL;
     }
 #endif
 
     if (mf->fp)
-	fclose(mf->fp);
+        fclose(mf->fp);
 
     mfdestroy(mf);
 
@@ -375,15 +375,15 @@ int mfclose(mFILE *mf) {
  */
 int mfdetach(mFILE *mf) {
     if (!mf)
-	return -1;
+        return -1;
 
     mfflush(mf);
     if (mf->mode & MF_MMAP)
-	return -1;
+        return -1;
 
     if (mf->fp) {
-	fclose(mf->fp);
-	mf->fp = NULL;
+        fclose(mf->fp);
+        mf->fp = NULL;
     }
 
     return 0;
@@ -394,10 +394,10 @@ int mfdetach(mFILE *mf) {
  */
 int mfdestroy(mFILE *mf) {
     if (!mf)
-	return -1;
+        return -1;
 
     if (mf->data)
-	free(mf->data);
+        free(mf->data);
     free(mf);
 
     return 0;
@@ -418,11 +418,11 @@ void *mfsteal(mFILE *mf, size_t *size_out) {
     if (!mf) return NULL;
 
     data = mf->data;
-    
+
     if (NULL != size_out) *size_out = mf->size;
 
     if (mfdetach(mf) != 0)
-	return NULL;
+        return NULL;
 
     mf->data = NULL;
     mfdestroy(mf);
@@ -438,17 +438,17 @@ void *mfsteal(mFILE *mf, size_t *size_out) {
 int mfseek(mFILE *mf, long offset, int whence) {
     switch (whence) {
     case SEEK_SET:
-	mf->offset = offset;
-	break;
+        mf->offset = offset;
+        break;
     case SEEK_CUR:
-	mf->offset += offset;
-	break;
+        mf->offset += offset;
+        break;
     case SEEK_END:
-	mf->offset = mf->size + offset;
-	break;
+        mf->offset = mf->size + offset;
+        break;
     default:
-	errno = EINVAL;
-	return -1;
+        errno = EINVAL;
+        return -1;
     }
 
     mf->eof = 0;
@@ -475,7 +475,7 @@ void mrewind(mFILE *mf) {
 void mftruncate(mFILE *mf, long offset) {
     mf->size = offset != -1 ? offset : mf->offset;
     if (mf->offset > mf->size)
-	mf->offset = mf->size;
+        mf->offset = mf->size;
 }
 
 int mfeof(mFILE *mf) {
@@ -489,23 +489,23 @@ int mfeof(mFILE *mf) {
 size_t mfread(void *ptr, size_t size, size_t nmemb, mFILE *mf) {
     size_t len;
     char *cptr = (char *)ptr;
-    
+
     if (mf == m_channel[0]) init_mstdin();
 
     if (mf->size <= mf->offset)
-	return 0;
+        return 0;
 
     len = size * nmemb <= mf->size - mf->offset
-	? size * nmemb
-	: mf->size - mf->offset;
+        ? size * nmemb
+        : mf->size - mf->offset;
     if (!size)
-	return 0;
+        return 0;
 
     memcpy(cptr, &mf->data[mf->offset], len);
     mf->offset += len;
-    
+
     if (len != size * nmemb) {
-	mf->eof = 1;
+        mf->eof = 1;
     }
 
     return len / size;
@@ -513,30 +513,30 @@ size_t mfread(void *ptr, size_t size, size_t nmemb, mFILE *mf) {
 
 size_t mfwrite(void *ptr, size_t size, size_t nmemb, mFILE *mf) {
     if (!(mf->mode & MF_WRITE))
-	return 0;
+        return 0;
 
     /* Append mode => forced all writes to end of file */
     if (mf->mode & MF_APPEND)
-	mf->offset = mf->size;
+        mf->offset = mf->size;
 
     /* Make sure we have enough room */
     while (size * nmemb + mf->offset > mf->alloced) {
-	size_t new_alloced = mf->alloced ? mf->alloced * 2 : 1024;
-	void * new_data = realloc(mf->data, new_alloced);
-	if (NULL == new_data) return 0;
-	mf->alloced = new_alloced;
-	mf->data    = new_data;
+        size_t new_alloced = mf->alloced ? mf->alloced * 2 : 1024;
+        void * new_data = realloc(mf->data, new_alloced);
+        if (NULL == new_data) return 0;
+        mf->alloced = new_alloced;
+        mf->data    = new_data;
     }
 
     /* Record where we need to reflush from */
     if (mf->offset < mf->flush_pos)
-	mf->flush_pos = mf->offset;
+        mf->flush_pos = mf->offset;
 
     /* Copy the data over */
     memcpy(&mf->data[mf->offset], ptr, size * nmemb);
     mf->offset += size * nmemb;
     if (mf->size < mf->offset)
-	mf->size = mf->offset;
+        mf->size = mf->offset;
 
     return nmemb;
 }
@@ -544,7 +544,7 @@ size_t mfwrite(void *ptr, size_t size, size_t nmemb, mFILE *mf) {
 int mfgetc(mFILE *mf) {
     if (mf == m_channel[0]) init_mstdin();
     if (mf->offset < mf->size) {
-	return (unsigned char)mf->data[mf->offset++];
+        return (unsigned char)mf->data[mf->offset++];
     }
 
     mf->eof = 1;
@@ -553,10 +553,10 @@ int mfgetc(mFILE *mf) {
 
 int mungetc(int c, mFILE *mf) {
     if (mf->offset > 0) {
-	mf->data[--mf->offset] = c;
-	return c;
+        mf->data[--mf->offset] = c;
+        return c;
     }
-    
+
     mf->eof = 1;
     return -1;
 }
@@ -567,14 +567,14 @@ char *mfgets(char *s, int size, mFILE *mf) {
     if (mf == m_channel[0]) init_mstdin();
     *s = 0;
     for (i = 0; i < size-1;) {
-	if (mf->offset < mf->size) {
-	    s[i] = mf->data[mf->offset++];
-	    if (s[i++] == '\n')
-		break;
-	} else {
-	    mf->eof = 1;
-	    break;
-	}
+        if (mf->offset < mf->size) {
+            s[i] = mf->data[mf->offset++];
+            if (s[i++] == '\n')
+                break;
+        } else {
+            mf->eof = 1;
+            break;
+        }
     }
 
     s[i] = 0;
@@ -593,38 +593,38 @@ char *mfgets(char *s, int size, mFILE *mf) {
  */
 int mfflush(mFILE *mf) {
     if (!mf->fp)
-	return 0;
+        return 0;
 
     /* FIXME: only do this when opened in write mode */
     if (mf == m_channel[1] || mf == m_channel[2]) {
-	if (mf->flush_pos < mf->size) {
-	    size_t bytes = mf->size - mf->flush_pos;
-	    if (fwrite(mf->data + mf->flush_pos, 1, bytes, mf->fp) < bytes)
-		return -1;
-	    if (0 != fflush(mf->fp))
-		return -1;
-	}
+        if (mf->flush_pos < mf->size) {
+            size_t bytes = mf->size - mf->flush_pos;
+            if (fwrite(mf->data + mf->flush_pos, 1, bytes, mf->fp) < bytes)
+                return -1;
+            if (0 != fflush(mf->fp))
+                return -1;
+        }
 
-	/* Stdout & stderr are non-seekable streams so throw away the data */
-	mf->offset = mf->size = mf->flush_pos = 0;
+        /* Stdout & stderr are non-seekable streams so throw away the data */
+        mf->offset = mf->size = mf->flush_pos = 0;
     }
 
     /* only flush when opened in write mode */
     if (mf->mode & MF_WRITE) {
-	if (mf->flush_pos < mf->size) {
-	    size_t bytes = mf->size - mf->flush_pos;
-	    if (!(mf->mode & MF_MODEX)) {
-		fseek(mf->fp, mf->flush_pos, SEEK_SET);
-	    }
-	    if (fwrite(mf->data + mf->flush_pos, 1, bytes, mf->fp) < bytes)
-		return -1;
-	    if (0 != fflush(mf->fp))
-		return -1;
-	}
-	if (ftell(mf->fp) != -1 &&
-	    ftruncate(fileno(mf->fp), ftell(mf->fp)) == -1)
-		return -1;
-	mf->flush_pos = mf->size;
+        if (mf->flush_pos < mf->size) {
+            size_t bytes = mf->size - mf->flush_pos;
+            if (!(mf->mode & MF_MODEX)) {
+                fseek(mf->fp, mf->flush_pos, SEEK_SET);
+            }
+            if (fwrite(mf->data + mf->flush_pos, 1, bytes, mf->fp) < bytes)
+                return -1;
+            if (0 != fflush(mf->fp))
+                return -1;
+        }
+        if (ftell(mf->fp) != -1 &&
+            ftruncate(fileno(mf->fp), ftell(mf->fp)) == -1)
+            return -1;
+        mf->flush_pos = mf->size;
     }
 
     return 0;
@@ -644,10 +644,10 @@ void mfascii(mFILE *mf) {
     size_t p1, p2;
 
     for (p1 = p2 = 1; p1 < mf->size; p1++, p2++) {
-	if (mf->data[p1] == '\n' && mf->data[p1-1] == '\r') {
-	    p2--; /* delete the \r */
-	}
-	mf->data[p2] = mf->data[p1];
+        if (mf->data[p1] == '\n' && mf->data[p1-1] == '\r') {
+            p2--; /* delete the \r */
+        }
+        mf->data[p2] = mf->data[p1];
     }
     mf->size = p2;
 

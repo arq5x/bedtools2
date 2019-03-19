@@ -69,25 +69,25 @@ char *bcf_sr_strerror(int errnum)
     switch (errnum)
     {
         case open_failed:
-            return strerror(errno); break;
+            return strerror(errno);
         case not_bgzf:
-            return "not compressed with bgzip"; break;
+            return "not compressed with bgzip";
         case idx_load_failed:
-            return "could not load index"; break;
+            return "could not load index";
         case file_type_error:
-            return "unknown file type"; break;
+            return "unknown file type";
         case api_usage_error:
-            return "API usage error"; break;
+            return "API usage error";
         case header_error:
-            return "could not parse header"; break;
+            return "could not parse header";
         case no_eof:
-            return "no BGZF EOF marker; file may be truncated"; break;
+            return "no BGZF EOF marker; file may be truncated";
         case no_memory:
-            return "Out of memory"; break;
+            return "Out of memory";
         case vcf_parse_error:
-            return "VCF parse error"; break;
+            return "VCF parse error";
         case bcf_read_error:
-            return "BCF read error"; break;
+            return "BCF read error";
         default: return "";
     }
 }
@@ -598,7 +598,10 @@ int _reader_next_line(bcf_srs_t *files)
             {
                 min_pos = files->readers[i].buffer[1]->pos;
                 chr = bcf_seqname(files->readers[i].header, files->readers[i].buffer[1]);
+                bcf_sr_sort_set_active(&BCF_SR_AUX(files)->sort, i);
             }
+            else if ( min_pos==files->readers[i].buffer[1]->pos )
+                bcf_sr_sort_add_active(&BCF_SR_AUX(files)->sort, i);
         }
         if ( min_pos==INT_MAX )
         {
@@ -669,6 +672,7 @@ static void bcf_sr_seek_start(bcf_srs_t *readers)
 int bcf_sr_seek(bcf_srs_t *readers, const char *seq, int pos)
 {
     if ( !readers->regions ) return 0;
+    bcf_sr_sort_reset(&BCF_SR_AUX(readers)->sort);
     if ( !seq && !pos )
     {
         // seek to start
@@ -873,6 +877,7 @@ static bcf_sr_regions_t *_regions_init_string(const char *str)
 // returns -1 on error, 0 if the line is a comment line, 1 on success
 static int _regions_parse_line(char *line, int ichr,int ifrom,int ito, char **chr,char **chr_end,int *from,int *to)
 {
+    if (ifrom < 0 || ito < 0) return -1;
     *chr_end = NULL;
 
     if ( line[0]=='#' ) return 0;

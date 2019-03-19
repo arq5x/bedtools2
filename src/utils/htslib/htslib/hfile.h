@@ -217,7 +217,7 @@ hread(hFILE *fp, void *buffer, size_t nbytes)
     if (n > nbytes) n = nbytes;
     memcpy(buffer, fp->begin, n);
     fp->begin += n;
-    return (n == nbytes)? (ssize_t) n : hread2(fp, buffer, nbytes, n);
+    return (n == nbytes || !fp->mobile)? (ssize_t) n : hread2(fp, buffer, nbytes, n);
 }
 
 /// Write a character to the stream
@@ -254,8 +254,22 @@ static inline ssize_t HTS_RESULT_USED
 hwrite(hFILE *fp, const void *buffer, size_t nbytes)
 {
     extern ssize_t hwrite2(hFILE *, const void *, size_t, size_t);
+    extern int hfile_set_blksize(hFILE *fp, size_t bufsiz);
+
+    if(!fp->mobile){
+        if (fp->limit - fp->begin < (ssize_t)nbytes){
+            hfile_set_blksize(fp, fp->limit - fp->buffer + nbytes);
+            fp->end = fp->limit;
+        }
+    }
 
     size_t n = fp->limit - fp->begin;
+    if (nbytes >= n && fp->begin == fp->buffer) {
+        // Go straight to hwrite2 if the buffer is empty and the request
+        // won't fit.
+        return hwrite2(fp, buffer, nbytes, 0);
+    }
+
     if (n > nbytes) n = nbytes;
     memcpy(fp->begin, buffer, n);
     fp->begin += n;
@@ -268,6 +282,24 @@ hwrite(hFILE *fp, const void *buffer, size_t nbytes)
 This includes low-level flushing such as via `fdatasync(2)`.
 */
 int hflush(hFILE *fp) HTS_RESULT_USED;
+
+/// For hfile_mem: get the internal buffer and it's size from a hfile
+/** @return  buffer if successful, or NULL if an error occurred
+
+The buffer returned should not be freed as this will happen when the
+hFILE is closed.
+*/
+char *hfile_mem_get_buffer(hFILE *file, size_t *length);
+
+/// For hfile_mem: get the internal buffer and it's size from a hfile.
+/** @return  buffer if successful, or NULL if an error occurred
+
+This is similar to hfile_mem_get_buffer except that ownership of the
+buffer is granted to the caller, who now has responsibility for freeing
+it.  From this point onwards, the hFILE should not be used for any
+purpose other than closing.
+*/
+char *hfile_mem_steal_buffer(hFILE *file, size_t *length);
 
 #ifdef __cplusplus
 }

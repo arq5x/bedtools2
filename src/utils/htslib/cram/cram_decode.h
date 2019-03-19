@@ -2,23 +2,23 @@
 Copyright (c) 2012-2013 Genome Research Ltd.
 Author: James Bonfield <jkb@sanger.ac.uk>
 
-Redistribution and use in source and binary forms, with or without 
+Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
 
-   1. Redistributions of source code must retain the above copyright notice, 
+   1. Redistributions of source code must retain the above copyright notice,
 this list of conditions and the following disclaimer.
 
-   2. Redistributions in binary form must reproduce the above copyright notice, 
-this list of conditions and the following disclaimer in the documentation 
+   2. Redistributions in binary form must reproduce the above copyright notice,
+this list of conditions and the following disclaimer in the documentation
 and/or other materials provided with the distribution.
 
    3. Neither the names Genome Research Ltd and Wellcome Trust Sanger
 Institute nor the names of its contributors may be used to endorse or promote
 products derived from this software without specific prior written permission.
 
-THIS SOFTWARE IS PROVIDED BY GENOME RESEARCH LTD AND CONTRIBUTORS "AS IS" AND 
-ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED 
-WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE 
+THIS SOFTWARE IS PROVIDED BY GENOME RESEARCH LTD AND CONTRIBUTORS "AS IS" AND
+ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
 DISCLAIMED. IN NO EVENT SHALL GENOME RESEARCH LTD OR CONTRIBUTORS BE LIABLE
 FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
 DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
@@ -82,7 +82,7 @@ int cram_get_bam_seq(cram_fd *fd, bam_seq_t **bam);
  *         NULL on failure
  */
 cram_block_compression_hdr *cram_decode_compression_header(cram_fd *fd,
-							   cram_block *b);
+                                                           cram_block *b);
 
 /*! INTERNAL:
  * Decodes a CRAM (un)mapped slice header block.
@@ -102,8 +102,13 @@ cram_block_slice_hdr *cram_decode_slice_header(cram_fd *fd, cram_block *b);
  *        -1 on failure
  */
 int cram_decode_slice(cram_fd *fd, cram_container *c, cram_slice *s,
-		      SAM_hdr *hdr);
+                      SAM_hdr *hdr);
 
+
+/*
+ * Drains and frees the decode read-queue for a multi-threaded reader.
+ */
+void cram_drain_rqueue(cram_fd *fd);
 
 #ifdef __cplusplus
 }

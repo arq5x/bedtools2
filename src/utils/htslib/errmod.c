@@ -64,7 +64,7 @@ static double* logbinomial_table( const int n_size )
 static void cal_coef(errmod_t *em, double depcorr, double eta)
 {
     int k, n, q;
-    long double sum, sum1;
+    double sum, sum1;
     double *lC;
 
     // initialize ->fk
@@ -84,10 +84,11 @@ static void cal_coef(errmod_t *em, double depcorr, double eta)
         double le1 = log(1.0 - e);
         for (n = 1; n <= 255; ++n) {
             double *beta = em->beta + (q<<16|n<<8);
-            sum1 = sum = 0.0;
-            for (k = n; k >= 0; --k, sum1 = sum) {
-                sum = sum1 + expl(lC[n<<8|k] + k*le + (n-k)*le1);
-                beta[k] = -10. / M_LN10 * logl(sum1 / sum);
+            sum1 = lC[n<<8|n] + n*le;
+            beta[n] = HUGE_VAL;
+            for (k = n - 1; k >= 0; --k, sum1 = sum) {
+                sum = sum1 + log1p(exp(lC[n<<8|k] + k*le + (n-k)*le1 - sum1));
+                beta[k] = -10. / M_LN10 * (sum1 - sum);
             }
         }
     }

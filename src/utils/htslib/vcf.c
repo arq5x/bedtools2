@@ -366,7 +366,7 @@ bcf_hrec_t *bcf_hdr_parse_line(const bcf_hdr_t *h, const char *line, int *len)
     // Skip to end of line
     int nonspace = 0;
     p = q;
-    while ( *q && *q!='\n' ) { nonspace |= !isspace(*q); q++; }
+    while ( *q && *q!='\n' ) { nonspace |= !isspace_c(*q); q++; }
     if (nonspace) {
         hts_log_warning("Dropped trailing junk from header line '%.*s'", (int) (q - line), line);
     }
@@ -453,7 +453,7 @@ int bcf_hdr_register_hrec(bcf_hdr_t *hdr, bcf_hrec_t *hrec)
 
     // INFO/FILTER/FORMAT
     char *id = NULL;
-    uint32_t type = -1, var = -1;
+    uint32_t type = UINT32_MAX, var = UINT32_MAX;
     int num = -1, idx = -1;
     for (i=0; i<hrec->nkeys; i++)
     {
@@ -1474,12 +1474,20 @@ bcf1_t *bcf_copy(bcf1_t *dst, bcf1_t *src)
     dst->n_info = src->n_info; dst->n_allele = src->n_allele;
     dst->n_fmt = src->n_fmt; dst->n_sample = src->n_sample;
 
-    dst->shared.m = dst->shared.l = src->shared.l;
-    dst->shared.s = (char*) malloc(dst->shared.l);
+    if ( dst->shared.m < src->shared.l )
+    {
+        dst->shared.s = (char*) realloc(dst->shared.s, src->shared.l);
+        dst->shared.m = src->shared.l;
+    }
+    dst->shared.l = src->shared.l;
     memcpy(dst->shared.s,src->shared.s,dst->shared.l);
 
-    dst->indiv.m = dst->indiv.l = src->indiv.l;
-    dst->indiv.s = (char*) malloc(dst->indiv.l);
+    if ( dst->indiv.m < src->indiv.l )
+    {
+        dst->indiv.s = (char*) realloc(dst->indiv.s, src->indiv.l);
+        dst->indiv.m = src->indiv.l;
+    }
+    dst->indiv.l = src->indiv.l;
     memcpy(dst->indiv.s,src->indiv.s,dst->indiv.l);
 
     return dst;
@@ -3067,11 +3075,25 @@ int bcf_hdr_set_samples(bcf_hdr_t *hdr, const char *samples, int is_file)
 {
     if ( samples && !strcmp("-",samples) ) return 0;            // keep all samples
 
-    hdr->nsamples_ori = bcf_hdr_nsamples(hdr);
-    if ( !samples ) { bcf_hdr_nsamples(hdr) = 0; return 0; }    // exclude all samples
-
     int i, narr = bit_array_size(bcf_hdr_nsamples(hdr));
     hdr->keep_samples = (uint8_t*) calloc(narr,1);
+
+    hdr->nsamples_ori = bcf_hdr_nsamples(hdr);
+    if ( !samples )
+    {
+        // exclude all samples
+        bcf_hdr_nsamples(hdr) = 0;
+        khint_t k;
+        vdict_t *d = (vdict_t*)hdr->dict[BCF_DT_SAMPLE];
+        for (k = kh_begin(d); k != kh_end(d); ++k)
+            if (kh_exist(d, k)) free((char*)kh_key(d, k));
+        kh_destroy(vdict, d);
+        hdr->dict[BCF_DT_SAMPLE] = kh_init(vdict);
+        bcf_hdr_sync(hdr);
+
+        return 0;
+    }
+
     if ( samples[0]=='^' )
         for (i=0; i<bcf_hdr_nsamples(hdr); i++) bit_array_set(hdr->keep_samples,i);
 
@@ -3559,9 +3581,9 @@ static inline int _bcf1_sync_alleles(const bcf_hdr_t *hdr, bcf1_t *line, int nal
         n++;
     }
 
-    // Update REF length
+    // Update REF length. Note that END is 1-based while line->pos 0-based
     bcf_info_t *end_info = bcf_get_info(hdr,line,"END");
-    line->rlen = end_info ? end_info->v1.i : strlen(line->d.allele[0]);
+    line->rlen = end_info ? end_info->v1.i - line->pos : strlen(line->d.allele[0]);
 
     return 0;
 }
@@ -3689,7 +3711,7 @@ bcf_info_t *bcf_get_info_id(bcf1_t *line, const int id)
 
 int bcf_get_info_values(const bcf_hdr_t *hdr, bcf1_t *line, const char *tag, void **dst, int *ndst, int type)
 {
-    int i,j, tag_id = bcf_hdr_id2int(hdr, BCF_DT_ID, tag);
+    int i, ret = -4, tag_id = bcf_hdr_id2int(hdr, BCF_DT_ID, tag);
     if ( !bcf_hdr_idinfo_exists(hdr,BCF_HL_INFO,tag_id) ) return -1;    // no such INFO field in the header
     if ( bcf_hdr_id2type(hdr,BCF_HL_INFO,tag_id)!=type ) return -2;     // expected different type
 
@@ -3722,18 +3744,19 @@ int bcf_get_info_values(const bcf_hdr_t *hdr, bcf1_t *line, const char *tag, voi
         *dst  = realloc(*dst, *ndst * size1);
     }
 
-    #define BRANCH(type_t, convert, is_missing, is_vector_end, set_missing, set_regular, out_type_t) { \
+    #define BRANCH(type_t, convert, is_missing, is_vector_end, set_missing, set_regular, out_type_t) do { \
         out_type_t *tmp = (out_type_t *) *dst; \
+        int j; \
         for (j=0; j<info->len; j++) \
         { \
             type_t p = convert(info->vptr + j * sizeof(type_t)); \
-            if ( is_vector_end ) return j; \
+            if ( is_vector_end ) break; \
             if ( is_missing ) set_missing; \
             else set_regular; \
             tmp++; \
         } \
-        return j; \
-    }
+        ret = j; \
+    } while (0)
     switch (info->type) {
         case BCF_BT_INT8:  BRANCH(int8_t,  le_to_i8,  p==bcf_int8_missing,  p==bcf_int8_vector_end,  *tmp=bcf_int32_missing, *tmp=p, int32_t); break;
         case BCF_BT_INT16: BRANCH(int16_t, le_to_i16, p==bcf_int16_missing, p==bcf_int16_vector_end, *tmp=bcf_int32_missing, *tmp=p, int32_t); break;
@@ -3742,7 +3765,7 @@ int bcf_get_info_values(const bcf_hdr_t *hdr, bcf1_t *line, const char *tag, voi
         default: hts_log_error("Unexpected type %d", info->type); exit(1);
     }
     #undef BRANCH
-    return -4;  // this can never happen
+    return ret;  // set by BRANCH
 }
 
 int bcf_get_format_string(const bcf_hdr_t *hdr, bcf1_t *line, const char *tag, char ***dst, int *ndst)

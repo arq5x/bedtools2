@@ -29,6 +29,8 @@ DEALINGS IN THE SOFTWARE.  */
 
 #include "htslib/hfile.h"
 
+#include "textutils_internal.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif

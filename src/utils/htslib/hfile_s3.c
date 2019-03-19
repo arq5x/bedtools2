@@ -30,7 +30,6 @@ DEALINGS IN THE SOFTWARE.  */
 #include <string.h>
 #include <time.h>
 
-#include "hts_internal.h"
 #include "hfile_internal.h"
 #ifdef ENABLE_PLUGINS
 #include "version.h"

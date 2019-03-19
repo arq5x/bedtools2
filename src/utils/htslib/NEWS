@@ -1,3 +1,164 @@
+Noteworthy changes in release 1.9 (18th July 2018)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* If `./configure` fails, `make` will stop working until either configure
+  is re-run successfully, or `make distclean` is used.  This makes
+  configuration failures more obvious.  (#711, thanks to John Marshall)
+
+* The default SAM version has been changed to 1.6.  This is in line with the
+  latest version specification and indicates that HTSlib supports the
+  CG tag used to store long CIGAR data in BAM format.
+
+* bgzip integrity check option '--test' (#682, thanks to @sd4B75bJ, @jrayner)
+
+* Faidx can now index fastq files as well as fasta.  The fastq index adds
+  an extra column to the `.fai` index which gives the offset to the quality
+  values.  New interfaces have been added to `htslib/faidx.h` to read the
+  fastq index and retrieve the quality values.  It is possible to open
+  a fastq index as if fasta (only sequences will be returned), but not
+  the other way round. (#701)
+
+* New API interfaces to add or update integer, float and array aux tags. (#694)
+
+* Add `level=<number>` option to `hts_set_opt()` to allow the compression
+  level to be set.  Setting `level=0` enables uncompressed output. (#715)
+
+* Improved bgzip error reporting.
+
+* Better error reporting when CRAM reference files can't be opened. (#706)
+
+* Fixes to make tests work properly on Windows/MinGW - mainly to handle
+  line ending differences. (#716)
+
+* Efficiency improvements:
+
+  - Small speed-up for CRAM indexing.
+
+  - Reduce the number of unnecessary wake-ups in the thread pool. (#703)
+
+  - Avoid some memory copies when writing data, notably for uncompressed
+    BGZF output. (#703)
+
+* Bug fixes:
+
+  - Fix multi-region iterator bugs on CRAM files. (#684)
+
+  - Fixed multi-region iterator bug that caused some reads to be skipped
+    incorrectly when reading BAM files. (#687)
+
+  - Fixed synced_bcf_reader() bug when reading contigs multiple times. (#691,
+    reported by @freeseek)
+
+  - Fixed bug where bcf_hdr_set_samples() did not update the sample dictionary
+    when removing samples. (#692, reported by @freeseek)
+
+  - Fixed bug where the VCF record ref length was calculated incorrectly
+    if an INFO END tag was present. (71b00a)
+
+  - Fixed warnings found when compiling with gcc 8.1.0. (#700)
+
+  - sam_hdr_read() and sam_hdr_write() will now return an error code
+    if passed a NULL file pointer, instead of crashing.
+
+  - Fixed possible negative array look-up in sam_parse1() that somehow
+    escaped previous fuzz testing. (#731, reported by @fCorleone)
+
+  - Fixed bug where cram range queries could incorrectly report an error
+    when using multiple threads. (#734, reported by Brent Pedersen)
+
+  - Fixed very rare rANS normalisation bug that could cause an assertion
+    failure when writing CRAM files.  (#739, reported by @carsonhh)
+
+Noteworthy changes in release 1.8 (3rd April 2018)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* The URL to get sequences from the EBI reference server has been changed
+  to https://.  This is because the EBI no longer serve sequences via
+  plain HTTP - requests to the http:// endpoint just get redirected.
+  HTSlib needs to be linked against libcurl to download https:// URLs,
+  so CRAM users who want to get references from the EBI will need to
+  run configure and ensure libcurl support is enabled using the
+  --enable-libcurl option.
+
+* Added libdeflate as a build option for alternative faster compression and
+  decompression.  Results vary by CPU but compression should be twice as fast
+  and decompression faster.
+
+* It is now possible to set the compression level in bgzip.  (#675; thanks
+  to Nathan Weeks).
+
+* bgzip now gets its own manual page.
+
+* CRAM encoding now stored MD and NM tags verbatim where the reference
+  contains 'N' characters, to work around ambiguities in the SAM
+  specification (samtools #717/762).
+  Also added "store_md" and "store_nm" cram-options for forcing these
+  tags to be stored at all locations.  This is best when combined with
+  a subsequent decode_md=0 option while reading CRAM.
+
+* Multiple CRAM bug fixes, including a fix to free and the subsequent reuse of
+  references with `-T ref.fa`. (#654; reported by Chris Saunders)
+
+* CRAM multi-threading bugs fixed: don't try to call flush on reading;
+  processing of multiple range queries; problems with multi-slice containers.
+
+* Fixed crashes caused when decoding some cramtools produced CRAM files.
+
+* Fixed a couple of minor rANS issues with handling invalid data.
+
+* Fixed bug where probaln_glocal() tried to allocate far more memory than
+  needed when the query sequence was much longer than the reference.  This
+  caused crashes in samtools and bcftools mpileup when used on data with very
+  long reads. (#572, problem reported by Felix Bemm via minimap2).
+
+* sam_prop_realn() now returns -1 (the same value as for unmapped reads)
+  on reads that do not include at least one 'M', 'X' or '=' CIGAR operator,
+  and no longer adds BQ or ZQ tags.  BAQ adjustments are only made to bases
+  covered by these operators so there is no point in trying to align
+  reads that do not have them. (#572)
+
+Noteworthy changes in release 1.7 (26th January 2018)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* BAM: HTSlib now supports BAMs which include CIGARs with more than 
+  65535 operations as per HTS-Specs 18th November (dab57f4 and 2f915a8).
+
+* BCF/VCF:
+  - Removed the need for long double in pileup calculations.
+  - Sped up the synced reader in some situations.
+  - Bug fixing: removed memory leak in bcf_copy.
+
+* CRAM:
+  - Added support for HTS_IDX_START in cram iterators.
+  - Easier to build when lzma header files are absent.
+  - Bug fixing: a region query with REQUIRED_FIELDS option to
+    disable sequence retrieval now gives correct results.
+  - Bug fixing: stop queries to regions starting after the last
+    read on a chromosome from incorrectly reporting errors
+    (#651, #653; reported by Imran Haque and @egafni via pysam).
+
+* Multi-region iterator: The new structure takes a list of regions and
+  iterates over all, deduplicating reads in the process, and producing a 
+  full list of file offset intervals. This is usually much faster than 
+  repeatedly using the old single-region iterator on a series of regions.
+
+* Curl improvements:
+  - Add Bearer token support via HTS_AUTH_LOCATION env (#600).
+  - Use CURL_CA_BUNDLE environment variable to override the CA (#622; 
+    thanks to Garret Kelly & David Alexander).
+  - Speed up (removal of excessive waiting) for both http(s) and ftp.
+  - Avoid repeatedly reconnecting by removal of unnecessary seeks.
+  - Bug fixing: double free when libcurl_open fails.
+
+* BGZF block caching, if enabled, now performs far better (#629; reported
+  by Ram Yalamanchili).
+
+* Added an hFILE layer for in-memory I/O buffers (#590; thanks to Thomas 
+  Hickman).
+
+* Tidied up the drand48 support (intended for systems that do not
+  provide this function).
+
 Noteworthy changes in release 1.6 (28th September 2017)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

@@ -32,6 +32,14 @@
 #include <string.h>
 #include <stdlib.h>
 
+#ifndef klib_unused
+#if (defined __clang__ && __clang_major__ >= 3) || (defined __GNUC__ && __GNUC__ >= 3)
+#define klib_unused __attribute__ ((__unused__))
+#else
+#define klib_unused
+#endif
+#endif /* klib_unused */
+
 #define KS_SEP_SPACE 0 // isspace(): \t, \n, \v, \f, \r
 #define KS_SEP_TAB   1 // isspace() && !' '
 #define KS_SEP_LINE  2 // line separator: "\n" (Unix) or "\r\n" (Windows)
@@ -65,7 +73,7 @@
 	}
 
 #define __KS_INLINED(__read) \
-	static inline int ks_getc(kstream_t *ks) \
+	static inline klib_unused int ks_getc(kstream_t *ks) \
 	{ \
 		if (ks->is_eof && ks->begin >= ks->end) return -1; \
 		if (ks->begin >= ks->end) { \
@@ -76,7 +84,7 @@
         ks->seek_pos++; \
 		return (int)ks->buf[ks->begin++]; \
 	} \
-	static inline int ks_getuntil(kstream_t *ks, int delimiter, kstring_t *str, int *dret) \
+	static inline klib_unused int ks_getuntil(kstream_t *ks, int delimiter, kstring_t *str, int *dret) \
 	{ return ks_getuntil2(ks, delimiter, str, dret, 0); }
 
 #ifndef KSTRING_T

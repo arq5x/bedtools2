@@ -83,8 +83,10 @@ open_next:
                 (strlen(p->url) > 120)? "..." : "");
 
             fp->currentfp = p->headers?
-                  hopen(p->url, "r:", "httphdr:v", p->headers, NULL)
-                : hopen(p->url, "r");
+                  hopen(p->url, "r:",
+                        "httphdr:v", p->headers,
+                        "auth_token_enabled", "false", NULL)
+                : hopen(p->url, "r:", "auth_token_enabled", "false", NULL);
 
             if (fp->currentfp == NULL) return -1;
         }

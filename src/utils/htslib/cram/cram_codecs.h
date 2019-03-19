@@ -2,23 +2,23 @@
 Copyright (c) 2012-2013 Genome Research Ltd.
 Author: James Bonfield <jkb@sanger.ac.uk>
 
-Redistribution and use in source and binary forms, with or without 
+Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
 
-   1. Redistributions of source code must retain the above copyright notice, 
+   1. Redistributions of source code must retain the above copyright notice,
 this list of conditions and the following disclaimer.
 
-   2. Redistributions in binary form must reproduce the above copyright notice, 
-this list of conditions and the following disclaimer in the documentation 
+   2. Redistributions in binary form must reproduce the above copyright notice,
+this list of conditions and the following disclaimer in the documentation
 and/or other materials provided with the distribution.
 
    3. Neither the names Genome Research Ltd and Wellcome Trust Sanger
 Institute nor the names of its contributors may be used to endorse or promote
 products derived from this software without specific prior written permission.
 
-THIS SOFTWARE IS PROVIDED BY GENOME RESEARCH LTD AND CONTRIBUTORS "AS IS" AND 
-ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED 
-WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE 
+THIS SOFTWARE IS PROVIDED BY GENOME RESEARCH LTD AND CONTRIBUTORS "AS IS" AND
+ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
 DISCLAIMED. IN NO EVENT SHALL GENOME RESEARCH LTD OR CONTRIBUTORS BE LIABLE
 FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
 DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
@@ -84,7 +84,6 @@ typedef struct {
 typedef struct {
     int32_t content_id;
     enum cram_external_type type;
-    cram_block *b;
 } cram_external_decoder;
 
 typedef struct {
@@ -95,7 +94,6 @@ typedef struct {
 typedef struct {
     unsigned char stop;
     int32_t content_id;
-    cram_block *b;
 } cram_byte_array_stop_decoder;
 
 typedef struct {
@@ -110,43 +108,48 @@ typedef struct {
 /*
  * A generic codec structure.
  */
+#ifdef __SUNPRO_C
+#  pragma error_messages(off, E_ANONYMOUS_UNION_DECL)
+#endif
 typedef struct cram_codec {
     enum cram_encoding codec;
     cram_block *out;
     void (*free)(struct cram_codec *codec);
     int (*decode)(cram_slice *slice, struct cram_codec *codec,
-		  cram_block *in, char *out, int *out_size);
+                  cram_block *in, char *out, int *out_size);
     int (*encode)(cram_slice *slice, struct cram_codec *codec,
-		  char *in, int in_size);
+                  char *in, int in_size);
     int (*store)(struct cram_codec *codec, cram_block *b, char *prefix,
-		 int version);
-    void (*reset)(struct cram_codec *codec); // used between slices in a container
+                 int version);
 
     union {
-	cram_huffman_decoder         huffman;
-	cram_external_decoder        external;
-	cram_beta_decoder            beta;
-	cram_gamma_decoder           gamma;
-	cram_subexp_decoder          subexp;
-	cram_byte_array_len_decoder  byte_array_len;
-	cram_byte_array_stop_decoder byte_array_stop;
+        cram_huffman_decoder         huffman;
+        cram_external_decoder        external;
+        cram_beta_decoder            beta;
+        cram_gamma_decoder           gamma;
+        cram_subexp_decoder          subexp;
+        cram_byte_array_len_decoder  byte_array_len;
+        cram_byte_array_stop_decoder byte_array_stop;
 
-	cram_huffman_encoder         e_huffman;
-	cram_external_decoder        e_external;
-	cram_byte_array_stop_decoder e_byte_array_stop;
-	cram_byte_array_len_encoder  e_byte_array_len;
-	cram_beta_decoder            e_beta;
+        cram_huffman_encoder         e_huffman;
+        cram_external_decoder        e_external;
+        cram_byte_array_stop_decoder e_byte_array_stop;
+        cram_byte_array_len_encoder  e_byte_array_len;
+        cram_beta_decoder            e_beta;
     };
 } cram_codec;
+#ifdef __SUNPRO_C
+#  pragma error_messages(default, E_ANONYMOUS_UNION_DECL)
+#endif
 
 const char *cram_encoding2str(enum cram_encoding t);
 
 cram_codec *cram_decoder_init(enum cram_encoding codec, char *data, int size,
-			      enum cram_external_type option,
-			      int version);
+                              enum cram_external_type option,
+                              int version);
 cram_codec *cram_encoder_init(enum cram_encoding codec, cram_stats *st,
-			      enum cram_external_type option, void *dat,
-			      int version);
+                              enum cram_external_type option, void *dat,
+                              int version);
 
 //int cram_decode(void *codes, char *in, int in_size, char *out, int *out_size);
 //void cram_decoder_free(void *codes);
@@ -163,9 +166,9 @@ cram_codec *cram_encoder_init(enum cram_encoding codec, cram_stats *st,
 
 static inline int cram_not_enough_bits(cram_block *blk, int nbits) {
     if (nbits < 0 ||
-	(blk->byte >= blk->uncomp_size && nbits > 0) ||
-	(blk->uncomp_size - blk->byte <= INT32_MAX / 8 + 1 &&
-	 (blk->uncomp_size - blk->byte) * 8 + blk->bit - 7 < nbits)) {
+        (blk->byte >= blk->uncomp_size && nbits > 0) ||
+        (blk->uncomp_size - blk->byte <= INT32_MAX / 8 + 1 &&
+         (blk->uncomp_size - blk->byte) * 8 + blk->bit - 7 < nbits)) {
         return 1;
     }
     return 0;

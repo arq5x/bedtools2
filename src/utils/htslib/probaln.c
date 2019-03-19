@@ -29,7 +29,9 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdint.h>
+#include <limits.h>
 #include <math.h>
+#include <errno.h>
 #include "htslib/hts.h"
 
 /*****************************************
@@ -57,7 +59,7 @@ static float g_qual2prob[256];
 
    M[0] points to every {M,I}[k] and every {M,I}[k] points to M[L+1].
 
-   On input, _ref is the reference sequence and _query is the query
+   On input, ref is the reference sequence and query is the query
    sequence. Both are sequences of 0/1/2/3/4 where 4 stands for an
    ambiguous residue. iqual is the base quality. c sets the gap open
    probability, gap extension probability and band width.
@@ -67,37 +69,56 @@ static float g_qual2prob[256];
    lower two bits can be 0 (an alignment match) or 1 (an
    insertion). q[i] gives the phred scaled posterior probability of
    state[i] being wrong.
+
+   Returns phred-scaled likelihood score, or INT_MIN on failure.
  */
-int probaln_glocal(const uint8_t *_ref, int l_ref, const uint8_t *_query, int l_query,
+int probaln_glocal(const uint8_t *ref, int l_ref, const uint8_t *query, int l_query,
                    const uint8_t *iqual, const probaln_par_t *c, int *state, uint8_t *q)
 {
-    double *f, *b = 0, *s, m[9], sI, sM, bI, bM;
-    float *qual, *_qual;
-    const uint8_t *ref, *query;
+    double *f = NULL, *b = NULL, *s = NULL, m[9], sI, sM, bI, bM;
+    float *qual = NULL;
     int bw, bw2, i, k, is_backward = 1, Pr;
 
-    if ( l_ref<=0 || l_query<=0 ) return 0; // FIXME: this may not be an ideal fix, just prevents sefgault
+    if ( l_ref<0 || l_query<0 || l_query >= INT_MAX - 2) {
+        errno = EINVAL;
+        return INT_MIN;
+    }
+    if (l_ref==0 || l_query==0)
+        return 0;  // Is this actually invalid??
 
     /*** initialization ***/
     is_backward = state && q? 1 : 0;
-    ref = _ref - 1; query = _query - 1; // change to 1-based coordinate
     bw = l_ref > l_query? l_ref : l_query;
     if (bw > c->bw) bw = c->bw;
     if (bw < abs(l_ref - l_query)) bw = abs(l_ref - l_query);
     bw2 = bw * 2 + 1;
-    int i_dim = bw2*3+6;
+    size_t i_dim = bw2 < l_ref ? (size_t) bw2*3+6 : (size_t) l_ref*3+6;
+
     // allocate the forward and backward matrices f[][] and b[][] and the scaling array s[]
     // Ideally these callocs would be mallocs + initialisation of the few bits needed.
+    if (SIZE_MAX / (l_query+1) / i_dim < sizeof(double)) {
+        errno = ENOMEM; // Allocation would fail
+        return INT_MIN;
+    }
     f = calloc((l_query+1)*i_dim, sizeof(double));
-    if (is_backward) b = calloc((l_query+1)*i_dim, sizeof(double));
+    if (!f) goto fail;
+    if (is_backward) {
+        b = calloc((l_query+1)*i_dim, sizeof(double));
+        if (!b) goto fail;
+    }
     s = malloc((l_query+2) * sizeof(double)); // s[] is the scaling factor to avoid underflow
+    if (!s) goto fail;
+
     // initialize qual
-    _qual = malloc(l_query * sizeof(float));
+    qual = malloc(l_query * sizeof(float));
+    if (!qual) goto fail;
     if (g_qual2prob[0] == 0)
         for (i = 0; i < 256; ++i)
             g_qual2prob[i] = pow(10, -i/10.);
-    for (i = 0; i < l_query; ++i) _qual[i] = g_qual2prob[iqual? iqual[i] : 30];
-    qual = _qual - 1;
+    qual[0] = 0.0; // Should be unused
+    for (i = 0; i < l_query; ++i)
+        qual[i] = g_qual2prob[iqual? iqual[i] : 30];
+
     // initialize transition probability
     sM = sI = 1. / (2 * l_query + 2); // the value here seems not to affect results; FIXME: need proof
     m[0*3+0] = (1 - c->d - c->d) * (1 - sM); m[0*3+1] = m[0*3+2] = c->d * (1 - sM);
@@ -113,7 +134,7 @@ int probaln_glocal(const uint8_t *_ref, int l_ref, const uint8_t *_query, int l_
         int beg = 1, end = l_ref < bw + 1? l_ref : bw + 1;
         for (k = beg, sum = 0.; k <= end; ++k) {
             int u;
-            double e = (ref[k] > 3 || query[1] > 3)? 1. : ref[k] == query[1]? 1. - qual[1] : qual[1] * EM;
+            double e = (ref[k - 1] > 3 || query[0] > 3)? 1. : ref[k - 1] == query[0]? 1. - qual[0] : qual[0] * EM;
             set_u(u, bw, 1, k);
             fi[u+0] = e * bM; fi[u+1] = EI * bI;
             sum += fi[u] + fi[u+1];
@@ -122,9 +143,9 @@ int probaln_glocal(const uint8_t *_ref, int l_ref, const uint8_t *_query, int l_
     }
     // f[2..l_query]
     for (i = 2; i <= l_query; ++i) {
-        double *fi = &f[i*i_dim], *fi1 = &f[(i-1)*i_dim], sum, qli = qual[i];
+        double *fi = &f[i*i_dim], *fi1 = &f[(i-1)*i_dim], sum, qli = qual[i-1];
         int beg = 1, end = l_ref, x;
-        uint8_t qyi = query[i];
+        uint8_t qyi = query[i - 1];
         x = i - bw; beg = beg > x? beg : x; // band start
         x = i + bw; end = end < x? end : x; // band end
         double E[] = {
@@ -137,7 +158,7 @@ int probaln_glocal(const uint8_t *_ref, int l_ref, const uint8_t *_query, int l_
         for (k = beg, sum = 0.; k <= end; ++k) {
             int u, v11, v01, v10;
             double e;
-            e = E[(ref[k] > 3 || qyi > 3)*2 + (ref[k] == qyi)];
+            e = E[(ref[k - 1] > 3 || qyi > 3)*2 + (ref[k - 1] == qyi)];
             set_u(u, bw, i, k); set_u(v11, bw, i-1, k-1); set_u(v10, bw, i-1, k); set_u(v01, bw, i, k-1);
             fi[u+0] = e * (m[0] * M*fi1[v11+0] + m[3] * M*fi1[v11+1] + m[6] * M*fi1[v11+2]);
             fi[u+1] = EI * (m[1] * M*fi1[v10+0] + m[4] * M*fi1[v10+1]);
@@ -153,7 +174,7 @@ int probaln_glocal(const uint8_t *_ref, int l_ref, const uint8_t *_query, int l_
         for (k = 1, sum = 0.; k <= l_ref; ++k) {
             int u;
             set_u(u, bw, l_query, k);
-            if (u < 3 || u >= bw2*3+3) continue;
+            if (u < 3 || u >= i_dim - 3) continue;
             sum += M*f[l_query*i_dim + u+0] * sM + M*f[l_query*i_dim + u+1] * sI;
         }
         s[l_query+1] = sum; // the last scaling factor
@@ -167,7 +188,7 @@ int probaln_glocal(const uint8_t *_ref, int l_ref, const uint8_t *_query, int l_
         Pr1 += -4.343 * log(p * l_ref * l_query);
         Pr = (int)(Pr1 + .499);
         if (!is_backward) { // skip backward and MAP
-            free(f); free(s); free(_qual);
+            free(f); free(s); free(qual);
             return Pr;
         }
     }
@@ -177,14 +198,14 @@ int probaln_glocal(const uint8_t *_ref, int l_ref, const uint8_t *_query, int l_
         int u;
         double *bi = &b[l_query*i_dim];
         set_u(u, bw, l_query, k);
-        if (u < 3 || u >= bw2*3+3) continue;
+        if (u < 3 || u >= i_dim - 3) continue;
         bi[u+0] = sM / s[l_query] / s[l_query+1]; bi[u+1] = sI / s[l_query] / s[l_query+1];
     }
     // b[l_query-1..1]
     for (i = l_query - 1; i >= 1; --i) {
         int beg = 1, end = l_ref, x, _beg, _end;
-        double *bi = &b[i*i_dim], *bi1 = &b[(i+1)*i_dim], y = (i > 1), qli1 = qual[i+1];
-        uint8_t qyi1 = query[i+1];
+        double *bi = &b[i*i_dim], *bi1 = &b[(i+1)*i_dim], y = (i > 1), qli1 = qual[i];
+        uint8_t qyi1 = query[i];
         x = i - bw; beg = beg > x? beg : x;
         x = i + bw; end = end < x? end : x;
         double E[] = {
@@ -198,7 +219,7 @@ int probaln_glocal(const uint8_t *_ref, int l_ref, const uint8_t *_query, int l_
             int u, v11, v01, v10;
             double e;
             set_u(u, bw, i, k); set_u(v11, bw, i+1, k+1); set_u(v10, bw, i+1, k); set_u(v01, bw, i, k+1);
-            e = (k>=l_ref)?0 :E[(ref[k+1] > 3 || qyi1 > 3)*2 + (ref[k+1] == qyi1)] * bi1[v11];
+            e = (k>=l_ref)?0 :E[(ref[k] > 3 || qyi1 > 3)*2 + (ref[k] == qyi1)] * bi1[v11];
             bi[u+0] = e * m[0] + EI * m[1] * bi1[v10+1] + m[2] * bi[v01+2]; // bi1[v11] has been foled into e.
             bi[u+1] = e * m[3] + EI * m[4] * bi1[v10+1];
             bi[u+2] = (e * m[6] + m[8] * bi[v01+2]) * y;
@@ -213,9 +234,9 @@ int probaln_glocal(const uint8_t *_ref, int l_ref, const uint8_t *_query, int l_
         double sum = 0.;
         for (k = end; k >= beg; --k) {
             int u;
-            double e = (ref[k] > 3 || query[1] > 3)? 1. : ref[k] == query[1]? 1. - qual[1] : qual[1] * EM;
+            double e = (ref[k - 1] > 3 || query[0] > 3)? 1. : ref[k - 1] == query[0]? 1. - qual[0] : qual[0] * EM;
             set_u(u, bw, 1, k);
-            if (u < 3 || u >= bw2*3+3) continue;
+            if (u < 3 || u >= i_dim - 3) continue;
             sum += e * b[1*i_dim + u+0] * bM + EI * b[1*i_dim + u+1] * bI;
         }
         set_u(k, bw, 0, 0);
@@ -242,12 +263,16 @@ int probaln_glocal(const uint8_t *_ref, int l_ref, const uint8_t *_query, int l_
         k = 0;
         set_u(k, bw, 0, 0);
         fprintf(stderr, "(%.10lg,%.10lg) (%d,%d:%c,%c:%d) %lg\n", b[0][k], sum, i-1, max_k>>2,
-                "ACGT"[query[i]], "ACGT"[ref[(max_k>>2)+1]], max_k&3, max); // DEBUG
+                "ACGT"[query[i - 1]], "ACGT"[ref[(max_k>>2)]], max_k&3, max); // DEBUG
 #endif
     }
     /*** free ***/
-    free(f); free(b); free(s); free(_qual);
+    free(f); free(b); free(s); free(qual);
     return Pr;
+
+ fail:
+    free(f); free(b); free(s); free(qual);
+    return INT_MIN;
 }
 
 #ifdef _MAIN

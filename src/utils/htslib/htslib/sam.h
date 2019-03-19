@@ -34,6 +34,9 @@ DEALINGS IN THE SOFTWARE.  */
 extern "C" {
 #endif
 
+/// Highest SAM format version supported by this library
+#define SAM_FORMAT_VERSION "1.6"
+
 /**********************
  *** SAM/BAM header ***
  **********************/
@@ -353,7 +356,10 @@ int sam_index_build3(const char *fn, const char *fnidx, int min_shift, int nthre
     #define sam_itr_destroy(iter) hts_itr_destroy(iter)
     hts_itr_t *sam_itr_queryi(const hts_idx_t *idx, int tid, int beg, int end);
     hts_itr_t *sam_itr_querys(const hts_idx_t *idx, bam_hdr_t *hdr, const char *region);
+    hts_itr_multi_t *sam_itr_regions(const hts_idx_t *idx, bam_hdr_t *hdr, hts_reglist_t *reglist, unsigned int regcount);
+
     #define sam_itr_next(htsfp, itr, r) hts_itr_next((htsfp)->fp.bgzf, (itr), (r), (htsfp))
+    #define sam_itr_multi_next(htsfp, itr, r) hts_itr_multi_next((htsfp), (itr), (r))
 
     /***************
      *** SAM I/O ***
@@ -376,6 +382,7 @@ int sam_index_build3(const char *fn, const char *fnidx, int min_shift, int nthre
     bam_hdr_t *sam_hdr_parse(int l_text, const char *text);
     bam_hdr_t *sam_hdr_read(samFile *fp);
     int sam_hdr_write(samFile *fp, const bam_hdr_t *h) HTS_RESULT_USED;
+    int sam_hdr_change_HD(bam_hdr_t *h, const char *key, const char *val);
 
     int sam_parse1(kstring_t *s, bam_hdr_t *h, bam1_t *b) HTS_RESULT_USED;
     int sam_format1(const bam_hdr_t *h, const bam1_t *b, kstring_t *str) HTS_RESULT_USED;
@@ -481,14 +488,106 @@ int bam_aux_append(bam1_t *b, const char tag[2], char type, int len, const uint8
 */
 int bam_aux_del(bam1_t *b, uint8_t *s);
 
-/// Update a string-type tag
+/// Update or add a string-type tag
 /* @param b    The bam record to update
    @param tag  Tag identifier
    @param len  The length of the new string
    @param data The new string
    @return 0 on success, -1 on failure
+   This function will not change the ordering of tags in the bam record.
+   New tags will be appended to any existing aux records.
+
+   On failure, errno may be set to one of the following values:
+
+   EINVAL: The bam record's aux data is corrupt or an existing tag with the
+   given ID is not of type 'Z'.
+
+   ENOMEM: The bam data needs to be expanded and either the attempt to
+   reallocate the data buffer failed or the resulting buffer would be
+   longer than the maximum size allowed in a bam record (2Gbytes).
 */
 int bam_aux_update_str(bam1_t *b, const char tag[2], int len, const char *data);
+
+/// Update or add an integer tag
+/* @param b    The bam record to update
+   @param tag  Tag identifier
+   @param val  The new value
+   @return 0 on success, -1 on failure
+   This function will not change the ordering of tags in the bam record.
+   New tags will be appended to any existing aux records.
+
+   On failure, errno may be set to one of the following values:
+
+   EINVAL: The bam record's aux data is corrupt or an existing tag with the
+   given ID is not of an integer type (c, C, s, S, i or I).
+
+   EOVERFLOW (or ERANGE on systems that do not have EOVERFLOW): val is
+   outside the range that can be stored in an integer bam tag (-2147483647
+   to 4294967295).
+
+   ENOMEM: The bam data needs to be expanded and either the attempt to
+   reallocate the data buffer failed or the resulting buffer would be
+   longer than the maximum size allowed in a bam record (2Gbytes).
+*/
+int bam_aux_update_int(bam1_t *b, const char tag[2], int64_t val);
+
+/// Update or add a floating-point tag
+/* @param b    The bam record to update
+   @param tag  Tag identifier
+   @param val  The new value
+   @return 0 on success, -1 on failure
+   This function will not change the ordering of tags in the bam record.
+   New tags will be appended to any existing aux records.
+
+   On failure, errno may be set to one of the following values:
+
+   EINVAL: The bam record's aux data is corrupt or an existing tag with the
+   given ID is not of a float type.
+
+   ENOMEM: The bam data needs to be expanded and either the attempt to
+   reallocate the data buffer failed or the resulting buffer would be
+   longer than the maximum size allowed in a bam record (2Gbytes).
+*/
+int bam_aux_update_float(bam1_t *b, const char tag[2], float val);
+
+/// Update or add an array tag
+/* @param b     The bam record to update
+   @param tag   Tag identifier
+   @param type  Data type (one of c, C, s, S, i, I or f)
+   @param items Number of items
+   @param data  Pointer to data
+   @return 0 on success, -1 on failure
+   The type parameter indicates the how the data is interpreted:
+
+   Letter code | Data type | Item Size (bytes)
+   ----------- | --------- | -----------------
+   c           | int8_t    | 1
+   C           | uint8_t   | 1
+   s           | int16_t   | 2
+   S           | uint16_t  | 2
+   i           | int32_t   | 4
+   I           | uint32_t  | 4
+   f           | float     | 4
+
+   This function will not change the ordering of tags in the bam record.
+   New tags will be appended to any existing aux records.  The bam record
+   will grow or shrink in order to accomodate the new data.
+
+   The data parameter must not point to any data in the bam record itself or
+   undefined behaviour may result.
+
+   On failure, errno may be set to one of the following values:
+
+   EINVAL: The bam record's aux data is corrupt, an existing tag with the
+   given ID is not of an array type or the type parameter is not one of
+   the values listed above.
+
+   ENOMEM: The bam data needs to be expanded and either the attempt to
+   reallocate the data buffer failed or the resulting buffer would be
+   longer than the maximum size allowed in a bam record (2Gbytes).
+*/
+int bam_aux_update_array(bam1_t *b, const char tag[2],
+                         uint8_t type, uint32_t items, void *data);
 
 /**************************
  *** Pileup and Mpileup ***
@@ -599,6 +698,47 @@ typedef struct __bam_mplp_t *bam_mplp_t;
  ***********************************/
 
 int sam_cap_mapq(bam1_t *b, const char *ref, int ref_len, int thres);
+
+/// Calculate BAQ scores
+/** @param b   BAM record
+    @param ref     Reference sequence
+    @param ref_len Reference sequence length
+    @param flag    Flags, see description
+    @return 0 on success \n
+           -1 if the read was unmapped, zero length, had no quality values, did not have at least one M, X or = CIGAR operator, or included a reference skip. \n
+           -3 if BAQ alignment has already been done and does not need to be applied, or has already been applied. \n
+           -4 if alignment failed (most likely due to running out of memory)
+
+This function calculates base alignment quality (BAQ) values using the method
+described in "Improving SNP discovery by base alignment quality", Heng Li,
+Bioinformatics, Volume 27, Issue 8 (https://doi.org/10.1093/bioinformatics/btr076).
+
+The following @param flag bits can be used:
+
+Bit 0: Adjust the quality values using the BAQ values
+
+ If set, the data in the BQ:Z tag is used to adjust the quality values, and
+ the BQ:Z tag is renamed to ZQ:Z.
+
+ If clear, and a ZQ:Z tag is present, the quality values are reverted using
+ the data in the tag, and the tag is renamed to BQ:Z.
+
+Bit 1: Use "extended" BAQ.
+
+ Changes the BAQ calculation to increase sensitivity at the expense of
+ reduced specificity.
+
+Bit 2: Recalculate BAQ, even if a BQ tag is present.
+
+ Force BAQ to be recalculated.  Note that a ZQ:Z tag will always disable
+ recalculation.
+
+@bug
+If the input read has both BQ:Z and ZQ:Z tags, the ZQ:Z one will be removed.
+Depending on what previous processing happened, this may or may not be the
+correct thing to do.  It would be wise to avoid this situation if possible.
+*/
+
 int sam_prob_realn(bam1_t *b, const char *ref, int ref_len, int flag);
 
 #ifdef __cplusplus

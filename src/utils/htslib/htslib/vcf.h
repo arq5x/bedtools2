@@ -802,8 +802,13 @@ typedef struct {
 
     /**
      *  bcf_index_build() - Generate and save an index file
-     *  @fn:         Input VCF/BCF filename
-     *  @min_shift:  Positive to generate CSI, or 0 to generate TBI
+     *  @fn:         Input VCF(compressed)/BCF filename
+     *  @min_shift:  log2(width of the smallest bin), e.g. a value of 14
+     *  imposes a 16k base lower limit on the width of index bins.
+     *  Positive to generate CSI, or 0 to generate TBI. However, a small
+     *  value of min_shift would create a large index, which would lead to
+     *  reduced performance when using the index. A recommended value is 14.
+     *  For BCF files, only the CSI index can be generated.
      *
      *  Returns 0 if successful, or negative if an error occurred.
      *

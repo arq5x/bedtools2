@@ -231,6 +231,8 @@ enum hts_fmt_option {
     CRAM_OPT_REQUIRED_FIELDS,
     CRAM_OPT_LOSSY_NAMES,
     CRAM_OPT_BASES_PER_SLICE,
+    CRAM_OPT_STORE_MD,
+    CRAM_OPT_STORE_NM,
 
     // General purpose
     HTS_OPT_COMPRESSION_LEVEL = 100,
@@ -523,10 +525,29 @@ struct __hts_idx_t;
 typedef struct __hts_idx_t hts_idx_t;
 
 typedef struct {
+    uint32_t beg, end;
+} hts_pair32_t;
+
+typedef struct {
     uint64_t u, v;
 } hts_pair64_t;
 
+typedef struct {
+    uint64_t u, v;
+    uint64_t max;
+} hts_pair64_max_t;
+
+typedef struct {
+    const char *reg;
+    int tid;
+    hts_pair32_t *intervals;
+    uint32_t count;
+    uint32_t min_beg, max_end;
+} hts_reglist_t;
+
 typedef int hts_readrec_func(BGZF *fp, void *data, void *r, int *tid, int *beg, int *end);
+typedef int hts_seek_func(void *fp, int64_t offset, int where);
+typedef int64_t hts_tell_func(void *fp);
 
 typedef struct {
     uint32_t read_rest:1, finished:1, is_cram:1, dummy:29;
@@ -540,6 +561,24 @@ typedef struct {
         int *a;
     } bins;
 } hts_itr_t;
+
+typedef struct {
+    int key;
+    uint64_t min_off, max_off;
+} aux_key_t;
+
+typedef struct {
+    uint32_t read_rest:1, finished:1, is_cram:1, nocoor:1, dummy:28;
+    hts_reglist_t *reg_list;
+    int n_reg, i;
+    int curr_tid, curr_intv, curr_beg, curr_end, curr_reg;
+    hts_pair64_max_t *off;
+    int n_off;
+    uint64_t curr_off, nocoor_off;
+    hts_readrec_func *readrec;
+    hts_seek_func *seek;
+    hts_tell_func *tell;
+} hts_itr_multi_t;
 
     #define hts_bin_first(l) (((1<<(((l)<<1) + (l))) - 1) / 7)
     #define hts_bin_parent(l) (((l) - 1) >> 3)
@@ -649,6 +688,19 @@ const char *hts_parse_reg(const char *str, int *beg, int *end);
     int hts_itr_next(BGZF *fp, hts_itr_t *iter, void *r, void *data) HTS_RESULT_USED;
     const char **hts_idx_seqnames(const hts_idx_t *idx, int *n, hts_id2name_f getid, void *hdr); // free only the array, not the values
 
+/**********************************
+ * Iterator with multiple regions *
+ **********************************/
+
+typedef hts_itr_multi_t *hts_itr_multi_query_func(const hts_idx_t *idx, hts_itr_multi_t *itr);
+hts_itr_multi_t *hts_itr_multi_bam(const hts_idx_t *idx, hts_itr_multi_t *iter);
+hts_itr_multi_t *hts_itr_multi_cram(const hts_idx_t *idx, hts_itr_multi_t *iter);
+hts_itr_multi_t *hts_itr_regions(const hts_idx_t *idx, hts_reglist_t *reglist, int count, hts_name2id_f getid, void *hdr, hts_itr_multi_query_func *itr_specific, hts_readrec_func *readrec, hts_seek_func *seek, hts_tell_func *tell);
+int hts_itr_multi_next(htsFile *fd, hts_itr_multi_t *iter, void *r);
+void hts_reglist_free(hts_reglist_t *reglist, int count);
+void hts_itr_multi_destroy(hts_itr_multi_t *iter);
+
+
     /**
      * hts_file_type() - Convenience function to determine file type
      * DEPRECATED:  This function has been replaced by hts_detect_format().
@@ -683,14 +735,39 @@ void errmod_destroy(errmod_t *em);
 int errmod_cal(const errmod_t *em, int n, int m, uint16_t *bases, float *q);
 
 
-/*****************************************
- * Probabilistic banded glocal alignment *
- *****************************************/
+/*****************************************************
+ * Probabilistic banded glocal alignment             *
+ * See https://doi.org/10.1093/bioinformatics/btr076 *
+ *****************************************************/
 
 typedef struct probaln_par_t {
     float d, e;
     int bw;
 } probaln_par_t;
+
+/// Perform probabilistic banded glocal alignment
+/** @param      ref     Reference sequence
+    @param      l_ref   Length of reference
+    @param      query   Query sequence
+    @param      l_query Length of query sequence
+    @param      iqual   Query base qualities
+    @param      c       Alignment parameters
+    @param[out] state   Output alignment
+    @param[out] q    Phred scaled posterior probability of state[i] being wrong
+    @return     Phred-scaled likelihood score, or INT_MIN on failure.
+
+The reference and query sequences are coded using integers 0,1,2,3,4 for
+bases A,C,G,T,N respectively (N here is for any ambiguity code).
+
+On output, state and q are arrays of length l_query. The higher 30
+bits give the reference position the query base is matched to and the
+lower two bits can be 0 (an alignment match) or 1 (an
+insertion). q[i] gives the phred scaled posterior probability of
+state[i] being wrong.
+
+On failure, errno will be set to EINVAL if the values of l_ref or l_query
+were invalid; or ENOMEM if a memory allocation failed.
+*/
 
 int probaln_glocal(const uint8_t *ref, int l_ref, const uint8_t *query, int l_query, const uint8_t *iqual, const probaln_par_t *c, int *state, uint8_t *q);
 
