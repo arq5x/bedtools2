@@ -225,19 +225,19 @@ void window_help(void) {
 
     cerr << "\t-w\t"            << "Base pairs added upstream and downstream of each entry" << endl;
     cerr                        << "\t\tin A when searching for overlaps in B." << endl;
-    cerr                        << "\t\t- Creates symterical \"windows\" around A." << endl;
+    cerr                        << "\t\t- Creates symmetrical \"windows\" around A." << endl;
     cerr                        << "\t\t- Default is 1000 bp." << endl;
     cerr                        << "\t\t- (INTEGER)" << endl << endl;
 
     cerr << "\t-l\t"            << "Base pairs added upstream (left of) of each entry" << endl;
     cerr                        << "\t\tin A when searching for overlaps in B." << endl;
-    cerr                        << "\t\t- Allows one to define assymterical \"windows\"." << endl;
+    cerr                        << "\t\t- Allows one to define asymmetrical \"windows\"." << endl;
     cerr                        << "\t\t- Default is 1000 bp." << endl;
     cerr                        << "\t\t- (INTEGER)" << endl << endl;
 
     cerr << "\t-r\t"            << "Base pairs added downstream (right of) of each entry" << endl;
     cerr                        << "\t\tin A when searching for overlaps in B." << endl;
-    cerr                        << "\t\t- Allows one to define assymterical \"windows\"." << endl;
+    cerr                        << "\t\t- Allows one to define asymmetrical \"windows\"." << endl;
     cerr                        << "\t\t- Default is 1000 bp." << endl;
     cerr                        << "\t\t- (INTEGER)" << endl << endl;
 

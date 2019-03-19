@@ -46,10 +46,10 @@ void BedCluster::ClusterBed() {
         if (_bed->_status != BED_VALID)
             continue;            
 
+        int distance = ((int) curr.start - end);
+        
         // new cluster, no overlap
-        if ( (((int) curr.start - end) > _maxDistance) || 
-             (curr.chrom != prev.chrom)
-           ) 
+        if ( (distance > _maxDistance) || (curr.chrom != prev.chrom) ) 
         {
             cluster_id++;
             end   = curr.end;

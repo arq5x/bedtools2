@@ -39,6 +39,10 @@ void reverseComplement(string &seq) {
             case 'T':
                 seq[i] = 'A';
                 break;
+            // issue 682
+            case 'U':  
+                seq[i] = 'A';
+                break;
             case 'a':
                 seq[i] = 't';
                 break;
@@ -49,6 +53,10 @@ void reverseComplement(string &seq) {
                 seq[i] = 'c';
                 break;
             case 't':
+                seq[i] = 'a';
+                break;
+            // issue 682
+            case 'u':  
                 seq[i] = 'a';
                 break;
 
@@ -185,6 +193,8 @@ void getDnaContent(const string &seq, int &a, int &c, int &g, int &t, int &n, in
                 break;
             case 'T':
             case 't':
+            case 'U':
+            case 'u':
                 t++;
                 break;
             case 'N':

@@ -513,6 +513,7 @@ void RecordOutputMgr::null(bool queryType, bool dbType)
 		(static_cast<GffRecord *>(dummyRecord))->setNumFields((static_cast<ContextIntersect *>(_context))->getMaxNumDatabaseFields());
 		break;
 	default:
+		dummyRecord = new Bed3Interval();
 		break;
 	}
 	if (dummyRecord) {

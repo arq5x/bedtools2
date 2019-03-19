@@ -281,7 +281,7 @@ Assaf.
 ----------------------------------------------------------------------------
 Support for “split” or “spliced” BAM alignments and “blocked” BED features
 ----------------------------------------------------------------------------
-As of Version 2.8.0, five bedtools (``intersect``, ``coverage``, ``genomecob``,
+As of Version 2.8.0, five bedtools (``intersect``, ``coverage``, ``genomecov``,
 ``bamToBed``, and ``bed12ToBed6``) can properly handle “split”/”spliced” BAM alignments (i.e., having an
 “N” CIGAR operation) and/or “blocked” BED (aka BED12) features.
 

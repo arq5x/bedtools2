@@ -26,7 +26,7 @@ the `releases <https://github.com/arq5x/bedtools2/releases>`_ tab.
 The following commands will install ``bedtools`` in a local directory on an UNIX or OS X machine.
 
 .. note::
-    1. This example is based on version 2.25.0. For future releasese, you should replace 
+    1. This example is based on version 2.25.0. For future releases, you should replace
     the version number with the version you intend to install.
     
     2. The bedtools Makefiles utilize the GCC compiler. One should edit the

@@ -20,7 +20,7 @@ Usage:
 ===========================      ===============================================================================================================================================================================================================
 **-mapq**				         Set a mapping quality (SAM MAPQ field) value for all BED entries. *Default: 255*			 
 **-ubam**					     Write uncompressed BAM output. The default is write compressed BAM output.
-**-bed12**                       Indicate that the input BED file is in BED12 (a.k.a "blocked" BED) format. In this case, bedToBam will convert blocked BED features (e.g., gene annotaions) into "spliced" BAM alignments by creating an appropriate CIGAR string.
+**-bed12**                       Indicate that the input BED file is in BED12 (a.k.a "blocked" BED) format. In this case, bedToBam will convert blocked BED features (e.g., gene annotations) into "spliced" BAM alignments by creating an appropriate CIGAR string.
 ===========================      ===============================================================================================================================================================================================================
 
 
