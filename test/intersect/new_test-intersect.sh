@@ -12,6 +12,17 @@ check()
 	fi
 }
 
+bam_check() 
+{
+	if diff <(samtools view $1) <(samtools view $2) 
+	then
+		echo ok
+	else
+		FAILURES$(expr $FAILURES + 1);
+		echo fail
+	fi
+}
+
 ###########################################################
 #  Test intersection of a as bed from file vs b as bed from file
 ############################################################
@@ -161,7 +172,7 @@ rm obs exp
 ############################################################
 echo -e "    intersect.new.t13...\c"
 $BT intersect -a a.bam -b b.bed> obs
-check obs aVSb.bam
+bam_check obs aVSb.bam
 rm obs
 
 
@@ -170,7 +181,7 @@ rm obs
 ############################################################
 echo -e "    intersect.new.t14...\c"
 $BT intersect -a - -b b.bed < a.bam> obs
-check obs aVSb.bam
+bam_check obs aVSb.bam
 rm obs
 
 
@@ -179,7 +190,7 @@ rm obs
 ############################################################
 echo -e "    intersect.new.t15...\c"
 cat a.bam | $BT intersect -a - -b b.bed> obs
-check obs aVSb.bam
+bam_check obs aVSb.bam
 rm obs
 
 
@@ -188,7 +199,7 @@ rm obs
 ############################################################
 echo -e "    intersect.new.t16...\c"
 $BT intersect -a <(cat a.bam) -b b.bed > obs
-check obs aVSb.bam
+bam_check obs aVSb.bam
 rm obs
 
 
@@ -888,6 +899,18 @@ echo \
 1	400	500	a3	az	.	.	-1	-1	.	.	0
 2	500	600	a4	aq	.	.	-1	-1	.	.	0" > exp
 $BT intersect -a null_a.bed -b null_b.bed null_c.bed -wao -names b c > obs
+check exp obs
+rm exp obs
+[[ $FAILURES -eq 0 ]] || exit 1;
+
+###########################################################
+#  Test intersect with cram
+############################################################
+echo -e "    intersect.new.t73...\c"
+echo \
+"FCC1MK2ACXX:2:2110:4301:28831#	99	chr1	10004	0	100M	=	10047	140	CCCTAACCCTAACCCTAACCCTAACCCTAACCCTAACCCTAACCCTAACCCTAACCCTAACCCTAACCCTAACCCTAACCCTAACCCTAACCCTAACCCT	CCCFFFFFHHHHHJJIJJJJIGIIIJIGIGJJJJIJJJJIJIIJJDIIIJJIJEHEE@GAHHGE@CEFB;A>AB=??5?B?2?<ABDAD9ABBBC9ABDA	PG:Z:novoalign	AM:i:2	SM:i:2	MQ:i:0	PQ:i:219	UQ:i:0	AS:i:0	MD:Z:100	NM:i:0	RG:Z:NCH411GBM_CD133low
+FCC1MK2ACXX:2:2110:4301:28831#	147	chr1	10047	0	3S97M	=	10004	-140	AACCCTACCCCTACCCCTAACCCTACCCCTACCCCTACCCCTACCCCTACCCCTACCCCTACCCCTACCCTAACCCTAACCCTAACCCTAACCCTAACCC	###?<55-@?250&A?882(@?795&B?8;;/?8('9'A?;8?8C;(<A@FB-/7'F?((@0D:)*9JIIHFCJJJIHFJJJIHEJJHHFFHFFFDDCCB	PG:Z:novoalign	AM:i:2	SM:i:70	MQ:i:0	PQ:i:219	UQ:i:194	AS:i:194	MD:Z:4A5A11A5A5A5A5A5A5A3A34	NM:i:10	RG:Z:NCH411GBM_CD133low" > exp
+CRAM_REFERENCE=test_ref.fa $BT intersect -a a.cram -b b.cram | samtools view -T test_ref.fa - > obs
 check exp obs
 rm exp obs
 [[ $FAILURES -eq 0 ]] || exit 1;

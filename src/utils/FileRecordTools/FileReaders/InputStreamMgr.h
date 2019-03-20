@@ -12,8 +12,8 @@
 #include "InflateStreamBuf.h"
 #include "string.h"
 #include "api/BamReader.h"
-#include "api/internal/io/BgzfStream_p.h"
 
+#include <bgzf.h>
 #include <iostream>
 
 using namespace std;
@@ -35,6 +35,7 @@ public:
 	bool isGzipped() const { return _isGzipped; }
 	bool isBGzipped() const { return _isBgzipped; }
 	bool isBam() const { return _isBam; }
+	bool isCram() const { return _isCram; }
 
 	bool isCompressed() const { return _isGzipped || _isBgzipped || _isBam; }
 	PushBackStreamBuf *getPushBackStreamBuf() const {return _pushBackStreamBuf; }
@@ -55,6 +56,7 @@ private:
 	bool _isStdin;
 	bool _isGzipped;
 	bool _isBam;
+	bool _isCram;
 	bool _isBgzipped;
 	char *_tmpZipBuf;
 	bool _bamRuledOut;
@@ -65,7 +67,7 @@ private:
 	static const int MIN_SCAN_BUFFER_SIZE = 2048;
 	int _numBytesInBuffer; //this will hold the length of the buffer after the scan.
 	BamTools::BamReader *_bamReader;
-	BamTools::Internal::BgzfStream *_bgStream;
+	BGZF* _bgStream;
 	bool _eofHit;
 
 	static const char *FIFO_STRING_LITERAL;

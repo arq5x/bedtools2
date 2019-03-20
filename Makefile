@@ -10,17 +10,21 @@ VERSION_FILE=./src/utils/version/version_git.h
 RELEASED_VERSION_FILE=./src/utils/version/version_release.txt
 
 
-
 # define our object and binary directories
+ifeq ($(VERBOSE),1)
+export CCPREFIX = 
+else
+export CCPREFIX = @
+endif
 export OBJ_DIR	= obj
 export BIN_DIR	= bin
-export SRC_DIR	= src
+export SRC_DIR	= $(shell readlink -f src)
 export UTIL_DIR	= src/utils
 export CXX		= g++
 ifeq ($(DEBUG),1)
-export CXXFLAGS = -Wall -Wextra -DDEBUG -D_DEBUG -g -O0 -D_FILE_OFFSET_BITS=64 -fPIC $(INCLUDES)
+export CXXFLAGS = -Wall -Wextra -DDEBUG -D_DEBUG -g -O0 -D_FILE_OFFSET_BITS=64 -DWITH_HTS_CB_API $(INCLUDES) 
 else
-export CXXFLAGS = -Wall -O2 -D_FILE_OFFSET_BITS=64 -fPIC $(INCLUDES)
+export CXXFLAGS = -g -Wall -O2 -D_FILE_OFFSET_BITS=64 -DWITH_HTS_CB_API $(INCLUDES)
 endif
 
 # If the user has specified to do so, tell the compile to use rand() (instead of mt19937).
@@ -30,7 +34,7 @@ else
 export CXXFLAGS += -std=c++11
 endif 
 
-export LIBS		= -lz
+export LIBS		= -lz -lm -lbz2 -llzma -lpthread
 export BT_ROOT  = src/utils/BamTools/
 
 prefix ?= /usr/local
@@ -97,7 +101,6 @@ UTIL_SUBDIRS =	$(SRC_DIR)/utils/FileRecordTools \
 				$(SRC_DIR)/utils/NewChromsweep \
 				$(SRC_DIR)/utils/sequenceUtilities \
 				$(SRC_DIR)/utils/tabFile \
-				$(SRC_DIR)/utils/BamTools \
 				$(SRC_DIR)/utils/BamTools-Ancillary \
 				$(SRC_DIR)/utils/BlockedIntervals \
 				$(SRC_DIR)/utils/Fasta \
@@ -105,7 +108,8 @@ UTIL_SUBDIRS =	$(SRC_DIR)/utils/FileRecordTools \
 				$(SRC_DIR)/utils/GenomeFile \
 				$(SRC_DIR)/utils/RecordOutputMgr \
 				$(SRC_DIR)/utils/ToolBase \
-				$(SRC_DIR)/utils/driver
+				$(SRC_DIR)/utils/driver \
+				$(SRC_DIR)/utils/htslib
 
 BUILT_OBJECTS = $(OBJ_DIR)/*.o
 
@@ -128,9 +132,7 @@ INCLUDES =	-I$(SRC_DIR)/utils/bedFile \
 				-I$(SRC_DIR)/utils/NewChromsweep \
 				-I$(SRC_DIR)/utils/sequenceUtilities \
 				-I$(SRC_DIR)/utils/tabFile \
-				-I$(SRC_DIR)/utils/BamTools \
 				-I$(SRC_DIR)/utils/BamTools/include \
-				-I$(SRC_DIR)/utils/BamTools/src \
 				-I$(SRC_DIR)/utils/BamTools-Ancillary \
 				-I$(SRC_DIR)/utils/BlockedIntervals \
 				-I$(SRC_DIR)/utils/Fasta \
@@ -139,12 +141,13 @@ INCLUDES =	-I$(SRC_DIR)/utils/bedFile \
 				-I$(SRC_DIR)/utils/RecordOutputMgr \
 				-I$(SRC_DIR)/utils/ToolBase \
 				-I$(SRC_DIR)/utils/driver \
+				-I$(SRC_DIR)/utils/htslib/htslib
 
 
 all: print_banner $(OBJ_DIR) $(BIN_DIR) autoversion $(UTIL_SUBDIRS) $(SUBDIRS)
 	@echo "- Building main bedtools binary."
-	@$(CXX) $(CXXFLAGS) $(CPPFLAGS) -c src/bedtools.cpp -o obj/bedtools.o $(INCLUDES)
-	@$(CXX) $(CXXFLAGS) $(CPPFLAGS) -o $(BIN_DIR)/bedtools $(BUILT_OBJECTS) -L$(UTIL_DIR)/BamTools/lib/ -lbamtools $(LIBS) $(LDFLAGS) $(INCLUDES)
+	$(CCPREFIX) $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c src/bedtools.cpp -o obj/bedtools.o $(INCLUDES)
+	$(CCPREFIX) $(CXX) -o $(BIN_DIR)/bedtools $(BUILT_OBJECTS) $(SRC_DIR)/utils/htslib/libhts.a $(LIBS) $(LDFLAGS)
 	@echo "done."
 
 	@echo "- Creating executables for old CLI."
@@ -172,12 +175,6 @@ $(OBJ_DIR) $(BIN_DIR):
 	@mkdir -p $@
 
 
-# One special case: All (or almost all) programs requires the BamTools API files to be created first.
-.PHONY: bamtools_api
-bamtools_api:
-	@$(MAKE) --no-print-directory --directory=$(BT_ROOT) api
-$(UTIL_SUBDIRS) $(SUBDIRS): bamtools_api
-
 
 # even though these are real directories, treat them as phony targets, forcing to always go in them are re-make.
 # a future improvement would be the check for the compiled object, and rebuild only if the source code is newer.
@@ -187,9 +184,9 @@ $(UTIL_SUBDIRS) $(SUBDIRS): $(OBJ_DIR) $(BIN_DIR)
 	@$(MAKE) --no-print-directory --directory=$@
 
 clean:
-	@$(MAKE) --no-print-directory --directory=$(BT_ROOT) clean_api
 	@echo " * Cleaning up."
 	@rm -f $(VERSION_FILE) $(OBJ_DIR)/* $(BIN_DIR)/*
+	@cd src/utils/htslib && make clean > /dev/null
 .PHONY: clean
 
 test: all

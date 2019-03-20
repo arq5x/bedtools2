@@ -1,0 +1,13 @@
+@HD	VN:1.4	SO:coordinate
+@SQ	SN:xx	LN:20	AS:?	SP:?	UR:?	M5:bbf4de6d8497a119dda6e074521643dc
+@RG	ID:x1	SM:x1
+@RG	ID:x2	SM:x2	LB:x	PG:foo:bar	PI:1111
+@PG	ID:emacs	PN:emacs	VN:23.1.1
+@CO	also test
+@CO	other	headers
+a1	16	xx	1	1	10M	*	0	0	AAAAAAAAAA	**********	RG:Z:x1
+b1	16	xx	1	1	10M	*	0	0	AAAAAAAAAA	**********	RG:Z:x2
+c1	16	xx	1	1	10M	*	0	0	AAAAAAAAAA	**********
+a2	16	xx	11	1	10M	*	0	0	TTTTTTTTTT	**********	RG:Z:x1
+b2	16	xx	11	1	10M	*	0	0	TTTTTTTTTT	**********	RG:Z:x2
+c2	16	xx	11	1	10M	*	0	0	TTTTTTTTTT	**********

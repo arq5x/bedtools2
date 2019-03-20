@@ -1,5 +1,9 @@
 set -e; # Alert user to any uncaught error
 
+ulimit -c unlimited
+
+export LD_LIBRARY_PATH=/home/haohou/base2/htslib
+
 STARTWD=$(pwd);
 TOOL_PASSES="";
 TOOL_FAILURES="";

@@ -1,0 +1,8 @@
+@SQ	SN:c1	LN:10
+s0a	0	c1	1	0	10M	*	0	0	AACCGCGGTT	**********
+s0A	0	c1	1	0	3M4N3M	*	0	0	AACGTT	******
+s0b	0	c1	2	0	1S8M1S	*	0	0	AACCGCGGTT	**********
+s0B	0	c1	2	0	1H8M1H	*	0	0	ACCGCGGT	********
+s0c	0	c1	3	0	2S6M2S	*	0	0	AACCGCGGTT	**********
+s0c	0	c1	3	0	2S3M2I3M2S	*	0	0	AACCGNNCGGTT	************
+s0C	0	c1	3	0	2H6M2H	*	0	0	CCGCGG	******

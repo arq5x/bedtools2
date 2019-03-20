@@ -40,40 +40,23 @@ int str2chrPos(const string &str);
 template<class T>
 void int2str(int number, T& buffer, bool appendToBuf = false)
 {
-	if (number == 0) {
-		if (appendToBuf) {
-			buffer.append("0");
-		} else {
-			buffer = "0";
-		}
+	if(number == 0) 
+	{
+		if(appendToBuf) buffer.append("0");
+		else buffer.assign("0", 1);
 		return;
 	}
-	//check for negative numbers.
-	bool isNegative = number < 0;
-	unsigned useNum = number;
-	if (isNegative) {
-		useNum = 0 - useNum; //convert to positive.
-	}
+	char tmp[12];
 
-	char tmpBuffer[numeric_limits<int>::digits10 + 3];
-	char *tmpBuf = &tmpBuffer[sizeof tmpBuffer];
-	*--tmpBuf = '\0';
+	bool neg = number < 0;
+	if(neg) number = -number;
+	uint32_t n;
+	for(n = 0; number; number /= 10)
+		tmp[12 - ++n] = number % 10 + '0';
+	if(neg) tmp[12 - ++n] = '-';
 
-	while (useNum > 0) {
-		*--tmpBuf = (useNum % 10) + '0';
-		useNum /= 10;
-	}
-
-	if (isNegative) {
-		*--tmpBuf = '-';
-	}
-
-	if (!appendToBuf) {
-		buffer = tmpBuf;
-	} else {
-		buffer.append(tmpBuf);
-	}
-
+	if(appendToBuf) buffer.append(tmp + 12 - n, n);
+	else buffer.assign(tmp + 12 - n, n);
 }
 
 bool isHeaderLine(const string &line);

@@ -168,7 +168,7 @@ void MultiCovBam::CollectCoverage()
                             if (_obeySplits == false) {
                                 // enforce fractional overlap
                                 int al_end = al.GetEndPosition(false, false);
-                                CHRPOS s = max(al.Position, (int) bed.start);
+                                CHRPOS s = max((int)al.Position, (int) bed.start);
                                 CHRPOS e = min(al_end, (int) bed.end);
                                 CHRPOS aLength = (bed.end - bed.start);
                                 CHRPOS bLength = (al_end - al.Position);

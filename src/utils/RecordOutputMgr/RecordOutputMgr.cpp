@@ -65,7 +65,13 @@ void RecordOutputMgr::init(ContextBase *context) {
 		_bamWriter->SetCompressionMode(_context->getUncompressedBam() ?  BamTools::BamWriter::Uncompressed : BamTools::BamWriter::Compressed);
 
 		int bamFileIdx = _context->getBamHeaderAndRefIdx();
-		_bamWriter->Open("stdout", _context->getFile(bamFileIdx)->getHeader().c_str(), _context->getFile(bamFileIdx)->getBamReferences());
+
+		if(!_context->isCram())
+			_bamWriter->Open("stdout", _context->getFile(bamFileIdx)->getHeader().c_str(), _context->getFile(bamFileIdx)->getBamReferences());
+		else
+			_bamWriter->Open("stdout", _context->getFile(bamFileIdx)->getHeader().c_str(), 
+					                   _context->getFile(bamFileIdx)->getBamReferences(), 
+									   _context->getFile(bamFileIdx)->getCramRefs());
 	} else {
 		//for everything but BAM, we'll copy output to an output buffer before printing.
 		_outBuf.reserve(MAX_OUTBUF_SIZE);

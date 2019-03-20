@@ -1,0 +1,178 @@
+.TH bgzip 1 "18 July 2018" "htslib-1.9" "Bioinformatics tools"
+.SH NAME
+.PP
+bgzip \- Block compression/decompression utility
+.\"
+.\" Copyright (C) 2009-2011 Broad Institute.
+.\" Copyright (C) 2018 Genome Research Limited.
+.\"
+.\" Author: Heng Li <lh3@sanger.ac.uk>
+.\"
+.\" Permission is hereby granted, free of charge, to any person obtaining a
+.\" copy of this software and associated documentation files (the "Software"),
+.\" to deal in the Software without restriction, including without limitation
+.\" the rights to use, copy, modify, merge, publish, distribute, sublicense,
+.\" and/or sell copies of the Software, and to permit persons to whom the
+.\" Software is furnished to do so, subject to the following conditions:
+.\"
+.\" The above copyright notice and this permission notice shall be included in
+.\" all copies or substantial portions of the Software.
+.\"
+.\" THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+.\" IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+.\" FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+.\" THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+.\" LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+.\" FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+.\" DEALINGS IN THE SOFTWARE.
+.\"
+.
+.\" For code blocks and examples (cf groff's Ultrix-specific man macros)
+.de EX
+
+.  in +\\$1
+.  nf
+.  ft CR
+..
+.de EE
+.  ft
+.  fi
+.  in
+
+..
+.SH SYNOPSIS
+.PP
+.B bgzip
+.RB [ -cdfhir ]
+.RB [ -b
+.IR virtualOffset ]
+.RB [ -I
+.IR index_name ]
+.RB [ -l
+.IR compression_level ]
+.RB [ -s
+.IR size ]
+.RB [ -@
+.IR threads ]
+.RI [ file ]
+.PP
+.SH DESCRIPTION
+.PP
+Bgzip compresses files in a similar manner to, and compatible with, gzip(1).
+The file is compressed into a series of small (less than 64K) 'BGZF' blocks.
+This allows indexes to be built against the compressed file and used to
+retrieve portions of the data without having to decompress the entire file. 
+
+If no files are specified on the command line, bgzip will compress (or
+decompress if the -d option is used) standard input to standard output.
+If a file is specified, it will be compressed (or decompressed with -d).
+If the -c option is used, the result will be written to standard output,
+otherwise when compressing bgzip will write to a new file with a .gz
+suffix and remove the original.  When decompressing the input file must
+have a .gz suffix, which will be removed to make the output name.  Again
+after decompression completes the input file will be removed.
+
+.SH OPTIONS
+.TP 10
+.BI "-b, --offset " INT
+Decompress to standard output from virtual file position (0-based uncompressed
+offset).
+Implies -c and -d.
+.TP
+.B "-c, --stdout"
+Write to standard output, keep original files unchanged.
+.TP
+.B "-d, --decompress"
+Decompress.
+.TP
+.B "-f, --force"
+Overwrite files without asking.
+.TP
+.B "-h, --help"
+Displays a help message.
+.TP
+.B "-i, --index"
+Create a BGZF index while compressing.
+Unless the -I option is used, this will have the name of the compressed
+file with .gzi appended to it.
+.TP
+.BI "-I, --index-name " FILE
+Index file name.
+.TP
+.BI "-l, --compress-level " INT
+Compression level to use when compressing.
+From 0 to 9, or -1 for the default level set by the compression library. [-1]
+.TP
+.B "-r, --reindex"
+Rebuild the index on an existing compressed file.
+.TP
+.B "-g, --rebgzip"
+Try to use an existing index to create a compressed file with matching
+block offsets.
+Note that this assumes that the same compression library and level are in use
+as when making the original file.
+Don't use it unless you know what you're doing.
+.TP
+.BI "-s, --size " INT
+Decompress INT bytes (uncompressed size) to standard output.
+Implies -c.
+.TP
+.BI "-@, --threads " INT
+Number of threads to use [1].
+.PP
+
+.SH BGZF FORMAT
+The BGZF format written by bgzip is described in the SAM format specification
+available from http://samtools.github.io/hts-specs/SAMv1.pdf.
+
+It makes use of a gzip feature which allows compressed files to be
+concatenated.
+The input data is divided into blocks which are no larger than 64 kilobytes
+both before and after compression (including compression headers).
+Each block is compressed into a gzip file.
+The gzip header includes an extra sub-field with identifier 'BC' and the length
+of the compressed block, including all headers.
+
+.SH GZI FORMAT
+The index format is a binary file listing pairs of compressed and
+uncompressed offsets in a BGZF file.
+Each compressed offset points to the start of a BGZF block.
+The uncompressed offset is the corresponding location in the uncompressed
+data stream.
+
+All values are stored as little-endian 64-bit unsigned integers.
+
+The file contents are:
+.EX 4
+uint64_t number_entries
+.EE
+followed by number_entries pairs of:
+.EX 4
+uint64_t compressed_offset
+uint64_t uncompressed_offset
+.EE
+
+.SH EXAMPLES
+.EX 4
+# Compress stdin to stdout
+bgzip < /usr/share/dict/words > /tmp/words.gz
+
+# Make a .gzi index
+bgzip -r /tmp/words.gz
+
+# Extract part of the data using the index
+bgzip -b 367635 -s 4 /tmp/words.gz 
+
+# Uncompress the whole file, removing the compressed copy
+bgzip -d /tmp/words.gz
+.EE
+
+.SH AUTHOR
+.PP
+The BGZF library was originally implemented by Bob Handsaker and modified
+by Heng Li for remote file access and in-memory caching.
+
+.SH SEE ALSO
+.PP
+.BR gzip (1),
+.BR tabix (1)

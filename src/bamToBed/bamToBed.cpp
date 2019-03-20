@@ -506,7 +506,7 @@ void PrintBed(const BamAlignment &bam,  const RefVector &refs,
                        curr.start,
                        curr.end,
                        name.c_str(),
-                       bam.MapQuality,
+                       (uint16_t)bam.MapQuality,
                        strand.c_str());
             }
             else {
@@ -567,7 +567,7 @@ void PrintBed12(const BamAlignment &bam, const RefVector &refs,
     }
 
     // write the colors, etc.
-    printf("%d\t%d\t%s\t%d\t", bam.Position, alignmentEnd, 
+    printf("%d\t%d\t%s\t%d\t", (int)bam.Position, alignmentEnd, 
                                color.c_str(), (int) bedBlocks.size());
 
     // now write the lengths portion

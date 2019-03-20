@@ -1,0 +1,39 @@
+# The MIT License
+#
+# Copyright (c) 2017 Genome Research Ltd.
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in
+# all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+# THE SOFTWARE.
+#
+# Bed format information: https://genome.ucsc.edu/FAQ/FAQformat.html
+#
+X	1000	1100	X1	500	+	1000	1100	255,0,0
+X	1200	1300	X2	500	+	1200	1300	255,0,0
+X	1400	1500	X3	500	+	1400	1500	255,0,0
+X	1600	1700	X4	500	+	1600	1700	255,0,0
+X	1800	1900	X5	500	+	1800	1900	255,0,0
+Y	100000	100900	Y1	600	+	100000	100900	255,0,0
+Y	100200	100700	Y2	600	+	100200	100700	255,0,0
+Y	100400	100500	Y3	600	+	100400	100500	255,0,0
+Y	100600	100700	Y4	600	+	100600	100700	255,0,0
+Y	100800	100900	Y5	600	+	100800	100900	255,0,0
+Z	100000	100001	Z1	600	+	100000	100001	255,0,0
+Z	100002	100003	Z2	600	+	100002	100003	255,0,0
+Z	100004	100005	Z3	600	+	100004	100005	255,0,0
+Z	100006	100007	Z4	600	+	100006	100007	255,0,0
+Z	100008	100009	Z5	600	+	100008	100009	255,0,0

@@ -43,7 +43,10 @@ bool BufferedStreamMgr::init()
 		//there is a special check for a BAM file's magic string inside
 		//the inputStreamMgr's init method. If it is found, we can
 		//stop here.
-		_typeChecker.setBam();
+		if(_inputStreamMgr->isCram())
+			_typeChecker.setCram();
+		else
+			_typeChecker.setBam();
 		return true;
 	}
 	if (!getTypeData()) {

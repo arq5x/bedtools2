@@ -1,0 +1,10 @@
+@SQ	SN:c1	LN:10
+sq1	0	c1	1	0	10M	*	0	0	AACCGCGGTT	**********	MD:Z:10	NM:i:0
+sQ1	0	c1	1	0	10M	*	0	0	AACCGCGGTT	*	MD:Z:10	NM:i:0
+SQ1	0	c1	1	0	10M	*	0	0	*	*	MD:Z:10	NM:i:0
+sq2	0	c1	1	0	4M1D5M	*	0	0	AACCCGGTT	*********	MD:Z:4^G5	NM:i:1
+sQ2	0	c1	1	0	4M1D5M	*	0	0	AACCCGGTT	*	MD:Z:4^G5	NM:i:1
+SQ2	0	c1	1	0	4M1D5M	*	0	0	*	*	MD:Z:4^G5	NM:i:1
+sq3	4	c1	1	0	*	*	0	0	AACCCGGTT	*********
+sQ3	4	c1	1	0	*	*	0	0	AACCCGGTT	*
+SQ3	4	c1	1	0	*	*	0	0	*	*
