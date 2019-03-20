@@ -37,10 +37,10 @@ int str2chrPos(const string &str);
 //assignment operater for char *, meaning it needs a T::operator = (const char *) method.
 //strings, strings, stringbuffers, and the like are acceptable.
 
-template<class T>
-void int2str(int number, T& buffer, bool appendToBuf = false)
+template<class T, class U>
+void int2str(U number, T& buffer, bool appendToBuf = false)
 {
-	if(number == 0) 
+	if(number == 0)
 	{
 		if(appendToBuf) buffer.append("0");
 		else buffer.assign("0", 1);

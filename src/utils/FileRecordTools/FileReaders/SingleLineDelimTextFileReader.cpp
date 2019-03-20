@@ -55,7 +55,7 @@ bool SingleLineDelimTextFileReader::readEntry()
 
 	//check to make sure line has something besides whitespace.
 	bool hasNonSpace = false;
-	int lineLen = _sLine.size();
+	int lineLen = (int)_sLine.size();
 	for (int i=0; i < lineLen; i++) {
 		if (!isspace(_sLine[i])) {
 			hasNonSpace = true;

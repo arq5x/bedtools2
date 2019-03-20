@@ -101,16 +101,16 @@ unsigned long Fisher::getTotalIntersection(RecordKeyVector &recList)
 {
     unsigned long intersection = 0;
     Record *key = recList.getKey();
-    int keyStart = key->getStartPos();
-    int keyEnd = key->getEndPos();
+    CHRPOS keyStart = key->getStartPos();
+    CHRPOS keyEnd = key->getEndPos();
 
     _overlapCounts += recList.size();
     _qsizes.push_back((keyEnd - keyStart));
 
     int hitIdx = 0;
     for (RecordKeyVector::iterator_type iter = recList.begin(); iter != recList.end(); iter = recList.next()) {
-        int maxStart = max((*iter)->getStartPos(), keyStart);
-        int minEnd = min((*iter)->getEndPos(), keyEnd);
+        CHRPOS maxStart = max((*iter)->getStartPos(), keyStart);
+        CHRPOS minEnd = min((*iter)->getEndPos(), keyEnd);
         _qsizes.push_back((int)(minEnd - maxStart));
         if (_context->getObeySplits()) {
             intersection += upCast(_context)->getSplitBlockInfo()->getOverlapBases(hitIdx);

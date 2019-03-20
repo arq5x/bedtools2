@@ -26,7 +26,7 @@ using namespace std;
 #include <map>
 
 
-typedef uint32_t CHRPOS;
+typedef int64_t CHRPOS;
 
 
 

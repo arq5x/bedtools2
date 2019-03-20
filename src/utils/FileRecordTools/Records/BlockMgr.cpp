@@ -80,8 +80,8 @@ void BlockMgr::getBlocksFromBam(RecordKeyVector &keyList, bool &mustDelete)
 {
 	const BamRecord *keyRecord = static_cast<const BamRecord *>(keyList.getKey());
 	const vector<BamTools::CigarOp> &cigarData = keyRecord->getCigarData();
-	int currPos = keyRecord->getStartPos();
-	int  blockLength = 0;
+	CHRPOS currPos = keyRecord->getStartPos();
+	CHRPOS blockLength = 0;
 
 	for (int i=0; i < (int)cigarData.size(); i++) {
 		char opType = cigarData[i].Type;

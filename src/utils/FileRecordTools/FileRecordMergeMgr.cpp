@@ -76,7 +76,7 @@ Record *FileRecordMergeMgr::getNextRecord(RecordKeyVector *recList)
 	Record::strandType currStrand = startRecord->getStrandVal();
 	bool mustMatchStrand = _desiredStrand != ANY_STRAND;
 
-	int currEnd = startRecord->getEndPos();
+	CHRPOS currEnd = startRecord->getEndPos();
 	//now look for more records to merge with this one.
 	//stop when they're out of range, not on the same chromosome, or we hit EOF.
 	//ignore if they don't comply with strand.
@@ -110,7 +110,7 @@ Record *FileRecordMergeMgr::getNextRecord(RecordKeyVector *recList)
 		}
 
 		//check whether it's in range
-		int nextStart = nextRecord->getStartPos();
+		CHRPOS nextStart = nextRecord->getStartPos();
 		if (nextStart > currEnd + _maxDistance) {
 			//no, it's out of range.
 			if (!mustDelete) {
@@ -141,7 +141,7 @@ Record *FileRecordMergeMgr::getNextRecord(RecordKeyVector *recList)
 		//ok, they're on the same chrom and in range, and the strand is good. Do a merge.
 		if (recList != NULL) recList->push_back(nextRecord);
 		madeComposite = true;
-		int nextEnd = nextRecord->getEndPos();
+		CHRPOS nextEnd = nextRecord->getEndPos();
 		if (nextEnd > currEnd) {
 			currEnd = nextEnd;
 		}

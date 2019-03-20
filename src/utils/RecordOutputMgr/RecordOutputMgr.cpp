@@ -150,7 +150,7 @@ void RecordOutputMgr::printRecord(Record *record, const string & value)
 	if (needsFlush()) flush();
 }
 
-void RecordOutputMgr::printClosest(RecordKeyVector &keyList, const vector<int> *dists) {
+void RecordOutputMgr::printClosest(RecordKeyVector &keyList, const vector<CHRPOS> *dists) {
 
 	//The first time we print a record is when we print any header, because the header
 	//hasn't been read from the query file until after the first record has also been read.
@@ -174,7 +174,7 @@ void RecordOutputMgr::printClosest(RecordKeyVector &keyList, const vector<int> *
 			printKey(hitRec, hitRec->getStartPosStr(), hitRec->getEndPosStr());
 			if (dists != NULL) {
 				tab();
-				int dist = (*dists)[distCount];
+				CHRPOS dist = (*dists)[distCount];
 				//if not using sign distance, use absolute value instead.
 				dist = context->signDistance() ? dist : abs(dist);
 				ostringstream s;

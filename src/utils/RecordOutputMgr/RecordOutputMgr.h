@@ -29,7 +29,7 @@ public:
 	void printRecord(Record *record, const string & value);
 	void checkForHeader();
 
-	void printClosest(RecordKeyVector &keyList, const vector<int> *dists = NULL);
+	void printClosest(RecordKeyVector &keyList, const vector<CHRPOS> *dists = NULL);
 
 	void tab() { _outBuf.append("\t"); }
 	void newline() { _outBuf.append("\n"); }

@@ -13,6 +13,10 @@
 #include "string.h"
 #include "FileRecordTypeChecker.h"
 
+// Aaron use other typedef from bedFile.h
+typedef int64_t CHRPOS;
+
+
 using namespace std;
 
 class FileRecordMgr;
@@ -56,13 +60,13 @@ public:
 	virtual int getChromId() const { return _chrId; }
 	virtual void setChromId(int id) { _chrId = id; }
 
-	virtual int getStartPos() const { return _startPos; }
-	virtual void setStartPos(int startPos) { _startPos = startPos; }
+	virtual CHRPOS getStartPos() const { return _startPos; }
+	virtual void setStartPos(CHRPOS startPos) { _startPos = startPos; }
 	virtual const string &getStartPosStr() const { return _startPosStr; }
 	virtual void setStartPosStr(const string &str) { _startPosStr = str; }
 
-	virtual int getEndPos() const { return _endPos; }
-	virtual void setEndPos(int endPos) { _endPos = endPos; }
+	virtual CHRPOS getEndPos() const { return _endPos; }
+	virtual void setEndPos(CHRPOS endPos) { _endPos = endPos; }
 	virtual const string &getEndPosStr() const { return _endPosStr; }
 	virtual void setEndPosStr(const string &str) { _endPosStr = str; }
 
@@ -152,7 +156,7 @@ public:
 
 	bool hasChrInChromName() const;
 	bool hasLeadingZeroInChromName(bool chrKnown = false) const;
-	virtual int getLength(bool obeySplits) const;
+	virtual CHRPOS getLength(bool obeySplits) const;
 
 	void setFileRecordManager(FileRecordMgr *frm);
 	FileRecordMgr * getFileRecordManager();
@@ -165,8 +169,8 @@ protected:
 	int _fileIdx; //associated file the record came from
 	string _chrName;
 	int _chrId;
-	int _startPos;
-	int _endPos;
+	CHRPOS _startPos;
+	CHRPOS _endPos;
 	//It is actually faster to also store the start and end positions as their original strings than to
 	//have to convert their integer representations back to strings when printing them.
 	string _startPosStr;

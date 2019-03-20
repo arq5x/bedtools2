@@ -28,7 +28,7 @@ public:
 	virtual FileRecordTypeChecker::RECORD_TYPE getType() const { return FileRecordTypeChecker::GFF_PLUS_RECORD_TYPE; }
 
 	virtual const string &getField(int fieldNum) const;
-	virtual int getNumFields() const  { return GffRecord::getNumFields() + _plusFields.size(); }
+	virtual int getNumFields() const  { return (int)GffRecord::getNumFields() + (int)_plusFields.size(); }
 
 	virtual void setNumPrintFields(int num) { _numPrintFields = num; }
 	virtual int getNumPrintFields() const { return _numPrintFields; }

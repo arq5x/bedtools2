@@ -58,14 +58,14 @@ unsigned long Jaccard::getTotalIntersection(RecordKeyVector &hits)
 {
 	unsigned long intersection = 0;
 	Record *key = hits.getKey();
-	int keyStart = key->getStartPos();
-	int keyEnd = key->getEndPos();
+	CHRPOS keyStart = key->getStartPos();
+	CHRPOS keyEnd = key->getEndPos();
 
 	int hitIdx = 0;
 	for (RecordKeyVector::iterator_type iter = hits.begin(); iter != hits.end(); iter = hits.next()) {
 		Record *currRec = *iter;
-		int maxStart = max(currRec->getStartPos(), keyStart);
-		int minEnd = min(currRec->getEndPos(), keyEnd);
+		CHRPOS maxStart = max(currRec->getStartPos(), keyStart);
+		CHRPOS minEnd = min(currRec->getEndPos(), keyEnd);
 		if (_context->getObeySplits()) {
 			intersection += upCast(_context)->getSplitBlockInfo()->getOverlapBases(hitIdx);
 			hitIdx++;

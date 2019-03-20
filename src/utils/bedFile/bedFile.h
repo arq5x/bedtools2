@@ -37,7 +37,7 @@ using namespace std;
 //*************************************************
 // Data type tydedef
 //*************************************************
-typedef uint32_t CHRPOS;
+typedef int64_t CHRPOS;
 typedef uint16_t BINLEVEL;
 typedef uint32_t BIN;
 typedef uint16_t USHORT;

@@ -22,7 +22,7 @@ class RecordMgr;
 
 class BlockMgr {
 public:
-	BlockMgr(float overlapFraction = 1E-9, bool hasReciprocal = false);
+	BlockMgr(float overlapFraction = 1E-9f, bool hasReciprocal = false);
 	~BlockMgr();
 
 	void getBlocks(RecordKeyVector &keyList, bool &mustDelete);
