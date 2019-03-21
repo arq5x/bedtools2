@@ -157,6 +157,17 @@ all: print_banner $(OBJ_DIR) $(BIN_DIR) autoversion $(UTIL_SUBDIRS) $(SUBDIRS)
 	@chmod +x bin/*
 	@echo "done."
 
+all-static: print_banner $(OBJ_DIR) $(BIN_DIR) autoversion $(UTIL_SUBDIRS) $(SUBDIRS)
+	@echo "- Building main bedtools binary."
+	$(CCPREFIX) $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c src/bedtools.cpp -o obj/bedtools.o $(INCLUDES)
+	$(CCPREFIX) $(CXX) -static -o $(BIN_DIR)/bedtools $(BUILT_OBJECTS) $(SRC_DIR)/utils/htslib/libhts.a $(LIBS) $(LDFLAGS)
+	@echo "done."
+
+	@echo "- Creating executables for old CLI."
+	@python scripts/makeBashScripts.py
+	@chmod +x bin/*
+	@echo "done."
+
 
 .PHONY: all
 
