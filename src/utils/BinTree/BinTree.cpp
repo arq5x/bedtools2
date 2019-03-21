@@ -115,10 +115,10 @@ bool BinTree::addRecordToTree(Record *record)
 	binNumType binNum = getBin(startPos, endPos);
 
 	if (binNum < 0 || binNum >= NUM_BINS) {
-		fprintf(stderr, "ERROR: Received illegal bin number %u from getBin call.\n
-                                This typically means that your coordinates are
-                                negative or too large to represent in the data
-                                structure bedtools uses to find intersections.", binNum);
+		fprintf(stderr, "ERROR: Received illegal bin number %lu from getBin call.\n"
+                                "This typically means that your coordinates are\n"
+                                "negative or too large to represent in the data\n"
+                                "structure bedtools uses to find intersections.", binNum);
 		return false;
 	}
 	_mainMap[chr][binNum].push_back(record);
