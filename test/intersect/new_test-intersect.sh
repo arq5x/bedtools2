@@ -921,7 +921,9 @@ rm exp obs
 ############################################################
 echo -e "    intersect.new.t74...\c"
 echo \
-"1	1000000004	1000000005" > exp
+"1	1000000004	1000000005
+1	10000000004	10000000005
+1	30000000000	30000000005" > exp
 $BT intersect -a large_a.bed  -b large_b.bed > obs
 check exp obs
 rm exp obs
