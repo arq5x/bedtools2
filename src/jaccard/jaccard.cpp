@@ -45,7 +45,7 @@ void  Jaccard::giveFinalReport(RecordOutputMgr *outputMgr) {
 	// header
 	outputMgr->checkForHeader();
 
-	cout << "intersection\tunion-intersection\tjaccard\tn_intersections" << endl;
+	cout << "intersection\tunion\tjaccard\tn_intersections" << endl;
 
 	unsigned long adjustedUnion = _unionVal - _intersectionVal;
 
