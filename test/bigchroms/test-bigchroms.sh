@@ -27,7 +27,7 @@ $BT intersect -a abig.bed -b abig.bed > obs
 check obs abig.bed
 rm obs
 
-if [[ "$BT_NO_BIG_FILES" ]]; then
+if [[ "$BT_NO_BIG_FILES" != "" ]]; then
 python make-big-chrom.py
 
 echo -e "    bigchroms.t03...big get fasta \c"
@@ -60,6 +60,6 @@ chr1	8900000000	9000000000	chr1	8000000000	9000000000" > exp
 check obs exp
 rm obs exp
 
-[[ $FAILURES -ne 0 ]] || exit 1;
+[[ $FAILURES -eq 0 ]] || exit 1;
 
 
