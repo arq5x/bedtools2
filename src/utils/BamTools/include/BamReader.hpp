@@ -44,7 +44,7 @@ namespace BamTools {
 			{
 				// default to just reading "core"
 				// atts., ignore seq and qual
-				set_cram_reqd_fields(2559);
+				//set_cram_reqd_fields(2559);
 			}
 			~_SamFile() 
 			{
@@ -180,15 +180,25 @@ namespace BamTools {
 			if(nullptr == fp) return false;
 			if(fp->format.format != htsExactFormat::bam && fp->format.format != htsExactFormat::cram && fp->format.format != htsExactFormat::sam)
 				return false;
+
+			_SamFile* sam_file = new _SamFile(fp, idx, this);
+
+			if(fp->format.format == htsExactFormat::cram)
+			{
+				const char* ref_file = getenv("CRAM_REFERENCE");
+				if(NULL == ref_file || hts_set_fai_filename(fp, ref_file) < -1)
+				{
+					// If we are not able to load a reference we just load the core data
+					sam_file->set_cram_reqd_fields(2559);
+				}
+			}
+			
 			bam_hdr_t* hdr = sam_hdr_read(fp);
 			if(nullptr == hdr)
 				return false;
 
-			const char* ref_file = getenv("CRAM_REFERENCE");
-			
-			hts_set_fai_filename(fp, ref_file);
 
-			_files.push_back(new _SamFile(fp, idx, this));
+			_files.push_back(sam_file);
 			_hdrs.push_back(SamHeader(filename, hdr));
 
 			if(_read_sam_file(_files[_files.size() - 1]) || GetErrorString() == "")
@@ -367,7 +377,7 @@ namespace BamTools {
 			// specifying reqd_fields_code
 			for(auto& file: _files)
 			{
-				hts_set_opt(file->fp, CRAM_OPT_REQUIRED_FIELDS, ReqdFieldsCode);
+				file->set_cram_reqd_fields(ReqdFieldsCode);
 			}
 		}
 

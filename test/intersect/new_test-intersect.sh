@@ -904,13 +904,13 @@ rm exp obs
 [[ $FAILURES -eq 0 ]] || exit 1;
 
 ###########################################################
-#  Test intersect with cram
+#  Test intersect with cram without a reference provided
 ############################################################
 echo -e "    intersect.new.t73...\c"
 echo \
 "FCC1MK2ACXX:2:2110:4301:28831#	99	chr1	10004	0	100M	=	10047	140	*	*	PG:Z:novoalign	AM:i:2	SM:i:2	MQ:i:0	PQ:i:219	UQ:i:0	AS:i:0	RG:Z:NCH411GBM_CD133low
 FCC1MK2ACXX:2:2110:4301:28831#	147	chr1	10047	0	3S97M	=	10004	-140	*	*	PG:Z:novoalign	AM:i:2	SM:i:70	MQ:i:0	PQ:i:219	UQ:i:194	AS:i:194	RG:Z:NCH411GBM_CD133low" > exp
-CRAM_REFERENCE=test_ref.fa $BT intersect -a a.cram -b b.cram | samtools view -T test_ref.fa - > obs
+$BT intersect -a a.cram -b b.cram | samtools view - > obs
 check exp obs
 rm exp obs
 [[ $FAILURES -eq 0 ]] || exit 1;
@@ -925,6 +925,18 @@ echo \
 1	10000000004	10000000005
 1	30000000000	30000000005" > exp
 $BT intersect -a large_a.bed  -b large_b.bed > obs
+check exp obs
+rm exp obs
+[[ $FAILURES -eq 0 ]] || exit 1;
+
+###########################################################
+#  Test intersect with cram with a reference provided
+############################################################
+echo -e "    intersect.new.t75...\c"
+echo \
+"FCC1MK2ACXX:2:2110:4301:28831#	99	chr1	10004	0	100M	=	10047	140	CCCTAACCCTAACCCTAACCCTAACCCTAACCCTAACCCTAACCCTAACCCTAACCCTAACCCTAACCCTAACCCTAACCCTAACCCTAACCCTAACCCT	CCCFFFFFHHHHHJJIJJJJIGIIIJIGIGJJJJIJJJJIJIIJJDIIIJJIJEHEE@GAHHGE@CEFB;A>AB=??5?B?2?<ABDAD9ABBBC9ABDA	PG:Z:novoalign	AM:i:2	SM:i:2	MQ:i:0	PQ:i:219	UQ:i:0	AS:i:0	MD:Z:100	NM:i:0	RG:Z:NCH411GBM_CD133low
+FCC1MK2ACXX:2:2110:4301:28831#	147	chr1	10047	0	3S97M	=	10004	-140	AACCCTACCCCTACCCCTAACCCTACCCCTACCCCTACCCCTACCCCTACCCCTACCCCTACCCCTACCCTAACCCTAACCCTAACCCTAACCCTAACCC	###?<55-@?250&A?882(@?795&B?8;;/?8('9'A?;8?8C;(<A@FB-/7'F?((@0D:)*9JIIHFCJJJIHFJJJIHEJJHHFFHFFFDDCCB	PG:Z:novoalign	AM:i:2	SM:i:70	MQ:i:0	PQ:i:219	UQ:i:194	AS:i:194	MD:Z:4A5A11A5A5A5A5A5A5A3A34	NM:i:10	RG:Z:NCH411GBM_CD133low">exp
+CRAM_REFERENCE=test_ref.fa $BT intersect -a a.cram -b b.cram | samtools view -T test_ref.fa - > obs
 check exp obs
 rm exp obs
 [[ $FAILURES -eq 0 ]] || exit 1;
