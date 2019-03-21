@@ -66,27 +66,9 @@ BUILT_PROGRAMS = \
 	htsfile \
 	tabix
 
-BUILT_TEST_PROGRAMS = \
-	test/hts_endian \
-	test/fieldarith \
-	test/hfile \
-	test/sam \
-	test/test_bgzf \
-	test/test_realn \
-	test/test-regidx \
-	test/test_view \
-	test/test-vcf-api \
-	test/test-vcf-sweep \
-	test/test-bcf-sr \
-	test/test-bcf-translate
+BUILT_TEST_PROGRAMS = 
 
-BUILT_THRASH_PROGRAMS = \
-	test/thrash_threads1 \
-	test/thrash_threads2 \
-	test/thrash_threads3 \
-	test/thrash_threads4 \
-	test/thrash_threads5 \
-	test/thrash_threads6
+BUILT_THRASH_PROGRAMS =
 
 all: lib-static lib-shared $(BUILT_PROGRAMS) plugins $(BUILT_TEST_PROGRAMS)
 
