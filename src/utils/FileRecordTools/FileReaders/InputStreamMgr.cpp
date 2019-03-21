@@ -22,6 +22,7 @@ InputStreamMgr::InputStreamMgr(const string &filename, bool buildScanBuffer)
  _isStdin(false),
  _isGzipped(false),
  _isBam(false),
+ _isCram(false),
  _isBgzipped(false),
  _tmpZipBuf(NULL),
  _bamRuledOut(false),
@@ -29,8 +30,7 @@ InputStreamMgr::InputStreamMgr(const string &filename, bool buildScanBuffer)
  _numBytesInBuffer(0),
  _bamReader(NULL),
  _bgStream(NULL),
- _eofHit(false),
-_isCram(false)
+ _eofHit(false)
 {
 	_possibleBamCode.resize(4, 0);
 }
