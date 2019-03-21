@@ -41,8 +41,11 @@ namespace BamTools {
 		{
 			if(nullptr != _fp) sam_close(_fp);
 		}
-		void SaveAlignment(const BamAlignment& al)
+
+		void SaveAlignment(const BamAlignment& al, bool sync_data = false)
 		{
+			if(sync_data)
+				al.SyncExtraData();
 			const bam1_t* bam = al.HtsObj();
 			sam_write1(_fp, _hdr.GetHeaderStruct(), bam);
 		}
