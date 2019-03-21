@@ -17,6 +17,7 @@
 #include <stdio.h>
 #include <algorithm>
 #include "LargeFileSupport.h"
+#include "bedFile.h"
 #include <sys/stat.h>
 #include <sys/mman.h>
 #include "split.h"
@@ -76,7 +77,7 @@ class FastaReference {
         string getSequence(string seqname);
         // potentially useful for performance, investigate
         // void getSequence(string seqname, string& sequence);
-        string getSubSequence(string seqname, int start, int length);
+        string getSubSequence(string seqname, CHRPOS start, CHRPOS length);
         string sequenceNameStartingWith(string seqnameStart);
         long unsigned int sequenceLength(string seqname);
 };

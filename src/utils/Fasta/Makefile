@@ -4,7 +4,7 @@ UTILITIES_DIR = ../../utils/
 # -------------------
 # define our includes
 # -------------------
-INCLUDES = 
+INCLUDES = -I$(UTILITIES_DIR)/bedFile/
 
 # ----------------------------------
 # define our source and object files

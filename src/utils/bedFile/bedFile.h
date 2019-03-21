@@ -674,8 +674,8 @@ private:
         if (_numFields == this->bedType) {
             bed.fields = fields;
             bed.chrom = fields[0];
-            int i;
-            i = atoi(fields[1].c_str());
+            CHRPOS i;
+            i = stoll(fields[1].c_str());
             if (i<0) {
                  cerr << "Error: malformed BED entry at line " 
                       << _lineNum 
@@ -684,7 +684,7 @@ private:
                  exit(1);
             }
             bed.start = (CHRPOS)i;
-            i = atoi(fields[2].c_str());
+            i = stoll(fields[2].c_str());
             if (i<0) {
                 cerr << "Error: malformed BED entry at line " 
                      << _lineNum 
