@@ -34,10 +34,9 @@ void Jaccard::cleanupHits(RecordKeyVector &hits)
 
 
 bool Jaccard::finalizeCalculations() {
-	_sweep->closeOut();
+	_sweep->closeOut(true);
 	_queryUnion = _sweep->getQueryTotalRecordLength();
 	_dbUnion = _sweep->getDatabaseTotalRecordLength();
-
 	_unionVal = _queryUnion + _dbUnion;
 	return true;
 }
