@@ -41,7 +41,11 @@ namespace BamTools {
 			_SamFile(samFile* fp, uint32_t _idx, BamReader* reader) : 
 				fp(fp), idx(_idx), ip(NULL), it(NULL), 
 				reader(reader), has_range(false)
-			{}
+			{
+				// default to just reading "core"
+				// atts., ignore seq and qual
+				set_cram_reqd_fields(2559);
+			}
 			~_SamFile() 
 			{
 				if(nullptr != ip) hts_idx_destroy(ip);
@@ -88,9 +92,17 @@ namespace BamTools {
 				return cram_get_refs(fp);
 			}
 
+			void set_cram_reqd_fields(int reqd_fields_code)
+			{
+				// tell HTSLIB what fields to read via
+				// specifying reqd_fields_code
+				hts_set_opt(fp, CRAM_OPT_REQUIRED_FIELDS, reqd_fields_code);
+			}
+
 			samFile* fp;
 			uint32_t idx;
 			hts_idx_t* ip;
+			uint32_t cram_fields_code;
 			
 			int tid_l, tid_r;
 			int ofs_l, ofs_r;
@@ -347,6 +359,16 @@ namespace BamTools {
 			}
 
 			return true;
+		}
+
+		void SetCramReqdFieldsCode(int ReqdFieldsCode)
+		{
+			// tell HTSLIB what fields to read via
+			// specifying reqd_fields_code
+			for(auto& file: _files)
+			{
+				hts_set_opt(file->fp, CRAM_OPT_REQUIRED_FIELDS, ReqdFieldsCode);
+			}
 		}
 
 		refs_t* GetReference(int idx = 0)
