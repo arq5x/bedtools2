@@ -40,9 +40,9 @@ public:
 	void clear();
 	int uniqueSize() const { return _currNumIdxs; }
 	size_t totalSize() const { return _totalRecs; }
-	bool addRec(int dist, Record *, chromDirType chromDir);
-	bool exists(int dist) const {
-		int dummyVal = 0;
+	bool addRec(CHRPOS dist, Record *, chromDirType chromDir);
+	bool exists(CHRPOS dist) const {
+		CHRPOS dummyVal = 0;
 		return find(dist, dummyVal);
 	}
 	typedef pair<chromDirType, Record *> elemPairType;
@@ -56,16 +56,16 @@ public:
 	int currDist(constIterType iter) const { return _distIndex[iter].first; }
 	size_t currNumElems(constIterType iter) const { return allElems(iter)->size(); }
 	elemsType *allElems(constIterType iter) const { return _allRecs[_distIndex[iter].second]; }
-	int getMaxLeftEndPos() const;
+	CHRPOS getMaxLeftEndPos() const;
 
 private:
 
-	void insert(int dist, Record *, chromDirType chromDir);
+	void insert(CHRPOS dist, Record *, chromDirType chromDir);
 
 
 	//if true, pos will be the idx the distance is at.
 	//if false, pos will be the idx to insert at.
-	bool find(int dist, int &pos) const;
+	bool find(CHRPOS dist, CHRPOS &pos) const;
 
 
 	int _kVal; //max unique allowed
@@ -82,7 +82,7 @@ public:
 	CloseSweep(ContextClosest *context);
 	~CloseSweep(void);
 	bool init();
-	const vector<int> &getDistances() { return _finalDistances; }
+	const vector<CHRPOS> &getDistances() { return _finalDistances; }
 
 private:
    ContextClosest *_context;
@@ -90,10 +90,10 @@ private:
 	vector<RecDistList *> _minUpstreamRecs;
 	vector<RecDistList *> _minDownstreamRecs;
 	vector<RecDistList *> _overlapRecs;
-	vector<int> _maxPrevLeftClosestEndPos;
-	vector<int> _maxPrevLeftClosestEndPosReverse;
+	vector<CHRPOS> _maxPrevLeftClosestEndPos;
+	vector<CHRPOS> _maxPrevLeftClosestEndPosReverse;
 
-	vector<int> _finalDistances;
+	vector<CHRPOS> _finalDistances;
 
 
 	//
@@ -128,7 +128,7 @@ private:
 
 	//structs to help with finding closest among all of multiple dbs.
 	RecordKeyVector _copyRetList;
-	vector<int> _copyDists;
+	vector<CHRPOS> _copyDists;
 
 	//override these methods from chromsweep
 	void masterScan(RecordKeyVector &retList);
@@ -148,9 +148,9 @@ private:
     void setLeftClosestEndPos(int dbIdx);
     bool beforeLeftClosestEndPos(int dbIdx, Record *rec);
     void clearClosestEndPos(int dbIdx);
-    int addRecsToRetList(RecDistList::elemsType *recs, int currDist, RecordKeyVector &retList);
-    void addSingleRec(Record *rec, int currDist, int &hitsUsed, RecordKeyVector &retList);
-    rateOvlpType tryToAddRecord(Record *cacheRec, int dist, int dbIdx, bool &stopScanning, chromDirType chromDir, streamDirType streamDir);
+    int addRecsToRetList(RecDistList::elemsType *recs, CHRPOS currDist, RecordKeyVector &retList);
+    void addSingleRec(Record *rec, CHRPOS currDist, int &hitsUsed, RecordKeyVector &retList);
+    rateOvlpType tryToAddRecord(Record *cacheRec, CHRPOS dist, int dbIdx, bool &stopScanning, chromDirType chromDir, streamDirType streamDir);
     purgeDirectionType purgePointException();
 
 };

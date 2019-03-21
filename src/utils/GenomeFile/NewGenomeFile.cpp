@@ -101,7 +101,7 @@ bool NewGenomeFile::projectOnGenome(CHRPOS genome_pos, string &chrom, CHRPOS &st
     // use the iterator to identify the appropriate index 
     // into the chrom name and start vectors
     CHRPOS i = CHRPOS(low-_startOffsets.begin());
-    if (i >= _chromList.size()) {
+    if (i >= (CHRPOS)_chromList.size()) {
     	return false; //position not on genome
     }
     chrom = _chromList[i - 1];
@@ -136,7 +136,7 @@ CHRPOS NewGenomeFile::getChromSize(const string &chrom) const {
     return INT_MAX;
 }
 
-CHRPOS NewGenomeFile::getChromId(const string &chrom) {
+uint32_t NewGenomeFile::getChromId(const string &chrom) {
 	if (chrom == _currChromName) {
 		return _currChromId;
 	}

@@ -22,7 +22,7 @@ export SRC_DIR	= $(shell readlink -f src)
 export UTIL_DIR	= src/utils
 export CXX		= g++
 ifeq ($(DEBUG),1)
-export CXXFLAGS = -Wall -Wextra -DDEBUG -D_DEBUG -g -O0 -D_FILE_OFFSET_BITS=64 -DWITH_HTS_CB_API $(INCLUDES) 
+export CXXFLAGS = -Wconversion -Wall -Wextra -DDEBUG -D_DEBUG -g -O0 -D_FILE_OFFSET_BITS=64 -DWITH_HTS_CB_API $(INCLUDES)
 else
 export CXXFLAGS = -g -Wall -O2 -D_FILE_OFFSET_BITS=64 -DWITH_HTS_CB_API $(INCLUDES)
 endif

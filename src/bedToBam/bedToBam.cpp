@@ -191,7 +191,7 @@ void ProcessBed(BedFile *bed, GenomeFile *genome, bool isBED12, int mapQual, boo
             BamAlignment bamEntry;
             if (bed->bedType >= 4) {
                 ConvertBedToBam(bedEntry, bamEntry, chromToId, isBED12, mapQual, bed->_lineNum);
-                writer->SaveAlignment(bamEntry);
+                writer->SaveAlignment(bamEntry, true);
             }
             else {
                 cerr << "Error: BED entry without name found at line: " << bed->_lineNum << ".  Exiting!" << endl;

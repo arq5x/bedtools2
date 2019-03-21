@@ -103,28 +103,28 @@ void BedSlop::AddSlop(BED &bed) {
         }
     }
     else {
-        if ( ((int)bed.start - (long)_leftSlop) >= 0 ) {
+        if ( (bed.start - (CHRPOS)_leftSlop) >= 0 ) {
           // checking negative condition for _leftSlop
-            if( ((int)bed.start - (long)_leftSlop) >= chromSize && _leftSlop < 0)
+            if( (bed.start - (CHRPOS)_leftSlop) >= chromSize && _leftSlop < 0)
             {
               bed.start = chromSize;
             }
             else {
-              bed.start = bed.start - (int)_leftSlop;
+              bed.start = bed.start - (CHRPOS)_leftSlop;
             }
         }
         else {
             bed.start = 0;
         }
 
-        if ( ((int)bed.end + (long)_rightSlop) <= chromSize )
+        if ( (bed.end + (CHRPOS)_rightSlop) <= chromSize )
         {
           // checking negative _rightSlop condition
-            if( ((int)bed.end + (long)_rightSlop) <= 0 && _rightSlop < 0) {
+            if( (bed.end + (CHRPOS)_rightSlop) <= 0 && _rightSlop < 0) {
                 bed.end = 0;
               }
               else {
-                bed.end = bed.end + (int)_rightSlop;            
+                bed.end = bed.end + (CHRPOS)_rightSlop;            
               }
         }
         else
@@ -142,7 +142,7 @@ void BedSlop::AddSlop(BED &bed) {
       bed.end += 1;
     }
     else if(bed.start > bed.end){
-      int temp = bed.start;
+      CHRPOS temp = bed.start;
       bed.start = bed.end;
       bed.end = temp;
     }

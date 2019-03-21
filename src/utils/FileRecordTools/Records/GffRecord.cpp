@@ -67,7 +67,7 @@ void GffRecord::print(string &outBuf) const
 	printRemainingFields(outBuf);
 }
 
-void GffRecord::print(string &outBuf, int start, int end) const
+void GffRecord::print(string &outBuf, CHRPOS start, CHRPOS end) const
 {
 	ostringstream s;	
 	s << _chrName;

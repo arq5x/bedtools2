@@ -4,6 +4,7 @@
 #include <memory>
 #include <cstring>
 namespace BamTools {
+	const static char cigar_ops_as_chars[] = { 'M', 'I', 'D', 'N', 'S', 'H', 'P', '=', 'X', 'B' };
 	static std::string _mkstr(const uint8_t* what) { return std::string((const char*)what + 1); }
 	struct CigarOp {
 	  
@@ -16,8 +17,26 @@ namespace BamTools {
 			: Type(type)
 			, Length(length) 
 		{ }
+
+		uint32_t to_htslib_repr() const
+		{
+			static bool init_flag = false;
+			static int cigar_code[256] = {};
+
+			if(!init_flag) 
+			{
+				init_flag = true;
+				memset(cigar_code, -1, sizeof(cigar_code));
+				for(unsigned i = 0; i < sizeof(cigar_ops_as_chars)/sizeof(*cigar_ops_as_chars); i++)
+					cigar_code[(size_t)cigar_ops_as_chars[i]] = (int)i;
+			}
+
+			int code = cigar_code[(size_t)Type];
+			if(code < 0) return 0;
+
+			return (Length << 4) + code;
+		}
 	};
-	const char cigar_ops_as_chars[] = { 'M', 'I', 'D', 'N', 'S', 'H', 'P', '=', 'X', 'B' };
 
 	class BamAlignment {
 
@@ -61,6 +80,24 @@ namespace BamTools {
 				return true;
 			}
 		};
+
+		static inline void* _ensure_data_chunk(bam1_t* bam, size_t ofs, size_t old_size, size_t new_size) 
+		{
+			if(ofs + old_size > (size_t)bam->l_data) return NULL;
+
+			if(bam->data == NULL || bam->m_data < bam->l_data + new_size - old_size)
+			{
+				size_t next_size = (bam->l_data + new_size - old_size + 31) & ~(size_t)31;
+				if(NULL == (bam->data = (uint8_t*)realloc(bam->data, next_size))) return NULL;
+				bam->m_data = next_size;
+			}
+
+			memmove(bam->data + ofs + old_size, bam->data + ofs + new_size, bam->l_data - ofs - old_size);
+
+			bam->l_data = bam->l_data + new_size - old_size;
+
+			return bam->data + ofs;
+		}
 
 	public:
 
@@ -119,6 +156,26 @@ namespace BamTools {
 				Qualities.resize(QuerySequenceLength, -1);
 			else for(unsigned i = 0; i < QuerySequenceLength; i ++)
 				Qualities.push_back((char)(33 + qual[i]));
+		}
+
+		bool SyncExtraData() const
+		{
+#define BAM_DATA_OFFSET(what) ((size_t)(((uint8_t*)bam_get_##what(&_bam)) - ((uint8_t*)_bam.data)))
+			void* qname_buf = _ensure_data_chunk((bam1_t*)&_bam, BAM_DATA_OFFSET(qname), _bam.core.l_qname, Name.size());
+			if(NULL == qname_buf) return false;
+			memcpy(qname_buf, Name.c_str(), Name.size());
+			((bam1_t*)&_bam)->core.l_qname = Name.size();
+
+			uint32_t* cigar_buf = (uint32_t*)_ensure_data_chunk((bam1_t*)&_bam, BAM_DATA_OFFSET(cigar), _bam.core.n_cigar * sizeof(uint32_t), sizeof(uint32_t) * CigarData.size());
+			if(NULL == cigar_buf) return false;
+			for(auto& cigar_op : CigarData) 
+				*(cigar_buf++) = cigar_op.to_htslib_repr();
+			((bam1_t*)&_bam)->core.n_cigar = CigarData.size();
+
+			// TODO: also sync the quality and qseq
+#undef BAM_DATA_OFFSET
+
+			return true;
 		}
 
 #include <BamAlignment.mapping.hpp>

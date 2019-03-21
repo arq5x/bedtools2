@@ -114,11 +114,11 @@ int InputStreamMgr::read(char *data, size_t dataSize)
 			string newDataStr;
 			newDataStr = _saveDataStr.substr(dataSize, _saveDataStr.size() - dataSize);
 			_saveDataStr = newDataStr;
-			return dataSize;
+			return (int)dataSize;
 		}
 	}
 	if (_streamFinished) {
-		return origRead;
+		return (int)origRead;
 	}
 	if (_isBgzipped) {
 		ssize_t rc;
@@ -128,7 +128,7 @@ int InputStreamMgr::read(char *data, size_t dataSize)
 		return (int)(origRead + rc);
 	}
 	_finalInputStream->read(data, dataSize);
-	return origRead + _finalInputStream->gcount();
+	return (int)(origRead + _finalInputStream->gcount());
 }
 
 bool InputStreamMgr::populateScanBuffer()
@@ -197,7 +197,7 @@ bool InputStreamMgr::populateScanBuffer()
 			break;
 		}
 	}
-	_numBytesInBuffer = _scanBuffer.size();
+	_numBytesInBuffer = (int)_scanBuffer.size();
 	//append it to the savedDataStr.
  	_scanBuffer.toStr(_saveDataStr, true);
 	if (_numBytesInBuffer == 0) return false;
@@ -266,7 +266,7 @@ bool InputStreamMgr::detectBamOrBgzip(int &numChars, int currChar)
 			}
 			//This is a BAM file.
 			_isBam = true;
-			_numBytesInBuffer = _scanBuffer.size();
+			_numBytesInBuffer = (int)_scanBuffer.size();
 			return true;
 		} else if (numChars == 4) {
 			//This is a gzipped file, and it is not bgzipped or BAM.
@@ -296,7 +296,7 @@ bool InputStreamMgr::readZipChunk()
 	memset(_tmpZipBuf, 0, SCAN_BUFFER_SIZE +1);
 	size_t numCharsRead = read(_tmpZipBuf, (size_t)SCAN_BUFFER_SIZE);
 	_saveDataStr.append(_tmpZipBuf);
-	_numBytesInBuffer = _saveDataStr.size();
+	_numBytesInBuffer = (int)_saveDataStr.size();
 	if ((int)numCharsRead < SCAN_BUFFER_SIZE) {
 		_streamFinished = true;
 	}

@@ -48,8 +48,8 @@ void RecDistList::clear() {
 	_totalRecs = 0;
 }
 
-bool RecDistList::addRec(int dist, Record *record, chromDirType chromDir) {
-	int newPos = 0;
+bool RecDistList::addRec(CHRPOS dist, Record *record, chromDirType chromDir) {
+	CHRPOS newPos = 0;
 	bool mustAppend = false;
 	int useElemIdx = 0;
 
@@ -70,7 +70,7 @@ bool RecDistList::addRec(int dist, Record *record, chromDirType chromDir) {
 	if (!mustAppend) {
 		//smaller than maxDist, and doesn't currently exist. must insert
 		//newPos now is the insertion point.
-		int startShiftPos = 0;
+		CHRPOS startShiftPos = 0;
 		if (_currNumIdxs == _kVal) {
 			//already full. must remove oldest max.
 			//determine which vector it was using
@@ -83,7 +83,7 @@ bool RecDistList::addRec(int dist, Record *record, chromDirType chromDir) {
 			useElemIdx = _currNumIdxs;
 			_currNumIdxs++;
 		}
-		for (int i=startShiftPos; i > newPos; i--) {
+		for (CHRPOS i=startShiftPos; i > newPos; i--) {
 			_distIndex[i].first = _distIndex[i-1].first;
 			_distIndex[i].second = _distIndex[i-1].second;
 		}
@@ -94,7 +94,7 @@ bool RecDistList::addRec(int dist, Record *record, chromDirType chromDir) {
 	_allRecs[useElemIdx]->reserve(16);
 	_allRecs[useElemIdx]->push_back(elemPairType(chromDir, record));
 
-	_distIndex[newPos].first = dist;
+	_distIndex[newPos].first = (int)dist;
 	_distIndex[newPos].second = useElemIdx;
 	_empty = false;
 	_totalRecs++;
@@ -103,8 +103,8 @@ bool RecDistList::addRec(int dist, Record *record, chromDirType chromDir) {
 
 //if true, pos will be the idx the distance is at.
 //if false, pos will be the idx to insert at.
-bool RecDistList::find(int dist, int &pos) const {
-	int lbound=0, ubound=_currNumIdxs-1, currVal =0;
+bool RecDistList::find(CHRPOS dist, CHRPOS &pos) const {
+	CHRPOS lbound=0, ubound=_currNumIdxs-1, currVal =0;
 	pos = 0;
 	while(lbound <= ubound)
 	{
@@ -123,11 +123,11 @@ bool RecDistList::find(int dist, int &pos) const {
 	return false;
 }
 
-int RecDistList::getMaxLeftEndPos() const {
+CHRPOS RecDistList::getMaxLeftEndPos() const {
 
 	if (_empty) return -1;
 
-	int maxDist =_distIndex[_currNumIdxs-1].first;
+	CHRPOS maxDist =_distIndex[_currNumIdxs-1].first;
 
   const elemsType *elems = _allRecs[_distIndex[_currNumIdxs-1].second];
 	for (int i=0; i < (int)elems->size(); i++) {
@@ -279,7 +279,7 @@ CloseSweep::rateOvlpType CloseSweep::considerRecord(Record *cacheRec, int dbIdx,
 	// Determine whether the hit and query intersect, and if so, what to do about it.
 	_dbForward = cacheRec->getStrandVal() == Record::FORWARD;
 	_dbReverse = cacheRec->getStrandVal() == Record::REVERSE;
-	int currDist = 0;
+	CHRPOS currDist = 0;
 
 	if (intersects(_currQueryRec, cacheRec)) {
 
@@ -335,8 +335,8 @@ void CloseSweep::finalizeSelections(int dbIdx, RecordKeyVector &retList) {
 	RecDistList *overlaps = _overlapRecs[dbIdx];
 	RecDistList::constIterType upIter = upRecs->begin();
 	RecDistList::constIterType downIter = downRecs->begin();
-	int upDist = INT_MAX;
-	int downDist = INT_MAX;
+	CHRPOS upDist = INT_MAX;
+	CHRPOS downDist = INT_MAX;
 
 	int totalHitsUsed = 0;
 
@@ -414,7 +414,7 @@ void CloseSweep::finalizeSelections(int dbIdx, RecordKeyVector &retList) {
 
 
 
-int CloseSweep::addRecsToRetList(RecDistList::elemsType *recs, int currDist, RecordKeyVector &retList) {
+int CloseSweep::addRecsToRetList(RecDistList::elemsType *recs, CHRPOS currDist, RecordKeyVector &retList) {
 
 	int hitsUsed = 0;
 	int numRecs = (int)recs->size(); //just to clean the code some.
@@ -437,7 +437,7 @@ int CloseSweep::addRecsToRetList(RecDistList::elemsType *recs, int currDist, Rec
 	}
 }
 
-void CloseSweep::addSingleRec(Record *rec, int currDist, int &hitsUsed, RecordKeyVector &retList) {
+void CloseSweep::addSingleRec(Record *rec, CHRPOS currDist, int &hitsUsed, RecordKeyVector &retList) {
 	retList.push_back(rec);
 	_finalDistances.push_back(currDist);
 	hitsUsed++;
@@ -458,9 +458,9 @@ void CloseSweep::checkMultiDbs(RecordKeyVector &retList) {
 	vector<distanceTuple> copyDists;
 	int numHits = (int)retList.size();
 	copyDists.resize(numHits);
-	int i=0;
+	CHRPOS i=0;
 	for (RecordKeyVector::iterator_type iter = retList.begin(); iter != retList.end(); iter++) {
-		int dist = _finalDistances[i];
+		CHRPOS dist = _finalDistances[i];
 		copyDists[i]._dist = abs(dist);
 		copyDists[i]._rec = *iter;
 		copyDists[i]._isNeg = dist < 0;
@@ -474,7 +474,7 @@ void CloseSweep::checkMultiDbs(RecordKeyVector &retList) {
 	//and how many of each of these there are. Use a map<int, int>,
 	//where the key is a distance (in absolute value) and the value
 	//is the number of ties that that distance has.
-	map<int, int> ties;
+	map<CHRPOS, CHRPOS> ties;
 	for (vector<distanceTuple>::iterator i = copyDists.begin(); i != copyDists.end(); ++i)
     	++ties[i->_dist];
 
@@ -486,13 +486,13 @@ void CloseSweep::checkMultiDbs(RecordKeyVector &retList) {
 
 	int hitsUsed = 0;
 	for (i=0; i < numHits && hitsUsed < _kClosest; i++) {
-		int dist = copyDists[i]._dist;
+		CHRPOS dist = copyDists[i]._dist;
 		bool isNeg = copyDists[i]._isNeg;
 		//see if this distance is tied with any other
-		map<int, int>::iterator iter = ties.find(dist);
+		map<CHRPOS, CHRPOS>::iterator iter = ties.find(dist);
 		if (iter != ties.end()) {
 			//tie was found
-			int numTies = iter->second;
+			CHRPOS numTies = iter->second;
 			if (!_allTies) {
 				if (_firstTie) {
 					//just add the first of the ties
@@ -614,13 +614,13 @@ void CloseSweep::setLeftClosestEndPos(int dbIdx)
   RecDistList *upRecs = _minUpstreamRecs[dbIdx];
   RecDistList *downRecs = _minDownstreamRecs[dbIdx];
 
-	int upDist = upRecs->getMaxLeftEndPos();
-	int downDist = downRecs->getMaxLeftEndPos();
+  CHRPOS upDist = upRecs->getMaxLeftEndPos();
+  CHRPOS downDist = downRecs->getMaxLeftEndPos();
 
 
   if (upDist == -1 && downDist == -1) return;
 
-	int leftMostEndPos = (_currQueryRec->getStartPos() - max(upDist, downDist)) +1;
+	CHRPOS leftMostEndPos = (_currQueryRec->getStartPos() - max(upDist, downDist)) +1;
 	if ((!_sameStrand && !_diffStrand) ||
 		(_sameStrand && _qForward) ||
 		(_diffStrand && _qReverse))  {
@@ -633,9 +633,9 @@ void CloseSweep::setLeftClosestEndPos(int dbIdx)
 
 bool CloseSweep::beforeLeftClosestEndPos(int dbIdx, Record *rec)
 {
-	int recEndPos = rec->getEndPos();
-	int prevPos = _maxPrevLeftClosestEndPos[dbIdx];
-	int prevPosReverse = _maxPrevLeftClosestEndPosReverse[dbIdx];
+	CHRPOS recEndPos = rec->getEndPos();
+	CHRPOS prevPos = _maxPrevLeftClosestEndPos[dbIdx];
+	CHRPOS prevPosReverse = _maxPrevLeftClosestEndPosReverse[dbIdx];
 
 	if (!_sameStrand && !_diffStrand) {
 		return recEndPos < prevPos;
@@ -655,7 +655,7 @@ void CloseSweep::clearClosestEndPos(int dbIdx)
 	_maxPrevLeftClosestEndPosReverse[dbIdx] = 0;
 }
 
-CloseSweep::rateOvlpType CloseSweep::tryToAddRecord(Record *cacheRec, int dist, int dbIdx, bool &stopScanning, chromDirType chromDir, streamDirType streamDir) {
+CloseSweep::rateOvlpType CloseSweep::tryToAddRecord(Record *cacheRec, CHRPOS dist, int dbIdx, bool &stopScanning, chromDirType chromDir, streamDirType streamDir) {
 
 	//
 	// Decide whether to ignore hit

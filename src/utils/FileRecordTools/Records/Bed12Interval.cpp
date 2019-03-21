@@ -39,7 +39,7 @@ bool Bed12Interval::initFromFile(SingleLineDelimTextFileReader *fileReader)
 
 	 _thickStart = str2chrPos(_thickStartStr);
 	 _thickEnd = str2chrPos(_thickEndStr);
-	 _blockCount = str2chrPos(_blockCountStr);
+	 _blockCount = (int)str2chrPos(_blockCountStr);
 	return baseRetFlag;
 }
 
@@ -76,7 +76,7 @@ void Bed12Interval::print(string &outBuf) const
 	outBuf.append(_blockStarts);
 }
 
-void Bed12Interval::print(string &outBuf, int start, int end) const
+void Bed12Interval::print(string &outBuf, CHRPOS start, CHRPOS end) const
 {
 	Bed6Interval::print(outBuf, start, end);
 
@@ -172,12 +172,12 @@ bool Bed12Interval::isNumericField(int fieldNum) {
 	}
 }
 
-int Bed12Interval::getLength(bool obeySplits) const {
+CHRPOS Bed12Interval::getLength(bool obeySplits) const {
 	//only bed12 and BAM need to check splits
 	if (!obeySplits || _blockCount <=0) {
 		return _endPos - _startPos;
 	} else {
-		vector<int> vBlockSizes;
+		vector<CHRPOS> vBlockSizes;
 		Tokenize(_blockSizes, vBlockSizes, ',');
 	    return accumulate(vBlockSizes.begin(), vBlockSizes.end(), 0);
 	}
