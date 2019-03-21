@@ -10,7 +10,7 @@
 
 using namespace std;
 
-FastaIndexEntry::FastaIndexEntry(string name, CHRPOS length, CHRPOS offset, int line_blen, int line_len, bool useFullHeader)
+FastaIndexEntry::FastaIndexEntry(string name, CHRPOS length, CHRPOS offset, CHRPOS line_blen, CHRPOS line_len, bool useFullHeader)
     : name(name)
     , length(length)
     , offset(offset)
@@ -108,7 +108,7 @@ void FastaIndex::indexReference(string refname) {
     string line;
     FastaIndexEntry entry;  // an entry buffer used in processing
     entry.clear();
-    int line_length = 0;
+    CHRPOS line_length = 0;
     long long offset = 0;  // byte offset from start of file
     long long line_number = 0; // current line number
     bool mismatchedLineLengths = false; // flag to indicate if our line length changes mid-file
