@@ -25,6 +25,7 @@ namespace BamTools {
 
 			if(!init_flag) 
 			{
+				init_flag = true;
 				memset(cigar_code, -1, sizeof(cigar_code));
 				for(unsigned i = 0; i < sizeof(cigar_ops_as_chars)/sizeof(*cigar_ops_as_chars); i++)
 					cigar_code[(size_t)cigar_ops_as_chars[i]] = (int)i;
