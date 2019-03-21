@@ -92,7 +92,7 @@ namespace BamTools {
 				bam->m_data = next_size;
 			}
 
-			memmove(bam->data + ofs + old_size, bam->data + ofs + new_size, bam->l_data - old_size);
+			memmove(bam->data + ofs + old_size, bam->data + ofs + new_size, bam->l_data - ofs - old_size);
 
 			bam->l_data = bam->l_data + new_size - old_size;
 
