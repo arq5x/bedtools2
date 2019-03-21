@@ -5,8 +5,8 @@ UTILITIES_DIR = ../
 # define our includes
 # -------------------
 INCLUDES = -I$(UTILITIES_DIR)/general/ \
-		 	-I$(UTILITIES_DIR)/lineFileUtilities/ \
- 			-I$(UTILITIES_DIR)/KeyListOps/ \
+           -I$(UTILITIES_DIR)/lineFileUtilities/ \
+           -I$(UTILITIES_DIR)/KeyListOps/ \
            -I$(UTILITIES_DIR)/BamTools/include/	
 
 # ----------------------------------

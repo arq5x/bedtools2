@@ -28,7 +28,6 @@ using namespace std;
 
 typedef int64_t CHRPOS;
 
-
 // typedef for mapping b/w chrom name and it's size in b.p.
 typedef map<string, CHRPOS, std::less<string> > chromToSizes;
 
