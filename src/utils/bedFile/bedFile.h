@@ -675,7 +675,7 @@ private:
             bed.fields = fields;
             bed.chrom = fields[0];
 
-            int i;
+            CHRPOS i;
             i = stoll(fields[1].c_str());
             if (i<0) {
                  cerr << "Error: malformed BED entry at line " 
@@ -684,7 +684,7 @@ private:
                       << endl;
                  exit(1);
             }
-            bed.start = (CHRPOS)i;
+            bed.start = i;
             i = stoll(fields[2].c_str());
             if (i<0) {
                 cerr << "Error: malformed BED entry at line " 
@@ -693,7 +693,7 @@ private:
                      << endl;
                 exit(1);
             }
-            bed.end = (CHRPOS)i;
+            bed.end = i;
             
             // handle starts == end (e.g., insertions in reference genome)
             if (bed.start == bed.end) {
