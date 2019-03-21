@@ -145,4 +145,17 @@ $BT jaccard -a aMixedStrands.bed -b bMixedStrands.bed -S - > obs
 check obs exp
 rm obs exp
 
+echo -e "    jaccard.t14...\c"
+echo  "intersection	union-intersection	jaccard	n_intersections
+1	3	0.333333	1" > exp
+
+$BT jaccard -b a645.bed -a b645.bed > obs
+check obs exp
+rm obs 
+
+echo -e "    jaccard.t15...\c"
+$BT jaccard -a a645.bed -b b645.bed > obs
+check obs exp
+rm obs  exp
+
 [[ $FAILURES -eq 0 ]] || exit 1;
