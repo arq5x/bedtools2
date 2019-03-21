@@ -277,7 +277,7 @@ int BedSplit::doSimpleSplit()
 
 int BedSplit::doEuristicSplitOnTotalSize()
     {
-    double total_bases = 0.0;
+    long double total_bases = 0.0;
     vector<BedSplitItems*> splits;
     loadBed();
    

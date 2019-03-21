@@ -52,7 +52,7 @@ bool SpacingFile::findNext(RecordKeyVector &hits)
 					_distance.append("-1");
 				else
 				{
-					int distance = _currRec->getStartPos() - _prevRec->getEndPos();
+					CHRPOS distance = _currRec->getStartPos() - _prevRec->getEndPos();
 					ostringstream s;
 					s << distance;
 					_distance.append(s.str());

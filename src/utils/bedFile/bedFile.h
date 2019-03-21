@@ -169,7 +169,7 @@ public:
       weight(0.0)
     {}
     
-    int size() const {
+    CHRPOS size() const {
         return end-start;
     }
 
@@ -256,7 +256,7 @@ struct BEDCOVLIST {
     bool   zeroLength;
 
     // Additional fields specific to computing coverage
-    vector< map<unsigned int, DEPTH> > depthMapList;
+    vector< map<CHRPOS, DEPTH> > depthMapList;
     vector<unsigned int> counts;
     vector<CHRPOS> minOverlapStarts;
     
@@ -351,7 +351,7 @@ inline bool isInteger(const std::string& s) {
 // return the amount of overlap between two features.  Negative if none and the
 // number of negative bases is the distance between the two.
 inline
-int overlaps(CHRPOS aS, CHRPOS aE, CHRPOS bS, CHRPOS bE) {
+CHRPOS overlaps(CHRPOS aS, CHRPOS aE, CHRPOS bS, CHRPOS bE) {
     return min(aE, bE) - max(aS, bS);
 }
 
@@ -520,10 +520,10 @@ private:
     bool _firstLine;
     vector<string> _bedFields;
     unsigned int _numFields;
-    int _merged_start;
-    int _merged_end;
+    CHRPOS _merged_start;
+    CHRPOS _merged_end;
     string _merged_chrom;
-    int _prev_start;
+    CHRPOS _prev_start;
     string _prev_chrom;
     unsigned long _total_length;
     unsigned long _total_flattened_length;

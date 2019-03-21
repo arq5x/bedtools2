@@ -105,7 +105,8 @@ unsigned long Fisher::getTotalIntersection(RecordKeyVector &recList)
     CHRPOS keyEnd = key->getEndPos();
 
     _overlapCounts += recList.size();
-    _qsizes.push_back((keyEnd - keyStart));
+    // note that we truncate to a max size of 2.1GB
+    _qsizes.push_back((int)(keyEnd - keyStart));
 
     int hitIdx = 0;
     for (RecordKeyVector::iterator_type iter = recList.begin(); iter != recList.end(); iter = recList.next()) {

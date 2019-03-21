@@ -71,7 +71,7 @@ void BedRandom::Generate()
         numGenerated++;
         // flip a coin for strand
         (rand() / double(RAND_MAX)) > 0.5 ? strand = '+' : strand = '-';
-        printf("%s\t%d\t%d\t%d\t%d\t%c\n", chrom.c_str(), start, end, numGenerated, end-start, strand);
+        printf("%s\t%ld\t%ld\t%d\t%ld\t%c\n", chrom.c_str(), start, end, numGenerated, end-start, strand);
     }
 }
 

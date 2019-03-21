@@ -458,7 +458,7 @@ void CloseSweep::checkMultiDbs(RecordKeyVector &retList) {
 	vector<distanceTuple> copyDists;
 	int numHits = (int)retList.size();
 	copyDists.resize(numHits);
-	int i=0;
+	CHRPOS i=0;
 	for (RecordKeyVector::iterator_type iter = retList.begin(); iter != retList.end(); iter++) {
 		CHRPOS dist = _finalDistances[i];
 		copyDists[i]._dist = abs(dist);

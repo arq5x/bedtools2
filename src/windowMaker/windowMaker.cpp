@@ -101,8 +101,8 @@ void WindowMaker::MakeFixedSizeWindow(const BED& interval) {
 }
 
 void WindowMaker::MakeFixedCountWindow(const BED& interval) {
-    uint32_t interval_size = interval.end - interval.start ;
-    uint32_t window_size = (interval_size)/_count; // integer version of ceil(interval_size/_count)
+    CHRPOS interval_size = interval.end - interval.start ;
+    CHRPOS window_size = (interval_size)/_count; // integer version of ceil(interval_size/_count)
 
     if (window_size == 0)
     {

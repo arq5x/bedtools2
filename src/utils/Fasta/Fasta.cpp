@@ -10,7 +10,7 @@
 
 using namespace std;
 
-FastaIndexEntry::FastaIndexEntry(string name, int length, long long offset, int line_blen, int line_len, bool useFullHeader)
+FastaIndexEntry::FastaIndexEntry(string name, CHRPOS length, CHRPOS offset, int line_blen, int line_len, bool useFullHeader)
     : name(name)
     , length(length)
     , offset(offset)
@@ -282,8 +282,8 @@ FastaReference::~FastaReference(void) {
 
 string FastaReference::getSequence(string seqname) {
     FastaIndexEntry entry = index->entry(seqname);
-    int newlines_in_sequence = entry.length / entry.line_blen;
-    int seqlen = newlines_in_sequence  + entry.length;
+    CHRPOS newlines_in_sequence = entry.length / entry.line_blen;
+    CHRPOS seqlen = newlines_in_sequence  + entry.length;
     char* seq = (char*) calloc (seqlen + 1, sizeof(char));
     if (usingmmap) {
         memcpy(seq, (char*) filemm + entry.offset, seqlen);
@@ -312,7 +312,7 @@ string FastaReference::sequenceNameStartingWith(string seqnameStart) {
     }
 }
 
-string FastaReference::getSubSequence(string seqname, int start, int length) {
+string FastaReference::getSubSequence(string seqname, CHRPOS start, CHRPOS length) {
     FastaIndexEntry entry = index->entry(seqname);
     if (start < 0 || length < 1) {
         cerr << "Error: cannot construct subsequence with negative offset or length < 1" << endl;
@@ -322,10 +322,10 @@ string FastaReference::getSubSequence(string seqname, int start, int length) {
     // approach: count newlines before start
     //           count newlines by end of read
     //             subtracting newlines before start find count of embedded newlines
-    int newlines_before = start > 0 ? (start - 1) / entry.line_blen : 0;
-    int newlines_by_end = (start + length - 1) / entry.line_blen;
-    int newlines_inside = newlines_by_end - newlines_before;
-    int seqlen = length + newlines_inside;
+    CHRPOS newlines_before = start > 0 ? (start - 1) / entry.line_blen : 0;
+    CHRPOS newlines_by_end = (start + length - 1) / entry.line_blen;
+    CHRPOS newlines_inside = newlines_by_end - newlines_before;
+    CHRPOS seqlen = length + newlines_inside;
     char* seq = (char*) calloc (seqlen + 1, sizeof(char));
     if (usingmmap) {
         memcpy(seq, (char*) filemm + entry.offset + newlines_before + start, seqlen);

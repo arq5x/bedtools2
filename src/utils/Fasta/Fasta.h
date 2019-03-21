@@ -31,7 +31,7 @@ typedef int64_t CHRPOS;
 class FastaIndexEntry {
     friend ostream& operator<<(ostream& output, const FastaIndexEntry& e);
     public:
-        FastaIndexEntry(string name, int length, long long offset,
+        FastaIndexEntry(string name, CHRPOS length, CHRPOS offset,
 			int line_blen, int line_len, bool useFullHeader);
         FastaIndexEntry(void);
         ~FastaIndexEntry(void);
@@ -78,7 +78,7 @@ class FastaReference {
         string getSequence(string seqname);
         // potentially useful for performance, investigate
         // void getSequence(string seqname, string& sequence);
-        string getSubSequence(string seqname, int start, int length);
+        string getSubSequence(string seqname, CHRPOS start, CHRPOS length);
         string sequenceNameStartingWith(string seqnameStart);
         CHRPOS sequenceLength(string seqname);
 };
