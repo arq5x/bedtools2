@@ -37,28 +37,16 @@ private:
     //
     // BIN HANDLING
     //
-	typedef int32_t binNumType;
-	static const binNumType NUM_BINS = 37450;
-	static const binNumType NUM_BIN_LEVELS = 7;
+	typedef int64_t binNumType;
 
-	// bins range in size from 16kb to 512Mb
-	// Bin  0          spans 512Mbp,   # Level 1
-	// Bins 1-8        span 64Mbp,     # Level 2
-	// Bins 9-72       span 8Mbp,      # Level 3
-	// Bins 73-584     span 1Mbp       # Level 4
-	// Bins 585-4680   span 128Kbp     # Level 5
-	// Bins 4681-37449 span 16Kbp      # Level 6
+	// bins range in size from 16kb to 32Gb
+	static const binNumType NUM_BIN_LEVELS = 8;
+
 	binNumType *_binOffsetsExtended;
 	static const binNumType _binFirstShift = 14;       /* How much to shift to get to finest bin. */
 	static const binNumType _binNextShift  = 3;        /* How much to shift to get to next larger bin. */
-
-//	typedef RecordList innerListType;
-//	typedef const RecordListNode * innerListIterType;
-//	typedef innerListType * binType;
-//	typedef binType * allBinsType;
-//	typedef string mainKeyType;
-//	typedef map<mainKeyType, allBinsType> mainMapType;
-//	mainMapType _mainMap;
+	
+	static const binNumType NUM_BINS = (1 << (_binNextShift * NUM_BIN_LEVELS)) / ((1 << _binNextShift) - 1);
 
 	typedef vector<Record *> binType;
 	typedef map<binNumType, binType> allBinsType; //for each bin number, have a RecordList
