@@ -78,13 +78,13 @@ bool SingleLineDelimTextFileReader::readEntry()
 
 
 void SingleLineDelimTextFileReader::getField(int fieldNum, string &str) const {
-	int startPos = _delimPositions[fieldNum] +1;
-	int endPos = _delimPositions[fieldNum+1];
+	CHRPOS startPos = _delimPositions[fieldNum] +1;
+	CHRPOS endPos = _delimPositions[fieldNum+1];
 	str.assign(_sLine.c_str() + startPos, endPos - startPos);
 }
 
 
-void SingleLineDelimTextFileReader::getField(int fieldNum, int &val) const {
+void SingleLineDelimTextFileReader::getField(int fieldNum, CHRPOS &val) const {
 	string temp;
 	getField(fieldNum, temp);
 	val = str2chrPos(temp.c_str());
@@ -182,7 +182,7 @@ int SingleLineDelimTextFileReader::getVcfSVlen() {
         		string start_str;
         		getField(1, start_str);
         		// length is END - POS + 1
-        		return str2chrPos(keytoval.at(1)) - str2chrPos(start_str) + 1;
+        		return (int)(str2chrPos(keytoval.at(1)) - str2chrPos(start_str) + 1);
         	}
 		}
     }

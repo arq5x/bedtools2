@@ -13,6 +13,8 @@
 #include "string.h"
 #include "lineFileUtilities.h"
 
+typedef int64_t CHRPOS;
+
 class SingleLineDelimTextFileReader : public FileReader {
 public:
 	//Allow VCF records to access a specialized private method.
@@ -25,7 +27,7 @@ public:
 	virtual bool readEntry();
 	virtual int getNumFields() const { return _numFields; }
 	virtual void getField(int numField, string &val) const;
-	virtual void getField(int numField, int &val) const; //this signaiture isn't const because it operates on an internal string for speed.
+	virtual void getField(int numField, CHRPOS &val) const; //this signaiture isn't const because it operates on an internal string for speed.
 	virtual void getField(int fieldNum, char &val) const;
 	virtual void appendField(int fieldNum, string &str) const;
 	virtual const string &getHeader() const { return _header; }

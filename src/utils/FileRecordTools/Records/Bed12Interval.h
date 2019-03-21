@@ -22,18 +22,18 @@ public:
 	virtual bool initFromFile(SingleLineDelimTextFileReader *);
 	virtual void clear();
 	virtual void print(string &outBuf) const;
-	virtual void print(string &outBuf, int start, int end) const;
+	virtual void print(string &outBuf, CHRPOS start, CHRPOS end) const;
 	virtual void print(string &outBuf, const string & start, const string & end) const;
 	virtual void printNull(string &outBuf) const;
 	virtual FileRecordTypeChecker::RECORD_TYPE getType() const { return FileRecordTypeChecker::BED12_RECORD_TYPE; }
 
 	const Bed12Interval &operator=(const Bed12Interval &other);
 
-	virtual int getThickStart() const { return _thickStart; }
-	virtual void setThickStart(int thickStart)  { _thickStart = thickStart; }
+	virtual CHRPOS getThickStart() const { return _thickStart; }
+	virtual void setThickStart(CHRPOS thickStart)  { _thickStart = thickStart; }
 
-	virtual int getThickEnd() const { return _thickEnd; }
-	virtual void setThickEnd(int thickEnd) { _thickEnd = thickEnd; }
+	virtual CHRPOS getThickEnd() const { return _thickEnd; }
+	virtual void setThickEnd(CHRPOS thickEnd) { _thickEnd = thickEnd; }
 
 	virtual const string & getItemRGB() const { return _itemRGB; }
 	virtual void setItemRGB(const string & rgb) { _itemRGB = rgb; }
@@ -59,8 +59,8 @@ public:
 protected:
 	virtual ~Bed12Interval();
 
-	int _thickStart;
-	int _thickEnd;
+	CHRPOS _thickStart;
+	CHRPOS _thickEnd;
 	string _itemRGB;
 	int _blockCount;
 	string _blockSizes;

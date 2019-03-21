@@ -37,7 +37,7 @@ public:
 	virtual bool initFromFile(FileReader *) =0;
 	virtual void clear();
 	virtual void print(string &) const {}
-	virtual void print(string &, int, int ) const {}
+	virtual void print(string &, CHRPOS, CHRPOS ) const {}
 	virtual void print(string &, const string &, const string &) const {}
 	virtual void print(FILE *fp, bool newline = false) const;
 	virtual void printNull(string &) const {}

@@ -56,7 +56,7 @@ public:
 	int currDist(constIterType iter) const { return _distIndex[iter].first; }
 	size_t currNumElems(constIterType iter) const { return allElems(iter)->size(); }
 	elemsType *allElems(constIterType iter) const { return _allRecs[_distIndex[iter].second]; }
-	int getMaxLeftEndPos() const;
+	CHRPOS getMaxLeftEndPos() const;
 
 private:
 

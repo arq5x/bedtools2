@@ -52,7 +52,7 @@ private:
 	void printRecord(RecordKeyVector &keyList, RecordKeyVector *blockList);
 	void printKey(const Record *key);
 	void printKey(const Record *key, const string & start, const string & end);
-	void printKey(const Record *key, int start, int end);
+	void printKey(const Record *key, CHRPOS start, CHRPOS end);
 	void addDbFileId(int fileId);
 	bool printKeyAndTerminate(RecordKeyVector &keyList);
 	printBamType printBamRecord(RecordKeyVector &keyList, bool bamOutputOnly = false);

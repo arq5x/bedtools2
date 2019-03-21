@@ -94,7 +94,7 @@ bool RecDistList::addRec(CHRPOS dist, Record *record, chromDirType chromDir) {
 	_allRecs[useElemIdx]->reserve(16);
 	_allRecs[useElemIdx]->push_back(elemPairType(chromDir, record));
 
-	_distIndex[newPos].first = dist;
+	_distIndex[newPos].first = (int)dist;
 	_distIndex[newPos].second = useElemIdx;
 	_empty = false;
 	_totalRecs++;
@@ -104,7 +104,7 @@ bool RecDistList::addRec(CHRPOS dist, Record *record, chromDirType chromDir) {
 //if true, pos will be the idx the distance is at.
 //if false, pos will be the idx to insert at.
 bool RecDistList::find(CHRPOS dist, CHRPOS &pos) const {
-	int lbound=0, ubound=_currNumIdxs-1, currVal =0;
+	CHRPOS lbound=0, ubound=_currNumIdxs-1, currVal =0;
 	pos = 0;
 	while(lbound <= ubound)
 	{
@@ -123,7 +123,7 @@ bool RecDistList::find(CHRPOS dist, CHRPOS &pos) const {
 	return false;
 }
 
-int RecDistList::getMaxLeftEndPos() const {
+CHRPOS RecDistList::getMaxLeftEndPos() const {
 
 	if (_empty) return -1;
 

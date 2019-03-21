@@ -31,7 +31,7 @@ void GffPlusRecord::print(string &outBuf) const
 	_plusFields.printFields(outBuf);
 }
 
-void GffPlusRecord::print(string &outBuf, int start, int end) const
+void GffPlusRecord::print(string &outBuf, CHRPOS start, CHRPOS end) const
 {
 	GffRecord::print(outBuf, start, end);
 	_plusFields.printFields(outBuf);

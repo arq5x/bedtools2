@@ -986,14 +986,14 @@ public:
         else if (_isGff == true) {
             // "GFF-8"
             if (this->bedType == 8) {
-                printf ("%s\t%s\t%s\t%d\t%d\t%s\t%s\t%s\t", 
+                printf ("%s\t%s\t%s\t%ld\t%ld\t%s\t%s\t%s\t", 
                     bed.chrom.c_str(), bed.fields[bed.other_idxs[0]].c_str(),
                     bed.name.c_str(), start+1, end, bed.score.c_str(), 
                     bed.strand.c_str(), bed.fields[bed.other_idxs[1]].c_str());
             }
             // "GFF-9"
             else if (this->bedType == 9) {
-                printf ("%s\t%s\t%s\t%d\t%d\t%s\t%s\t%s\t%s\t", 
+                printf ("%s\t%s\t%s\t%ld\t%ld\t%s\t%s\t%s\t%s\t", 
                     bed.chrom.c_str(), bed.fields[bed.other_idxs[0]].c_str(),
                     bed.name.c_str(), start+1, end,
                     bed.score.c_str(), bed.strand.c_str(),
@@ -1028,24 +1028,24 @@ public:
         //BED
         if (_isGff == false && _isVcf == false) {
             if (this->bedType == 3) {
-                fprintf(out,"%s\t%d\t%d\n", bed.chrom.c_str(), start, end);
+                fprintf(out,"%s\t%ld\t%ld\n", bed.chrom.c_str(), start, end);
             }
             else if (this->bedType == 4) {
-                fprintf(out,"%s\t%d\t%d\t%s\n", 
+                fprintf(out,"%s\t%ld\t%ld\t%s\n", 
                     bed.chrom.c_str(), start, end, bed.name.c_str());
             }
             else if (this->bedType == 5) {
-                fprintf(out,"%s\t%d\t%d\t%s\t%s\n", 
+                fprintf(out,"%s\t%ld\t%ld\t%s\t%s\n", 
                     bed.chrom.c_str(), start, end, 
                     bed.name.c_str(), bed.score.c_str());
             }
             else if (this->bedType == 6) {
-                fprintf(out,"%s\t%d\t%d\t%s\t%s\t%s\n", 
+                fprintf(out,"%s\t%ld\t%ld\t%s\t%s\t%s\n", 
                     bed.chrom.c_str(), start, end, bed.name.c_str(),
                     bed.score.c_str(), bed.strand.c_str());
             }
             else if (this->bedType > 6) {
-                fprintf(out,"%s\t%d\t%d\t%s\t%s\t%s", 
+                fprintf(out,"%s\t%ld\t%ld\t%s\t%s\t%s", 
                     bed.chrom.c_str(), start, end, bed.name.c_str(),
                     bed.score.c_str(), bed.strand.c_str());
 
@@ -1061,7 +1061,7 @@ public:
         }
         // VCF
         else if (_isGff == false && _isVcf == true) {
-            fprintf(out,"%s\t%d", bed.chrom.c_str(), start+1);
+            fprintf(out,"%s\t%ld", bed.chrom.c_str(), start+1);
 
             vector<uint16_t>::const_iterator othIt  = bed.other_idxs.begin();
             vector<uint16_t>::const_iterator othEnd = bed.other_idxs.end();
@@ -1074,7 +1074,7 @@ public:
         else if (_isGff == true) {
             // "GFF-8"
             if (this->bedType == 8) {
-                fprintf (out,"%s\t%s\t%s\t%d\t%d\t%s\t%s\t%s\n", 
+                fprintf (out,"%s\t%s\t%s\t%ld\t%ld\t%s\t%s\t%s\n", 
                     bed.chrom.c_str(), bed.fields[bed.other_idxs[0]].c_str(),
                     bed.name.c_str(), start+1, end,
                     bed.score.c_str(), bed.strand.c_str(),
@@ -1082,7 +1082,7 @@ public:
             }
             // "GFF-9"
             else if (this->bedType == 9) {
-                fprintf (out,"%s\t%s\t%s\t%d\t%d\t%s\t%s\t%s\t%s\n", 
+                fprintf (out,"%s\t%s\t%s\t%ld\t%ld\t%s\t%s\t%s\t%s\n", 
                     bed.chrom.c_str(), bed.fields[bed.other_idxs[0]].c_str(),
                     bed.name.c_str(), start+1, end,
                     bed.score.c_str(), bed.strand.c_str(),

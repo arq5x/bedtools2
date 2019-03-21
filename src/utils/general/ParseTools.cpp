@@ -35,11 +35,11 @@ bool isInteger(const string &str) {
 
 
 
-int str2chrPos(const string &str) {
+CHRPOS str2chrPos(const string &str) {
 	return str2chrPos(str.c_str(), str.size());
 }
 
-int str2chrPos(const char *str, size_t ulen) {
+CHRPOS str2chrPos(const char *str, size_t ulen) {
 
 	if (ulen == 0) {
 		ulen = strlen(str);
@@ -61,7 +61,7 @@ int str2chrPos(const char *str, size_t ulen) {
 		exit(1);
 	}
 
-	int sum=0;
+	CHRPOS sum=0;
 	int startPos =0;
 	bool isNegative = false;
 
@@ -93,34 +93,34 @@ int str2chrPos(const char *str, size_t ulen) {
 
 		switch (power) {
 		case 0:
-			sum += dig;
+			sum += (CHRPOS)dig;
 			break;
 		case 1:
-			sum += dig * 10;
+			sum += (CHRPOS)dig * 10;
 			break;
 		case 2:
-			sum += dig *100;
+			sum += (CHRPOS)dig *100;
 			break;
 		case 3:
-			sum += dig *1000;
+			sum += (CHRPOS)dig *1000;
 			break;
 		case 4:
-			sum += dig *10000;
+			sum += (CHRPOS)dig *10000;
 			break;
 		case 5:
-			sum += dig *100000;
+			sum += (CHRPOS)dig *100000;
 			break;
 		case 6:
-			sum += dig *1000000;
+			sum += (CHRPOS)dig *1000000;
 			break;
 		case 7:
-			sum += dig *10000000;
+			sum += (CHRPOS)dig *10000000;
 			break;
 		case 8:
-			sum += dig *100000000;
+			sum += (CHRPOS)dig *100000000;
 			break;
 		case 9:
-			sum += dig *1000000000;
+			sum += (CHRPOS)dig *1000000000;
 			break;
 		default:
 			return 0;

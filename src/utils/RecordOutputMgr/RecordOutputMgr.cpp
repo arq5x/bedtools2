@@ -350,9 +350,9 @@ void RecordOutputMgr::reportOverlapDetail(const Record *keyRecord, const Record 
 {
 
 	// overlap interval is defined by min(e1,e2) - max(s1,s2)
-	int maxStart = max(keyRecord->getStartPos(), hitRecord->getStartPos());
+	CHRPOS maxStart = max(keyRecord->getStartPos(), hitRecord->getStartPos());
 	//cout << keyRecord->getStartPos() << "," << hitRecord->getStartPos();
-	int minEnd = min(keyRecord->getEndPos(), hitRecord->getEndPos());
+	CHRPOS minEnd = min(keyRecord->getEndPos(), hitRecord->getEndPos());
 
 	// need to undo our conversion of 1-based start coordinates to 0-based
 	if (!keyRecord->isZeroBased())
@@ -531,7 +531,7 @@ void RecordOutputMgr::printKey(const Record *key, const string & start, const st
 	}
 }
 
-void RecordOutputMgr::printKey(const Record *key, int start, int end)
+void RecordOutputMgr::printKey(const Record *key, CHRPOS start, CHRPOS end)
 {
 	if (key->getType() != FileRecordTypeChecker::BAM_RECORD_TYPE) {
 		key->print(_outBuf, start, end);

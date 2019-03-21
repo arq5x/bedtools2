@@ -27,7 +27,7 @@ void Bed4Interval::print(string &outBuf) const
 	outBuf.append(_name);
 }
 
-void Bed4Interval::print(string &outBuf, int start, int end) const
+void Bed4Interval::print(string &outBuf, CHRPOS start, CHRPOS end) const
 {
 	Bed3Interval::print(outBuf, start, end);
 	outBuf.append("\t");

@@ -363,7 +363,7 @@ void BedFile::allHits(string chrom, CHRPOS start,
             for (; bedItr != bedEnd; ++bedItr) {
                 CHRPOS s = max(start, bedItr->start);
                 CHRPOS e = min(end, bedItr->end);
-                int overlapBases = (e - s); 
+                int overlapBases = (int)(e - s); 
                 // 1. is there sufficient overlap w.r.t A?
                 if ( (float) overlapBases 
                       / 
@@ -421,7 +421,7 @@ bool BedFile::anyHits(string chrom, CHRPOS start, CHRPOS end, string strand,
             for (; bedItr != bedEnd; ++bedItr) {
                 CHRPOS s = max(start, bedItr->start);
                 CHRPOS e = min(end, bedItr->end);
-                int overlapBases = (e - s); 
+                int overlapBases = (int)(e - s); 
                 // 1. is there sufficient overlap w.r.t A?
                 if ( (float) overlapBases 
                       / 

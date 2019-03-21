@@ -674,7 +674,7 @@ bool ContextBase::parseIoBufSize(string bufStr)
 		_errorMsg = "\n***** ERROR: argument passed to -iobuf is not numeric. *****";
 		return false;
 	}
-	_ioBufSize = str2chrPos(bufStr) * multiplier;
+	_ioBufSize = (int)str2chrPos(bufStr) * multiplier;
 	if (_ioBufSize < MIN_ALLOWED_BUF_SIZE) {
 		_errorMsg = "\n***** ERROR: specified buffer size is too small. *****";
 		return false;

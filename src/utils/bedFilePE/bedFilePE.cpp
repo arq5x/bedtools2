@@ -90,26 +90,26 @@ BedLineStatus BedFilePE::GetNextBedPE (BEDPE &bedpe, int &lineNum) {
 void BedFilePE::reportBedPETab(const BEDPE &a) {
 
     if (this->bedType == 6) {
-        printf("%s\t%d\t%d\t%s\t%d\t%d\t", a.chrom1.c_str(), a.start1, a.end1,
+        printf("%s\t%ld\t%ld\t%s\t%ld\t%ld\t", a.chrom1.c_str(), a.start1, a.end1,
                                             a.chrom2.c_str(), a.start2, a.end2);
     }
     else if (this->bedType == 7) {
-        printf("%s\t%d\t%d\t%s\t%d\t%d\t%s\t", a.chrom1.c_str(), a.start1, a.end1,
+        printf("%s\t%ld\t%ld\t%s\t%ld\t%ld\t%s\t", a.chrom1.c_str(), a.start1, a.end1,
                                             a.chrom2.c_str(), a.start2, a.end2,
                                             a.name.c_str());
     }
     else if (this->bedType == 8) {
-        printf("%s\t%d\t%d\t%s\t%d\t%d\t%s\t%s\t", a.chrom1.c_str(), a.start1, a.end1,
+        printf("%s\t%ld\t%ld\t%s\t%ld\t%ld\t%s\t%s\t", a.chrom1.c_str(), a.start1, a.end1,
                                             a.chrom2.c_str(), a.start2, a.end2,
                                             a.name.c_str(), a.score.c_str());
     }
     else if (this->bedType == 10) {
-        printf("%s\t%d\t%d\t%s\t%d\t%d\t%s\t%s\t%s\t%s\t", a.chrom1.c_str(), a.start1, a.end1,
+        printf("%s\t%ld\t%ld\t%s\t%ld\t%ld\t%s\t%s\t%s\t%s\t", a.chrom1.c_str(), a.start1, a.end1,
                                             a.chrom2.c_str(), a.start2, a.end2,
                                             a.name.c_str(), a.score.c_str(), a.strand1.c_str(), a.strand2.c_str());
     }
     else if (this->bedType > 10) {
-        printf("%s\t%d\t%d\t%s\t%d\t%d\t%s\t%s\t%s\t%s", a.chrom1.c_str(), a.start1, a.end1,
+        printf("%s\t%ld\t%ld\t%s\t%ld\t%ld\t%s\t%s\t%s\t%s", a.chrom1.c_str(), a.start1, a.end1,
                                             a.chrom2.c_str(), a.start2, a.end2,
                                             a.name.c_str(), a.score.c_str(), a.strand1.c_str(), a.strand2.c_str());
         vector<uint16_t>::const_iterator othIt  = a.other_idxs.begin();
@@ -132,26 +132,26 @@ void BedFilePE::reportBedPETab(const BEDPE &a) {
 void BedFilePE::reportBedPENewLine(const BEDPE &a) {
 
     if (this->bedType == 6) {
-        printf("%s\t%d\t%d\t%s\t%d\t%d\n", a.chrom1.c_str(), a.start1, a.end1,
+        printf("%s\t%ld\t%ld\t%s\t%ld\t%ld\n", a.chrom1.c_str(), a.start1, a.end1,
                                             a.chrom2.c_str(), a.start2, a.end2);
     }
     else if (this->bedType == 7) {
-        printf("%s\t%d\t%d\t%s\t%d\t%d\t%s\n", a.chrom1.c_str(), a.start1, a.end1,
+        printf("%s\t%ld\t%ld\t%s\t%ld\t%ld\t%s\n", a.chrom1.c_str(), a.start1, a.end1,
                                             a.chrom2.c_str(), a.start2, a.end2,
                                             a.name.c_str());
     }
     else if (this->bedType == 8) {
-        printf("%s\t%d\t%d\t%s\t%d\t%d\t%s\t%s\n", a.chrom1.c_str(), a.start1, a.end1,
+        printf("%s\t%ld\t%ld\t%s\t%ld\t%ld\t%s\t%s\n", a.chrom1.c_str(), a.start1, a.end1,
                                             a.chrom2.c_str(), a.start2, a.end2,
                                             a.name.c_str(), a.score.c_str());
     }
     else if (this->bedType == 10) {
-        printf("%s\t%d\t%d\t%s\t%d\t%d\t%s\t%s\t%s\t%s\n", a.chrom1.c_str(), a.start1, a.end1,
+        printf("%s\t%ld\t%ld\t%s\t%ld\t%ld\t%s\t%s\t%s\t%s\n", a.chrom1.c_str(), a.start1, a.end1,
                                             a.chrom2.c_str(), a.start2, a.end2,
                                             a.name.c_str(), a.score.c_str(), a.strand1.c_str(), a.strand2.c_str());
     }
     else if (this->bedType > 10) {
-        printf("%s\t%d\t%d\t%s\t%d\t%d\t%s\t%s\t%s\t%s", a.chrom1.c_str(), a.start1, a.end1,
+        printf("%s\t%ld\t%ld\t%s\t%ld\t%ld\t%s\t%s\t%s\t%s", a.chrom1.c_str(), a.start1, a.end1,
                                             a.chrom2.c_str(), a.start2, a.end2,
                                             a.name.c_str(), a.score.c_str(), a.strand1.c_str(), a.strand2.c_str());
         vector<uint16_t>::const_iterator othIt  = a.other_idxs.begin();
@@ -397,7 +397,7 @@ bool BedFilePE::parseBedPELine (BEDPE &bed, const vector<string> &lineVector, co
 void BedFilePE::FindOverlapsPerBin(int bEnd, string chrom, CHRPOS start, CHRPOS end, string name, string strand,
                                    vector<MATE> &hits, float overlapFraction, bool forceStrand, bool enforceDiffNames) {
 
-    int startBin, endBin;
+    CHRPOS startBin, endBin;
     startBin = (start >> _binFirstShift);
     endBin = ((end-1) >> _binFirstShift);
 
@@ -405,8 +405,8 @@ void BedFilePE::FindOverlapsPerBin(int bEnd, string chrom, CHRPOS start, CHRPOS 
     for (int i = 0; i < _binLevels; ++i) {
 
         // loop through each bin at this level of the hierarchy
-        int offset = _binOffsetsExtended[i];
-        for (int j = (startBin+offset); j <= (endBin+offset); ++j)  {
+        CHRPOS offset = _binOffsetsExtended[i];
+        for (CHRPOS j = (startBin+offset); j <= (endBin+offset); ++j)  {
 
             // loop through each feature in this chrom/bin and see if it overlaps
             // with the feature that was passed in.  if so, add the feature to
@@ -426,7 +426,7 @@ void BedFilePE::FindOverlapsPerBin(int bEnd, string chrom, CHRPOS start, CHRPOS 
             }
             for (; bedItr != bedEnd; ++bedItr) {
                 float overlap = overlaps(bedItr->bed.start, bedItr->bed.end, start, end);
-                float size    = end - start;
+                float size    = (float)(end - start);
 
                 if ( (overlap / size) >= overlapFraction ) {
 
