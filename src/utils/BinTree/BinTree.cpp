@@ -2,22 +2,11 @@
 #include "FileRecordMgr.h"
 
 
-BinTree::BinTree(ContextIntersect *context)
-:  _context(context),
-  _binOffsetsExtended(NULL)
- {
-	_binOffsetsExtended = new binNumType[NUM_BIN_LEVELS];
-	memset(_binOffsetsExtended, 0, NUM_BIN_LEVELS * sizeof(binNumType));
-
-	//start at idx 1, because the memset above already initialized
-	//the first idx to zero, which is what we want.
-	for (binNumType i= 1; i < NUM_BIN_LEVELS; i++) {
-		_binOffsetsExtended[i] = _binOffsetsExtended[i-1] + (1 << ((NUM_BIN_LEVELS - i -1) * 3));
-	}
+BinTree::BinTree(ContextIntersect *context) 
+:  _context(context) {
 }
 
 BinTree::~BinTree() {
-	delete [] _binOffsetsExtended;
 }
 
 void BinTree::loadDB()
@@ -116,9 +105,10 @@ bool BinTree::addRecordToTree(Record *record)
 
 	if (binNum < 0 || binNum >= NUM_BINS) {
 		fprintf(stderr, "ERROR: Received illegal bin number %lu from getBin call.\n"
+                                "Maximum values is: %lu\n"
                                 "This typically means that your coordinates are\n"
                                 "negative or too large to represent in the data\n"
-                                "structure bedtools uses to find intersections.", binNum);
+                                "structure bedtools uses to find intersections.", binNum, NUM_BINS);
 		return false;
 	}
 	_mainMap[chr][binNum].push_back(record);

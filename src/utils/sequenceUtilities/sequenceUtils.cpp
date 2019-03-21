@@ -177,7 +177,7 @@ void toUpperCase(std::string &seq)
 void getDnaContent(const string &seq, CHRPOS &a, CHRPOS &c, CHRPOS &g, CHRPOS &t, CHRPOS &n, CHRPOS &other)
 {
     // swap the bases
-    for(CHRPOS i = 0; i < seq.length(); i++) {
+    for(CHRPOS i = 0; i < (CHRPOS)seq.length(); i++) {
         switch(seq[i]) {
             case 'A':
             case 'a':

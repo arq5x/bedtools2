@@ -219,7 +219,6 @@ bool BedFile::GetNextBed(BED &bed, bool forceSorted) {
 	}
 	_lineNum++;
     }
-
     // ditch \r for Windows if necessary.
     if (_bedLine.size() && _bedLine[_bedLine.size()-1] == '\r') {
 	_bedLine.resize(_bedLine.size()-1);

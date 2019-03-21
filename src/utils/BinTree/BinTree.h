@@ -22,6 +22,9 @@ using namespace std;
 class FileRecordMgr;
 class Record;
 
+typedef int64_t binNumType;
+static const binNumType _binOffsetsExtended[] = {262144+32678+4096+512+64+8+1, 32678+4096+512+64+8+1, 4096+512+64+8+1, 512+64+8+1, 64+8+1, 8+1, 1, 0};
+
 class BinTree {
 public:
 	BinTree(ContextIntersect *context);
@@ -37,16 +40,16 @@ private:
     //
     // BIN HANDLING
     //
-	typedef int64_t binNumType;
+        typedef int64_t binNumType;
 
 	// bins range in size from 16kb to 32Gb
 	static const binNumType NUM_BIN_LEVELS = 8;
 
-	binNumType *_binOffsetsExtended;
 	static const binNumType _binFirstShift = 14;       /* How much to shift to get to finest bin. */
 	static const binNumType _binNextShift  = 3;        /* How much to shift to get to next larger bin. */
-	
+
 	static const binNumType NUM_BINS = (1 << (_binNextShift * NUM_BIN_LEVELS)) / ((1 << _binNextShift) - 1);
+
 
 	typedef vector<Record *> binType;
 	typedef map<binNumType, binType> allBinsType; //for each bin number, have a RecordList
