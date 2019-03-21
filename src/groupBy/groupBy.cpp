@@ -36,8 +36,8 @@ bool GroupBy::init()
 		if (strchr(elem.c_str(), '-')) {
 			Tokenizer rangeElems;
 			rangeElems.tokenize(elem, '-');
-			int startNum = str2chrPos(rangeElems.getElem(0));
-			int endNum = str2chrPos(rangeElems.getElem(1));
+			int startNum = (int)str2chrPos(rangeElems.getElem(0));
+			int endNum = (int)str2chrPos(rangeElems.getElem(1));
 			for (int i=startNum; i <= endNum; i++) {
 				_groupCols.push_back(i);
 			}

@@ -51,7 +51,7 @@ private:
     // instance of a bed file class.
     BedFile  *_bed;
     void PrintHeader(void);
-    void ReportDnaProfile(const BED& bed, const string &sequence, int seqLength);
+    void ReportDnaProfile(const BED& bed, const string &sequence, CHRPOS seqLength);
 };
 
 #endif

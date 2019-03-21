@@ -52,9 +52,10 @@ bool BamRecord::initFromFile(BamFileReader *bamFileReader)
 
 	_bamChromId = bamFileReader->getCurrChromdId();
 	_startPos = bamFileReader->getStartPos();
-	int2str(_startPos, _startPosStr);
+        // NOTE: casting to int here, but bam currently only supports int32_t for position
+	int2str((int)_startPos, _startPosStr);
 	_endPos = bamFileReader->getEndPos();
-	int2str(_endPos, _endPosStr);
+	int2str((int)_endPos, _endPosStr);
 	bamFileReader->getName(_name);
 	bamFileReader->getScore(_score);
 	char strandChar = bamFileReader->getStrand();
@@ -68,8 +69,8 @@ bool BamRecord::initFromFile(BamFileReader *bamFileReader)
 	buildCigarStr();
 
 	bamFileReader->getMateChrName(_mateChrName);
-	int2str(_bamAlignment.MatePosition, _matePos);
-	int2str(_bamAlignment.InsertSize, _insertSize);
+	int2str((CHRPOS)_bamAlignment.MatePosition, _matePos);
+	int2str((CHRPOS)_bamAlignment.InsertSize, _insertSize);
 	_queryBases = _bamAlignment.QueryBases;
 	_qualities = _bamAlignment.Qualities;
 
@@ -161,8 +162,8 @@ void BamRecord::printRemainingBamFields(string &outBuf, RecordKeyVector *keyList
             vector<int> blockStarts;
             for (RecordKeyVector::iterator_type iter = keyList->begin(); iter != keyList->end(); iter = keyList->next()) {
                     const Record *block = *iter;
-                    blockLengths.push_back(block->getEndPos() - block->getStartPos());
-                    blockStarts.push_back(block->getStartPos() - _startPos);
+                    blockLengths.push_back((int)(block->getEndPos() - block->getStartPos()));
+                    blockStarts.push_back((int)(block->getStartPos() - _startPos));
             }
 
             s << "\t";
@@ -303,7 +304,7 @@ void BamRecord::buildCigarStr() {
 }
 
 
-int BamRecord::getLength(bool obeySplits) const {
+CHRPOS BamRecord::getLength(bool obeySplits) const {
 	//only bed12 and BAM need to check splits
 	if (!obeySplits) {
 		return _endPos - _startPos;
@@ -317,7 +318,7 @@ int BamRecord::getLength(bool obeySplits) const {
 	    		length += (int)cigarData[i].Length;
 	    	}
 	    }
-	    return length;
+	    return (CHRPOS)length;
 	}
 }
 

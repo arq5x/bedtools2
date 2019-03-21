@@ -144,15 +144,15 @@ void ProcessBed(istream &bedInput, BedFile *bed) {
 
             for (int i = 0; i < (int) bedBlocks.size(); ++i) {
                 if (addBlockNums == false) {
-                    printf ("%s\t%d\t%d\t%s\t%s\t%s\n", bedBlocks[i].chrom.c_str(), bedBlocks[i].start, bedBlocks[i].end, bedBlocks[i].name.c_str(),
+                    printf ("%s\t%ld\t%ld\t%s\t%s\t%s\n", bedBlocks[i].chrom.c_str(), bedBlocks[i].start, bedBlocks[i].end, bedBlocks[i].name.c_str(),
                                                         bedBlocks[i].score.c_str(), bedBlocks[i].strand.c_str());
                 }
                 else {
                     if (bedBlocks[i].strand == "+")
-                        printf ("%s\t%d\t%d\t%s\t%d\t%s\n", bedBlocks[i].chrom.c_str(), bedBlocks[i].start, bedBlocks[i].end, bedBlocks[i].name.c_str(),
+                        printf ("%s\t%ld\t%ld\t%s\t%d\t%s\n", bedBlocks[i].chrom.c_str(), bedBlocks[i].start, bedBlocks[i].end, bedBlocks[i].name.c_str(),
                                                         i+1, bedBlocks[i].strand.c_str());
                     else 
-                        printf ("%s\t%d\t%d\t%s\t%d\t%s\n", bedBlocks[i].chrom.c_str(), bedBlocks[i].start, bedBlocks[i].end, bedBlocks[i].name.c_str(),
+                        printf ("%s\t%ld\t%ld\t%s\t%d\t%s\n", bedBlocks[i].chrom.c_str(), bedBlocks[i].start, bedBlocks[i].end, bedBlocks[i].name.c_str(),
                                                         (int) ((bedBlocks.size())-i), bedBlocks[i].strand.c_str());
                 }
             }

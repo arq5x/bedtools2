@@ -170,7 +170,7 @@ void FileRecordMgr::testInputSortOrder(Record *record)
 
 
 	const string &currChrom = record->getChrName();
-	int currStart = record->getStartPos();
+	CHRPOS currStart = record->getStartPos();
 	if (record->isZeroLength()) {
 		currStart++;
 	}

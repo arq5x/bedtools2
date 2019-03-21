@@ -150,7 +150,7 @@ void RecordOutputMgr::printRecord(Record *record, const string & value)
 	if (needsFlush()) flush();
 }
 
-void RecordOutputMgr::printClosest(RecordKeyVector &keyList, const vector<int> *dists) {
+void RecordOutputMgr::printClosest(RecordKeyVector &keyList, const vector<CHRPOS> *dists) {
 
 	//The first time we print a record is when we print any header, because the header
 	//hasn't been read from the query file until after the first record has also been read.
@@ -174,7 +174,7 @@ void RecordOutputMgr::printClosest(RecordKeyVector &keyList, const vector<int> *
 			printKey(hitRec, hitRec->getStartPosStr(), hitRec->getEndPosStr());
 			if (dists != NULL) {
 				tab();
-				int dist = (*dists)[distCount];
+				CHRPOS dist = (*dists)[distCount];
 				//if not using sign distance, use absolute value instead.
 				dist = context->signDistance() ? dist : abs(dist);
 				ostringstream s;
@@ -350,9 +350,9 @@ void RecordOutputMgr::reportOverlapDetail(const Record *keyRecord, const Record 
 {
 
 	// overlap interval is defined by min(e1,e2) - max(s1,s2)
-	int maxStart = max(keyRecord->getStartPos(), hitRecord->getStartPos());
+	CHRPOS maxStart = max(keyRecord->getStartPos(), hitRecord->getStartPos());
 	//cout << keyRecord->getStartPos() << "," << hitRecord->getStartPos();
-	int minEnd = min(keyRecord->getEndPos(), hitRecord->getEndPos());
+	CHRPOS minEnd = min(keyRecord->getEndPos(), hitRecord->getEndPos());
 
 	// need to undo our conversion of 1-based start coordinates to 0-based
 	if (!keyRecord->isZeroBased())
@@ -531,7 +531,7 @@ void RecordOutputMgr::printKey(const Record *key, const string & start, const st
 	}
 }
 
-void RecordOutputMgr::printKey(const Record *key, int start, int end)
+void RecordOutputMgr::printKey(const Record *key, CHRPOS start, CHRPOS end)
 {
 	if (key->getType() != FileRecordTypeChecker::BAM_RECORD_TYPE) {
 		key->print(_outBuf, start, end);

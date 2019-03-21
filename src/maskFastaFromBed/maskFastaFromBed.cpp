@@ -62,9 +62,9 @@ void MaskFastaFromBed::MaskFasta() {
     string currChrom;
     string currDNA = "";
     currDNA.reserve(500000000);
-    int fastaWidth = -1;
+    CHRPOS fastaWidth = -1;
     bool widthSet  = false;
-    int start, end, length;
+    CHRPOS start, end, length;
     string replacement;
 
     while (getline(fa,fastaInLine)) {
@@ -146,12 +146,12 @@ void MaskFastaFromBed::MaskFasta() {
 }
 
 
-void MaskFastaFromBed::PrettyPrintChrom(ofstream &out, string chrom, const string &sequence, int width) {
+void MaskFastaFromBed::PrettyPrintChrom(ofstream &out, string chrom, const string &sequence, CHRPOS width) {
 
-    int seqLength = sequence.size();
+    CHRPOS seqLength = sequence.size();
 
     out << ">" << chrom << endl;
-    for(int i = 0; i < seqLength; i += width)  {
+    for(CHRPOS i = 0; i < seqLength; i += (CHRPOS)width)  {
         if (i + width < seqLength) out << sequence.substr(i, width) << endl;
         else out << sequence.substr(i, seqLength-i) << endl;
     }

@@ -34,7 +34,7 @@ using namespace std;
 // Data type tydedef
 //*************************************************
 #ifndef CHRPOS
-typedef uint32_t CHRPOS;
+typedef int64_t CHRPOS;
 #endif
 
 #ifndef DEPTH

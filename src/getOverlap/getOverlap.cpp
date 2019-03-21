@@ -162,7 +162,7 @@ void ComputeOverlaps(istream &input, short &s1Col, short &e1Col, short &s2Col, s
     string inLine;
     vector<string> inFields;
 
-    int overlap;
+    CHRPOS overlap;
 
     char *s1End, *e1End, *s2End, *e2End;
     long s1, e1, s2, e2;
@@ -187,7 +187,7 @@ void ComputeOverlaps(istream &input, short &s1Col, short &e1Col, short &s2Col, s
                 e2End != inFields[e2Col-1].c_str()) {
 
                 overlap = overlaps(s1, e1, s2, e2);
-                printf("%s\t%d\n", inLine.c_str(), overlap);
+                printf("%s\t%ld\n", inLine.c_str(), overlap);
             }
             else {
                 cerr << "One of your columns appears to be non-numeric at line " << lineNum << ". Exiting..." << endl << endl;

@@ -22,13 +22,13 @@ public:
 	virtual bool initFromFile(SingleLineDelimTextFileReader *);
 	virtual void clear();
 	virtual void print(string &outBuf) const;
-	virtual void print(string &outBuf, int start, int end) const;
+	virtual void print(string &outBuf, CHRPOS start, CHRPOS end) const;
 	virtual void print(string &outBuf, const string & start, const string & end) const;
 	virtual void printNull(string &outBuf) const;
 	virtual FileRecordTypeChecker::RECORD_TYPE getType() const { return FileRecordTypeChecker::GFF_PLUS_RECORD_TYPE; }
 
 	virtual const string &getField(int fieldNum) const;
-	virtual int getNumFields() const  { return GffRecord::getNumFields() + _plusFields.size(); }
+	virtual int getNumFields() const  { return (int)GffRecord::getNumFields() + (int)_plusFields.size(); }
 
 	virtual void setNumPrintFields(int num) { _numPrintFields = num; }
 	virtual int getNumPrintFields() const { return _numPrintFields; }

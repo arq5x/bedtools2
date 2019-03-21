@@ -19,6 +19,8 @@
 
 using namespace std;
 
+typedef int64_t CHRPOS;
+
 bool isNumeric(const string &str);
 bool isInteger(const string &str);
 
@@ -27,8 +29,8 @@ bool isInteger(const string &str);
 //Empty strings, too long strings, or strings containing anything other than
 //digits (with the excpetion of a minus sign in the first position)
 //will result in error. Errors return INT_MIN.
-int str2chrPos(const char *str, size_t len = 0);
-int str2chrPos(const string &str);
+CHRPOS str2chrPos(const char *str, size_t len = 0);
+CHRPOS str2chrPos(const string &str);
 
 
 //int2str is faster but less flexible version of the ToString method in
@@ -37,10 +39,10 @@ int str2chrPos(const string &str);
 //assignment operater for char *, meaning it needs a T::operator = (const char *) method.
 //strings, strings, stringbuffers, and the like are acceptable.
 
-template<class T>
-void int2str(int number, T& buffer, bool appendToBuf = false)
+template<class T, class U>
+void int2str(U number, T& buffer, bool appendToBuf = false)
 {
-	if(number == 0) 
+	if(number == 0)
 	{
 		if(appendToBuf) buffer.append("0");
 		else buffer.assign("0", 1);

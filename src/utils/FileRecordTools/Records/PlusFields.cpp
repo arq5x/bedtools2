@@ -14,7 +14,7 @@ bool PlusFields::initFromFile(SingleLineDelimTextFileReader *fileReader)
 	}
 
 	for (size_t i=0; i < numFields; i++) {
-		fileReader->getField(i + _numOffsetFields, _fields[i]);
+		fileReader->getField((int)(i + _numOffsetFields), _fields[i]);
 	}
 	return true;
 }

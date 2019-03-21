@@ -21,7 +21,7 @@ public:
 	Bed4Interval();
 	virtual bool initFromFile(SingleLineDelimTextFileReader *);
 	virtual void print(string &outBuf) const;
-	virtual void print(string &outBuf, int start, int end) const;
+	virtual void print(string &outBuf, CHRPOS start, CHRPOS end) const;
 	virtual void print(string &outBuf, const string & start, const string & end) const;
 	virtual void printNull(string &outBuf) const;
 	virtual FileRecordTypeChecker::RECORD_TYPE getType() const { return FileRecordTypeChecker::BED4_RECORD_TYPE; }
