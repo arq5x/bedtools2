@@ -18,7 +18,7 @@ export CCPREFIX = @
 endif
 export OBJ_DIR	= obj
 export BIN_DIR	= bin
-export SRC_DIR	= $(shell readlink -f src)
+export SRC_DIR	= src
 export UTIL_DIR	= src/utils
 export CXX		= g++
 ifeq ($(DEBUG),1)
@@ -114,34 +114,36 @@ UTIL_SUBDIRS =	$(SRC_DIR)/utils/FileRecordTools \
 BUILT_OBJECTS = $(OBJ_DIR)/*.o
 
 
-INCLUDES =	-I$(SRC_DIR)/utils/bedFile \
-				-I$(SRC_DIR)/utils/BinTree \
-				-I$(SRC_DIR)/utils/version \
-				-I$(SRC_DIR)/utils/bedGraphFile \
-				-I$(SRC_DIR)/utils/chromsweep \
-				-I$(SRC_DIR)/utils/Contexts \
-				-I$(SRC_DIR)/utils/FileRecordTools \
-				-I$(SRC_DIR)/utils/FileRecordTools/FileReaders \
-				-I$(SRC_DIR)/utils/FileRecordTools/Records \
-				-I$(SRC_DIR)/utils/general \
-				-I$(SRC_DIR)/utils/gzstream \
-				-I$(SRC_DIR)/utils/fileType \
-				-I$(SRC_DIR)/utils/gzstream/ \
-				-I$(SRC_DIR)/utils/lineFileUtilities \
-				-I$(SRC_DIR)/utils/KeyListOps \
-				-I$(SRC_DIR)/utils/NewChromsweep \
-				-I$(SRC_DIR)/utils/sequenceUtilities \
-				-I$(SRC_DIR)/utils/tabFile \
-				-I$(SRC_DIR)/utils/BamTools/include \
-				-I$(SRC_DIR)/utils/BamTools-Ancillary \
-				-I$(SRC_DIR)/utils/BlockedIntervals \
-				-I$(SRC_DIR)/utils/Fasta \
-				-I$(SRC_DIR)/utils/VectorOps \
-				-I$(SRC_DIR)/utils/GenomeFile \
-				-I$(SRC_DIR)/utils/RecordOutputMgr \
-				-I$(SRC_DIR)/utils/ToolBase \
-				-I$(SRC_DIR)/utils/driver \
-				-I$(SRC_DIR)/utils/htslib/htslib
+REAL_SRC_DIR=$(shell pwd)/$(SRC_DIR)
+
+INCLUDES =	-I"$(REAL_SRC_DIR)/utils/bedFile" \
+				-I"$(REAL_SRC_DIR)/utils/BinTree" \
+				-I"$(REAL_SRC_DIR)/utils/version" \
+				-I"$(REAL_SRC_DIR)/utils/bedGraphFile" \
+				-I"$(REAL_SRC_DIR)/utils/chromsweep" \
+				-I"$(REAL_SRC_DIR)/utils/Contexts" \
+				-I"$(REAL_SRC_DIR)/utils/FileRecordTools" \
+				-I"$(REAL_SRC_DIR)/utils/FileRecordTools/FileReaders" \
+				-I"$(REAL_SRC_DIR)/utils/FileRecordTools/Records" \
+				-I"$(REAL_SRC_DIR)/utils/general" \
+				-I"$(REAL_SRC_DIR)/utils/gzstream" \
+				-I"$(REAL_SRC_DIR)/utils/fileType" \
+				-I"$(REAL_SRC_DIR)/utils/gzstream/" \
+				-I"$(REAL_SRC_DIR)/utils/lineFileUtilities" \
+				-I"$(REAL_SRC_DIR)/utils/KeyListOps" \
+				-I"$(REAL_SRC_DIR)/utils/NewChromsweep" \
+				-I"$(REAL_SRC_DIR)/utils/sequenceUtilities" \
+				-I"$(REAL_SRC_DIR)/utils/tabFile" \
+				-I"$(REAL_SRC_DIR)/utils/BamTools/include" \
+				-I"$(REAL_SRC_DIR)/utils/BamTools-Ancillary" \
+				-I"$(REAL_SRC_DIR)/utils/BlockedIntervals" \
+				-I"$(REAL_SRC_DIR)/utils/Fasta" \
+				-I"$(REAL_SRC_DIR)/utils/VectorOps" \
+				-I"$(REAL_SRC_DIR)/utils/GenomeFile" \
+				-I"$(REAL_SRC_DIR)/utils/RecordOutputMgr" \
+				-I"$(REAL_SRC_DIR)/utils/ToolBase" \
+				-I"$(REAL_SRC_DIR)/utils/driver" \
+				-I"$(REAL_SRC_DIR)/utils/htslib/htslib"
 
 
 all: print_banner $(OBJ_DIR) $(BIN_DIR) autoversion $(UTIL_SUBDIRS) $(SUBDIRS)
