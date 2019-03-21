@@ -126,7 +126,7 @@ protected:
 	//members for enforcing sorted order.
         std::set<string> _foundChroms;
 	string _prevChrom;
-	int _prevStart;
+	CHRPOS _prevStart;
 	int _prevChromId;
 
 

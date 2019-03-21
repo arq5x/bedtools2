@@ -89,8 +89,8 @@ void GetBedBlocks(const BED &bed, bedVector &bedBlocks) {
         string blockSizes(bed.fields[10]);
         string blockStarts(bed.fields[11]);
 
-        vector<int> sizes;
-        vector<int> starts;
+        vector<CHRPOS> sizes;
+        vector<CHRPOS> starts;
         Tokenize(blockSizes, sizes, ',');
         Tokenize(blockStarts, starts, ',');
 

@@ -9,6 +9,7 @@ INCLUDES = -I$(UTILITIES_DIR)/fileType/ \
 	-I$(UTILITIES_DIR)/FileRecordTools/Records/ \
 	-I$(UTILITIES_DIR)/GenomeFile/ \
 	-I$(UTILITIES_DIR)/general/ \
+	-I$(UTILITIES_DIR)/bedFile/ \
 	-I$(UTILITIES_DIR)/lineFileUtilities/ \
 	-I$(UTILITIES_DIR)/BamTools/include \
 	-I$(UTILITIES_DIR)/BamTools/src/ \

@@ -243,7 +243,7 @@ public:
 		}
 		str.reserve(_size + str.size());
 		for (const BTlistNode<T> *iter = begin(); iter != end(); iter = iter->next()) {
-			str += iter->value();
+			str += (char)iter->value();
 		}
 	}
 

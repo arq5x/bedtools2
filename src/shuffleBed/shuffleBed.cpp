@@ -339,10 +339,10 @@ void BedShuffle::ChooseLocus(BED &bedEntry) {
             // because RAND_MAX is 2^31 (2147483648), whereas
             // mammalian genomes are obviously much larger.
 #ifdef USE_RAND
-            uint32_t randStart = ((((long) rand()) << 31) | rand()) %
+            CHRPOS randStart = ((((long) rand()) << 31) | rand()) %
                                  _genomeSize;
 #else
-            uint32_t randStart = ((((long) mt_rand()) << 31) | mt_rand()) %
+            CHRPOS randStart = ((((long) mt_rand()) << 31) | mt_rand()) %
                                  _genomeSize;
 #endif
             // use the above randomStart (e.g., for human 0..3.1billion) 

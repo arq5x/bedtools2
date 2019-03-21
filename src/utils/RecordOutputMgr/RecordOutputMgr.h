@@ -29,7 +29,7 @@ public:
 	void printRecord(Record *record, const string & value);
 	void checkForHeader();
 
-	void printClosest(RecordKeyVector &keyList, const vector<int> *dists = NULL);
+	void printClosest(RecordKeyVector &keyList, const vector<CHRPOS> *dists = NULL);
 
 	void tab() { _outBuf.append("\t"); }
 	void newline() { _outBuf.append("\n"); }
@@ -52,7 +52,7 @@ private:
 	void printRecord(RecordKeyVector &keyList, RecordKeyVector *blockList);
 	void printKey(const Record *key);
 	void printKey(const Record *key, const string & start, const string & end);
-	void printKey(const Record *key, int start, int end);
+	void printKey(const Record *key, CHRPOS start, CHRPOS end);
 	void addDbFileId(int fileId);
 	bool printKeyAndTerminate(RecordKeyVector &keyList);
 	printBamType printBamRecord(RecordKeyVector &keyList, bool bamOutputOnly = false);

@@ -35,11 +35,11 @@ bool isInteger(const string &str) {
 
 
 
-int str2chrPos(const string &str) {
+CHRPOS str2chrPos(const string &str) {
 	return str2chrPos(str.c_str(), str.size());
 }
 
-int str2chrPos(const char *str, size_t ulen) {
+CHRPOS str2chrPos(const char *str, size_t ulen) {
 
 	if (ulen == 0) {
 		ulen = strlen(str);
@@ -56,12 +56,15 @@ int str2chrPos(const char *str, size_t ulen) {
 	}
 
 	int len=(int)ulen;
-	if (len < 1 || len > 10) {
+	if (len < 1 || len > 19) {
 		fprintf(stderr, "***** ERROR: too many digits/characters for integer conversion in string %s. Exiting...\n", str);
 		exit(1);
 	}
+        if(len > 12) {
+            return std::stoll(str);
+        }
 
-	int sum=0;
+	CHRPOS sum=0;
 	int startPos =0;
 	bool isNegative = false;
 
@@ -81,7 +84,7 @@ int str2chrPos(const char *str, size_t ulen) {
 		char currChar = str[i];
 		if (currChar == 'e' || currChar == 'E') {
 			//default to atoi for scientific notation
-			return atoi(str);
+			return stoll(str);
 		}
 		if (!isdigit(currChar)) {
 			fprintf(stderr, "***** ERROR: illegal character '%c' found in integer conversion of string \"%s\". Exiting...\n", currChar, str);
@@ -93,34 +96,43 @@ int str2chrPos(const char *str, size_t ulen) {
 
 		switch (power) {
 		case 0:
-			sum += dig;
+			sum += (CHRPOS)dig;
 			break;
 		case 1:
-			sum += dig * 10;
+			sum += (CHRPOS)dig * 10;
 			break;
 		case 2:
-			sum += dig *100;
+			sum += (CHRPOS)dig *100;
 			break;
 		case 3:
-			sum += dig *1000;
+			sum += (CHRPOS)dig *1000;
 			break;
 		case 4:
-			sum += dig *10000;
+			sum += (CHRPOS)dig *10000;
 			break;
 		case 5:
-			sum += dig *100000;
+			sum += (CHRPOS)dig *100000;
 			break;
 		case 6:
-			sum += dig *1000000;
+			sum += (CHRPOS)dig *1000000;
 			break;
 		case 7:
-			sum += dig *10000000;
+			sum += (CHRPOS)dig *10000000;
 			break;
 		case 8:
-			sum += dig *100000000;
+			sum += (CHRPOS)dig *100000000;
 			break;
 		case 9:
-			sum += dig *1000000000;
+			sum += (CHRPOS)dig *1000000000;
+			break;
+		case 10:
+			sum += (CHRPOS)dig *10000000000;
+			break;
+		case 11:
+			sum += (CHRPOS)dig *100000000000;
+			break;
+		case 12:
+			sum += (CHRPOS)dig *1000000000000;
 			break;
 		default:
 			return 0;

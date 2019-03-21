@@ -273,8 +273,8 @@ bool FileRecordTypeChecker::isBedFormat() {
 		return false;
 	}
 
-	int start = str2chrPos(_tokenizer.getElem(1));
-	int end = str2chrPos(_tokenizer.getElem(2));
+	CHRPOS start = str2chrPos(_tokenizer.getElem(1));
+	CHRPOS end = str2chrPos(_tokenizer.getElem(2));
 	if (end < start) {
 		return false;
 	}
@@ -291,8 +291,8 @@ bool FileRecordTypeChecker::isGFFformat()
 	if (!isNumeric(_tokenizer.getElem(3)) || !isNumeric(_tokenizer.getElem(4))) {
 		return false;
 	}
-	int start = str2chrPos(_tokenizer.getElem(3));
-	int end = str2chrPos(_tokenizer.getElem(4));
+	CHRPOS start = str2chrPos(_tokenizer.getElem(3));
+	CHRPOS end = str2chrPos(_tokenizer.getElem(4));
 	if (end < start) {
 		return false;
 	}

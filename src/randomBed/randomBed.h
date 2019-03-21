@@ -25,6 +25,8 @@ using namespace std;
 
 const int MAX_TRIES = 1000000;
 
+typedef int64_t CHRPOS;
+
 //************************************************
 // Class methods and elements
 //************************************************
@@ -34,7 +36,7 @@ public:
 
     // constructor
     BedRandom(string &genomeFile, uint32_t numToGenerate, int seed,
-               bool haveSeed, uint32_t length);
+               bool haveSeed, CHRPOS length);
 
     // destructor
     ~BedRandom(void);
@@ -46,7 +48,7 @@ private:
     bool _haveSeed;
 
     GenomeFile *_genome;
-    uint32_t _length;
+    CHRPOS _length;
     uint32_t _numToGenerate;
     
     // methods

@@ -282,10 +282,10 @@ void BedIntersectPE::FindSpanningOverlaps(const BEDPE &a, vector<BED> &hits, con
     vector<BED>::const_iterator hitsEnd = hits.end();
     for (; h != hitsEnd; ++h) {
 
-        int s = max(spanStart, h->start);
-        int e = min(spanEnd, h->end);
-        int overlapBases = (e - s);                     // the number of overlapping bases b/w a and b
-        int spanLength = (spanEnd - spanStart);     // the length of a in b.p.
+        CHRPOS s = max(spanStart, h->start);
+        CHRPOS e = min(spanEnd, h->end);
+        CHRPOS overlapBases = (e - s);                     // the number of overlapping bases b/w a and b
+        CHRPOS spanLength = (spanEnd - spanStart);     // the length of a in b.p.
 
         // is there enough overlap relative to the user's request? (default ~ 1bp)
         if ( ( (float) overlapBases / (float) spanLength ) >= _overlapFraction ) {
@@ -305,9 +305,9 @@ void BedIntersectPE::FindSpanningOverlaps(const BEDPE &a, vector<BED> &hits, con
 
 bool BedIntersectPE::FindOneOrMoreSpanningOverlaps(const BEDPE &a, const string &type) {
 
-    int spanStart = 0;
-    int spanEnd = 0;
-    int spanLength = 0;
+    CHRPOS spanStart = 0;
+    CHRPOS spanEnd = 0;
+    CHRPOS spanLength = 0;
     bool overlapFound;
 
     if ((type == "ispan") || (type == "notispan")) {

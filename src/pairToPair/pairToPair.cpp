@@ -72,10 +72,10 @@ void PairToPair::FindOverlaps(const BEDPE &a) {
     vector<MATE> hitsA1B1, hitsA1B2, hitsA2B1, hitsA2B2;
 
     // add the appropriate slop to the starts and ends
-    int start1 = a.start1;
-    int end1   = a.end1;
-    int start2 = a.start2;
-    int end2   = a.end2;
+    CHRPOS start1 = a.start1;
+    CHRPOS end1   = a.end1;
+    CHRPOS start2 = a.start2;
+    CHRPOS end2   = a.end2;
 
     if (_strandedSlop == true) {
         if (a.strand1 == "+")
@@ -100,8 +100,8 @@ void PairToPair::FindOverlaps(const BEDPE &a) {
     _bedB->FindOverlapsPerBin(2, a.chrom1, start1, end1, a.name, a.strand1, hitsA1B2, _overlapFraction, !(_ignoreStrand), _reqDiffNames);   // hits b/w A1 & B2
     _bedB->FindOverlapsPerBin(2, a.chrom2, start2, end2, a.name, a.strand2, hitsA2B2, _overlapFraction, !(_ignoreStrand), _reqDiffNames);   // hits b/w A2 & B2
 
-    unsigned int matchCount1 = (hitsA1B1.size() + hitsA2B2.size());
-    unsigned int matchCount2 = (hitsA2B1.size() + hitsA1B2.size());
+    CHRPOS matchCount1 = (hitsA1B1.size() + hitsA2B2.size());
+    CHRPOS matchCount2 = (hitsA2B1.size() + hitsA1B2.size());
 
     
     // report the fact that no hits were found iff _searchType is neither.
@@ -157,7 +157,7 @@ bool PairToPair::FindHitsOnBothEnds(const BEDPE &a, const vector<MATE> &qualityH
 
             if (_searchType == "both") {
                 _bedA->reportBedPETab(a);
-                printf("%s\t%d\t%d\t%s\t%d\t%d\t%s\t%s\t%s\t%s", b1.bed.chrom.c_str(), b1.bed.start, b1.bed.end,
+                printf("%s\t%ld\t%ld\t%s\t%ld\t%ld\t%s\t%s\t%s\t%s", b1.bed.chrom.c_str(), b1.bed.start, b1.bed.end,
                                                                    b2.bed.chrom.c_str(), b2.bed.start, b2.bed.end,
                                                                    b1.bed.name.c_str(), b1.bed.score.c_str(),
                                                                    b1.bed.strand.c_str(), b2.bed.strand.c_str());
@@ -191,7 +191,7 @@ void PairToPair::FindHitsOnEitherEnd(const BEDPE &a, const vector<MATE> &quality
                 MATE b2 = m->second[1];
 
                 _bedA->reportBedPETab(a);
-                printf("%s\t%d\t%d\t%s\t%d\t%d\t%s\t%s\t%s\t%s", b1.bed.chrom.c_str(), b1.bed.start, b1.bed.end,
+                printf("%s\t%ld\t%ld\t%s\t%ld\t%ld\t%s\t%s\t%s\t%s", b1.bed.chrom.c_str(), b1.bed.start, b1.bed.end,
                                                                    b2.bed.chrom.c_str(), b2.bed.start, b2.bed.end,
                                                                    b1.bed.name.c_str(), b1.bed.score.c_str(),
                                                                    b1.bed.strand.c_str(), b2.bed.strand.c_str());
@@ -203,7 +203,7 @@ void PairToPair::FindHitsOnEitherEnd(const BEDPE &a, const vector<MATE> &quality
                 MATE b1 = m->second[0];
 
                 _bedA->reportBedPETab(a);
-                printf("%s\t%d\t%d\t%s\t%d\t%d\t%s\t%s\t%s\t%s", b1.bed.chrom.c_str(), b1.bed.start, b1.bed.end,
+                printf("%s\t%ld\t%ld\t%s\t%ld\t%ld\t%s\t%s\t%s\t%s", b1.bed.chrom.c_str(), b1.bed.start, b1.bed.end,
                                                                    b1.mate->bed.chrom.c_str(), b1.mate->bed.start, b1.mate->bed.end,
                                                                    b1.bed.name.c_str(), b1.bed.score.c_str(),
                                                                    b1.bed.strand.c_str(), b1.mate->bed.strand.c_str());
