@@ -66,29 +66,11 @@ BUILT_PROGRAMS = \
 	htsfile \
 	tabix
 
-BUILT_TEST_PROGRAMS = \
-	test/hts_endian \
-	test/fieldarith \
-	test/hfile \
-	test/sam \
-	test/test_bgzf \
-	test/test_realn \
-	test/test-regidx \
-	test/test_view \
-	test/test-vcf-api \
-	test/test-vcf-sweep \
-	test/test-bcf-sr \
-	test/test-bcf-translate
+BUILT_TEST_PROGRAMS = 
 
-BUILT_THRASH_PROGRAMS = \
-	test/thrash_threads1 \
-	test/thrash_threads2 \
-	test/thrash_threads3 \
-	test/thrash_threads4 \
-	test/thrash_threads5 \
-	test/thrash_threads6
+BUILT_THRASH_PROGRAMS =
 
-all: lib-static lib-shared $(BUILT_PROGRAMS) plugins $(BUILT_TEST_PROGRAMS)
+all: lib-static lib-shared $(BUILT_PROGRAMS) plugins 
 
 HTSPREFIX =
 include htslib_vars.mk
@@ -355,85 +337,6 @@ tabix.o: tabix.c config.h $(htslib_tbx_h) $(htslib_sam_h) $(htslib_vcf_h) $(htsl
 # If using MSYS, avoid poor shell expansion via:
 #    MSYS2_ARG_CONV_EXCL="*" make check
 check test: $(BUILT_PROGRAMS) $(BUILT_TEST_PROGRAMS)
-	test/hts_endian
-	test/fieldarith test/fieldarith.sam
-	test/hfile
-	test/test_bgzf test/bgziptest.txt
-	cd test/tabix && ./test-tabix.sh tabix.tst
-	REF_PATH=: test/sam test/ce.fa test/faidx.fa test/fastqs.fq
-	test/test-regidx
-	cd test && REF_PATH=: ./test.pl $${TEST_OPTS:-}
-
-test/hts_endian: test/hts_endian.o
-	$(CC) $(LDFLAGS) -o $@ test/hts_endian.o $(LIBS)
-
-test/fieldarith: test/fieldarith.o libhts.a
-	$(CC) $(LDFLAGS) -o $@ test/fieldarith.o libhts.a $(LIBS) -lpthread
-
-test/hfile: test/hfile.o libhts.a
-	$(CC) $(LDFLAGS) -o $@ test/hfile.o libhts.a $(LIBS) -lpthread
-
-test/sam: test/sam.o libhts.a
-	$(CC) $(LDFLAGS) -o $@ test/sam.o libhts.a $(LIBS) -lpthread
-
-test/test_bgzf: test/test_bgzf.o libhts.a
-	$(CC) $(LDFLAGS) -o $@ test/test_bgzf.o libhts.a -lz $(LIBS) -lpthread
-
-test/test_realn: test/test_realn.o libhts.a
-	$(CC) $(LDFLAGS) -o $@ test/test_realn.o libhts.a $(LIBS) -lpthread
-
-test/test-regidx: test/test-regidx.o libhts.a
-	$(CC) $(LDFLAGS) -o $@ test/test-regidx.o libhts.a $(LIBS) -lpthread
-
-test/test_view: test/test_view.o libhts.a
-	$(CC) $(LDFLAGS) -o $@ test/test_view.o libhts.a $(LIBS) -lpthread
-
-test/test-vcf-api: test/test-vcf-api.o libhts.a
-	$(CC) $(LDFLAGS) -o $@ test/test-vcf-api.o libhts.a $(LIBS) -lpthread
-
-test/test-vcf-sweep: test/test-vcf-sweep.o libhts.a
-	$(CC) $(LDFLAGS) -o $@ test/test-vcf-sweep.o libhts.a $(LIBS) -lpthread
-
-test/test-bcf-sr: test/test-bcf-sr.o libhts.a
-	$(CC) $(LDFLAGS) -o $@ test/test-bcf-sr.o libhts.a -lz $(LIBS) -lpthread
-
-test/test-bcf-translate: test/test-bcf-translate.o libhts.a
-	$(CC) $(LDFLAGS) -o $@ test/test-bcf-translate.o libhts.a -lz $(LIBS) -lpthread
-
-test/hts_endian.o: test/hts_endian.c config.h $(htslib_hts_endian_h)
-test/fieldarith.o: test/fieldarith.c config.h $(htslib_sam_h)
-test/hfile.o: test/hfile.c config.h $(htslib_hfile_h) $(htslib_hts_defs_h)
-test/sam.o: test/sam.c config.h $(htslib_hts_defs_h) $(htslib_sam_h) $(htslib_faidx_h) $(htslib_kstring_h)
-test/test_bgzf.o: test/test_bgzf.c config.h $(htslib_bgzf_h) $(htslib_hfile_h) $(hfile_internal_h)
-test/test-realn.o: test/test_realn.c config.h $(htslib_hts_h) $(htslib_sam_h) $(htslib_faidx_h)
-test/test-regidx.o: test/test-regidx.c config.h $(htslib_regidx_h) $(hts_internal_h)
-test/test_view.o: test/test_view.c config.h $(cram_h) $(htslib_sam_h)
-test/test-vcf-api.o: test/test-vcf-api.c config.h $(htslib_hts_h) $(htslib_vcf_h) $(htslib_kstring_h) $(htslib_kseq_h)
-test/test-vcf-sweep.o: test/test-vcf-sweep.c config.h $(htslib_vcf_sweep_h)
-test/test-bcf-sr.o: test/test-bcf-sr.c config.h $(htslib_synced_bcf_reader_h)
-test/test-bcf-translate.o: test/test-bcf-translate.c config.h $(htslib_vcf_h)
-
-
-test/thrash_threads1: test/thrash_threads1.o libhts.a
-	$(CC) $(LDFLAGS) -o $@ test/thrash_threads1.o libhts.a -lz $(LIBS) -lpthread
-
-test/thrash_threads2: test/thrash_threads2.o libhts.a
-	$(CC) $(LDFLAGS) -o $@ test/thrash_threads2.o libhts.a -lz $(LIBS) -lpthread
-
-test/thrash_threads3: test/thrash_threads3.o libhts.a
-	$(CC) $(LDFLAGS) -o $@ test/thrash_threads3.o libhts.a -lz $(LIBS) -lpthread
-
-test/thrash_threads4: test/thrash_threads4.o libhts.a
-	$(CC) $(LDFLAGS) -o $@ test/thrash_threads4.o libhts.a -lz $(LIBS) -lpthread
-
-test/thrash_threads5: test/thrash_threads5.o libhts.a
-	$(CC) $(LDFLAGS) -o $@ test/thrash_threads5.o libhts.a -lz $(LIBS) -lpthread
-
-test/thrash_threads6: test/thrash_threads6.o libhts.a
-	$(CC) $(LDFLAGS) -o $@ test/thrash_threads6.o libhts.a -lz $(LIBS) -lpthread
-
-test_thrash: $(BUILT_THRASH_PROGRAMS)
-
 
 install: libhts.a $(BUILT_PROGRAMS) $(BUILT_PLUGINS) installdirs install-$(SHLIB_FLAVOUR) install-pkgconfig
 	$(INSTALL_PROGRAM) $(BUILT_PROGRAMS) $(DESTDIR)$(bindir)
