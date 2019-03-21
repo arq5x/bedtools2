@@ -56,10 +56,13 @@ CHRPOS str2chrPos(const char *str, size_t ulen) {
 	}
 
 	int len=(int)ulen;
-	if (len < 1 || len > 10) {
+	if (len < 1 || len > 19) {
 		fprintf(stderr, "***** ERROR: too many digits/characters for integer conversion in string %s. Exiting...\n", str);
 		exit(1);
 	}
+        if(len > 12) {
+            return std::stoll(str);
+        }
 
 	CHRPOS sum=0;
 	int startPos =0;
@@ -81,7 +84,7 @@ CHRPOS str2chrPos(const char *str, size_t ulen) {
 		char currChar = str[i];
 		if (currChar == 'e' || currChar == 'E') {
 			//default to atoi for scientific notation
-			return atoi(str);
+			return stoll(str);
 		}
 		if (!isdigit(currChar)) {
 			fprintf(stderr, "***** ERROR: illegal character '%c' found in integer conversion of string \"%s\". Exiting...\n", currChar, str);
@@ -121,6 +124,15 @@ CHRPOS str2chrPos(const char *str, size_t ulen) {
 			break;
 		case 9:
 			sum += (CHRPOS)dig *1000000000;
+			break;
+		case 10:
+			sum += (CHRPOS)dig *10000000000;
+			break;
+		case 11:
+			sum += (CHRPOS)dig *100000000000;
+			break;
+		case 12:
+			sum += (CHRPOS)dig *1000000000000;
 			break;
 		default:
 			return 0;

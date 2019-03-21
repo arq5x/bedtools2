@@ -14,6 +14,7 @@
 
 #include "bedFilePE.h"
 
+using namespace std;
 
 // Constructor
 BedFilePE::BedFilePE(string &bedFile) {
@@ -200,35 +201,35 @@ bool BedFilePE::parseBedPELine (BEDPE &bed, const vector<string> &lineVector, co
         bed.fields = lineVector;
         if (this->bedType == 6) {
             bed.chrom1 = lineVector[0];
-            bed.start1 = atoi(lineVector[1].c_str());
-            bed.end1 = atoi(lineVector[2].c_str());
+            bed.start1 = stoll(lineVector[1].c_str());
+            bed.end1 = stoll(lineVector[2].c_str());
 
             bed.chrom2 = lineVector[3];
-            bed.start2 = atoi(lineVector[4].c_str());
-            bed.end2 = atoi(lineVector[5].c_str());
+            bed.start2 = stoll(lineVector[4].c_str());
+            bed.end2 = stoll(lineVector[5].c_str());
 
             return true;
         }
         else if (this->bedType == 7) {
             bed.chrom1 = lineVector[0];
-            bed.start1 = atoi(lineVector[1].c_str());
-            bed.end1 = atoi(lineVector[2].c_str());
+            bed.start1 = stoll(lineVector[1].c_str());
+            bed.end1 = stoll(lineVector[2].c_str());
 
             bed.chrom2 = lineVector[3];
-            bed.start2 = atoi(lineVector[4].c_str());
-            bed.end2 = atoi(lineVector[5].c_str());
+            bed.start2 = stoll(lineVector[4].c_str());
+            bed.end2 = stoll(lineVector[5].c_str());
 
             bed.name = lineVector[6];
             return true;
         }
         else if (this->bedType == 8) {
             bed.chrom1 = lineVector[0];
-            bed.start1 = atoi(lineVector[1].c_str());
-            bed.end1 = atoi(lineVector[2].c_str());
+            bed.start1 = stoll(lineVector[1].c_str());
+            bed.end1 = stoll(lineVector[2].c_str());
 
             bed.chrom2 = lineVector[3];
-            bed.start2 = atoi(lineVector[4].c_str());
-            bed.end2 = atoi(lineVector[5].c_str());
+            bed.start2 = stoll(lineVector[4].c_str());
+            bed.end2 = stoll(lineVector[5].c_str());
 
             bed.name = lineVector[6];
             bed.score = lineVector[7].c_str();
@@ -236,12 +237,12 @@ bool BedFilePE::parseBedPELine (BEDPE &bed, const vector<string> &lineVector, co
         }
         else if (this->bedType == 10) {
             bed.chrom1 = lineVector[0];
-            bed.start1 = atoi(lineVector[1].c_str());
-            bed.end1 = atoi(lineVector[2].c_str());
+            bed.start1 = stoll(lineVector[1].c_str());
+            bed.end1 = stoll(lineVector[2].c_str());
 
             bed.chrom2 = lineVector[3];
-            bed.start2 = atoi(lineVector[4].c_str());
-            bed.end2 = atoi(lineVector[5].c_str());
+            bed.start2 = stoll(lineVector[4].c_str());
+            bed.end2 = stoll(lineVector[5].c_str());
 
             bed.name = lineVector[6];
             bed.score = lineVector[7].c_str();
@@ -253,12 +254,12 @@ bool BedFilePE::parseBedPELine (BEDPE &bed, const vector<string> &lineVector, co
         }
         else if (this->bedType > 10) {
             bed.chrom1 = lineVector[0];
-            bed.start1 = atoi(lineVector[1].c_str());
-            bed.end1 = atoi(lineVector[2].c_str());
+            bed.start1 = stoll(lineVector[1].c_str());
+            bed.end1 = stoll(lineVector[2].c_str());
 
             bed.chrom2 = lineVector[3];
-            bed.start2 = atoi(lineVector[4].c_str());
-            bed.end2 = atoi(lineVector[5].c_str());
+            bed.start2 = stoll(lineVector[4].c_str());
+            bed.end2 = stoll(lineVector[5].c_str());
 
             bed.name = lineVector[6];
             bed.score = lineVector[7].c_str();
@@ -291,35 +292,35 @@ bool BedFilePE::parseBedPELine (BEDPE &bed, const vector<string> &lineVector, co
         
         if (this->bedType == 6) {
             bed.chrom1 = lineVector[0];
-            bed.start1 = atoi(lineVector[1].c_str());
-            bed.end1 = atoi(lineVector[2].c_str());
+            bed.start1 = stoll(lineVector[1].c_str());
+            bed.end1 = stoll(lineVector[2].c_str());
 
             bed.chrom2 = lineVector[3];
-            bed.start2 = atoi(lineVector[4].c_str());
-            bed.end2 = atoi(lineVector[5].c_str());
+            bed.start2 = stoll(lineVector[4].c_str());
+            bed.end2 = stoll(lineVector[5].c_str());
 
             return true;
         }
         else if (this->bedType == 7) {
             bed.chrom1 = lineVector[0];
-            bed.start1 = atoi(lineVector[1].c_str());
-            bed.end1 = atoi(lineVector[2].c_str());
+            bed.start1 = stoll(lineVector[1].c_str());
+            bed.end1 = stoll(lineVector[2].c_str());
 
             bed.chrom2 = lineVector[3];
-            bed.start2 = atoi(lineVector[4].c_str());
-            bed.end2 = atoi(lineVector[5].c_str());
+            bed.start2 = stoll(lineVector[4].c_str());
+            bed.end2 = stoll(lineVector[5].c_str());
 
             bed.name = lineVector[6];
             return true;
         }
         else if (this->bedType == 8) {
             bed.chrom1 = lineVector[0];
-            bed.start1 = atoi(lineVector[1].c_str());
-            bed.end1 = atoi(lineVector[2].c_str());
+            bed.start1 = stoll(lineVector[1].c_str());
+            bed.end1 = stoll(lineVector[2].c_str());
 
             bed.chrom2 = lineVector[3];
-            bed.start2 = atoi(lineVector[4].c_str());
-            bed.end2 = atoi(lineVector[5].c_str());
+            bed.start2 = stoll(lineVector[4].c_str());
+            bed.end2 = stoll(lineVector[5].c_str());
 
             bed.name = lineVector[6];
             bed.score = lineVector[7].c_str();
@@ -327,12 +328,12 @@ bool BedFilePE::parseBedPELine (BEDPE &bed, const vector<string> &lineVector, co
         }
         else if (this->bedType == 10) {
             bed.chrom1 = lineVector[0];
-            bed.start1 = atoi(lineVector[1].c_str());
-            bed.end1 = atoi(lineVector[2].c_str());
+            bed.start1 = stoll(lineVector[1].c_str());
+            bed.end1 = stoll(lineVector[2].c_str());
 
             bed.chrom2 = lineVector[3];
-            bed.start2 = atoi(lineVector[4].c_str());
-            bed.end2 = atoi(lineVector[5].c_str());
+            bed.start2 = stoll(lineVector[4].c_str());
+            bed.end2 = stoll(lineVector[5].c_str());
 
             bed.name = lineVector[6];
             bed.score = lineVector[7].c_str();
@@ -344,12 +345,12 @@ bool BedFilePE::parseBedPELine (BEDPE &bed, const vector<string> &lineVector, co
         }
         else if (this->bedType > 10) {
             bed.chrom1 = lineVector[0];
-            bed.start1 = atoi(lineVector[1].c_str());
-            bed.end1 = atoi(lineVector[2].c_str());
+            bed.start1 = stoll(lineVector[1].c_str());
+            bed.end1 = stoll(lineVector[2].c_str());
 
             bed.chrom2 = lineVector[3];
-            bed.start2 = atoi(lineVector[4].c_str());
-            bed.end2 = atoi(lineVector[5].c_str());
+            bed.start2 = stoll(lineVector[4].c_str());
+            bed.end2 = stoll(lineVector[5].c_str());
 
             bed.name = lineVector[6];
             bed.score = lineVector[7].c_str();

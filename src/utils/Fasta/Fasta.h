@@ -26,6 +26,8 @@
 
 using namespace std;
 
+typedef int64_t CHRPOS;
+
 class FastaIndexEntry {
     friend ostream& operator<<(ostream& output, const FastaIndexEntry& e);
     public:
@@ -34,7 +36,7 @@ class FastaIndexEntry {
         FastaIndexEntry(void);
         ~FastaIndexEntry(void);
         string name;  // sequence name
-        int length;  // length of sequence
+        CHRPOS length;  // length of sequence
         long long offset;  // bytes offset of sequence from start of file
         int line_blen;  // line length in bytes, sequence characters
         int line_len;  // line length including newline
@@ -78,7 +80,7 @@ class FastaReference {
         // void getSequence(string seqname, string& sequence);
         string getSubSequence(string seqname, int start, int length);
         string sequenceNameStartingWith(string seqnameStart);
-        long unsigned int sequenceLength(string seqname);
+        CHRPOS sequenceLength(string seqname);
 };
 
 #endif

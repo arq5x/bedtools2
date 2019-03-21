@@ -52,7 +52,7 @@ protected:
 	//This is actually a very specialized function strictly for VCF
 	//records to read and process extra information about Structural Variants.
 	static const int VCF_TAG_FIELD = 7;
-	int getVcfSVlen();
+	CHRPOS getVcfSVlen();
 
 
 };

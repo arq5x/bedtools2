@@ -596,8 +596,8 @@ private:
                     
                     // test to see if the file has true blocked BED12 records
                     if (_numFields == 12) {
-                        int cdsStart = atoi(fields[6].c_str());
-                        int cdsEnd   = atoi(fields[7].c_str());
+                        CHRPOS cdsStart = stoll(fields[6].c_str());
+                        CHRPOS cdsEnd   = stoll(fields[7].c_str());
                         int numExons = atoi(fields[9].c_str());
 
                         if (cdsStart > 0 && cdsEnd > 0&& numExons > 0 &&
@@ -675,7 +675,7 @@ private:
             bed.fields = fields;
             bed.chrom = fields[0];
             int i;
-            i = atoi(fields[1].c_str());
+            i = stoll(fields[1].c_str());
             if (i<0) {
                  cerr << "Error: malformed BED entry at line " 
                       << _lineNum 
@@ -684,7 +684,7 @@ private:
                  exit(1);
             }
             bed.start = (CHRPOS)i;
-            i = atoi(fields[2].c_str());
+            i = stoll(fields[2].c_str());
             if (i<0) {
                 cerr << "Error: malformed BED entry at line " 
                      << _lineNum 
@@ -778,7 +778,7 @@ private:
             bed.fields = fields;
             bed.chrom  = fields[0];
             // VCF is one-based
-            bed.start  = atoi(fields[1].c_str()) - 1;  
+            bed.start  = stoll(fields[1].c_str()) - 1;  
             // VCF 4.0 stores the size of the affected REF allele.
             bed.end    = bed.start + fields[3].size(); 
             bed.strand = "+";
@@ -851,9 +851,9 @@ private:
             if (this->bedType >= 8 && _isGff) {
                 bed.chrom = fields[0];
                 if (isInteger(fields[3]))
-                    bed.start  = atoi(fields[3].c_str());
+                    bed.start  = stoll(fields[3].c_str());
                 if (isInteger(fields[4]))
-                    bed.end  = atoi(fields[4].c_str());
+                    bed.end  = stoll(fields[4].c_str());
                 bed.name   = fields[2];
                 bed.score  = fields[5];
                 bed.strand = fields[6].c_str();
@@ -942,24 +942,24 @@ public:
         // BED
         if (_isGff == false && _isVcf == false) {
             if (this->bedType == 3) {
-                printf ("%s\t%d\t%d\t", bed.chrom.c_str(), start, end);
+                printf ("%s\t%ld\t%ld\t", bed.chrom.c_str(), start, end);
             }
             else if (this->bedType == 4) {
-                printf ("%s\t%d\t%d\t%s\t", 
+                printf ("%s\t%ld\t%ld\t%s\t", 
                     bed.chrom.c_str(), start, end, bed.name.c_str());
             }
             else if (this->bedType == 5) {
-                printf ("%s\t%d\t%d\t%s\t%s\t", 
+                printf ("%s\t%ld\t%ld\t%s\t%s\t", 
                     bed.chrom.c_str(), start, end, 
                     bed.name.c_str(), bed.score.c_str());
             }
             else if (this->bedType == 6) {
-                printf ("%s\t%d\t%d\t%s\t%s\t%s\t", 
+                printf ("%s\t%ld\t%ld\t%s\t%s\t%s\t", 
                     bed.chrom.c_str(), start, end, 
                     bed.name.c_str(), bed.score.c_str(), bed.strand.c_str());
             }
             else if (this->bedType > 6) {
-                printf ("%s\t%d\t%d\t%s\t%s\t%s\t", 
+                printf ("%s\t%ld\t%ld\t%s\t%s\t%s\t", 
                     bed.chrom.c_str(), start, end, bed.name.c_str(),
                     bed.score.c_str(), bed.strand.c_str());
                 
@@ -974,7 +974,7 @@ public:
         }
         // VCF
         else if (_isGff == false && _isVcf == true) {
-            printf ("%s\t%d\t", bed.chrom.c_str(), start+1);
+            printf ("%s\t%ld\t", bed.chrom.c_str(), start+1);
 
             vector<uint16_t>::const_iterator othIt  = bed.other_idxs.begin();
             vector<uint16_t>::const_iterator othEnd = bed.other_idxs.end();

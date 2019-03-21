@@ -177,7 +177,7 @@ CHRPOS Bed12Interval::getLength(bool obeySplits) const {
 	if (!obeySplits || _blockCount <=0) {
 		return _endPos - _startPos;
 	} else {
-		vector<int> vBlockSizes;
+		vector<CHRPOS> vBlockSizes;
 		Tokenize(_blockSizes, vBlockSizes, ',');
 	    return accumulate(vBlockSizes.begin(), vBlockSizes.end(), 0);
 	}

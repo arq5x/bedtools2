@@ -8,6 +8,8 @@
 
 #include "Fasta.h"
 
+using namespace std;
+
 FastaIndexEntry::FastaIndexEntry(string name, int length, long long offset, int line_blen, int line_len, bool useFullHeader)
     : name(name)
     , length(length)
@@ -62,10 +64,10 @@ void FastaIndex::readIndexFile(string fname) {
                 string name = useFullHeader ? fields[0] :
 		  split(fields[0], " \t").at(0);  // key by first token of name
                 sequenceNames.push_back(name);
-                this->insert(make_pair(name, FastaIndexEntry(fields[0], atoi(fields[1].c_str()),
+                this->insert(make_pair(name, FastaIndexEntry(fields[0], stoll(fields[1].c_str()),
 							     strtoll(fields[2].c_str(), &end, 10),
-							     atoi(fields[3].c_str()),
-							     atoi(fields[4].c_str()),
+							     stoll(fields[3].c_str()),
+							     stoll(fields[4].c_str()),
 							     useFullHeader)));
             } else {
                 cerr << "Warning: malformed fasta index file " << fname << 
@@ -342,7 +344,7 @@ string FastaReference::getSubSequence(string seqname, int start, int length) {
     return s;
 }
 
-long unsigned int FastaReference::sequenceLength(string seqname) {
+CHRPOS FastaReference::sequenceLength(string seqname) {
     if (index->chromFound(seqname)) {
         FastaIndexEntry entry = index->entry(seqname);
         return entry.length;

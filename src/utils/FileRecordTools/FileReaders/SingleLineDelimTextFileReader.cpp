@@ -148,7 +148,7 @@ bool SingleLineDelimTextFileReader::findDelimiters() {
 	return true;
 }
 
-int SingleLineDelimTextFileReader::getVcfSVlen() {
+CHRPOS SingleLineDelimTextFileReader::getVcfSVlen() {
 	// tokenize the INFO field
 	string info_str;
 	vector<string> infofields;
@@ -166,7 +166,7 @@ int SingleLineDelimTextFileReader::getVcfSVlen() {
         //SVLEN->100
         if (keytoval.size() == 2) {
         	if (keytoval.at(0) == "SVLEN") {
-        		vector<int> svlens;
+        		vector<CHRPOS> svlens;
         		Tokenize(keytoval.at(1), svlens, ',');
         		// are the multiple SVLENS?
         		if (svlens.size() == 1) {
@@ -174,7 +174,7 @@ int SingleLineDelimTextFileReader::getVcfSVlen() {
         		}
         		else {
         			// return the abs_max SVLEN
-        			int max_len = *max_element(svlens.begin(),svlens.end(), abs_cmp);
+        			CHRPOS max_len = *max_element(svlens.begin(),svlens.end(), abs_cmp);
         			return abs(max_len);
         		}
         	}
