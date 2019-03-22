@@ -187,7 +187,7 @@ void ComputeOverlaps(istream &input, short &s1Col, short &e1Col, short &s2Col, s
                 e2End != inFields[e2Col-1].c_str()) {
 
                 overlap = overlaps(s1, e1, s2, e2);
-                printf("%s\t%ld\n", inLine.c_str(), overlap);
+                printf("%s\t%" PRId_CHRPOS "\n", inLine.c_str(), overlap);
             }
             else {
                 cerr << "One of your columns appears to be non-numeric at line " << lineNum << ". Exiting..." << endl << endl;

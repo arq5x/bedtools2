@@ -104,8 +104,8 @@ bool BinTree::addRecordToTree(Record *record)
 	binNumType binNum = getBin(startPos, endPos);
 
 	if (binNum < 0 || binNum >= NUM_BINS) {
-		fprintf(stderr, "ERROR: Received illegal bin number %lu from getBin call.\n"
-                                "Maximum values is: %lu\n"
+		fprintf(stderr, "ERROR: Received illegal bin number %" PRId_BINNUMTYPE " from getBin call.\n"
+                                "Maximum values is: %" PRId_BINNUMTYPE "\n"
                                 "This typically means that your coordinates are\n"
                                 "negative or too large to represent in the data\n"
                                 "structure bedtools uses to find intersections.", binNum, NUM_BINS);

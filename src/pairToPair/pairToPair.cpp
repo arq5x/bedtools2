@@ -157,10 +157,11 @@ bool PairToPair::FindHitsOnBothEnds(const BEDPE &a, const vector<MATE> &qualityH
 
             if (_searchType == "both") {
                 _bedA->reportBedPETab(a);
-                printf("%s\t%ld\t%ld\t%s\t%ld\t%ld\t%s\t%s\t%s\t%s", b1.bed.chrom.c_str(), b1.bed.start, b1.bed.end,
-                                                                   b2.bed.chrom.c_str(), b2.bed.start, b2.bed.end,
-                                                                   b1.bed.name.c_str(), b1.bed.score.c_str(),
-                                                                   b1.bed.strand.c_str(), b2.bed.strand.c_str());
+                printf("%s\t%" PRId_CHRPOS "\t%" PRId_CHRPOS "\t%s\t%" PRId_CHRPOS "\t%" PRId_CHRPOS "\t%s\t%s\t%s\t%s",
+                    b1.bed.chrom.c_str(), b1.bed.start, b1.bed.end,
+                    b2.bed.chrom.c_str(), b2.bed.start, b2.bed.end,
+                    b1.bed.name.c_str(), b1.bed.score.c_str(),
+                    b1.bed.strand.c_str(), b2.bed.strand.c_str());
                 for (size_t i = 0; i < b1.bed.other_idxs.size(); ++i)
                     printf("\t%s", b1.bed.fields[b1.bed.other_idxs[i]].c_str());
                 printf("\n");
@@ -191,10 +192,11 @@ void PairToPair::FindHitsOnEitherEnd(const BEDPE &a, const vector<MATE> &quality
                 MATE b2 = m->second[1];
 
                 _bedA->reportBedPETab(a);
-                printf("%s\t%ld\t%ld\t%s\t%ld\t%ld\t%s\t%s\t%s\t%s", b1.bed.chrom.c_str(), b1.bed.start, b1.bed.end,
-                                                                   b2.bed.chrom.c_str(), b2.bed.start, b2.bed.end,
-                                                                   b1.bed.name.c_str(), b1.bed.score.c_str(),
-                                                                   b1.bed.strand.c_str(), b2.bed.strand.c_str());
+                printf("%s\t%" PRId_CHRPOS "\t%" PRId_CHRPOS "\t%s\t%" PRId_CHRPOS "\t%" PRId_CHRPOS "\t%s\t%s\t%s\t%s",
+                    b1.bed.chrom.c_str(), b1.bed.start, b1.bed.end,
+                    b2.bed.chrom.c_str(), b2.bed.start, b2.bed.end,
+                    b1.bed.name.c_str(), b1.bed.score.c_str(),
+                    b1.bed.strand.c_str(), b2.bed.strand.c_str());
                 for (size_t i = 0; i < b1.bed.other_idxs.size(); ++i)
                     printf("\t%s", b1.bed.fields[b1.bed.other_idxs[i]].c_str());
                 printf("\n");
@@ -203,10 +205,11 @@ void PairToPair::FindHitsOnEitherEnd(const BEDPE &a, const vector<MATE> &quality
                 MATE b1 = m->second[0];
 
                 _bedA->reportBedPETab(a);
-                printf("%s\t%ld\t%ld\t%s\t%ld\t%ld\t%s\t%s\t%s\t%s", b1.bed.chrom.c_str(), b1.bed.start, b1.bed.end,
-                                                                   b1.mate->bed.chrom.c_str(), b1.mate->bed.start, b1.mate->bed.end,
-                                                                   b1.bed.name.c_str(), b1.bed.score.c_str(),
-                                                                   b1.bed.strand.c_str(), b1.mate->bed.strand.c_str());
+                printf("%s\t%" PRId_CHRPOS "\t%" PRId_CHRPOS "\t%s\t%" PRId_CHRPOS "\t%" PRId_CHRPOS "\t%s\t%s\t%s\t%s",
+                    b1.bed.chrom.c_str(), b1.bed.start, b1.bed.end,
+                    b1.mate->bed.chrom.c_str(), b1.mate->bed.start, b1.mate->bed.end,
+                    b1.bed.name.c_str(), b1.bed.score.c_str(),
+                    b1.bed.strand.c_str(), b1.mate->bed.strand.c_str());
                 for (size_t i = 0; i < b1.bed.other_idxs.size(); ++i)
                     printf("\t%s", b1.bed.fields[b1.bed.other_idxs[i]].c_str());
                 printf("\n");
