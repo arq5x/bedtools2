@@ -5,7 +5,7 @@
 #include <cstring>
 namespace BamTools {
 	const static char cigar_ops_as_chars[] = { 'M', 'I', 'D', 'N', 'S', 'H', 'P', '=', 'X', 'B' };
-	static std::string _mkstr(const uint8_t* what) { return std::string((const char*)what + 1); }
+	static inline std::string _mkstr(const uint8_t* what) { return std::string((const char*)what + 1); }
 	struct CigarOp {
 	  
 		char     Type;   //!< CIGAR operation type (MIDNSHPX=)

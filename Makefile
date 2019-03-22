@@ -143,7 +143,7 @@ INCLUDES =	-I"$(REAL_SRC_DIR)/utils/bedFile" \
 				-I"$(REAL_SRC_DIR)/utils/RecordOutputMgr" \
 				-I"$(REAL_SRC_DIR)/utils/ToolBase" \
 				-I"$(REAL_SRC_DIR)/utils/driver" \
-				-I"$(REAL_SRC_DIR)/utils/htslib/htslib"
+				-I"$(REAL_SRC_DIR)/utils/htslib"
 
 
 all: print_banner $(OBJ_DIR) $(BIN_DIR) autoversion $(UTIL_SUBDIRS) $(SUBDIRS)

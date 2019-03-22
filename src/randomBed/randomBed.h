@@ -17,6 +17,7 @@
 #include <map>
 #include <cstdlib>
 #include <ctime>
+#include <inttypes.h>
 #include <sys/time.h>
 #include <unistd.h>
 #include <sys/types.h>
@@ -26,6 +27,8 @@ using namespace std;
 const int MAX_TRIES = 1000000;
 
 typedef int64_t CHRPOS;
+
+#define PRId_CHRPOS PRId64
 
 //************************************************
 // Class methods and elements

@@ -53,13 +53,13 @@ void NucBed::ReportDnaProfile(const BED& bed, const string &sequence, CHRPOS seq
     // report AT and GC content
     printf("%f\t%f\t",(float)(a+t)/seqLength, (float)(c+g)/seqLength);
     // report raw nucleotide counts
-    printf("%ld\t%ld\t%ld\t%ld\t%ld\t%ld\t%ld",a,c,g,t,n,other,seqLength);
+    printf("%" PRId_CHRPOS "\t%" PRId_CHRPOS "\t%" PRId_CHRPOS "\t%" PRId_CHRPOS "\t%" PRId_CHRPOS "\t%" PRId_CHRPOS "\t%" PRId_CHRPOS,a,c,g,t,n,other,seqLength);
     // add the original sequence if requested.
 
     if (_printSeq)
         printf("\t%s",sequence.c_str());
     if (_hasPattern)
-        printf("\t%d",userPatternCount);
+        printf("\t%" PRId_CHRPOS,userPatternCount);
     printf("\n");
 
 }

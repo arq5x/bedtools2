@@ -1,8 +1,8 @@
 #ifndef __HTSLIBPP_BAM_WRITER_HPP__
 #define __HTSLIBPP_BAM_WRITER_HPP__
 #include <string>
-#include <cram.h>
-#include <sam.h>
+#include <stdexcept>
+#include <htslib/sam.h>
 #include <SamHeader.hpp>
 #include <BamAlignment.hpp>
 namespace BamTools {
@@ -49,7 +49,8 @@ namespace BamTools {
 			if(sync_data)
 				al.SyncExtraData();
 			const bam1_t* bam = al.HtsObj();
-			sam_write1(_fp, _hdr.GetHeaderStruct(), bam);
+			if (sam_write1(_fp, _hdr.GetHeaderStruct(), bam) < 0)
+				throw std::runtime_error("can't write alignment record");
 		}
 		void SetCompressionMode(CompressionMode mode)
 		{

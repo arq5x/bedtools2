@@ -8,6 +8,7 @@
 #ifndef BINTREE_H_
 #define BINTREE_H_
 
+#include <inttypes.h>
 #include <stdint.h>
 #include <string>
 #include <set>
@@ -41,6 +42,8 @@ private:
     // BIN HANDLING
     //
         typedef int64_t binNumType;
+
+#define PRId_BINNUMTYPE PRId64
 
 	// bins range in size from 16kb to 32Gb
 	static const binNumType NUM_BIN_LEVELS = 8;

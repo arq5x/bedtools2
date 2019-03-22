@@ -91,26 +91,31 @@ BedLineStatus BedFilePE::GetNextBedPE (BEDPE &bedpe, int &lineNum) {
 void BedFilePE::reportBedPETab(const BEDPE &a) {
 
     if (this->bedType == 6) {
-        printf("%s\t%ld\t%ld\t%s\t%ld\t%ld\t", a.chrom1.c_str(), a.start1, a.end1,
+        printf("%s\t%" PRId_CHRPOS "\t%" PRId_CHRPOS "\t%s\t%" PRId_CHRPOS "\t%" PRId_CHRPOS "\t",
+                                            a.chrom1.c_str(), a.start1, a.end1,
                                             a.chrom2.c_str(), a.start2, a.end2);
     }
     else if (this->bedType == 7) {
-        printf("%s\t%ld\t%ld\t%s\t%ld\t%ld\t%s\t", a.chrom1.c_str(), a.start1, a.end1,
+        printf("%s\t%" PRId_CHRPOS "\t%" PRId_CHRPOS "\t%s\t%" PRId_CHRPOS "\t%" PRId_CHRPOS "\t%s\t",
+                                            a.chrom1.c_str(), a.start1, a.end1,
                                             a.chrom2.c_str(), a.start2, a.end2,
                                             a.name.c_str());
     }
     else if (this->bedType == 8) {
-        printf("%s\t%ld\t%ld\t%s\t%ld\t%ld\t%s\t%s\t", a.chrom1.c_str(), a.start1, a.end1,
+        printf("%s\t%" PRId_CHRPOS "\t%" PRId_CHRPOS "\t%s\t%" PRId_CHRPOS "\t%" PRId_CHRPOS "\t%s\t%s\t",
+                                            a.chrom1.c_str(), a.start1, a.end1,
                                             a.chrom2.c_str(), a.start2, a.end2,
                                             a.name.c_str(), a.score.c_str());
     }
     else if (this->bedType == 10) {
-        printf("%s\t%ld\t%ld\t%s\t%ld\t%ld\t%s\t%s\t%s\t%s\t", a.chrom1.c_str(), a.start1, a.end1,
+        printf("%s\t%" PRId_CHRPOS "\t%" PRId_CHRPOS "\t%s\t%" PRId_CHRPOS "\t%" PRId_CHRPOS "\t%s\t%s\t%s\t%s\t",
+                                            a.chrom1.c_str(), a.start1, a.end1,
                                             a.chrom2.c_str(), a.start2, a.end2,
                                             a.name.c_str(), a.score.c_str(), a.strand1.c_str(), a.strand2.c_str());
     }
     else if (this->bedType > 10) {
-        printf("%s\t%ld\t%ld\t%s\t%ld\t%ld\t%s\t%s\t%s\t%s", a.chrom1.c_str(), a.start1, a.end1,
+        printf("%s\t%" PRId_CHRPOS "\t%" PRId_CHRPOS "\t%s\t%" PRId_CHRPOS "\t%" PRId_CHRPOS "\t%s\t%s\t%s\t%s",
+                                            a.chrom1.c_str(), a.start1, a.end1,
                                             a.chrom2.c_str(), a.start2, a.end2,
                                             a.name.c_str(), a.score.c_str(), a.strand1.c_str(), a.strand2.c_str());
         vector<uint16_t>::const_iterator othIt  = a.other_idxs.begin();
@@ -133,26 +138,31 @@ void BedFilePE::reportBedPETab(const BEDPE &a) {
 void BedFilePE::reportBedPENewLine(const BEDPE &a) {
 
     if (this->bedType == 6) {
-        printf("%s\t%ld\t%ld\t%s\t%ld\t%ld\n", a.chrom1.c_str(), a.start1, a.end1,
+        printf("%s\t%" PRId_CHRPOS "\t%" PRId_CHRPOS "\t%s\t%" PRId_CHRPOS "\t%" PRId_CHRPOS "\n",
+                                            a.chrom1.c_str(), a.start1, a.end1,
                                             a.chrom2.c_str(), a.start2, a.end2);
     }
     else if (this->bedType == 7) {
-        printf("%s\t%ld\t%ld\t%s\t%ld\t%ld\t%s\n", a.chrom1.c_str(), a.start1, a.end1,
+        printf("%s\t%" PRId_CHRPOS "\t%" PRId_CHRPOS "\t%s\t%" PRId_CHRPOS "\t%" PRId_CHRPOS "\t%s\n",
+                                            a.chrom1.c_str(), a.start1, a.end1,
                                             a.chrom2.c_str(), a.start2, a.end2,
                                             a.name.c_str());
     }
     else if (this->bedType == 8) {
-        printf("%s\t%ld\t%ld\t%s\t%ld\t%ld\t%s\t%s\n", a.chrom1.c_str(), a.start1, a.end1,
+        printf("%s\t%" PRId_CHRPOS "\t%" PRId_CHRPOS "\t%s\t%" PRId_CHRPOS "\t%" PRId_CHRPOS "\t%s\t%s\n",
+                                            a.chrom1.c_str(), a.start1, a.end1,
                                             a.chrom2.c_str(), a.start2, a.end2,
                                             a.name.c_str(), a.score.c_str());
     }
     else if (this->bedType == 10) {
-        printf("%s\t%ld\t%ld\t%s\t%ld\t%ld\t%s\t%s\t%s\t%s\n", a.chrom1.c_str(), a.start1, a.end1,
+        printf("%s\t%" PRId_CHRPOS "\t%" PRId_CHRPOS "\t%s\t%" PRId_CHRPOS "\t%" PRId_CHRPOS "\t%s\t%s\t%s\t%s\n",
+                                            a.chrom1.c_str(), a.start1, a.end1,
                                             a.chrom2.c_str(), a.start2, a.end2,
                                             a.name.c_str(), a.score.c_str(), a.strand1.c_str(), a.strand2.c_str());
     }
     else if (this->bedType > 10) {
-        printf("%s\t%ld\t%ld\t%s\t%ld\t%ld\t%s\t%s\t%s\t%s", a.chrom1.c_str(), a.start1, a.end1,
+        printf("%s\t%" PRId_CHRPOS "\t%" PRId_CHRPOS "\t%s\t%" PRId_CHRPOS "\t%" PRId_CHRPOS "\t%s\t%s\t%s\t%s",
+                                            a.chrom1.c_str(), a.start1, a.end1,
                                             a.chrom2.c_str(), a.start2, a.end2,
                                             a.name.c_str(), a.score.c_str(), a.strand1.c_str(), a.strand2.c_str());
         vector<uint16_t>::const_iterator othIt  = a.other_idxs.begin();
