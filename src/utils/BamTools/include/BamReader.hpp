@@ -2,10 +2,10 @@
 #define __HTSLIBPP_BAMREADER_HPP__
 #include <BamAlignment.hpp>
 #include <SamHeader.hpp>
-#include <cram.h>
-#include <sam.h>
-#include <hts.h>
-#include <hfile.h>
+#include <htslib/cram.h>
+#include <htslib/sam.h>
+#include <htslib/hts.h>
+#include <htslib/hfile.h>
 #include <stdint.h>
 #include <string>
 #include <queue>

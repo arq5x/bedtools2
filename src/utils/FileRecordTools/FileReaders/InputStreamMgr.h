@@ -13,7 +13,7 @@
 #include "string.h"
 #include "api/BamReader.h"
 
-#include <bgzf.h>
+#include <htslib/bgzf.h>
 #include <iostream>
 
 using namespace std;

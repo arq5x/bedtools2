@@ -1,8 +1,7 @@
 #ifndef __HTSLIBPP_BAM_WRITER_HPP__
 #define __HTSLIBPP_BAM_WRITER_HPP__
 #include <string>
-#include <cram.h>
-#include <sam.h>
+#include <htslib/sam.h>
 #include <SamHeader.hpp>
 #include <BamAlignment.hpp>
 namespace BamTools {
