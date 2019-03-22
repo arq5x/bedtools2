@@ -24,8 +24,6 @@ test/genomecov/two_blocks.bam
 test/shift/genome.len
 test/split/exp
 
-src/utils/htslib/test/test-bcf-translate
-src/utils/htslib/test/test_realn
 test/genomecov/pair-chip.bam
 test/bigchroms/bigx.fasta
 test/bigchroms/bigx.fasta.fai
