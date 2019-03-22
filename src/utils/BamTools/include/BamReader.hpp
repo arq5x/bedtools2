@@ -137,9 +137,6 @@ namespace BamTools {
 		std::vector<_SamFile*> _files;
 		std::vector<SamHeader> _hdrs;
 		std::priority_queue<std::pair<_MetaData, bam1_t*>, std::vector<std::pair<_MetaData, bam1_t*> >, _Comp> _queue;
-#ifdef WITH_HTS_CB_API
-		hFILE_callback_ops _hops;
-#endif
 		std::string _error_str;
 
 		bool _read_sam_file(_SamFile* file)
