@@ -98,3 +98,14 @@ $BT fisher -a a_merge.bed -b b.bed -g t.60.genome -m > obs
 check obs exp
 rm obs exp
 [[ $FAILURES -eq 0 ]] || exit 1;
+
+echo -e "    fisher.t5...\c"
+$BT fisher -b test.bed -a tumor.gff -g dm6.fai > exp
+DIR="${TMPDIR:-/tmp}/Users/mvandenb/src/genomic_features_bardin_lab/build/modencode/dm6/bed/"
+LONG_PATH="$DIR/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAaS-\(phospho-S2\)_.bed"
+mkdir -p "$DIR"
+cp test.bed "$LONG_PATH"
+$BT fisher -b "$LONG_PATH" -a tumor.gff -g dm6.fai > obs
+check obs exp
+rm obs exp
+[[ $FAILURES -eq 0 ]] || exit 1;
