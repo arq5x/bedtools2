@@ -2,6 +2,13 @@
 Release History
 ###############
 
+Version 2.28.0 (23-Mar-2018)
+============================
+1. Included support for htslib to enable CRAM support and long-term stability (Thanks to Hao Hou!)
+2. Included support for genomes with large chromosomes by moving to 64-bit integeres throughout the code base. Thanks to Brent Pedersen and John Marshall!
+3. We now provide a statically-linked binary for LINUX (not OSX) systems.
+4. Various minor bug fixes.
+
 Version 2.27.0 (6-Dec-2017)
 ============================
 1. Fixed a big memory leak and algorithmic flaw in the `split` option. Thanks to Neil Kindlon!

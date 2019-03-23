@@ -17,6 +17,17 @@ Installing stable releases
 --------------------------
 
 .....................................
+Downloading a pre-compiled binary
+.....................................
+.. note::    
+    1. The following approach will only work for Linux (non-OSX) systems.
+
+Starting with release 2.28.0, wqe provide statically-linked binaries thast should work
+right away on Linux systems. Go to the `releases <https://github.com/arq5x/bedtools2/releases>`_
+page and look for the static binary named `bedtools`. Right click on it, get the URL, then download it
+with `wget` or `curl` and you should be good to go.
+
+.....................................
 Compiling from source via Github
 .....................................
 
@@ -25,17 +36,14 @@ Stable, versioned releases of bedtools are made available on Github at the
 the `releases <https://github.com/arq5x/bedtools2/releases>`_ tab.  
 The following commands will install ``bedtools`` in a local directory on an UNIX or OS X machine.
 
-.. note::
-    1. This example is based on version 2.25.0. For future releases, you should replace
-    the version number with the version you intend to install.
-    
-    2. The bedtools Makefiles utilize the GCC compiler. One should edit the
+.. note::    
+    1. The bedtools Makefiles utilize the GCC compiler. One should edit the
     Makefiles accordingly if one wants to use a different compiler.
 
 .. code-block:: bash
 
-  $ wget https://github.com/arq5x/bedtools2/releases/download/v2.25.0/bedtools-2.25.0.tar.gz 
-  $ tar -zxvf bedtools-2.25.0.tar.gz
+  $ wget https://github.com/arq5x/bedtools2/releases/download/v2.28.0/bedtools-2.28.0.tar.gz 
+  $ tar -zxvf bedtools-2.28.0.tar.gz
   $ cd bedtools2
   $ make
 
