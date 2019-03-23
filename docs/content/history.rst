@@ -2,7 +2,7 @@
 Release History
 ###############
 
-Version 2.28.0 (23-Mar-2018)
+Version 2.28.0 (23-Mar-2019)
 ============================
 1. Included support for htslib to enable CRAM support and long-term stability (Thanks to Hao Hou!)
 2. Included support for genomes with large chromosomes by moving to 64-bit integeres throughout the code base. Thanks to Brent Pedersen and John Marshall!
