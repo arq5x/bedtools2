@@ -179,9 +179,10 @@ namespace BamTools {
 			if(fp->format.format == htsExactFormat::cram)
 			{
 				char* ref_file = getenv("CRAM_REFERENCE");
-				if(NULL == ref_file || hts_set_fai_filename(fp, ref_file) < -1)
+				if(NULL == ref_file || hts_set_fai_filename(fp, ref_file) == -1)
 				{
-					// If we are not able to load a reference we just load the core data
+					// If we are not able to load a reference 
+					// we will punt and just load the core alignment data.
 					sam_file->set_cram_reqd_fields(2559);
 				}
 			}
