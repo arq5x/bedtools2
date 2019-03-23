@@ -6,6 +6,15 @@
 ``bedtools bamtofastq`` is a conversion utility for extracting FASTQ records
 from sequence alignments in BAM format. 
 
+
+.. note::
+
+    If you are using CRAM as input, you will need to specify
+    the *full path* describing the location of the relevant reference genome in FASTA format via the CRAM_REFERENCE environment variable. For example:
+
+        `export CRAM_REFERENCE=/path/to/ref/g1k_v37_decoy.fa`
+
+
 ==========================================================================
 Usage and option summary
 ==========================================================================
