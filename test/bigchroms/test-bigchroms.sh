@@ -34,7 +34,7 @@ echo -e "    bigchroms.t03...big get fasta \c"
 $BT getfasta -fi bigx.fasta -bed bigx.bed | tail -1 > obs
 echo "ACTGACCCCGAGACGTTTGCATCCTGCACAGCTAGAGATCCTTTATTAAAAGCACACTGT" > exp
 check obs exp
-rm obs
+rm obs exp
 
 rm bigx.fasta*
 
@@ -49,6 +49,7 @@ echo -e "    bigchroms.t04... merge \c"
 echo "chr1	1	9000000000" > exp
 $BT merge -i big4.bed > obs
 check obs exp
+rm obs exp
 
 
 echo -e "    bigchroms.t05... closest \c"
