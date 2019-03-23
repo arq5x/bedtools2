@@ -124,7 +124,7 @@ bool KeyListOps::isValidColumnOps(FileRecordMgr *dbFile) {
 	// ordering.
 
 	for (int i=0; i < loop; i++) {
-		int col = str2chrPos(colTokens.getElem(numCols > 1 ? i : 0));
+		int col = (int)str2chrPos(colTokens.getElem(numCols > 1 ? i : 0));
 
 		//check that the column number is valid
 		if (col < 1 || col > dbFile->getNumFields()) {

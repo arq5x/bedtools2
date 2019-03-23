@@ -124,12 +124,12 @@ void CoverageFile::makeDepthCount(RecordKeyVector &hits) {
 	for (RecordKeyVector::iterator_type iter = hits.begin(); iter != hits.end(); iter = hits.next())
 	{
 		const Record *dbRec = *iter;
-		int dbStart = dbRec->getStartPos();
-		int dbEnd = dbRec->getEndPos();
-		int maxStart = max(_queryOffset, dbStart);
-		int minEnd = min(dbEnd, key->getEndPos());
+		CHRPOS dbStart = dbRec->getStartPos();
+		CHRPOS dbEnd = dbRec->getEndPos();
+		CHRPOS maxStart = max(_queryOffset, dbStart);
+		CHRPOS minEnd = min(dbEnd, key->getEndPos());
 
-		for (int i=maxStart; i < minEnd; i++) {
+		for (CHRPOS i=maxStart; i < minEnd; i++) {
 			_depthArray[i - _queryOffset]++;
 		}
 		_hitCount++;

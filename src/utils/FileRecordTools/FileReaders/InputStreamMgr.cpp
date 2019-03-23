@@ -22,6 +22,7 @@ InputStreamMgr::InputStreamMgr(const string &filename, bool buildScanBuffer)
  _isStdin(false),
  _isGzipped(false),
  _isBam(false),
+ _isCram(false),
  _isBgzipped(false),
  _tmpZipBuf(NULL),
  _bamRuledOut(false),
@@ -48,8 +49,8 @@ InputStreamMgr::~InputStreamMgr() {
 	delete _infStreamBuf;
 	_infStreamBuf = NULL;
 
+	if(_bamReader) _bamReader->Close();
 	delete _bamReader;
-	_bgStream = NULL;
 
 	delete _bgStream;
 	_bgStream = NULL;
@@ -113,17 +114,21 @@ int InputStreamMgr::read(char *data, size_t dataSize)
 			string newDataStr;
 			newDataStr = _saveDataStr.substr(dataSize, _saveDataStr.size() - dataSize);
 			_saveDataStr = newDataStr;
-			return dataSize;
+			return (int)dataSize;
 		}
 	}
 	if (_streamFinished) {
-		return origRead;
+		return (int)origRead;
 	}
 	if (_isBgzipped) {
-		return (int)(origRead + _bgStream->Read(data, dataSize));
+		ssize_t rc;
+		if((rc = bgzf_read(_bgStream, data, dataSize)) < 0)
+			return -1;
+
+		return (int)(origRead + rc);
 	}
 	_finalInputStream->read(data, dataSize);
-	return origRead + _finalInputStream->gcount();
+	return (int)(origRead + _finalInputStream->gcount());
 }
 
 bool InputStreamMgr::populateScanBuffer()
@@ -132,6 +137,7 @@ bool InputStreamMgr::populateScanBuffer()
 	_saveDataStr.clear();
 	int numChars=0;
 	int currChar = 0;
+	char cram_code[4];
 	while (1) {
 		if (_isGzipped && _bamRuledOut) {
 			return readZipChunk();
@@ -154,6 +160,36 @@ bool InputStreamMgr::populateScanBuffer()
 				//is definitely not BAM, and want to start over.
 			}
 		}
+	   else
+	   {
+			if(numChars <= 4) cram_code[numChars-1] = currChar;
+			if(numChars == 4 && memcmp(cram_code, "CRAM", 4) == 0)
+			{
+				for (; numChars < BAM_SCAN_BUFFER_SIZE; numChars++) {
+					currChar = _pushBackStreamBuf->sbumpc();
+					//Stop when EOF hit.
+					if (currChar == EOF) {
+						_eofHit = true;
+						break;
+					}
+					_scanBuffer.push_back(currChar);
+
+				}
+				_pushBackStreamBuf->pushBack(_scanBuffer);
+
+				_bamReader = new BamTools::BamReader();
+				if (_bamReader->OpenStream(_finalInputStream))
+				{
+					_isBam = true;
+					_isCram = true;
+					_numBytesInBuffer = _scanBuffer.size();
+
+					return true;
+				}
+				else return false;
+			}
+		}
+
 
 		//Stop if we have the minimum number of bytes and newline is hit.
 		//For gzip, stop at SCAN_BUFFER_SIZE.
@@ -161,7 +197,7 @@ bool InputStreamMgr::populateScanBuffer()
 			break;
 		}
 	}
-	_numBytesInBuffer = _scanBuffer.size();
+	_numBytesInBuffer = (int)_scanBuffer.size();
 	//append it to the savedDataStr.
  	_scanBuffer.toStr(_saveDataStr, true);
 	if (_numBytesInBuffer == 0) return false;
@@ -212,16 +248,25 @@ bool InputStreamMgr::detectBamOrBgzip(int &numChars, int currChar)
 				_numBytesInBuffer = 0;
 				delete _bamReader;
 				_bamReader = NULL;
+				_finalInputStream->clear();
 
-				//Alter the finalInputSream to become a bgzfReader.
-				_bgStream = new BamTools::Internal::BgzfStream();
-				_bgStream->OpenStream(_finalInputStream, BamTools::IBamIODevice::ReadOnly);
 
+				BamTools::stream_data_t* cb_data = new BamTools::stream_data_t(*_finalInputStream);
+				hFILE_callback_ops ops;
+				memset(&ops, 0, sizeof(ops));
+				ops.read = BamTools::stream_data_t::read;
+				ops.close = BamTools::stream_data_t::close;
+				ops.cb_data = cb_data;
+				hFILE* hp = hopen_callback(ops, "rb");
+				if(nullptr == hp) return false;
+				if(nullptr == (_bgStream = bgzf_hopen(hp, "rb")))
+					return false;
+				
 				return false;
 			}
 			//This is a BAM file.
 			_isBam = true;
-			_numBytesInBuffer = _scanBuffer.size();
+			_numBytesInBuffer = (int)_scanBuffer.size();
 			return true;
 		} else if (numChars == 4) {
 			//This is a gzipped file, and it is not bgzipped or BAM.
@@ -251,7 +296,7 @@ bool InputStreamMgr::readZipChunk()
 	memset(_tmpZipBuf, 0, SCAN_BUFFER_SIZE +1);
 	size_t numCharsRead = read(_tmpZipBuf, (size_t)SCAN_BUFFER_SIZE);
 	_saveDataStr.append(_tmpZipBuf);
-	_numBytesInBuffer = _saveDataStr.size();
+	_numBytesInBuffer = (int)_saveDataStr.size();
 	if ((int)numCharsRead < SCAN_BUFFER_SIZE) {
 		_streamFinished = true;
 	}

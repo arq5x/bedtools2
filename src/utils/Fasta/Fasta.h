@@ -17,6 +17,7 @@
 #include <stdio.h>
 #include <algorithm>
 #include "LargeFileSupport.h"
+#include "bedFile.h"
 #include <sys/stat.h>
 #include <sys/mman.h>
 #include "split.h"
@@ -29,15 +30,15 @@ using namespace std;
 class FastaIndexEntry {
     friend ostream& operator<<(ostream& output, const FastaIndexEntry& e);
     public:
-        FastaIndexEntry(string name, int length, long long offset,
-			int line_blen, int line_len, bool useFullHeader);
+        FastaIndexEntry(string name, CHRPOS length, CHRPOS offset,
+			CHRPOS line_blen, CHRPOS line_len, bool useFullHeader);
         FastaIndexEntry(void);
         ~FastaIndexEntry(void);
         string name;  // sequence name
-        int length;  // length of sequence
+        CHRPOS length;  // length of sequence
         long long offset;  // bytes offset of sequence from start of file
-        int line_blen;  // line length in bytes, sequence characters
-        int line_len;  // line length including newline
+        CHRPOS line_blen;  // line length in bytes, sequence characters
+        CHRPOS line_len;  // line length including newline
 	bool useFullHeader;
         void clear(void);
 };
@@ -62,10 +63,10 @@ class FastaIndex : public map<string, FastaIndexEntry> {
 class FastaReference {
     public:
         void open(string reffilename, bool usemmap = false,
-		  bool useFullHeader = false);
+		bool useFullHeader = false);
         bool usingmmap;
         string filename;
-	bool usingfullheader;
+        bool usingfullheader;
         FastaReference(void) : usingmmap(false), usingfullheader(false) { }
         ~FastaReference(void);
         FILE* file;
@@ -76,9 +77,9 @@ class FastaReference {
         string getSequence(string seqname);
         // potentially useful for performance, investigate
         // void getSequence(string seqname, string& sequence);
-        string getSubSequence(string seqname, int start, int length);
+        string getSubSequence(string seqname, CHRPOS start, CHRPOS length);
         string sequenceNameStartingWith(string seqnameStart);
-        long unsigned int sequenceLength(string seqname);
+        CHRPOS sequenceLength(string seqname);
 };
 
 #endif

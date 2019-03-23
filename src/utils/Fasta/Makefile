@@ -4,7 +4,7 @@ UTILITIES_DIR = ../../utils/
 # -------------------
 # define our includes
 # -------------------
-INCLUDES = 
+INCLUDES = -I$(UTILITIES_DIR)/bedFile/
 
 # ----------------------------------
 # define our source and object files
@@ -19,7 +19,7 @@ all: $(BUILT_OBJECTS)
 	
 $(BUILT_OBJECTS): $(SOURCES)
 	@echo "  * compiling" $(*F).cpp
-	@$(CXX) -c -o $@ $(*F).cpp $(LDFLAGS) $(CXXFLAGS) $(CPPFLAGS)
+	$(CCPREFIX) $(CXX) -c -o $@ $(*F).cpp $(LDFLAGS) $(CXXFLAGS) $(CPPFLAGS)
 
 clean:
 	@echo "Cleaning up."

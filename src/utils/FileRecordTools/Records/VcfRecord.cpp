@@ -55,7 +55,7 @@ void VcfRecord::print(string &outBuf) const {
 	printOtherFields(outBuf);
 }
 
-void VcfRecord::print(string &outBuf, int start, int end) const {
+void VcfRecord::print(string &outBuf, CHRPOS start, CHRPOS end) const {
 	outBuf.append(_chrName);
 	outBuf.append("\t");
 	outBuf.append(_startPosStr);

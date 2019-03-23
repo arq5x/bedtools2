@@ -36,7 +36,7 @@ protected:
 	Bed3Interval _outRecord;
 	string _currChrom;
 	const NewGenomeFile *_genomeFile;
-	int _currStartPos;
+	CHRPOS _currStartPos;
 	RecordOutputMgr *_outputMgr;
 	const vector<string> &_chromList;
 	int _currPosInGenomeList;
@@ -45,7 +45,7 @@ protected:
 
 	void outPutLastRecordInPrevChrom();
 	bool fastForward(const string &newChrom);
-	void printRecord(int endPos);
+	void printRecord(CHRPOS endPos);
 
 };
 

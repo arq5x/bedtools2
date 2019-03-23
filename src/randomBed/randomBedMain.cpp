@@ -36,7 +36,7 @@ int random_main(int argc, char* argv[]) {
     bool haveGenome       = false;
     bool haveSeed         = false;
     int seed              = -1;
-    int length            = 100;
+    CHRPOS length            = 100;
     int numToGenerate     = 1000000;
 
     for(int i = 1; i < argc; i++) {
@@ -71,7 +71,7 @@ int random_main(int argc, char* argv[]) {
         }
         else if(PARAMETER_CHECK("-l", 2, parameterLength)) {
             if ((i+1) < argc) {
-                length = atoi(argv[i + 1]);
+                length = std::stoll(argv[i + 1]);
                 i++;
             }
         }

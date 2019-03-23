@@ -38,7 +38,7 @@ BIN_DIR = ../../../bin/
 UTILITIES_DIR = ../../utils/
 	
 ${OBJ_DIR}/gzstream.o : gzstream.C gzstream.h
-	$(CXX) $(CXXFLAGS) $(CPPFLAGS) -c -o $(OBJ_DIR)/gzstream.o gzstream.C $(INCLUDES)
+	$(CCPREFIX) $(CXX) $(CXXFLAGS) $(CPPFLAGS) -c -o $(OBJ_DIR)/gzstream.o gzstream.C $(INCLUDES)
 
 clean:
 	@echo "Cleaning up."

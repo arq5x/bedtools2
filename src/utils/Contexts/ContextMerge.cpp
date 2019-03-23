@@ -94,7 +94,7 @@ bool ContextMerge::isValidState()
 bool ContextMerge::handle_d() {
     if ((_i+1) < _argc) {
     	if (isNumeric(_argv[_i+1])) {
-			int dist = str2chrPos(_argv[_i+1]);
+			int dist = (int)str2chrPos(_argv[_i+1]);
 			
 			_maxDistance = dist;
 	    	markUsed(_i - _skipFirstArgs);

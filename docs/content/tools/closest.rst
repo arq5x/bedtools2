@@ -8,7 +8,7 @@ Similar to :doc:`../tools/intersect`, `closest` searches for overlapping feature
 no feature in B overlaps the current feature in A, `closest` will report the nearest (that is, least
 genomic distance from the start or end of A) feature in B. For example, one might want to find which
 is the closest gene to a significant GWAS polymorphism. Note that `closest` will report an
-overlapping feature as the closest---that is, it does not restrict to closest *non-overlapping* feature. The following iconic "cheatsheet" summarizes the funcitonality available through the various optyions provided by the `closest` tool.
+overlapping feature as the closest---that is, it does not restrict to closest *non-overlapping* feature. The following iconic "cheatsheet" summarizes the functionality available through the various options provided by the `closest` tool.
 
 |
 
@@ -61,7 +61,7 @@ Option                           Description
 ===========================      ===============================================================================================================================================================================================================
 **-s**                           Require same strandedness.  That is, find the closest feature in B that overlaps A on the _same_ strand. By default, overlaps are reported without respect to strand.
 
-**-S**                           Require opposite strandedness.  That is, find the closest featurein B that overlaps A on the _opposite_ strand. By default, overlaps are reported without respect to strand.
+**-S**                           Require opposite strandedness.  That is, find the closest feature in B that overlaps A on the _opposite_ strand. By default, overlaps are reported without respect to strand.
 
 **-d**                           In addition to the closest feature in B, report its distance to A as an extra column. The reported distance for overlapping features will be 0.
 
@@ -93,7 +93,7 @@ Option                           Description
                                  | - `first`  Report the first tie that occurred in the B file.
                                  | - `last`   Report the last tie that occurred in the B file.
 
-**-mdb**                         | Specifiy how multiple databases should be resolved.
+**-mdb**                         | Specify how multiple databases should be resolved.
                                  | - `each`  Report closest records for each database (default).
                                  | - `all`   Report closest records among all databases.
 
@@ -117,7 +117,7 @@ Default behavior
 The `closest` tool first searches for features in B that overlap a feature in A. If overlaps are found, the feature in B that overlaps the highest fraction of A is reported. If no overlaps are found, `closestBed` looks for
 the feature in B that is *closest* (that is, least genomic distance to the start or end of A) to A. For example, 
 
-For example, consider the case where one of the intervals im B overlaps the interval in B, yet another does not:
+For example, consider the case where one of the intervals in B overlaps the interval in B, yet another does not:
 
 .. code-block:: bash
 
@@ -210,7 +210,7 @@ Or, you can use the full original filename via the `-filenames` option.
 
 
 =========================================================================================
-``-mdb`` Find thw closest interval in **each* or among **all** `-b` files.
+``-mdb`` Find the closest interval in **each* or among **all** `-b` files.
 =========================================================================================
 By default, the closest interval from **each** file is reported when using multiple `-b` files.
 

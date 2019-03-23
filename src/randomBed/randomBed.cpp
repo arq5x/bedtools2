@@ -13,7 +13,7 @@
 
 
 BedRandom::BedRandom(string &genomeFile, uint32_t numToGenerate, int seed,
-                       bool haveSeed, uint32_t length) {
+                       bool haveSeed, CHRPOS length) {
     _genomeFile        = genomeFile;
     _numToGenerate     = numToGenerate;
     _length            = length;
@@ -43,13 +43,13 @@ BedRandom::~BedRandom(void)
 void BedRandom::Generate() 
 {
     _genome  = new GenomeFile(_genomeFile);
-    uint32_t genomeSize  = _genome->getGenomeSize();
+    CHRPOS genomeSize  = _genome->getGenomeSize();
     
     string chrom;
-    uint32_t start;
-    uint32_t end;
+    CHRPOS start;
+    CHRPOS end;
     char strand;
-    uint32_t chromSize;
+    CHRPOS chromSize;
     uint32_t numGenerated = 0;
     while (numGenerated < _numToGenerate)
     {
@@ -58,10 +58,10 @@ void BedRandom::Generate()
             // we need to combine two consective calls to rand()
             // because RAND_MAX is 2^31 (2147483648), whereas
             // mammalian genomes are obviously much larger.
-            uint32_t randStart = ((((long) rand()) << 31) | rand()) % genomeSize;
+            CHRPOS randStart = ((((long) rand()) << 31) | rand()) % genomeSize;
             // use the above randomStart (e.g., for human 0..3.1billion) 
             // to identify the chrom and start on that chrom.
-            pair<string, int> location = _genome->projectOnGenome(randStart);
+            pair<string, CHRPOS> location = _genome->projectOnGenome(randStart);
             chrom     = location.first;
             start     = location.second;
             end       = start + _length;
@@ -71,7 +71,8 @@ void BedRandom::Generate()
         numGenerated++;
         // flip a coin for strand
         (rand() / double(RAND_MAX)) > 0.5 ? strand = '+' : strand = '-';
-        printf("%s\t%d\t%d\t%d\t%d\t%c\n", chrom.c_str(), start, end, numGenerated, end-start, strand);
+        printf("%s\t%" PRId_CHRPOS "\t%" PRId_CHRPOS "\t%d\t%" PRId_CHRPOS "\t%c\n",
+            chrom.c_str(), start, end, numGenerated, end-start, strand);
     }
 }
 

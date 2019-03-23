@@ -9,6 +9,7 @@ INCLUDES = -I$(UTILITIES_DIR)/fileType/ \
 	-I$(UTILITIES_DIR)/FileRecordTools/Records/ \
 	-I$(UTILITIES_DIR)/GenomeFile/ \
 	-I$(UTILITIES_DIR)/general/ \
+	-I$(UTILITIES_DIR)/bedFile/ \
 	-I$(UTILITIES_DIR)/lineFileUtilities/ \
 	-I$(UTILITIES_DIR)/BamTools/include \
 	-I$(UTILITIES_DIR)/BamTools/src/ \
@@ -34,9 +35,9 @@ all: $(BUILT_OBJECTS) $(SUBDIRS)
 
 $(BUILT_OBJECTS): $(SOURCES)
 	@echo "  * compiling FileRecordMgr.cpp"
-	@$(CXX) -c -o $(OBJ_DIR)/FileRecordMgr.o FileRecordMgr.cpp $(LDFLAGS) $(CXXFLAGS) $(CPPFLAGS) $(INCLUDES)
+	$(CCPREFIX) $(CXX) -c -o $(OBJ_DIR)/FileRecordMgr.o FileRecordMgr.cpp $(LDFLAGS) $(CXXFLAGS) $(CPPFLAGS) $(INCLUDES)
 	@echo "  * compiling FileRecordMergeMgr.cpp"
-	@$(CXX) -c -o $(OBJ_DIR)/FileRecordMergeMgr.o FileRecordMergeMgr.cpp $(LDFLAGS) $(CXXFLAGS) $(CPPFLAGS) $(INCLUDES)
+	$(CCPREFIX) $(CXX) -c -o $(OBJ_DIR)/FileRecordMergeMgr.o FileRecordMergeMgr.cpp $(LDFLAGS) $(CXXFLAGS) $(CPPFLAGS) $(INCLUDES)
 	
 	
 

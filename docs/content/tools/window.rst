@@ -38,8 +38,8 @@ Option                           Description
 **-ubam**					     Write uncompressed BAM output. The default is write compressed BAM output.
 **-bed**					     When using BAM input (-abam), write output as BED. The default is to write output in BAM when using -abam. For example:  bedtools window -abam reads.bam -b genes.bed -bed                                              
 **-w**					         Base pairs added upstream and downstream of each entry in A when searching for overlaps in B. *Default is 1000 bp*.
-**-l**					         Base pairs added upstream (left of) of each entry in A when searching for overlaps in B. *Allows one to create assymetrical "windows". Default is 1000bp*.                    
-**-r**					         Base pairs added downstream (right of) of each entry in A when searching for overlaps in B. *Allows one to create assymetrical "windows". Default is 1000bp*.
+**-l**					         Base pairs added upstream (left of) of each entry in A when searching for overlaps in B. *Allows one to create asymmetrical "windows". Default is 1000bp*.
+**-r**					         Base pairs added downstream (right of) of each entry in A when searching for overlaps in B. *Allows one to create asymmetrical "windows". Default is 1000bp*.
 **-sw** 				         Define -l and -r based on strand. For example if used, -l 500 for a negative-stranded feature will add 500 bp downstream. *By default, this is disabled*.
 **-sm** 				         Only report hits in B that overlap A on the same strand. *By default, overlaps are reported without respect to strand*.
 **-Sm** 				         Only report hits in B that overlap A on the opposite strand. *By default, overlaps are reported without respect to strand*.
@@ -97,10 +97,10 @@ the second B entry is reported):
 
 
 ==========================================================================
-``-l and -r`` Defining *assymteric* windows 
+``-l and -r`` Defining *asymmetric* windows
 ==========================================================================
 One can also define asymmetric windows where a differing number of bases are 
-added upstream and downstream of each feature using the ``-l`` (upstream) 
+added upstream and downstream of each feature using the ``-l`` (upstream)
 and ``-r`` (downstream)** options.
 
 .. note::
@@ -130,7 +130,7 @@ For example (note the difference between -l 200 and -l 300):
 
   
 ==========================================================================
-``-sw`` Defining assymteric windows based on strand 
+``-sw`` Defining asymmetric windows based on strand
 ==========================================================================
 Especially when dealing with gene annotations or RNA-seq experiments, you may 
 want to define asymmetric windows based on "strand". For example, you may want 

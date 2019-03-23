@@ -57,6 +57,9 @@ bool ContextSubtract::isValidState()
 	if (!ContextIntersect::isValidState()) {
 		return false;
 	}
+	// ensure that all records in A that are reported
+	// whether or not they overlap a record in B.
+	setRunToQueryEnd(true);
 	return true;
 }
 

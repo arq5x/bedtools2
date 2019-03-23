@@ -1,0 +1,15 @@
+includedir=@-includedir@
+libdir=@-libdir@
+
+# Flags and libraries needed when linking against a static libhts.a
+# (used by manual and semi-manual pkg-config(1)-style enquiries).
+static_ldflags=@static_LDFLAGS@
+static_libs=@static_LIBS@
+
+Name: htslib
+Description: C library for high-throughput sequencing data formats
+Version: @-PACKAGE_VERSION@
+Cflags: -I${includedir}
+Libs: -L${libdir} -lhts
+Libs.private: -L${libdir} @private_LIBS@ -lhts -lm -lpthread
+Requires.private: zlib @pc_requires@

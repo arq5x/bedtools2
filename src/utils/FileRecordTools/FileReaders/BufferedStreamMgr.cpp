@@ -43,7 +43,10 @@ bool BufferedStreamMgr::init()
 		//there is a special check for a BAM file's magic string inside
 		//the inputStreamMgr's init method. If it is found, we can
 		//stop here.
-		_typeChecker.setBam();
+		if(_inputStreamMgr->isCram())
+			_typeChecker.setCram();
+		else
+			_typeChecker.setBam();
 		return true;
 	}
 	if (!getTypeData()) {
@@ -54,11 +57,11 @@ bool BufferedStreamMgr::init()
 	}
 
 	size_t trueBufSize = max(_useBufSize, (int)_currScanBuffer.size());
-	_useBufSize = trueBufSize;
+	_useBufSize = (int)trueBufSize;
 	_mainBuf = new bufType[_useBufSize +1];
 	memset(_mainBuf, 0, _useBufSize +1);
 	memcpy(_mainBuf, _currScanBuffer.c_str(), _currScanBuffer.size());
-	_mainBufCurrLen = _currScanBuffer.size();
+	_mainBufCurrLen = (int)_currScanBuffer.size();
 
 	return true;
 }
@@ -124,7 +127,7 @@ bool BufferedStreamMgr::getLine(string &line)
 	}
 	//strip any whitespace characters, such as DOS newline characters or extra tabs,
 	//from the end of the line
-	int lastPos = line.size();
+	int lastPos = (int)line.size();
 	while (lastPos > 0 && (line[lastPos-1] == '\n' || line[lastPos-1] == '\r')) lastPos--;
 	line.resize(lastPos);
 

@@ -39,14 +39,14 @@ void BedCluster::ClusterBed() {
 
     uint32_t cluster_id = 0;
     BED prev, curr;
-    int end   = -1;
+    CHRPOS end   = -1;
     
     _bed->Open();
     while (_bed->GetNextBed(curr, true)) { // true = force sorted intervals
         if (_bed->_status != BED_VALID)
             continue;            
 
-        int distance = ((int) curr.start - end);
+        CHRPOS distance = (curr.start - end);
         
         // new cluster, no overlap
         if ( (distance > _maxDistance) || (curr.chrom != prev.chrom) ) 
@@ -55,7 +55,7 @@ void BedCluster::ClusterBed() {
             end   = curr.end;
         }
         else {
-            if ((int) curr.end > end)
+            if (curr.end > end)
                 end   = curr.end;
         }
         prev = curr;
@@ -90,7 +90,7 @@ void BedCluster::ClusterBedStranded() {
         // do two passes, one for each strand.
         for (unsigned int s = 0; s < strands.size(); s++) {
             // cluster overlapping features for this chromosome.
-            int end   = -1;
+            CHRPOS end   = -1;
             BED prev;    
             vector<BED>::const_iterator bedItr = bedList.begin();
             vector<BED>::const_iterator bedEnd = bedList.end();
@@ -101,14 +101,14 @@ void BedCluster::ClusterBedStranded() {
                     continue;
                 
                 // new cluster, no overlap
-                if ( (((int) bedItr->start - end) > _maxDistance) || (end < 0)) 
+                if ( ((bedItr->start - end) > _maxDistance) || (end < 0)) 
                 {
                     cluster_id++;
                     end   = bedItr->end;
                 }
                 // same cluster, overlaps
                 else {
-                    if ((int) bedItr->end > end) 
+                    if (bedItr->end > end) 
                         end = bedItr->end;
                 }
                 prev = *bedItr;

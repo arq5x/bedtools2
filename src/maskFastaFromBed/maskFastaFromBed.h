@@ -52,7 +52,7 @@ private:
 
     void MaskFasta();
 
-    void PrettyPrintChrom(ofstream &out, string chrom, const string &sequence, int width);
+    void PrettyPrintChrom(ofstream &out, string chrom, const string &sequence, CHRPOS width);
 
 };
 
