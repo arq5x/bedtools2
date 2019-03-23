@@ -45,8 +45,6 @@ void BamToFastq::SingleFastq() {
     // open the BAM file
     BamReader reader;
     reader.Open(_bamFile);
-    //                           qual seq 
-    reader.SetCramReqdFieldsCode(1024+512);
     BamAlignment bam;
     while (reader.GetNextAlignment(bam)) {
         // extract the sequence and qualities for the BAM "query"
