@@ -41,11 +41,7 @@ namespace BamTools {
 			_SamFile(samFile* fp, uint32_t _idx, BamReader* reader) : 
 				fp(fp), idx(_idx), ip(NULL), it(NULL), 
 				reader(reader), has_range(false)
-			{
-				// default to just reading "core"
-				// atts., ignore seq and qual
-				//set_cram_reqd_fields(2559);
-			}
+			{}
 			~_SamFile() 
 			{
 				if(nullptr != ip) hts_idx_destroy(ip);
@@ -182,7 +178,7 @@ namespace BamTools {
 
 			if(fp->format.format == htsExactFormat::cram)
 			{
-				const char* ref_file = getenv("CRAM_REFERENCE");
+				char* ref_file = getenv("CRAM_REFERENCE");
 				if(NULL == ref_file || hts_set_fai_filename(fp, ref_file) < -1)
 				{
 					// If we are not able to load a reference we just load the core data
