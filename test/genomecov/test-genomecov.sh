@@ -260,4 +260,6 @@ $BT genomecov -ibam chip.bam -bg -fs 100 > obs
 check obs exp
 rm obs exp
 
+rm one_block.bam two_blocks.bam three_blocks.bam sam-w-del.bam pair-chip.bam chip.bam
+
 [[ $FAILURES -eq 0 ]] || exit 1;

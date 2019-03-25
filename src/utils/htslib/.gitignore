@@ -40,11 +40,13 @@ lib*.so.*
 /test/sam
 /test/tabix/*.tmp.*
 /test/tabix/FAIL*
+/test/test-bcf-sr
+/test/test-bcf-translate
 /test/test_bgzf
+/test/test_realn
 /test/test-regidx
 /test/test-vcf-api
 /test/test-vcf-sweep
-/test/test-bcf-sr
 /test/test_view
 /test/thrash_threads[1-6]
 /test/*.tmp
