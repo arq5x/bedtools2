@@ -6,6 +6,7 @@
 #include <vector>
 #include <string.h>
 #include <api/BamAux.h>
+#include <stdlib.h>
 namespace BamTools {
 
 	typedef std::vector<RefData> RefVector;
