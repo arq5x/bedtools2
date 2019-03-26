@@ -70,7 +70,7 @@ int nuc_main(int argc, char* argv[]);//
 int pairtobed_main(int argc, char* argv[]);//
 int pairtopair_main(int argc, char* argv[]);
 int random_main(int argc, char* argv[]); //
-void qc_help();
+void summary_help();
 int reldist_main(int argc, char* argv[]); //
 void sample_help();
 int shift_main(int argc, char* argv[]); //
@@ -272,7 +272,7 @@ int bedtools_help(void)
     cout  << "    groupby       "  << "Group by common cols. & summarize oth. cols. (~ SQL \"groupBy\")\n";
     cout  << "    expand        "  << "Replicate lines based on lists of values in columns.\n";
     cout  << "    split         "  << "Split a file into multiple files with equal records or base pairs.\n"; 
-    cout  << "    qc            "  << "Profile an interval file for quality control.\n"; 
+    cout  << "    summary       "  << "Statistical summary of intervals in a file.\n"; 
 
     cout  << endl;
     cout  << "[ General help ]" << endl;
@@ -324,8 +324,8 @@ void showHelp(const string &subCmd) {
 		complement_help();
 	} else if (subCmd == "groupby") {
 		groupby_help();
-	} else if (subCmd == "qc") {
-        qc_help();
+	} else if (subCmd == "summary") {
+        summary_help();
     }
 }
 

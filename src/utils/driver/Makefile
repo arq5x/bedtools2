@@ -58,7 +58,7 @@ INCLUDES = -I$(UTILITIES_DIR)/bedFile/ \
 			-I$(TOOLS_DIR)/pairToPair/ \
 			-I$(TOOLS_DIR)/randomBed/ \
 			-I$(TOOLS_DIR)/regressTest/ \
-			-I$(TOOLS_DIR)/qcFile/ \
+			-I$(TOOLS_DIR)/summaryFile/ \
 			-I$(TOOLS_DIR)/reldist/ \
 			-I$(TOOLS_DIR)/sampleFile/ \
 			-I$(TOOLS_DIR)/shiftBed/ \

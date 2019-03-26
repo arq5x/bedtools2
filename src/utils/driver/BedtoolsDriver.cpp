@@ -11,7 +11,7 @@
 #include "ContextSubtract.h"
 #include "ContextSpacing.h"
 #include "ContextCoverage.h"
-#include "ContextQc.h"
+#include "ContextSummary.h"
 
 //tools
 #include "intersectFile.h"
@@ -26,7 +26,7 @@
 #include "coverageFile.h"
 #include "complementFile.h"
 #include "groupBy.h"
-#include "qcFile.h"
+#include "summaryFile.h"
 
 BedtoolsDriver::BedtoolsDriver()
 : _hadError(false) {
@@ -42,7 +42,7 @@ BedtoolsDriver::BedtoolsDriver()
 	_supported.insert("coverage");
 	_supported.insert("complement");
 	_supported.insert("groupby");
-	_supported.insert("qc");
+	_supported.insert("summary");
 }
 
 
@@ -119,8 +119,8 @@ ContextBase *BedtoolsDriver::getContext()
 		context = new ContextComplement();
 	} else if (_subCmd == "groupby") {
 		context = new ContextGroupBy();
-	} else if (_subCmd == "qc") {
-		context = new ContextQc();
+	} else if (_subCmd == "summary") {
+		context = new ContextSummary();
 	} else {
 		cerr << "Error: Tool " << _subCmd << " is not supported. Exiting..." << endl;
 		exit(1);
@@ -155,8 +155,8 @@ ToolBase *BedtoolsDriver::getTool(ContextBase *context)
 		tool = new ComplementFile(static_cast<ContextComplement *>(context));
 	} else if (_subCmd == "groupby") {
 		tool = new GroupBy(static_cast<ContextGroupBy *>(context));
-	} else if (_subCmd == "qc") {
-		tool = new QcFile(static_cast<ContextQc *>(context));
+	} else if (_subCmd == "summary") {
+		tool = new SummaryFile(static_cast<ContextSummary *>(context));
 	}
 
 	else {
