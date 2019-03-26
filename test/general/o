@@ -1,5 +1,0 @@
-Error: unable to open file or unable to determine types for file -
-
-- Please ensure that your file is TAB delimited (e.g., cat -t FILE).
-- Also ensure that your file has integer chromosome coordinates in the 
-  expected columns (e.g., cols 2 and 3 for BED).
