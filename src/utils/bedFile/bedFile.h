@@ -648,9 +648,9 @@ private:
             }
         }
         else {
-            cerr << "It looks as though you have less than 3 columns at line: " 
+            cerr << "It looks as though you have less than 3 columns at line " 
                  << _lineNum 
-                 << ".  Are you sure your files are tab-delimited?" 
+                 << " in file " << bedFile << ".  Are you sure your files are tab-delimited?" 
                  << endl;
             exit(1);
         }
