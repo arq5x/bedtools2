@@ -197,10 +197,13 @@ $(UTIL_SUBDIRS) $(SUBDIRS): $(OBJ_DIR) $(BIN_DIR)
 	@echo "- Building in $@"
 	@$(MAKE) --no-print-directory --directory=$@
 
+# Usually HTSlib's configure script has not been used (detected via config.mk
+# not existing), so clean should also remove the generated config.h.
 clean:
 	@echo " * Cleaning up."
 	@rm -f $(VERSION_FILE) $(OBJ_DIR)/* $(BIN_DIR)/*
 	@cd src/utils/htslib && make clean > /dev/null
+	@test -e src/utils/htslib/config.mk || rm -f src/utils/htslib/config.h
 .PHONY: clean
 
 test: all
