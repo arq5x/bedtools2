@@ -3,6 +3,7 @@
 #include <stdint.h>
 #include <memory>
 #include <cstring>
+#include <stdlib.h>
 namespace BamTools {
 	const static char cigar_ops_as_chars[] = { 'M', 'I', 'D', 'N', 'S', 'H', 'P', '=', 'X', 'B' };
 	static inline std::string _mkstr(const uint8_t* what) { return std::string((const char*)what + 1); }
