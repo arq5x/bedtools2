@@ -52,7 +52,7 @@ private:
     string _bedBFile;
     
     map<string, vector<CHRPOS> > _db_midpoints;
-    map<float, size_t> _reldists;
+    map<double, size_t> _reldists;
     size_t _tot_queries;
     
     // instance of a bed file class.
@@ -64,7 +64,7 @@ private:
     //------------------------------------------------
     void LoadMidpoints();
     void CalculateRelativeDistance();
-    void UpdateDistanceSummary(float rel_dist);
+    void UpdateDistanceSummary(double rel_dist);
     void ReportDistanceSummary();
 
 

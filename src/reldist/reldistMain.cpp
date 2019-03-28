@@ -127,8 +127,8 @@ void reldist_help(void) {
     cerr << "Options: " << endl;
 
 
-    cerr << "\t-detail\t"       << "Instead of a summary, report the relative" 
-                                << "\t\t distance for each interval in A" 
+    cerr << "\t-detail\t"       << "Report the relative" 
+                                << "distance for each interval in A" 
                                 << endl << endl;
     // end the program here
     exit(1);
