@@ -11,7 +11,6 @@
 #include <climits>
 #include <sstream>
 #include <iomanip>
-#include <inttypes.h>
 #include <getopt.h>
 #include "lineFileUtilities.h"
 #include "version.h"
