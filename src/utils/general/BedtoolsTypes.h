@@ -8,9 +8,11 @@
 #ifndef BEDTOOLSTYPES_H_
 #define BEDTOOLSTYPES_H_
 
-using namespace std;
+// Some old environments require this even though standard C++ doesn't
+#define __STDC_FORMAT_MACROS
 
 #include <stdint.h>
+#include <inttypes.h>
 #include <climits>
 #include <string>
 #include <cstdlib>
@@ -25,9 +27,11 @@ using namespace std;
 #include <set>
 #include <map>
 
+using namespace std;
 
 typedef int64_t CHRPOS;
 
+#define PRId_CHRPOS PRId64
 
 
 #endif /* BEDTOOLSTYPES_H_ */

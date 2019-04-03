@@ -8,7 +8,8 @@
 #ifndef BINTREE_H_
 #define BINTREE_H_
 
-#include <inttypes.h>
+#include "BedtoolsTypes.h"
+
 #include <stdint.h>
 #include <string>
 #include <set>

@@ -13,6 +13,7 @@
 #define BEDFILE_H
 
 // "local" includes
+#include "BedtoolsTypes.h"
 #include "gzstream.h"
 #include "lineFileUtilities.h"
 #include "fileType.h"
@@ -27,7 +28,6 @@
 #include <sstream>
 #include <cstring>
 #include <algorithm>
-#include <inttypes.h>
 #include <limits.h>
 #include <stdint.h>
 #include <cstdio>
@@ -38,13 +38,10 @@ using namespace std;
 //*************************************************
 // Data type tydedef
 //*************************************************
-typedef int64_t CHRPOS;
 typedef uint16_t BINLEVEL;
 typedef uint32_t BIN;
 typedef uint16_t USHORT;
 typedef uint32_t UINT;
-
-#define PRId_CHRPOS PRId64
 
 //*************************************************
 // Genome binning constants
