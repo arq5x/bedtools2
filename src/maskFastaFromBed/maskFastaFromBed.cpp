@@ -150,10 +150,11 @@ void MaskFastaFromBed::PrettyPrintChrom(ofstream &out, string chrom, const strin
 
     CHRPOS seqLength = sequence.size();
 
-    out << ">" << chrom << endl;
+    out << ">" << chrom << '\n';
     for(CHRPOS i = 0; i < seqLength; i += (CHRPOS)width)  {
-        if (i + width < seqLength) out << sequence.substr(i, width) << endl;
-        else out << sequence.substr(i, seqLength-i) << endl;
+        if (i + width < seqLength) out << sequence.substr(i, width) << '\n';
+        else out << sequence.substr(i, seqLength-i) << '\n';
     }
+    out.flush();
 }
 
