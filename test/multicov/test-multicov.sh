@@ -13,14 +13,10 @@ check()
 	fi
 }
 
-samtools view -Sb one_block.sam > one_block.bam 2>/dev/null
-samtools view -Sb two_blocks.sam > two_blocks.bam 2>/dev/null
-samtools view -Sb test-multi.sam > test-multi.bam 2>/dev/null
-samtools view -Sb test-multi.2.sam > test-multi.2.bam 2>/dev/null
-samtools index one_block.bam
-samtools index two_blocks.bam
-samtools index test-multi.bam
-samtools index test-multi.2.bam
+../htsutil samtoindexedbam one_block.sam one_block.bam
+../htsutil samtoindexedbam two_blocks.sam two_blocks.bam
+../htsutil samtoindexedbam test-multi.sam test-multi.bam
+../htsutil samtoindexedbam test-multi.2.sam test-multi.2.bam
 
 ##################################################################
 #  Test one block matches all BEDs

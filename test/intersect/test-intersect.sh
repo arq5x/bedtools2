@@ -196,10 +196,10 @@ rm obs exp
 #                       -split                            #
 ###########################################################
 ###########################################################
-samtools view -Sb one_block.sam > one_block.bam 2>/dev/null
-samtools view -Sb two_blocks.sam > two_blocks.bam 2>/dev/null
-samtools view -Sb three_blocks.sam > three_blocks.bam 2>/dev/null
-samtools view -Sb split.issue750.sam > split.issue750.bam 2>/dev/null
+../htsutil samtobam one_block.sam one_block.bam
+../htsutil samtobam two_blocks.sam two_blocks.bam
+../htsutil samtobam three_blocks.sam three_blocks.bam
+../htsutil samtobam split.issue750.sam split.issue750.bam
 
 
 ##################################################################
@@ -208,7 +208,7 @@ samtools view -Sb split.issue750.sam > split.issue750.bam 2>/dev/null
 echo -e "    intersect.t17...\c"
 echo \
 "three_blocks	16	chr1	1	40	10M10N10M10N10M	*	0	0	GAAGGCCACCGCCGCGGTTATTTTCCTTCA	CCCDDB?=FJIIJIGFJIJHIJJJJJJJJI	MD:Z:50" > exp
-$BT intersect -abam three_blocks.bam -b three_blocks_nomatch.bed | samtools view - > obs
+$BT intersect -abam three_blocks.bam -b three_blocks_nomatch.bed | ../htsutil viewbamrecords > obs
 check obs exp
 rm obs exp
 
@@ -217,7 +217,7 @@ rm obs exp
 ##################################################################
 echo -e "    intersect.t18...\c"
 touch exp
-$BT intersect -abam three_blocks.bam -b three_blocks_nomatch.bed -split | samtools view - > obs
+$BT intersect -abam three_blocks.bam -b three_blocks_nomatch.bed -split | ../htsutil viewbamrecords > obs
 check obs exp
 rm obs exp
 
@@ -227,7 +227,7 @@ rm obs exp
 echo -e "    intersect.t19...\c"
 echo \
 "three_blocks	16	chr1	1	40	10M10N10M10N10M	*	0	0	GAAGGCCACCGCCGCGGTTATTTTCCTTCA	CCCDDB?=FJIIJIGFJIJHIJJJJJJJJI	MD:Z:50" > exp
-$BT intersect -abam three_blocks.bam -b three_blocks_match.bed -split | samtools view - > obs
+$BT intersect -abam three_blocks.bam -b three_blocks_match.bed -split | ../htsutil viewbamrecords > obs
 check obs exp
 rm obs exp
 
@@ -237,7 +237,7 @@ rm obs exp
 ##################################################################
 echo -e "    intersect.t20...\c"
 touch exp
-$BT intersect -abam three_blocks.bam -b three_blocks_match.bed -split -s | samtools view - > obs
+$BT intersect -abam three_blocks.bam -b three_blocks_match.bed -split -s | ../htsutil viewbamrecords > obs
 check obs exp
 rm obs exp
 
@@ -247,7 +247,7 @@ rm obs exp
 echo -e "    intersect.t21...\c"
 echo \
 "three_blocks	16	chr1	1	40	10M10N10M10N10M	*	0	0	GAAGGCCACCGCCGCGGTTATTTTCCTTCA	CCCDDB?=FJIIJIGFJIJHIJJJJJJJJI	MD:Z:50" > exp
-$BT intersect -abam three_blocks.bam -b three_blocks_match_1bp.bed -split | samtools view - > obs
+$BT intersect -abam three_blocks.bam -b three_blocks_match_1bp.bed -split | ../htsutil viewbamrecords > obs
 check obs exp
 rm obs exp
 
@@ -256,7 +256,7 @@ rm obs exp
 ################################################################################
 echo -e "    intersect.t22...\c"
 touch exp
-$BT intersect -abam three_blocks.bam -b three_blocks_match_1bp.bed -split -f 0.1 | samtools view - > obs
+$BT intersect -abam three_blocks.bam -b three_blocks_match_1bp.bed -split -f 0.1 | ../htsutil viewbamrecords > obs
 check obs exp
 rm obs exp
 
@@ -590,7 +590,7 @@ rm obs exp
 echo -e "    intersect.t23...\c"
 echo \
 "mapped	16	chr1	1	40	30M	*	0	0	GAAGGCCACCGCCGCGGTTATTTTCCTTCA	CCCDDB?=FJIIJIGFJIJHIJJJJJJJJI	MD:Z:50" > exp
-samtools view -Sb mapped_and_unmapped.sam 2>/dev/null | $BT intersect -abam - -b a.bed | samtools view - > obs
+../htsutil samtobam mapped_and_unmapped.sam | $BT intersect -abam - -b a.bed | ../htsutil viewbamrecords > obs
 check obs exp
 rm obs exp
 
@@ -600,7 +600,7 @@ rm obs exp
 echo -e "    intersect.t24...\c"
 echo \
 "umapped	4	*	1	40	30M	*	0	0	GAAGGCCACCGCCGCGGTTATTTTCCTTCA	CCCDDB?=FJIIJIGFJIJHIJJJJJJJJI	MD:Z:50" > exp
-samtools view -Sb mapped_and_unmapped.sam 2>/dev/null | $BT intersect -abam - -b a.bed -v | samtools view - > obs
+../htsutil samtobam mapped_and_unmapped.sam | $BT intersect -abam - -b a.bed -v | ../htsutil viewbamrecords > obs
 check obs exp
 rm obs exp
 
@@ -977,34 +977,34 @@ rm exp obs
 ##################################################################
 echo -e "    intersect.t63...\c"
 echo -n "" > exp
-$BT intersect -a x.bam -b y.bed -f 0.21 -F 0.21 -wa | samtools view - > obs
+$BT intersect -a x.bam -b y.bed -f 0.21 -F 0.21 -wa | ../htsutil viewbamrecords > obs
 check exp obs
 rm exp obs
 
 echo -e "    intersect.t64...\c"
 echo "a1	0	chr1	11	255	10M	*	0	0	*	*
 a2	16	chr2	11	255	10M	*	0	0	*	*" > exp
-$BT intersect -a x.bam -b y.bed -f 0.19 -F 0.21 -wa | samtools view - > obs
+$BT intersect -a x.bam -b y.bed -f 0.19 -F 0.21 -wa | ../htsutil viewbamrecords > obs
 check exp obs
 rm exp obs
 
 echo -e "    intersect.t65...\c"
 echo "a1	0	chr1	11	255	10M	*	0	0	*	*
 a2	16	chr2	11	255	10M	*	0	0	*	*" > exp
-$BT intersect -a x.bam -b y.bed -f 0.19 -F 0.21 -wa | samtools view - > obs
+$BT intersect -a x.bam -b y.bed -f 0.19 -F 0.21 -wa | ../htsutil viewbamrecords > obs
 check exp obs
 rm exp obs
 
 echo -e "    intersect.t66...\c"
 echo "a1	0	chr1	11	255	10M	*	0	0	*	*
 a2	16	chr2	11	255	10M	*	0	0	*	*" > exp
-$BT intersect -a x.bam -b y.bed -f 0.19 -F 0.50 -wa | samtools view - > obs
+$BT intersect -a x.bam -b y.bed -f 0.19 -F 0.50 -wa | ../htsutil viewbamrecords > obs
 check exp obs
 rm exp obs
 
 echo -e "    intersect.t67...\c"
 echo -n "" > exp
-$BT intersect -a x.bam -b y.bed -f 0.19 -F 0.51 -wa | samtools view - > obs
+$BT intersect -a x.bam -b y.bed -f 0.19 -F 0.51 -wa | ../htsutil viewbamrecords > obs
 check exp obs
 rm exp obs
 

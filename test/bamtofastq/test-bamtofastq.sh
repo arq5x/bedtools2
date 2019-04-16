@@ -13,7 +13,7 @@ check()
 	fi
 }
 
-samtools view -Sb test2.sam > test2.bam 2> /dev/null
+../htsutil samtobam test2.sam test2.bam
 
 $BT bamtofastq -i test2.bam -fq test2.fq -fq2 test2.fq2 2> /dev/null
 
