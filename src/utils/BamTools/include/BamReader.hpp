@@ -263,7 +263,7 @@ namespace BamTools {
 		}
 		std::string GetErrorString() const
 		{
-			return "FIXME: error string is not supported";
+			return _error_str;
 		}
 
 		bool GetNextAlignment(BamAlignment& alignment)
