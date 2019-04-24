@@ -78,7 +78,7 @@ void NewGenomeFile::loadGenomeFileIntoMap() {
 		_chromList.push_back(chrName);
 	}
 	if (_maxId == -1) {
-		cerr << "Error: The genome file " << _genomeFileName << " has no valid entries. Exiting." << endl;
+		cerr << "Error: The genome file " << _genomeFileName << " has no valid entries (are you sure it's a 2-column bedtools genome file). Exiting." << endl;
 		exit(1);
 	}
 	// Special: BAM files can have unmapped reads, which show as no chromosome, or an empty chrom string.
