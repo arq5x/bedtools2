@@ -4,9 +4,34 @@
 #include <memory>
 #include <cstring>
 #include <stdlib.h>
+#include <htslib/hts_endian.h>
 namespace BamTools {
 	const static char cigar_ops_as_chars[] = { 'M', 'I', 'D', 'N', 'S', 'H', 'P', '=', 'X', 'B' };
 	static inline std::string _mkstr(const uint8_t* what) { return std::string((const char*)what + 1); }
+	template <class T>
+	static inline T _mk_numeric(const uint8_t* what) {
+		switch(what[0]) {
+			case 'd': 
+				return le_to_double(what + 1);
+			case 'f':
+				return le_to_float(what + 1);
+			case 'A':
+			case 'C':
+				return what[1];
+			case 'c':
+				return le_to_i8(what + 1);
+			case 's':
+				return le_to_i16(what + 1);
+			case 'S':
+				return le_to_u16(what + 1);
+			case 'i':
+				return le_to_i32(what + 1);
+			case 'I':
+				return le_to_u32(what + 1);
+			default:
+				return 0;
+		}
+	}
 	struct CigarOp {
 	  
 		char     Type;   //!< CIGAR operation type (MIDNSHPX=)
@@ -323,9 +348,27 @@ namespace BamTools {
 		bool GetTag(const std::string& tag, T& destination) const
 		{
 
-			_TagGetter<std::string, T> string_getter(*this, destination);
-			if(string_getter)
-				return string_getter(tag, _mkstr);
+			{
+				_TagGetter<std::string, T> string_getter(*this, destination);
+				if(string_getter)
+					return string_getter(tag, _mkstr);
+			}
+
+#define _GET_NUM(type) \
+			{\
+				_TagGetter<type, T> getter(*this, destination);\
+				if(getter)\
+					return getter(tag, _mk_numeric<type>);\
+			}
+			_GET_NUM(uint8_t);
+			_GET_NUM(int8_t);
+			_GET_NUM(uint16_t);
+			_GET_NUM(int16_t);
+			_GET_NUM(uint32_t);
+			_GET_NUM(int32_t);
+			_GET_NUM(double);
+			_GET_NUM(float);
+
 			return false;
 		}
 
