@@ -42,7 +42,7 @@ void Bed3Interval::print(string &outBuf) const
 	outBuf.append(s.str());
 }
 
-void Bed3Interval::print(string &outBuf, int start, int end) const
+void Bed3Interval::print(string &outBuf, CHRPOS start, CHRPOS end) const
 {
 	ostringstream s;
 	s << _chrName;

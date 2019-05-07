@@ -62,7 +62,7 @@ void ComplementFile::processHits(RecordOutputMgr *outputMgr, RecordKeyVector &hi
 	// starting with 0.
 	if (rec->getStartPos() != 0)
 	{
-		int endPos = rec->getStartPos();
+		CHRPOS endPos = rec->getStartPos();
 		printRecord(endPos);
 	}
 	_currStartPos = rec->getEndPos();
@@ -70,7 +70,7 @@ void ComplementFile::processHits(RecordOutputMgr *outputMgr, RecordKeyVector &hi
 
 void ComplementFile::checkCoordinatesAgainstChromLength(const Record *rec)
 {
-	int maxChromSize = _genomeFile->getChromSize(_currChrom);	
+	CHRPOS maxChromSize = _genomeFile->getChromSize(_currChrom);	
 	if (rec->getStartPos() > maxChromSize || rec->getEndPos() > maxChromSize)
 	{
 		cerr << "***** WARNING: " 
@@ -100,7 +100,7 @@ void ComplementFile::outPutLastRecordInPrevChrom()
 	//do nothing if triggered by first record in DB. At this point,
 	//there was no prev chrom, so nothing is stored in the output Record yet.
 	if (chrom.empty()) return;
-	int maxChromSize = _genomeFile->getChromSize(chrom);
+	CHRPOS maxChromSize = _genomeFile->getChromSize(chrom);
 	if (_currStartPos >= maxChromSize) return; //chrom already covered and reported.
 
 	printRecord(maxChromSize);
@@ -113,7 +113,7 @@ bool ComplementFile::fastForward(const string &newChrom) {
 	while (i < (int)_chromList.size() && _chromList[i] != newChrom) {
 		_outRecord.setChrName(_chromList[i]);
 		_currStartPos = 0;
-		int endPos = _genomeFile->getChromSize(_chromList[i]);
+		CHRPOS endPos = _genomeFile->getChromSize(_chromList[i]);
 		printRecord(endPos);
 		i++;
 	}
@@ -130,7 +130,7 @@ bool ComplementFile::fastForward(const string &newChrom) {
 	return true;
 }
 
-void ComplementFile::printRecord(int endPos)
+void ComplementFile::printRecord(CHRPOS endPos)
 {
 	_outRecord.setStartPos(_currStartPos);
 	stringstream startStr;

@@ -129,7 +129,7 @@ void BedGenomeCoverage::StartNewChrom(const string& newChrom) {
 }
 
 
-void BedGenomeCoverage::AddCoverage(int start, int end) {
+void BedGenomeCoverage::AddCoverage(CHRPOS start, CHRPOS end) {
     // process the first line for this chromosome.
     // make sure the coordinates fit within the chrom
     if (start < _currChromSize)
@@ -219,7 +219,7 @@ void BedGenomeCoverage::CoverageBed() {
                 AddBlockedCoverage(bedBlocks,a.strand);
             }
             else if (_only_5p_end) {
-                int pos = ( a.strand=="+" ) ? a.start : a.end-1;
+                CHRPOS pos = ( a.strand=="+" ) ? a.start : a.end-1;
                 if (_tn5) {
                     pos = ( a.strand=="+" ) ? pos+4 : pos-5;
                 }
@@ -231,7 +231,7 @@ void BedGenomeCoverage::CoverageBed() {
                 }
             }
             else if (_only_3p_end) {
-                int pos = ( a.strand=="-" ) ? a.start : a.end-1;
+                CHRPOS pos = ( a.strand=="-" ) ? a.start : a.end-1;
                 if ( pos<_extensionSize ) { //sometimes extensionSize is bigger :(
                             AddCoverage(0, pos+_extensionSize);
                 } 
@@ -240,8 +240,8 @@ void BedGenomeCoverage::CoverageBed() {
                 }
             }
             else {
-                int pos_start=a.start;
-                int pos_end=a.end-1;
+                CHRPOS pos_start=a.start;
+                CHRPOS pos_end=a.end-1;
                 if (_tn5) {
                     pos_start = ( a.strand=="+" ) ? pos_start+4 : pos_start;
                     pos_end = ( a.strand=="-" ) ? pos_end-5 : pos_end;
@@ -281,7 +281,7 @@ void BedGenomeCoverage::PrintEmptyChromosomes()
             _currChromSize = _genome->getChromSize(_currChromName);
             std::vector<DEPTH>().swap(_currChromCoverage);
             _currChromCoverage.resize(_currChromSize);
-            for (int i = 0; i < _currChromSize; ++i)
+            for (CHRPOS i = 0; i < _currChromSize; ++i)
             {
                 _currChromCoverage[i].starts = 0;
                 _currChromCoverage[i].ends = 0;
@@ -437,7 +437,7 @@ void BedGenomeCoverage::CoverageBam(string bamFile) {
             AddBlockedCoverage(bedBlocks, readStrand);
         }
         else if (_only_5p_end) {
-            int pos = ( !bam.IsReverseStrand() ) ? start : end;
+            CHRPOS pos = ( !bam.IsReverseStrand() ) ? start : end;
             if (_tn5) {
                 pos = ( !bam.IsReverseStrand() ) ? pos+4 : pos-5;
             }
@@ -449,7 +449,7 @@ void BedGenomeCoverage::CoverageBam(string bamFile) {
             }
         }
         else if (_only_3p_end) {
-            int pos = ( bam.IsReverseStrand() ) ? start : end;
+            CHRPOS pos = ( bam.IsReverseStrand() ) ? start : end;
             if ( pos<_extensionSize ) { //sometimes extensionSize is bigger :(
                         AddCoverage(0, pos+_extensionSize);
             } 
@@ -473,12 +473,12 @@ void BedGenomeCoverage::CoverageBam(string bamFile) {
 }
 
 
-void BedGenomeCoverage::ReportChromCoverage(const vector<DEPTH> &chromCov, const int &chromSize, const string &chrom, chromHistMap &chromDepthHist) {
+void BedGenomeCoverage::ReportChromCoverage(const vector<DEPTH> &chromCov, const CHRPOS &chromSize, const string &chrom, chromHistMap &chromDepthHist) {
 
     if (_eachBase) {
         int depth = 0; // initialize the depth
-        int offset = (_eachBaseZeroBased)?0:1;
-        for (int pos = 0; pos < chromSize; pos++) {
+        CHRPOS offset = (_eachBaseZeroBased)?0:1;
+        for (CHRPOS pos = 0; pos < chromSize; pos++) {
 
             depth += chromCov[pos].starts;
             // report the depth for this position.
@@ -494,7 +494,7 @@ void BedGenomeCoverage::ReportChromCoverage(const vector<DEPTH> &chromCov, const
 
         int depth = 0; // initialize the depth
 
-        for (int pos = 0; pos < chromSize; pos++) {
+        for (CHRPOS pos = 0; pos < chromSize; pos++) {
 
             depth += chromCov[pos].starts;
 
@@ -528,7 +528,7 @@ void BedGenomeCoverage::ReportGenomeCoverage(chromHistMap &chromDepthHist) {
     // get the list of chromosome names in the genome
     vector<string> chromList = _genome->getChromList();
 
-    unsigned int genomeSize = 0;
+    CHRPOS genomeSize = 0;
     vector<string>::const_iterator chromItr = chromList.begin();
     vector<string>::const_iterator chromEnd = chromList.end();
     for (; chromItr != chromEnd; ++chromItr) {
@@ -549,7 +549,7 @@ void BedGenomeCoverage::ReportGenomeCoverage(chromHistMap &chromDepthHist) {
         string chrom = chromIt->first;
         for (histMap::iterator depthIt = chromDepthHist[chrom].begin(); depthIt != chromDepthHist[chrom].end(); ++depthIt) {
             int depth = depthIt->first;
-            unsigned int numBasesAtDepth = depthIt->second;
+            CHRPOS numBasesAtDepth = depthIt->second;
             genomeHist[depth] += numBasesAtDepth;
         }
     }
@@ -559,7 +559,7 @@ void BedGenomeCoverage::ReportGenomeCoverage(chromHistMap &chromDepthHist) {
     // the entire genome that are at said depth.
     for (histMap::iterator genomeDepthIt = genomeHist.begin(); genomeDepthIt != genomeHist.end(); ++genomeDepthIt) {
         int depth = genomeDepthIt->first;
-        unsigned int numBasesAtDepth = genomeDepthIt->second;
+        CHRPOS numBasesAtDepth = genomeDepthIt->second;
 
         cout << "genome" << "\t" << depth << "\t" << numBasesAtDepth << "\t"
             << genomeSize << "\t" << (float) ((float)numBasesAtDepth / (float)genomeSize) << endl;
@@ -567,13 +567,13 @@ void BedGenomeCoverage::ReportGenomeCoverage(chromHistMap &chromDepthHist) {
 }
 
 
-void BedGenomeCoverage::ReportChromCoverageBedGraph(const vector<DEPTH> &chromCov, const int &chromSize, const string &chrom) {
+void BedGenomeCoverage::ReportChromCoverageBedGraph(const vector<DEPTH> &chromCov, const CHRPOS &chromSize, const string &chrom) {
 
     int depth = 0; // initialize the depth
-    int lastStart = -1;
+    CHRPOS lastStart = -1;
     int lastDepth = -1;
 
-    for (int pos = 0; pos < chromSize; pos++) {
+    for (CHRPOS pos = 0; pos < chromSize; pos++) {
         depth += chromCov[pos].starts;
 
         if (depth != lastDepth) {

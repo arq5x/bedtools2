@@ -18,6 +18,7 @@ FileRecordTypeChecker::FileRecordTypeChecker()
 	_firstValidDataLineIdx = -1;
 	_isVCF = false;
 	_isBAM = false;
+	_isCRAM = false;
 	_isGFF = false;
 	_isGFFplus = false;
 	_isGzipped = false;
@@ -272,8 +273,8 @@ bool FileRecordTypeChecker::isBedFormat() {
 		return false;
 	}
 
-	int start = str2chrPos(_tokenizer.getElem(1));
-	int end = str2chrPos(_tokenizer.getElem(2));
+	CHRPOS start = str2chrPos(_tokenizer.getElem(1));
+	CHRPOS end = str2chrPos(_tokenizer.getElem(2));
 	if (end < start) {
 		return false;
 	}
@@ -290,8 +291,8 @@ bool FileRecordTypeChecker::isGFFformat()
 	if (!isNumeric(_tokenizer.getElem(3)) || !isNumeric(_tokenizer.getElem(4))) {
 		return false;
 	}
-	int start = str2chrPos(_tokenizer.getElem(3));
-	int end = str2chrPos(_tokenizer.getElem(4));
+	CHRPOS start = str2chrPos(_tokenizer.getElem(3));
+	CHRPOS end = str2chrPos(_tokenizer.getElem(4));
 	if (end < start) {
 		return false;
 	}
@@ -448,6 +449,15 @@ void FileRecordTypeChecker::setBam()
 	_recordType = BAM_RECORD_TYPE;
 	_isBinary = true;
 	_isBAM = true;
+}
+
+void FileRecordTypeChecker::setCram()
+{
+	_fileType = BAM_FILE_TYPE;
+	_recordType = BAM_RECORD_TYPE;
+	_isBinary = true;
+	_isBAM = true;
+	_isCRAM = true;
 }
 
 bool FileRecordTypeChecker::passesBed5() {

@@ -25,6 +25,7 @@
 
 using namespace std;
 
+typedef int64_t CHRPOS;
 
 //************************************************
 // VectorOps Class methods and elements

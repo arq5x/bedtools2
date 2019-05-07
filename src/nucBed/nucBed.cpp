@@ -37,9 +37,9 @@ NucBed::~NucBed(void)
 {}
 
 
-void NucBed::ReportDnaProfile(const BED& bed, const string &sequence, int seqLength)
+void NucBed::ReportDnaProfile(const BED& bed, const string &sequence, CHRPOS seqLength)
 {
-    int a,c,g,t,n,other,userPatternCount;
+    CHRPOS a,c,g,t,n,other,userPatternCount;
     a = c = g = t = n = other = userPatternCount = 0;
     
     getDnaContent(sequence,a,c,g,t,n,other);
@@ -53,13 +53,13 @@ void NucBed::ReportDnaProfile(const BED& bed, const string &sequence, int seqLen
     // report AT and GC content
     printf("%f\t%f\t",(float)(a+t)/seqLength, (float)(c+g)/seqLength);
     // report raw nucleotide counts
-    printf("%d\t%d\t%d\t%d\t%d\t%d\t%d",a,c,g,t,n,other,seqLength);
+    printf("%" PRId_CHRPOS "\t%" PRId_CHRPOS "\t%" PRId_CHRPOS "\t%" PRId_CHRPOS "\t%" PRId_CHRPOS "\t%" PRId_CHRPOS "\t%" PRId_CHRPOS,a,c,g,t,n,other,seqLength);
     // add the original sequence if requested.
 
     if (_printSeq)
         printf("\t%s",sequence.c_str());
     if (_hasPattern)
-        printf("\t%d",userPatternCount);
+        printf("\t%" PRId_CHRPOS,userPatternCount);
     printf("\n");
 
 }
@@ -125,12 +125,12 @@ void NucBed::ProfileDNA() {
             }
             // make sure we are extracting >= 1 bp
             if (bed.zeroLength == false) {
-                size_t seqLength = fr.sequenceLength(bed.chrom);
+                CHRPOS seqLength = fr.sequenceLength(bed.chrom);
                 // make sure this feature will not exceed the end of the chromosome.
                 if ( (bed.start <= seqLength) && (bed.end <= seqLength) ) 
                 {
                     // grab the dna at this interval
-                    int length = bed.end - bed.start;
+                    CHRPOS length = bed.end - bed.start;
                     // report the sequence's content
                     string dna = fr.getSubSequence(bed.chrom, bed.start, length);
                     // rev comp si necessaire

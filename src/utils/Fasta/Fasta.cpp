@@ -8,7 +8,9 @@
 
 #include "Fasta.h"
 
-FastaIndexEntry::FastaIndexEntry(string name, int length, long long offset, int line_blen, int line_len, bool useFullHeader)
+using namespace std;
+
+FastaIndexEntry::FastaIndexEntry(string name, CHRPOS length, CHRPOS offset, CHRPOS line_blen, CHRPOS line_len, bool useFullHeader)
     : name(name)
     , length(length)
     , offset(offset)
@@ -62,10 +64,10 @@ void FastaIndex::readIndexFile(string fname) {
                 string name = useFullHeader ? fields[0] :
 		  split(fields[0], " \t").at(0);  // key by first token of name
                 sequenceNames.push_back(name);
-                this->insert(make_pair(name, FastaIndexEntry(fields[0], atoi(fields[1].c_str()),
+                this->insert(make_pair(name, FastaIndexEntry(fields[0], stoll(fields[1].c_str()),
 							     strtoll(fields[2].c_str(), &end, 10),
-							     atoi(fields[3].c_str()),
-							     atoi(fields[4].c_str()),
+							     stoll(fields[3].c_str()),
+							     stoll(fields[4].c_str()),
 							     useFullHeader)));
             } else {
                 cerr << "Warning: malformed fasta index file " << fname << 
@@ -106,7 +108,7 @@ void FastaIndex::indexReference(string refname) {
     string line;
     FastaIndexEntry entry;  // an entry buffer used in processing
     entry.clear();
-    int line_length = 0;
+    CHRPOS line_length = 0;
     long long offset = 0;  // byte offset from start of file
     long long line_number = 0; // current line number
     bool mismatchedLineLengths = false; // flag to indicate if our line length changes mid-file
@@ -280,8 +282,8 @@ FastaReference::~FastaReference(void) {
 
 string FastaReference::getSequence(string seqname) {
     FastaIndexEntry entry = index->entry(seqname);
-    int newlines_in_sequence = entry.length / entry.line_blen;
-    int seqlen = newlines_in_sequence  + entry.length;
+    CHRPOS newlines_in_sequence = entry.length / entry.line_blen;
+    CHRPOS seqlen = newlines_in_sequence  + entry.length;
     char* seq = (char*) calloc (seqlen + 1, sizeof(char));
     if (usingmmap) {
         memcpy(seq, (char*) filemm + entry.offset, seqlen);
@@ -310,7 +312,7 @@ string FastaReference::sequenceNameStartingWith(string seqnameStart) {
     }
 }
 
-string FastaReference::getSubSequence(string seqname, int start, int length) {
+string FastaReference::getSubSequence(string seqname, CHRPOS start, CHRPOS length) {
     FastaIndexEntry entry = index->entry(seqname);
     if (start < 0 || length < 1) {
         cerr << "Error: cannot construct subsequence with negative offset or length < 1" << endl;
@@ -320,10 +322,10 @@ string FastaReference::getSubSequence(string seqname, int start, int length) {
     // approach: count newlines before start
     //           count newlines by end of read
     //             subtracting newlines before start find count of embedded newlines
-    int newlines_before = start > 0 ? (start - 1) / entry.line_blen : 0;
-    int newlines_by_end = (start + length - 1) / entry.line_blen;
-    int newlines_inside = newlines_by_end - newlines_before;
-    int seqlen = length + newlines_inside;
+    CHRPOS newlines_before = start > 0 ? (start - 1) / entry.line_blen : 0;
+    CHRPOS newlines_by_end = (start + length - 1) / entry.line_blen;
+    CHRPOS newlines_inside = newlines_by_end - newlines_before;
+    CHRPOS seqlen = length + newlines_inside;
     char* seq = (char*) calloc (seqlen + 1, sizeof(char));
     if (usingmmap) {
         memcpy(seq, (char*) filemm + entry.offset + newlines_before + start, seqlen);
@@ -342,7 +344,7 @@ string FastaReference::getSubSequence(string seqname, int start, int length) {
     return s;
 }
 
-long unsigned int FastaReference::sequenceLength(string seqname) {
+CHRPOS FastaReference::sequenceLength(string seqname) {
     if (index->chromFound(seqname)) {
         FastaIndexEntry entry = index->entry(seqname);
         return entry.length;

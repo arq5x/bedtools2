@@ -88,7 +88,7 @@ void BamFileReader::getName(string &str) const
 
 void BamFileReader::getScore(string &str) const
 {
-	int2str(_bamAlignment.MapQuality, str);
+	int2str((int)_bamAlignment.MapQuality, str);
 }
 
 char BamFileReader::getStrand() const

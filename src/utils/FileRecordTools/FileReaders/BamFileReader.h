@@ -49,6 +49,8 @@ public:
 	void getMateChrName(string &str) const;
 	virtual int getNumFields() const { return MINIMUM_VALID_BAM_FIELDS; }
 
+	refs_t* getCramRefs() { return _bamReader->GetReference(); }
+
 protected:
 
 	BamTools::BamReader *_bamReader;

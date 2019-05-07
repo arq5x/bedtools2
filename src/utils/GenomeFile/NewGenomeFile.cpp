@@ -12,6 +12,7 @@
 #include "NewGenomeFile.h"
 #include "ParseTools.h"
 #include "Tokenizer.h"
+#include <fstream>
 
 NewGenomeFile::NewGenomeFile(const string &genomeFilename)
 : _maxId(-1)
@@ -55,6 +56,7 @@ void NewGenomeFile::loadGenomeFileIntoMap() {
 	string sLine;
 	Tokenizer fieldTokens;
 	CHRPOS chrSize = 0;
+	_genomeLength = 0;
 	string chrName;
 	while (!genFile.eof()) {
 		sLine.clear();
@@ -76,7 +78,7 @@ void NewGenomeFile::loadGenomeFileIntoMap() {
 		_chromList.push_back(chrName);
 	}
 	if (_maxId == -1) {
-		cerr << "Error: The genome file " << _genomeFileName << " has no valid entries. Exiting." << endl;
+		cerr << "Error: The genome file " << _genomeFileName << " has no valid entries (are you sure it's a 2-column bedtools genome file). Exiting." << endl;
 		exit(1);
 	}
 	// Special: BAM files can have unmapped reads, which show as no chromosome, or an empty chrom string.
@@ -100,7 +102,7 @@ bool NewGenomeFile::projectOnGenome(CHRPOS genome_pos, string &chrom, CHRPOS &st
     // use the iterator to identify the appropriate index 
     // into the chrom name and start vectors
     CHRPOS i = CHRPOS(low-_startOffsets.begin());
-    if (i >= _chromList.size()) {
+    if (i >= (CHRPOS)_chromList.size()) {
     	return false; //position not on genome
     }
     chrom = _chromList[i - 1];
@@ -135,7 +137,7 @@ CHRPOS NewGenomeFile::getChromSize(const string &chrom) const {
     return INT_MAX;
 }
 
-CHRPOS NewGenomeFile::getChromId(const string &chrom) {
+uint32_t NewGenomeFile::getChromId(const string &chrom) {
 	if (chrom == _currChromName) {
 		return _currChromId;
 	}

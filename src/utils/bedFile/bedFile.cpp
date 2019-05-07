@@ -219,7 +219,6 @@ bool BedFile::GetNextBed(BED &bed, bool forceSorted) {
 	}
 	_lineNum++;
     }
-
     // ditch \r for Windows if necessary.
     if (_bedLine.size() && _bedLine[_bedLine.size()-1] == '\r') {
 	_bedLine.resize(_bedLine.size()-1);
@@ -240,7 +239,7 @@ bool BedFile::GetNextBed(BED &bed, bool forceSorted) {
 
     if (_status == BED_VALID) {
 	if (bed.chrom == _prev_chrom) {
-	    if ((int) bed.start >= _prev_start) {
+	    if (bed.start >= _prev_start) {
 		_prev_chrom = bed.chrom;
 		_prev_start = bed.start;
 	    }
@@ -279,7 +278,7 @@ bool BedFile::GetNextMergedBed(BED &merged_bed) {
         // force sorting; hence third param = true
         while (GetNextBed(bed, true)) {
             if (_status == BED_VALID) {
-                if (((int) bed.start - _merged_end > 0) || 
+                if ((bed.start - _merged_end > 0) || 
                    (_merged_end < 0) || 
                    (bed.chrom != _merged_chrom))
                 {
@@ -302,7 +301,7 @@ bool BedFile::GetNextMergedBed(BED &merged_bed) {
                         _merged_end = bed.end;
                     }
                 }
-                else if ((int) bed.end > _merged_end)
+                else if (bed.end > _merged_end)
                 {   
                     _merged_end = bed.end;
                 }
@@ -363,7 +362,7 @@ void BedFile::allHits(string chrom, CHRPOS start,
             for (; bedItr != bedEnd; ++bedItr) {
                 CHRPOS s = max(start, bedItr->start);
                 CHRPOS e = min(end, bedItr->end);
-                int overlapBases = (e - s); 
+                int overlapBases = (int)(e - s); 
                 // 1. is there sufficient overlap w.r.t A?
                 if ( (float) overlapBases 
                       / 
@@ -421,7 +420,7 @@ bool BedFile::anyHits(string chrom, CHRPOS start, CHRPOS end, string strand,
             for (; bedItr != bedEnd; ++bedItr) {
                 CHRPOS s = max(start, bedItr->start);
                 CHRPOS e = min(end, bedItr->end);
-                int overlapBases = (e - s); 
+                int overlapBases = (int)(e - s); 
                 // 1. is there sufficient overlap w.r.t A?
                 if ( (float) overlapBases 
                       / 

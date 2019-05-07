@@ -91,7 +91,7 @@ private:
     string _currChromName ;
     vector<DEPTH> _currChromCoverage;
     chromHistMap _currChromDepthHist;
-    int _currChromSize ;
+    CHRPOS _currChromSize ;
     set<string> _visitedChromosomes;
 
 
@@ -99,12 +99,12 @@ private:
     void CoverageBed();
     void CoverageBam(string bamFile);
     void LoadBamHeaderIntoGenomeFile(const string &bamFile);
-    void ReportChromCoverage(const vector<DEPTH> &, const int &chromSize, const string &chrom, chromHistMap&);
+    void ReportChromCoverage(const vector<DEPTH> &, const CHRPOS &chromSize, const string &chrom, chromHistMap&);
     void ReportGenomeCoverage(chromHistMap &chromDepthHist);
-    void ReportChromCoverageBedGraph(const vector<DEPTH> &chromCov, const int &chromSize, const string &chrom);
+    void ReportChromCoverageBedGraph(const vector<DEPTH> &chromCov, const CHRPOS &chromSize, const string &chrom);
     void ResetChromCoverage();
     void StartNewChrom (const string& chrom);
-    void AddCoverage (int start, int end);
+    void AddCoverage (CHRPOS start, CHRPOS end);
     void AddBlockedCoverage(const vector<BED> &bedBlocks, string strand);
     void PrintFinalCoverage();
     void PrintEmptyChromosomes();

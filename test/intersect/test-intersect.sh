@@ -1,4 +1,5 @@
 set -e;
+
 BT=${BT-../../bin/bedtools}
 
 FAILURES=0;
