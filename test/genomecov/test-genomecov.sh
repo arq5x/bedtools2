@@ -294,7 +294,7 @@ echo \
 chr1	225	295	1" > exp
 $BT genomecov -ibam chip.bam -bg -tn5 > obs
 check obs exp
-rm one_block.bam two_blocks.bam three_blocks.bam sam-w-del.bam pair-chip.bam chip.bam
+rm obs exp
 
 ##################################################################
 #  Test chip with ext
@@ -306,5 +306,8 @@ chr1	215	310	1" > exp
 $BT genomecov -ibam chip.bam -bg -ext 10 > obs
 check obs exp
 rm obs exp
+
+
+rm one_block.bam two_blocks.bam three_blocks.bam sam-w-del.bam pair-chip.bam chip.bam
 
 [[ $FAILURES -eq 0 ]] || exit 1;
