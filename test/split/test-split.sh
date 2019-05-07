@@ -36,6 +36,7 @@ _tmp.00009.bed	9943539	200
 _tmp.00010.bed	9943531	200" > exp
 ${BT} split -i randData.bed -p _tmp -n 50 -a size | head > _tmp.size.tsv
 check exp _tmp.size.tsv
+rm exp
 
 
 echo -e "    split.02.simple...\c"
@@ -52,6 +53,7 @@ _tmp.00009.bed	9502188	200
 _tmp.00010.bed	9991229	200" > exp
 ${BT} split -i randData.bed -p _tmp -n 50 -a simple | head > _tmp.simple.tsv
 check exp _tmp.simple.tsv
+rm exp
 
 echo -e "    spliit.03.simple...\c"
 rm -f _tmp.*.bed
@@ -67,7 +69,7 @@ _tmp.00009.bed	474511	10
 _tmp.00010.bed	633012	10" > exp
 ${BT} split -i randData.bed -p _tmp -n 1000 -a simple | head > _tmp.simple.tsv
 check exp _tmp.simple.tsv
-
+rm exp
 
 
 rm -f _tmp.*.bed jeter.bed _tmp.simple.tsv  _tmp.size.tsv

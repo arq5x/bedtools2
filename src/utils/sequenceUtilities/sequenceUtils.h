@@ -7,6 +7,9 @@
 
 using namespace std;
 
+
+typedef int64_t CHRPOS;
+
 // Performs an in-place sequence reversal
 void reverseSequence(string &seq);
 
@@ -20,7 +23,7 @@ void toLowerCase(string &seq);
 void toUpperCase(string &seq);
 
 // Calculates the number of a, c, g, t, n, and other bases found in a sequence
-void getDnaContent(const string &seq, int &a, int &c, int &g, int &t, int &n, int &other);
+void getDnaContent(const string &seq, CHRPOS &a, CHRPOS &c, CHRPOS &g, CHRPOS &t, CHRPOS &n, CHRPOS &other);
 
 int countPattern(const string &seq, const string &pattern, bool ignoreCase);
 

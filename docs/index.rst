@@ -21,6 +21,7 @@ We have developed a fairly comprehensive `tutorial <http://quinlanlab.org/tutori
 ==========================
 Important notes
 ==========================
+- As of version 2.28.0, bedtools now supports the CRAM format via the use of `htslib <https://github.com/samtools/htslib>`_. Specify the reference genome associated with your CRAM file via the CRAM_REFERENCE environment variable. Bedtools will look for this environment variable when it needs to access sequence data from the CRAM file (e.g., `bamtofastq`). 
 - With the exception of BAM files, `bedtools` assumes all input files are TAB delimited.
 - `bedtools` also assumes that all input files use UNIX line endings.
 - Unless you use the `-sorted` option, `bedtools` currently does not support chromosomes larger than 512Mb

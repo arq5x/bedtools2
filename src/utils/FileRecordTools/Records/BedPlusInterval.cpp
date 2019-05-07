@@ -43,7 +43,7 @@ void BedPlusInterval::print(string &outBuf) const
 	_plusFields.printFields(outBuf);
 }
 
-void BedPlusInterval::print(string &outBuf, int start, int end) const
+void BedPlusInterval::print(string &outBuf, CHRPOS start, CHRPOS end) const
 {
 	Bed3Interval::print(outBuf, start, end);
 	outBuf.append("\t");

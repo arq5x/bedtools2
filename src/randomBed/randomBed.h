@@ -9,6 +9,7 @@
 
   Licenced under the GNU General Public License 2.0 license.
 ******************************************************************************/
+#include "BedtoolsTypes.h"
 #include "GenomeFile.h"
 
 #include <vector>
@@ -34,7 +35,7 @@ public:
 
     // constructor
     BedRandom(string &genomeFile, uint32_t numToGenerate, int seed,
-               bool haveSeed, uint32_t length);
+               bool haveSeed, CHRPOS length);
 
     // destructor
     ~BedRandom(void);
@@ -46,7 +47,7 @@ private:
     bool _haveSeed;
 
     GenomeFile *_genome;
-    uint32_t _length;
+    CHRPOS _length;
     uint32_t _numToGenerate;
     
     // methods

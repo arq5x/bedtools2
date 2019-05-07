@@ -34,10 +34,9 @@ void Jaccard::cleanupHits(RecordKeyVector &hits)
 
 
 bool Jaccard::finalizeCalculations() {
-	_sweep->closeOut();
+	_sweep->closeOut(true);
 	_queryUnion = _sweep->getQueryTotalRecordLength();
 	_dbUnion = _sweep->getDatabaseTotalRecordLength();
-
 	_unionVal = _queryUnion + _dbUnion;
 	return true;
 }
@@ -46,7 +45,7 @@ void  Jaccard::giveFinalReport(RecordOutputMgr *outputMgr) {
 	// header
 	outputMgr->checkForHeader();
 
-	cout << "intersection\tunion-intersection\tjaccard\tn_intersections" << endl;
+	cout << "intersection\tunion\tjaccard\tn_intersections" << endl;
 
 	unsigned long adjustedUnion = _unionVal - _intersectionVal;
 
@@ -58,14 +57,14 @@ unsigned long Jaccard::getTotalIntersection(RecordKeyVector &hits)
 {
 	unsigned long intersection = 0;
 	Record *key = hits.getKey();
-	int keyStart = key->getStartPos();
-	int keyEnd = key->getEndPos();
+	CHRPOS keyStart = key->getStartPos();
+	CHRPOS keyEnd = key->getEndPos();
 
 	int hitIdx = 0;
 	for (RecordKeyVector::iterator_type iter = hits.begin(); iter != hits.end(); iter = hits.next()) {
 		Record *currRec = *iter;
-		int maxStart = max(currRec->getStartPos(), keyStart);
-		int minEnd = min(currRec->getEndPos(), keyEnd);
+		CHRPOS maxStart = max(currRec->getStartPos(), keyStart);
+		CHRPOS minEnd = min(currRec->getEndPos(), keyEnd);
 		if (_context->getObeySplits()) {
 			intersection += upCast(_context)->getSplitBlockInfo()->getOverlapBases(hitIdx);
 			hitIdx++;

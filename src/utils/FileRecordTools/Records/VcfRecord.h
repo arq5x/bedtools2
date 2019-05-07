@@ -20,7 +20,7 @@ public:
 	virtual bool initFromFile(SingleLineDelimTextFileReader *);
 	virtual void clear();
 	void print(string &outBuf) const;
-	void print(string &outBuf, int start, int end) const;
+	void print(string &outBuf, CHRPOS start, CHRPOS end) const;
 	void print(string &outBuf, const string & start, const string & end) const;
 	virtual void printNull(string &outBuf) const;
 	virtual FileRecordTypeChecker::RECORD_TYPE getType() const { return FileRecordTypeChecker::VCF_RECORD_TYPE; }

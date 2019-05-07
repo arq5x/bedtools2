@@ -62,24 +62,24 @@ void RelativeDistance::ReportDistanceSummary()
          << "total\t"
          << "fraction\n";
     
-    map<float, size_t>::const_iterator freqItr = _reldists.begin();
-    map<float, size_t>::const_iterator freqEnd = _reldists.end();
+    map<double, size_t>::const_iterator freqItr = _reldists.begin();
+    map<double, size_t>::const_iterator freqEnd = _reldists.end();
     for (; freqItr != freqEnd; ++freqItr)
     {
-        printf("%.2f\t%lu\t%lu\t%.3f\n", 
+        printf("%.2f\t%lu\t%lu\t%.3lf\n", 
                freqItr->first, 
                freqItr->second,
                _tot_queries,
-               (float) freqItr->second / (float) _tot_queries);
+               (double) freqItr->second / (double) _tot_queries);
     }
 }
 
 
-void RelativeDistance::UpdateDistanceSummary(float rel_dist)
+void RelativeDistance::UpdateDistanceSummary(double rel_dist)
 {
     _tot_queries++;
     // round the relative distance to two decimal places.
-    float rounded_rel_dist = floorf(rel_dist * 100) / 100;
+    double rounded_rel_dist = floor(rel_dist * 100) / 100;
     _reldists[rounded_rel_dist]++;
 }
 
@@ -89,8 +89,8 @@ void RelativeDistance::CalculateRelativeDistance()
     LoadMidpoints();
     
     vector<CHRPOS>::iterator low;
-    size_t low_idx, high_idx;
-    float rel_dist;
+    CHRPOS low_idx, high_idx;
+    double rel_dist;
     
     _bedA = new BedFile(_bedAFile);
 
@@ -101,53 +101,55 @@ void RelativeDistance::CalculateRelativeDistance()
         if (_bedA->_status != BED_VALID)
             continue;
 
-        vector<CHRPOS> *chrom_mids = &_db_midpoints[bed.chrom];
-        // binary search the current query's midpoint among
-        // the database midpoints
-        int midpoint = (int) (bed.end + bed.start) / 2;
-        low = lower_bound(chrom_mids->begin(), 
-                          chrom_mids->end(), 
-                          midpoint);
-        
-        // grab the indicies for the database midpoints that are left and
-        // right of the query's midpoint.
-        if(low == chrom_mids->begin())
+        if (_db_midpoints.count(bed.chrom) > 0)
         {
-            low_idx = low - chrom_mids->begin();
-        }
-        else {
-            low_idx = low - chrom_mids->begin() - 1;
-        }
-        high_idx = low_idx + 1;
-        
-        // make sure we don't run off the boundaries of the database's
-        // midpoint vector
-        if (low_idx != chrom_mids->size() - 1)
-        {
-            // grab the database midpoints that are left and right of
-            // the query's midpoint.
-            int left = (*chrom_mids)[low_idx];
-            int right = (*chrom_mids)[high_idx];
+            vector<CHRPOS> *chrom_mids = &_db_midpoints[bed.chrom];
+            // binary search the current query's midpoint among
+            // the database midpoints
+            CHRPOS midpoint = (CHRPOS) (bed.end + bed.start) / 2;
+            low = lower_bound(chrom_mids->begin(), 
+                              chrom_mids->end(), 
+                              midpoint);
             
-            // ?
-            if (left > midpoint)
-                continue;
-            
-            // calculate the relative distance between the query's midpoint
-            // and the two nearest database midpoints.
-            size_t left_dist = abs(midpoint-left);
-            size_t right_dist = abs(midpoint-right);            
-            rel_dist = (float) min(left_dist, right_dist) 
-                        / 
-                       (float) (right-left);
-
-            if (!_summary)
+            // grab the indices for the database midpoints that are left and
+            // right of the query's midpoint.
+            if(low == chrom_mids->begin())
             {
-                _bedA->reportBedTab(bed);
-                printf("%.3f\n", rel_dist);
+                low_idx = low - chrom_mids->begin();
             }
-            else { 
-                UpdateDistanceSummary(rel_dist);
+            else 
+            {
+                low_idx = low - chrom_mids->begin() - 1;
+            }
+            high_idx = low_idx + 1;
+
+            
+            // make sure we don't run off the boundaries of the database's
+            // midpoint vector
+            if (low_idx != chrom_mids->size() - 1)
+            {
+                // grab the database midpoints that are left and right of
+                // the query's midpoint.
+                CHRPOS left = (*chrom_mids)[low_idx];
+                CHRPOS right = (*chrom_mids)[high_idx];
+                
+                // ?
+                if (left > midpoint)
+                    continue;
+                
+                // calculate the relative distance between the query's midpoint
+                // and the two nearest database midpoints.
+                CHRPOS left_dist = abs(midpoint-left);
+                CHRPOS right_dist = abs(midpoint-right);            
+                rel_dist = (double) min(left_dist, right_dist) / (double) (right-left);
+                if (!_summary)
+                {
+                    _bedA->reportBedTab(bed);
+                    printf("%.3lf\n", rel_dist);
+                }
+                else { 
+                    UpdateDistanceSummary(rel_dist);
+                }
             }
         }
     }

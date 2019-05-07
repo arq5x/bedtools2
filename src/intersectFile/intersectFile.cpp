@@ -67,7 +67,6 @@ bool IntersectFile::findNext(RecordKeyVector &hits)
 
 void IntersectFile::processHits(RecordOutputMgr *outputMgr, RecordKeyVector &hits)
 {
-	RecordKeyVector::iterator_type hitListIter = hits.begin();
 	outputMgr->printRecord(hits);
 }
 

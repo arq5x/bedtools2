@@ -59,9 +59,11 @@ public:
 
 	bool isBinary() const { return _isBinary; }
 	bool isBam() const { return _isBAM; }
+	bool isCram() const { return _isCRAM; }
 	bool isGzipped() const { return _isGzipped; }
 
 	void setBam(); //call only if you're SURE the file is BAM!
+	void setCram();
 	void setIsGroupBy(bool val) { _isGroupBy = val; } // When using groupBy,
 
 
@@ -104,6 +106,7 @@ private:
 	char _delimChar;
 	bool _isVCF;
 	bool _isBAM;
+	bool _isCRAM;
 	bool _isGFF;
 	bool _isGFFplus;
 	bool _isGzipped;

@@ -1,4 +1,4 @@
-% bedtools Tutorial
+% bedtools Tutorial 2017-2018, Hao Hou
 % Aaron Quinlan
 
 

@@ -65,7 +65,7 @@ public:
 		}
 		in->read((char*)buffin, GZBUFSIZ);
 
-		strm.avail_in = in->gcount();
+		strm.avail_in = (uInt)in->gcount();
 
 		if(strm.avail_in == 0) {
 			close();

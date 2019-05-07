@@ -89,7 +89,7 @@ void BedAnnotate::InitializeMainFile() {
             for (; bedItr != bedEnd; ++bedItr) {
                 // initialize the depthMaps, counts, etc. for each anno file.
                 for (size_t i = 0; i < _annoFiles.size(); ++i) {
-                    map<unsigned int, DEPTH> dummy;
+                    map<CHRPOS, DEPTH> dummy;
                     bedItr->depthMapList.push_back(dummy);
                     bedItr->counts.push_back(0);
                     bedItr->minOverlapStarts.push_back(INT_MAX);
@@ -154,18 +154,18 @@ void BedAnnotate::ReportAnnotations() {
 
                 // now report the coverage from each annotation file.
                 for (size_t i = 0; i < _annoFiles.size(); ++i) {
-                    unsigned int totalLength = 0;
-                    int zeroDepthCount = 0; // number of bases with zero depth
+                    CHRPOS totalLength = 0;
+                    CHRPOS zeroDepthCount = 0; // number of bases with zero depth
                     int depth          = 0; // tracks the depth at the current base
 
                     // the start is either the first base in the feature OR
                     // the leftmost position of an overlapping feature. e.g. (s = start):
                     // A    ----------
                     // B    s    ------------
-                    int start          = min(bedItr->minOverlapStarts[i], bedItr->start);
+                    CHRPOS start          = min(bedItr->minOverlapStarts[i], bedItr->start);
 
-                    map<unsigned int, DEPTH>::const_iterator depthItr;
-                    map<unsigned int, DEPTH>::const_iterator depthEnd;
+                    map<CHRPOS, DEPTH>::const_iterator depthItr;
+                    map<CHRPOS, DEPTH>::const_iterator depthEnd;
 
                     // compute the coverage observed at each base in the feature marching from start to end.
                     for (CHRPOS pos = start+1; pos <= bedItr->end; pos++) {
@@ -186,8 +186,8 @@ void BedAnnotate::ReportAnnotations() {
                     // Summarize the coverage for the current interval,
                     CHRPOS length     = bedItr->end - bedItr->start;
                     totalLength       += length;
-                    int nonZeroBases   = (length - zeroDepthCount);
-                    float fractCovered = (float) nonZeroBases / length;
+                    CHRPOS nonZeroBases   = (length - zeroDepthCount);
+                    double fractCovered = (double) nonZeroBases / length;
                     if (_reportCounts == false && _reportBoth == false)
                         printf("%f", fractCovered);
                     else if (_reportCounts == true && _reportBoth == false)

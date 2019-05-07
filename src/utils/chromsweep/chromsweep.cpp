@@ -141,7 +141,7 @@ bool ChromSweep::IsValidHit(const BED &query, const BED &db) {
     CHRPOS aLength = query.end - query.start;
     CHRPOS s = max(query.start, db.start);
     CHRPOS e = min(query.end, db.end);
-    int overlapBases = (e - s); 
+    CHRPOS overlapBases = (e - s); 
     // 1. is there sufficient overlap w.r.t A?
     if ( (float) overlapBases / (float) aLength  >= _overlapFraction) {
         CHRPOS bLength = (db.end - db.start);

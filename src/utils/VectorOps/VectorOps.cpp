@@ -117,14 +117,14 @@ double VectorOps::GetMedian(void)
     
     double median = 0.0;
     sort(_vecd.begin(), _vecd.end());
-    int totalLines = _vecd.size();
+    CHRPOS totalLines = _vecd.size();
     if ((totalLines % 2) > 0) {
-        long mid;
+        CHRPOS mid;
         mid = totalLines / 2;
         median = _vecd[mid];
     }
     else {
-        long midLow, midHigh;
+        CHRPOS midLow, midHigh;
         midLow = (totalLines / 2) - 1;
         midHigh = (totalLines / 2);
         median = (_vecd[midLow] + _vecd[midHigh]) / 2.0;

@@ -156,8 +156,8 @@ void reverseComplement(string &seq) {
 
 void toLowerCase(std::string &seq)
 {
-    const int length = seq.length();
-    for(int i=0; i < length; ++i)
+    const CHRPOS length = seq.length();
+    for(CHRPOS i=0; i < length; ++i)
     {
         seq[i] = std::tolower(seq[i]);
     }
@@ -166,18 +166,18 @@ void toLowerCase(std::string &seq)
 
 void toUpperCase(std::string &seq)
 {
-    const int length = seq.length();
-    for(int i=0; i < length; ++i)
+    const CHRPOS length = seq.length();
+    for(CHRPOS i=0; i < length; ++i)
     {
         seq[i] = std::toupper(seq[i]);
     }
 }
 
 
-void getDnaContent(const string &seq, int &a, int &c, int &g, int &t, int &n, int &other)
+void getDnaContent(const string &seq, CHRPOS &a, CHRPOS &c, CHRPOS &g, CHRPOS &t, CHRPOS &n, CHRPOS &other)
 {
     // swap the bases
-    for(unsigned int i = 0; i < seq.length(); i++) {
+    for(CHRPOS i = 0; i < (CHRPOS)seq.length(); i++) {
         switch(seq[i]) {
             case 'A':
             case 'a':

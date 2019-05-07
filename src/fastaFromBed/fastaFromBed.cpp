@@ -133,7 +133,7 @@ void Bed2Fa::ExtractDNA() {
             // make sure we are extracting >= 1 bp
             if (bed.zeroLength == false) {
     
-                size_t seqLength = fr->sequenceLength(bed.chrom);
+                CHRPOS seqLength = fr->sequenceLength(bed.chrom);
                 // seqLength > 0 means chrom was found in index.
                 // seqLength == 0 otherwise.
                 if (seqLength) {
@@ -141,7 +141,7 @@ void Bed2Fa::ExtractDNA() {
                     // the end of the chromosome.
                     if ( (bed.start <= seqLength) && (bed.end <= seqLength) ) 
                     {
-                        int length = bed.end - bed.start;
+                        CHRPOS length = bed.end - bed.start;
                         if(_useBlocks){
                             // vec to store the discrete BED "blocks"
                             bedVector bedBlocks;  
