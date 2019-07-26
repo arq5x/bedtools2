@@ -363,7 +363,7 @@ bool FileRecordTypeChecker::isTextDelimtedFormat(const char *buffer, size_t len)
 
 		//a line must have some alphanumeric characters in order to be valid.
 		bool hasAlphaNum = false;
-		for (int j=0; j < len; j++) {
+		for (size_t j=0; j < len; j++) {
 			if(isalnum(line[j])) {
 				hasAlphaNum = true;
 				break;
