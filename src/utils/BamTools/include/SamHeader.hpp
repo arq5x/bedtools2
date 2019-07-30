@@ -29,14 +29,17 @@ namespace BamTools {
 		SamHeader(const std::string& filename, bam_hdr_t* hdr) 
 			: _header(hdr), _filename(filename), SortOrder(_defulat_sort_order), Version(_defualt_version),  GroupOrder(_default_group_order) 
 		{
-			char buf[1024];
+			char* buf = (char*)malloc(1024);
 			size_t len = _header->text == NULL ? 0 : strlen(_header->text);
 			size_t sz = 0;
 			for(size_t i = 0; i <= len; i ++)
 			{
 				char ch = _header->text[i];
 				if(ch != ' ' &&  ch != '\n' && ch != '\t' && ch != '\n' && ch != 0)
+				{
+					if(sz >= 1024) buf = (char*)realloc(buf, len + 1);
 					buf[sz++] = ch;
+				}
 				else 
 				{
 					buf[sz] = 0;
@@ -53,6 +56,7 @@ namespace BamTools {
 					sz = 0;
 				}
 			}
+			free(buf);
 		}
 
 		std::string GetHeaderText() const 
