@@ -24,7 +24,7 @@ samtools view -Sb three_blocks.sam > three_blocks.bam 2>/dev/null
 #samtools view -Sb sam-w-del.sam > sam-w-del.bam 2>/dev/null
 samtools view -Sb two_blocks_w_D.sam > two_blocks_w_D.bam 2>/dev/null
 samtools view -Sb numeric_tag.sam > numeric_tag.bam 2> /dev/null
-gzip -dfc extra-long-header.sam > extra-long-header.bam 2> /dev/null
+gzip -dfc extra-long-header.sam | samtools view -Sb > extra-long-header.bam 2> /dev/null
 
 
 ##################################################################
