@@ -72,11 +72,14 @@ namespace BamTools {
 			std::vector<uint32_t> target_size;
 			std::vector<std::string> target_name;
 			size_t sz = 0;
-			char buf[1024];
+			char* buf = (char*)malloc(1024);
 			for(;;ptr++)
 			{
 				if(*ptr &&  *ptr != ' ' &&  *ptr != '\n' && *ptr != '\t' && *ptr != '\n')
+				{
+					if(sz >= 1024) buf = (char*)realloc(buf, text.length() + 1);
 					buf[sz++] = *ptr;
+				}
 				else
 				{
 					if(sz > 0)
@@ -99,6 +102,8 @@ namespace BamTools {
 				}
 				if(*ptr == 0) break;
 			}
+
+			free(buf);
 
 			_header->n_targets = target_size.size();
 			_header->l_text = text.length();
