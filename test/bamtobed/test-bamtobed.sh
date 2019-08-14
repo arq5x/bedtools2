@@ -24,6 +24,7 @@ samtools view -Sb three_blocks.sam > three_blocks.bam 2>/dev/null
 #samtools view -Sb sam-w-del.sam > sam-w-del.bam 2>/dev/null
 samtools view -Sb two_blocks_w_D.sam > two_blocks_w_D.bam 2>/dev/null
 samtools view -Sb numeric_tag.sam > numeric_tag.bam 2> /dev/null
+gzip -dfc extra-long-header.sam | samtools view -Sb > extra-long-header.bam 2> /dev/null
 
 
 ##################################################################
@@ -187,6 +188,16 @@ echo \
 1	9998	10064	HISEQ1:18:H8VC6ADXX:1:1208:16920:47717/2	2	+"	>	exp
 $BT bamtobed -tag NM -i numeric_tag.bam > obs
 
+check exp obs
+rm exp obs
+
+
+##################################################################
+# Test BAM input with long header
+##################################################################
+echo -e "    bamtobed.t13..\c"
+echo -n ""	>	exp
+$BT bamtobed -tag NM -i extra-long-header.bam > obs
 check exp obs
 rm exp obs
 
