@@ -13,11 +13,12 @@
 #include "api/BamAlignment.h"
 #include "api/BamAux.h"
 
-BlockMgr::BlockMgr(float overlapFraction, bool hasReciprocal)
+BlockMgr::BlockMgr(float overlapFractionA, float overlapFractionB, bool hasReciprocal)
 : 	_blockRecordsMgr(NULL),
   	_breakOnDeletionOps(false),
   	_breakOnSkipOps(true),
-  	_overlapFraction(overlapFraction),
+  	_overlapFractionA(overlapFractionA),
+  	_overlapFractionB(overlapFractionB),
   	_hasReciprocal(hasReciprocal)
 {
 	_blockRecordsMgr = new RecordMgr(_blockRecordsType);
@@ -156,6 +157,9 @@ int BlockMgr::findBlockedOverlaps(RecordKeyVector &keyList, RecordKeyVector &hit
 	}
 	_overlapBases.clear();
 	CHRPOS keyBlocksSumLength = getTotalBlockLength(keyList);
+	CHRPOS totalHitOverlap = 0;
+	CHRPOS hitBlockSumLength = 0;
+	
 
 	//Loop through every database record the query intersected with
 	RecordKeyVector::iterator_type hitListIter = hitList.begin();
@@ -164,8 +168,8 @@ int BlockMgr::findBlockedOverlaps(RecordKeyVector &keyList, RecordKeyVector &hit
 		RecordKeyVector hitBlocks(*hitListIter);
 		bool deleteHitBlocks = false;
 		getBlocks(hitBlocks, deleteHitBlocks); //get all blocks for the hit record.
-		CHRPOS hitBlockSumLength = getTotalBlockLength(hitBlocks); //get total length of the bocks for the hitRecord.
-		CHRPOS totalHitOverlap = 0;
+		hitBlockSumLength += getTotalBlockLength(hitBlocks); //get total length of the bocks for the hitRecord.
+		
 		bool hitHasOverlap = false;
 
 		//loop through every block of the database record.
@@ -191,22 +195,39 @@ int BlockMgr::findBlockedOverlaps(RecordKeyVector &keyList, RecordKeyVector &hit
 				}
 			}
 		}
-		if (hitHasOverlap) {
-			if ((float) totalHitOverlap / (float)keyBlocksSumLength >= _overlapFraction) {
-				if (_hasReciprocal &&
-						((float)totalHitOverlap / (float)hitBlockSumLength >= _overlapFraction)) {
-					_overlapBases.push_back((int)totalHitOverlap);
-					resultList.push_back(*hitListIter);
-				} else if (!_hasReciprocal) {
-					_overlapBases.push_back((int)totalHitOverlap);
-					resultList.push_back(*hitListIter);
-				}
-			}
+		// add the database record to the list of potential (i.e., subject to -f, -r, -F)
+		// hits if an overlap was observed
+		if (hitHasOverlap)
+		{
+			resultList.push_back(*hitListIter);
+			_overlapBases.push_back((int)totalHitOverlap);
 		}
 		if (deleteHitBlocks) {
 			deleteBlocks(hitBlocks);
 		}
 	}
+
+	// was there sufficient overlap with respect ot -a? if not, delete.
+	if ((float) totalHitOverlap / (float)keyBlocksSumLength < _overlapFractionA) 
+	{
+		resultList.clearAll();
+		_overlapBases.clear();
+	}
+	// was there sufficient overlap with respect ot -b? if not, delete.
+	if ((float)totalHitOverlap / (float)hitBlockSumLength < _overlapFractionB) 
+	{
+		resultList.clearAll();
+		_overlapBases.clear();
+	}	
+	// was there sufficient overlap with respect ot -b when using -r? if not, delete.
+	if (_hasReciprocal &&
+				((float)totalHitOverlap / (float)hitBlockSumLength < _overlapFractionA)) 
+	{
+		resultList.clearAll();
+		_overlapBases.clear();
+	}
+
+	// clean up
 	if (deleteKeyBlocks) {
 		deleteBlocks(keyList);
 	}

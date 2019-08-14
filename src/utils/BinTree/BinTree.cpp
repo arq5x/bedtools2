@@ -79,7 +79,8 @@ void BinTree::getHits(Record *record, RecordKeyVector &hitSet)
             			               _context->getOverlapFractionA(),
                                        _context->getOverlapFractionB(),
                                        _context->getReciprocalFraction(),
-                                       _context->getEitherFraction()
+                                       _context->getEitherFraction(),
+                                       _context->getObeySplits()
                                       )
                     )
                 {

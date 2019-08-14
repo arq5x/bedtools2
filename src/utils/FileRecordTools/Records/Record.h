@@ -139,7 +139,8 @@ public:
 							float overlapFractionA,
 							float overlapFractionB,
 							bool reciprocalFraction,
-						    bool eitherFraction) const;
+						    bool eitherFraction,
+						    bool obeySplits) const;
 
 	// *** WARNING !!! ** sameChromIntersects is a faster version of the intersects method,
 	// BUT the caller MUST ensure that the records are on the same
@@ -150,7 +151,8 @@ public:
 									 float overlapFractionA,
 									 float overlapFractionB,
 									 bool reciprocalFraction,
-									 bool eitherFraction) const;
+									 bool eitherFraction,
+									 bool obeySplits) const;
 
 //	virtual static bool isNumericField(int fieldNum) const = 0;
 

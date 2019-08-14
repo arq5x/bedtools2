@@ -134,7 +134,8 @@ bool Record::intersects(const Record *record,
                         float overlapFractionA,
                         float overlapFractionB,
                         bool reciprocalFraction,
-                        bool eitherFraction) const
+                        bool eitherFraction,
+                        bool obeySplits) const
 {
 	//must be on same chromosome
 	if (!sameChrom(record)) {
@@ -143,7 +144,7 @@ bool Record::intersects(const Record *record,
 	return sameChromIntersects(record,
                                sameStrand, diffStrand,
                                overlapFractionA, overlapFractionB,
-                               reciprocalFraction, eitherFraction);
+                               reciprocalFraction, eitherFraction, obeySplits);
 }
 
 bool Record::sameChromIntersects(const Record *record,
@@ -152,7 +153,8 @@ bool Record::sameChromIntersects(const Record *record,
                                  float overlapFractionA,
                                  float overlapFractionB,
                                  bool reciprocalFraction,
-                                 bool eitherFraction) const
+                                 bool eitherFraction,
+                                 bool obeySplits) const
 {
 	// Special: For records that are unmapped, intersect should automatically return false
 	if (_isUnmapped || record->isUnmapped()) {
@@ -197,7 +199,6 @@ bool Record::sameChromIntersects(const Record *record,
 	}
 
 	CHRPOS overlapBases = minEnd - maxStart;
-        // Aaron: look here.
 	CHRPOS aLen = _endPos - _startPos;
 	CHRPOS bLen = otherEnd - otherStart;
 
@@ -207,6 +208,15 @@ bool Record::sameChromIntersects(const Record *record,
     bool sufficentFractionA = (overlapA >= overlapFractionA);
     bool sufficentFractionB = (overlapB >= overlapFractionB);
 
+    // if there is any overlap at all, we need to consider if when
+    // -split is involved, as overlaps can span multiple
+    // database records and query chunks, so the final calculatiom
+    // of the overlap fractions must be handled in findBlockedOverlaps()
+    if ((overlapBases > 0) && (obeySplits == true))
+    {
+    	return true;
+    }
+    
     if (!eitherFraction)
     {
         if (sufficentFractionA && sufficentFractionB) { return true; }

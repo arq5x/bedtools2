@@ -271,7 +271,7 @@ bool ContextBase::isValidState()
 		return false;
 	}
 	if (getObeySplits()) {
-		_splitBlockInfo = new BlockMgr(_overlapFractionA, _reciprocalFraction);
+		_splitBlockInfo = new BlockMgr(_overlapFractionA, _overlapFractionB, _reciprocalFraction);
 	}
 	if (hasColumnOpsMethods()) {
 
