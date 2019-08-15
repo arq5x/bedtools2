@@ -362,6 +362,8 @@ string BuildCigarString(const vector<CigarOp> &cigar) {
     for (size_t i = 0; i < cigar.size(); ++i) {
         switch (cigar[i].Type) {
             case ('M') :
+            case ('=') :
+            case ('X') :
             case ('I') :
             case ('D') :
             case ('N') :
