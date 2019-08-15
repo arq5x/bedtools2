@@ -29,6 +29,7 @@ ContextBase::ContextBase()
   _writeB(false),
   _leftJoin(false),
   _writeCount(false),
+  _writeCountsPerDatabase(false),
   _writeOverlap(false),
   _writeAllOverlap(false),
   _haveFractionA(false),

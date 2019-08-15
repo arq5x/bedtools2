@@ -189,6 +189,7 @@ protected:
     bool _writeB;
     bool _leftJoin;
     bool _writeCount;
+    bool _writeCountsPerDatabase;
     bool _writeOverlap;
     bool _writeAllOverlap;
     bool _haveFractionA;

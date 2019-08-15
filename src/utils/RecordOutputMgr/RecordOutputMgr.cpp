@@ -77,8 +77,10 @@ void RecordOutputMgr::init(ContextBase *context) {
 		_outBuf.reserve(MAX_OUTBUF_SIZE);
 	}
 	if (_context->getProgram() == ContextBase::INTERSECT) {
-		if ((static_cast<ContextIntersect *>(_context))->getAnyHit() || (static_cast<ContextIntersect *>(_context))->getNoHit() ||
-				(static_cast<ContextIntersect *>(_context))->getWriteCount()) {
+		if ((static_cast<ContextIntersect *>(_context))->getAnyHit() || 
+			(static_cast<ContextIntersect *>(_context))->getNoHit() ||
+			(static_cast<ContextIntersect *>(_context))->getWriteCount() ||
+			(static_cast<ContextIntersect *>(_context))->getWriteCountsPerDatabase()) {
 			_printable = false;
 		}
 	}
@@ -433,7 +435,34 @@ void RecordOutputMgr::reportOverlapSummary(RecordKeyVector &keyList)
 		int2str(numOverlapsFound, _outBuf, true);
 		newline();
 		if (needsFlush()) flush();
-	} else if ((static_cast<ContextIntersect *>(_context))->getNoHit() && numOverlapsFound == 0) {
+	} 
+	else if ((static_cast<ContextIntersect *>(_context))->getWriteCountsPerDatabase()) {
+		// build a map of the hit counts per database
+		map<int, int> db_counts; 
+		// initialize to 0 for all files (-A is file 0)
+		for (size_t i = 1; i < _context->getNumInputFiles(); i++)
+		{
+			db_counts[i] = 0;
+		}
+		// tally hits per database
+		for (auto & hit : keyList) {
+			db_counts[hit->getFileIdx()]+=1;
+		}
+
+		// report A with a separate line for each db and its hit count
+		for (auto it=db_counts.begin(); it!=db_counts.end(); ++it)
+		{
+			if (printKeyAndTerminate(keyList)) {
+				return;
+			}
+			tab();
+			addDbFileId(it->first);
+			int2str(it->second, _outBuf, true);
+			newline();
+		}
+		if (needsFlush()) flush();
+	}
+	else if ((static_cast<ContextIntersect *>(_context))->getNoHit() && numOverlapsFound == 0) {
 		if (printKeyAndTerminate(keyList)) {
 			return;
 		}

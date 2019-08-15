@@ -33,7 +33,12 @@ void IntersectOutputHelp() {
 
     cerr << "\t-c\t"            << "For each entry in A, report the number of overlaps with B." << endl;
     cerr                        << "\t\t- Reports 0 for A entries that have no overlap with B." << endl;
-    cerr                        << "\t\t- Overlaps restricted by -f and -r." << endl << endl;
+    cerr                        << "\t\t- Overlaps restricted by -f, -F, -r, and -s." << endl << endl;
+
+    cerr << "\t-C\t"            << "For each entry in A, separately report the number of" << endl;
+    cerr                        << "\t\t- overlaps with each B file on a distinct line." << endl;
+    cerr                        << "\t\t- Reports 0 for A entries that have no overlap with B." << endl;
+    cerr                        << "\t\t- Overlaps restricted by -f, -F, -r, and -s." << endl << endl;
 
     cerr << "\t-v\t"            << "Only report those entries in A that have _no overlaps_ with B." << endl;
     cerr                        << "\t\t- Similar to \"grep -v\" (an homage)." << endl << endl;

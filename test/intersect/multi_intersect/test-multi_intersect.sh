@@ -178,11 +178,236 @@ $BT intersect -a query.bed -b d1.bed d2.bed d3.bed -c -sorted -sortout > obs
 check exp obs
 rm exp obs
 
+###########################################################
+#  Test -C option
+###########################################################
+echo -e "    intersect.t12...\c"
+echo \
+"chr1	1	20	1	1
+chr1	1	20	2	0
+chr1	1	20	3	0
+chr1	40	45	1	0
+chr1	40	45	2	1
+chr1	40	45	3	0
+chr1	70	90	1	1
+chr1	70	90	2	0
+chr1	70	90	3	1
+chr1	105	120	1	0
+chr1	105	120	2	1
+chr1	105	120	3	1
+chr2	1	20	1	1
+chr2	1	20	2	0
+chr2	1	20	3	0
+chr2	40	45	1	0
+chr2	40	45	2	1
+chr2	40	45	3	0
+chr2	70	90	1	1
+chr2	70	90	2	0
+chr2	70	90	3	1
+chr2	105	120	1	0
+chr2	105	120	2	1
+chr2	105	120	3	1
+chr3	1	20	1	1
+chr3	1	20	2	0
+chr3	1	20	3	0
+chr3	40	45	1	0
+chr3	40	45	2	1
+chr3	40	45	3	0
+chr3	70	90	1	1
+chr3	70	90	2	0
+chr3	70	90	3	1
+chr3	105	120	1	0
+chr3	105	120	2	1
+chr3	105	120	3	1" > exp
+$BT intersect -a query.bed -b d1.bed d2.bed d3.bed -C > obs
+check exp obs
+rm exp obs
+
+###########################################################
+#  Test -C with -filenames option
+###########################################################
+echo -e "    intersect.t13...\c"
+echo \
+"chr1	1	20	d1.bed	1
+chr1	1	20	d2.bed	0
+chr1	1	20	d3.bed	0
+chr1	40	45	d1.bed	0
+chr1	40	45	d2.bed	1
+chr1	40	45	d3.bed	0
+chr1	70	90	d1.bed	1
+chr1	70	90	d2.bed	0
+chr1	70	90	d3.bed	1
+chr1	105	120	d1.bed	0
+chr1	105	120	d2.bed	1
+chr1	105	120	d3.bed	1
+chr2	1	20	d1.bed	1
+chr2	1	20	d2.bed	0
+chr2	1	20	d3.bed	0
+chr2	40	45	d1.bed	0
+chr2	40	45	d2.bed	1
+chr2	40	45	d3.bed	0
+chr2	70	90	d1.bed	1
+chr2	70	90	d2.bed	0
+chr2	70	90	d3.bed	1
+chr2	105	120	d1.bed	0
+chr2	105	120	d2.bed	1
+chr2	105	120	d3.bed	1
+chr3	1	20	d1.bed	1
+chr3	1	20	d2.bed	0
+chr3	1	20	d3.bed	0
+chr3	40	45	d1.bed	0
+chr3	40	45	d2.bed	1
+chr3	40	45	d3.bed	0
+chr3	70	90	d1.bed	1
+chr3	70	90	d2.bed	0
+chr3	70	90	d3.bed	1
+chr3	105	120	d1.bed	0
+chr3	105	120	d2.bed	1
+chr3	105	120	d3.bed	1" > exp
+$BT intersect -a query.bed -b d1.bed d2.bed d3.bed -C -filenames > obs
+check exp obs
+rm exp obs
+
+###########################################################
+#  Test -C with -names option
+###########################################################
+echo -e "    intersect.t14...\c"
+echo \
+"chr1	1	20	d1	1
+chr1	1	20	d2	0
+chr1	1	20	d3	0
+chr1	40	45	d1	0
+chr1	40	45	d2	1
+chr1	40	45	d3	0
+chr1	70	90	d1	1
+chr1	70	90	d2	0
+chr1	70	90	d3	1
+chr1	105	120	d1	0
+chr1	105	120	d2	1
+chr1	105	120	d3	1
+chr2	1	20	d1	1
+chr2	1	20	d2	0
+chr2	1	20	d3	0
+chr2	40	45	d1	0
+chr2	40	45	d2	1
+chr2	40	45	d3	0
+chr2	70	90	d1	1
+chr2	70	90	d2	0
+chr2	70	90	d3	1
+chr2	105	120	d1	0
+chr2	105	120	d2	1
+chr2	105	120	d3	1
+chr3	1	20	d1	1
+chr3	1	20	d2	0
+chr3	1	20	d3	0
+chr3	40	45	d1	0
+chr3	40	45	d2	1
+chr3	40	45	d3	0
+chr3	70	90	d1	1
+chr3	70	90	d2	0
+chr3	70	90	d3	1
+chr3	105	120	d1	0
+chr3	105	120	d2	1
+chr3	105	120	d3	1" > exp
+$BT intersect -a query.bed -b d1.bed d2.bed d3.bed -C -names d1 d2 d3 > obs
+check exp obs
+rm exp obs
+
+###########################################################
+#  Test -C with -names option and -f 0.5
+###########################################################
+echo -e "    intersect.t15...\c"
+echo \
+"chr1	1	20	d1	1
+chr1	1	20	d2	0
+chr1	1	20	d3	0
+chr1	40	45	d1	0
+chr1	40	45	d2	1
+chr1	40	45	d3	0
+chr1	70	90	d1	0
+chr1	70	90	d2	0
+chr1	70	90	d3	0
+chr1	105	120	d1	0
+chr1	105	120	d2	1
+chr1	105	120	d3	1
+chr2	1	20	d1	1
+chr2	1	20	d2	0
+chr2	1	20	d3	0
+chr2	40	45	d1	0
+chr2	40	45	d2	1
+chr2	40	45	d3	0
+chr2	70	90	d1	0
+chr2	70	90	d2	0
+chr2	70	90	d3	0
+chr2	105	120	d1	0
+chr2	105	120	d2	1
+chr2	105	120	d3	1
+chr3	1	20	d1	1
+chr3	1	20	d2	0
+chr3	1	20	d3	0
+chr3	40	45	d1	0
+chr3	40	45	d2	1
+chr3	40	45	d3	0
+chr3	70	90	d1	0
+chr3	70	90	d2	0
+chr3	70	90	d3	0
+chr3	105	120	d1	0
+chr3	105	120	d2	1
+chr3	105	120	d3	1" > exp
+$BT intersect -a query.bed -b d1.bed d2.bed d3.bed -C -f 0.5 -names d1 d2 d3 > obs
+check exp obs
+rm exp obs
+
+###########################################################
+#  Test -C with -names option and -f 1.0
+###########################################################
+echo -e "    intersect.t16...\c"
+echo \
+"chr1	1	20	d1	0
+chr1	1	20	d2	0
+chr1	1	20	d3	0
+chr1	40	45	d1	0
+chr1	40	45	d2	1
+chr1	40	45	d3	0
+chr1	70	90	d1	0
+chr1	70	90	d2	0
+chr1	70	90	d3	0
+chr1	105	120	d1	0
+chr1	105	120	d2	0
+chr1	105	120	d3	0
+chr2	1	20	d1	0
+chr2	1	20	d2	0
+chr2	1	20	d3	0
+chr2	40	45	d1	0
+chr2	40	45	d2	1
+chr2	40	45	d3	0
+chr2	70	90	d1	0
+chr2	70	90	d2	0
+chr2	70	90	d3	0
+chr2	105	120	d1	0
+chr2	105	120	d2	0
+chr2	105	120	d3	0
+chr3	1	20	d1	0
+chr3	1	20	d2	0
+chr3	1	20	d3	0
+chr3	40	45	d1	0
+chr3	40	45	d2	1
+chr3	40	45	d3	0
+chr3	70	90	d1	0
+chr3	70	90	d2	0
+chr3	70	90	d3	0
+chr3	105	120	d1	0
+chr3	105	120	d2	0
+chr3	105	120	d3	0" > exp
+$BT intersect -a query.bed -b d1.bed d2.bed d3.bed -C -f 1.0 -names d1 d2 d3 > obs
+check exp obs
+rm exp obs
+
 
 ###########################################################
 #  Test -f option
 ###########################################################
-echo -e "    intersect.t12...\c"
+echo -e "    intersect.t17...\c"
 echo \
 "chr1	5	20
 chr1	40	45
@@ -203,7 +428,7 @@ check exp obs
 ###########################################################
 #  Test -s option
 ###########################################################
-echo -e "    intersect.t13...\c"
+echo -e "    intersect.t18...\c"
 echo \
 "chr1	5	20	q1	100	+
 chr1	85	90	q3	100	+
@@ -239,7 +464,7 @@ rm exp obs
 ###########################################################
 #  Test -wo option
 ###########################################################
-echo -e "    intersect.t14...\c"
+echo -e "    intersect.t19...\c"
 echo \
 "chr1	1	20	1	chr1	5	25	15
 chr1	40	45	2	chr1	40	50	5
@@ -268,7 +493,7 @@ rm exp obs
 ###########################################################
 #  Test -wa -wb -header option
 ###########################################################
-echo -e "    intersect.t15...\c"
+echo -e "    intersect.t20...\c"
 echo \
 "# Query 3 Header Line.
 chr1	1	20	q1	100	+	1	chr1	5	25	d7_1	100	+
@@ -298,7 +523,7 @@ rm exp obs
 ###########################################################
 #  Test the -filenames option, before db listing
 ###########################################################
-echo -e "    intersect.t16...\c"
+echo -e "    intersect.t21...\c"
 echo \
 "chr1	1	20	q1	100	+	d7.bed	chr1	5	25	d7_1	100	+
 chr1	40	45	q2	100	+	d8.bed	chr1	40	50	d8_1	100	-
@@ -325,7 +550,7 @@ rm exp obs
 ###########################################################
 #  Test the -filenames option, after db listing
 ###########################################################
-echo -e "    intersect.t17...\c"
+echo -e "    intersect.t22...\c"
 echo \
 "chr1	1	20	q1	100	+	d7.bed	chr1	5	25	d7_1	100	+
 chr1	40	45	q2	100	+	d8.bed	chr1	40	50	d8_1	100	-
@@ -353,7 +578,7 @@ rm exp obs
 ###########################################################
 #  Test the -names option, before db listing
 ###########################################################
-echo -e "    intersect.t18...\c"
+echo -e "    intersect.t23...\c"
 echo \
 "chr1	1	20	q1	100	+	blue	chr1	5	25	d7_1	100	+
 chr1	40	45	q2	100	+	red	chr1	40	50	d8_1	100	-
@@ -380,7 +605,7 @@ rm exp obs
 ###########################################################
 #  Test the -names option, after db listing
 ###########################################################
-echo -e "    intersect.t19...\c"
+echo -e "    intersect.t24...\c"
 echo \
 "chr1	1	20	q1	100	+	blue	chr1	5	25	d7_1	100	+
 chr1	40	45	q2	100	+	red	chr1	40	50	d8_1	100	-
