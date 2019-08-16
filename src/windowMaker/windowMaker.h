@@ -9,7 +9,7 @@ aaronquinlan@gmail.com
 
 Licenced under the GNU General Public License 2.0 license.
 ******************************************************************************/
-#include "GenomeFile.h"
+#include "NewGenomeFile.h"
 #include "bedFile.h"
 
 using namespace std;

@@ -48,6 +48,7 @@ public:
 
 private:
     string  _genomeFileName;
+    istream   *_genomeFile;
     typedef map<string, pair<CHRPOS, int> > lookupType;
     lookupType _chromSizeIds;
     vector<string> _chromList;

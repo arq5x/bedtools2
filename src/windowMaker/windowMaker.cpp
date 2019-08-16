@@ -44,7 +44,7 @@ WindowMaker::~WindowMaker(void) {}
 
 void WindowMaker::MakeWindowsFromGenome(const string& genomeFileName) {
 
-    GenomeFile *_genome = new GenomeFile(genomeFileName);
+    NewGenomeFile *_genome = new NewGenomeFile(genomeFileName);
 
     // get a list of the chroms in the user's genome
     vector<string> chromList = _genome->getChromList();
