@@ -120,6 +120,10 @@ int slop_main(int argc, char* argv[]) {
       cerr << endl << "*****" << endl << "*****ERROR: Need -l and -r together or -b alone. " << endl << "*****" << endl;
       showHelp = true;
     }
+    if (haveLeft && haveRight && haveBoth) {
+      cerr << endl << "*****" << endl << "*****ERROR: Use -l and -r together or just -b alone. " << endl << "*****" << endl;
+      showHelp = true;
+    }
     if ((!haveLeft && haveRight) || (haveLeft && !haveRight)) {
       cerr << endl << "*****" << endl << "*****ERROR: Need both -l and -r. " << endl << "*****" << endl;
       showHelp = true;
