@@ -54,9 +54,9 @@ void BedSlop::SlopBed() {
                 AddSlop(bedEntry);
             }
             else {
-               l = _leftSlop;	
+               l = _leftSlop;   
                _leftSlop  = _leftSlop * (float)bedEntry.size();
-               r = _rightSlop;	
+               r = _rightSlop;  
                _rightSlop = _rightSlop * (float)bedEntry.size();
                AddSlop(bedEntry);
                _rightSlop = r;
@@ -82,7 +82,13 @@ void BedSlop::AddSlop(BED &bed) {
                 bed.start = chromSize;  
             }
             else {
-              bed.start = bed.start - (long)_rightSlop;
+                bed.start = bed.start - (long)_rightSlop;
+            }
+            // checking if start is already outside of chrom bounds.
+            // issue #195
+            if((bed.start >= chromSize) || ((bed.start + (CHRPOS)_leftSlop) >= chromSize))
+            {
+                bed.start = chromSize;
             }
         }
         else {
@@ -94,7 +100,7 @@ void BedSlop::AddSlop(BED &bed) {
                 bed.end = 0;
             }
             else {
-              bed.end = bed.end + (int)_leftSlop;
+                bed.end = bed.end + (int)_leftSlop;
             }
         }    
         else {
@@ -102,9 +108,11 @@ void BedSlop::AddSlop(BED &bed) {
             bed.end = chromSize;
         }
     }
-    else {
+    // strand is +
+    else 
+    {
         if ( (bed.start - (CHRPOS)_leftSlop) >= 0 ) {
-          // checking negative condition for _leftSlop
+            // checking negative condition for _leftSlop
             if( (bed.start - (CHRPOS)_leftSlop) >= chromSize && _leftSlop < 0)
             {
               bed.start = chromSize;
@@ -112,25 +120,33 @@ void BedSlop::AddSlop(BED &bed) {
             else {
               bed.start = bed.start - (CHRPOS)_leftSlop;
             }
+            // checking if start is already outside of chrom bounds.
+            // issue #195
+            if((bed.start >= chromSize) || ((bed.start + (CHRPOS)_leftSlop) >= chromSize))
+            {
+                bed.start = chromSize;
+            }
         }
-        else {
+        else 
+        {
             bed.start = 0;
         }
 
         if ( (bed.end + (CHRPOS)_rightSlop) <= chromSize )
         {
-          // checking negative _rightSlop condition
-            if( (bed.end + (CHRPOS)_rightSlop) <= 0 && _rightSlop < 0) {
+            // checking negative _rightSlop condition
+            if( (bed.end + (CHRPOS)_rightSlop) <= 0 && _rightSlop < 0) 
+            {
                 bed.end = 0;
-              }
-              else {
+            }
+            else 
+            {
                 bed.end = bed.end + (CHRPOS)_rightSlop;            
-              }
+            }
         }
         else
         {
-          
-                bed.end = chromSize;                
+            bed.end = chromSize; 
         }
     }
     //checking edge case and adjusting
