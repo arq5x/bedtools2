@@ -11,10 +11,7 @@
 
 |
 
-``bedtools subtract`` searches for features in B that overlap A. If an 
-overlapping feature is found in B, the overlapping portion is removed from A 
-and the remaining portion of A is reported. If a feature in B overlaps all of a 
-feature in A, the A feature will not be reported.
+``bedtools subtract`` bedtools` subtract searches for features in B that overlap A by at least the number of base pairs given by the -f option. If an overlapping feature is found in B, the overlapping portion is removed from A and the remaining portion of A is reported. If a feature in B overlaps all of a feature in A, the A feature will not be reported. If a feature in B does not overlap a feature in A by at least the -f amount, the A feature will be reported in its entirety.
 
 
 ===============================
