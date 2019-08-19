@@ -137,6 +137,7 @@ void bamtofastq_help(void) {
     cerr << "\tIf you want to create a single, interleaved FASTQ file " << endl;
     cerr << "\tfor paired-end data, you can just write both to /dev/stdout:" << endl << endl;
     cerr << "\tbedtools bamtofastq -i x.bam -fq /dev/stdout -fq2 /dev/stdout > x.ilv.fq" << endl << endl;
+    cerr << "\tAlso, the samtools fastq command has more fucntionality and is a useful alternative." <<  endl << endl;
     exit(1);    
 }
 
