@@ -502,4 +502,8 @@ void BedShuffle::ChooseLocusFromInclusionFile(BED &bedEntry)
     bedEntry.chrom = includeInterval->chrom;
     bedEntry.start = randomStart;
     bedEntry.end   = randomStart + length;
+    if (includeInterval->strand.size() > 0 and bedEntry.strand.size() > 0)
+    {
+        bedEntry.strand = includeInterval->strand;
+    }
 }
