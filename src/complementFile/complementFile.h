@@ -20,12 +20,12 @@ class RecordOutputMgr;
 class ComplementFile : public ToolBase {
 
 public:
-    ComplementFile(ContextComplement *context);
-    virtual ~ComplementFile();
+  ComplementFile(ContextComplement *context);
+  virtual ~ComplementFile();
 	virtual bool init();
 	virtual bool findNext(RecordKeyVector &hits);
 	virtual void processHits(RecordOutputMgr *outputMgr, RecordKeyVector &hits);
-    virtual void checkCoordinatesAgainstChromLength(const Record *rec);
+  virtual void checkCoordinatesAgainstChromLength(const Record *rec);
 	virtual void cleanupHits(RecordKeyVector &hits);
 	virtual bool finalizeCalculations() {return true;}
 	virtual void giveFinalReport(RecordOutputMgr *outputMgr);
@@ -37,6 +37,7 @@ protected:
 	string _currChrom;
 	const NewGenomeFile *_genomeFile;
 	CHRPOS _currStartPos;
+  bool _onlyChromsWithBedRecords;
 	RecordOutputMgr *_outputMgr;
 	const vector<string> &_chromList;
 	int _currPosInGenomeList;
@@ -46,7 +47,6 @@ protected:
 	void outPutLastRecordInPrevChrom();
 	bool fastForward(const string &newChrom);
 	void printRecord(CHRPOS endPos);
-
 };
 
 

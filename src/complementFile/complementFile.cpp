@@ -5,6 +5,7 @@ ComplementFile::ComplementFile(ContextComplement *context)
 : ToolBase(context),
   _genomeFile(context->getGenomeFile()),
   _currStartPos(0),
+  _onlyChromsWithBedRecords(context->getOnlyChromsWithBedRecords()),
   _outputMgr(NULL),
   _chromList(_genomeFile->getChromList()),
   _currPosInGenomeList(-1)
@@ -113,8 +114,14 @@ bool ComplementFile::fastForward(const string &newChrom) {
 	while (i < (int)_chromList.size() && _chromList[i] != newChrom) {
 		_outRecord.setChrName(_chromList[i]);
 		_currStartPos = 0;
-		CHRPOS endPos = _genomeFile->getChromSize(_chromList[i]);
-		printRecord(endPos);
+		// by default, print all chroms in genomefile regardless of records
+    // in the input BED file. If the _onlyChromsWithBedRecords is True,
+    // however, we skip chroms without data.
+    if (!_onlyChromsWithBedRecords)
+    {
+        CHRPOS endPos = _genomeFile->getChromSize(_chromList[i]);
+		    printRecord(endPos);
+    }
 		i++;
 	}
 	if (newChrom.empty()) return true;

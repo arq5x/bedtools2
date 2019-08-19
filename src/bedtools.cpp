@@ -114,7 +114,7 @@ int main(int argc, char *argv[])
     else if (subCmd == "window")      return window_main(argc-1, argv+1);
     else if (subCmd == "genomecov")   return genomecoverage_main(argc-1, argv+1);
     else if (subCmd == "cluster")     return cluster_main(argc-1, argv+1);
-	else if (subCmd == "shift")        return shift_main(argc-1, argv+1);
+	  else if (subCmd == "shift")       return shift_main(argc-1, argv+1);
     else if (subCmd == "slop")        return slop_main(argc-1, argv+1);
     else if (subCmd == "split")       return split_main(argc-1, argv+1);
     else if (subCmd == "flank")       return flank_main(argc-1, argv+1);
@@ -326,7 +326,7 @@ void showHelp(const string &subCmd) {
 		groupby_help();
 	} else if (subCmd == "summary") {
         summary_help();
-    }
+  }
 }
 
 void showErrors(const string &errors) 

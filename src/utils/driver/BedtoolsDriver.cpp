@@ -8,6 +8,7 @@
 #include "ContextSample.h"
 #include "ContextJaccard.h"
 #include "ContextClosest.h"
+#include "ContextComplement.h"
 #include "ContextSubtract.h"
 #include "ContextSpacing.h"
 #include "ContextCoverage.h"
