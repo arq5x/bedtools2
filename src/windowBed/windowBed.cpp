@@ -118,7 +118,7 @@ bool BedWindow::FindOneOrMoreWindowOverlaps(const BED &a) {
     CHRPOS aFudgeEnd;
     AddWindow(a, aFudgeStart, aFudgeEnd);
 
-    bool overlapsFound = _bedB->anyHits(a.chrom, a.start, a.end, a.strand, 
+    bool overlapsFound = _bedB->anyHits(a.chrom, aFudgeStart, aFudgeEnd, a.strand, 
                                         _matchOnSameStrand, _matchOnDiffStrand, 0.0, false);
     return overlapsFound;
 }
