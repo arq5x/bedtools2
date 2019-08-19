@@ -78,27 +78,31 @@ void BamToFastq::PairedFastq() {
     BamReader reader;
     reader.Open(_bamFile);
     // rip through the BAM file and convert each mapped entry to BEDPE
-    BamAlignment bam1, bam2;
-    bool shouldConsumeReads = true;
-    while (true) {
-        
-        if (shouldConsumeReads) {
-            if (!reader.GetNextAlignment(bam1) || !reader.GetNextAlignment(bam2)) break;
-        } else {
-            shouldConsumeReads = true;
+    BamAlignment bam1, bam2, nextRead;
+    reader.GetNextAlignment(nextRead);
+    bam1 = nextRead;
+    bool finishedBam;
+    finishedBam = false;
+    while (!finishedBam) {
+        // rip in all entries from this mate pair including multimappers
+        while(nextRead.Name == bam1.Name) {
+            if (nextRead.IsPaired() && nextRead.IsFirstMate()) {
+                bam1 = nextRead;
+            }
+            else if (nextRead.IsPaired() && nextRead.IsSecondMate()) {
+                bam2 = nextRead;
+            }
+            if (!reader.GetNextAlignment(nextRead)) {
+                finishedBam = true;
+                break;
+            }
         }
+
         if (bam1.Name != bam2.Name) {
-            while (bam1.Name != bam2.Name)
-            {
-                if (bam1.IsPaired()) 
-                {
-                    cerr << "*****WARNING: Query " << bam1.Name
-                         << " is marked as paired, but its mate does not occur"
-                         << " next to it in your BAM file.  Skipping. " << endl;
-                }
-                bam1 = bam2;
-                if (!reader.GetNextAlignment(bam2)) break;
-                shouldConsumeReads = false;
+            if (bam1.IsPaired()) {
+                cerr << "*****WARNING: Query " << bam1.Name
+                     << " is marked as paired, but its mate does not occur"
+                     << " next to it in your BAM file.  Skipping. " << endl;
             }
         }
         else if (bam1.IsPaired() && bam2.IsPaired()) {
@@ -125,6 +129,8 @@ void BamToFastq::PairedFastq() {
             fq2 << "+" << endl;
             fq2 << qual2 << endl;
         }
+        // set for next mate pair read group
+        bam1 = nextRead;
     }
     reader.Close();
 }
