@@ -141,7 +141,7 @@ echo "chr1	0	1
 chr1	500	900
 chr1	950	1000
 chr2	0	1000
-chr3	01000" > exp
+chr3	0	1000" > exp
 $BT complement -i issue_503.bed \
                -g issue_503.genome \
                > obs
