@@ -260,18 +260,6 @@ $BT genomecov -ibam chip.bam -bg -fs 100 > obs
 check obs exp
 rm obs exp
 
-<<<<<<< HEAD
-##################################################################
-#  Test chip with tn5
-##################################################################
-echo -e "    genomecov.t16...\c"
-echo \
-"chr1	5	76	1
-chr1	225	295	1" > exp
-$BT genomecov -ibam chip.bam -bg -tn5 > obs
-=======
-rm one_block.bam two_blocks.bam three_blocks.bam sam-w-del.bam pair-chip.bam chip.bam
-
 ##################################################################
 #  Make sure empty bam doesn't cause failure
 ##################################################################
@@ -282,7 +270,6 @@ echo \
 3	0	100	100	1
 genome	0	300	300	1" > exp
 $BT genomecov -ibam empty.bam > obs
->>>>>>> dff883bc60db22e71dfb0a6874e06aed3c4f212c
 check obs exp
 rm obs exp
 
@@ -297,16 +284,29 @@ CRAM_REFERENCE=test_ref.fa $BT genomecov -ibam empty.cram > obs
 check obs exp
 rm obs exp
 
+##################################################################
+#  Test chip with tn5
+##################################################################
+echo -e "    genomecov.t18...\c"
+echo \
+"chr1	5	76	1
+chr1	225	295	1" > exp
+$BT genomecov -ibam chip.bam -bg -tn5 > obs
+check obs exp
+rm obs exp
 
 ##################################################################
 #  Test chip with ext
 ##################################################################
-echo -e "    genomecov.t18...\c"
+echo -e "    genomecov.t19...\c"
 echo \
 "chr1	0	86	1
 chr1	215	310	1" > exp
 $BT genomecov -ibam chip.bam -bg -ext 10 > obs
 check obs exp
 rm obs exp
+
+
+rm one_block.bam two_blocks.bam three_blocks.bam sam-w-del.bam pair-chip.bam chip.bam
 
 [[ $FAILURES -eq 0 ]] || exit 1;
