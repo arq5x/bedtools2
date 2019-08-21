@@ -37,9 +37,9 @@ public:
     CHRPOS getGenomeSize(void) const { return _genomeLength; }                // return the total size of the genome
     CHRPOS getChromSize(const string &chrom);  // return the size of a chromosome
     CHRPOS getChromSize(const string &chrom) const;  // return the size of a chromosome
-    CHRPOS getChromId(const string &chrom); // return chromosome's sort order
+    uint32_t getChromId(const string &chrom); // return chromosome's sort order
     const vector<string> &getChromList() const { return _chromList; }  // return a list of chrom names
-    CHRPOS getNumberOfChroms() const { return _chromList.size() -1; }//the -1 excludes the blank chrom added for unmapped reads
+    uint32_t getNumberOfChroms() const { return (uint32_t)(_chromList.size() -1); }//the -1 excludes the blank chrom added for unmapped reads
     const string &getGenomeFileName() const { return _genomeFileName; }
     bool hasChrom(const string &chrom) const { return _chromSizeIds.find(chrom) != _chromSizeIds.end(); }
 
@@ -48,6 +48,7 @@ public:
 
 private:
     string  _genomeFileName;
+    istream   *_genomeFile;
     typedef map<string, pair<CHRPOS, int> > lookupType;
     lookupType _chromSizeIds;
     vector<string> _chromList;

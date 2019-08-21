@@ -29,7 +29,7 @@ protected:
 	size_t _queryLen;
 	size_t _totalQueryLen;
 	size_t _hitCount;
-	int _queryOffset;
+	CHRPOS _queryOffset;
 	static const int DEFAULT_DEPTH_CAPACITY = 1024;
 	char *_floatValBuf;
 	static const int floatValBufLen = 16;

@@ -134,7 +134,8 @@ bool Record::intersects(const Record *record,
                         float overlapFractionA,
                         float overlapFractionB,
                         bool reciprocalFraction,
-                        bool eitherFraction) const
+                        bool eitherFraction,
+                        bool obeySplits) const
 {
 	//must be on same chromosome
 	if (!sameChrom(record)) {
@@ -143,7 +144,7 @@ bool Record::intersects(const Record *record,
 	return sameChromIntersects(record,
                                sameStrand, diffStrand,
                                overlapFractionA, overlapFractionB,
-                               reciprocalFraction, eitherFraction);
+                               reciprocalFraction, eitherFraction, obeySplits);
 }
 
 bool Record::sameChromIntersects(const Record *record,
@@ -152,7 +153,8 @@ bool Record::sameChromIntersects(const Record *record,
                                  float overlapFractionA,
                                  float overlapFractionB,
                                  bool reciprocalFraction,
-                                 bool eitherFraction) const
+                                 bool eitherFraction,
+                                 bool obeySplits) const
 {
 	// Special: For records that are unmapped, intersect should automatically return false
 	if (_isUnmapped || record->isUnmapped()) {
@@ -172,12 +174,12 @@ bool Record::sameChromIntersects(const Record *record,
 	if (diffStrand && !isDiffStrand) {
 		return false; //want different, but they're not different.
 	}
-	int otherStart = record->getStartPos();
-	int otherEnd = record->getEndPos();
+	CHRPOS otherStart = record->getStartPos();
+	CHRPOS otherEnd = record->getEndPos();
 
 	bool otherZeroLen = (otherStart - otherEnd == 0);
-	int maxStart = max(_startPos, otherStart);
-	int minEnd = min(_endPos, otherEnd);
+	CHRPOS maxStart = max(_startPos, otherStart);
+	CHRPOS minEnd = min(_endPos, otherEnd);
 
 	bool localZeroLen = (_endPos - _startPos == 0);
 	//rule out all cases of no intersection at all
@@ -196,9 +198,9 @@ bool Record::sameChromIntersects(const Record *record,
 		return true;
 	}
 
-	int overlapBases = minEnd - maxStart;
-	int aLen = _endPos - _startPos;
-	int bLen = otherEnd - otherStart;
+	CHRPOS overlapBases = minEnd - maxStart;
+	CHRPOS aLen = _endPos - _startPos;
+	CHRPOS bLen = otherEnd - otherStart;
 
     float overlapA = (float)overlapBases / (float)aLen;
     float overlapB = (float)overlapBases / (float)bLen;
@@ -206,6 +208,15 @@ bool Record::sameChromIntersects(const Record *record,
     bool sufficentFractionA = (overlapA >= overlapFractionA);
     bool sufficentFractionB = (overlapB >= overlapFractionB);
 
+    // if there is any overlap at all, we need to consider if when
+    // -split is involved, as overlaps can span multiple
+    // database records and query chunks, so the final calculatiom
+    // of the overlap fractions must be handled in findBlockedOverlaps()
+    if ((overlapBases > 0) && (obeySplits == true))
+    {
+    	return true;
+    }
+    
     if (!eitherFraction)
     {
         if (sufficentFractionA && sufficentFractionB) { return true; }
@@ -288,7 +299,7 @@ void Record::print(FILE *fp, bool newline) const {
 	if(newline) fprintf(fp, "\n");
 }
 
-int Record::getLength(bool obeySplits) const {
+CHRPOS Record::getLength(bool obeySplits) const {
 	//only bed12 and BAM need to check splits
 	return _endPos - _startPos;
 }

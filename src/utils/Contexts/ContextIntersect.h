@@ -57,6 +57,9 @@ public:
 	bool getWriteCount() const {return _writeCount; }
 	void setWriteCount(bool val) { _writeCount = val; }
 
+	bool getWriteCountsPerDatabase() const {return _writeCountsPerDatabase; }
+	void setWriteCountsPerDatabase(bool val) { _writeCountsPerDatabase = val; }
+
 	bool getWriteOverlap() const {return _writeOverlap; }
 	void setWriteOverlap(bool val) { _writeOverlap = val; }
 
@@ -112,6 +115,7 @@ protected:
 	virtual bool handle_filenames();
 
 	virtual bool handle_c();
+	virtual bool handle_C();
 	virtual bool handle_f();
 	virtual bool handle_F();
 	virtual bool handle_loj();

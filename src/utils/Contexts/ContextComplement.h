@@ -15,8 +15,13 @@ class ContextComplement : public ContextBase {
 public:
 	ContextComplement();
 	virtual ~ContextComplement();
+  virtual bool parseCmdArgs(int argc, char **argv, int skipFirstArgs);
 	bool isValidState();
+  bool getOnlyChromsWithBedRecords() const { return _onlyChromsWithBedRecords; }
 
+private:
+  bool handle_limit_chroms();
+  bool _onlyChromsWithBedRecords;
 protected:
 
 };

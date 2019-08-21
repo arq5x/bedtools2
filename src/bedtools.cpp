@@ -68,8 +68,9 @@ int multibamcov_main(int argc, char* argv[]);//
 int multiintersect_main(int argc, char* argv[]);//
 int nuc_main(int argc, char* argv[]);//
 int pairtobed_main(int argc, char* argv[]);//
-int pairtopair_main(int argc, char* argv[]);//
+int pairtopair_main(int argc, char* argv[]);
 int random_main(int argc, char* argv[]); //
+void summary_help();
 int reldist_main(int argc, char* argv[]); //
 void sample_help();
 int shift_main(int argc, char* argv[]); //
@@ -113,7 +114,7 @@ int main(int argc, char *argv[])
     else if (subCmd == "window")      return window_main(argc-1, argv+1);
     else if (subCmd == "genomecov")   return genomecoverage_main(argc-1, argv+1);
     else if (subCmd == "cluster")     return cluster_main(argc-1, argv+1);
-	else if (subCmd == "shift")        return shift_main(argc-1, argv+1);
+	  else if (subCmd == "shift")       return shift_main(argc-1, argv+1);
     else if (subCmd == "slop")        return slop_main(argc-1, argv+1);
     else if (subCmd == "split")       return split_main(argc-1, argv+1);
     else if (subCmd == "flank")       return flank_main(argc-1, argv+1);
@@ -271,6 +272,7 @@ int bedtools_help(void)
     cout  << "    groupby       "  << "Group by common cols. & summarize oth. cols. (~ SQL \"groupBy\")\n";
     cout  << "    expand        "  << "Replicate lines based on lists of values in columns.\n";
     cout  << "    split         "  << "Split a file into multiple files with equal records or base pairs.\n"; 
+    cout  << "    summary       "  << "Statistical summary of intervals in a file.\n"; 
 
     cout  << endl;
     cout  << "[ General help ]" << endl;
@@ -322,7 +324,9 @@ void showHelp(const string &subCmd) {
 		complement_help();
 	} else if (subCmd == "groupby") {
 		groupby_help();
-	}
+	} else if (subCmd == "summary") {
+        summary_help();
+  }
 }
 
 void showErrors(const string &errors) 

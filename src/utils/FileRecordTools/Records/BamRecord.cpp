@@ -52,9 +52,10 @@ bool BamRecord::initFromFile(BamFileReader *bamFileReader)
 
 	_bamChromId = bamFileReader->getCurrChromdId();
 	_startPos = bamFileReader->getStartPos();
-	int2str(_startPos, _startPosStr);
+        // NOTE: casting to int here, but bam currently only supports int32_t for position
+	int2str((int)_startPos, _startPosStr);
 	_endPos = bamFileReader->getEndPos();
-	int2str(_endPos, _endPosStr);
+	int2str((int)_endPos, _endPosStr);
 	bamFileReader->getName(_name);
 	bamFileReader->getScore(_score);
 	char strandChar = bamFileReader->getStrand();
@@ -68,8 +69,8 @@ bool BamRecord::initFromFile(BamFileReader *bamFileReader)
 	buildCigarStr();
 
 	bamFileReader->getMateChrName(_mateChrName);
-	int2str(_bamAlignment.MatePosition, _matePos);
-	int2str(_bamAlignment.InsertSize, _insertSize);
+	int2str((CHRPOS)_bamAlignment.MatePosition, _matePos);
+	int2str((CHRPOS)_bamAlignment.InsertSize, _insertSize);
 	_queryBases = _bamAlignment.QueryBases;
 	_qualities = _bamAlignment.Qualities;
 
@@ -161,8 +162,8 @@ void BamRecord::printRemainingBamFields(string &outBuf, RecordKeyVector *keyList
             vector<int> blockStarts;
             for (RecordKeyVector::iterator_type iter = keyList->begin(); iter != keyList->end(); iter = keyList->next()) {
                     const Record *block = *iter;
-                    blockLengths.push_back(block->getEndPos() - block->getStartPos());
-                    blockStarts.push_back(block->getStartPos() - _startPos);
+                    blockLengths.push_back((int)(block->getEndPos() - block->getStartPos()));
+                    blockStarts.push_back((int)(block->getStartPos() - _startPos));
             }
 
             s << "\t";
@@ -268,19 +269,42 @@ void BamRecord::buildCigarStr() {
 	const vector<BamTools::CigarOp> &cigarData = _bamAlignment.CigarData;
 	size_t cigarVecLen = cigarData.size();
 	_cigarStr.clear();
-	_cigarStr.reserve(2 * cigarVecLen);
 
-	std::ostringstream tmp;
-	for (size_t i=0; i < cigarVecLen; i++) {
-		tmp << cigarData[i].Type;
-		tmp << cigarData[i].Length;
+	static char* buffer = NULL;
+	static size_t buffer_size = 0;
+
+	size_t new_buffer_size = buffer_size;
+
+	while(new_buffer_size < cigarVecLen * 11)
+		new_buffer_size = new_buffer_size == 0 ? 128 : new_buffer_size * 2;
+
+	if(new_buffer_size != buffer_size)
+	{
+		free(buffer);
+		buffer = (char*)malloc(new_buffer_size + 1);
+		buffer_size = new_buffer_size;
 	}
-	_cigarStr = tmp.str();
 
+
+	if(cigarVecLen)
+	{
+		char* ptr = buffer + buffer_size - 1;
+		ptr[1] = 0;
+
+		for (size_t i = cigarVecLen ; i > 0; i--) {
+			for(uint32_t val = cigarData[i - 1].Length; val > 0; val /= 10)
+				*ptr-- = (val % 10) + '0';
+			if(cigarData[i - 1].Length == 0)
+				*ptr-- = '0';
+			*ptr-- = cigarData[i - 1].Type;
+		}
+
+		_cigarStr.assign(ptr + 1, buffer + buffer_size - 1 - ptr);
+	}
 }
 
 
-int BamRecord::getLength(bool obeySplits) const {
+CHRPOS BamRecord::getLength(bool obeySplits) const {
 	//only bed12 and BAM need to check splits
 	if (!obeySplits) {
 		return _endPos - _startPos;
@@ -294,7 +318,7 @@ int BamRecord::getLength(bool obeySplits) const {
 	    		length += (int)cigarData[i].Length;
 	    	}
 	    }
-	    return length;
+	    return (CHRPOS)length;
 	}
 }
 

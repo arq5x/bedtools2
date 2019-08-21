@@ -22,14 +22,14 @@ class RecordMgr;
 
 class BlockMgr {
 public:
-	BlockMgr(float overlapFraction = 1E-9, bool hasReciprocal = false);
+	BlockMgr(float overlapFractionA = 1E-9f, float overlapFractionB = 1E-9f, bool hasReciprocal = false);
 	~BlockMgr();
 
 	void getBlocks(RecordKeyVector &keyList, bool &mustDelete);
 	void deleteBlocks(RecordKeyVector &keyList);
 
 	// Get the sum of the lengths of all blocks for a record.
-	int getTotalBlockLength(RecordKeyVector &keyList);
+	CHRPOS getTotalBlockLength(RecordKeyVector &keyList);
 
 	// Determine which hits in the hitList intersect the hits in the keyList by comparing all blocks in each
 	// and checking that their total intersection meets any overlapFraction and reciprocal criteria compared to
@@ -47,7 +47,7 @@ public:
 	void setBreakOnSkipOps(bool val) { _breakOnSkipOps = val; }
 	int getOverlapBases(int hitIdx) const { return _overlapBases[hitIdx]; }
 
-	Record *allocateAndAssignRecord(const Record *keyRecord, int startPos, int endPos);
+	Record *allocateAndAssignRecord(const Record *keyRecord, CHRPOS startPos, CHRPOS endPos);
 
 
 private:
@@ -56,7 +56,8 @@ private:
 	bool _breakOnSkipOps;
 	vector<int> _overlapBases;
 
-	float _overlapFraction;
+	float _overlapFractionA;
+	float _overlapFractionB;
 	bool _hasReciprocal;
 	Tokenizer _blockSizeTokens;
 	Tokenizer _blockStartTokens;

@@ -11,7 +11,6 @@ check()
 	else
     	FAILURES=$(expr $FAILURES + 1);
 		echo fail
-
 	fi
 }
 
@@ -118,4 +117,35 @@ $BT complement -i <(echo -e "chr1\t90\t110") \
                &> obs
 check obs exp
 rm obs exp
+[[ $FAILURES -eq 0 ]] || exit 1;
+
+###########################################################
+# -L only reports chroms that were in the BED file.
+###########################################################
+echo -e "    complement.t9...\c"
+echo "chr1	0	1
+chr1	500	900
+chr1	950	1000" > exp
+$BT complement -i issue_503.bed \
+               -g issue_503.genome \
+               -L \
+               > obs
+check obs exp
+rm obs exp
+
+###########################################################
+# Now, without -L
+###########################################################
+echo -e "    complement.t10...\c"
+echo "chr1	0	1
+chr1	500	900
+chr1	950	1000
+chr2	0	1000
+chr3	0	1000" > exp
+$BT complement -i issue_503.bed \
+               -g issue_503.genome \
+               > obs
+check obs exp
+rm obs exp
+
 [[ $FAILURES -eq 0 ]] || exit 1;

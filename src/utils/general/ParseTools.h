@@ -19,6 +19,8 @@
 
 using namespace std;
 
+typedef int64_t CHRPOS;
+
 bool isNumeric(const string &str);
 bool isInteger(const string &str);
 
@@ -27,8 +29,8 @@ bool isInteger(const string &str);
 //Empty strings, too long strings, or strings containing anything other than
 //digits (with the excpetion of a minus sign in the first position)
 //will result in error. Errors return INT_MIN.
-int str2chrPos(const char *str, size_t len = 0);
-int str2chrPos(const string &str);
+CHRPOS str2chrPos(const char *str, size_t len = 0);
+CHRPOS str2chrPos(const string &str);
 
 
 //int2str is faster but less flexible version of the ToString method in
@@ -37,43 +39,26 @@ int str2chrPos(const string &str);
 //assignment operater for char *, meaning it needs a T::operator = (const char *) method.
 //strings, strings, stringbuffers, and the like are acceptable.
 
-template<class T>
-void int2str(int number, T& buffer, bool appendToBuf = false)
+template<class T, class U>
+void int2str(U number, T& buffer, bool appendToBuf = false)
 {
-	if (number == 0) {
-		if (appendToBuf) {
-			buffer.append("0");
-		} else {
-			buffer = "0";
-		}
+	if(number == 0)
+	{
+		if(appendToBuf) buffer.append("0");
+		else buffer.assign("0", 1);
 		return;
 	}
-	//check for negative numbers.
-	bool isNegative = number < 0;
-	unsigned useNum = number;
-	if (isNegative) {
-		useNum = 0 - useNum; //convert to positive.
-	}
+	char tmp[12];
 
-	char tmpBuffer[numeric_limits<int>::digits10 + 3];
-	char *tmpBuf = &tmpBuffer[sizeof tmpBuffer];
-	*--tmpBuf = '\0';
+	bool neg = number < 0;
+	if(neg) number = -number;
+	uint32_t n;
+	for(n = 0; number; number /= 10)
+		tmp[12 - ++n] = number % 10 + '0';
+	if(neg) tmp[12 - ++n] = '-';
 
-	while (useNum > 0) {
-		*--tmpBuf = (useNum % 10) + '0';
-		useNum /= 10;
-	}
-
-	if (isNegative) {
-		*--tmpBuf = '-';
-	}
-
-	if (!appendToBuf) {
-		buffer = tmpBuf;
-	} else {
-		buffer.append(tmpBuf);
-	}
-
+	if(appendToBuf) buffer.append(tmp + 12 - n, n);
+	else buffer.assign(tmp + 12 - n, n);
 }
 
 bool isHeaderLine(const string &line);

@@ -44,7 +44,7 @@ WindowMaker::~WindowMaker(void) {}
 
 void WindowMaker::MakeWindowsFromGenome(const string& genomeFileName) {
 
-    GenomeFile *_genome = new GenomeFile(genomeFileName);
+    NewGenomeFile *_genome = new NewGenomeFile(genomeFileName);
 
     // get a list of the chroms in the user's genome
     vector<string> chromList = _genome->getChromList();
@@ -101,8 +101,8 @@ void WindowMaker::MakeFixedSizeWindow(const BED& interval) {
 }
 
 void WindowMaker::MakeFixedCountWindow(const BED& interval) {
-    uint32_t interval_size = interval.end - interval.start ;
-    uint32_t window_size = (interval_size)/_count; // integer version of ceil(interval_size/_count)
+    CHRPOS interval_size = interval.end - interval.start ;
+    CHRPOS window_size = (interval_size)/_count; // integer version of ceil(interval_size/_count)
 
     if (window_size == 0)
     {
@@ -127,9 +127,9 @@ void WindowMaker::MakeFixedCountWindow(const BED& interval) {
 
 
     uint32_t i=1;
-    for (uint32_t start = interval.start; start < interval.end; start += window_size, ++i) {
+    for (CHRPOS start = interval.start; start < interval.end; start += window_size, ++i) {
         string name = GenerateID(interval, i, _count, _reverse);
-        uint32_t end = min(start + window_size,interval.end);
+        CHRPOS end = min(start + window_size,interval.end);
 
         // extend range of last interval if necessary
         if (i == _count) 

@@ -13,11 +13,12 @@
 #include "api/BamAlignment.h"
 #include "api/BamAux.h"
 
-BlockMgr::BlockMgr(float overlapFraction, bool hasReciprocal)
+BlockMgr::BlockMgr(float overlapFractionA, float overlapFractionB, bool hasReciprocal)
 : 	_blockRecordsMgr(NULL),
   	_breakOnDeletionOps(false),
   	_breakOnSkipOps(true),
-  	_overlapFraction(overlapFraction),
+  	_overlapFractionA(overlapFractionA),
+  	_overlapFractionB(overlapFractionB),
   	_hasReciprocal(hasReciprocal)
 {
 	_blockRecordsMgr = new RecordMgr(_blockRecordsType);
@@ -67,8 +68,8 @@ void BlockMgr::getBlocksFromBed12(RecordKeyVector &keyList, bool &mustDelete)
     }
 
     for (int i=0; i < blockCount; i++) {
-    	int startPos = keyRecord->getStartPos() + str2chrPos(_blockStartTokens.getElem(i).c_str());
-    	int endPos = startPos + str2chrPos(_blockSizeTokens.getElem(i).c_str());
+    	CHRPOS startPos = keyRecord->getStartPos() + str2chrPos(_blockStartTokens.getElem(i).c_str());
+    	CHRPOS endPos = startPos + str2chrPos(_blockSizeTokens.getElem(i).c_str());
 
     	Record *record = allocateAndAssignRecord(keyRecord, startPos, endPos);
     	keyList.push_back(record);
@@ -80,8 +81,8 @@ void BlockMgr::getBlocksFromBam(RecordKeyVector &keyList, bool &mustDelete)
 {
 	const BamRecord *keyRecord = static_cast<const BamRecord *>(keyList.getKey());
 	const vector<BamTools::CigarOp> &cigarData = keyRecord->getCigarData();
-	int currPos = keyRecord->getStartPos();
-	int  blockLength = 0;
+	CHRPOS currPos = keyRecord->getStartPos();
+	CHRPOS blockLength = 0;
 
 	for (int i=0; i < (int)cigarData.size(); i++) {
 		char opType = cigarData[i].Type;
@@ -119,7 +120,7 @@ void BlockMgr::getBlocksFromBam(RecordKeyVector &keyList, bool &mustDelete)
 	mustDelete = true;
 }
 
-Record *BlockMgr::allocateAndAssignRecord(const Record *keyRecord, int startPos, int endPos)
+Record *BlockMgr::allocateAndAssignRecord(const Record *keyRecord, CHRPOS startPos, CHRPOS endPos)
 {
 	Record *record = _blockRecordsMgr->allocateRecord();
 	record->setChrName(keyRecord->getChrName());
@@ -129,8 +130,8 @@ Record *BlockMgr::allocateAndAssignRecord(const Record *keyRecord, int startPos,
 	return record;
 }
 
-int BlockMgr::getTotalBlockLength(RecordKeyVector &keyList) {
-	int sum = 0;
+CHRPOS BlockMgr::getTotalBlockLength(RecordKeyVector &keyList) {
+	CHRPOS sum = 0;
 	for (RecordKeyVector::iterator_type iter = keyList.begin(); iter != keyList.end(); iter = keyList.next()) {
 		const Record *record = *iter;
 		sum += record->getEndPos() - record->getStartPos();
@@ -155,7 +156,10 @@ int BlockMgr::findBlockedOverlaps(RecordKeyVector &keyList, RecordKeyVector &hit
 		getBlocks(keyList, deleteKeyBlocks);
 	}
 	_overlapBases.clear();
-	int keyBlocksSumLength = getTotalBlockLength(keyList);
+	CHRPOS keyBlocksSumLength = getTotalBlockLength(keyList);
+	CHRPOS totalHitOverlap = 0;
+	CHRPOS hitBlockSumLength = 0;
+	
 
 	//Loop through every database record the query intersected with
 	RecordKeyVector::iterator_type hitListIter = hitList.begin();
@@ -164,8 +168,8 @@ int BlockMgr::findBlockedOverlaps(RecordKeyVector &keyList, RecordKeyVector &hit
 		RecordKeyVector hitBlocks(*hitListIter);
 		bool deleteHitBlocks = false;
 		getBlocks(hitBlocks, deleteHitBlocks); //get all blocks for the hit record.
-		int hitBlockSumLength = getTotalBlockLength(hitBlocks); //get total length of the bocks for the hitRecord.
-		int totalHitOverlap = 0;
+		hitBlockSumLength += getTotalBlockLength(hitBlocks); //get total length of the bocks for the hitRecord.
+		
 		bool hitHasOverlap = false;
 
 		//loop through every block of the database record.
@@ -179,9 +183,9 @@ int BlockMgr::findBlockedOverlaps(RecordKeyVector &keyList, RecordKeyVector &hit
 				const Record *keyBlock = *keyListIter;
 				const Record *hitBlock = *hitBlockIter;
 
-				int maxStart = max(keyBlock->getStartPos(), hitBlock->getStartPos());
-				int minEnd = min(keyBlock->getEndPos(), hitBlock->getEndPos());
-				int overlap  = minEnd - maxStart;
+				CHRPOS maxStart = max(keyBlock->getStartPos(), hitBlock->getStartPos());
+				CHRPOS minEnd = min(keyBlock->getEndPos(), hitBlock->getEndPos());
+				CHRPOS overlap  = minEnd - maxStart;
 				if (overlap > 0) {
 					hitHasOverlap = true;
 					if (overlapList != NULL) {
@@ -191,22 +195,39 @@ int BlockMgr::findBlockedOverlaps(RecordKeyVector &keyList, RecordKeyVector &hit
 				}
 			}
 		}
-		if (hitHasOverlap) {
-			if ((float) totalHitOverlap / (float)keyBlocksSumLength >= _overlapFraction) {
-				if (_hasReciprocal &&
-						((float)totalHitOverlap / (float)hitBlockSumLength >= _overlapFraction)) {
-					_overlapBases.push_back(totalHitOverlap);
-					resultList.push_back(*hitListIter);
-				} else if (!_hasReciprocal) {
-					_overlapBases.push_back(totalHitOverlap);
-					resultList.push_back(*hitListIter);
-				}
-			}
+		// add the database record to the list of potential (i.e., subject to -f, -r, -F)
+		// hits if an overlap was observed
+		if (hitHasOverlap)
+		{
+			resultList.push_back(*hitListIter);
+			_overlapBases.push_back((int)totalHitOverlap);
 		}
 		if (deleteHitBlocks) {
 			deleteBlocks(hitBlocks);
 		}
 	}
+
+	// was there sufficient overlap with respect ot -a? if not, delete.
+	if ((float) totalHitOverlap / (float)keyBlocksSumLength < _overlapFractionA) 
+	{
+		resultList.clearAll();
+		_overlapBases.clear();
+	}
+	// was there sufficient overlap with respect ot -b? if not, delete.
+	if ((float)totalHitOverlap / (float)hitBlockSumLength < _overlapFractionB) 
+	{
+		resultList.clearAll();
+		_overlapBases.clear();
+	}	
+	// was there sufficient overlap with respect ot -b when using -r? if not, delete.
+	if (_hasReciprocal &&
+				((float)totalHitOverlap / (float)hitBlockSumLength < _overlapFractionA)) 
+	{
+		resultList.clearAll();
+		_overlapBases.clear();
+	}
+
+	// clean up
 	if (deleteKeyBlocks) {
 		deleteBlocks(keyList);
 	}

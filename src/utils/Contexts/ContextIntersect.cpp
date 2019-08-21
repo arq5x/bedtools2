@@ -62,6 +62,9 @@ bool ContextIntersect::parseCmdArgs(int argc, char **argv, int skipFirstArgs) {
         else if (strcmp(_argv[_i], "-c") == 0) {
 			if (!handle_c()) return false;
         }
+        else if (strcmp(_argv[_i], "-C") == 0) {
+			if (!handle_C()) return false;
+        }
         else if(strcmp(_argv[_i], "-r") == 0) {
 			if (!handle_r()) return false;
         }
@@ -134,7 +137,10 @@ bool ContextIntersect::isValidState()
 		_errorMsg = "\n***** ERROR: -r must be used solely with -f. *****";
 		return false;
 	}
-
+	if (_writeCount && (_reportDBfileNames || _reportDBnameTags)) {
+		_errorMsg = "\n***** ERROR: -c cannot be used with -filenames or -names. Use -C. *****";
+		return false;
+	}
 	// if -f and -r are given, then we need to set _overlapFractionB to be the same as _overlapFractionA
 	if (_haveFractionA && _reciprocalFraction) {
 		setOverlapFractionB(_overlapFractionA);
@@ -295,6 +301,12 @@ bool ContextIntersect::handle_c()
     return true;
 }
 
+bool ContextIntersect::handle_C()
+{
+    setWriteCountsPerDatabase(true);
+    markUsed(_i - _skipFirstArgs);
+    return true;
+}
 
 bool ContextIntersect::handle_f()
 {

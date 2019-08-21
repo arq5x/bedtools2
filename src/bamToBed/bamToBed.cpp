@@ -362,6 +362,8 @@ string BuildCigarString(const vector<CigarOp> &cigar) {
     for (size_t i = 0; i < cigar.size(); ++i) {
         switch (cigar[i].Type) {
             case ('M') :
+            case ('=') :
+            case ('X') :
             case ('I') :
             case ('D') :
             case ('N') :
@@ -501,12 +503,12 @@ void PrintBed(const BamAlignment &bam,  const RefVector &refs,
             BED curr = bedBlocks[i];
 
             if (bamTag == "") {
-                printf("%s\t%d\t%d\t%s\t%d\t%s\n", 
+                printf("%s\t%" PRId_CHRPOS "\t%" PRId_CHRPOS "\t%s\t%d\t%s\n",
                        chrom.c_str(), 
                        curr.start,
                        curr.end,
                        name.c_str(),
-                       bam.MapQuality,
+                       (uint16_t)bam.MapQuality,
                        strand.c_str());
             }
             else {
@@ -567,21 +569,22 @@ void PrintBed12(const BamAlignment &bam, const RefVector &refs,
     }
 
     // write the colors, etc.
-    printf("%d\t%d\t%s\t%d\t", bam.Position, alignmentEnd, 
+    printf("%" PRId_CHRPOS "\t%" PRId_CHRPOS "\t%s\t%d\t",
+                               (CHRPOS)bam.Position, alignmentEnd,
                                color.c_str(), (int) bedBlocks.size());
 
     // now write the lengths portion
     unsigned int b;
     for (b = 0; b < bedBlocks.size() - 1; ++b) {
-        printf("%d,", bedBlocks[b].end - bedBlocks[b].start);
+        printf("%" PRId_CHRPOS ",", bedBlocks[b].end - bedBlocks[b].start);
     }
-    printf("%d\t", bedBlocks[b].end - bedBlocks[b].start);
+    printf("%" PRId_CHRPOS "\t", bedBlocks[b].end - bedBlocks[b].start);
 
     // now write the starts portion
     for (b = 0; b < bedBlocks.size() - 1; ++b) {
-        printf("%d,", bedBlocks[b].start - bam.Position);
+        printf("%" PRId_CHRPOS ",", bedBlocks[b].start - bam.Position);
     }
-    printf("%d\n", bedBlocks[b].start - bam.Position);
+    printf("%" PRId_CHRPOS "\n", bedBlocks[b].start - bam.Position);
 }
 
 

@@ -35,49 +35,53 @@ Summary of available tools.
 bedtools support a  wide range of operations for  interrogating and manipulating genomic features. The table below summarizes
 the tools available in the suite.
 
-===========================      =========================================================================================================================================================
-Utility	                         Description
-===========================      =========================================================================================================================================================
-**annotate**                     Annotate coverage of features from multiple files.
-**bamtobed**                     Convert BAM alignments to BED (& other) formats.
-**bamtofastq**                   Convert BAM records to FASTQ records.
-**bed12tobed6**                  Breaks BED12 intervals into discrete BED6 intervals.
-**bedpetobam**                   Convert BEDPE intervals to BAM records.
-**bedtobam**                     Convert intervals to BAM records.
-**closest**                      Find the closest, potentially non-overlapping interval.
-**cluster**                      Cluster (but don't merge) overlapping/nearby intervals.
-**complement**                   Extract intervals _not_ represented by an interval file.
-**coverage**                     Compute the coverage over defined intervals.
-**expand**                       Replicate lines based on lists of values in columns.
-**flank**                        Create new intervals from the flanks of existing intervals.
-**genomecov**                    Compute the coverage over an entire genome.
-**getfasta**                     Use intervals to extract sequences from a FASTA file.
-**groupby**                      Group by common cols. & summarize oth. cols. (~ SQL "groupBy")
-**igv**                          Create an IGV snapshot batch script.
-**intersect**                    Find overlapping intervals in various ways.
-**jaccard**                      Calculate the Jaccard statistic b/w two sets of intervals.
-**links**                        Create a HTML page of links to UCSC locations.
-**makewindows**                  Make interval "windows" across a genome.
-**map**                          Apply a function to a column for each overlapping interval.
-**maskfasta**                    Use intervals to mask sequences from a FASTA file.
-**merge**                        Combine overlapping/nearby intervals into a single interval.
-**multicov**                     Counts coverage from multiple BAMs at specific intervals.
-**multiinter**                   Identifies common intervals among multiple interval files.
-**nuc**                          Profile the nucleotide content of intervals in a FASTA file.
-**overlap**                      Computes the amount of overlap from two intervals.
-**pairtobed**                    Find pairs that overlap intervals in various ways.
-**pairtopair**                   Find pairs that overlap other pairs in various ways.
-**random**                       Generate random intervals in a genome.
-**reldist**                      Calculate the distribution of relative distances b/w two files.
-**shift**                        Adjust the position of intervals.
-**shuffle**                      Randomly redistribute intervals in a genome.
-**slop**                         Adjust the size of intervals.
-**sort**                         Order the intervals in a file.
-**subtract**                     Remove intervals based on overlaps b/w two files.
-**tag**                          Tag BAM alignments based on overlaps with interval files.
-**unionbedg**                    Combines coverage intervals from multiple BEDGRAPH files.
-**window**                       Find overlapping intervals within a window around an interval.
-===========================      =========================================================================================================================================================
+===============================================        ========================================================================
+Utility	                                               Description
+===============================================        ========================================================================
+:doc:`tools/annotate`                                  Annotate coverage of features from multiple files.
+:doc:`tools/bamtobed`                                  Convert BAM alignments to BED (& other) formats.
+:doc:`tools/bamtofastq`                                Convert BAM records to FASTQ records.
+:doc:`tools/bed12tobed6`                               Breaks BED12 intervals into discrete BED6 intervals.
+:doc:`tools/bedpetobam`                                Convert BEDPE intervals to BAM records.
+:doc:`tools/bedtobam`                                  Convert intervals to BAM records.
+:doc:`tools/closest`                                   Find the closest, potentially non-overlapping interval.
+:doc:`tools/cluster`                                   Cluster (but don't merge) overlapping/nearby intervals.
+:doc:`tools/complement`                                Extract intervals _not_ represented by an interval file.
+:doc:`tools/coverage`                                  Compute the coverage over defined intervals.
+:doc:`tools/expand`                                    Replicate lines based on lists of values in columns.
+:doc:`tools/fisher`                                    Calculate Fisher statistic b/w two feature files.
+:doc:`tools/flank`                                     Create new intervals from the flanks of existing intervals.
+:doc:`tools/genomecov`                                 Compute the coverage over an entire genome.
+:doc:`tools/getfasta`                                  Use intervals to extract sequences from a FASTA file.
+:doc:`tools/groupby`                                   Group by common cols. & summarize oth. cols. (~ SQL "groupBy")
+:doc:`tools/igv`                                       Create an IGV snapshot batch script.
+:doc:`tools/intersect`                                 Find overlapping intervals in various ways.
+:doc:`tools/jaccard`                                   Calculate the Jaccard statistic b/w two sets of intervals.
+:doc:`tools/links`                                     Create a HTML page of links to UCSC locations.
+:doc:`tools/makewindows`                               Make interval "windows" across a genome.
+:doc:`tools/map`                                       Apply a function to a column for each overlapping interval.
+:doc:`tools/maskfasta`                                 Use intervals to mask sequences from a FASTA file.
+:doc:`tools/merge`                                     Combine overlapping/nearby intervals into a single interval.
+:doc:`tools/multicov`                                  Counts coverage from multiple BAMs at specific intervals.
+:doc:`tools/multiinter`                                Identifies common intervals among multiple interval files.
+:doc:`tools/nuc`                                       Profile the nucleotide content of intervals in a FASTA file.
+:doc:`tools/overlap`                                   Computes the amount of overlap from two intervals.
+:doc:`tools/pairtobed`                                 Find pairs that overlap intervals in various ways.
+:doc:`tools/pairtopair`                                Find pairs that overlap other pairs in various ways.
+:doc:`tools/random`                                    Generate random intervals in a genome.
+:doc:`tools/reldist`                                   Calculate the distribution of relative distances b/w two files.
+:doc:`tools/sample`                                    Sample random records from file using reservoir sampling.
+:doc:`tools/shift`                                     Adjust the position of intervals.
+:doc:`tools/shuffle`                                   Randomly redistribute intervals in a genome.
+:doc:`tools/slop`                                      Adjust the size of intervals.
+:doc:`tools/sort`                                      Order the intervals in a file.
+:doc:`tools/spacing`                                   Sample random records from file using reservoir sampling.
+:doc:`tools/split`                                     Split a file into multiple files with equal records or base pairs.
+:doc:`tools/subtract`                                  Remove intervals based on overlaps b/w two files.
+:doc:`tools/tag`                                       Tag BAM alignments based on overlaps with interval files.
+:doc:`tools/unionbedg`                                 Combines coverage intervals from multiple BEDGRAPH files.
+:doc:`tools/window`                                    Find overlapping intervals within a window around an interval.
+===============================================        ========================================================================
 
 
 

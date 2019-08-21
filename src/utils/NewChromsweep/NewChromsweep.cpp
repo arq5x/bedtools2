@@ -296,7 +296,8 @@ bool NewChromSweep::intersects(const Record *rec1, const Record *rec2) const
                                      _context->getOverlapFractionA(),
                                      _context->getOverlapFractionB(),
                                      _context->getReciprocalFraction(),
-                                     _context->getEitherFraction());
+                                     _context->getEitherFraction(),
+                                     _context->getObeySplits());
 }
 
 

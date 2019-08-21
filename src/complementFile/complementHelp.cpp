@@ -16,6 +16,10 @@ void complement_help(void) {
 
     cerr << "Usage:   " << "bedtools complement" << " [OPTIONS] -i <bed/gff/vcf> -g <genome>" << endl << endl;
 
+    cerr << "Options: " << endl;
+
+    cerr << "\t-L\t"       << "Limit output to solely the chromosomes with records in the input file." << endl << endl;
+
     cerr << "Notes: " << endl;
     cerr << "\t(1)  The genome file should tab delimited and structured as follows:" << endl;
     cerr << "\t     <chromName><TAB><chromSize>" << endl << endl;

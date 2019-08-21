@@ -78,6 +78,7 @@ public:
 	}
 
 	const BamTools::RefVector &getBamReferences();
+	refs_t* getCramRefs();
 
 	int getNumFields() const { return _fileReader->getNumFields(); }
 
@@ -107,6 +108,8 @@ public:
 	void setNoEnforceCoordSort(bool val) { _noEnforceCoordSort = val; }
 	void setIsGroupBy(bool val) { _isGroupBy = val; }
 
+	bool isCram() const { return _isCram; }
+
 protected:
 	int _fileIdx;
 	string _filename;
@@ -123,7 +126,7 @@ protected:
 	//members for enforcing sorted order.
         std::set<string> _foundChroms;
 	string _prevChrom;
-	int _prevStart;
+	CHRPOS _prevStart;
 	int _prevChromId;
 
 
@@ -141,6 +144,7 @@ protected:
 	int _ioBufSize;
 	bool _noEnforceCoordSort; //only true for GroupBy
 	bool _isGroupBy; //hopefully also only true for GroupBy
+	bool _isCram;
 
 	void allocateFileReader(bool inheader=false);
 	void testInputSortOrder(Record *record);

@@ -11,7 +11,6 @@
 #include <climits>
 #include <sstream>
 #include <iomanip>
-#include <inttypes.h>
 #include <getopt.h>
 #include "lineFileUtilities.h"
 #include "version.h"
@@ -277,7 +276,7 @@ int BedSplit::doSimpleSplit()
 
 int BedSplit::doEuristicSplitOnTotalSize()
     {
-    double total_bases = 0.0;
+    long double total_bases = 0.0;
     vector<BedSplitItems*> splits;
     loadBed();
    

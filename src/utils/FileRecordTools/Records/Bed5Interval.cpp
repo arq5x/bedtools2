@@ -30,7 +30,7 @@ void Bed5Interval::print(string &outBuf) const
 	outBuf.append(_score);
 }
 
-void Bed5Interval::print(string &outBuf, int start, int end) const
+void Bed5Interval::print(string &outBuf, CHRPOS start, CHRPOS end) const
 {
 	Bed3Interval::print(outBuf, start, end);
 	outBuf.append("\t");

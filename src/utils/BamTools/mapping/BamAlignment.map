@@ -1,0 +1,12 @@
+int32_t RefID ==> int32_t core.tid
+int32_t Position ==> int32_t core.pos
+int32_t MatePosition ==> int32_t core.mpos
+int32_t MateRefID ==> int32_t core.mtid
+int32_t InsertSize ==> int32_t core.isize
+int32_t Length ==> int32_t core.l_qseq
+uint32_t Bin ==> uint32_t core.bin
+int16_t MapQuality ==> int32_t core.qual
+int32_t AlignmentFlag ==> int32_t core.flag
+uint32_t NumCigarOperations ==> uint32_t core.n_cigar
+uint32_t QueryNameLength ==> uint32_t core.l_qname
+uint32_t QuerySequenceLength ==> uint32_t core.l_qseq

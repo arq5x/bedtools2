@@ -67,7 +67,7 @@ echo "chr1	.	2" | $BT merge -i - 2> o \
 	&& failedtofail || true;
 tail -n 5 o > obs
 check obs exp
-rm obs exp
+rm o obs exp
 
 
 
@@ -76,7 +76,7 @@ rm obs exp
 ###########################################################
 echo -e "    general.t05...\c"
 echo \
-"chr1 1 2" | $BT merge -i - 2> obs \
+"chr1 1 2" | $BT merge -i - 2> o \
 	&& failedtofail || true;
 echo "Error: unable to open file or unable to determine types for file -
 
@@ -85,7 +85,7 @@ echo "Error: unable to open file or unable to determine types for file -
   expected columns (e.g., cols 2 and 3 for BED)." >> exp
 tail -n 5 o > obs
 check obs exp
-rm obs exp
+rm o obs exp
 
 ###########################################################
 #  Fail on non-existent files.

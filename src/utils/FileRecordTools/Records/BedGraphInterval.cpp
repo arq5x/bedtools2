@@ -27,7 +27,7 @@ void BedGraphInterval::print(string &outBuf) const
 	outBuf.append(_name);
 }
 
-void BedGraphInterval::print(string &outBuf, int start, int end) const
+void BedGraphInterval::print(string &outBuf, CHRPOS start, CHRPOS end) const
 {
 	Bed3Interval::print(outBuf, start, end);
 	outBuf.append("\t");

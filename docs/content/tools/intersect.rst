@@ -73,7 +73,8 @@ Option                         Description
 **-wo** 	                     Write the original A and B entries plus the number of base pairs of overlap between the two features. Only A features with overlap are reported. Restricted by -f and -r.
 **-wao** 	   	                 Write the original A and B entries plus the number of base pairs of overlap between the two features. However, A features w/o overlap are also reported with a NULL B feature and overlap = 0. Restricted by -f and -r.
 **-u**		                     Write original A entry once if any overlaps found in B. In other words, just report the fact at least one overlap was found in B. Restricted by -f and -r.
-**-c** 		                     For each entry in A, report the number of hits in B while restricting to -f. Reports 0 for A entries that have no overlap with B. Restricted by -f and -r.
+**-c** 		                     For each entry in A, report the number of hits in B while restricting to -f. Reports 0 for A entries that have no overlap with B. Restricted -f, -F, -r, and -s.
+**-C**                         For each entry in A, separately report the number of overlaps with each B file on a distinct line. Reports 0 for A entries that have no overlap with B. Overlaps restricted by -f, -F, -r, and -s.
 **-v**	 	                     Only report those entries in A that have no overlap in B. Restricted by -f and -r.
 **-f**		                     Minimum overlap required as a fraction of A. Default is 1E-9 (i.e. 1bp).
 **-F**                         Minimum overlap required as a fraction of B. Default is 1E-9 (i.e., 1bp).
@@ -502,7 +503,67 @@ features found in "B". Therefore, *each feature in A is reported once*.
     chr1    10    20    2
     chr1    30    40    0
 
+The `-c` option can also work with multiple -B files. In this case, the reported count will reflect the total number of intersections observed across _all_ `-B` files. It will not report a separate count for each database file. This can be achieved with the `-C` option.
 
+
+.. code-block:: bash
+
+    $ cat A.bed
+    chr1    10    20
+    chr1    30    40
+
+    $ cat B.bed
+    chr1    15  20
+    chr1    18  25
+
+    $ cat C.bed
+    chr1    16  21
+    chr1    19  26
+
+    $ bedtools intersect -a A.bed -b B.bed -c
+    chr1    10    20    4
+    chr1    30    40    0
+
+==========================================================================
+``-C`` Reporting the number of overlapping features for each database file
+==========================================================================
+Unlike the the `-c` option, in the case of multiple `-B` files, the `-C` option will  report a separate count for each database file. 
+
+.. code-block:: bash
+
+    $ cat A.bed
+    chr1    10    20
+    chr1    30    40
+
+    $ cat B.bed
+    chr1    15  20
+    chr1    18  25
+
+    $ cat C.bed
+    chr1    16  21
+    chr1    19  26
+
+    $ bedtools intersect -a A.bed -b B.bed -C
+    chr1    10    20    1 2
+    chr1    10    20    2 2
+    chr1    30    40    1 0
+    chr1    30    40    1 0
+
+If you would like to see more useful information than the file _number_ from which the counts came, one can use the `-filenames` or `-names` options.
+
+.. code-block:: bash
+
+    $ bedtools intersect -a A.bed -b B.bed -C -filenames
+    chr1    10    20    A.bed 2
+    chr1    10    20    B.bed 2
+    chr1    30    40    A.bed 0
+    chr1    30    40    B.bed 0
+
+    $ bedtools intersect -a A.bed -b B.bed -C -names a b
+    chr1    10    20    a 2
+    chr1    10    20    b 2
+    chr1    30    40    a 0
+    chr1    30    40    b 0
 
 
 =======================================================================

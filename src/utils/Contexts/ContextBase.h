@@ -55,6 +55,7 @@ public:
 
 	const string &getHeader(int fileIdx) { return _files[fileIdx]->getHeader(); }
 	const BamTools::RefVector &getBamReferences(int fileIdx)  { return _files[fileIdx]->getBamReferences(); }
+	refs_t* getCramRefs(int fileIdx) { return _files[fileIdx]->getCramRefs(); }
 	int getBamHeaderAndRefIdx(); //return idx of 1st query that is BAM. If none, first DB that is BAM.
 
 	bool getUseMergedIntervals() const { return _useMergedIntervals; }
@@ -154,6 +155,8 @@ public:
 
     string getErrorMessages() const { return _errorMsg; }
 
+	bool isCram() const { return _isCram; }
+
 protected:
 	PROGRAM_TYPE _program;
 
@@ -186,6 +189,7 @@ protected:
     bool _writeB;
     bool _leftJoin;
     bool _writeCount;
+    bool _writeCountsPerDatabase;
     bool _writeOverlap;
     bool _writeAllOverlap;
     bool _haveFractionA;
@@ -211,6 +215,7 @@ protected:
     int _bamHeaderAndRefIdx;
     int _maxNumDatabaseFields;
     bool _useFullBamTags;
+	bool _isCram;   // Used when a "BAM" type which is actually a CRAM
 
 	int _numOutputRecords;
 

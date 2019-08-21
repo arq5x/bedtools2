@@ -8,6 +8,8 @@
 #ifndef BINTREE_H_
 #define BINTREE_H_
 
+#include "BedtoolsTypes.h"
+
 #include <stdint.h>
 #include <string>
 #include <set>
@@ -21,6 +23,9 @@ using namespace std;
 
 class FileRecordMgr;
 class Record;
+
+typedef int64_t binNumType;
+static const binNumType _binOffsetsExtended[] = {262144+32678+4096+512+64+8+1, 32678+4096+512+64+8+1, 4096+512+64+8+1, 512+64+8+1, 64+8+1, 8+1, 1, 0};
 
 class BinTree {
 public:
@@ -37,28 +42,18 @@ private:
     //
     // BIN HANDLING
     //
-	typedef int32_t binNumType;
-	static const binNumType NUM_BINS = 37450;
-	static const binNumType NUM_BIN_LEVELS = 7;
+        typedef int64_t binNumType;
 
-	// bins range in size from 16kb to 512Mb
-	// Bin  0          spans 512Mbp,   # Level 1
-	// Bins 1-8        span 64Mbp,     # Level 2
-	// Bins 9-72       span 8Mbp,      # Level 3
-	// Bins 73-584     span 1Mbp       # Level 4
-	// Bins 585-4680   span 128Kbp     # Level 5
-	// Bins 4681-37449 span 16Kbp      # Level 6
-	binNumType *_binOffsetsExtended;
+#define PRId_BINNUMTYPE PRId64
+
+	// bins range in size from 16kb to 32Gb
+	static const binNumType NUM_BIN_LEVELS = 8;
+
 	static const binNumType _binFirstShift = 14;       /* How much to shift to get to finest bin. */
 	static const binNumType _binNextShift  = 3;        /* How much to shift to get to next larger bin. */
 
-//	typedef RecordList innerListType;
-//	typedef const RecordListNode * innerListIterType;
-//	typedef innerListType * binType;
-//	typedef binType * allBinsType;
-//	typedef string mainKeyType;
-//	typedef map<mainKeyType, allBinsType> mainMapType;
-//	mainMapType _mainMap;
+	static const binNumType NUM_BINS = (1 << (_binNextShift * NUM_BIN_LEVELS)) / ((1 << _binNextShift) - 1);
+
 
 	typedef vector<Record *> binType;
 	typedef map<binNumType, binType> allBinsType; //for each bin number, have a RecordList

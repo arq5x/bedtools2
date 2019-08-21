@@ -1,5 +1,7 @@
 set -e; # Alert user to any uncaught error
 
+ulimit -c unlimited
+
 STARTWD=$(pwd);
 TOOL_PASSES="";
 TOOL_FAILURES="";
