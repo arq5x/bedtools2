@@ -33,12 +33,12 @@ Details
 First created through urgency and adrenaline by Aaron Quinlan Spring 2009. 
 Maintained by the Quinlan Laboratory at the University of Virginia.
 
-1. **Lead developers**:           Aaron Quinlan, Neil Kindlon
+1. **Lead developers**:           Aaron Quinlan, Hao Hoou, Brent Pedersen, Neil Kindlon
 2. **Significant contributions**: Assaf Gordon, Royden Clark, John Marshall, Brent Pedersen, Ryan Dale
 3. **Repository**:                https://github.com/arq5x/bedtools2
 4. **Stable releases**:           https://github.com/arq5x/bedtools2/releases
 5. **Documentation**:             http://bedtools.readthedocs.org
-6. **License**:                   Released under GNU public license version 2 (GPL v2).
+6. **License**:                   Released under MIT license
 
 
 Citation
