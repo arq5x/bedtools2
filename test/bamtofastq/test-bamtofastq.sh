@@ -13,13 +13,13 @@ check()
 	fi
 }
 
-samtools view -Sb test.sam > test.bam 2> /dev/null
+samtools view -Sb test2.sam > test2.bam 2> /dev/null
 
-$BT bamtofastq -i test.bam -fq test.fq -fq2 test.fq2 2> /dev/null
+$BT bamtofastq -i test2.bam -fq test2.fq -fq2 test2.fq2 2> /dev/null
 
-check test.fq golden.fq
-check test.fq2 golden.fq2
+check test2.fq golden.fq
+check test2.fq2 golden.fq2
 
-rm test.bam test.fq test.fq2
+rm test2.bam test2.fq test2.fq2
 
 [[ $FAILURES -eq 0 ]] || exit 1;
