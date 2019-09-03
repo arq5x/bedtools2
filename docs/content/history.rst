@@ -2,6 +2,20 @@
 Release History
 ###############
 
+Version 2.29.0 (3-Sep-2019)
+============================
+1. Added a new `-C` option to the `intersect` tool that separately reports the count of intersections observed for each database (`-b`) file given. Formerly, the `-c` option reported to sum of all intersections observed across all database files.
+2. Fixed an important `bug <https://github.com/arq5x/bedtools2/issues/750>`_ in `intersect` that prevented some split reads from being counted properly with using the `-split` option with the `-f` option.
+3. Fixed a bug in `shuffle` such that shuffled regions should have the same strand as the chose `-incl` region.
+4. Added a new `-L` option to `L`imit the output of the `complement` tool to solely the chromosomes that are represented in the `-i` file.
+5. Fixed a regression in the `multicov` tool introduced in 2.28 that caused incorrect counts.
+6. Added support for multi-mapping reads in the `bamtofastq` tool.
+7. Fixed a `bug <https://github.com/arq5x/bedtools2/issues/301>`_ that prevented the "window" tool from properly adding interval "slop" to BAM records. 
+8. Fixed a `bug <https://github.com/arq5x/bedtools2/issues/195>`_ that caused the `slop` tool to not truncate an interval's end coordinate when it overlapped the end of a chromosome.
+9. Added support for the "=" and "X" CIGAR operations to `bamtobed`.
+10. Various other minor bug fixes and improvements to documentation.
+
+
 Version 2.28.0 (23-Mar-2019)
 ============================
 1. Included support for htslib to enable CRAM support and long-term stability (Thanks to Hao Hou!)
