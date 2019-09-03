@@ -15,8 +15,12 @@ check()
 
 samtools view -Sb one_block.sam > one_block.bam 2>/dev/null
 samtools view -Sb two_blocks.sam > two_blocks.bam 2>/dev/null
+samtools view -Sb test-multi.sam > test-multi.bam 2>/dev/null
+samtools view -Sb test-multi.2.sam > test-multi.2.bam 2>/dev/null
 samtools index one_block.bam
 samtools index two_blocks.bam
+samtools index test-multi.bam
+samtools index test-multi.2.bam
 
 ##################################################################
 #  Test one block matches all BEDs
@@ -136,6 +140,18 @@ check obs exp
 rm obs exp
 
 
+##################################################################
+#  Test when one of the iterator returns an empty set
+##################################################################
+echo -e "    multicov.t10...\c"
+echo \
+"chr1	0	250	4	0
+chr1	500	1000	0	4"	>	exp
+$BT multicov -bams test-multi.bam test-multi.2.bam -bed test-multi.bed > obs
+check obs exp
+rm obs exp
 
-rm *.bam
+
+
+rm *.bam *.bai
 [[ $FAILURES -eq 0 ]] || exit 1;
