@@ -358,7 +358,8 @@ namespace BamTools {
 
 			for(auto& sam: _files)
 			{
-				if(!_read_sam_file(sam))
+				_error_str = "";
+				if(!_read_sam_file(sam) && _error_str != "")
 					return false;
 			}
 
