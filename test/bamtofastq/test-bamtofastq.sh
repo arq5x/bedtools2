@@ -6,7 +6,7 @@ FAILURES=0;
 check()
 {
 	if diff $1 $2; then
-    	echo ok
+		echo ok
 	else
     	FAILURES=$(expr $FAILURES + 1);
 		echo fail
