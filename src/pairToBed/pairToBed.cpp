@@ -179,13 +179,13 @@ void BedIntersectPE::FindOverlaps(const BEDPE &a, vector<BED> &hits1, vector<BED
     }
     else if (type == "both") {
         if ( (numOverlapsEnd1 > 0) && (numOverlapsEnd2 > 0) ) {
-            for (vector<BED>::iterator q = qualityHits1.begin(); q != qualityHits1.end(); ++q) {
+            for (vector<BED>::iterator q1 = qualityHits1.begin(); q1 != qualityHits1.end(); ++q1) {
                 _bedA->reportBedPETab(a);
-                _bedB->reportBedNewLine(*q);
+                _bedB->reportBedNewLine(*q1);
             }
-            for (vector<BED>::iterator q = qualityHits2.begin(); q != qualityHits2.end(); ++q) {
+            for (vector<BED>::iterator q2 = qualityHits2.begin(); q2 != qualityHits2.end(); ++q2) {
                 _bedA->reportBedPETab(a);
-                _bedB->reportBedNewLine(*q);
+                _bedB->reportBedNewLine(*q2);
             }
         }
     }

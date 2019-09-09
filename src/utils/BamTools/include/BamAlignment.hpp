@@ -259,6 +259,7 @@ namespace BamTools {
 		{
 			memset(&_bam, 0, sizeof(_bam));
 			bam_copy1(&_bam, ba.HtsObj());
+			Name = ba.Name;
 			CigarData = ba.CigarData;
 			QueryBases = ba.QueryBases;
 			Qualities = ba.Qualities;
@@ -319,7 +320,7 @@ namespace BamTools {
 			return !(_bam.core.flag & BAM_FUNMAP);
 		}
 
-		bool IsMateMapped() const
+		inline bool IsMateMapped() const
 		{
 			return !(_bam.core.flag & BAM_FMUNMAP);
 		}

@@ -37,8 +37,8 @@ BamToFastq::~BamToFastq(void) {}
 
 void BamToFastq::SingleFastq() {
     // open the 1st fastq file for writing
-    ofstream fq(_fastq1.c_str(), ios::out);
-    if ( !fq ) {
+    _fq = new ofstream(_fastq1.c_str(), ios::out);
+    if ( !*_fq1 ) {
         cerr << "Error: The first fastq file (" << _fastq1 << ") could not be opened.  Exiting!" << endl;
         exit (1);
     }
@@ -54,23 +54,23 @@ void BamToFastq::SingleFastq() {
             reverseComplement(seq);
             reverseSequence(qual);
         }
-        fq << "@" << bam.Name << endl;
-        fq << seq << endl;
-        fq << "+" << endl;
-        fq << qual << endl;
+        *_fq << "@" << bam.Name << endl;
+        *_fq << seq << endl;
+        *_fq << "+" << endl;
+        *_fq << qual << endl;
     }
 }
 
 void BamToFastq::PairedFastq() {
     // open the 1st fastq file for writing
-    ofstream fq1(_fastq1.c_str(), ios::out);
-    if ( !fq1 ) {
+    _fq1 = new ofstream(_fastq1.c_str(), ios::out);
+    if ( !*_fq1 ) {
         cerr << "Error: The first fastq file (" << _fastq1 << ") could not be opened.  Exiting!" << endl;
         exit (1);
     }
     // open the 2nd fastq file for writing
-    ofstream fq2(_fastq2.c_str(), ios::out);
-    if ( !fq2 ) {
+    _fq2 = new ofstream(_fastq2.c_str(), ios::out);
+    if ( !*_fq2 ) {
         cerr << "Error: The second fastq file (" << _fastq2 << ") could not be opened.  Exiting!" << endl;
         exit (1);
     }
@@ -78,75 +78,180 @@ void BamToFastq::PairedFastq() {
     BamReader reader;
     reader.Open(_bamFile);
     // rip through the BAM file and convert each mapped entry to BEDPE
-    BamAlignment bam1, bam2, nextRead;
-    reader.GetNextAlignment(nextRead);
-    bam1 = nextRead;
-    bool finishedBam;
-    finishedBam = false;
-    while (!finishedBam) {
-        // rip in all entries from this mate pair including multimappers
-        while(nextRead.Name == bam1.Name) {
-            if (nextRead.IsPaired() && nextRead.IsFirstMate()) {
-                bam1 = nextRead;
-            }
-            else if (nextRead.IsPaired() && nextRead.IsSecondMate()) {
-                bam2 = nextRead;
-            }
-            if (!reader.GetNextAlignment(nextRead)) {
-                finishedBam = true;
-                break;
+    vector<BamAlignment> alignments;
+    string prevName = "";
+    string currName = "";
+    BamAlignment curr;
+    while (reader.GetNextAlignment(curr)) {
+        currName = curr.Name;
+        if ((currName != prevName) && (prevName != "")) 
+        {
+            WritePairs(alignments);
+            alignments.clear();
+            alignments.push_back(curr);
+        }
+        else {
+            if (curr.IsPaired())
+            {
+                alignments.push_back(curr);
             }
         }
-
-        if (bam1.Name != bam2.Name) {
-            if (bam1.IsPaired()) {
-                cerr << "*****WARNING: Query " << bam1.Name
-                     << " is marked as paired, but its mate does not occur"
-                     << " next to it in your BAM file.  Skipping. " << endl;
-            }
-        }
-        else if (bam1.IsPaired() && bam2.IsPaired()) {
-            // extract the sequence and qualities for the BAM "query"
-            string seq1  = bam1.QueryBases;
-            string qual1 = bam1.Qualities;
-            string seq2  = bam2.QueryBases;
-            string qual2 = bam2.Qualities;
-            if (bam1.IsReverseStrand() == true) {
-                reverseComplement(seq1);
-                reverseSequence(qual1);
-            }
-            if (bam2.IsReverseStrand() == true) {
-                reverseComplement(seq2);
-                reverseSequence(qual2);
-            }
-            fq1 << "@" << bam1.Name << "/1" << endl;
-            fq1 << seq1 << endl;
-            fq1 << "+" << endl;
-            fq1 << qual1 << endl;
-            
-            fq2 << "@" << bam2.Name << "/2" << endl;
-            fq2 << seq2 << endl;
-            fq2 << "+" << endl;
-            fq2 << qual2 << endl;
-        }
-        // set for next mate pair read group
-        bam1 = nextRead;
+        prevName = currName;
     }
+    WritePairs(alignments);
     reader.Close();
 }
 
+void BamToFastq::WritePairs(vector<BamAlignment> &alignments) 
+{
+    string seq1, seq2;
+    string qual1, qual2;
+    string queryName;
+    if (alignments.size() == 1)
+    {
+        cerr << "*****WARNING: Query " << alignments[0].Name
+             << " is marked as paired, but its mate does not occur"
+             << " next to it in your BAM file.  Skipping. " << endl;
+        return;
+    }
+    else if (alignments.size() == 2)
+    {
+        queryName = alignments[0].Name;
+        BamAlignment curr = alignments[0];
+        if (alignments[0].IsFirstMate() && alignments[1].IsSecondMate())
+        {
+            seq1  = alignments[0].QueryBases;
+            qual1 = alignments[0].Qualities;
+            seq2  = alignments[1].QueryBases;
+            qual2 = alignments[1].Qualities;
+            if (alignments[0].IsReverseStrand() == true) {
+                reverseComplement(seq1);
+                reverseSequence(qual1);
+            }
+            if (alignments[1].IsReverseStrand() == true) {
+                reverseComplement(seq2);
+                reverseSequence(qual2);
+            }
+        }
+        else if (alignments[0].IsSecondMate() && alignments[1].IsFirstMate())
+        {
+            seq1  = alignments[1].QueryBases;
+            qual1 = alignments[1].Qualities;
+            seq2  = alignments[0].QueryBases;
+            qual2 = alignments[0].Qualities;
+            if (alignments[1].IsReverseStrand() == true) {
+                reverseComplement(seq1);
+                reverseSequence(qual1);
+            }
+            if (alignments[0].IsReverseStrand() == true) {
+                reverseComplement(seq2);
+                reverseSequence(qual2);
+            }
+        }
+        else {
+            cerr << "*****WARNING: Query " << alignments[0].Name
+                 << " is marked as paired, but first and/or second mates"
+                 << " were not found in your BAM file.  Skipping. " << endl;
+            return;
+        }
+    }
+    else if (alignments.size() > 2)
+    {
+        queryName = alignments[0].Name;
+        size_t mateIndex = 0;
+        if (alignments[0].IsFirstMate())
+        {
+            for (size_t i = 1; i < alignments.size(); ++i)
+            {
+                if (alignments[i].IsSecondMate())
+                {
+                    mateIndex = i;
+                    break;
+                }
+            }
+            if (mateIndex > 0)
+            {
+                seq1  = alignments[0].QueryBases;
+                qual1 = alignments[0].Qualities;
+                seq2  = alignments[mateIndex].QueryBases;
+                qual2 = alignments[mateIndex].Qualities;
+                if (alignments[0].IsReverseStrand() == true) {
+                    reverseComplement(seq1);
+                    reverseSequence(qual1);
+                }
+                if (alignments[mateIndex].IsReverseStrand() == true) {
+                    reverseComplement(seq2);
+                    reverseSequence(qual2);
+                }
+            }
+            else {
+                cerr << "*****WARNING: Query " << alignments[0].Name
+                    << " is marked as paired, but only was found"
+                    << " in your BAM file.  Skipping. " << endl;
+                return;
+            }
+        }
+        else if (alignments[0].IsSecondMate())
+        {
+            for (size_t i = 1; i < alignments.size(); ++i)
+            {
+                if (alignments[i].IsFirstMate())
+                {
+                    mateIndex = i;
+                    break;
+                }
+            }
+            if (mateIndex > 0)
+            {
+                seq2  = alignments[0].QueryBases;
+                qual2 = alignments[0].Qualities;
+                seq1  = alignments[mateIndex].QueryBases;
+                qual1 = alignments[mateIndex].Qualities;
+                if (alignments[0].IsReverseStrand() == true) {
+                    reverseComplement(seq1);
+                    reverseSequence(qual1);
+                }
+                if (alignments[mateIndex].IsReverseStrand() == true) {
+                    reverseComplement(seq2);
+                    reverseSequence(qual2);
+                }
+            }
+            else {
+                cerr << "*****WARNING: Query " << alignments[0].Name
+                    << " is marked as paired, but only was found"
+                    << " in your BAM file.  Skipping. " << endl;
+                return;
+            }
+        }
+        else {
+            cerr << "*****WARNING: Query " << alignments[0].Name
+                 << " is marked as paired, but first and/or second mates"
+                 << " were not found in your BAM file.  Skipping. " << endl;
+            return;
+        }
+    }
+    *_fq1 << "@" << queryName << "/1" << endl;
+    *_fq1 << seq1 << endl;
+    *_fq1 << "+" << endl;
+    *_fq1 << qual1 << endl;
+    
+    *_fq2 << "@" << queryName << "/2" << endl;
+    *_fq2 << seq2 << endl;
+    *_fq2 << "+" << endl;
+    *_fq2 << qual2 << endl;
+}
 
 void BamToFastq::PairedFastqUseTags() {
 
     // open the 1st fastq file for writing
-    ofstream fq1(_fastq1.c_str(), ios::out);
-    if ( !fq1 ) {
+    _fq1 = new ofstream(_fastq1.c_str(), ios::out);
+    if ( !*_fq1 ) {
         cerr << "Error: The first fastq file (" << _fastq1 << ") could not be opened.  Exiting!" << endl;
         exit (1);
     }
     // open the 2nd fastq file for writing
-    ofstream fq2(_fastq2.c_str(), ios::out);
-    if ( !fq2 ) {
+    _fq2 = new ofstream(_fastq2.c_str(), ios::out);
+    if ( !*_fq2 ) {
         cerr << "Error: The second fastq file (" << _fastq2 << ") could not be opened.  Exiting!" << endl;
         exit (1);
     }
@@ -192,27 +297,27 @@ void BamToFastq::PairedFastqUseTags() {
             //      and revcomped if necessary
             if (bam1.IsFirstMate() == true) {
                 // end1
-                fq1 << "@" << bam1.Name << "/1" << endl;
-                fq1 << seq1 << endl;
-                fq1 << "+" << endl;
-                fq1 << qual1 << endl;
+                *_fq1 << "@" << bam1.Name << "/1" << endl;
+                *_fq1 << seq1 << endl;
+                *_fq1 << "+" << endl;
+                *_fq1 << qual1 << endl;
                 // end2
-                fq2 << "@" << bam1.Name << "/2" <<endl;
-                fq2 << mateSequence << endl;
-                fq2 << "+" << endl;
-                fq2 << mateQualities << endl;
+                *_fq2 << "@" << bam1.Name << "/2" <<endl;
+                *_fq2 << mateSequence << endl;
+                *_fq2 << "+" << endl;
+                *_fq2 << mateQualities << endl;
             }
             else {
                 // end 2
-                fq2 << "@" << bam1.Name << "/2" <<endl;
-                fq2 << seq1 << endl;
-                fq2 << "+" << endl;
-                fq2 << qual1 << endl;
+                *_fq2 << "@" << bam1.Name << "/2" <<endl;
+                *_fq2 << seq1 << endl;
+                *_fq2 << "+" << endl;
+                *_fq2 << qual1 << endl;
                 // end 1
-                fq1 << "@" << bam1.Name << "/1" <<endl;
-                fq1 << mateSequence << endl;
-                fq1 << "+" << endl;
-                fq1 << mateQualities << endl;
+                *_fq1 << "@" << bam1.Name << "/1" <<endl;
+                *_fq1 << mateSequence << endl;
+                *_fq1 << "+" << endl;
+                *_fq1 << mateQualities << endl;
             }
         }
     }

@@ -42,6 +42,7 @@ private:
     void SingleFastq();
     void PairedFastq();
     void PairedFastqUseTags();
+    void WritePairs(vector<BamAlignment> &alignments);
 
     string _bamFile;
 
@@ -49,6 +50,8 @@ private:
     BamAlignment _end2;
 
     string _fastq1, _fastq2;    // the names of the fastq output files
+    ofstream *_fq, *_fq1, *_fq2;
+
     bool _useMateTags;          // whether or not the mate sequence should be 
                                 // extracted from the R2 BAM tag.
     bool _pairedEnd;
