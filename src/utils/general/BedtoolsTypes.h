@@ -24,7 +24,7 @@
 //STL headers
 #include <utility> //include pair and make_pair
 #include <vector>
-#include <set>
+#include <unordered_set>
 #include <map>
 
 using namespace std;

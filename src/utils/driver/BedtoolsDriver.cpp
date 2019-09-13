@@ -30,21 +30,21 @@
 #include "summaryFile.h"
 
 BedtoolsDriver::BedtoolsDriver()
-: _hadError(false) {
-	_supported.insert("intersect");
-	_supported.insert("map");
-	_supported.insert("closest");
-	_supported.insert("merge");
-	_supported.insert("jaccard");
-	_supported.insert("subtract");
-	_supported.insert("sample");
-	_supported.insert("spacing");
-	_supported.insert("fisher");
-	_supported.insert("coverage");
-	_supported.insert("complement");
-	_supported.insert("groupby");
-	_supported.insert("summary");
-}
+: _supported({
+  	"intersect",
+  	"map",
+  	"closest",
+  	"merge",
+  	"jaccard",
+  	"subtract",
+  	"sample",
+  	"spacing",
+  	"fisher",
+  	"coverage",
+  	"complement",
+  	"groupby",
+  	"summary"
+  }), _hadError(false) {}
 
 
 bool BedtoolsDriver::supports(const string &tool) {

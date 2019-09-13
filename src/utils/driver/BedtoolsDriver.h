@@ -12,7 +12,7 @@ public:
 	string getErrors() const { return _errors; }
 protected:
 	string _subCmd;
-	typedef set<string> supportType;
+	typedef unordered_set<string> supportType;
 	supportType _supported;
 	bool _hadError;
 	string _errors;
