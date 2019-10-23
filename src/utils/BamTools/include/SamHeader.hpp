@@ -7,6 +7,41 @@
 #include <string.h>
 #include <api/BamAux.h>
 #include <stdlib.h>
+
+
+#ifdef WITH_HTS_CB_API
+#include <htslib/hfile.h>
+namespace htslib_future {
+	static inline ssize_t buf_write(void* data, const void* buf, size_t sz) 
+	{
+		std::string* buffer = static_cast<std::string*>(data);
+
+		buffer->append((const char*)buf, sz);
+
+		return sz;
+	}
+	static inline int sam_hdr_rebuild(bam_hdr_t* hdr) 
+	{
+		std::string* buffer = new std::string();
+		hFILE_callback_ops ops;
+		memset(&ops, 0, sizeof(ops));
+		ops.write = buf_write;
+		ops.cb_data = buffer;
+		samFile* fp = hts_open_callback(NULL, &ops, "w");
+
+		sam_hdr_write(fp, hdr);
+
+		hts_close(fp);
+
+		hdr->l_text = buffer->length();
+		hdr->text = strdup(buffer->c_str());
+		delete buffer;
+
+		return 0;
+	}
+}
+#endif
+
 namespace BamTools {
 
 	typedef std::vector<RefData> RefVector;
@@ -30,6 +65,9 @@ namespace BamTools {
 			: _header(hdr), _filename(filename), SortOrder(_defulat_sort_order), Version(_defualt_version),  GroupOrder(_default_group_order) 
 		{
 			char* buf = (char*)malloc(1024);
+#ifdef WITH_HTS_CB_API
+			htslib_future::sam_hdr_rebuild(_header);
+#endif
 			size_t len = _header->text == NULL ? 0 : strlen(_header->text);
 			size_t sz = 0;
 			for(size_t i = 0; i <= len; i ++)
@@ -66,58 +104,8 @@ namespace BamTools {
 
 		void ParseHeaderText(const std::string& text)
 		{
-			_header = bam_hdr_init();
-			int sq = 0;
-			const char* ptr = text.c_str();
-			std::vector<uint32_t> target_size;
-			std::vector<std::string> target_name;
-			size_t sz = 0;
-			char* buf = (char*)malloc(1024);
-			for(;;ptr++)
-			{
-				if(*ptr &&  *ptr != ' ' &&  *ptr != '\n' && *ptr != '\t' && *ptr != '\n')
-				{
-					if(sz >= 1024) buf = (char*)realloc(buf, text.length() + 1);
-					buf[sz++] = *ptr;
-				}
-				else
-				{
-					if(sz > 0)
-					{
-						buf[sz] = 0;
-						if(sq == 1)
-						{
-							target_name.push_back(buf + 3);
-							sq = 2;
-						}
-						else if(sq == 2)
-						{
-							target_size.push_back(atoi(buf + 3));
-							sq = 0;
-						}
-						if(strcmp(buf, "@SQ") == 0)
-							sq = 1;
-					}
-					sz = 0;
-				}
-				if(*ptr == 0) break;
-			}
-
-			free(buf);
-
-			_header->n_targets = target_size.size();
-			_header->l_text = text.length();
-			_header->target_len = (uint32_t*)malloc(sizeof(uint32_t) * _header->n_targets);
-			_header->target_name = (char**)malloc(sizeof(char*) * _header->n_targets);
-
-			for(int i = 0; i < _header->n_targets; i++)
-			{
-				_header->target_len[i] = target_size[i];
-				_header->target_name[i] = strdup(target_name[i].c_str());
-			}
-
+			_header = sam_hdr_parse(text.length(), text.c_str());
 			_header->text = strdup(text.c_str());
-
 		}
 		void destory() 
 		{

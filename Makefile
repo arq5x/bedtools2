@@ -16,6 +16,7 @@ CCPREFIX =
 else
 CCPREFIX = @
 endif
+
 OBJ_DIR	= obj
 BIN_DIR	= bin
 SRC_DIR	= src
@@ -148,7 +149,7 @@ DEPFLAGS = -MT $@ -MMD -MP -MF $*.Td
 
 define CXX_COMPILE
 @echo "  * compiling $<"
-$(CCPREFIX)$(CXX) $(ALL_CXXFLAGS) $(ALL_CPPFLAGS) $(DEPFLAGS) -c -o $@ $<
+$(CCPREFIX) $(CC_WRAPPER) $(CXX) $(ALL_CXXFLAGS) $(ALL_CPPFLAGS) $(DEPFLAGS) -c -o $@ $<
 @mv -f $*.Td $*.d
 endef
 
@@ -170,7 +171,7 @@ $(BUILT_OBJECTS): | $(OBJ_DIR)
 
 $(BIN_DIR)/bedtools: autoversion $(BUILT_OBJECTS) $(HTSDIR)/libhts.a | $(BIN_DIR)
 	@echo "- Building main bedtools binary."
-	$(CCPREFIX)$(CXX) $(ALL_LDFLAGS) -o $(BIN_DIR)/bedtools $(BUILT_OBJECTS) $(HTSDIR)/libhts.a $(ALL_LIBS)
+	$(CCPREFIX) $(CC_WRAPPER) $(CXX) $(ALL_LDFLAGS) -o $(BIN_DIR)/bedtools $(BUILT_OBJECTS) $(HTSDIR)/libhts.a $(ALL_LIBS)
 	@echo "done."
 
 $(BIN_DIR)/intersectBed: | $(BIN_DIR)
