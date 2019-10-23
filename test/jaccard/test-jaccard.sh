@@ -158,4 +158,11 @@ $BT jaccard -a a645.bed -b b645.bed > obs
 check obs exp
 rm obs  exp
 
+echo -e "    jaccard.t16...\c"
+echo -e "intersection	union	jaccard	n_intersections
+247800000	615800000	0.402403	4" > exp
+$BT jaccard -a long.bed -b short.bed > obs
+check obs exp
+rm obs  exp
+
 [[ $FAILURES -eq 0 ]] || exit 1;
