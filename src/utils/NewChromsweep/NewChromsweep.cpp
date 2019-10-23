@@ -70,13 +70,15 @@ void NewChromSweep::closeOut(bool testChromOrderVal) {
     if (_testLastQueryRec) {
         testChromOrder(_currQueryRec);
     }
+    bool should_test_last_rec = true;
     while (!_queryFRM->eof()) {
         nextRecord(true);
         testChromOrder(_currQueryRec);
         _queryFRM->deleteRecord(_currQueryRec);
+		should_test_last_rec = false;
     }
     if (testChromOrderVal) {
-        testChromOrder(_currQueryRec);
+        if(should_test_last_rec) testChromOrder(_currQueryRec);
         for (int i=0; i < _numDBs; i++) {
             while (!_dbFRMs[i]->eof()) {
                 if (testChromOrderVal) testChromOrder(_currDbRecs[i]);
