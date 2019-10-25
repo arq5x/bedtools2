@@ -78,6 +78,11 @@ void BedSlop::AddSlop(BED &bed) {
     // strand and the user cares about strandedness.
     CHRPOS chromSize = (CHRPOS)_genome->getChromSize(bed.chrom);
 
+	if(chromSize < 0) {
+		cerr << "* Input error: Chromosome " << bed.chrom << " doesn't present in the .genome file. *" << endl;
+		exit(1);
+	}
+
 	bool should_swap = _forceStrand && bed.strand == "-";
 	long left_slop = should_swap ? (long)_rightSlop : (long)_leftSlop;
 	long right_slop = should_swap ? (long)_leftSlop : (long)_rightSlop;
