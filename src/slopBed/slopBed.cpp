@@ -67,88 +67,27 @@ void BedSlop::SlopBed() {
    }
    _bed->Close();
 }
-
-
+static inline long _normalize_coord(long size, long pos) {
+	if(pos < 0) return 0;
+	if(size >= 0 && pos > size) return size;
+	return pos;
+}
 void BedSlop::AddSlop(BED &bed) {
 
     // special handling if the BED entry is on the negative
     // strand and the user cares about strandedness.
     CHRPOS chromSize = (CHRPOS)_genome->getChromSize(bed.chrom);
 
-    if ( (_forceStrand) && (bed.strand == "-") ) {
-        if ( ((int)bed.start - (long)_rightSlop) >= 0 ) {
-          // if the _rightSlop is negative and pushes bed.start to be > chromSize 0, set to chromSize
-            if (((int)bed.start - (long)_rightSlop) >= chromSize && _rightSlop < 0) {
-                bed.start = chromSize;  
-            }
-            else {
-                bed.start = bed.start - (long)_rightSlop;
-            }
-            // checking if start is already outside of chrom bounds.
-            // issue #195
-            if((bed.start >= chromSize) || ((bed.start + (CHRPOS)_leftSlop) >= chromSize))
-            {
-                bed.start = chromSize;
-            }
-        }
-        else {
-            bed.start = 0;
-        }
-        if ( ((int)bed.end + (long)_leftSlop) <= chromSize ) {
-            // if the _leftSlop is negative and pushes bed.end to be < 0, set to 0
-            if((((int)bed.end + (int)_leftSlop) <= 0) && _leftSlop < 0) {
-                bed.end = 0;
-            }
-            else {
-                bed.end = bed.end + (int)_leftSlop;
-            }
-        }    
-        else {
-            
-            bed.end = chromSize;
-        }
-    }
-    // strand is +
-    else 
-    {
-        if ( (bed.start - (CHRPOS)_leftSlop) >= 0 ) {
-            // checking negative condition for _leftSlop
-            if( (bed.start - (CHRPOS)_leftSlop) >= chromSize && _leftSlop < 0)
-            {
-              bed.start = chromSize;
-            }
-            else {
-              bed.start = bed.start - (CHRPOS)_leftSlop;
-            }
-            // checking if start is already outside of chrom bounds.
-            // issue #195
-            if((bed.start >= chromSize) || ((bed.start + (CHRPOS)_leftSlop) >= chromSize))
-            {
-                bed.start = chromSize;
-            }
-        }
-        else 
-        {
-            bed.start = 0;
-        }
+	bool should_swap = _forceStrand && bed.strand == "-";
+	long left_slop = should_swap ? (long)_rightSlop : (long)_leftSlop;
+	long right_slop = should_swap ? (long)_leftSlop : (long)_rightSlop;
 
-        if ( (bed.end + (CHRPOS)_rightSlop) <= chromSize )
-        {
-            // checking negative _rightSlop condition
-            if( (bed.end + (CHRPOS)_rightSlop) <= 0 && _rightSlop < 0) 
-            {
-                bed.end = 0;
-            }
-            else 
-            {
-                bed.end = bed.end + (CHRPOS)_rightSlop;            
-            }
-        }
-        else
-        {
-            bed.end = chromSize; 
-        }
-    }
+	bed.start -= left_slop;
+	bed.end += right_slop;
+
+	bed.start = _normalize_coord(chromSize, bed.start);
+	bed.end = _normalize_coord(chromSize, bed.end);
+
     //checking edge case and adjusting
     if( bed.start == bed.end && bed.start == chromSize ){
       bed.start -= 1;
