@@ -181,7 +181,7 @@ protected:
     bool _obeySplits;
     bool _uncompressedBam;
     bool _useBufferedOutput;
-    int _ioBufSize;
+    size_t _ioBufSize;
 
 	bool _anyHit;
     bool _noHit;

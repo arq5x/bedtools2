@@ -941,7 +941,6 @@ check exp obs
 rm exp obs
 [[ $FAILURES -eq 0 ]] || exit 1;
 
-
 ###########################################################
 #  Test intersect with bam has no text header
 ############################################################
@@ -956,6 +955,16 @@ GA5:3:49:1480:1116#0	16	dummy_chr	11913868	37	76M	*	0	0	GGGAGGAGGCCAGGACTTCAGGGA
 GA5:3:61:213:1812#0	16	dummy_chr	13030396	37	76M	*	0	0	GGTCCGGCGGGGTCGGACTGGACCAGCTGTTGGGCTTTGTTTGCTCTTTTTACGAATTGAAAAACTGAAGCCAGGA	/=81,5948=485=4,),1;;7:87:6=;;@@AB=C8A@@BAB=>5>BBBB>BBAAA9ABA@B4B;BBBBBBBBCB	XT:A:U	NM:i:1	X0:i:1	X1:i:0	XM:i:1	XO:i:0	XG:i:0	MD:Z:0T75
 GA5:3:116:1581:552#0	16	dummy_chr	15055984	37	76M	*	0	0	AGAAAGCCTAAGGTCAGGGTGCCAGCAGGTTTGGTGTCTGGTGAGGTACCCATCTCTGCTTCTAAGGCAGAGCCTT	48887429,3=;98<8<8@;<=?8@??98@@@<=AA>@@?B?A@@BA6BA@=@BABBB???B@BBBBBABBCBB?B	XT:A:U	NM:i:0	X0:i:1	X1:i:0	XM:i:0	XO:i:0	XG:i:0	MD:Z:76" > exp
 $BT intersect -a notexthdr.bam -b notexthdr.bam | samtools view > obs
+check exp obs
+rm exp obs
+[[ $FAILURES -eq 0 ]] || exit 1;
+
+###########################################################
+#  Test intersect with 2G io buffer, shouldn't overflow
+############################################################
+echo -e "    intersect.new.t77...\c"
+echo -n "" > exp
+$BT intersect -iobuf 2G -ubam -S -u -sorted -b a.bam -a a.bed >obs
 check exp obs
 rm exp obs
 [[ $FAILURES -eq 0 ]] || exit 1;
