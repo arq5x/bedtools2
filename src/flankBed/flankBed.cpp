@@ -84,36 +84,42 @@ void BedFlank::AddFlank(BED &bed, int leftFlank, int rightFlank) {
     // we'll create the flanks from these coordinates.
     BED left  = bed;
     BED right = bed;
+    // split of feature bed to be similar to BedFlank::AddStrandedFlank
+    BED feature = bed;
     
     left.zeroLength = false;
     right.zeroLength = false;
     
     // make the left flank (if necessary)
-    if ((leftFlank > 0) && (left.start != 0)) {
-        if ( (static_cast<int>(left.start) - leftFlank) > 0) 
+    // do not report a left flank if the left feature start is already
+    // the very first base of the scaffold
+    if ((leftFlank > 0) && (feature.start != 0)) {
+        if ( (static_cast<int>(feature.start) - leftFlank) > 0)
         {
-            left.end    = left.start;
+            left.end    = feature.start;
             left.start -= leftFlank;
         }
         else 
         {
-            left.end    = left.start;
+            left.end    = feature.start;
             left.start  = 0;
         }
         // report the left flank
         _bed->reportBedNewLine(left);
     }
     
-    // make the left flank (if necessary)
-    if (rightFlank > 0) {
-        if ( (static_cast<int>(right.end) + static_cast<int>(rightFlank+1))
+    // make the right flank (if necessary)
+    // Do not flank if the right flank of the feature (which is feature.end)
+    // is already last base of scaffold
+    if (rightFlank > 0 && (feature.end < chromSize) ) {
+        if ( (static_cast<int>(feature.end) + static_cast<int>(rightFlank+1))
              <= static_cast<int>(chromSize)) 
         {
-            right.start    = right.end;
+            right.start    = feature.end;
             right.end     += (rightFlank);
         }
         else {
-            right.start    = right.end;
+            right.start    = feature.end;
             right.end      = chromSize;
         }
         // report the right flank
@@ -131,20 +137,23 @@ void BedFlank::AddStrandedFlank(BED &bed, int leftFlank, int rightFlank) {
     }
 
     // init. our left and right flanks to the original BED entry.
-    // we'll create the flanks from these coordinates.
     BED left  = bed;
     BED right = bed;
+    // separate feature bed file because when calling both left and right flanks otherwise gives conflicts
+    BED feature = bed;
     
-    // make the left flank (if necessary)
-    if (rightFlank > 0) {
-        if ( (static_cast<int>(left.start) - rightFlank) > 0) 
+    // make the right flank (if necessary)
+    // Do not flank if the right flank of the feature (which is feature.start)
+    // since in reverse strand is first base of scaffold
+    if (rightFlank > 0 && (feature.start != 0)) {
+        if ( (static_cast<int>(feature.start) - rightFlank) > 0)
         {
-            left.end    = left.start;
+            left.end    = feature.start;
             left.start -= rightFlank;
         }
         else 
         {
-            left.end    = left.start;
+            left.end    = feature.start;
             left.start  = 0;
         }
         // report the left flank
@@ -152,14 +161,23 @@ void BedFlank::AddStrandedFlank(BED &bed, int leftFlank, int rightFlank) {
     }
     
     // make the left flank (if necessary)
-    if (leftFlank > 0) {
-        if ( (static_cast<int>(right.end) + leftFlank) <= static_cast<int>(chromSize)) 
+    // left.start is on the right side of the feature because feature is on reverse strand
+    // do not report a left flank if the feature.end is already last base of the scaffold
+    // coordinates here are BED so end is exclusive
+    // in BED coords, this will create a zero length feature with flank.start == flank.end
+    // however when converting however to GFF, the start will get +1
+    // and so the feature start will be 1 higher than the end
+    // resulting in errors in further bed tools
+    // you would create a left flank that has as left.start the feature.end coordinate
+    // so end needs to be smaller than chromsize to have at least 1 flanking base
+    if (leftFlank > 0 && (feature.end < chromSize) ) {
+        if ( (static_cast<int>(feature.end) + leftFlank) <= static_cast<int>(chromSize))
         {
-            right.start    = right.end;
+            right.start    = feature.end;
             right.end     += leftFlank;
         }
         else {
-            right.start    = right.end;
+            right.start    = feature.end;
             right.end      = chromSize;
         }
         // report the right flank
