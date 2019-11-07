@@ -187,10 +187,10 @@ namespace BamTools {
 		bool SyncExtraData() const
 		{
 #define BAM_DATA_OFFSET(what) ((size_t)(((uint8_t*)bam_get_##what(&_bam)) - ((uint8_t*)_bam.data)))
-			void* qname_buf = _ensure_data_chunk((bam1_t*)&_bam, BAM_DATA_OFFSET(qname), _bam.core.l_qname, Name.size());
+			void* qname_buf = _ensure_data_chunk((bam1_t*)&_bam, BAM_DATA_OFFSET(qname), _bam.core.l_qname, Name.size() + 1);
 			if(NULL == qname_buf) return false;
-			memcpy(qname_buf, Name.c_str(), Name.size());
-			((bam1_t*)&_bam)->core.l_qname = Name.size();
+			memcpy(qname_buf, Name.c_str(), Name.size() + 1);
+			((bam1_t*)&_bam)->core.l_qname = Name.size() + 1;
 
 			uint32_t* cigar_buf = (uint32_t*)_ensure_data_chunk((bam1_t*)&_bam, BAM_DATA_OFFSET(cigar), _bam.core.n_cigar * sizeof(uint32_t), sizeof(uint32_t) * CigarData.size());
 			if(NULL == cigar_buf) return false;
