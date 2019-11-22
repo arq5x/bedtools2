@@ -10,7 +10,7 @@ aaronquinlan@gmail.com
 Licenced under the GNU General Public License 2.0 license.
 ******************************************************************************/
 #include "bedFile.h"
-#include "GenomeFile.h"
+#include "NewGenomeFile.h"
 
 #include "BlockedIntervals.h"
 #include "api/BamReader.h"
@@ -81,7 +81,7 @@ private:
     string _requestedStrand;
 
     BedFile *_bed;
-    GenomeFile *_genome;
+    NewGenomeFile *_genome;
 
     // data for internal processing
     chromDepthMap _chromCov;

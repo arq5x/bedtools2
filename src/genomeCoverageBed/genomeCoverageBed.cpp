@@ -50,7 +50,7 @@ BedGenomeCoverage::BedGenomeCoverage(string bedFile, string genomeFile,
 
 
     if (_bamInput == false) {
-        _genome = new GenomeFile(genomeFile);
+        _genome = new NewGenomeFile(genomeFile);
     }
 
     PrintTrackDefinitionLine();
@@ -101,7 +101,6 @@ void BedGenomeCoverage::StartNewChrom(const string& newChrom) {
         ReportChromCoverage(_currChromCoverage, _currChromSize,
                 _currChromName, _currChromDepthHist);
     }
-
     // empty the previous chromosome and reserve new
     std::vector<DEPTH>().swap(_currChromCoverage);
 
@@ -128,7 +127,7 @@ void BedGenomeCoverage::StartNewChrom(const string& newChrom) {
 
 void BedGenomeCoverage::AddCoverage(CHRPOS start, CHRPOS end) {
     // process the first line for this chromosome.
-    // make sure the coordinates fit within the chrom
+    // make sure the coordinates fit within the chrom 
     if (start < _currChromSize)
         _currChromCoverage[start].starts++;
     if (end >= 0 && end < _currChromSize)
@@ -190,8 +189,9 @@ void BedGenomeCoverage::CoverageBed() {
                 CHRPOS pos = ( a.strand=="-" ) ? a.start : a.end-1;
                 AddCoverage(pos,pos);
             }
-            else
+            else {
                 AddCoverage(a.start, a.end-1);
+            }
         }
     }
     _bed->Close();
@@ -256,7 +256,7 @@ void BedGenomeCoverage::CoverageBam(string bamFile) {
     RefVector refs = reader.GetReferenceData();
 
     // load the BAM header references into a BEDTools "genome file"
-    _genome = new GenomeFile(refs);
+    _genome = new NewGenomeFile(refs);
     // convert each aligned BAM entry to BED
     // and compute coverage on B
     BamAlignment bam;
