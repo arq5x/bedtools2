@@ -286,4 +286,14 @@ CRAM_REFERENCE=test_ref.fa $BT genomecov -ibam empty.cram > obs
 check obs exp
 rm obs exp
 
+
+##################################################################
+#  Make sure zero sized chromosome doesn't cause segfault
+##################################################################
+echo -e "    genomecov.t18...\c"
+echo -n  "" > exp
+$BT genomecov -i y.bed -g zero-sized-genome.txt > obs
+check obs exp
+rm obs exp
+
 [[ $FAILURES -eq 0 ]] || exit 1;

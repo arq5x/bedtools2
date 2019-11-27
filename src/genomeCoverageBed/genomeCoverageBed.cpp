@@ -130,6 +130,10 @@ void BedGenomeCoverage::StartNewChrom(const string& newChrom) {
 
 
 void BedGenomeCoverage::AddCoverage(CHRPOS start, CHRPOS end) {
+	// If we have a chromSize of 0, it means we should stop here 
+	// since there's nothing to track at all.
+	if(_currChromSize == 0) return;
+
     // process the first line for this chromosome.
     // make sure the coordinates fit within the chrom 
     if (start < _currChromSize)
