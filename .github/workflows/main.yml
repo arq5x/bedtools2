@@ -9,10 +9,12 @@ jobs:
 
     steps:
     - uses: actions/checkout@v1
+    - name: Install samtools
+      run: sudo apt-get install -y samtools 
     - name: Compile and test Bedtools
-      run: make && make test
+      run: make -j8 && make test
     - name: Compile static binary
-      run:  make static
+      run:  make -j8 static
     - uses: actions/upload-artifact@v1
       with:
           name: bedtools.static
