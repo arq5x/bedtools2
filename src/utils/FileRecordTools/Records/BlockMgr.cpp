@@ -156,9 +156,13 @@ int BlockMgr::findBlockedOverlaps(RecordKeyVector &keyList, RecordKeyVector &hit
 		getBlocks(keyList, deleteKeyBlocks);
 	}
 	_overlapBases.clear();
+	_overlapStarts.clear();
+	_overlapEnds.clear();
 	CHRPOS keyBlocksSumLength = getTotalBlockLength(keyList);
 	CHRPOS totalHitOverlap = 0;
 	CHRPOS hitBlockSumLength = 0;
+	vector<CHRPOS> overlappingStarts;
+	vector<CHRPOS> overlappingEnd;
 	
 
 	//Loop through every database record the query intersected with
@@ -171,7 +175,7 @@ int BlockMgr::findBlockedOverlaps(RecordKeyVector &keyList, RecordKeyVector &hit
 		hitBlockSumLength += getTotalBlockLength(hitBlocks); //get total length of the bocks for the hitRecord.
 		
 		bool hitHasOverlap = false;
-
+		CHRPOS totalDbOverlap = 0;
 		//loop through every block of the database record.
 		RecordKeyVector::iterator_type hitBlockIter = hitBlocks.begin();
 		for (; hitBlockIter != hitBlocks.end(); hitBlockIter = hitBlocks.next()) 
@@ -191,7 +195,9 @@ int BlockMgr::findBlockedOverlaps(RecordKeyVector &keyList, RecordKeyVector &hit
 					if (overlapList != NULL) {
 						overlapList->push_back(allocateAndAssignRecord(keyList.getKey(), maxStart, minEnd));
 					}
-					totalHitOverlap += overlap;
+					totalDbOverlap += overlap;
+					_overlapStarts.push_back(maxStart);
+					_overlapEnds.push_back(minEnd);
 				}
 			}
 		}
@@ -200,11 +206,70 @@ int BlockMgr::findBlockedOverlaps(RecordKeyVector &keyList, RecordKeyVector &hit
 		if (hitHasOverlap)
 		{
 			resultList.push_back(*hitListIter);
-			_overlapBases.push_back((int)totalHitOverlap);
+			_overlapBases.push_back(totalDbOverlap);
 		}
 		if (deleteHitBlocks) {
 			deleteBlocks(hitBlocks);
 		}
+	}
+
+	// compute the non-redundant (merged) overlap
+		// -f 0.2
+	// ---------      --
+    //         =      = 
+    // Yes
+	// 
+	// ---------      --
+    //                =
+    //                =
+    // No
+    //
+	// ---------      --
+    //                =
+    //                 =
+    // Yes
+    //
+	// ---------      
+    //        ==
+    //                
+    // Yes
+    //
+	// ---------      
+    //        =
+    //        =
+    //                
+    // No	
+	if (_overlapStarts.size() == 1) 
+	{
+		CHRPOS start = _overlapStarts[0];
+		CHRPOS end   = _overlapEnds[0];
+		totalHitOverlap += end - start;
+	}
+	else if (_overlapStarts.size() > 1) {
+		sort(_overlapStarts.begin(), _overlapStarts.end());
+		sort(_overlapEnds.begin(), _overlapEnds.end());
+		CHRPOS start = _overlapStarts[0];
+		CHRPOS end   = _overlapEnds[0];
+		for (int i = 1; i < _overlapStarts.size(); ++i)
+		{
+			CHRPOS currStart = _overlapStarts[i];
+			CHRPOS currEnd = _overlapEnds[i];
+			// new overlap block
+			if (currStart >= end)
+			{
+				totalHitOverlap += end - start;
+				start = currStart;
+				end = currEnd;
+			}
+			// current overlap block continues
+			else
+			{
+				start = currStart;
+				end = currEnd;
+			}
+		}
+		// account for last block
+		totalHitOverlap += end - start;
 	}
 
 	// was there sufficient overlap with respect ot -a? if not, delete.

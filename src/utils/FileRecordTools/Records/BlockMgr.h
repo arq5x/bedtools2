@@ -54,7 +54,11 @@ private:
 	RecordMgr *_blockRecordsMgr;
 	bool _breakOnDeletionOps;
 	bool _breakOnSkipOps;
-	vector<int> _overlapBases;
+	// keep track of the overlapping sub-intervals so
+	// that we can tabulate non-redundant overlaps at the end
+	vector<CHRPOS> _overlapBases;
+	vector<CHRPOS> _overlapStarts;
+	vector<CHRPOS> _overlapEnds;
 
 	float _overlapFractionA;
 	float _overlapFractionB;
