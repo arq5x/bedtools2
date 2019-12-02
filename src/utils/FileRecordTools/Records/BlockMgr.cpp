@@ -147,6 +147,74 @@ void BlockMgr::deleteBlocks(RecordKeyVector &keyList)
 	keyList.clearVector();
 }
 
+int BlockMgr::getNonRedundantOverlap()
+{
+		// compute the non-redundant (merged) overlap
+		// -f 0.2
+	// ---------......--
+    //         =      = 
+    // Yes
+	// 
+	// ---------......--
+    //                =
+    //                =
+    // No
+	// ---------......--
+    //         =......=
+    // 
+    // Yes
+    //
+	// ---------......--
+    //                =
+    //                 =
+    // Yes
+    //
+	// ---------      
+    //        ==
+    //                
+    // Yes
+    //
+	// ---------      
+    //        =
+    //        =
+    //                
+    // No	
+    int totalNonRedundantOverlap = 0;
+	if (_overlapStarts.size() == 1) 
+	{
+		CHRPOS start = _overlapStarts[0];
+		CHRPOS end   = _overlapEnds[0];
+		totalNonRedundantOverlap += end - start;
+	}
+	else if (_overlapStarts.size() > 1) {
+		sort(_overlapStarts.begin(), _overlapStarts.end());
+		sort(_overlapEnds.begin(), _overlapEnds.end());
+		CHRPOS start = _overlapStarts[0];
+		CHRPOS end   = _overlapEnds[0];
+		for (int i = 1; i < _overlapStarts.size(); ++i)
+		{
+			CHRPOS currStart = _overlapStarts[i];
+			CHRPOS currEnd = _overlapEnds[i];
+			// new overlap block
+			if (currStart >= end)
+			{
+				totalNonRedundantOverlap += end - start;
+				start = currStart;
+				end = currEnd;
+			}
+			// current overlap block continues
+			else
+			{
+				start = currStart;
+				end = currEnd;
+			}
+		}
+		// account for last block
+		totalNonRedundantOverlap += end - start;
+	}
+	return totalNonRedundantOverlap;
+}
+
 int BlockMgr::findBlockedOverlaps(RecordKeyVector &keyList, RecordKeyVector &hitList,
 	                              RecordKeyVector &resultList, RecordKeyVector *overlapList)
 {
@@ -159,7 +227,6 @@ int BlockMgr::findBlockedOverlaps(RecordKeyVector &keyList, RecordKeyVector &hit
 	_overlapStarts.clear();
 	_overlapEnds.clear();
 	CHRPOS keyBlocksSumLength = getTotalBlockLength(keyList);
-	CHRPOS totalHitOverlap = 0;
 	CHRPOS hitBlockSumLength = 0;
 	vector<CHRPOS> overlappingStarts;
 	vector<CHRPOS> overlappingEnd;
@@ -213,80 +280,23 @@ int BlockMgr::findBlockedOverlaps(RecordKeyVector &keyList, RecordKeyVector &hit
 		}
 	}
 
-	// compute the non-redundant (merged) overlap
-		// -f 0.2
-	// ---------      --
-    //         =      = 
-    // Yes
-	// 
-	// ---------      --
-    //                =
-    //                =
-    // No
-    //
-	// ---------      --
-    //                =
-    //                 =
-    // Yes
-    //
-	// ---------      
-    //        ==
-    //                
-    // Yes
-    //
-	// ---------      
-    //        =
-    //        =
-    //                
-    // No	
-	if (_overlapStarts.size() == 1) 
-	{
-		CHRPOS start = _overlapStarts[0];
-		CHRPOS end   = _overlapEnds[0];
-		totalHitOverlap += end - start;
-	}
-	else if (_overlapStarts.size() > 1) {
-		sort(_overlapStarts.begin(), _overlapStarts.end());
-		sort(_overlapEnds.begin(), _overlapEnds.end());
-		CHRPOS start = _overlapStarts[0];
-		CHRPOS end   = _overlapEnds[0];
-		for (int i = 1; i < _overlapStarts.size(); ++i)
-		{
-			CHRPOS currStart = _overlapStarts[i];
-			CHRPOS currEnd = _overlapEnds[i];
-			// new overlap block
-			if (currStart >= end)
-			{
-				totalHitOverlap += end - start;
-				start = currStart;
-				end = currEnd;
-			}
-			// current overlap block continues
-			else
-			{
-				start = currStart;
-				end = currEnd;
-			}
-		}
-		// account for last block
-		totalHitOverlap += end - start;
-	}
+	int totalUniqueOverlap = getNonRedundantOverlap();
 
 	// was there sufficient overlap with respect ot -a? if not, delete.
-	if ((float) totalHitOverlap / (float)keyBlocksSumLength < _overlapFractionA) 
+	if ((float) totalUniqueOverlap / (float)keyBlocksSumLength < _overlapFractionA) 
 	{
 		resultList.clearAll();
 		_overlapBases.clear();
 	}
 	// was there sufficient overlap with respect ot -b? if not, delete.
-	if ((float)totalHitOverlap / (float)hitBlockSumLength < _overlapFractionB) 
+	if ((float)totalUniqueOverlap / (float)hitBlockSumLength < _overlapFractionB) 
 	{
 		resultList.clearAll();
 		_overlapBases.clear();
 	}	
 	// was there sufficient overlap with respect ot -b when using -r? if not, delete.
 	if (_hasReciprocal &&
-				((float)totalHitOverlap / (float)hitBlockSumLength < _overlapFractionA)) 
+				((float)totalUniqueOverlap / (float)hitBlockSumLength < _overlapFractionA)) 
 	{
 		resultList.clearAll();
 		_overlapBases.clear();

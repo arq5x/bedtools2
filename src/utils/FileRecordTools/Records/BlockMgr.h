@@ -26,10 +26,14 @@ public:
 	~BlockMgr();
 
 	void getBlocks(RecordKeyVector &keyList, bool &mustDelete);
+	
+	int getNonRedundantOverlap();
+
 	void deleteBlocks(RecordKeyVector &keyList);
 
 	// Get the sum of the lengths of all blocks for a record.
 	CHRPOS getTotalBlockLength(RecordKeyVector &keyList);
+
 
 	// Determine which hits in the hitList intersect the hits in the keyList by comparing all blocks in each
 	// and checking that their total intersection meets any overlapFraction and reciprocal criteria compared to
