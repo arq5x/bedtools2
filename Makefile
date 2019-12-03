@@ -132,6 +132,8 @@ ALL_LIBS     = $(BT_LIBS) $(LIBS)
 
 all: print_banner $(BIN_DIR)/bedtools $(BIN_DIR)/intersectBed
 
+static: print_banner $(BIN_DIR)/bedtools.static
+
 BUILT_OBJECTS = $(OBJ_DIR)/bedtools.o
 # Include all the Makefile fragments, which add to $(BUILT_OBJECTS)
 include $(patsubst %,%/Makefile.frag,$(SUBDIRS) $(UTIL_SUBDIRS))
@@ -172,6 +174,11 @@ $(BUILT_OBJECTS): | $(OBJ_DIR)
 $(BIN_DIR)/bedtools: autoversion $(BUILT_OBJECTS) $(HTSDIR)/libhts.a | $(BIN_DIR)
 	@echo "- Building main bedtools binary."
 	$(CCPREFIX) $(CC_WRAPPER) $(CXX) $(ALL_LDFLAGS) -o $(BIN_DIR)/bedtools $(BUILT_OBJECTS) $(HTSDIR)/libhts.a $(ALL_LIBS)
+	@echo "done."
+
+$(BIN_DIR)/bedtools.static: autoversion $(BUILT_OBJECTS) $(HTSDIR)/libhts.a | $(BIN_DIR)
+	@echo "- Building main bedtools binary."
+	$(CCPREFIX) $(CC_WRAPPER) $(CXX) -static $(ALL_LDFLAGS) -o $(BIN_DIR)/bedtools.static $(BUILT_OBJECTS) $(HTSDIR)/libhts.a $(ALL_LIBS)
 	@echo "done."
 
 $(BIN_DIR)/intersectBed: | $(BIN_DIR)
