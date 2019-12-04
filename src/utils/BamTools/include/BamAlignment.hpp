@@ -179,7 +179,7 @@ namespace BamTools {
 			const uint8_t* qual = bam_get_qual(&_bam);
 
 			if(_bam.core.l_qseq == 0 || qual[0] == 0xffu)
-				Qualities.resize(QuerySequenceLength, -1);
+				Qualities.resize(QuerySequenceLength, 33);
 			else for(unsigned i = 0; i < QuerySequenceLength; i ++)
 				Qualities.push_back((char)(33 + qual[i]));
 		}
