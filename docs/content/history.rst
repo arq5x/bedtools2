@@ -4,7 +4,7 @@ Release History
 
 Version 2.29.1 (9-Dec-2019)
 ============================
-1. Fixed a `bug <https://github.com/arq5x/bedtools2/issues/773>`_ that now allows blocked intersection to be counted based on unique base pairs of overlap. The resoluation for `issue 750 <https://github.com/arq5x/bedtools2/issues/750>`_ in version 2.29.0 mistakenly allowed for fractional overlap to be counted based upon redundant overlap. 
+1. Fixed a `bug <https://github.com/arq5x/bedtools2/issues/773>`_ that now allows blocked intersection to be counted based on unique base pairs of overlap. The resolution for `issue 750 <https://github.com/arq5x/bedtools2/issues/750>`_ in version 2.29.0 mistakenly allowed for fractional overlap to be counted based upon redundant overlap. 
 2. Moved to Github Continuous Integration for automatic testing.
 3. Fixed a `bug <https://github.com/arq5x/bedtools2/issues/799>`_ that injected erroneous quality values with BAM records had no valid quality values.
 4. Fixed a `bug <https://github.com/arq5x/bedtools2/issues/609>`_ that destroyed backwards compatibility in the `getfasta` tool. Thanks to Torsten Seeman for reporting this.
