@@ -2,6 +2,18 @@
 Release History
 ###############
 
+Version 2.29.1 (9-Dec-2019)
+============================
+1. Fixed a `bug <https://github.com/arq5x/bedtools2/issues/773>`_ that now allows blocked intersection to be counted based on unique base pairs of overlap. The resoluation for `issue 750 <https://github.com/arq5x/bedtools2/issues/750>`_ in version 2.29.0 mistakenly allowed for fractional overlap to be counted based upon redundant overlap. 
+2. Moved to Github Continuous Integration for automatic testing.
+3. Fixed a `bug <https://github.com/arq5x/bedtools2/issues/799>`_ that injected erroneous quality values with BAM records had no valid quality values.
+4. Fixed a `bug <https://github.com/arq5x/bedtools2/issues/609>`_ that destroyed backwards compatibility in the `getfasta` tool. Thanks to Torsten Seeman for reporting this.
+5. Fixed a corner case `bug <https://github.com/arq5x/bedtools2/issues/711>`_ in the `reldist` tool.
+6. Fixed a `bug <https://github.com/arq5x/bedtools2/issues/788>`_ in the `bedtobam` tool that caused the last character in read names to be removed.
+7. Fixed a `bug <https://github.com/arq5x/bedtools2/issues/779>`_ causing a segfault in the `jaccard` tool.
+8. Fixed a `bug <https://github.com/arq5x/bedtools2/issues/777>`_ causing a corner case issue in the way coordinates are reported in the `flank` tool.
+
+
 Version 2.29.0 (3-Sep-2019)
 ============================
 1. Added a new `-C` option to the `intersect` tool that separately reports the count of intersections observed for each database (`-b`) file given. Formerly, the `-c` option reported to sum of all intersections observed across all database files.
