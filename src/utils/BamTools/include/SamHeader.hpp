@@ -33,7 +33,7 @@ namespace htslib_future {
 
 		hts_close(fp);
 
-		hdr->l_text = buffer->length();
+		hdr->l_text = (uint32_t)buffer->length();
 		hdr->text = strdup(buffer->c_str());
 		delete buffer;
 
@@ -104,8 +104,9 @@ namespace BamTools {
 
 		void ParseHeaderText(const std::string& text)
 		{
-			_header = sam_hdr_parse(text.length(), text.c_str());
+			_header = sam_hdr_parse((int)text.length(), text.c_str());
 			_header->text = strdup(text.c_str());
+			_header->l_text = (uint32_t)text.length();
 		}
 		void destory() 
 		{
