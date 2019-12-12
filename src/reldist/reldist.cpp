@@ -140,8 +140,15 @@ void RelativeDistance::CalculateRelativeDistance()
                 // calculate the relative distance between the query's midpoint
                 // and the two nearest database midpoints.
                 CHRPOS left_dist = abs(midpoint-left);
-                CHRPOS right_dist = abs(midpoint-right);            
-                rel_dist = (double) min(left_dist, right_dist) / (double) (right-left);
+                CHRPOS right_dist = abs(midpoint-right); 
+                if (min(left_dist, right_dist) == 0)
+                {
+                    rel_dist = 0.0;
+                }
+                else
+                {
+                    rel_dist = (double) min(left_dist, right_dist) / (double) (right-left);
+                }
                 if (!_summary)
                 {
                     _bedA->reportBedTab(bed);

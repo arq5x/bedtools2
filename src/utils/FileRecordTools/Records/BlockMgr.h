@@ -26,10 +26,14 @@ public:
 	~BlockMgr();
 
 	void getBlocks(RecordKeyVector &keyList, bool &mustDelete);
+	
+	int getNonRedundantOverlap();
+
 	void deleteBlocks(RecordKeyVector &keyList);
 
 	// Get the sum of the lengths of all blocks for a record.
 	CHRPOS getTotalBlockLength(RecordKeyVector &keyList);
+
 
 	// Determine which hits in the hitList intersect the hits in the keyList by comparing all blocks in each
 	// and checking that their total intersection meets any overlapFraction and reciprocal criteria compared to
@@ -54,7 +58,11 @@ private:
 	RecordMgr *_blockRecordsMgr;
 	bool _breakOnDeletionOps;
 	bool _breakOnSkipOps;
-	vector<int> _overlapBases;
+	// keep track of the overlapping sub-intervals so
+	// that we can tabulate non-redundant overlaps at the end
+	vector<CHRPOS> _overlapBases;
+	vector<CHRPOS> _overlapStarts;
+	vector<CHRPOS> _overlapEnds;
 
 	float _overlapFractionA;
 	float _overlapFractionB;

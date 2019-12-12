@@ -167,8 +167,21 @@ void RecordOutputMgr::printClosest(RecordKeyVector &keyList, const vector<CHRPOS
 		_currBamBlockList = &blockList;
 	}
 	if (!keyList.empty()) {
+		if (context->getNumClosestHitsWanted() > keyList.size()) 
+		{
+			cerr << "Warning: Fewer hits ("
+			     << keyList.size()
+			     << ") found on " 
+			     << keyRec->getChrName() 
+			     << " than requested ("
+			     << context->getNumClosestHitsWanted()
+			     << "). It is likely that there are fewer total records"
+			     << " on that chromosome than requested." 
+			     << endl;
+		}		
 		int distCount = 0;
-		for (RecordKeyVector::iterator_type iter = keyList.begin(); iter != keyList.end(); iter = keyList.next()) {
+		for (RecordKeyVector::iterator_type iter = keyList.begin(); iter != keyList.end(); iter = keyList.next())
+		{
 			const Record *hitRec = *iter;
 			printKey(keyRec, keyRec->getStartPosStr(), keyRec->getEndPosStr());
 			tab();
@@ -198,7 +211,6 @@ void RecordOutputMgr::printClosest(RecordKeyVector &keyList, const vector<CHRPOS
 		null(false, true);
 		if (context->reportDistance()) {
 			tab();
-
 			_outBuf.append("-1");
 		}
 		newline();

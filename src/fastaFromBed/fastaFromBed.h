@@ -34,7 +34,8 @@ public:
            const string &bedFile, const string &fastaOutFile,
            bool useFasta, bool useStrand, 
            bool useBlocks, bool useFullHeader,
-           bool useBedOut, bool useName, bool useNamePlus);
+           bool useBedOut, bool useName, 
+           bool useNamePlus, bool useNameOnly);
 
     // destructor
     ~Bed2Fa(void);
@@ -56,6 +57,7 @@ private:
     bool _useBedOut;    // priginal BED records followed by FASTA on same line
     bool _useName;
     bool _useNamePlus;
+    bool _useNameOnly;
 
     // instance of a bed file class.
     BedFile  *_bed;
