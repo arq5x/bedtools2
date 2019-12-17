@@ -2,6 +2,10 @@
 Release History
 ###############
 
+Version 2.29.2 (17-Dec-2019)
+============================
+1. Fixed a `bug <https://github.com/arq5x/bedtools2/issues/803>`_ that mistakenly removed a BAM/CRAM header line (sorting criteria). 
+
 Version 2.29.1 (9-Dec-2019)
 ============================
 1. Fixed a `bug <https://github.com/arq5x/bedtools2/issues/773>`_ that now allows blocked intersection to be counted based on unique base pairs of overlap. The resolution for `issue 750 <https://github.com/arq5x/bedtools2/issues/750>`_ in version 2.29.0 mistakenly allowed for fractional overlap to be counted based upon redundant overlap. 
