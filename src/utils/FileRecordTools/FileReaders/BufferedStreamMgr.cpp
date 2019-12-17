@@ -56,7 +56,7 @@ bool BufferedStreamMgr::init()
 		_useBufSize = GZIP_LINE_BUF_SIZE;
 	}
 
-	size_t trueBufSize = max(_useBufSize, (int)_currScanBuffer.size());
+	size_t trueBufSize = max(_useBufSize, _currScanBuffer.size());
 	_useBufSize = (int)trueBufSize;
 	_mainBuf = new bufType[_useBufSize +1];
 	memset(_mainBuf, 0, _useBufSize +1);

@@ -18,7 +18,8 @@ Bed2Fa::Bed2Fa(const string &dbFile,
                const string &bedFile, const string &fastaOutFile,
                bool useFasta, bool useStrand, 
                bool useBlocks, bool useFullHeader,
-               bool useBedOut, bool useName, bool useNamePlus) :
+               bool useBedOut, bool useName, 
+               bool useNamePlus, bool useNameOnly) :
     _dbFile(dbFile),
     _bedFile(bedFile),
     _fastaOutFile(fastaOutFile),
@@ -28,7 +29,8 @@ Bed2Fa::Bed2Fa(const string &dbFile,
     _useFullHeader(useFullHeader),
     _useBedOut(useBedOut),
     _useName(useName),
-    _useNamePlus(useNamePlus)
+    _useNamePlus(useNamePlus),
+    _useNameOnly(useNameOnly)
 {
     _bed = new BedFile(_bedFile);
 
@@ -74,14 +76,14 @@ void Bed2Fa::ReportDNA(const BED &bed, string &dna) {
     }
     else {
         ostringstream header;
-        if (_useName)
-        {
-            header << bed.name;
-        }
-        else if (_useNamePlus) 
+        if (_useName || _useNamePlus)
         {
             header << bed.name << "::" << bed.chrom << ":" 
                    << bed.start << "-" << bed.end;
+        }
+        else if (_useNameOnly)
+        {
+            header << bed.name;
         }
         else 
         {
@@ -100,8 +102,6 @@ void Bed2Fa::ReportDNA(const BED &bed, string &dna) {
             *_faOut << header.str() << "\t" << dna << endl;
     }
 }
-
-
 
 //******************************************************************************
 // ExtractDNA

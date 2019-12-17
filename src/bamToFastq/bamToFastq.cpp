@@ -38,7 +38,7 @@ BamToFastq::~BamToFastq(void) {}
 void BamToFastq::SingleFastq() {
     // open the 1st fastq file for writing
     _fq = new ofstream(_fastq1.c_str(), ios::out);
-    if ( !*_fq1 ) {
+    if ( !*_fq ) {
         cerr << "Error: The first fastq file (" << _fastq1 << ") could not be opened.  Exiting!" << endl;
         exit (1);
     }

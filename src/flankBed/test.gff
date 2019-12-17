@@ -1,0 +1,14 @@
+1	ena	gene	40	65	.	+	.	gene_id_1
+1	ena	gene	1	50	.	+	.	gene_id_2
+1	ena	gene	50	75	.	+	.	gene_id_3
+1	ena	gene	75	100	.	+	.	gene_id_4
+1	ena	gene	26	50	.	+	.	gene_id_5
+1	ena	gene	10	50	.	+	.	gene_id_6
+1	ena	gene	75	90	.	+	.	gene_id_7
+1	ena	gene	40	65	.	-	.	gene_id_8
+1	ena	gene	1	50	.	-	.	gene_id_9
+1	ena	gene	50	75	.	-	.	gene_id_10
+1	ena	gene	75	100	.	-	.	gene_id_11
+1	ena	gene	26	50	.	-	.	gene_id_12
+1	ena	gene	10	50	.	-	.	gene_id_13
+1	ena	gene	75	90	.	+	.	gene_id_14

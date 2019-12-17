@@ -77,6 +77,13 @@ void NewGenomeFile::loadGenomeFileIntoMap() {
 		}
 		chrName = fieldTokens.getElem(0);
 		chrSize = str2chrPos(fieldTokens.getElem(1));
+		if (chrSize == 0) {
+			cerr << "Error: " 
+			     << chrName 
+			     << " has length equal to 0. Each chromosome must have non-zero length. Exiting." 
+			     << endl;
+			exit(1);
+		}
 		_maxId++;
 		_chromSizeIds[chrName] = pair<CHRPOS, int>(chrSize, _maxId);
 		_startOffsets.push_back(_genomeLength);

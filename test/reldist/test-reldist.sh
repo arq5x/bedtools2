@@ -152,4 +152,18 @@ $BT reldist -a $DATA/refseq.chr1.exons.bed.gz \
             -b $DATA/gerp.chr1.bed.gz > obs
 check obs exp
 rm obs exp
+
+###########################################################
+#  Issue 711. Corner case
+############################################################
+echo -e "    reldist.t02...\c"
+echo \
+"reldist	count	total	fraction
+0.00	1	2	0.500
+0.50	1	2	0.500" > exp
+$BT reldist -a issue_711.a.bed \
+            -b issue_711.b.bed > obs
+check obs exp
+rm obs exp
+
 [[ $FAILURES -eq 0 ]] || exit 1;

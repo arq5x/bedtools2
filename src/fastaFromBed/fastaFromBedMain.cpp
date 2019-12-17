@@ -42,6 +42,7 @@ int fastafrombed_main(int argc, char* argv[]) {
     bool haveFastaOut = false;
     bool useName = false;
     bool useNamePlus = false;
+    bool useNameOnly = false;
     bool useFasta = true;
     bool useStrand = false;
     bool useBlocks = false;
@@ -94,6 +95,9 @@ int fastafrombed_main(int argc, char* argv[]) {
         else if(PARAMETER_CHECK("-name+", 6, parameterLength)) {
             useNamePlus = true;
         }
+        else if(PARAMETER_CHECK("-nameOnly", 9, parameterLength)) {
+            useNameOnly = true;
+        }
         else if(PARAMETER_CHECK("-split", 6, parameterLength)) {
             useBlocks = true;
         }
@@ -133,7 +137,7 @@ int fastafrombed_main(int argc, char* argv[]) {
                                  bedFile, fastaOutFile,
                                  useFasta, useStrand, 
                                  useBlocks, useFullHeader,
-                                 useBedOut, useName, useNamePlus);
+                                 useBedOut, useName, useNamePlus, useNameOnly);
         delete b2f;
     }
     else {
@@ -153,23 +157,24 @@ void fastafrombed_help(void) {
          << endl << endl;
 
     cerr << "Options: " << endl;
-    cerr << "\t-fi\tInput FASTA file" << endl;
-    cerr << "\t-fo\tOutput file (opt., default is STDOUT" << endl;
-    cerr << "\t-bed\tBED/GFF/VCF file of ranges to extract from -fi" << endl;
-    cerr << "\t-name\tUse the name field for the FASTA header" << endl;
-    cerr << "\t-name+\tUse the name field and coordinates for the FASTA header" << endl;
-    cerr << "\t-split\tgiven BED12 fmt., extract and concatenate the sequences"
-         << "\n\t\tfrom the BED \"blocks\" (e.g., exons)" << endl;
-    cerr << "\t-tab\tWrite output in TAB delimited format." << endl;
-    cerr << "\t\t- Default is FASTA format." << endl << endl;
+    cerr << "\t-fi\t\tInput FASTA file" << endl;
+    cerr << "\t-fo\t\tOutput file (opt., default is STDOUT" << endl;
+    cerr << "\t-bed\t\tBED/GFF/VCF file of ranges to extract from -fi" << endl;
+    cerr << "\t-name\t\tUse the name field and coordinates for the FASTA header" << endl;
+    cerr << "\t-name+\t\t(deprecated) Use the name field and coordinates for the FASTA header" << endl;
+    cerr << "\t-nameOnly\tUse the name field for the FASTA header" << endl;
+    cerr << "\t-split\t\tGiven BED12 fmt., extract and concatenate the sequences"
+         << "\n\t\t\tfrom the BED \"blocks\" (e.g., exons)" << endl;
+    cerr << "\t-tab\t\tWrite output in TAB delimited format." << endl;
+    cerr << "\t\t\t- Default is FASTA format." << endl;
 
-    cerr << "\t-s\tForce strandedness. If the feature occupies the antisense," 
+    cerr << "\t-s\t\tForce strandedness. If the feature occupies the antisense," 
          << endl;
-    cerr << "\t\tstrand, the sequence will be reverse complemented." << endl;
-    cerr << "\t\t- By default, strand information is ignored." << endl << endl;
+    cerr << "\t\t\tstrand, the sequence will be reverse complemented." << endl;
+    cerr << "\t\t\t- By default, strand information is ignored." << endl;
     cerr << "\t-fullHeader\tUse full fasta header." << endl;
-    cerr << "\t\t- By default, only the word before the first space or tab "
-	     << "\n\t\tis used." << endl << endl;
+    cerr << "\t\t\t- By default, only the word before the first space or tab "
+	     << "\n\t\t\tis used." << endl << endl;
 
     // end the program here
     exit(1);

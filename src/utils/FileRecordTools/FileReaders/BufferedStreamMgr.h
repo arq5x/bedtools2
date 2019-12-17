@@ -26,7 +26,7 @@ public:
 	bool getLine(string &line);
 	BamTools::BamReader *getBamReader() { return _inputStreamMgr->getBamReader(); }
 	static const int DEFAULT_MAIN_BUF_READ_SIZE = 1023;
-	void setIoBufSize(int val) { _useBufSize = val; }
+	void setIoBufSize(size_t val) { _useBufSize = val; }
 private:
 	InputStreamMgr *_inputStreamMgr;
 	typedef unsigned char bufType;
@@ -38,7 +38,7 @@ private:
 	int _mainBufCurrStartPos;
 	int _mainBufCurrLen;
 	bool _eof;
-	int _useBufSize;
+	size_t _useBufSize;
 	bool _streamFinished;
 	string _currScanBuffer;
 
