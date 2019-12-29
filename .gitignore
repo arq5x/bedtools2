@@ -12,6 +12,8 @@ src/utils/version/version_git.h
 .cproject
 nbproject
 sandbox
+.directory
+.vscode/*
 test/general/o
 test/genomecov/chip.bam
 test/genomecov/one_block.bam

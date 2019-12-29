@@ -50,7 +50,8 @@ public:
                       bool only_5p_end, bool only_3p_end,
                       bool pair_chip,bool haveSize, int fragmentSize, bool dUTP,
                       bool eachBaseZeroBased,
-                      bool add_gb_track_line, string gb_track_line_opts);
+                      bool add_gb_track_line, string gb_track_line_opts,
+                      int extensionSize, bool tn5);
 
     // destructor
     ~BedGenomeCoverage(void);
@@ -79,6 +80,8 @@ private:
     bool _add_gb_track_line;
     string _gb_track_line_opts;
     string _requestedStrand;
+    int _extensionSize;
+    bool _tn5;
 
     BedFile *_bed;
     NewGenomeFile *_genome;
@@ -102,7 +105,7 @@ private:
     void ResetChromCoverage();
     void StartNewChrom (const string& chrom);
     void AddCoverage (CHRPOS start, CHRPOS end);
-    void AddBlockedCoverage(const vector<BED> &bedBlocks);
+    void AddBlockedCoverage(const vector<BED> &bedBlocks, string strand);
     void PrintFinalCoverage();
     void PrintEmptyChromosomes();
     void PrintTrackDefinitionLine();
