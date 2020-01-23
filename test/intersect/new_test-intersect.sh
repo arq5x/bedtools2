@@ -975,8 +975,8 @@ rm exp obs
 #  Test intersect preserve the text header in bam
 ############################################################
 echo -e "    intersect.new.t78...\c"
-echo -e "@HD     VN:1.5  SO:coordinate" > exp
-echo "@HD     VN:1.5  SO:coordinate" | samtools view -b  | $BT intersect -a /dev/stdin -b b.bed | samtools view -H >obs
+echo -e "@HD	VN:1.5	SO:coordinate" > exp
+echo "@HD	VN:1.5	SO:coordinate" | samtools view --no-PG -b  | $BT intersect -a /dev/stdin -b b.bed | samtools view --no-PG -H >obs
 check exp obs
 rm exp obs
 [[ $FAILURES -eq 0 ]] || exit 1;
