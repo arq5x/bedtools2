@@ -1,6 +1,8 @@
+#include <fstream>
 #include <iostream>
 #include <string>
 
+#include <htslib/bgzf.h>
 #include <htslib/sam.h>
 
 int convert(htsExactFormat outformat, const char *outfname, bool outheaders,
@@ -72,6 +74,47 @@ int convert(htsExactFormat outformat, const char *outfname, bool outheaders,
     return 0;
 }
 
+int compress(const char *outfname, std::streambuf* in)
+{
+    BGZF* out = NULL;
+
+    try {
+        out = bgzf_open(outfname, "w");
+        if (out == NULL)
+            throw std::string("can't write to ") + outfname;
+
+        char buffer[65536];
+        size_t n;
+        while ((n = in->sgetn(buffer, sizeof buffer)) > 0) {
+            if (bgzf_write(out, buffer, n) < 0)
+                throw std::string("can't write to ") + outfname;
+        }
+
+        bgzf_close(out);
+    }
+    catch (const std::string& what) {
+        std::cerr << "htsutil: " << what << '\n';
+        if (out) bgzf_close(out);
+        return 1;
+    }
+
+    return 0;
+}
+
+int compress(const char *outfname, const char *infname)
+{
+    if (std::string(infname) == "-")
+        return compress(outfname, std::cin.rdbuf());
+    else {
+        std::filebuf in;
+        if (in.open(infname, std::ios::in) == NULL) {
+            std::cerr << "htsutil: can't open " << infname << '\n';
+            return 1;
+        }
+        return compress(outfname, &in);
+    }
+}
+
 int index(const char *fname, bool csi)
 {
     if (std::string(fname) == "-") {
@@ -96,6 +139,8 @@ int main(int argc, char **argv)
         return convert(sam, "-", true, bam, src);
     else if (cmd == "viewcramrecords")
         return convert(sam, "-", false, cram, src, (argc >= 4)? argv[3] : NULL);
+    else if (cmd == "bgzfcompress")
+        return compress(dest, src);
     else if (cmd == "index")
         return index(src, false);
     else if (cmd == "indexcsi")
@@ -109,7 +154,8 @@ int main(int argc, char **argv)
     }
     else {
         std::cerr <<
-"Usage: htsutil index FILE\n"
+"Usage: htsutil bgzfcompress [SRCFILE [DESTFILE]]\n"
+"       htsutil index FILE\n"
 "       htsutil indexcsi FILE\n"
 "       htsutil samtobam [SRCFILE [DESTFILE]]\n"
 "       htsutil samtoindexedbam SRCFILE DESTFILE\n"

@@ -740,21 +740,12 @@ rm obs dummy.txt.gz exp
 #  Test that an empty query with header, bgzipped, that
 #  runs with -header option will print header
 ############################################################
-
-# I'm not quite sure what this test was trying to do.
-# It may have been attempting to test bzip2 compression,
-# which bedtools does not currently support, or bgzf compression,
-# which is exceedingly rare outside of a BAM file. At any rate,
-# it fails on systems without a "bgzip" command, so I've commented
-# it out for now. NEK 10/02/2017.
 echo -e "    intersect.new.t61...\c"
-echo ok
-#echo "#Random Header" >dummy.txt
-#bgzip dummy.txt
-#echo "#Random Header" >exp
-#$BT intersect -a dummy.txt.gz -b a.bed -header > obs
-#check obs exp
-#rm obs dummy.txt.gz exp
+echo "#Random Header" | ../htsutil bgzfcompress - dummy.txt.gz
+echo "#Random Header" >exp
+$BT intersect -a dummy.txt.gz -b a.bed -header > obs
+check obs exp
+rm obs dummy.txt.gz exp
 
 
 ###########################################################
