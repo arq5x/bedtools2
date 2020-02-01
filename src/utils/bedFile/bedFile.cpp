@@ -154,7 +154,7 @@ void BedFile::Seek(unsigned long offset) {
     _bedStream->seekg(offset);
 }
 
-// Jump to a specific byte in the file
+// are the any intervals left in the file?
 bool BedFile::Empty(void) {
     return _status == BED_INVALID || _status == BED_BLANK;
 }
