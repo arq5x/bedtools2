@@ -130,7 +130,7 @@ ALL_LDFLAGS  = $(BT_LDFLAGS) $(LDFLAGS)
 ALL_LIBS     = $(BT_LIBS) $(LIBS)
 
 
-all: print_banner $(BIN_DIR)/bedtools $(BIN_DIR)/intersectBed
+all: print_banner $(BIN_DIR)/bedtools $(BIN_DIR)/intersectBed test/htsutil
 
 static: print_banner $(BIN_DIR)/bedtools.static
 
@@ -163,6 +163,9 @@ $(OBJ_DIR)/%.d: ;
 $(OBJ_DIR)/bedtools.o: $(SRC_DIR)/bedtools.cpp $(OBJ_DIR)/bedtools.d
 	$(CXX_COMPILE)
 
+$(OBJ_DIR)/htsutil.o: $(SRC_DIR)/htsutil.cpp $(OBJ_DIR)/htsutil.d
+	$(CXX_COMPILE)
+
 # HTSlib's htslib.mk provides rules to rebuild $(HTSDIR)/libhts.a.
 HTSDIR = src/utils/htslib
 include $(HTSDIR)/htslib.mk
@@ -180,6 +183,9 @@ $(BIN_DIR)/bedtools.static: autoversion $(BUILT_OBJECTS) $(HTSDIR)/libhts.a | $(
 	@echo "- Building main bedtools binary."
 	$(CCPREFIX) $(CC_WRAPPER) $(CXX) -static $(ALL_LDFLAGS) -o $(BIN_DIR)/bedtools.static $(BUILT_OBJECTS) $(HTSDIR)/libhts.a $(ALL_LIBS)
 	@echo "done."
+
+test/htsutil: $(OBJ_DIR)/htsutil.o $(HTSDIR)/libhts.a
+	$(CCPREFIX) $(CC_WRAPPER) $(CXX) $(ALL_LDFLAGS) -o test/htsutil $(OBJ_DIR)/htsutil.o $(HTSDIR)/libhts.a $(ALL_LIBS)
 
 $(BIN_DIR)/intersectBed: | $(BIN_DIR)
 	@echo "- Creating executables for old CLI."
@@ -211,7 +217,7 @@ $(OBJ_DIR) $(BIN_DIR):
 # not existing), so clean should also remove the generated config.h.
 clean:
 	@echo " * Cleaning up."
-	@rm -f $(VERSION_FILE) $(OBJ_DIR)/* $(BIN_DIR)/*
+	@rm -f $(VERSION_FILE) $(OBJ_DIR)/* $(BIN_DIR)/* test/htsutil
 	@cd src/utils/htslib && make clean > /dev/null
 	@test -e src/utils/htslib/config.mk || rm -f src/utils/htslib/config.h
 .PHONY: clean

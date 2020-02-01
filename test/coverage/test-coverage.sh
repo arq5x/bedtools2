@@ -18,11 +18,10 @@ check()
 #                       BAM files                         #
 ###########################################################
 ###########################################################
-samtools view -Sb one_block.sam > one_block.bam 2>/dev/null
-samtools view -Sb two_blocks.sam > two_blocks.bam 2>/dev/null
-samtools view -Sb three_blocks.sam > three_blocks.bam 2>/dev/null
-samtools view -Sb sam-w-del.sam > sam-w-del.bam 2>/dev/null
-
+../htsutil samtobam one_block.sam one_block.bam
+../htsutil samtobam two_blocks.sam two_blocks.bam
+../htsutil samtobam three_blocks.sam three_blocks.bam
+../htsutil samtobam sam-w-del.sam sam-w-del.bam
 
 
 ##################################################################
@@ -730,5 +729,7 @@ echo \
 $BT coverage -a chr_0-100.bed -b chr_0-100.bed > obs
 check exp obs
 rm exp obs
+
+rm one_block.bam two_blocks.bam three_blocks.bam sam-w-del.bam
 
 [[ $FAILURES -eq 0 ]] || exit 1;

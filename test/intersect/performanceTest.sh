@@ -27,8 +27,7 @@ if true; then
   ../$BT random -l 1000 -n 10000000 -g ../human.hg19.genome | sort -k1,1 -k2,2n > b10M.bed 
   cp a10M.bed a10M_gzipped.bed
   gzip a10M_gzipped.bed
-  cp a10M.bed a10M_bgzipped.bed
-  bgzip a10M_bgzipped.bed
+  ../../htsutil bgzfcompress a10M.bed a10M_bgzipped.bed.gz
   ../$BT bedtobam -i a10M.bed -g ../human.hg19.genome > a10M.bam
   cd ..
 fi

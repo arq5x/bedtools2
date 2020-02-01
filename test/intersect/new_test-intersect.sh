@@ -14,7 +14,7 @@ check()
 
 bam_check() 
 {
-	if diff <(samtools view $1) <(samtools view $2) 
+	if diff <(../htsutil viewbamrecords $1) <(../htsutil viewbamrecords $2)
 	then
 		echo ok
 	else
@@ -740,21 +740,12 @@ rm obs dummy.txt.gz exp
 #  Test that an empty query with header, bgzipped, that
 #  runs with -header option will print header
 ############################################################
-
-# I'm not quite sure what this test was trying to do.
-# It may have been attempting to test bzip2 compression,
-# which bedtools does not currently support, or bgzf compression,
-# which is exceedingly rare outside of a BAM file. At any rate,
-# it fails on systems without a "bgzip" command, so I've commented
-# it out for now. NEK 10/02/2017.
 echo -e "    intersect.new.t61...\c"
-echo ok
-#echo "#Random Header" >dummy.txt
-#bgzip dummy.txt
-#echo "#Random Header" >exp
-#$BT intersect -a dummy.txt.gz -b a.bed -header > obs
-#check obs exp
-#rm obs dummy.txt.gz exp
+echo "#Random Header" | ../htsutil bgzfcompress - dummy.txt.gz
+echo "#Random Header" >exp
+$BT intersect -a dummy.txt.gz -b a.bed -header > obs
+check obs exp
+rm obs dummy.txt.gz exp
 
 
 ###########################################################
@@ -910,7 +901,7 @@ echo -e "    intersect.new.t73...\c"
 echo \
 "FCC1MK2ACXX:2:2110:4301:28831#	99	chr1	10004	0	100M	=	10047	140	*	*	PG:Z:novoalign	AM:i:2	SM:i:2	MQ:i:0	PQ:i:219	UQ:i:0	AS:i:0	RG:Z:NCH411GBM_CD133low
 FCC1MK2ACXX:2:2110:4301:28831#	147	chr1	10047	0	3S97M	=	10004	-140	*	*	PG:Z:novoalign	AM:i:2	SM:i:70	MQ:i:0	PQ:i:219	UQ:i:194	AS:i:194	RG:Z:NCH411GBM_CD133low" > exp
-$BT intersect -a a.cram -b b.cram | samtools view - > obs
+$BT intersect -a a.cram -b b.cram | ../htsutil viewbamrecords > obs
 check exp obs
 rm exp obs
 [[ $FAILURES -eq 0 ]] || exit 1;
@@ -936,7 +927,7 @@ echo -e "    intersect.new.t75...\c"
 echo \
 "FCC1MK2ACXX:2:2110:4301:28831#	99	chr1	10004	0	100M	=	10047	140	CCCTAACCCTAACCCTAACCCTAACCCTAACCCTAACCCTAACCCTAACCCTAACCCTAACCCTAACCCTAACCCTAACCCTAACCCTAACCCTAACCCT	CCCFFFFFHHHHHJJIJJJJIGIIIJIGIGJJJJIJJJJIJIIJJDIIIJJIJEHEE@GAHHGE@CEFB;A>AB=??5?B?2?<ABDAD9ABBBC9ABDA	PG:Z:novoalign	AM:i:2	SM:i:2	MQ:i:0	PQ:i:219	UQ:i:0	AS:i:0	MD:Z:100	NM:i:0	RG:Z:NCH411GBM_CD133low
 FCC1MK2ACXX:2:2110:4301:28831#	147	chr1	10047	0	3S97M	=	10004	-140	AACCCTACCCCTACCCCTAACCCTACCCCTACCCCTACCCCTACCCCTACCCCTACCCCTACCCCTACCCTAACCCTAACCCTAACCCTAACCCTAACCC	###?<55-@?250&A?882(@?795&B?8;;/?8('9'A?;8?8C;(<A@FB-/7'F?((@0D:)*9JIIHFCJJJIHFJJJIHEJJHHFFHFFFDDCCB	PG:Z:novoalign	AM:i:2	SM:i:70	MQ:i:0	PQ:i:219	UQ:i:194	AS:i:194	MD:Z:4A5A11A5A5A5A5A5A5A3A34	NM:i:10	RG:Z:NCH411GBM_CD133low">exp
-CRAM_REFERENCE=test_ref.fa $BT intersect -a a.cram -b b.cram | samtools view -T test_ref.fa - > obs
+CRAM_REFERENCE=test_ref.fa $BT intersect -a a.cram -b b.cram | ../htsutil viewcramrecords - test_ref.fa > obs
 check exp obs
 rm exp obs
 [[ $FAILURES -eq 0 ]] || exit 1;
@@ -954,7 +945,7 @@ GA5:3:31:677:1537#0	16	dummy_chr	11880931	37	76M	*	0	0	GAGGGTTTGAGAGAGCAGCCAGGAG
 GA5:3:49:1480:1116#0	16	dummy_chr	11913868	37	76M	*	0	0	GGGAGGAGGCCAGGACTTCAGGGACCCACAGCCATCACCTCCCTCCCCTGCCCCCTACACACCAACTCTCTGGAAA	#################################44:4=944==;=???>=?>==??=A=A;ABA?A?AABAAABBB	XT:A:U	NM:i:1	X0:i:1	X1:i:0	XM:i:1	XO:i:0	XG:i:0	MD:Z:0T75
 GA5:3:61:213:1812#0	16	dummy_chr	13030396	37	76M	*	0	0	GGTCCGGCGGGGTCGGACTGGACCAGCTGTTGGGCTTTGTTTGCTCTTTTTACGAATTGAAAAACTGAAGCCAGGA	/=81,5948=485=4,),1;;7:87:6=;;@@AB=C8A@@BAB=>5>BBBB>BBAAA9ABA@B4B;BBBBBBBBCB	XT:A:U	NM:i:1	X0:i:1	X1:i:0	XM:i:1	XO:i:0	XG:i:0	MD:Z:0T75
 GA5:3:116:1581:552#0	16	dummy_chr	15055984	37	76M	*	0	0	AGAAAGCCTAAGGTCAGGGTGCCAGCAGGTTTGGTGTCTGGTGAGGTACCCATCTCTGCTTCTAAGGCAGAGCCTT	48887429,3=;98<8<8@;<=?8@??98@@@<=AA>@@?B?A@@BA6BA@=@BABBB???B@BBBBBABBCBB?B	XT:A:U	NM:i:0	X0:i:1	X1:i:0	XM:i:0	XO:i:0	XG:i:0	MD:Z:76" > exp
-$BT intersect -a notexthdr.bam -b notexthdr.bam | samtools view > obs
+$BT intersect -a notexthdr.bam -b notexthdr.bam | ../htsutil viewbamrecords > obs
 check exp obs
 rm exp obs
 [[ $FAILURES -eq 0 ]] || exit 1;
@@ -975,8 +966,8 @@ rm exp obs
 #  Test intersect preserve the text header in bam
 ############################################################
 echo -e "    intersect.new.t78...\c"
-echo -e "@HD     VN:1.5  SO:coordinate" > exp
-echo "@HD     VN:1.5  SO:coordinate" | samtools view -b  | $BT intersect -a /dev/stdin -b b.bed | samtools view -H >obs
+echo -e "@HD	VN:1.5	SO:coordinate" > exp
+echo "@HD	VN:1.5	SO:coordinate" | ../htsutil samtobam - - | $BT intersect -a /dev/stdin -b b.bed | ../htsutil viewbam >obs
 check exp obs
 rm exp obs
 [[ $FAILURES -eq 0 ]] || exit 1;

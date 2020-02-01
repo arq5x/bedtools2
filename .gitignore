@@ -12,12 +12,16 @@ src/utils/version/version_git.h
 .cproject
 nbproject
 sandbox
+test/coverage/*.bam
+test/coverage/*.bam.bai
 test/general/o
 test/genomecov/chip.bam
+test/genomecov/merged.bam
 test/genomecov/one_block.bam
 test/genomecov/pair-chip.bam
 test/genomecov/sam-w-del.bam
 test/genomecov/three_blocks.bam
+test/htsutil
 test/multicov/one_block.bam.bai
 test/multicov/two_blocks.bam.bai
 test/genomecov/two_blocks.bam
