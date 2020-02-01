@@ -189,8 +189,8 @@ void ProcessBedPE(BedFilePE *bedpe, GenomeFile *genome,  int mapQual, bool uncom
 
             if (bedpe->bedType >= 10) {
                 ConvertBedPEToBam(bedpeEntry, bamEntry1, bamEntry2, chromToId,  mapQual, lineNum);
-                writer->SaveAlignment(bamEntry1);
-                writer->SaveAlignment(bamEntry2);
+                writer->SaveAlignment(bamEntry1, true);
+                writer->SaveAlignment(bamEntry2, true);
 
             }
             else {
