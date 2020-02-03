@@ -476,5 +476,5 @@ bool FileRecordTypeChecker::passesBed12() {
 
 bool FileRecordTypeChecker::isStrandField(int field) {
 	const string &strandChar = _tokenizer.getElem(field);
-	return (strandChar == "+" || strandChar == "-" || strandChar == ".");
+	return (strandChar == "+" || strandChar == "-" || strandChar == "." || strandChar == "*");
 }
