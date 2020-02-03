@@ -980,3 +980,16 @@ echo "@HD     VN:1.5  SO:coordinate" | samtools view -b  | $BT intersect -a /dev
 check exp obs
 rm exp obs
 [[ $FAILURES -eq 0 ]] || exit 1;
+
+
+###########################################################
+#  Test intersect recognize "*" as a valid strand char
+############################################################
+echo -e "    intersect.new.t79...\c"
+echo	-e	"GL000008.2	118286	119434	Pituitary_00000002	999	*
+GL000008.2	158006	158759	Pituitary_00000012	999	+
+GL000009.2	78532	79175	Pituitary_00000033	999	*"	>	exp
+$BT  intersect -s -v -a strand_with_star.a.bed -b strand_with_star.b.bed > obs 
+check exp obs
+rm exp obs
+[[ $FAILURES -eq 0 ]] || exit 1;

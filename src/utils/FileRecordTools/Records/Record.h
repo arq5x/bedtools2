@@ -74,7 +74,8 @@ public:
 	virtual void setZeroLength(bool val) { _zeroLength = val; }
 
 	virtual const string &getStrand() const { return _strand; }
-	virtual void setStrand(const string &val) { _strand = val;
+	virtual void setStrand(const string &val) {
+		_strand = val;
 		_strandVal = (val == "+" ? FORWARD : (val == "-" ? REVERSE : UNKNOWN));
 	}
 	virtual void setStrand(char val) { _strand = val;
