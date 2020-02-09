@@ -51,7 +51,7 @@ void BedShift::AddShift(BED &bed) {
 
   CHRPOS chromSize = (CHRPOS)_genome->getChromSize(bed.chrom);
 
-  CHRPOS shift;
+  double shift;
 
   if (bed.strand == "-") {
     shift = _shiftMinus;

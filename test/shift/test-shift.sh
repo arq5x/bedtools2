@@ -139,4 +139,18 @@ chr1	92146899	92352836	NR_036634	0	-" > exp
 $BT shift -i b.bed -s 1000 -g huge.genome > obs
 check obs exp
 rm obs exp
+
+###########################################################
+# Regression test for issue 807
+###########################################################
+echo -e "    shift.t11...\c"
+echo \
+"chr1	50	149	feature1	0	+
+chr1	150	250	feature2	0	+
+chr1	325	675	feature3	0	-
+chr1	925	975	feature4	0	+"	>	exp
+$BT shift -i issue_807.bed -s 0.5 -pct -g issue_807.genomesize > obs
+check obs exp
+rm obs exp
+
 [[ $FAILURES -eq 0 ]] || exit 1;
