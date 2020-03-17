@@ -55,7 +55,7 @@ it to be counted, you can first use intersectBed with the "-f 1.0" option.
 .. code-block:: bash
 
   bedtools intersect -a features.bed -b windows.bed -f 1.0 | \
-  bedtools coverage -a - -b windows.bed \
+  bedtools coverage -a windows.bed -b - \
   > windows.bed.coverage
 
 
@@ -68,7 +68,7 @@ from the BAM data by using ``bamtobed``.
 .. code-block:: bash
 
   bedtools bamtobed -i reads.bam | \
-  bedtools coverage -a - -b exons.bed \
+  bedtools coverage -a exons.bed -b - \
   > exons.bed.coverage
   
 
