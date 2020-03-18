@@ -347,7 +347,7 @@ void BedShuffle::ChooseLocus(BED &bedEntry) {
 #endif
             // use the above randomStart (e.g., for human 0..3.1billion) 
             // to identify the chrom and start on that chrom.
-            pair<string, int> location = _genome->projectOnGenome(randStart);
+            pair<string, CHRPOS> location = _genome->projectOnGenome(randStart);
             bedEntry.chrom = location.first;
             bedEntry.start = location.second;
             bedEntry.end   = bedEntry.start + length;
