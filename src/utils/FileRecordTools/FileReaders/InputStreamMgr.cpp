@@ -90,7 +90,9 @@ bool InputStreamMgr::init()
 	}
 	//now we have a PushBackStreamBuf. Make a new stream.
 	_finalInputStream = new istream(_pushBackStreamBuf);
+	hts_set_log_level(HTS_LOG_OFF);
 	populateScanBuffer();
+	hts_set_log_level(HTS_LOG_WARNING);
 	return true;
 }
 
