@@ -104,7 +104,7 @@ How can I get more help?
 bedtools "intersect"
 ====================
 
-The `intersect` command is the workhorse of the `bedtools` suite. It compares two or more BED/BAM/VCF/GFF files and identifies all the regions in the gemome where the features in the two files overlap (that is, share at least one base pair in common).
+The `intersect` command is the workhorse of the `bedtools` suite. It compares two or more BED/BAM/VCF/GFF files and identifies all the regions in the genome where the features in the two files overlap (that is, share at least one base pair in common).
 
 ![](http://bedtools.readthedocs.org/en/latest/_images/intersect-glyph.png)
 
