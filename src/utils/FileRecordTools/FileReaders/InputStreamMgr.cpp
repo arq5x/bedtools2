@@ -14,9 +14,6 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 
-#include <errno.h>
-
-
 InputStreamMgr::InputStreamMgr(const string &filename, bool buildScanBuffer)
 :
  _filename(filename),
