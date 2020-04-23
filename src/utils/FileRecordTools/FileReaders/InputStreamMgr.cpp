@@ -10,7 +10,9 @@
 #include "gzstream.h"
 #include "CompressionTools.h"
 
-const char *InputStreamMgr::FIFO_STRING_LITERAL = "/dev/fd";
+#include <unistd.h>
+#include <sys/stat.h>
+#include <sys/types.h>
 
 InputStreamMgr::InputStreamMgr(const string &filename, bool buildScanBuffer)
 :
@@ -72,9 +74,18 @@ bool InputStreamMgr::init()
 		}
 		_pushBackStreamBuf = new PushBackStreamBuf(cin.rdbuf());
 	} else {
-		if (strncmp(_filename.c_str(), FIFO_STRING_LITERAL, strlen(FIFO_STRING_LITERAL)) == 0) {
+		struct stat stat_buf = {};
+		if(stat(_filename.c_str(), &stat_buf)  < 0) {
+			cerr << "Error: Unable to open file "<< _filename << ". Exiting." << endl;
+			delete _inputFileStream;
+			_inputFileStream = NULL;
+			exit(1);
+		}
+
+		if(S_ISFIFO(stat_buf.st_mode)) {
 			_isStdin = true;
 		}
+		
 		_inputFileStream = new ifstream(_filename.c_str());
 		if (_inputFileStream->fail()) {
 			cerr << "Error: Unable to open file " << _filename << ". Exiting." << endl;
