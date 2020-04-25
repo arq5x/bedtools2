@@ -19,7 +19,8 @@ Bed2Fa::Bed2Fa(const string &dbFile,
                bool useFasta, bool useStrand, 
                bool useBlocks, bool useFullHeader,
                bool useBedOut, bool useName, 
-               bool useNamePlus, bool useNameOnly) :
+               bool useNamePlus, bool useNameOnly,
+               bool isRNA) :
     _dbFile(dbFile),
     _bedFile(bedFile),
     _fastaOutFile(fastaOutFile),
@@ -30,7 +31,8 @@ Bed2Fa::Bed2Fa(const string &dbFile,
     _useBedOut(useBedOut),
     _useName(useName),
     _useNamePlus(useNamePlus),
-    _useNameOnly(useNameOnly)
+    _useNameOnly(useNameOnly),
+    _isRNA(isRNA)
 {
     _bed = new BedFile(_bedFile);
 
@@ -53,7 +55,7 @@ Bed2Fa::Bed2Fa(const string &dbFile,
         }
     }
     // Extract the requested intervals from the FASTA input file.
-    ExtractDNA();
+    ExtractSeq();
 }
 
 
@@ -62,17 +64,17 @@ Bed2Fa::~Bed2Fa(void) {
 
 
 //******************************************************************************
-// ReportDNA
+// ReportSeq
 //******************************************************************************
-void Bed2Fa::ReportDNA(const BED &bed, string &dna) {
+void Bed2Fa::ReportSeq(const BED &bed, string &seq) {
 
     // revcomp if necessary.  Thanks to Thomas Doktor.
     if ((_useStrand == true) && (bed.strand == "-"))
-        reverseComplement(dna);
+        reverseComplement(seq, _isRNA);
 
     if (_useBedOut) {
         _bed->reportBedTab(bed);
-        *_faOut  << dna << endl;
+        *_faOut  << seq << endl;
     }
     else {
         ostringstream header;
@@ -97,16 +99,16 @@ void Bed2Fa::ReportDNA(const BED &bed, string &dna) {
         }
         
         if (_useFasta)
-            *_faOut << ">" << header.str() << endl << dna << endl;
+            *_faOut << ">" << header.str() << endl << seq << endl;
         else
-            *_faOut << header.str() << "\t" << dna << endl;
+            *_faOut << header.str() << "\t" << seq << endl;
     }
 }
 
 //******************************************************************************
-// ExtractDNA
+// Extract sequence
 //******************************************************************************
-void Bed2Fa::ExtractDNA() {
+void Bed2Fa::ExtractSeq() {
 
     /* Make sure that we can open all of the files successfully*/
 
@@ -156,7 +158,7 @@ void Bed2Fa::ExtractDNA() {
                             sequence = \
                                fr->getSubSequence(bed.chrom, bed.start, length);
                         }
-                        ReportDNA(bed, sequence);
+                        ReportSeq(bed, sequence);
                     }
                     else
                     {

@@ -18,7 +18,7 @@ void reverseSequence(string &seq) {
 }
 
 // Performs an in-place reverse complement conversion
-void reverseComplement(string &seq) {
+void reverseComplement(string &seq, bool isRNA) {
 
     // reverse the sequence
     reverseSequence(seq);
@@ -28,7 +28,8 @@ void reverseComplement(string &seq) {
         switch(seq[i]) {
             // nucleotides
             case 'A':
-                seq[i] = 'T';
+                if (!isRNA) seq[i] = 'T';
+                else seq[i] = 'U';
                 break;
             case 'C':
                 seq[i] = 'G';
@@ -44,7 +45,8 @@ void reverseComplement(string &seq) {
                 seq[i] = 'A';
                 break;
             case 'a':
-                seq[i] = 't';
+                if (!isRNA) seq[i] = 't';
+                else seq[i] = 'u';
                 break;
             case 'c':
                 seq[i] = 'g';

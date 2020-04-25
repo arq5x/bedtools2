@@ -48,6 +48,7 @@ int fastafrombed_main(int argc, char* argv[]) {
     bool useBlocks = false;
     bool useFullHeader = false;
     bool useBedOut = false;
+    bool isRNA = false;
 
     // check to see if we should print out some help
     if(argc <= 1) showHelp = true;
@@ -114,6 +115,9 @@ int fastafrombed_main(int argc, char* argv[]) {
         else if(PARAMETER_CHECK("-fullHeader", 11, parameterLength)) {
             useFullHeader = true;
         }
+        else if(PARAMETER_CHECK("-rna", 4, parameterLength)) {
+            isRNA = true;
+        }
         else {
             cerr << "*****ERROR: Unrecognized parameter: " 
                  << argv[i] 
@@ -137,7 +141,9 @@ int fastafrombed_main(int argc, char* argv[]) {
                                  bedFile, fastaOutFile,
                                  useFasta, useStrand, 
                                  useBlocks, useFullHeader,
-                                 useBedOut, useName, useNamePlus, useNameOnly);
+                                 useBedOut, useName, 
+                                 useNamePlus, useNameOnly,
+                                 isRNA);
         delete b2f;
     }
     else {
@@ -166,6 +172,7 @@ void fastafrombed_help(void) {
     cerr << "\t-split\t\tGiven BED12 fmt., extract and concatenate the sequences"
          << "\n\t\t\tfrom the BED \"blocks\" (e.g., exons)" << endl;
     cerr << "\t-tab\t\tWrite output in TAB delimited format." << endl;
+    cerr << "\t-bedOut\t\tReport extract sequences in a tab-delimited BED format instead of in FASTA format." << endl;
     cerr << "\t\t\t- Default is FASTA format." << endl;
 
     cerr << "\t-s\t\tForce strandedness. If the feature occupies the antisense," 
@@ -174,7 +181,9 @@ void fastafrombed_help(void) {
     cerr << "\t\t\t- By default, strand information is ignored." << endl;
     cerr << "\t-fullHeader\tUse full fasta header." << endl;
     cerr << "\t\t\t- By default, only the word before the first space or tab "
-	     << "\n\t\t\tis used." << endl << endl;
+	     << "\n\t\t\tis used." << endl;
+    cerr << "\t-rna\tThe FASTA is RNA not DNA. Reverse complementation handled accordingly." << endl << endl;
+
 
     // end the program here
     exit(1);

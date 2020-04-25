@@ -219,3 +219,23 @@ $BT getfasta -fi t.fa -bed <(echo -e "chr1\t0\t1") > obs
 check obs exp
 rm obs exp
 [[ $FAILURES -eq 0 ]] || exit 1;
+
+echo -e "    getfasta.t16..\c"
+echo ">candidate_1::chr1:0-10(-)
+catcggtcaa
+>candidate_2::chr1:0-10(+)
+uugaccgaug" > exp
+$BT getfasta -fi rna.fasta -bed rna.bed -s -name > obs
+check obs exp
+rm obs exp
+
+echo -e "    getfasta.t17..\c"
+echo ">candidate_1::chr1:0-10(-)
+caucggucaa
+>candidate_2::chr1:0-10(+)
+uugaccgaug" > exp
+$BT getfasta -fi rna.fasta -bed rna.bed -s -name -rna > obs
+check obs exp
+rm obs exp
+
+[[ $FAILURES -eq 0 ]] || exit 1;

@@ -14,7 +14,7 @@ typedef int64_t CHRPOS;
 void reverseSequence(string &seq);
 
 // Performs an in-place reverse complement conversion
-void reverseComplement(string &seq);
+void reverseComplement(string &seq, bool isRNA = false);
 
 // Converts every character in a string to lowercase
 void toLowerCase(string &seq);

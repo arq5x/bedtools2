@@ -35,13 +35,14 @@ public:
            bool useFasta, bool useStrand, 
            bool useBlocks, bool useFullHeader,
            bool useBedOut, bool useName, 
-           bool useNamePlus, bool useNameOnly);
+           bool useNamePlus, bool useNameOnly,
+           bool isRNA);
 
     // destructor
     ~Bed2Fa(void);
 
-    void ExtractDNA();
-    void ReportDNA(const BED &bed, string &dna);
+    void ExtractSeq();
+    void ReportSeq(const BED &bed, string &seq);
 
 
 private:
@@ -58,6 +59,7 @@ private:
     bool _useName;
     bool _useNamePlus;
     bool _useNameOnly;
+    bool _isRNA;
 
     // instance of a bed file class.
     BedFile  *_bed;
