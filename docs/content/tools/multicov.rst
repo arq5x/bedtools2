@@ -40,11 +40,11 @@ Usage and option summary
 **-S**          Require different strandedness. That is, only report hits in B
                 that overlap A on the _opposite_ strand. By default, overlaps 
                 are reported without respect to strand.
-**-f**          Minimum overlap required as a fraction of each A. Default is 
+**-f**          Minimum overlap required as a fraction of each -bed record. Default is 
                 1E-9 (i.e., 1bp).
-**-r**          Require that the fraction overlap be reciprocal for  A and B. In 
+**-r**          Require that the fraction overlap is reciprocal for -bed and B. In 
                 other words, if -f is 0.90 and -r is used, this requires that 
-                B overlap 90% of A and A _also_ overlaps 90% of B.
+                B overlap 90% of the -bed record and the -bed record _also_ overlaps 90% of B.
 **-q**          Minimum mapping quality (MAPQ) allowed. Default is 0.
 **-D**          Include duplicate reads.  Default counts non-duplicates only
 **-F**          Include failed-QC reads.  Default counts pass-QC reads only

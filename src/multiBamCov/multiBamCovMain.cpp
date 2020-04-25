@@ -168,13 +168,13 @@ void multibamcov_help(void) {
     cerr                       << "\t\tthat overlap A on the _opposite_ strand." << endl;
     cerr                       << "\t\t- By default, overlaps are reported without respect to strand." << endl << endl;
 
-    cerr << "\t-f\t"            << "Minimum overlap required as a fraction of each A." << endl;
+    cerr << "\t-f\t"            << "Minimum overlap required as a fraction of each -bed record." << endl;
     cerr                        << "\t\t- Default is 1E-9 (i.e., 1bp)." << endl;
     cerr                        << "\t\t- FLOAT (e.g. 0.50)" << endl << endl;
 
-    cerr << "\t-r\t"            << "Require that the fraction overlap be reciprocal for each A and B." << endl;
+    cerr << "\t-r\t"            << "Require that the fraction overlap be reciprocal for each -bed and B." << endl;
     cerr                        << "\t\t- In other words, if -f is 0.90 and -r is used, this requires" << endl;
-    cerr                        << "\t\t  that B overlap 90% of A and A _also_ overlaps 90% of B." << endl << endl;
+    cerr                        << "\t\t  that B overlap 90% of each -bed and the -bed record _also_ overlaps 90% of B." << endl << endl;
 
     cerr << "\t-q\t"           << "Minimum mapping quality allowed. Default is 0." << endl << endl;
 
