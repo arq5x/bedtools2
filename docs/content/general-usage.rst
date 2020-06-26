@@ -9,7 +9,7 @@ Supported file formats
 ----------------------
 BED format
 ----------------------
-As described on the UCSC Genome Browser website (see link below), the BED format is a concise and
+As described on the UCSC Genome Browser website (see link below), the browser extensible data (BED) format is a concise and
 flexible way to represent genomic features and annotations. The BED format description supports up to
 12 columns, but only the first 3 are required for the UCSC browser, the Galaxy browser and for
 bedtools. bedtools allows one to use the "BED12" format (that is, all 12 fields listed below).
@@ -101,7 +101,7 @@ bedtools requires that all BED input files (and input received from stdin) are *
 ----------------------
 BEDPE format
 ----------------------
-We have defined a new file format (BEDPE) in order to concisely describe disjoint genome features,
+We have defined a new file format, the browser extensible data paired-end (BEDPE) format, in order to concisely describe disjoint genome features,
 such as structural variations or paired-end sequence alignments. We chose to define a new format
 because the existing "blocked" BED format (a.k.a. BED12) does not allow inter-chromosomal feature
 definitions. In addition, BED12 only has one strand field, which is insufficient for paired-end sequence
