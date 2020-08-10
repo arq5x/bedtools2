@@ -11,6 +11,7 @@
 #include <queue>
 #include <istream>
 
+extern const char* cram_reference;
 namespace BamTools {
 #ifdef WITH_HTS_CB_API
 	struct stream_data_t {
@@ -178,7 +179,7 @@ namespace BamTools {
 
 			if(fp->format.format == htsExactFormat::cram)
 			{
-				char* ref_file = getenv("CRAM_REFERENCE");
+				const char* ref_file = cram_reference ? cram_reference : getenv("CRAM_REFERENCE");
 				if(NULL == ref_file || hts_set_fai_filename(fp, ref_file) == -1)
 				{
 					// If we are not able to load a reference 
