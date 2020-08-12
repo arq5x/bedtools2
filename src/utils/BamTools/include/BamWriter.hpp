@@ -5,6 +5,9 @@
 #include <htslib/sam.h>
 #include <SamHeader.hpp>
 #include <BamAlignment.hpp>
+
+extern const char* cram_reference;
+
 namespace BamTools {
 	class BamWriter {
 		samFile* _fp;
@@ -17,7 +20,7 @@ namespace BamTools {
 
 		bool Open(const std::string& filename, const std::string& samHeaderText, const RefVector& referenceSequences, refs_t* reference)
 		{
-			const char* ref_file = getenv("CRAM_REFERENCE");
+			const char* ref_file = cram_reference ? cram_reference : getenv("CRAM_REFERENCE");
 
 			_fp = sam_open(filename.empty() || filename == "stdout" ? "-" : filename.c_str(), ref_file ? "wc" : "wb");
 			if(_fp == nullptr) return false;

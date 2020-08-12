@@ -87,10 +87,28 @@ int windowmaker_main(int argc, char* argv[]); //
 int bedtools_help(void);
 int bedtools_faq(void);
 
+const char* cram_reference = NULL;
+
+int parse_global_args(int argc, char** argv) {
+	for(int i = 1; i < argc - 1; i ++) {
+		string this_arg = argv[i];
+		if (this_arg == "--cram-ref") {
+			cram_reference = argv[i + 1];
+			for(int j = i + 2; j < argc; j ++) {
+				argv[j - 2] = argv[j];
+			}
+			i --;
+			argc -= 2;
+		}
+	}
+	return argc;
+}
+
 
 
 int main(int argc, char *argv[])
 {
+	argc = parse_global_args(argc, argv);
     // make sure the user at least entered a sub_command
     if (argc < 2) return bedtools_help();
 
@@ -273,6 +291,10 @@ int bedtools_help(void)
     cout  << "    expand        "  << "Replicate lines based on lists of values in columns.\n";
     cout  << "    split         "  << "Split a file into multiple files with equal records or base pairs.\n"; 
     cout  << "    summary       "  << "Statistical summary of intervals in a file.\n"; 
+
+	cout << endl;
+	cout << "[ General Parameters ]" << endl;
+	cout << "     --cram-ref    " << "Reference used by a CRAM input" << endl;
 
     cout  << endl;
     cout  << "[ General help ]" << endl;
