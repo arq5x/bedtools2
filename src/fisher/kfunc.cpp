@@ -3,6 +3,8 @@
  * AS245, 2nd algorithm, http://lib.stat.cmu.edu/apstat/245
  */
 
+#include <stdint.h>
+
 #include "kfunc.h"
 
 double kf_lgamma(double z)
@@ -221,6 +223,38 @@ double kt_fisher_exact(long long n11, long long n12, long long n21, long long n2
     *two = *_left = *_right = 1.;
     if (min == max) return 1.; // no need to do test
     q = hypergeo_acc(n11, n1_, n_1, n, &aux); // the probability of the current table
+
+    if (q == 0.0) {
+        /*
+          If here, the calculated probablility is so small it can't be stored
+          in a double, which is possible when the table contains fairly large
+          numbers.  If this happens, most of the calculation can be skipped
+          as 'left', 'right' and '*two' will be (to a good approximation) 0.0.
+          The returned values '*_left' and '*_right' depend on which side
+          of the hypergeometric PDF 'n11' sits.  This can be found by
+          comparing with the mode of the distribution, the formula for which
+          can be found at:
+          https://en.wikipedia.org/wiki/Hypergeometric_distribution
+          Note that in the comparison we multiply through by the denominator
+          of the mode (n + 2) to avoid a division.
+        */
+        if ((int64_t) n11 * ((int64_t) n + 2) < ((int64_t) n_1 + 1) * ((int64_t) n1_ + 1)) {
+            // Peak to right of n11, so probability will be lower for all
+            // of the region from min to n11 and higher for at least some
+            // of the region from n11 to max; hence abs(i-n11) will be 0,
+            // abs(j-n11) will be > 0 and:
+            *_left = 0.0; *_right = 1.0; *two = 0.0;
+            return 0.0;
+        } else {
+            // Peak to left of n11, so probability will be lower for all
+            // of the region from n11 to max and higher for at least some
+            // of the region from min to n11; hence abs(i-n11) will be > 0,
+            // abs(j-n11) will be 0 and:
+            *_left = 1.0; *_right = 0.0; *two = 0.0;
+            return 0.0;
+        }
+    }
+
     // left tail
     p = hypergeo_acc(min, 0, 0, 0, &aux);
     for (left = 0., i = min + 1; p < 0.99999999 * q && i<=max; ++i) // loop until underflow
@@ -239,11 +273,7 @@ double kt_fisher_exact(long long n11, long long n12, long long n21, long long n2
     *two = left + right;
     if (*two > 1.) *two = 1.;
     // adjust left and right
-    if (q == 0.) {
-        if (n11 + n22 < n12 + n21) right = 1.;
-        else left = 1.;
-    }
-    else if (labs((long) (i - n11)) < labs((long) (j - n11))) right = 1. - left + q;
+    if (labs((long) (i - n11)) < labs((long) (j - n11))) right = 1. - left + q;
     else left = 1.0 - right + q;
     *_left = left; *_right = right;
     return q;
