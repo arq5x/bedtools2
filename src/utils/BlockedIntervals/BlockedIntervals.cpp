@@ -80,10 +80,6 @@ void GetBedBlocks(const BED &bed, bedVector &bedBlocks) {
         cerr << "Input error: found interval having <= 0 blocks." << endl;
         exit(1);
     }
-    else if ( blockCount == 1 ) {
-        //take a short-cut for single blocks
-        bedBlocks.push_back(bed);
-    }
     else {
         // get the comma-delimited strings for the BED12 block starts and block ends.
         string blockSizes(bed.fields[10]);
