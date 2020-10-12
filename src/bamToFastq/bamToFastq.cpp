@@ -81,7 +81,6 @@ void BamToFastq::PairedFastq() {
     }
     // open the BAM file
     BamReader reader;
-    reader.Open(_bamFile);
     if (!reader.Open(_bamFile)) {
         cerr << "Failed to open BAM file " << _bamFile << endl;
         exit(1);
