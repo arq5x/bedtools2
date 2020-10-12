@@ -45,6 +45,10 @@ void BamToFastq::SingleFastq() {
     // open the BAM file
     BamReader reader;
     reader.Open(_bamFile);
+    if (!reader.Open(_bamFile)) {
+        cerr << "Failed to open BAM file " << _bamFile << endl;
+        exit(1);
+    }
     BamAlignment bam;
     while (reader.GetNextAlignment(bam)) {
         // extract the sequence and qualities for the BAM "query"
@@ -54,6 +58,7 @@ void BamToFastq::SingleFastq() {
             reverseComplement(seq);
             reverseSequence(qual);
         }
+
         *_fq << "@" << bam.Name << endl;
         *_fq << seq << endl;
         *_fq << "+" << endl;
@@ -77,6 +82,10 @@ void BamToFastq::PairedFastq() {
     // open the BAM file
     BamReader reader;
     reader.Open(_bamFile);
+    if (!reader.Open(_bamFile)) {
+        cerr << "Failed to open BAM file " << _bamFile << endl;
+        exit(1);
+    }
     // rip through the BAM file and convert each mapped entry to BEDPE
     vector<BamAlignment> alignments;
     string prevName = "";
@@ -98,7 +107,7 @@ void BamToFastq::PairedFastq() {
         }
         prevName = currName;
     }
-    WritePairs(alignments);
+    if (alignments.size() != 0) WritePairs(alignments);
     reader.Close();
 }
 
