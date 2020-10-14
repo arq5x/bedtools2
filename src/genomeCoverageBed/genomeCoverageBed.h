@@ -45,7 +45,7 @@ public:
                       bool eachBase, bool startSites,
                       bool bedGraph, bool bedGraphAll,
                       int max, float scale,
-                      bool bamInput, bool obeySplits,
+                      bool bamInput, bool obeySplits, bool ignoreD,
                       bool filterByStrand, string requestedStrand,
                       bool only_5p_end, bool only_3p_end,
                       bool pair_chip,bool haveSize, int fragmentSize, bool dUTP,
@@ -69,6 +69,7 @@ private:
     int _max;
     float _scale;
     bool _obeySplits;
+    bool _ignoreD;
     bool _filterByStrand;
     bool _only_5p_end;
     bool _only_3p_end;
