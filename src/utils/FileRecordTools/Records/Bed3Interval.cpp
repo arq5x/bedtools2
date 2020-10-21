@@ -28,6 +28,7 @@ bool Bed3Interval::initFromFile(SingleLineDelimTextFileReader *fileReader)
 	fileReader->getField(2, _endPosStr);
 	_startPos = str2chrPos(_startPosStr);
 	_endPos = str2chrPos(_endPosStr);
+	_zeroLength = false;
 	return true;
 }
 
