@@ -45,6 +45,7 @@ int genomecoverage_main(int argc, char* argv[]) {
     bool eachBase = false;
     bool eachBaseZeroBased = false;
     bool obeySplits = false;
+    bool ignoreD = false;
     bool haveScale = false;
     bool filterByStrand = false;
     bool pair_chip = false;
@@ -125,6 +126,9 @@ int genomecoverage_main(int argc, char* argv[]) {
         }
         else if(PARAMETER_CHECK("-split", 6, parameterLength)) {
             obeySplits = true;
+        }
+        else if(PARAMETER_CHECK("-ignoreD", 8, parameterLength)) {
+            ignoreD = true;
         }
         else if(PARAMETER_CHECK("-strand", 7, parameterLength)) {
             if ((i+1) < argc) {
@@ -220,7 +224,7 @@ int genomecoverage_main(int argc, char* argv[]) {
     if (!showHelp) {
         BedGenomeCoverage *bc = new BedGenomeCoverage(bedFile, genomeFile, eachBase,
                                                       startSites, bedGraph, bedGraphAll,
-                                                      max, scale, bamInput, obeySplits,
+                                                      max, scale, bamInput, obeySplits, ignoreD,
                                                       filterByStrand, requestedStrand,
                                                       only_5p_end, only_3p_end,
                                                       pair_chip, haveSize, fragmentSize, dUTP,
@@ -269,6 +273,9 @@ void genomecoverage_help(void) {
     cerr << "\t\t\tto infer the blocks for computing coverage." << endl;
     cerr << "\t\t\tFor BED12 files, this uses the BlockCount, BlockStarts, and BlockEnds" << endl;
     cerr << "\t\t\tfields (i.e., columns 10,11,12)." << endl << endl;
+
+    cerr << "\t-ignoreD\t" << "Ignore local deletions (CIGAR \"D\" operations) in BAM entries" << endl;
+    cerr << "\t\t\twhen computing coverage." << endl << endl;
 
     cerr << "\t-strand\t\t" << "Calculate coverage of intervals from a specific strand." << endl;
     cerr << "\t\t\tWith BED files, requires at least 6 columns (strand is column 6). " << endl;

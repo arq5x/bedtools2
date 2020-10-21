@@ -17,7 +17,7 @@ BedGenomeCoverage::BedGenomeCoverage(string bedFile, string genomeFile,
                                      bool eachBase, bool startSites,
                                      bool bedGraph, bool bedGraphAll,
                                      int max, float scale,
-                                     bool bamInput, bool obeySplits,
+                                     bool bamInput, bool obeySplits, bool ignoreD,
                                      bool filterByStrand, string requestedStrand,
                                      bool only_5p_end, bool only_3p_end,
                                      bool pair_chip, bool haveSize, int fragmentSize, bool dUTP,
@@ -35,6 +35,7 @@ BedGenomeCoverage::BedGenomeCoverage(string bedFile, string genomeFile,
     _scale = scale;
     _bamInput = bamInput;
     _obeySplits = obeySplits;
+    _ignoreD = ignoreD;
     _filterByStrand = filterByStrand;
     _requestedStrand = requestedStrand;
     _only_3p_end = only_3p_end;
@@ -345,14 +346,9 @@ void BedGenomeCoverage::CoverageBam(string bamFile) {
         // add coverage accordingly.
         if (!_only_5p_end && !_only_3p_end) {
             bedVector bedBlocks;
-            // we always want to split blocks when a D CIGAR op is found.
+            // if the user invokes -ignoreD, we want to ignore D ops (breakOnDeletionOps == !_ignoreD).
             // if the user invokes -split, we want to also split on N ops.
-            if (_obeySplits) { // "D" true, "N" true
-                GetBamBlocks(bam, refs.at(bam.RefID).RefName, bedBlocks, true, true);
-            }
-            else { // "D" true, "N" false
-                GetBamBlocks(bam, refs.at(bam.RefID).RefName, bedBlocks, true, false);
-            }
+            GetBamBlocks(bam, refs.at(bam.RefID).RefName, bedBlocks, !_ignoreD, _obeySplits);
             AddBlockedCoverage(bedBlocks);
         }
         else if (_only_5p_end) {
