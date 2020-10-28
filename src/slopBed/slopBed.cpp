@@ -67,7 +67,7 @@ void BedSlop::SlopBed() {
    }
    _bed->Close();
 }
-static inline long _normalize_coord(long size, long pos) {
+static inline CHRPOS _normalize_coord(CHRPOS size, CHRPOS pos) {
 	if(pos < 0) return 0;
 	if(size >= 0 && pos > size) return size;
 	return pos;
@@ -84,8 +84,8 @@ void BedSlop::AddSlop(BED &bed) {
 	}
 
 	bool should_swap = _forceStrand && bed.strand == "-";
-	long left_slop = should_swap ? (long)_rightSlop : (long)_leftSlop;
-	long right_slop = should_swap ? (long)_leftSlop : (long)_rightSlop;
+	CHRPOS left_slop = should_swap ? (CHRPOS)_rightSlop : (CHRPOS)_leftSlop;
+	CHRPOS right_slop = should_swap ? (CHRPOS)_leftSlop : (CHRPOS)_rightSlop;
 
 	bed.start -= left_slop;
 	bed.end += right_slop;
