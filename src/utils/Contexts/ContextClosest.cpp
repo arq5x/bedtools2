@@ -264,7 +264,7 @@ bool ContextClosest::handle_k()
 			}
     	}
     }
-	_errorMsg = "\n***** ERROR: -k option must be followed by a postive integer value *****";
+	_errorMsg = "\n***** ERROR: -k option must be followed by a positive integer value *****";
 	return false;
 }
 
