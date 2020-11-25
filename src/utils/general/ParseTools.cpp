@@ -45,101 +45,21 @@ CHRPOS str2chrPos(const char *str, size_t ulen) {
 		ulen = strlen(str);
 	}
 
-	//first test for exponents / scientific notation
-	for (size_t i=0; i < ulen; i++) {
-		if (str[i] == 'e' || str[i] == 'E' || str[i] == '.') {
-			std::istringstream ss(str);
-			double retVal;
-			ss >> retVal;
-			return (int)retVal;
-		}
-	}
+	char* endpos = NULL;
+	long long result = strtoll(str, &endpos, 10);
 
-	int len=(int)ulen;
-	if (len < 1 || len > 19) {
-		fprintf(stderr, "***** ERROR: too many digits/characters for integer conversion in string %s. Exiting...\n", str);
+	if(endpos && *endpos) {
+		if(*endpos == 'e' || *endpos == 'E') {
+			CHRPOS ret = (CHRPOS)strtod(str, &endpos);
+			if(endpos && *endpos == 0) {
+				return ret;
+			}
+		}
+		fprintf(stderr, "***** ERROR: illegal number \"%s\". Exiting...\n", str);
 		exit(1);
 	}
-        if(len > 12) {
-            return std::stoll(str);
-        }
 
-	CHRPOS sum=0;
-	int startPos =0;
-	bool isNegative = false;
-
-	//check for negative numbers
-	if (str[0] == '-') {
-		isNegative = true;
-		startPos = 1;
-	}
-
-	//check for explicitly positive numbers
-	if (str[0] == '+') {
-		isNegative = false;
-		startPos = 1;
-	}
-
-	for (int i=startPos; i < len; i++) {
-		char currChar = str[i];
-		if (currChar == 'e' || currChar == 'E') {
-			//default to atoi for scientific notation
-			return stoll(str);
-		}
-		if (!isdigit(currChar)) {
-			fprintf(stderr, "***** ERROR: illegal character '%c' found in integer conversion of string \"%s\". Exiting...\n", currChar, str);
-			exit(1);
-		}
-
-		int dig = currChar - 48; //ascii code for zero.
-		int power = len -i -1;
-
-		switch (power) {
-		case 0:
-			sum += (CHRPOS)dig;
-			break;
-		case 1:
-			sum += (CHRPOS)dig * 10;
-			break;
-		case 2:
-			sum += (CHRPOS)dig *100;
-			break;
-		case 3:
-			sum += (CHRPOS)dig *1000;
-			break;
-		case 4:
-			sum += (CHRPOS)dig *10000;
-			break;
-		case 5:
-			sum += (CHRPOS)dig *100000;
-			break;
-		case 6:
-			sum += (CHRPOS)dig *1000000;
-			break;
-		case 7:
-			sum += (CHRPOS)dig *10000000;
-			break;
-		case 8:
-			sum += (CHRPOS)dig *100000000;
-			break;
-		case 9:
-			sum += (CHRPOS)dig *1000000000;
-			break;
-		case 10:
-			sum += (CHRPOS)dig *10000000000;
-			break;
-		case 11:
-			sum += (CHRPOS)dig *100000000000;
-			break;
-		case 12:
-			sum += (CHRPOS)dig *1000000000000;
-			break;
-		default:
-			return 0;
-			break;
-		}
-	}
-	return isNegative ? 0 - sum : sum;
+	return result;
 }
 
 string vectorIntToStr(const vector<int> &vec) {
@@ -162,25 +82,46 @@ bool isHeaderLine(const string &line) {
 		return true;
 	}
 	
-	string tmp = line;
-	transform(tmp.begin(), tmp.end(), tmp.begin(), ::tolower);
-	//allow chr chrom to start a header line
-	if (memcmp(tmp.c_str(), "chrom", 5) == 0 && isspace(tmp[5]) && ! isdigit(tmp[6])) {
-		return true;
+	if(line.length() > 4) {
+		uint32_t peek = *(uint32_t*)line.c_str() | 0x20202020u;
+		const char* full_text = NULL;
+		bool require_space = false;
+		bool require_digit = false;
+		switch(peek) {
+			case 0x6f726863: 
+				full_text = "chrom";
+				require_space = true;
+				require_digit = false;
+				break;
+			case 0x20726863:
+			case 0x09726863:
+				full_text = "chr";
+				require_space = require_digit = true;
+				break;
+			case 0x776f7262:
+				full_text = "browser";
+				break;
+			case 0x63617274:
+				full_text = "track";
+				break;
+			case 0x69736976:
+				full_text = "visibility";
+				break;
+			default:
+				return false;
+		}
+		if(full_text) {
+			const char* ptr = NULL;
+			for(ptr = line.c_str(); *ptr && *full_text; ptr ++, full_text ++) {
+				char c = *ptr;
+				if(c >= 'A' && c <= 'Z') c += 32;
+				if(c != *full_text) return false;
+			}
+			if(require_space && !isspace(*(ptr++))) return false;
+			if(require_digit && !isdigit(*(ptr++))) return false;
+			return true;
+		}
 	}
-	//allow chr chrom to start a header line
-	if (memcmp(tmp.c_str(), "chr", 3) == 0 && isspace(tmp[3]) && ! isdigit(tmp[4])) {
-		return true;
-	}
-	//UCSC file headers can also start with the words "browser" or "track", followed by a whitespace character.
-	if (memcmp(tmp.c_str(), "browser", 7) == 0) {
-		return true;
-	}
-	if (memcmp(tmp.c_str(), "track", 5) == 0) {
-		return true;
-	}
-	if (memcmp(tmp.c_str(), "visibility", 10) == 0) {
-		return true;
-	}
+
 	return false;
 }
