@@ -31,6 +31,7 @@ NewChromSweep::NewChromSweep(ContextIntersect *context)
      _lexicoAssumedFileIdx(-1),
      _testLastQueryRec(false)
 {
+	_filePrevChrom.resize(_numFiles);
 }
 
 
@@ -109,6 +110,10 @@ NewChromSweep::~NewChromSweep(void) {
 
    for (int i=0; i < _numDBs; i++) {
        _dbFRMs[i]->close();
+   }
+
+   for(int i = 0; i < _numFiles; i ++) {
+	   free(_filePrevChrom[i]);
    }
 
     if (!_context->hasGenomeFile()) {
@@ -341,15 +346,19 @@ void NewChromSweep::testChromOrder(const Record *rec)
     findChromOrder(rec);
 
     //determine what the previous chrom was for this file.
-    map<int, string>::iterator prevIter = _filePrevChrom.find(fileIdx);
-    if (prevIter == _filePrevChrom.end()) {
-        _filePrevChrom[fileIdx] = chrom;
-        return; //no previously stored chrom for this file.
-    }
-    const string prevChrom(prevIter->second);
-    _filePrevChrom[fileIdx] = chrom;
 
-    if (chrom == prevChrom) return;
+	if (_filePrevChrom[fileIdx] == NULL) {
+		_filePrevChrom[fileIdx] = strdup(chrom.c_str());
+		return;
+	}
+
+	if (strcmp(_filePrevChrom[fileIdx], chrom.c_str()) == 0) return;
+
+	const string prevChrom(_filePrevChrom[fileIdx]);
+
+	free(_filePrevChrom[fileIdx]);
+	_filePrevChrom[fileIdx] = strdup(chrom.c_str());
+
 
     if (verifyChromOrderMismatch(chrom, prevChrom, fileIdx)) {
         fprintf(stderr, "ERROR: chromomsome sort ordering for file %s is inconsistent with other files. Record was:\n", _context->getInputFileName(fileIdx).c_str());
