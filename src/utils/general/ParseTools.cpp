@@ -39,18 +39,29 @@ CHRPOS str2chrPos(const string &str) {
 	return str2chrPos(str.c_str(), str.size());
 }
 
-CHRPOS str2chrPos(const char *str, size_t ulen) {
+CHRPOS str2chrPos(const char * __restrict str, size_t ulen) {
 
 	if (ulen == 0) {
 		ulen = strlen(str);
 	}
 
-	char* endpos = NULL;
-	long long result = strtoll(str, &endpos, 10);
+	const char* endpos = str;
+	long long result = 0;
+	bool neg = false;
+	char last = 0;
 
-	if(endpos && *endpos) {
+	if(*endpos == '-') neg = true, endpos ++;
+
+	for(;(last = *endpos); endpos ++) {
+		if(last < '0' || last > '9') break;
+		result = result * 10 + last - '0';
+	}
+
+	if(last) {
 		if(*endpos == 'e' || *endpos == 'E') {
+			char* endpos = NULL;
 			CHRPOS ret = (CHRPOS)strtod(str, &endpos);
+
 			if(endpos && *endpos == 0) {
 				return ret;
 			}
@@ -59,7 +70,7 @@ CHRPOS str2chrPos(const char *str, size_t ulen) {
 		exit(1);
 	}
 
-	return result;
+	return neg?-result:result;
 }
 
 string vectorIntToStr(const vector<int> &vec) {

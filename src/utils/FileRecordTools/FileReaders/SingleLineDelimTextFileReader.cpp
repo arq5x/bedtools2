@@ -122,9 +122,11 @@ bool SingleLineDelimTextFileReader::findDelimiters() {
 	int nfields = 0;
 	const char* ptr = _sLine.c_str();
 	const char* start = ptr;
+	int target = _delimChar;
+
 	while(ptr) {
 		_delimPositions[nfields++] = ptr - start - 1;
-		ptr = strchr(ptr, _delimChar);
+		ptr = strchr(ptr, target);
 		if(ptr) ptr ++;
 	}
 	_delimPositions[nfields] = _sLine.size();
