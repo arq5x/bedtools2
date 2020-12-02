@@ -115,7 +115,7 @@ protected:
 
     typedef map<string, int> _orderTrackType;
     vector<_orderTrackType *> _fileTracks;
-    map<int, string> _filePrevChrom;
+    vector<string> _filePrevChrom;
     bool _lexicoDisproven; //whether we've established that any file ISN'T in lexicographical order
     bool _lexicoAssumed; //whether we've had to try to guess that any file might be in lexicographical order.
     string _lexicoAssumedChromName; //which chromosome we had to make that guess for. Used in error reporting.

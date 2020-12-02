@@ -107,9 +107,10 @@ bool BufferedStreamMgr::getLine(string &line)
 	}
 	bool retVal = true;
 	while (1) {
-		int searchPos = _mainBufCurrStartPos;
-		while (searchPos < _mainBufCurrLen && _mainBuf[searchPos] != '\n') {
-			searchPos++;
+		int searchPos = _mainBufCurrLen;
+		const char* eol_pos = (const char*)memchr((const char*)_mainBuf + _mainBufCurrStartPos, '\n', _mainBufCurrLen - _mainBufCurrStartPos);
+		if(eol_pos) {
+			searchPos = eol_pos - (const char*)_mainBuf;
 		}
 
 		line.append((char *)_mainBuf + _mainBufCurrStartPos, searchPos - _mainBufCurrStartPos);
