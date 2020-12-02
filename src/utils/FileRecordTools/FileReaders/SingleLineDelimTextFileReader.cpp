@@ -119,10 +119,10 @@ bool SingleLineDelimTextFileReader::detectAndHandleHeader()
 bool SingleLineDelimTextFileReader::findDelimiters() {
 	memset(_delimPositions, 0, (_numFields +1) * sizeof(int));
 	//scan the line for delimiters, determine their positions
-	_delimPositions[0] = -1;
-	int currField=1;
-	int len = (int)_sLine.size();
-	for (int i=0; i < len; i++) {
+	//_delimPositions[0] = -1;
+	//int currField=1;
+	//int len = (int)_sLine.size();
+	/*for (int i=0; i < len; i++) {
 		if (_sLine[i] == _delimChar) {
 			_delimPositions[currField] = i;
 			currField++;
@@ -132,14 +132,23 @@ bool SingleLineDelimTextFileReader::findDelimiters() {
 	if (_sLine[len] == '\t')
 	{
 		currField++;		
+	}*/
+	int nfields = 0;
+	const char* ptr = _sLine.c_str();
+	const char* start = ptr;
+	while(ptr) {
+		_delimPositions[nfields++] = ptr - start - 1;
+		ptr = strchr(ptr, _delimChar);
+		if(ptr) ptr ++;
 	}
+	_delimPositions[nfields] = _sLine.size();
 
 	// count the number of fields allow for lines ending in \t\n
-	if (currField != _numFields) {
+	if (nfields != _numFields) {
 		cerr << "Error: line number " 
 			 << _lineNum << " of file " 
 			 << _filename << " has " 
-			 << currField << " fields, but " 
+			 << nfields << " fields, but " 
 			 << _numFields 
 			 << " were expected." 
 			 << endl;

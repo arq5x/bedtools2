@@ -71,6 +71,8 @@ string vectorIntToStr(const vector<int> &vec) {
 	return str;
 }
 
+
+#if defined(__i386__) || defined(__x86_64__)
 bool isHeaderLine(const string &line) {
 	if (line[0] == '>') {
 		return true;
@@ -125,3 +127,38 @@ bool isHeaderLine(const string &line) {
 
 	return false;
 }
+#else
+bool isHeaderLine(const string &line) {
+	if (line[0] == '>') {
+		return true;
+	}
+	if (line[0] == '!') {
+		return true;
+	}
+	if (line[0] == '#') {
+		return true;
+	}
+	
+	string tmp = line;
+	transform(tmp.begin(), tmp.end(), tmp.begin(), ::tolower);
+	//allow chr chrom to start a header line
+	if (memcmp(tmp.c_str(), "chrom", 5) == 0 && isspace(tmp[5]) && ! isdigit(tmp[6])) {
+		return true;
+	}
+	//allow chr chrom to start a header line
+	if (memcmp(tmp.c_str(), "chr", 3) == 0 && isspace(tmp[3]) && ! isdigit(tmp[4])) {
+		return true;
+	}
+	//UCSC file headers can also start with the words "browser" or "track", followed by a whitespace character.
+	if (memcmp(tmp.c_str(), "browser", 7) == 0) {
+		return true;
+	}
+	if (memcmp(tmp.c_str(), "track", 5) == 0) {
+		return true;
+	}
+	if (memcmp(tmp.c_str(), "visibility", 10) == 0) {
+		return true;
+	}
+	return false;
+}
+#endif

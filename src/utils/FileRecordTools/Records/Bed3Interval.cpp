@@ -32,18 +32,18 @@ bool Bed3Interval::initFromFile(SingleLineDelimTextFileReader *fileReader)
 	return true;
 }
 
-inline void print_reocord(const string& name, CHRPOS start, CHRPOS end, string& buf) {
+inline void print_record(const string& name, CHRPOS start, CHRPOS end, string& buf) {
 	static char buffer[1024];
 	snprintf(buffer, sizeof(buffer), "%s\t%ld\t%ld", name.c_str(), start, end);
 	buf.append(buffer);
 }
 
 void Bed3Interval::print(string &outBuf) const{
-	print_reocord(_chrName, _startPos, _endPos, outBuf);
+	print_record(_chrName, _startPos, _endPos, outBuf);
 }
 
 void Bed3Interval::print(string &outBuf, CHRPOS start, CHRPOS end) const{
-	print_reocord(_chrName, start, end, outBuf);
+	print_record(_chrName, start, end, outBuf);
 }
 
 void Bed3Interval::print(string &outBuf, const string & start, const string & end) const
