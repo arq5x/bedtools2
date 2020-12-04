@@ -9,12 +9,10 @@
 #define RECORD_H_
 
 #include <string>
+#include "BedtoolsTypes.h"
 #include "FreeList.h"
 #include "string.h"
 #include "FileRecordTypeChecker.h"
-
-// Aaron use other typedef from bedFile.h
-typedef int64_t CHRPOS;
 
 
 using namespace std;
