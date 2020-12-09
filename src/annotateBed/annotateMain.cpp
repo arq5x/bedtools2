@@ -36,7 +36,6 @@ int annotate_main(int argc, char* argv[]) {
     bool diffStrand     = false;
     bool haveBed        = false;
     bool haveFiles      = false;
-    bool haveTitles     = false;
     bool reportCounts   = false;
     bool reportBoth     = false;
 
@@ -86,7 +85,6 @@ int annotate_main(int argc, char* argv[]) {
         }
         else if(PARAMETER_CHECK("-names", 6, parameterLength)) {
             if ((i+1) < argc) {
-                haveTitles = true;
                 i = i+1;
                 string title = argv[i];
                 while (title[0] != '-' && i < argc) {
