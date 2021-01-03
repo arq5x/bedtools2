@@ -6,6 +6,7 @@
  */
 
 #include "ContextBase.h"
+#include "Random.h"
 #include <unistd.h>
 #include <sys/types.h>
 #include <cctype>
@@ -382,7 +383,7 @@ int ContextBase::getUnspecifiedSeed()
 {
 	// thanks to Rob Long for the tip.
 	_seed = (unsigned)time(0)+(unsigned)getpid();
-	srand(_seed);
+	rand_set_seed(_seed);
 	return _seed;
 }
 
@@ -481,7 +482,7 @@ bool ContextBase::handle_seed()
 	}
 	_hasConstantSeed = true;
 	_seed  = atoi(_argv[_i+1]);
-	srand(_seed);
+	rand_set_seed(_seed);
 	markUsed(_i - _skipFirstArgs);
 	_i++;
 	markUsed(_i - _skipFirstArgs);

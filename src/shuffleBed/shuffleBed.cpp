@@ -11,6 +11,7 @@
 ******************************************************************************/
 #include "lineFileUtilities.h"
 #include "shuffleBed.h"
+#include "Random.h"
 
 
 BedShuffle::BedShuffle(string &bedFile, string &genomeFile, 
@@ -49,11 +50,7 @@ BedShuffle::BedShuffle(string &bedFile, string &genomeFile,
         // thanks to Rob Long for the tip.
         _seed = (unsigned)time(0)+(unsigned)getpid();
     }
-#ifdef USE_RAND
-    srand(_seed);
-#else
-    mt_rand.seed(_seed);
-#endif
+    rand_set_seed(_seed);
     
     if (_isBedpe == false)
         _bed         = new BedFile(bedFile);
@@ -334,17 +331,7 @@ void BedShuffle::ChooseLocus(BED &bedEntry) {
         _tries = 0;
         do 
         {
-
-            // we need to combine two consecutive calls to rand()
-            // because RAND_MAX is 2^31 (2147483648), whereas
-            // mammalian genomes are obviously much larger.
-#ifdef USE_RAND
-            CHRPOS randStart = ((((long) rand()) << 31) | rand()) %
-                                 _genomeSize;
-#else
-            CHRPOS randStart = ((((long) mt_rand()) << 31) | mt_rand()) %
-                                 _genomeSize;
-#endif
+            CHRPOS randStart = rand_range(_genomeSize);
             // use the above randomStart (e.g., for human 0..3.1billion) 
             // to identify the chrom and start on that chrom.
             pair<string, CHRPOS> location = _genome->projectOnGenome(randStart);
@@ -379,26 +366,16 @@ void BedShuffle::ChooseLocus(BED &bedEntry) {
         do 
         {
             if (_sameChrom == false) {
-#ifdef USE_RAND
-                randomChrom    = _chroms[rand() % _numChroms];
+                randomChrom    = _chroms[rand_range(_numChroms)];
                 chromSize      = _genome->getChromSize(randomChrom);
-                randomStart    = rand() % chromSize;
-#else
-                randomChrom    = _chroms[mt_rand() % _numChroms];
-                chromSize      = _genome->getChromSize(randomChrom);
-                randomStart    = mt_rand() % chromSize;
-#endif
+                randomStart    = rand_range(chromSize);
                 bedEntry.chrom = randomChrom;
                 bedEntry.start = randomStart;
                 bedEntry.end   = randomStart + length;
             }
             else {
                 chromSize      = _genome->getChromSize(chrom);
-#ifdef USE_RAND
-                randomStart    = rand() % chromSize;
-#else
-                randomStart    = mt_rand() % chromSize;
-#endif
+                randomStart    = rand_range(chromSize);
                 bedEntry.start = randomStart;
                 bedEntry.end   = randomStart + length;
             }
@@ -426,13 +403,7 @@ void BedShuffle::ChoosePairedLocus(BEDPE &b) {
         CHRPOS chromSize;
         do 
         {
-#ifdef USE_RAND
-            uint32_t randStart = ((((long) rand()) << 31) | rand()) %
-                                 _genomeSize;
-#else
-            uint32_t randStart = ((((long) mt_rand()) << 31) | mt_rand()) %
-                                 _genomeSize;
-#endif
+            CHRPOS randStart = rand_range(_genomeSize);
             pair<string, int> location = _genome->projectOnGenome(randStart);
             b.chrom1  = location.first;
             b.chrom2  = location.first;
@@ -451,17 +422,8 @@ void BedShuffle::ChoosePairedLocus(BEDPE &b) {
         CHRPOS chromSize1, chromSize2;
         do 
         {
-#ifdef USE_RAND
-            uint32_t rand1Start = ((((long) rand()) << 31) | rand()) %
-                                  _genomeSize;
-            uint32_t rand2Start = ((((long) rand()) << 31) | rand()) %
-                                  _genomeSize;
-#else
-            uint32_t rand1Start = ((((long) mt_rand()) << 31) | mt_rand()) %
-                                  _genomeSize;
-            uint32_t rand2Start = ((((long) mt_rand()) << 31) | mt_rand()) %
-                                  _genomeSize;
-#endif
+            CHRPOS rand1Start = rand_range(_genomeSize);
+            CHRPOS rand2Start = rand_range(_genomeSize);
             pair<string, int> location1 = _genome->projectOnGenome(rand1Start);
             pair<string, int> location2 = _genome->projectOnGenome(rand2Start);
             
@@ -486,19 +448,11 @@ void BedShuffle::ChooseLocusFromInclusionFile(BED &bedEntry)
 {
     // choose an -incl interval randomly, yet weighted by the size of the incl interval.
     size_t length = (bedEntry.end - bedEntry.start);
-#ifdef USE_RAND
-    double runif =((double)rand()/(double) RAND_MAX);
-#else
-    double runif =((double)mt_rand()/(double) mt_rand.max());
-#endif
+    double runif = rand_proportion();
     BED *includeInterval = _include->sizeWeightedSearch(runif);
     
     // choose a random start within the -incl interval and reconstruct shuffled record
-#ifdef USE_RAND
-    CHRPOS randomStart = includeInterval->start + (rand() % includeInterval->size());
-#else
-    CHRPOS randomStart = includeInterval->start + ((long) mt_rand() % includeInterval->size());
-#endif
+    CHRPOS randomStart = includeInterval->start + rand_range(includeInterval->size());
     bedEntry.chrom = includeInterval->chrom;
     bedEntry.start = randomStart;
     bedEntry.end   = randomStart + length;

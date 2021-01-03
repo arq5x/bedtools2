@@ -1,4 +1,5 @@
 #include "sampleFile.h"
+#include "Random.h"
 
 static bool SampleRecordLtFn(const Record *rec1, const Record *rec2) {
 	return (*rec1 < *rec2);
@@ -85,11 +86,8 @@ bool SampleFile::keepRecord(Record *record)
 	}
 
 
-	// We need a random number in the range [0, _currRecordNum].
-	// Must combine two consective calls to rand()
-    // because RAND_MAX is 2^31 (2147483648), whereas
-    // the number of input records could be far larger.
-    size_t idx = ((((long) rand()) << 31) | rand()) % _currRecordNum;
+    // We need a random number in the range [0, _currRecordNum).
+    size_t idx = rand_range(_currRecordNum);
 
     if (idx < _numSamples) {
     	//replace old record at idx with this new one.
