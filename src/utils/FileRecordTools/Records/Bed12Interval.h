@@ -70,6 +70,9 @@ protected:
 	string _thickStartStr;
 	string _thickEndStr;
 	string _blockCountStr;
+private:
+
+	static inline void print_record(const Bed12Interval& what, CHRPOS start, CHRPOS end, string& outBuf);
 };
 
 
