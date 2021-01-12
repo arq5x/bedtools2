@@ -22,7 +22,7 @@ bool BedGraphInterval::initFromFile(SingleLineDelimTextFileReader *fileReader)
 
 inline void print_record(const string& chrom_name, CHRPOS start, CHRPOS end, const string& name, string& buf) {
 	static char buffer[1024];
-	snprintf(buffer, sizeof(buffer), "%s\t%" PRId_CHRPOS "\t%" PRId_CHRPOS"%s", chrom_name.c_str(), start, end, name.c_str());
+	snprintf(buffer, sizeof(buffer), "%s\t%" PRId_CHRPOS "\t%" PRId_CHRPOS"\t%s", chrom_name.c_str(), start, end, name.c_str());
 	buf.append(buffer);
 }
 

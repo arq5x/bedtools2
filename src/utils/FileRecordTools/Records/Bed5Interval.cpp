@@ -23,7 +23,7 @@ bool Bed5Interval::initFromFile(SingleLineDelimTextFileReader *fileReader)
 
 inline void print_record(const string& chrom_name, CHRPOS start, CHRPOS end, const string& name, const string& score, string& buf) {
 	static char buffer[1024];
-	snprintf(buffer, sizeof(buffer), "%s\t%" PRId_CHRPOS "\t%" PRId_CHRPOS"%s\t%s", chrom_name.c_str(), start, end, name.c_str(), score.c_str());
+	snprintf(buffer, sizeof(buffer), "%s\t%" PRId_CHRPOS "\t%" PRId_CHRPOS"\t%s\t%s", chrom_name.c_str(), start, end, name.c_str(), score.c_str());
 	buf.append(buffer);
 }
 
