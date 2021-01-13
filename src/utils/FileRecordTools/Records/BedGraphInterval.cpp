@@ -20,18 +20,20 @@ bool BedGraphInterval::initFromFile(SingleLineDelimTextFileReader *fileReader)
 	return baseRetFlag;
 }
 
+inline void print_record(const string& chrom_name, CHRPOS start, CHRPOS end, const string& name, string& buf) {
+	static char buffer[1024];
+	snprintf(buffer, sizeof(buffer), "%s\t%" PRId_CHRPOS "\t%" PRId_CHRPOS"\t%s", chrom_name.c_str(), start, end, name.c_str());
+	buf.append(buffer);
+}
+
 void BedGraphInterval::print(string &outBuf) const
 {
-	Bed3Interval::print(outBuf);
-	outBuf.append("\t");
-	outBuf.append(_name);
+	print_record(_chrName, _startPos, _endPos, _name, outBuf);
 }
 
 void BedGraphInterval::print(string &outBuf, CHRPOS start, CHRPOS end) const
 {
-	Bed3Interval::print(outBuf, start, end);
-	outBuf.append("\t");
-	outBuf.append(_name);
+	print_record(_chrName, start, end, _name, outBuf);
 }
 
 void BedGraphInterval::print(string &outBuf, const string & start, const string & end) const

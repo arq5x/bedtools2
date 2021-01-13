@@ -55,43 +55,35 @@ void Bed12Interval::clear() {
 	 _thickStartStr.clear();
 	 _thickEndStr.clear();
 	 _blockCountStr.clear();
+}
 
+ inline void Bed12Interval::print_record(const Bed12Interval& what, CHRPOS start, CHRPOS end, string& outBuf) {
+	static char buffer[1024];
+	int size = snprintf(buffer, sizeof(buffer), "%s\t%" PRId_CHRPOS "\t%" PRId_CHRPOS"\t%s\t%s\t%s", what._chrName.c_str(), start, end, what._name.c_str(), what._score.c_str(), what._strand.c_str());
+#define APPEND(field) \
+	do{\
+		if(size < (int)sizeof(buffer) - 1) \
+			size += snprintf(buffer + size, sizeof(buffer) - size, "\t%s", what.field.c_str());\
+	}while(0)
+
+	APPEND(_thickStartStr);
+	APPEND(_thickEndStr);
+	APPEND(_itemRGB);
+	APPEND(_blockCountStr);
+	APPEND(_blockSizes);
+	APPEND(_blockStarts);
+
+	outBuf.append(buffer);
 }
 
 void Bed12Interval::print(string &outBuf) const
 {
-	Bed6Interval::print(outBuf);
-
-	outBuf.append("\t");
-	outBuf.append(_thickStartStr);
-	outBuf.append("\t");
-	outBuf.append(_thickEndStr);
-	outBuf.append("\t");
-	outBuf.append(_itemRGB);
-	outBuf.append("\t");
-	outBuf.append(_blockCountStr);
-	outBuf.append("\t");
-	outBuf.append(_blockSizes);
-	outBuf.append("\t");
-	outBuf.append(_blockStarts);
+	print_record(*this, _startPos, _endPos, outBuf);
 }
 
 void Bed12Interval::print(string &outBuf, CHRPOS start, CHRPOS end) const
 {
-	Bed6Interval::print(outBuf, start, end);
-
-	outBuf.append("\t");
-	outBuf.append(_thickStartStr);
-	outBuf.append("\t");
-	outBuf.append(_thickEndStr);
-	outBuf.append("\t");
-	outBuf.append(_itemRGB);
-	outBuf.append("\t");
-	outBuf.append(_blockCountStr);
-	outBuf.append("\t");
-	outBuf.append(_blockSizes);
-	outBuf.append("\t");
-	outBuf.append(_blockStarts);
+	print_record(*this, start, end,outBuf);
 }
 
 void Bed12Interval::print(string &outBuf, const string & start, const string & end) const
