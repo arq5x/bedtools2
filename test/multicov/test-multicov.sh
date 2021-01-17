@@ -1,5 +1,6 @@
 set -e;
 BT=${BT-../../bin/bedtools}
+htsutil=${htsutil-../htsutil}
 
 FAILURES=0;
 
@@ -13,10 +14,10 @@ check()
 	fi
 }
 
-../htsutil samtoindexedbam one_block.sam one_block.bam
-../htsutil samtoindexedbam two_blocks.sam two_blocks.bam
-../htsutil samtoindexedbam test-multi.sam test-multi.bam
-../htsutil samtoindexedbam test-multi.2.sam test-multi.2.bam
+$htsutil samtoindexedbam one_block.sam one_block.bam
+$htsutil samtoindexedbam two_blocks.sam two_blocks.bam
+$htsutil samtoindexedbam test-multi.sam test-multi.bam
+$htsutil samtoindexedbam test-multi.2.sam test-multi.2.bam
 
 ##################################################################
 #  Test one block matches all BEDs

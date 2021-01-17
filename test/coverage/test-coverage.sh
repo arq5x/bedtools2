@@ -1,5 +1,6 @@
 set -e;
 BT=${BT-../../bin/bedtools}
+htsutil=${htsutil-../htsutil}
 
 FAILURES=0;
 
@@ -18,10 +19,10 @@ check()
 #                       BAM files                         #
 ###########################################################
 ###########################################################
-../htsutil samtobam one_block.sam one_block.bam
-../htsutil samtobam two_blocks.sam two_blocks.bam
-../htsutil samtobam three_blocks.sam three_blocks.bam
-../htsutil samtobam sam-w-del.sam sam-w-del.bam
+$htsutil samtobam one_block.sam one_block.bam
+$htsutil samtobam two_blocks.sam two_blocks.bam
+$htsutil samtobam three_blocks.sam three_blocks.bam
+$htsutil samtobam sam-w-del.sam sam-w-del.bam
 
 
 ##################################################################

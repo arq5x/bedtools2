@@ -1,5 +1,6 @@
 set -e;
 BT=${BT-../../bin/bedtools}
+htsutil=${htsutil-../htsutil}
 
 FAILURES=0;
 
@@ -13,7 +14,7 @@ check()
 	fi
 }
 
-../htsutil samtobam test2.sam test2.bam
+$htsutil samtobam test2.sam test2.bam
 
 $BT bamtofastq -i test2.bam -fq test2.fq -fq2 test2.fq2 2> /dev/null
 
