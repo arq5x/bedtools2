@@ -1,4 +1,4 @@
-BUILT_OBJECTS += obj/ParseTools.o obj/PushBackStreamBuf.o obj/CompressionTools.o obj/Tokenizer.o obj/CommonHelp.o obj/ErrorMsg.o
+BUILT_OBJECTS += obj/ParseTools.o obj/PushBackStreamBuf.o obj/CompressionTools.o obj/Tokenizer.o obj/CommonHelp.o obj/ErrorMsg.o obj/Random.o
 
 obj/ParseTools.o: src/utils/general/ParseTools.cpp obj/ParseTools.d
 	$(CXX_COMPILE)
@@ -16,4 +16,7 @@ obj/CommonHelp.o: src/utils/general/CommonHelp.cpp obj/CommonHelp.d
 	$(CXX_COMPILE)
 
 obj/ErrorMsg.o: src/utils/general/ErrorMsg.cpp obj/ErrorMsg.d
+	$(CXX_COMPILE)
+
+obj/Random.o: src/utils/general/Random.cpp obj/Random.d
 	$(CXX_COMPILE)

@@ -1,5 +1,6 @@
 set -e;
 BT=${BT-../../bin/bedtools}
+htsutil=${htsutil-../htsutil}
 
 FAILURES=0;
 
@@ -19,7 +20,7 @@ check()
 echo -e "    bedtobam.t1...\c"
 echo \
 "read_name	0	1	1001	255	1000M	*	0	0	*	*">exp
-echo -e "1\t1000\t2000\tread_name\t255\t+" | $BT bedtobam -i - -g chrsize.tmp| ../htsutil viewbamrecords > obs
+echo -e "1\t1000\t2000\tread_name\t255\t+" | $BT bedtobam -i - -g chrsize.tmp| $htsutil viewbamrecords > obs
 check obs exp
 rm obs exp
 

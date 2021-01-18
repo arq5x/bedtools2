@@ -10,6 +10,7 @@
   Licenced under the GNU General Public License 2.0 license.
 ******************************************************************************/
 #include "randomBed.h"
+#include "Random.h"
 
 
 BedRandom::BedRandom(string &genomeFile, uint32_t numToGenerate, int seed,
@@ -23,15 +24,11 @@ BedRandom::BedRandom(string &genomeFile, uint32_t numToGenerate, int seed,
     // use the supplied seed for the random
     // number generation if given.  else,
     // roll our own.
-    if (_haveSeed) {
-        _seed = seed;
-        srand(seed);
-    }
-    else {
+    if (!_haveSeed) {
         // thanks to Rob Long for the tip.
         _seed = (unsigned)time(0)+(unsigned)getpid();
-        srand(_seed);
     }
+    rand_set_seed(_seed);
     Generate();
 }
 
@@ -55,10 +52,7 @@ void BedRandom::Generate()
     {
         do 
         {
-            // we need to combine two consective calls to rand()
-            // because RAND_MAX is 2^31 (2147483648), whereas
-            // mammalian genomes are obviously much larger.
-            CHRPOS randStart = ((((long) rand()) << 31) | rand()) % genomeSize;
+            CHRPOS randStart = rand_range(genomeSize);
             // use the above randomStart (e.g., for human 0..3.1billion) 
             // to identify the chrom and start on that chrom.
             pair<string, CHRPOS> location = _genome->projectOnGenome(randStart);
@@ -70,7 +64,7 @@ void BedRandom::Generate()
         } while (end > chromSize);
         numGenerated++;
         // flip a coin for strand
-        (rand() / double(RAND_MAX)) > 0.5 ? strand = '+' : strand = '-';
+        strand = (rand_range(2) >= 1)? '+' : '-';
         printf("%s\t%" PRId_CHRPOS "\t%" PRId_CHRPOS "\t%d\t%" PRId_CHRPOS "\t%c\n",
             chrom.c_str(), start, end, numGenerated, end-start, strand);
     }
