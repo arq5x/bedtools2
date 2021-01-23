@@ -5,11 +5,11 @@ Release History
 Version 2.30.0 (23-Dec-2021)
 ============================
 1. Thanks to Hao Hou (github: @38), we have substantial improvements in the speed associated with parsing input files and in printing results. It turns our that these tasks consume a large proportion of run time, especially as input files increase in size. These changes result in a 2-3X improvement in speed, depending on input types, options, etc.
-2. Thanks to John Marhsall (github: @jmarshall), who improved the stability and cleanliness of the code used for random number generation. These changes also squash a bug that arises on Debian systems.
+2. Thanks to John Marshall (github: @jmarshall), who improved the stability and cleanliness of the code used for random number generation. These changes also squash a bug that arises on Debian systems.
 3. John Marshall cleaned up some lingering data type problems in the `slop` tool.
 4. Thanks to @gringer for adding teh `-ignoreD` option to the `genomecov` tool, which allows `D` CIGAR operations to be ignored when calculating coverage. This is useful for long-read technologies with high INDEL error rates.
 5. Added a fix for a `bug <https://github.com/arq5x/bedtools2/issues/865>`_ that did not properly handle the splitting of intervals in BED12 records with one block.
-6. Thanks to John Marhsall (github: @jmarshall), we have addressed numerical instability issues in the `fisher` tool.
+6. Thanks to John Marshall (github: @jmarshall), we have addressed numerical instability issues in the `fisher` tool.
 7. Thanks to Hao Hou (github: @38), reference genomes can be read as an environment variable (`CRAM_REFERENCE`) when using CRAM input files.
 8. Added a `-rna` option to the `getfasta` tool to allow support for RNA genomes.
 9. Thanks to Hao Hou (github: @38), we fixed input file format detection bugs arising in ZSH.
@@ -17,7 +17,7 @@ Version 2.30.0 (23-Dec-2021)
 11. Thanks to Hao Hou (github: @38), we suppressed unnecessary warnings when reading GZIPP'ed files.
 12. Thanks to Hao Hou (github: @38), we fixed an overflow bug in the `shuffle` tool.
 13. Thanks to Hao Hou (github: @38), we fixed an data type bug in the `shift` tool.
-14. Thanks to John Marhsall (github: @jmarshall) and Hao Hou (github: @38), we have cleaned up the internal support for htslib.
+14. Thanks to John Marshall (github: @jmarshall) and Hao Hou (github: @38), we have cleaned up the internal support for htslib.
 
 
 Version 2.29.2 (17-Dec-2019)
