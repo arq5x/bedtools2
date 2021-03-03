@@ -182,7 +182,7 @@ been reported, a histogram summarizing the coverage among all features in A will
   chr1  30  40  a3  1  -
   chr1  100 200 a4  1  +
 
-  $ bedtools coverage  -a A.bed -b B.bed -hist
+  $ bedtools coverage -a A.bed -b B.bed -hist
   chr1  0   100 b1  1  +  0  70  100  0.7000000
   chr1  0   100 b1  1  +  1  30  100  0.3000000
   chr1  100 200 b2  1  -  1  100 100  1.0000000
