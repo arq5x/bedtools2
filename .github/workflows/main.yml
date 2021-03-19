@@ -34,7 +34,7 @@ jobs:
       with:
         msystem: MSYS
         install: gcc make python libbz2-devel liblzma-devel zlib-devel git diffutils
-    - name: CCompile and test Bedtools
+    - name: Compile and test Bedtools
       run: make -j $(nproc) && make test
     - name: Compile semi-static binary
       run: make VERBOSE=1 -j $(nproc) static
