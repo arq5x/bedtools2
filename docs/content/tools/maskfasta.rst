@@ -13,7 +13,7 @@
 
 ``bedtools maskfasta`` masks sequences in a FASTA file based on intervals defined in a feature file. The
 headers in the input FASTA file must exactly match the chromosome column in the feature file. This
-may be useful fro creating your own masked genome file based on custom annotations or for masking all
+may be useful for creating your own masked genome file based on custom annotations or for masking all
 but your target regions when aligning sequence data from a targeted capture experiment.
 
 
