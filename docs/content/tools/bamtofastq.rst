@@ -37,7 +37,7 @@ Option          Description
 =============   ================================================================
 **-fq2**        FASTQ for second end.  Used if BAM contains paired-end data.
                 BAM should be sorted by query name 
-                (``samtools sort -n aln.bam aln.qsort``) if creating 
+                (``samtools sort -n -o aln.qsort.bam aln.bam``) if creating 
                 paired FASTQ with this option.
 **-tags**       Create FASTQ based on the mate info in the BAM R2 and Q2 tags.
 =============   ================================================================
