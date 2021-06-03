@@ -27,7 +27,7 @@ Usage and option summary
 Option          Description
 =============   ================================================================
 **-bedpe**      Write BAM alignments in BEDPE format. Only one alignment from 
-                paired-end reads will be reported. Specifically, it each mate 
+                paired-end reads will be reported. Specifically, if each mate
                 is aligned to the same chromosome, the BAM alignment reported 
                 will be the one where the BAM insert size is greater than zero. 
                 When the mate alignments are interchromosomal, the 
@@ -95,7 +95,7 @@ column in the resulting BED records.
 ==========================================================================
 The ``-bedpe`` option converts BAM alignments to BEDPE format, thus allowing
 the two ends of a paired-end alignment to be reported on a single text line. 
-Specifically, it each mate is aligned to the same chromosome, 
+Specifically, if each mate is aligned to the same chromosome,
 the BAM alignment reported will be the one where the BAM insert size is greater 
 than zero. When the mate alignments are interchromosomal, the lexicographically 
 lower chromosome will be reported first. Lastly, when an end is unmapped, the 
