@@ -78,12 +78,12 @@ end 1 and one for end 2.
     When using this option, it is required that the BAM 
     file is sorted/grouped by the read name. This keeps the resulting records
     in the two output FASTQ files in the same order. One can sort the BAM
-    file by query name with ``samtools sort -n aln.bam aln.qsort``.
+    file by query name with ``samtools sort -n -o aln.qsort.bam aln.bam``.
 
 
 .. code-block:: bash
 
-  $ samtools sort -n aln.bam aln.qsort
+  $ samtools sort -n -o aln.qsort.bam aln.bam
   
   $ bedtools bamtofastq -i aln.qsort.bam \
                         -fq aln.end1.fq \
