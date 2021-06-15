@@ -98,7 +98,7 @@ int bamtofastq_main(int argc, char* argv[]) {
 
     // make sure we have a BAM file
     if (!haveInBam) {
-      cerr << endl << "*****" << endl << "*****ERROR: Need -bam. " << endl << "*****" << endl;
+      cerr << endl << "*****" << endl << "*****ERROR: Need bam file (-i). " << endl << "*****" << endl;
       showHelp = true;
     }
     // make sure we have an end1 FASTQ file
