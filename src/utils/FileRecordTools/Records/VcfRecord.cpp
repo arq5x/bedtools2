@@ -23,7 +23,9 @@ bool VcfRecord::initFromFile(SingleLineDelimTextFileReader *fileReader)
 	if (_varAlt[0] == '<') {
 		// this is a structural variant. Need to parse the tags to find the endpos,
 		// UNLESS it's an insertion.
-		if (!(_varAlt[1] == 'I' && _varAlt[2] == 'N' && _varAlt[3] == 'S')) {
+		if (memcmp(_varAlt.c_str(), "<*>", 3) == 0) {
+			_endPos = _startPos + 1;
+		} else if (memcmp(_varAlt.c_str(), "<INS>", 5) != 0) {
 			_endPos = _startPos + fileReader->getVcfSVlen();
 		} else {
 			//for insertions, treat as zero-length records
