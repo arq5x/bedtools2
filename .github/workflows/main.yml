@@ -3,17 +3,46 @@ name: CI
 on: [push, pull_request]
 
 jobs:
-  build:
+  build-linux:
 
     runs-on: ubuntu-latest
 
     steps:
     - uses: actions/checkout@v1
     - name: Compile and test Bedtools
-      run: make -j8 && make test
+      run: make -j $(nproc) && make test
     - name: Compile static binary
-      run:  make -j8 static
+      run:  make -j $(nproc) static
     - uses: actions/upload-artifact@v1
       with:
-          name: bedtools.static
+          name: bedtools.static-linux
           path: bin/bedtools.static
+
+  build-windows:
+
+    runs-on: windows-latest
+
+    defaults:
+      run:
+        shell: msys2 {0}
+    steps:
+    - name: Set proper line endings in git
+      shell: powershell
+      run: git config --global core.autocrlf false
+    - uses: actions/checkout@v1
+    - uses: msys2/setup-msys2@v2
+      with:
+        msystem: MSYS
+        install: gcc make python libbz2-devel liblzma-devel zlib-devel git diffutils
+    - name: Compile and test Bedtools
+      run: make -j $(nproc) && make test
+    - name: Compile semi-static binary
+      run: make VERBOSE=1 -j $(nproc) static
+    - name: Copy msys-2.0.dll to bin
+      run: cp /usr/bin/msys-2.0.dll bin/
+    - uses: actions/upload-artifact@v2
+      with:
+          name: bedtools.static-windows
+          path: |
+            bin/bedtools.static
+            bin/msys-2.0.dll

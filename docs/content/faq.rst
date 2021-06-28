@@ -40,6 +40,20 @@ and on Fedora/Centos this would be:
     yum install zlib1g-dev
 
 --------------------------------------------------
+Is build on Windows possible?
+--------------------------------------------------
+Yes. Currently build on Windows could be done via `MSYS2 <https://www.msys2.org/>`_. You need to:
+- Install MSYS2
+- Open MSYS2 Bash shell
+- Install build dependencies via command
+.. code-block:: bash
+    pacman -S gcc make python libbz2-devel liblzma-devel zlib-devel git diffutils
+- Run ``make`` command.
+At the moment MSYS2 does not support fully static builds, so bedtools.static depends on file ``msys-2.0.dll``
+(could be found at ``C:\msys64\usr\bin\msys-2.0.dll`` if default install path is used). You need to distribute this file
+together with main executable.
+
+--------------------------------------------------
 Compiling with a specific zlib library
 --------------------------------------------------
 If you need to override the location of the zlib library used to compile bedtools, you can run `make` and specify the `LIBS` argument. For example:
