@@ -33,8 +33,7 @@ bool Bed3Interval::initFromFile(SingleLineDelimTextFileReader *fileReader)
 }
 
 inline void print_record(const string& name, CHRPOS start, CHRPOS end, string& buf) {
-	static char buffer[1024];
-	snprintf(buffer, sizeof(buffer), "%s\t%" PRId_CHRPOS "\t%" PRId_CHRPOS, name.c_str(), start, end);
+	const char* buffer = buffer_printf("%s\t%" PRId_CHRPOS "\t%" PRId_CHRPOS, name.c_str(), start, end);
 	buf.append(buffer);
 }
 

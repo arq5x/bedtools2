@@ -9,6 +9,7 @@
 #define RECORD_H_
 
 #include <string>
+#include <cstdarg>
 #include "BedtoolsTypes.h"
 #include "FreeList.h"
 #include "string.h"
@@ -20,6 +21,37 @@ using namespace std;
 class FileRecordMgr;
 class FileReader;
 class ChromIdLookup;
+
+static inline const char* buffer_printf(const char* fmt, ...) __attribute__((format(printf, 1, 2)));
+static inline const char* buffer_printf(const char* fmt, ...) {
+	static char static_buffer[1024];
+	static char* dynamic_buffer = NULL;
+	static size_t dynamic_buffer_size;
+
+	char* current_buffer = dynamic_buffer ? dynamic_buffer : static_buffer;
+	size_t current_buffer_size =  dynamic_buffer ? dynamic_buffer_size : sizeof(static_buffer);
+
+	va_list ap;
+
+	va_start(ap, fmt);
+
+	for(;;) {
+		va_list ap_copy;
+		va_copy(ap_copy, ap);
+		int required_size = vsnprintf(current_buffer, current_buffer_size, fmt, ap_copy);
+		if(required_size < (int)current_buffer_size)
+			break;
+
+		free(dynamic_buffer);
+		dynamic_buffer = current_buffer = (char*)malloc(dynamic_buffer_size = required_size + 1);
+		current_buffer_size = required_size + 1;
+	}
+
+	va_end(ap);
+
+	return current_buffer;
+}
+
 
 class Record {
 public:
