@@ -58,20 +58,21 @@ void Bed12Interval::clear() {
 }
 
  inline void Bed12Interval::print_record(const Bed12Interval& what, CHRPOS start, CHRPOS end, string& outBuf) {
-	static char buffer[1024];
-	int size = snprintf(buffer, sizeof(buffer), "%s\t%" PRId_CHRPOS "\t%" PRId_CHRPOS"\t%s\t%s\t%s", what._chrName.c_str(), start, end, what._name.c_str(), what._score.c_str(), what._strand.c_str());
-#define APPEND(field) \
-	do{\
-		if(size < (int)sizeof(buffer) - 1) \
-			size += snprintf(buffer + size, sizeof(buffer) - size, "\t%s", what.field.c_str());\
-	}while(0)
-
-	APPEND(_thickStartStr);
-	APPEND(_thickEndStr);
-	APPEND(_itemRGB);
-	APPEND(_blockCountStr);
-	APPEND(_blockSizes);
-	APPEND(_blockStarts);
+	const char* buffer = buffer_printf(
+			"%s\t%" PRId_CHRPOS "\t%" PRId_CHRPOS"\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s", 
+			what._chrName.c_str(), 
+			start, 
+			end, 
+			what._name.c_str(), 
+			what._score.c_str(), 
+			what._strand.c_str(),
+			what._thickStartStr.c_str(),
+			what._thickEndStr.c_str(),
+			what._itemRGB.c_str(),
+			what._blockCountStr.c_str(),
+			what._blockSizes.c_str(),
+			what._blockStarts.c_str()
+	);
 
 	outBuf.append(buffer);
 }
