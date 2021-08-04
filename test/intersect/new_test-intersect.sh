@@ -985,3 +985,14 @@ $BT  intersect -s -v -a strand_with_star.a.bed -b strand_with_star.b.bed > obs
 check exp obs
 rm exp obs
 [[ $FAILURES -eq 0 ]] || exit 1;
+
+
+###########################################################
+#  Test utral bed4 intersection
+############################################################
+echo -e "    intersect.new.t80...\c"
+cp ultra-long-bed4.bed exp
+$BT intersect -a ultra-long-bed4.bed -b ultra-long-bed4.bed > obs
+check exp obs
+rm exp obs
+[[ $FAILURES -eq 0 ]] || exit 1;
