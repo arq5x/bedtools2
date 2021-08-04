@@ -64,7 +64,7 @@ The default output format is as follows:
 3. 1-based end coordinate of the sub-interval.
 4. The number of files whose intervals overlap this sub interval at least once.
 5. The list of file numbers (by order on the command line) whose intervals overlap this sub interval at least once.
-6..N. Columns reflecting whether each file had (1) or did not have (0) 1 or more intervals overlapping this sub interval.
+6. Columns reflecting whether each file had (1) or did not have (0) 1 or more intervals overlapping this sub interval.
 
 For example:
 
