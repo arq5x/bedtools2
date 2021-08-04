@@ -140,7 +140,7 @@ void MultiIntersectBed::PrintEmptyCoverage(CHRPOS start, CHRPOS end) {
         << start << "\t"
         << end   << "\t"
         << "0"   << "\t" << "none";
-        
+
     for (size_t i=0;i<current_depth.size();++i)
         output << "\t0";
 
