@@ -996,3 +996,13 @@ $BT intersect -a ultra-long-bed4.bed -b ultra-long-bed4.bed > obs
 check exp obs
 rm exp obs
 [[ $FAILURES -eq 0 ]] || exit 1;
+
+###########################################################
+#  Test -C that got -b parameter first
+############################################################
+echo -e "    intersect.new.t81...\c"
+echo	-e	"chr1	10	20	a1	1	+	0
+chr1	100	200	a2	2	-	2"	>	exp
+$BT intersect -b b.bed -a a.bed -C > obs
+check exp obs
+rm exp obs
