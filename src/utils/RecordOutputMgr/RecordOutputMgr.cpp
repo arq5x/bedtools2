@@ -449,10 +449,11 @@ void RecordOutputMgr::reportOverlapSummary(RecordKeyVector &keyList)
 		if (needsFlush()) flush();
 	} 
 	else if ((static_cast<ContextIntersect *>(_context))->getWriteCountsPerDatabase()) {
+		int query_file_idx = (static_cast<ContextIntersect *>(_context))->getQueryFileIdx();
 		// build a map of the hit counts per database
 		map<int, int> db_counts; 
 		// initialize to 0 for all files (-A is file 0)
-		for (size_t i = 1; i < _context->getNumInputFiles(); i++)
+		for (size_t i = 0; i < _context->getNumInputFiles(); i++)
 		{
 			db_counts[i] = 0;
 		}
@@ -464,6 +465,9 @@ void RecordOutputMgr::reportOverlapSummary(RecordKeyVector &keyList)
 		// report A with a separate line for each db and its hit count
 		for (auto it=db_counts.begin(); it!=db_counts.end(); ++it)
 		{
+			if (it->first == query_file_idx) {
+				continue;
+			}
 			if (printKeyAndTerminate(keyList)) {
 				return;
 			}
