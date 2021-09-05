@@ -95,8 +95,8 @@ chromosome, ``bedtools shift`` will "clip" the feature accordingly.
 ==========================================================================
 ``-pct`` Shifting features by a given fraction
 ==========================================================================
-``bedtools shift`` will optionally increase the size of a feature by a 
-user-specific fraction.
+``bedtools shift`` will shift the feature by a user-specific fraction of the
+feature length. Hence, 0.5 will add half the length of the feature to the start and end coordinates. 
 
 For example:
 
