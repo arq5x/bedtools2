@@ -29,9 +29,11 @@ NewChromSweep::NewChromSweep(ContextIntersect *context)
      _lexicoDisproven(false),
      _lexicoAssumed(false),
      _lexicoAssumedFileIdx(-1),
-     _testLastQueryRec(false)
+     _testLastQueryRec(false),
+     _runToDbEnd(false)
 {
 	_filePrevChrom.resize(_numFiles);
+	_runToDbEnd = context->shouldRunToDbEnd();
 }
 
 
@@ -249,6 +251,11 @@ bool NewChromSweep::next(RecordKeyVector &retList) {
     }
 
     if (!nextRecord(true)) { // query EOF hit
+		if (_runToDbEnd) {
+			for(int idx = 0; idx < _numDBs; idx ++) {
+				for(;nextRecord(false, idx););
+			}
+		}
         return false; 
     }
 

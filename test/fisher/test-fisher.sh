@@ -109,3 +109,26 @@ $BT fisher -b "$LONG_PATH" -a tumor.gff -g dm6.fai > obs
 check obs exp
 rm obs exp
 [[ $FAILURES -eq 0 ]] || exit 1;
+
+
+# Regression test for issue 954
+echo -e "    fisher.t6...\c"
+echo \
+"# Number of query intervals: 5
+# Number of db intervals: 9
+# Number of overlaps: 2
+# Number of possible intervals (estimated): 74
+# phyper(2 - 1, 5, 74 - 5, 9, lower.tail=F)
+# Contingency Table Of Counts
+#_________________________________________
+#           |  in -b       | not in -b    |
+#     in -a | 2            | 3            |
+# not in -a | 7            | 62           |
+#_________________________________________
+# p-values for fisher's exact test
+left	right	two-tail	ratio
+0.98864	0.10898	0.10898	5.905" > exp
+$BT fisher -a issue954_a.bed -b issue954_b.bed -g issue954.genome > obs
+check obs exp
+rm obs exp
+[[ $FAILURES -eq 0 ]] || exit 1;
