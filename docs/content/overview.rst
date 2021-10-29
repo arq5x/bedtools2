@@ -124,7 +124,7 @@ As an example, if one wanted to look for SNPs (file A) that overlap with exons (
 
   bedtools intersect –a snps.bed –b exons.bed
 
-There are two exceptions to this rule: 1) When the “A” file is in BAM format, the “-abam” option must bed used. For example::
+There are two exceptions to this rule: 1) When the “A” file is in BAM format, the “-abam” option must be used. For example::
 
   bedtools intersect –abam alignedReads.bam –b exons.bed 
 

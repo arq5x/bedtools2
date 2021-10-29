@@ -127,10 +127,10 @@ void getoverlap_help(void) {
     cerr                    << "\t\tstart1,end1,start2,end2" << endl << endl;
 
     cerr << "Example: " << endl;
-    cerr << "\t$ windowBed -a A.bed -b B.bed -w 10" << endl;
+    cerr << "\t$ bedtools window -a A.bed -b B.bed -w 10" << endl;
     cerr << "\tchr1 10  20  A   chr1    15  25  B" << endl;
     cerr << "\tchr1 10  20  C   chr1    25  35  D" << endl << endl;
-    cerr << "\t$ windowBed -a A.bed -b B.bed -w 10 | overlap -i stdin -cols 2,3,6,7" << endl;
+    cerr << "\t$ bedtools window -a A.bed -b B.bed -w 10 | bedtools overlap -i stdin -cols 2,3,6,7" << endl;
     cerr << "\tchr1 10  20  A   chr1    15  25  B   5" << endl;
     cerr << "\tchr1 10  20  C   chr1    25  35  D   -5" << endl;
 
@@ -143,7 +143,7 @@ void getoverlap_help(void) {
 void DetermineInput(string &inFile, short &s1Col, short &e1Col, short &s2Col, short &e2Col) {
 
 
-    if (inFile != "stdin") {   // process a file
+    if (inFile != "stdin" && inFile != "-") {   // process a file
 
         ifstream in(inFile.c_str(), ios::in);
         if ( !in ) {

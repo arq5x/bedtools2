@@ -56,7 +56,7 @@ void NewGenomeFile::loadGenomeFileIntoMap() {
 		_genomeFile = new ifstream(_genomeFileName.c_str(), ios::in);
 		if (!_genomeFile->good()) 
 		{
-			cerr << "Error: Can't open genome file" << _genomeFileName << "Exiting..." << endl;
+			cerr << "Error: Can't open genome file " << _genomeFileName << ". Exiting..." << endl;
 			exit(1);
 		}
 	}

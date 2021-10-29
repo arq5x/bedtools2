@@ -114,7 +114,7 @@ Option                           Description
 ==========================================================================
 Default behavior
 ==========================================================================
-The `closest` tool first searches for features in B that overlap a feature in A. If overlaps are found, the feature in B that overlaps the highest fraction of A is reported. If no overlaps are found, `closestBed` looks for
+The `closest` tool first searches for features in B that overlap a feature in A. If overlaps are found, each feature in B that overlaps A is reported. If no overlaps are found, `closestBed` looks for
 the feature in B that is *closest* (that is, least genomic distance to the start or end of A) to A. For example, 
 
 For example, consider the case where one of the intervals in B overlaps the interval in B, yet another does not:
