@@ -40,7 +40,7 @@ struct _{dest_name}_t {{
 
 
 props = {}
-for line in file(sys.argv[1]):
+for line in open(sys.argv[1]):
     line = line.strip().split(":")
     if len(line) == 1: 
         ptype = "simple"
@@ -55,4 +55,4 @@ for line in file(sys.argv[1]):
         props[prop.name()] = prop
 
 for p in props:
-    print props[p].class_def()
+    print(props[p].class_def())
