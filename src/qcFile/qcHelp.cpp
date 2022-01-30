@@ -1,5 +1,5 @@
 /*
- * summaryHelp.cpp
+ * qcHelp.cpp
  *
  *  Created on: Jan 2, 2019
  *      Author: Aaron Quinlan
@@ -7,13 +7,13 @@
 
 #include "CommonHelp.h"
 
-void summary_help(void) {
+void qc_help(void) {
 
-    cerr << "\nTool:    bedtools sammary" << endl;
+    cerr << "\nTool:    bedtools qc" << endl;
     cerr << "Version: " << VERSION << "\n";
-    cerr << "Summary: Report summary statistics of the intervals in a file " << endl << endl;
+    cerr << "Summary: Validate and report summary statistics of a file " << endl << endl;
 
-    cerr << "Usage:   " << "bedtools summary" << " [OPTIONS] -i <bed/gff/vcf/bam> -g <genome>" << endl << endl;
+    cerr << "Usage:   " << "bedtools qc" << " [OPTIONS] -i <bed/gff/vcf/bam> -g <genome>" << endl << endl;
 
     cerr << "Notes: " << endl;
     cerr << "\t(1)  The genome file should tab delimited and structured as follows:" << endl;

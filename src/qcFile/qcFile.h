@@ -1,27 +1,27 @@
 /*
- * summaryFile.h
+ * qcFile.h
  *
  *  Created on: Jan 02, 2019
  *      Author: Aaron Quinlan
  */
 
-#ifndef SUMMARYFILE_H_
-#define SUMMARYFILE_H_
+#ifndef QCFILE_H_
+#define QCFILE_H_
 
 
 #include "ToolBase.h"
-#include "ContextSummary.h"
+#include "ContextQc.h"
 
 struct Interval {
   CHRPOS start;
   CHRPOS end;
 };
 
-class SummaryFile : public ToolBase {
+class QcFile : public ToolBase {
 
 public:
-    SummaryFile(ContextSummary *context);
-    virtual ~SummaryFile();
+    QcFile(ContextQc *context);
+    virtual ~QcFile();
     virtual bool init();
     virtual bool findNext(RecordKeyVector &hits);
     virtual void processHits(RecordOutputMgr *outputMgr, RecordKeyVector &hits) {}
@@ -40,10 +40,10 @@ protected:
     map<string, vector<Interval>, std::less<string> > _chromData;
 
     FileRecordMgr *_inputFile;
-    virtual ContextSummary *upCast(ContextBase *context) { return static_cast<ContextSummary *>(context); }
+    virtual ContextQc *upCast(ContextBase *context) { return static_cast<ContextQc *>(context); }
 
 };
 
 
 
-#endif /* SUMMARYFILE_H_ */
+#endif /* QCFILE_H_ */

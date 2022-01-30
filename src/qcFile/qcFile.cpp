@@ -5,7 +5,7 @@
  *      Author: Aaron Quinlan
  */
 #include <iomanip>
-#include "summaryFile.h"
+#include "qcFile.h"
 
 
 bool compareByLength(const Interval &a, const Interval &b)
@@ -14,7 +14,7 @@ bool compareByLength(const Interval &a, const Interval &b)
 }
 
 
-SummaryFile::SummaryFile(ContextSummary *context)
+QcFile::QcFile(ContextQc *context)
 : ToolBase(context),
   _currRec(NULL),
   _total_length(0),
@@ -23,10 +23,10 @@ SummaryFile::SummaryFile(ContextSummary *context)
   _chromList(_genomeFile->getChromList())
 {}
 
-SummaryFile::~SummaryFile()
+QcFile::~QcFile()
 {}
 
-bool SummaryFile::init()
+bool QcFile::init()
 {
     //we're only operating on one file, so the idx is zero.
     _frm = static_cast<FileRecordMergeMgr *>(upCast(_context)->getFile(0));
@@ -34,7 +34,7 @@ bool SummaryFile::init()
 }
 
 
-bool SummaryFile::findNext(RecordKeyVector &hits)
+bool QcFile::findNext(RecordKeyVector &hits)
 {
     while (!_frm->eof()) {
 
@@ -62,7 +62,7 @@ bool SummaryFile::findNext(RecordKeyVector &hits)
     return false;  // no more records to find
 }
 
-void SummaryFile::giveFinalReport(RecordOutputMgr *outputMgr) 
+void QcFile::giveFinalReport(RecordOutputMgr *outputMgr) 
 {
 
     CHRPOS min_length = LLONG_MAX;
@@ -76,10 +76,10 @@ void SummaryFile::giveFinalReport(RecordOutputMgr *outputMgr)
     {
         map<string, vector<Interval>>::const_iterator chromDataIt = _chromData.find(*chromIt);
 
-        cout << *chromIt << "\t";
-
         if (chromDataIt != _chromData.end())
         {
+            cout << *chromIt << "\t";
+
             vector<Interval> chrom_intervals = _chromData[*chromIt];
             CHRPOS num_chrom_intervals = chrom_intervals.size();
                          
@@ -117,15 +117,17 @@ void SummaryFile::giveFinalReport(RecordOutputMgr *outputMgr)
                  << num_chrom_intervals << "\t"
                  << chrom_total_bp << "\t"
                  << fixed << std::setprecision(5) << pct_of_genome << "\t"
-                  << fixed << std::setprecision(3) << frac_all_ivls << "\t"	 
-                  << fixed << std::setprecision(3) << frac_all_bp << "\t"
-                  << min << "\t" 
+                 << fixed << std::setprecision(3) << frac_all_ivls << "\t"	 
+                 << fixed << std::setprecision(3) << frac_all_bp << "\t"
+                 << min << "\t" 
                  << max << "\t"
-                  << fixed << std::setprecision(3) << mean << "\t"
+                 << fixed << std::setprecision(3) << mean << "\t"
                  << endl;
         }
         else if (chromIt->length() > 0)
         {
+            cout << *chromIt << "\t";
+
             // chrom_frac_genome
              double pct_of_genome = (double) _genomeFile->getChromSize(*chromIt) / 
                                    (double) _genomeFile->getGenomeSize();
@@ -145,7 +147,7 @@ void SummaryFile::giveFinalReport(RecordOutputMgr *outputMgr)
     // report the overall stats
     cout << "all\t" 
          << _genomeFile->getGenomeSize() << "\t"
-         << _total_intervals << "\t" 
+         << _total_intervals << "\t"
          << _total_length << "\t"
          << "1.0" << "\t" 
          << "1.0" << "\t"

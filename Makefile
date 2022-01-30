@@ -83,8 +83,8 @@ SUBDIRS = $(SRC_DIR)/annotateBed \
 		  $(SRC_DIR)/spacingFile \
 		  $(SRC_DIR)/split \
 		  $(SRC_DIR)/subtractFile \
-		  $(SRC_DIR)/summaryFile \
 		  $(SRC_DIR)/tagBam \
+		  $(SRC_DIR)/qcFile \
 		  $(SRC_DIR)/unionBedGraphs \
 		  $(SRC_DIR)/windowBed \
 		  $(SRC_DIR)/windowMaker
