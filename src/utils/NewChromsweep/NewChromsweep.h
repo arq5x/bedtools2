@@ -90,6 +90,7 @@ protected:
     string _currQueryChromName;
     string _prevQueryChromName;
     bool _runToQueryEnd;
+	bool _runToDbEnd;
 
 
     virtual void masterScan(RecordKeyVector &retList);

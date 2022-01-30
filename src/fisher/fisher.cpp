@@ -16,6 +16,7 @@ Fisher::Fisher(ContextFisher *context)
   _excludeFile(NULL)
 
 {
+	context->runToDbEnd();
 }
 
 bool Fisher::init(void)

@@ -104,9 +104,13 @@ public:
 
     virtual bool hasIntersectMethods() const { return true; }
 
+	bool shouldRunToDbEnd() { return _shouldRunToDbEnd; }
+	void runToDbEnd() { _shouldRunToDbEnd = true; }
+
 protected:
 
 	BlockMgr *_splitBlockMgr;
+	bool _shouldRunToDbEnd;
 
 	virtual bool handle_a();
 	virtual bool handle_abam();

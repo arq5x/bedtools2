@@ -23,6 +23,8 @@ SRC_DIR	= src
 
 CXX     = g++
 
+PYTHON ?= $(shell python --version >/dev/null 2>&1 && echo "python" || echo python3)
+
 ifeq ($(DEBUG),1)
 BT_CPPFLAGS = -DDEBUG -D_DEBUG -D_FILE_OFFSET_BITS=64 -DWITH_HTS_CB_API $(INCLUDES)
 BT_CXXFLAGS = -Wconversion -Wall -Wextra -g -O0
@@ -113,7 +115,8 @@ UTIL_SUBDIRS =	$(SRC_DIR)/utils/FileRecordTools \
 				$(SRC_DIR)/utils/GenomeFile \
 				$(SRC_DIR)/utils/RecordOutputMgr \
 				$(SRC_DIR)/utils/ToolBase \
-				$(SRC_DIR)/utils/driver
+				$(SRC_DIR)/utils/driver \
+				$(SRC_DIR)/utils/BamTools
 
 INCLUDES =		$(addprefix -I,$(SUBDIRS) $(UTIL_SUBDIRS)) \
 				-I$(SRC_DIR)/utils/BamTools/include \
@@ -189,7 +192,7 @@ test/htsutil: $(OBJ_DIR)/htsutil.o $(HTSDIR)/libhts.a
 
 $(BIN_DIR)/intersectBed: | $(BIN_DIR)
 	@echo "- Creating executables for old CLI."
-	@python scripts/makeBashScripts.py
+	@$(PYTHON) scripts/makeBashScripts.py
 	@chmod +x bin/*
 	@echo "done."
 
