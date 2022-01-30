@@ -244,13 +244,16 @@ void genomecoverage_help(void) {
     cerr << "Version: " << VERSION << "\n";    
     cerr << "Summary: Compute the coverage of a feature file among a genome." << endl << endl;
 
-    cerr << "Usage: " << PROGRAM_NAME << " [OPTIONS] -i <bed/gff/vcf> -g <genome>" << endl << endl;
+    cerr << "Usage: " << PROGRAM_NAME << " [OPTIONS] -i <bed/gff/vcf> -g <genome> OR -ibam <bam/cram>" << endl << endl;
 
     cerr << "Options: " << endl;
 
     cerr << "\t-ibam\t\t" << "The input file is in BAM format." << endl;
     cerr << "\t\t\tNote: BAM _must_ be sorted by position" << endl << endl;
 
+    cerr << "\t-g\t\t" << "Provide a genome file to define chromosome lengths." << endl;
+    cerr << "\t\t\tNote:Required when not using -ibam option." << endl << endl;
+    
     cerr << "\t-d\t\t" << "Report the depth at each genome position (with one-based coordinates)." << endl;
     cerr << "\t\t\tDefault behavior is to report a histogram." << endl << endl;
 

@@ -32,12 +32,12 @@ Usage and option summary
 **Usage**:
 ::
 
-  bedtools genomecov [OPTIONS] [-i|-ibam] -g (iff. -i)
+  bedtools genomecov [OPTIONS] [-i|-ibam] -g (iff. -i and not -ibam)
 
 **(or)**:
 ::
 
-  genomeCoverageBed [OPTIONS] [-i|-ibam] -g (iff. -i)
+  genomeCoverageBed [OPTIONS] [-i|-ibam] -g (iff. -i and not -ibam)
 
 
 
@@ -46,7 +46,8 @@ Usage and option summary
 ===========================      ===============================================================================================================================================================================================================
 **-ibam**                        | BAM file as input for coverage. Each BAM alignment in A added to the total coverage for the genome. 
                                  | Use "stdin" or simply "-" if passing it with a UNIX pipe: For example:
-                                 | ``samtools view -b <BAM> | genomeCoverageBed -ibam stdin -g hg18.genome``
+                                 | ``samtools view -b <BAM> | genomeCoverageBed -ibam stdin``
+**-g**                           Provide a genome file to define chromosome lengths. Required when not using -ibam option.
 **-d**                           Report the depth at each genome position with 1-based coordinates.
 **-dz**                          Report the depth at each genome position with 0-based coordinates.
                                  Unlike, `-d`, this reports only non-zero positions.
