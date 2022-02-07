@@ -22,7 +22,7 @@ Downloading a pre-compiled binary
 .. note::    
     1. The following approach will only work for Linux (non-OSX) systems.
 
-Starting with release 2.28.0, wqe provide statically-linked binaries thast should work
+Starting with release 2.28.0, we provide statically-linked binaries thast should work
 right away on Linux systems. Go to the `releases <https://github.com/arq5x/bedtools2/releases>`_
 page and look for the static binary named `bedtools.static.binary`. Right click on it, get the URL, then download it
 with `wget` or `curl` and you should be good to go.
