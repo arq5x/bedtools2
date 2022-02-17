@@ -21,15 +21,20 @@ using namespace std;
 
 class InflateStreamBuf:public std::streambuf
 {
-public:
-	InflateStreamBuf(std::istream* in):in(in),status_flag(0) {
-		if(in==NULL) throw ("Null pointer");
+	void reset_decoder() {
 		std::memset((void*)&strm,0,sizeof(z_stream));
 		strm.zalloc = Z_NULL;
 		strm.zfree = Z_NULL;
 		strm.opaque = Z_NULL;
 		strm.avail_in = 0;
 		strm.next_in = Z_NULL;
+	}
+
+public:
+	InflateStreamBuf(std::istream* in):in(in),status_flag(0) {
+		if(in==NULL) throw ("Null pointer");
+
+		reset_decoder();
 
 		bufsiz=GZBUFSIZ;
 		buffer=(char*)std::malloc(GZBUFSIZ*sizeof(char));
@@ -81,21 +86,18 @@ public:
 
 			switch (status_flag) {
 				case 0:break;
-				case Z_STREAM_END:break;
+				case Z_STREAM_END:
+					   break;
 				case Z_NEED_DICT:
 					status_flag=Z_DATA_ERROR;
 				case Z_DATA_ERROR:
 				case Z_MEM_ERROR:
-
 					close();
 					throw status_flag;
 					break;
 				default:
-				{
-				close();
-				throw status_flag;
-				break;
-				}
+					close();
+					throw status_flag;
 			}
 
 			unsigned int have = GZBUFSIZ - strm.avail_out;
@@ -106,7 +108,29 @@ public:
 			}
 			memcpy((void*)&buffer[total], &buffout[0], sizeof(char)*have);
 			total+=have;
+			
+			// Handle the concatenated GZIP files: It's part of gzip standard that a GZIP file can be concatenated directly, just like BGZF
+			if(status_flag == Z_STREAM_END && (strm.avail_in != 0  || !in->eof())) {
+
+				memmove(buffin, strm.next_in, strm.avail_in);
+				int remaining = strm.avail_in;
+
+				if(remaining > 0) {
+					inflateEnd(&strm);
+					reset_decoder();
+					
+					if ( inflateInit2(&strm, 16+MAX_WBITS) != Z_OK) {
+						throw ("::inflateInit failed");
+					}
+
+					strm.avail_in = remaining;
+					strm.next_in = buffin;
+				}
+
+				status_flag = 0;
+			}
 		} while (strm.avail_out == 0 && strm.avail_in > 0);
+
 
 
 		setg(buffer, buffer, &buffer[total]);
