@@ -639,4 +639,16 @@ $BT merge -i bug254_e.bed -s -d 200 > obs
 check exp obs
 rm obs exp
 
+
+###########################################################
+#  Test the chained GZIP file - Regression test for bug #975
+###########################################################
+echo -e "    merge.t50...\c"
+echo \
+"1	10000	20000
+5	55554	66666"	>	exp
+$BT merge -i chained.bed.gz > obs
+check exp obs
+rm obs exp
+
 [[ $FAILURES -eq 0 ]] || exit 1;
