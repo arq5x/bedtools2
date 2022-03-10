@@ -174,10 +174,10 @@ void slop_help(void) {
 
     cerr << "Notes: " << endl;
     cerr << "\t(1)  Starts will be set to 0 if options would force it below 0." << endl;
-    cerr << "\t(2)  Ends will be set to the chromosome length if  requested slop would" << endl;
+    cerr << "\t(2)  Ends will be set to the chromosome length if requested slop would" << endl;
     cerr <<        "\tforce it above the max chrom length." << endl;
 
-    cerr << "\t(3)  The genome file should tab delimited and structured as follows:" << endl;
+    cerr << "\t(3)  The genome file should be tab delimited and structured as follows:" << endl;
     cerr << "\n\t<chromName><TAB><chromSize>" << endl << endl;
     cerr << "\tFor example, Human (hg19):" << endl;
     cerr << "\tchr1\t249250621" << endl;
