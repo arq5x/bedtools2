@@ -302,7 +302,6 @@ fail:
 BGZF *bgzf_open(const char *path, const char *mode)
 {
     BGZF *fp = 0;
-    assert(compressBound(BGZF_BLOCK_SIZE) < BGZF_MAX_BLOCK_SIZE);
     if (strchr(mode, 'r')) {
         hFILE *fpr;
         if ((fpr = hopen(path, mode)) == 0) return 0;
@@ -325,7 +324,6 @@ BGZF *bgzf_open(const char *path, const char *mode)
 BGZF *bgzf_dopen(int fd, const char *mode)
 {
     BGZF *fp = 0;
-    assert(compressBound(BGZF_BLOCK_SIZE) < BGZF_MAX_BLOCK_SIZE);
     if (strchr(mode, 'r')) {
         hFILE *fpr;
         if ((fpr = hdopen(fd, mode)) == 0) return 0;
@@ -348,7 +346,6 @@ BGZF *bgzf_dopen(int fd, const char *mode)
 BGZF *bgzf_hopen(hFILE *hfp, const char *mode)
 {
     BGZF *fp = NULL;
-    assert(compressBound(BGZF_BLOCK_SIZE) < BGZF_MAX_BLOCK_SIZE);
     if (strchr(mode, 'r')) {
         fp = bgzf_read_init(hfp);
         if (fp == NULL) return NULL;
@@ -428,6 +425,7 @@ int bgzf_compress(void *_dst, size_t *dlen, const void *src, size_t slen, int le
     uint8_t *dst = (uint8_t*)_dst;
 
     if (level == 0) {
+    uncomp:
         // Uncompressed data
         if (*dlen < slen+5 + BLOCK_HEADER_LENGTH + BLOCK_FOOTER_LENGTH) return -1;
         dst[BLOCK_HEADER_LENGTH] = 1; // BFINAL=1, BTYPE=00; see RFC1951
@@ -449,8 +447,20 @@ int bgzf_compress(void *_dst, size_t *dlen, const void *src, size_t slen, int le
             return -1;
         }
         if ((ret = deflate(&zs, Z_FINISH)) != Z_STREAM_END) {
-            hts_log_error("Deflate operation failed: %s", bgzf_zerr(ret, ret == Z_DATA_ERROR ? &zs : NULL));
+            if (ret == Z_OK && zs.avail_out == 0) {
+                deflateEnd(&zs);
+                goto uncomp;
+            } else {
+                hts_log_error("Deflate operation failed: %s", bgzf_zerr(ret, ret == Z_DATA_ERROR ? &zs : NULL));
+            }
             return -1;
+        }
+        // If we used up the entire output buffer, then we either ran out of
+        // room or we *just* fitted, but either way we may as well store
+        // uncompressed for faster decode.
+        if (zs.avail_out == 0) {
+            deflateEnd(&zs);
+            goto uncomp;
         }
         if ((ret = deflateEnd(&zs)) != Z_OK) {
             hts_log_error("Call to deflateEnd failed: %s", bgzf_zerr(ret, NULL));
