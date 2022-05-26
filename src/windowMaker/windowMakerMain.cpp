@@ -226,12 +226,23 @@ void windowmaker_help(void) {
     cerr << "\t..." << endl;
     cerr << "\tchr18_gl000207_random\t4262" << endl << endl;
 
-    cerr << "Tips: " << endl;
+    cerr << "Tip 1. Use samtools faidx to create a genome file from a FASTA: " << endl;
+    cerr << "\tOne can the samtools faidx command to index a FASTA file." << endl;
+    cerr << "\tThe resulting .fai index is suitable as a genome file, " << endl;
+    cerr << "\tas bedtools will only look at the first two, relevant columns" << endl;
+    cerr << "\tof the .fai file." << endl << endl;
+    cerr << "\tFor example:" << endl;
+    cerr << "\tsamtools faidx GRCh38.fa" << endl;
+    cerr << "\tbedtools makewindows -w 100 -g GRCh38.fa.fai" << endl << endl;
+
+    cerr << "Tip 2. Use UCSC Table Browser to create a genome file: " << endl;
     cerr << "\tOne can use the UCSC Genome Browser's MySQL database to extract" << endl;
     cerr << "\tchromosome sizes. For example, H. sapiens:" << endl << endl;
     cerr << "\tmysql --user=genome --host=genome-mysql.cse.ucsc.edu -A -e \\" << endl;
-    cerr << "\t\"select chrom, size from hg19.chromInfo\" > hg19.genome" << endl << endl;
+    cerr << "\t\"select chrom, size from hg19.chromInfo\"  > hg19.genome" << endl << endl;
 
+ 
+ 
     cerr << "Examples: " << endl;
     cerr << " # Divide the human genome into windows of 1MB:" << endl;
     cerr << " $ " << PROGRAM_NAME << " -g hg19.txt -w 1000000" << endl;
