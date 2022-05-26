@@ -24,6 +24,8 @@ typedef int64_t CHRPOS;
 bool isNumeric(const string &str);
 bool isInteger(const string &str);
 
+void trimNewlines(string& str);
+
 //This method is a faster version of atoi, but is limited to a maximum of
 //9 digit numbers in Base 10 only. The string may begin with a negative.
 //Empty strings, too long strings, or strings containing anything other than
