@@ -33,6 +33,12 @@ bool isInteger(const string &str) {
 	return hasDigits;
 }
 
+void trimNewlines(string& str) {
+	size_t len = str.length();
+	while (len > 0 && (str[len-1] == '\n' || str[len-1] == '\r'))
+		len--;
+	str.resize(len);
+}
 
 
 CHRPOS str2chrPos(const string &str) {

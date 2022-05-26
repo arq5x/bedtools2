@@ -67,6 +67,7 @@ void NewGenomeFile::loadGenomeFileIntoMap() {
 	_genomeLength = 0;
 	string chrName;
 	while (getline(*_genomeFile, line)) {
+		trimNewlines(line);
 		chrSize = 0;
 		chrName.clear();
 		int numFields = fieldTokens.tokenize(line.c_str());
