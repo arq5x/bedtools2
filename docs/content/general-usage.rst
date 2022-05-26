@@ -262,6 +262,20 @@ Genome files must be **tab-delimited** and are structured as follows (this is an
 bedtools includes pre-defined genome files for human and mouse in the **/genomes** directory included
 in the bedtools distribution.
 
+One can also create a suitable genome file by running `samtools faidx` on the appropriate
+FASTA reference genome. Then use the resulting .fai file as a genome file, as bedtools will only
+care about the first two columns, which define the chromosome name and length.
+For example:
+
+::
+
+  # download GRCh38
+  wget ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/technical/reference/GRCh38_reference_genome/GRCh38_full_analysis_set_plus_decoy_hla.fa
+  # create an index of it
+  samtools faidx GRCh38_full_analysis_set_plus_decoy_hla.fa
+  # use the .fai index as a genome file with bedtools
+  bedtools complement my.grch38.bed -g GRCh38_full_analysis_set_plus_decoy_hla.fa.fai
+
 
 ----------------------
 SAM/BAM format
