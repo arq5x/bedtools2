@@ -163,7 +163,7 @@ Now let's find the *mean* and *median* repeat score for each variant.
   chr21 9729310 9757478 variant2 3620.5
   chr21 9795588 9796685 variant3 600.6667
 
-  $ bedtools groupby -i variantsToRepeats.bed -g 1-4 -c 9 -op median
+  $ bedtools groupby -i variantsToRepeats.bed -g 1-4 -c 9 -o median
   chr21 9719758 9729320 variant1 1030.5
   chr21 9729310 9757478 variant2 2539.5
   chr21 9795588 9796685 variant3 652
@@ -196,7 +196,7 @@ Figure:
 
 .. code-block:: bash
 
-  $ bedtools groupby -i variantsToRepeats.bed -g 1-4 -c 9 -c count
+  $ bedtools groupby -i variantsToRepeats.bed -g 1-4 -c 9 -o count
   chr21 9719758 9729320 variant1 4
   chr21 9729310 9757478 variant2 4
   chr21 9795588 9796685 variant3 6
