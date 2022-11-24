@@ -31,3 +31,5 @@ test/*/obs
 test/genomecov/pair-chip.bam
 test/bigchroms/bigx.fasta
 test/bigchroms/bigx.fasta.fai
+test/getfasta/*.gzi
+test/getfasta/*.gz.fai
