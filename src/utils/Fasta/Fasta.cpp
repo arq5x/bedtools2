@@ -35,11 +35,21 @@ FastaIndex::FastaIndex(bool useFullHeader)
 void FastaIndex::readIndexFile(string fname) {
 
     faidx = fai_load(fname.c_str());
+    const char *idx_path = (fname + ".fai").c_str();
+
     // NOTE: can use faidx_set_cache_size to improve performance of repeated queries.
     if(faidx == NULL) {
         cerr << "Warning: malformed fasta index file " << fname <<  endl;
         exit(1);
     }
+
+    struct stat index_attr, fasta_attr;
+    stat(idx_path, &index_attr);
+    stat(fname.c_str(), &fasta_attr);
+    if(fasta_attr.st_mtime > index_attr.st_mtime) {
+        cerr << "Warning: the index file is older than the FASTA file." << endl;
+    }
+
     int n_seq = faidx_nseq(faidx);
     for(int i = 0; i < n_seq; i++){
         const char* chrom_name = faidx_iseq(faidx, i);

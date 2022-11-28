@@ -48,7 +48,6 @@ class FastaIndex : public map<string, FastaIndexEntry> {
         vector<string> sequenceNames;
         void indexReference(string refName);
         void readIndexFile(string fname);
-        //void writeIndexFile(string fname);
         FastaIndexEntry entry(string key);
         bool chromFound(string name);
         void flushEntryToIndex(FastaIndexEntry& entry);
@@ -64,8 +63,6 @@ class FastaReference {
         bool usingfullheader;
         FastaReference(void) : usingmmap(false), usingfullheader(false) { }
         ~FastaReference(void);
-        //FILE* file;
-        //void* filemm;
         size_t filesize;
         FastaIndex* index;
         vector<FastaIndexEntry> findSequencesStartingWith(string seqnameStart);

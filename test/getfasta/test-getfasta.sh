@@ -113,7 +113,7 @@ check obs exp
 rm obs exp test.iupac.fa.fai
 
 # test the warning about an outdated FASTA index file
-echo -e "    getfasta.t10..disabled..\c"
+echo -e "    getfasta.t10...\c"
 echo \
 ">chr1
 cggggggggg
@@ -127,7 +127,7 @@ touch test.fa
 echo -e "chr2\t2\t10" | $BT getfasta -fi test.fa -bed -  \
 	> /dev/null 2> obs
 echo "Warning: the index file is older than the FASTA file." > exp
-#check obs exp
+check obs exp
 rm obs exp test.fa test.fa.fai
 
 
