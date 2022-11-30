@@ -32,9 +32,9 @@ fi
 
 echo -e "    getfasta.t02...\c"
 LEN=$($BT getfasta -split -fi t.fa -bed blocks.bed | awk '(NR == 2){ print length($0) }')
-if [ "$LINES" != "2" ]; then
+if [ "$LEN" != "22" ]; then #   sizes: 2,10,10 == 22
     FAILURES=$(expr $FAILURES + 1);
-		echo fail
+		echo fail $LEN
 else
     echo ok
 fi
@@ -43,10 +43,11 @@ echo -e "    getfasta.t03...\c"
 SEQ=$($BT getfasta -split -fi t.fa -bed blocks.bed | awk '(NR == 4){ print $0 }')
 if [ "$SEQ" != "cta" ]; then
     FAILURES=$(expr $FAILURES + 1);
-		echo fail
+		echo fail "got $SEQ"
 else
     echo ok
 fi
+
 
 # test -fo -
 echo -e "    getfasta.t04...\c"
@@ -71,7 +72,7 @@ fi
 
 # test -fullHeader
 echo -e "    getfasta.t06...\c"
-LINES=$(echo $'chr1 assembled by consortium X\t1\t10' | $BT getfasta -fullHeader -fi t_fH.fa -bed stdin | awk 'END{ print NR }')
+LINES=$(echo $'chr1\t1\t10' | $BT getfasta -fullHeader -fi t_fH.fa -bed stdin | awk 'END{ print NR }')
 if [ "$LINES" != "2" ]; then
     FAILURES=$(expr $FAILURES + 1);
 		echo fail
@@ -237,5 +238,15 @@ uugaccgaug" > exp
 $BT getfasta -fi rna.fasta -bed rna.bed -s -name -rna > obs
 check obs exp
 rm obs exp
+
+
+echo -e "    getfasta.t18...\c"
+SEQ=$($BT getfasta -split -fi t.fa.gz -bed blocks.bed | awk '(NR == 4){ print $0 }')
+if [ "$SEQ" != "cta" ]; then
+    FAILURES=$(expr $FAILURES + 1);
+        echo fail
+else
+    echo ok
+fi
 
 [[ $FAILURES -eq 0 ]] || exit 1;

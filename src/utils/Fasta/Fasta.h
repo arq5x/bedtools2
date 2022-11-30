@@ -18,6 +18,7 @@
 #include <algorithm>
 #include "LargeFileSupport.h"
 #include "bedFile.h"
+#include "htslib/faidx.h"
 #include <sys/stat.h>
 #include <sys/mman.h>
 #include "split.h"
@@ -28,32 +29,25 @@
 using namespace std;
 
 class FastaIndexEntry {
-    friend ostream& operator<<(ostream& output, const FastaIndexEntry& e);
     public:
-        FastaIndexEntry(string name, CHRPOS length, CHRPOS offset,
-			CHRPOS line_blen, CHRPOS line_len, bool useFullHeader);
+        FastaIndexEntry(string name, CHRPOS length);
         FastaIndexEntry(void);
         ~FastaIndexEntry(void);
         string name;  // sequence name
         CHRPOS length;  // length of sequence
-        long long offset;  // bytes offset of sequence from start of file
-        CHRPOS line_blen;  // line length in bytes, sequence characters
-        CHRPOS line_len;  // line length including newline
-	bool useFullHeader;
         void clear(void);
 };
 
 class FastaIndex : public map<string, FastaIndexEntry> {
     friend ostream& operator<<(ostream& output, FastaIndex& i);
     public:
+        faidx_t *faidx;
         FastaIndex(bool useFullHeader);
         ~FastaIndex(void);
-	bool useFullHeader;
+	    bool useFullHeader;
         vector<string> sequenceNames;
         void indexReference(string refName);
         void readIndexFile(string fname);
-        void writeIndexFile(string fname);
-        ifstream indexFile;
         FastaIndexEntry entry(string key);
         bool chromFound(string name);
         void flushEntryToIndex(FastaIndexEntry& entry);
@@ -69,8 +63,6 @@ class FastaReference {
         bool usingfullheader;
         FastaReference(void) : usingmmap(false), usingfullheader(false) { }
         ~FastaReference(void);
-        FILE* file;
-        void* filemm;
         size_t filesize;
         FastaIndex* index;
         vector<FastaIndexEntry> findSequencesStartingWith(string seqnameStart);
