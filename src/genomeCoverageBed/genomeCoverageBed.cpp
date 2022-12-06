@@ -378,6 +378,12 @@ void BedGenomeCoverage::CoverageBam(string bamFile) {
 void BedGenomeCoverage::ReportChromCoverage(const vector<DEPTH> &chromCov, const CHRPOS &chromSize, const string &chrom, chromHistMap &chromDepthHist) {
 
     if (_eachBase) {
+        streamsize prec;
+        std::ios_base::fmtflags fflags;
+        if(_scale == 1.0) {
+            prec = cout.precision(0);
+            fflags = cout.setf(std::ios_base::fixed);
+        }
         int depth = 0; // initialize the depth
         CHRPOS offset = (_eachBaseZeroBased)?0:1;
         for (CHRPOS pos = 0; pos < chromSize; pos++) {
@@ -386,10 +392,14 @@ void BedGenomeCoverage::ReportChromCoverage(const vector<DEPTH> &chromCov, const
             // report the depth for this position.
             if (depth>0 || !_eachBaseZeroBased) {
                 cout << chrom << "\t" << pos+offset << "\t"
-                     << (_scale == 1.0 ? depth : depth * _scale)
+                     << depth * _scale
                      << endl;
             }
             depth = depth - chromCov[pos].ends;
+        }
+        if(_scale == 1.0) {
+            cout.precision(prec);
+            cout.setf(fflags);
         }
     }
     else if (_bedGraph == true || _bedGraphAll == true) {
@@ -472,11 +482,18 @@ void BedGenomeCoverage::ReportGenomeCoverage(chromHistMap &chromDepthHist) {
 }
 
 
+
 void BedGenomeCoverage::ReportChromCoverageBedGraph(const vector<DEPTH> &chromCov, const CHRPOS &chromSize, const string &chrom) {
 
     int depth = 0; // initialize the depth
     CHRPOS lastStart = -1;
     int lastDepth = -1;
+    streamsize prec;
+    std::ios_base::fmtflags fflags;
+    if(_scale == 1.0) {
+        prec = cout.precision(0);
+        fflags = cout.setf(std::ios_base::fixed);
+    }
 
     for (CHRPOS pos = 0; pos < chromSize; pos++) {
         depth += chromCov[pos].starts;
@@ -497,7 +514,7 @@ void BedGenomeCoverage::ReportChromCoverageBedGraph(const vector<DEPTH> &chromCo
                      << "\t"
                      << pos
                      << "\t"
-                     << (_scale == 1.0 ? lastDepth : lastDepth * _scale)
+                     << lastDepth * _scale
                      << endl;
             }
             //Set current position as the new interval start + depth
@@ -517,7 +534,11 @@ void BedGenomeCoverage::ReportChromCoverageBedGraph(const vector<DEPTH> &chromCo
              << "\t"
              << chromSize
              << "\t"
-             << (_scale == 1.0 ? lastDepth : lastDepth * _scale)
+             << lastDepth * _scale
              << endl;
+    }
+    if(_scale == 1.0) {
+        cout.precision(prec);
+        cout.setf(fflags);
     }
 }
