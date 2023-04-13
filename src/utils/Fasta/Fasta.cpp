@@ -35,7 +35,7 @@ FastaIndex::FastaIndex(bool useFullHeader)
 void FastaIndex::readIndexFile(string fname) {
 
     faidx = fai_load(fname.c_str());
-    const char *idx_path = (fname + ".fai").c_str();
+    string idx_path = fname + ".fai";
 
     // NOTE: can use faidx_set_cache_size to improve performance of repeated queries.
     if(faidx == NULL) {
@@ -44,7 +44,7 @@ void FastaIndex::readIndexFile(string fname) {
     }
 
     struct stat index_attr, fasta_attr;
-    stat(idx_path, &index_attr);
+    stat(idx_path.c_str(), &index_attr);
     stat(fname.c_str(), &fasta_attr);
     if(fasta_attr.st_mtime > index_attr.st_mtime) {
         cerr << "Warning: the index file is older than the FASTA file." << endl;
