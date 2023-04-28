@@ -6,35 +6,34 @@
 
 |
 
-Genomics experiments Have numerous sources of both technical and biological variation 
+Genomics experiments have numerous sources of both technical and biological variation 
 that can confound analysis and interpretation. Therefore, one of the most important steps
-And genomics data analysis is generating high-level summary stats of one's data to ask if the 
-basic observations are in line with the expectation.  Doing such Quality control as early 
-as possible in the analysis. Workflow helps to head off unnecessary time spent chasing 
-technical artifacts, that masquerade as biological signal.  This quality control
-Is the motivation behind the ``bedtools summary`` command.
+in genomics data analysis is generating high-level summary stats of one's data to ask if the 
+basic observations are in line with the expectation.  Doing such quality control as early 
+as possible in the analysis workflow helps to head off unnecessary time spent chasing 
+technical artifacts that masquerade as biological signal.  **This quality control
+is the motivation behind the** ``bedtools summary`` **command.**
 
-Given an input interval, file in standard formats, as well as a genome file defining
-the chromosome names and lengths relevant to your data, Bedtools summary will compute 
-a number of summary statistics detailing, for each chromosome, and overall, 
-the number of intervals, the total number of base pairs, and the fraction of intervals 
-and base pairs observed in your input file. From these summary measures, one can 
-get a quick sense of questions like:
+Given an input interval file in standard formats, as well as a genome file defining
+the chromosome names and lengths relevant to your data, ``bedtools summary`` will compute 
+a number of summary statistics detailing, for each chromosome, the number of intervals, 
+the total number of base pairs, and the fraction of intervals and base pairs observed 
+in your input file. From these summary measures, one can get a quick sense of questions like:
 
     - Are all chromosomes represented in my data or annotation file?
     - Do all chromosomes have the expected number of intervals or fraction of base pairs represented?
     - Which chromosomes are outliers?
 
 For example, the following plot was generated directly from the output of ``bedtools summary``.
-It plots, for each chrosome the the fraction of all intervals in the RepeatMasker track from UCSC
-_observed_ on each chromosome versus the fraction of RepeatMasker intervals that are _expected_
+It depicts, for each chromosome, the the fraction of all intervals in the RepeatMasker track from UCSC
+**observed** on each chromosome versus the fraction of RepeatMasker intervals that are **expected**
 for each chromosome, based on the fraction of the genome that each chromosome represents.
 
-This plot highlights that `chr19`, `chrM` `chrMT` (the different mitochindrial reference genomes) are outliers. 
+This plot highlights that ``chr19``, ``chrM``, and ``chrMT`` (the different mitochindrial reference genomes) are outliers. 
 Chromosome 19 has more than 1.5 times the intervals that are expected based upon the length of
 the chromosome. ChrM has no intervals, making the observed to expected ratio be 0. 
 This former is because the repeat content of chromosome 19 "is approximately 55%, more than 10% higher 
-than the genome-wide average" (Grimwood J, et al. Nature. 2004;428:529–35). The latter because
+than the genome-wide average" (``Grimwood J, et al. Nature. 2004;428:529–35``). The latter because
 are indeed no repeat annotations provided by UCSC for the mitochondrial genome.
 
 .. image:: ../images/tool-glyphs/summary.png 
@@ -55,16 +54,16 @@ Default behavior
 ``bedtools summary`` scans the input interval file and the chromosome lengths provided in 
 the "genome" file and reports the following columns for each chromosome.
 
-    1.	chrom (chromosome name)
-    2	chrom_length (the length of the chromosome in bp)
-    3	num_ivls (the total number of intervals observed for the chromosome)
-    4	total_ivl_bp (the total number of bp observed in the intervals for the chromosome)
-    5	chrom_frac_genome (the fraction of the genome represented by the chromosome)
-    6	frac_all_ivls (the fraction of all intervals observed the chromosome)
-    7	frac_all_bp (the fraction of all bp observed the chromosome)
-    8	min (the smallest interval observed on that chromosome)
-    9	max (the largest interval observed on that chromosome)
-    10	mean (the mean interval length observed on that chromosome)
+    #.	**chrom** (chromosome name)
+    #.	**chrom_length** (the length of the chromosome in bp)
+    #.	**num_ivls** (the total number of intervals observed for the chromosome)
+    #.	**total_ivl_bp** (the total number of bp observed in the intervals for the chromosome)
+    #.	**chrom_frac_genome** (the fraction of the genome represented by the chromosome)
+    #.	**frac_all_ivls** (the fraction of all intervals observed the chromosome)
+    #.	**frac_all_bp** (the fraction of all bp observed the chromosome)
+    #.	**min** (the smallest interval observed on that chromosome)
+    #.	**max** (the largest interval observed on that chromosome)
+    #.	**mean** (the mean interval length observed on that chromosome)
 
 In addition, ``bedtools summary`` reports a final line with the chromosome name "all", which
 depicts the metrics above but tabulated across all chromosomes in the input file.
