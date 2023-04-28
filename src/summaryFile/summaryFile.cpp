@@ -76,70 +76,70 @@ void SummaryFile::giveFinalReport(RecordOutputMgr *outputMgr)
     {
         map<string, vector<Interval>>::const_iterator chromDataIt = _chromData.find(*chromIt);
 
-        cout << *chromIt << "\t";
-
         if (chromDataIt != _chromData.end())
         {
+            cout << *chromIt << "\t";
+
             vector<Interval> chrom_intervals = _chromData[*chromIt];
             CHRPOS num_chrom_intervals = chrom_intervals.size();
                          
-             // total_bp
-             CHRPOS chrom_total_bp = 0;
-             for (auto chromDataIt = chrom_intervals.begin(); chromDataIt != chrom_intervals.end(); ++chromDataIt)
-             {
-                 chrom_total_bp += chromDataIt->end - chromDataIt->start;
-             }
+            // total_bp
+            CHRPOS chrom_total_bp = 0;
+            for (auto chromDataIt = chrom_intervals.begin(); chromDataIt != chrom_intervals.end(); ++chromDataIt)
+            {
+                chrom_total_bp += chromDataIt->end - chromDataIt->start;
+            }
              
-             // chrom_frac_genome
-             double pct_of_genome = (double) _genomeFile->getChromSize(*chromIt) / 
+            // chrom_frac_genome
+            double pct_of_genome = (double) _genomeFile->getChromSize(*chromIt) / 
                                    (double) _genomeFile->getGenomeSize();
-                                               // chrom_length and num_records 
                           
-             // frac_all_ivls
-             double frac_all_ivls = (double) num_chrom_intervals / _total_intervals;
+            // frac_all_ivls
+            double frac_all_ivls = (double) num_chrom_intervals / _total_intervals;
 
-             // frac_all_bp
-             double frac_all_bp = (double) chrom_total_bp / _total_length;
+            // frac_all_bp
+            double frac_all_bp = (double) chrom_total_bp / _total_length;
 
-             // min, max
-             CHRPOS min = chrom_intervals[0].end - chrom_intervals[0].start;
-             CHRPOS max = chrom_intervals[num_chrom_intervals - 1].end - 
-                          chrom_intervals[num_chrom_intervals - 1].start;
+            // min, max
+            CHRPOS min = chrom_intervals[0].end - chrom_intervals[0].start;
+            CHRPOS max = chrom_intervals[num_chrom_intervals - 1].end - 
+                        chrom_intervals[num_chrom_intervals - 1].start;
 
-             // update overall min and max?
-             if (min < min_length) min_length = min;
-             if (max > max_length) max_length = max;
+            // update overall min and max?
+            if (min < min_length) min_length = min;
+            if (max > max_length) max_length = max;
 
-             // mean
-             double mean = (double) chrom_total_bp / (double) num_chrom_intervals;
+            // mean
+            double mean = (double) chrom_total_bp / (double) num_chrom_intervals;
 
             cout << _genomeFile->getChromSize(*chromIt) << "\t"
-                 << num_chrom_intervals << "\t"
-                 << chrom_total_bp << "\t"
-                 << fixed << std::setprecision(5) << pct_of_genome << "\t"
-                  << fixed << std::setprecision(3) << frac_all_ivls << "\t"	 
-                  << fixed << std::setprecision(3) << frac_all_bp << "\t"
-                  << min << "\t" 
-                 << max << "\t"
-                  << fixed << std::setprecision(3) << mean << "\t"
-                 << endl;
+                    << num_chrom_intervals << "\t"
+                    << chrom_total_bp << "\t"
+                    << fixed << std::setprecision(9) << pct_of_genome << "\t"
+                    << fixed << std::setprecision(9) << frac_all_ivls << "\t"	 
+                    << fixed << std::setprecision(9) << frac_all_bp << "\t"
+                    << min << "\t" 
+                    << max << "\t"
+                    << fixed << std::setprecision(9) << mean << "\t"
+                    << endl;
         }
         else if (chromIt->length() > 0)
         {
+            cout << *chromIt << "\t";
             // chrom_frac_genome
              double pct_of_genome = (double) _genomeFile->getChromSize(*chromIt) / 
                                    (double) _genomeFile->getGenomeSize();
             // report default if no data available for this chromosome
             cout << _genomeFile->getChromSize(*chromIt) << "\t" 
-                 << "0\t"
-                 << "0\t"
-                 << pct_of_genome << "\t"
-                 << "0.0\t"
-                 << "0.0\t"
-                 << "-1\t"
-                 << "-1\t"
-                 << "-1"
-                 << endl;
+                << "0\t"
+                << "0\t"
+                << fixed << std::setprecision(9) << pct_of_genome << "\t"
+                << "0.000000000\t"
+                << "0.000000000\t"
+                << "-1\t"
+                << "-1\t"
+                << "-1"
+                << endl;
         }
     }
     // report the overall stats
@@ -154,6 +154,6 @@ void SummaryFile::giveFinalReport(RecordOutputMgr *outputMgr)
          << max_length << "\t";
     // mean
     double mean = (double) _total_length / (double) _total_intervals;
-    cout << fixed << std::setprecision(2) << mean 
+    cout << fixed << std::setprecision(9) << mean 
          << endl;
 }

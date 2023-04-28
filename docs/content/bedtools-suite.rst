@@ -52,7 +52,8 @@ The full list of `bedtools` sub-commands.
    tools/shuffle    
    tools/slop       
    tools/sort       
-   tools/subtract   
+   tools/subtract
+   tools/summary   
    tools/tag         
    tools/unionbedg   
    tools/window  
