@@ -36,6 +36,10 @@ This former is because the repeat content of chromosome 19 "is approximately 55%
 than the genome-wide average" (``Grimwood J, et al. Nature. 2004;428:529–35``). The latter because
 are indeed no repeat annotations provided by UCSC for the mitochondrial genome.
 
+In this case, the extremes in obersved versus expected ratios make sense. However,
+**this tool provides the ability to detect cases that do not and are either artifacts or
+biological signal**.
+
 .. image:: ../images/tool-glyphs/summary.png 
     :width: 600pt 
 
