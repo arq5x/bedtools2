@@ -24,7 +24,7 @@ class ChromIdLookup;
 
 static inline const char* buffer_printf(const char* fmt, ...) __attribute__((format(printf, 1, 2)));
 static inline const char* buffer_printf(const char* fmt, ...) {
-	static char static_buffer[1024];
+	static char static_buffer[8192];
 	static char* dynamic_buffer = NULL;
 	static size_t dynamic_buffer_size;
 
