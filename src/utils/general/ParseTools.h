@@ -15,6 +15,7 @@
 #include <vector>
 #include "string.h"
 #include <cstdio>
+#include <cstdint>
 #include <cstdlib>
 
 using namespace std;
