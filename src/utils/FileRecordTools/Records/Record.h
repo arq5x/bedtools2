@@ -73,7 +73,7 @@ public:
 	virtual void printNull(string &) const {}
 	friend ostream &operator << (ostream &out, const Record &record);
 
-	virtual const Record & operator=(const Record &);
+	const Record & operator=(const Record &);
 
 	virtual bool isZeroBased() const {return true;};
 

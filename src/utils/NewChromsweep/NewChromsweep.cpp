@@ -26,11 +26,11 @@ NewChromSweep::NewChromSweep(ContextIntersect *context)
      _wasInitialized(false),
      _currQueryRec(NULL),
      _runToQueryEnd(_context->getRunToQueryEnd()),
+     _runToDbEnd(false),
      _lexicoDisproven(false),
      _lexicoAssumed(false),
      _lexicoAssumedFileIdx(-1),
-     _testLastQueryRec(false),
-     _runToDbEnd(false)
+     _testLastQueryRec(false)
 {
 	_filePrevChrom.resize(_numFiles);
 	_runToDbEnd = context->shouldRunToDbEnd();

@@ -2,6 +2,7 @@
 #include <climits>
 #include <cctype>
 #include <cstring>
+#include <cstdint>
 #include <cstdio>
 #include <cstdlib>
 #include <sstream>

@@ -16,10 +16,9 @@
 #include "string.h"
 #include <cstdio>
 #include <cstdlib>
+#include "BedtoolsTypes.h"
 
 using namespace std;
-
-typedef int64_t CHRPOS;
 
 bool isNumeric(const string &str);
 bool isInteger(const string &str);
@@ -54,7 +53,7 @@ void int2str(U number, T& buffer, bool appendToBuf = false)
 
 	bool neg = number < 0;
 	if(neg) number = -number;
-	uint32_t n;
+	unsigned int n;
 	for(n = 0; number; number /= 10)
 		tmp[12 - ++n] = number % 10 + '0';
 	if(neg) tmp[12 - ++n] = '-';
