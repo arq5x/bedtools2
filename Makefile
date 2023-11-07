@@ -77,6 +77,7 @@ SUBDIRS = $(SRC_DIR)/annotateBed \
 		  $(SRC_DIR)/randomBed \
 		  $(SRC_DIR)/regressTest \
 		  $(SRC_DIR)/reldist \
+		  $(SRC_DIR)/revcompBed \
 		  $(SRC_DIR)/sampleFile \
 		  $(SRC_DIR)/shiftBed \
 		  $(SRC_DIR)/shuffleBed \
