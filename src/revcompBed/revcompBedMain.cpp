@@ -10,7 +10,7 @@ using namespace std;
 #define PARAMETER_CHECK(param, paramLen, actualLen) (strncmp(argv[i], param, min(actualLen, paramLen))== 0) && (actualLen == paramLen)
 
 // function declarations
-void revcomp_help(void);
+void revcomp_help(int);
 
 int revcomp_main(int argc, char* argv[]) {
 
@@ -34,7 +34,7 @@ int revcomp_main(int argc, char* argv[]) {
         }
     }
 
-    if(showHelp) revcomp_help();
+    if(showHelp) revcomp_help(0);
 
     // do some parsing (all of these parameters require 2 strings)
     for(int i = 1; i < argc; i++) {
@@ -68,23 +68,20 @@ int revcomp_main(int argc, char* argv[]) {
         cerr << endl << "*****" << endl << "*****ERROR: Need both a BED (-i) and a genome (-g) file. " << endl << "*****" << endl;
         showHelp = true;
     }
-    if (!showHelp) {
-        BedRevcomp(bedFile, genomeFile, printHeader);
-        return 0;
-    }
-    else {
-        revcomp_help();
-    }
+
+    if (showHelp) revcomp_help(1);
+
+    BedRevcomp(bedFile, genomeFile, printHeader);
     return 0;
 }
 
-void revcomp_help(void) {
+void revcomp_help(int exit_status) {
 
     cerr << "\nTool:    bedtools revcomp (aka revcompBed)" << endl;
     cerr << "Version: " << VERSION << "\n";    
-    cerr << "Summary: Shift each feature by requested number of base pairs." << endl << endl;
+    cerr << "Summary: Compute the intervals on the reverse complement." << endl << endl;
 
-    cerr << "Usage:   " << PROGRAM_NAME << " [OPTIONS] -i <bed/gff/vcf> -g <genome> [-s <int> or (-p and -m)]" << endl << endl;
+    cerr << "Usage:   " << PROGRAM_NAME << " [OPTIONS] -i <bed/gff/vcf> -g <genome>" << endl << endl;
 
     cerr << "Options: " << endl;
     cerr << "\t-header\t"           << "Print the header from the input file prior to results." << endl << endl;
@@ -92,7 +89,7 @@ void revcomp_help(void) {
     cerr << "Notes: " << endl;
     cerr << "\t(1)  Starts will be set to 0 if options would force it below 0." << endl;
     cerr << "\t(2)  Ends will be set to the chromosome length if above the max chrom length." << endl;
-    cerr << "\t(3)  The genome file should tab delimited and structured as follows:" << endl;
+    cerr << "\t(3)  The genome file should be tab delimited and structured as follows:" << endl;
     cerr << "\n\t<chromName><TAB><chromSize>" << endl << endl;
     cerr << "\tFor example, Human (hg19):" << endl;
     cerr << "\tchr1\t249250621" << endl;
@@ -116,5 +113,5 @@ void revcomp_help(void) {
     cerr << "\t\"select chrom, size from hg19.chromInfo\"  > hg19.genome" << endl << endl;
 
     // end the program here
-    exit(1);
+    exit(exit_status);
 }

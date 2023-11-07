@@ -18,8 +18,8 @@ private:
 
     bool   _printHeader;
 
-    BedFile *_bed;
-    GenomeFile *_genome;
+    BedFile _bed;
+    GenomeFile _genome;
 
     void Revcomp();
     void Revcomp(BED &bed);

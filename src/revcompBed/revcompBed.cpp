@@ -5,12 +5,10 @@
 BedRevcomp::BedRevcomp(/*const*/ std::string &bedFile, const std::string &genomeFile, bool printHeader):
  _bedFile(bedFile),
  _genomeFile(genomeFile),
- _printHeader(printHeader)
+ _printHeader(printHeader),
+ _bed(bedFile),
+ _genome(genomeFile)
 {
-
-  _bed = new BedFile(bedFile);
-  _genome = new GenomeFile(genomeFile);
-
   Revcomp();
 }
 
@@ -18,18 +16,18 @@ void BedRevcomp::Revcomp() {
 
   BED bedEntry; // used to store the current BED line from the BED file.
 
-  _bed->Open();
+  _bed.Open();
   // report header first if asked.
   if (_printHeader == true) {
-    _bed->PrintHeader();
+    _bed.PrintHeader();
   }
-  while (_bed->GetNextBed(bedEntry)) {
-    if (_bed->_status == BED_VALID) {
+  while (_bed.GetNextBed(bedEntry)) {
+    if (_bed._status == BED_VALID) {
       Revcomp(bedEntry);
-      _bed->reportBedNewLine(bedEntry);
+      _bed.reportBedNewLine(bedEntry);
     }
   }
-  _bed->Close();
+  _bed.Close();
 }
 
 namespace {
@@ -40,7 +38,7 @@ CHRPOS clamp(const CHRPOS& a, const CHRPOS& b, const CHRPOS& c) {
 }
 
 void BedRevcomp::Revcomp(BED &bed) {
-  CHRPOS chromSize = (CHRPOS)_genome->getChromSize(bed.chrom);
+  CHRPOS chromSize = (CHRPOS)_genome.getChromSize(bed.chrom);
 
   auto rcStart = clamp(0, chromSize - bed.end, chromSize);
   auto rcEnd   = clamp(0, chromSize - bed.start, chromSize);
