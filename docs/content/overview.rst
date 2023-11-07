@@ -133,15 +133,14 @@ And 2) For tools where only one input feature file is needed, the “-i” optio
   bedtools merge –i repeats.bed
 
 -----------------------------------------------------
-BED starts are zero-based and BED ends are one-based.
+BED uses zero-based half-open intervals
 -----------------------------------------------------
-bedtools users are sometimes confused by the way the start and end of BED features are represented. Specifically, bedtools uses the UCSC Genome Browser’s internal database convention of making the start position 0-based and the end position 1-based: (http://genome.ucsc.edu/FAQ/FAQtracks#tracks1)
-In other words, bedtools interprets the “start” column as being 1 basepair higher than what is represented in the file. For example, the following BED feature represents a single base on chromosome 1; namely, the 1st base::
+bedtools users are sometimes confused by the way the start and end of BED features are represented. Specifically, bedtools uses the UCSC Genome Browser’s internal database convention of making the start and end position 0-based (http://genome.ucsc.edu/FAQ/FAQtracks#tracks1).
+For example, the following BED feature represents a single base on chromosome 1; namely, the first base::
 
   chr1   0	  1    first_base
 
-Why, you might ask? The advantage of storing features this way is that when computing the length of a feature, one must simply subtract the start from the end.	Were the start position 1-based, 
-the calculation would be (slightly) more complex (i.e. (end-start)+1). Thus, storing BED features this way reduces the computational burden.
+Note that the end position is exclusive and the range represents only a single base. This is equivalent to the mathematical notion of using half-open intervals [0,1).
 
 -----------------------------------------------------
 GFF starts and ends are one-based.
