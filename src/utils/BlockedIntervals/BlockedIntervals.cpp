@@ -41,8 +41,11 @@ void GetBamBlocks(const BamAlignment &bam,
                 if (!breakOnDeletionOps)
                     blockLength += cigItr->Length;
                 else {
-                    bedBlocks.push_back( BED(chrom, currPosition, currPosition + blockLength,
-                                          bam.Name, ToString(bam.MapQuality), strand) );
+                    if (blockLength > 0)
+                    {
+                        bedBlocks.push_back( BED(chrom, currPosition, currPosition + blockLength,
+                                            bam.Name, ToString(bam.MapQuality), strand) );
+                    }
                     currPosition += cigItr->Length + blockLength;
                     blockLength = 0;
                 }
@@ -51,8 +54,11 @@ void GetBamBlocks(const BamAlignment &bam,
                 if (!breakOnSkipOps)
                     blockLength += cigItr->Length;
                 else {
-                    bedBlocks.push_back( BED(chrom, currPosition, currPosition + blockLength,
-                                          bam.Name, ToString(bam.MapQuality), strand) );
+                    if (blockLength > 0)
+                    {
+                        bedBlocks.push_back( BED(chrom, currPosition, currPosition + blockLength,
+                                            bam.Name, ToString(bam.MapQuality), strand) );
+                    }
                     currPosition += cigItr->Length + blockLength;
                     blockLength = 0;
                 }
