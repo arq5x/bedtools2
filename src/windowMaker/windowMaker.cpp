@@ -50,7 +50,8 @@ void WindowMaker::MakeWindowsFromGenome(const string& genomeFileName) {
     vector<string> chromList = _genome->getChromList();
 
     // process each chrom in the genome
-    for (size_t c = 0; c < chromList.size(); ++c) {
+    // exclude the last chrom from NewGenomeFile, because it has an empty name and 0-length
+    for (size_t c = 0; c < chromList.size() - 1; ++c) {
         string chrom = chromList[c];
 
         BED bed(chrom,0,_genome->getChromSize(chrom),chrom,"","");
