@@ -11,13 +11,15 @@ Licenced under the GNU General Public License 2.0 license.
 ******************************************************************************/
 #include "windowMaker.h"
 
-WindowMaker::WindowMaker(string &fileName, ID_METHOD id_method, INPUT_FILE_TYPE input_file_type, uint32_t size, uint32_t step, bool reverse)
+WindowMaker::WindowMaker(string &fileName, ID_METHOD id_method, INPUT_FILE_TYPE input_file_type, uint32_t size, uint32_t step, uint32_t initialSize, uint32_t initialStep, bool reverse)
 : _size(size)
 , _step(step)
 , _count(0)
 , _reverse(reverse)
 , _window_method(FIXED_WINDOW_SIZE)
 , _id_method(id_method)
+, _initialSize(initialSize)
+, _initialStep(initialStep)
 {
     if (input_file_type==GENOME_FILE)
         MakeWindowsFromGenome(fileName);
@@ -32,6 +34,8 @@ WindowMaker::WindowMaker(string &fileName, ID_METHOD id_method, INPUT_FILE_TYPE 
     , _reverse(reverse)
     , _window_method(FIXED_WINDOW_COUNT)
     , _id_method(id_method)
+    , _initialSize(0)
+    , _initialStep(0)
 {
     if (input_file_type==GENOME_FILE)
         MakeWindowsFromGenome(fileName);
@@ -79,24 +83,38 @@ void WindowMaker::MakeBEDWindow(const BED& interval)
 }
 
 uint32_t WindowMaker::CalculateWindows(const BED& interval) {
-    uint32_t num_windows = (interval.end - interval.start) / _step;
-    if ((interval.end - interval.start) % _step > 0) {
-        // add 1 to num_windows if the last window is less than _step 
-        num_windows += 1;
+    uint32_t num_windows = 0;
+    if (interval.end - interval.start > 0) {
+        num_windows = 1;
+    }
+    CHRPOS rest_interval = interval.end - interval.start - (CHRPOS)_initialStep;
+    // need to avoid adding a negative number, which may result in a huge unsigned positive number
+    if (rest_interval > 0) {
+        num_windows += rest_interval / _step;
+        if (rest_interval % _step > 0) {
+            // add 1 to num_windows if the last window is less than _step
+            num_windows += 1;
+        }
     }
     return num_windows;
 }
+
 void WindowMaker::MakeFixedSizeWindow(const BED& interval) {
     uint32_t i=1;
+    uint32_t current_size = _initialSize;
+    uint32_t current_step = _initialStep;
     uint32_t num_windows = CalculateWindows(interval);
-    for (uint32_t start = interval.start; start <= interval.end; start += _step, ++i) {
+    for (uint32_t start = interval.start; start <= interval.end; ++i) {
         string name = GenerateID(interval, i, num_windows, _reverse);
-        if ((start + _size) <= interval.end) {
-            cout << interval.chrom << "\t" << start << "\t" << start + _size << name << endl;
+        if ((start + current_size) <= interval.end) {
+            cout << interval.chrom << "\t" << start << "\t" << start + current_size << name << endl;
         }
         else if (start < interval.end) {
             cout << interval.chrom << "\t" << start << "\t" << interval.end << name << endl;
         }
+        start += current_step;
+        current_step = _step; // for i >= 2
+        current_size = _size; // for i >= 2
     }
 }
 
