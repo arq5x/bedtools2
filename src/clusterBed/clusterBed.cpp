@@ -12,6 +12,8 @@
 #include "lineFileUtilities.h"
 #include "clusterBed.h"
 
+#include <stdint.h>
+
 // = Constructor =
 BedCluster::BedCluster(string &bedFile, 
                    int  maxDistance, 

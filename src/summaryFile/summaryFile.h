@@ -12,6 +12,8 @@
 #include "ToolBase.h"
 #include "ContextSummary.h"
 
+#include <stdint.h>
+
 struct Interval {
   CHRPOS start;
   CHRPOS end;
