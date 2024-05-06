@@ -4,7 +4,8 @@
 # (c) 2009 Aaron Quinlan
 # ==========================
 
-SHELL := /bin/bash -e
+# Use sh for portability and avoid bash extensions in shell commands
+SHELL := /bin/sh -e
 
 VERSION_FILE=./src/utils/version/version_git.h
 RELEASED_VERSION_FILE=./src/utils/version/version_release.txt
@@ -21,7 +22,8 @@ OBJ_DIR	= obj
 BIN_DIR	= bin
 SRC_DIR	= src
 
-CXX     = g++
+# Default if not provided via the environment or make args
+CXX     ?= g++
 
 PYTHON ?= $(shell python --version >/dev/null 2>&1 && echo "python" || echo python3)
 
@@ -43,7 +45,8 @@ endif
 BT_LDFLAGS =
 BT_LIBS    = -lz -lm -lbz2 -llzma -lpthread
 
-prefix ?= /usr/local
+# Default if not provided via the environment or make args
+PREFIX ?= /usr/local
 
 SUBDIRS = $(SRC_DIR)/annotateBed \
 		  $(SRC_DIR)/bamToBed \
@@ -200,9 +203,9 @@ $(BIN_DIR)/intersectBed: | $(BIN_DIR)
 .PHONY: all
 
 install: all
-	mkdir -p $(DESTDIR)$(prefix)/bin
+	mkdir -p $(DESTDIR)$(PREFIX)/bin
 	for file in bin/* ; do \
-		cp -f $$file $(DESTDIR)$(prefix)/bin; \
+		cp -f $$file $(DESTDIR)$(PREFIX)/bin; \
 	done
 
 print_banner:
