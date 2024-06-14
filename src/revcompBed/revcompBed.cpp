@@ -2,11 +2,11 @@
 
 #include "lineFileUtilities.h"
 
-BedRevcomp::BedRevcomp(/*const*/ std::string &bedFile, const std::string &genomeFile, bool printHeader):
+BedRevcomp::BedRevcomp(const std::string &bedFile, const std::string &genomeFile, bool printHeader):
  _bedFile(bedFile),
  _genomeFile(genomeFile),
  _printHeader(printHeader),
- _bed(bedFile),
+ _bed(_bedFile),
  _genome(genomeFile)
 {
   Revcomp();
@@ -38,7 +38,7 @@ CHRPOS clamp(const CHRPOS& a, const CHRPOS& b, const CHRPOS& c) {
 }
 
 void BedRevcomp::Revcomp(BED &bed) {
-  CHRPOS chromSize = (CHRPOS)_genome.getChromSize(bed.chrom);
+  CHRPOS chromSize = _genome.getChromSize(bed.chrom);
 
   auto rcStart = clamp(0, chromSize - bed.end, chromSize);
   auto rcEnd   = clamp(0, chromSize - bed.start, chromSize);

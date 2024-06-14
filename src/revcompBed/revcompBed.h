@@ -9,7 +9,7 @@ class BedRevcomp {
 
 public:
 
-    BedRevcomp(/*const*/ std::string &bedFile, const std::string &genomeFile, bool printHeader);
+    BedRevcomp(const std::string &bedFile, const std::string &genomeFile, bool printHeader);
 
 private:
 
