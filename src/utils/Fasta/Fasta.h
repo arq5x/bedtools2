@@ -20,7 +20,9 @@
 #include "bedFile.h"
 #include "htslib/faidx.h"
 #include <sys/stat.h>
+#if (!defined(_WIN32) || !defined(__WIN32__))
 #include <sys/mman.h>
+#endif
 #include "split.h"
 #include <stdlib.h>
 #include <ctype.h>
