@@ -5,7 +5,7 @@ FAILURES=0;
 
 check()
 {
-	if diff $1 $2; then
+	if diff -Z $1 $2; then
     	echo ok
 	else
     	FAILURES=$(expr $FAILURES + 1);
@@ -254,7 +254,7 @@ check obs exp
 rm obs exp
 
 ###########################################################
-# test diff strand 
+# test diff -Z strand 
 ###########################################################
 echo -e "    closest.t21...\c"
 echo \
@@ -276,7 +276,7 @@ rm obs exp
 
 
 ###########################################################
-# test 2 dbs, tie mode = all, diff strand
+# test 2 dbs, tie mode = all, diff -Z strand
 ###########################################################
 echo -e "    closest.t23...\c"
 echo \

@@ -5,7 +5,7 @@ FAILURES=0;
 
 check()
 {
-	if diff $1 $2; then
+	if diff -Z $1 $2; then
     	echo ok
 	else
     	FAILURES=$(expr $FAILURES + 1);
@@ -15,7 +15,7 @@ check()
 
 bam_check() 
 {
-	if diff <($htsutil viewbamrecords $1) <($htsutil viewbamrecords $2)
+	if diff -Z <($htsutil viewbamrecords $1) <($htsutil viewbamrecords $2)
 	then
 		echo ok
 	else
