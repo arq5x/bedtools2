@@ -12,6 +12,10 @@
 #include <cstdio>
 #include <vector>
 #include <fstream>
+#if (defined(_WIN32) || defined(__WIN32__))
+#include <direct.h>
+#endif
+
 
 using namespace std;
 
