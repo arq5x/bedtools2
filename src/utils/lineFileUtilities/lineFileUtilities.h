@@ -7,6 +7,7 @@
 #include <cstdlib>
 #include <sstream>
 #include <iostream>
+#include <cstdint>
 
 using namespace std;
 
