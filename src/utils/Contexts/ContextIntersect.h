@@ -109,8 +109,8 @@ public:
 
 protected:
 
-	BlockMgr *_splitBlockMgr;
-	bool _shouldRunToDbEnd;
+	BlockMgr *_splitBlockMgr{};
+	bool _shouldRunToDbEnd{};
 
 	virtual bool handle_a();
 	virtual bool handle_abam();

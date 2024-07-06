@@ -105,9 +105,9 @@ private:
 
 	typedef enum { UNSORTED, ASC, DESC} SORT_TYPE;
 
-	bool _nonNumErrFlag;
+	bool _nonNumErrFlag{};
 	string _errMsg;
-	bool _isBam;
+	bool _isBam{};
 
 	typedef multimap<int, string, less<int> > histAscType;
 	typedef multimap<int, string, greater<int> > histDescType;

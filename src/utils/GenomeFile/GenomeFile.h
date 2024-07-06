@@ -65,7 +65,7 @@ private:
     vector<string> _chromList;
 
     // projecting chroms into a single coordinate system
-    CHRPOS _genomeLength;
+    CHRPOS _genomeLength{};
     vector<CHRPOS> _startOffsets;
     
 };

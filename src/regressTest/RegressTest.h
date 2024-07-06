@@ -46,7 +46,7 @@ protected:
 	int _filesPerRun;
 	vector<string> _filePrecessorOptions;
 
-	FILE *_fpReportFile;
+	FILE *_fpReportFile{};
 	ifstream _configFile;
 
 	typedef vector<pair<string, string> > fileListType;

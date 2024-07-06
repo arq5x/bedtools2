@@ -30,7 +30,7 @@ protected:
     Record *_currRec;
     string _distance;
 
-    FileRecordMgr *_inputFile;
+    FileRecordMgr *_inputFile{};
     virtual ContextSpacing *upCast(ContextBase *context) { return static_cast<ContextSpacing *>(context); }
 
 

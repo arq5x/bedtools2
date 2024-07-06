@@ -36,7 +36,7 @@ class FastaIndexEntry {
         FastaIndexEntry(void);
         ~FastaIndexEntry(void);
         string name;  // sequence name
-        CHRPOS length;  // length of sequence
+        CHRPOS length{};  // length of sequence
         void clear(void);
 };
 
