@@ -15,13 +15,16 @@ check()
 
 bam_check() 
 {
-	if diff -Z <($htsutil viewbamrecords $1) <($htsutil viewbamrecords $2)
+  $htsutil viewbamrecords $1 > b1
+  $htsutil viewbamrecords $2 > b2
+	if diff -Z b1 b2
 	then
 		echo ok
 	else
 		FAILURES$(expr $FAILURES + 1);
 		echo fail
 	fi
+	rm b1 b2
 }
 
 ###########################################################
