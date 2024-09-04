@@ -86,7 +86,7 @@ bool InputStreamMgr::init()
 			_isStdin = true;
 		}
 		
-		_inputFileStream = new ifstream(_filename.c_str());
+		_inputFileStream = new ifstream(_filename.c_str(), std::ios::binary);
 		if (_inputFileStream->fail()) {
 			cerr << "Error: Unable to open file " << _filename << ". Exiting." << endl;
 			delete _inputFileStream;
