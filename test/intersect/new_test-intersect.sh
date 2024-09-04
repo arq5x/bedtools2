@@ -21,7 +21,7 @@ bam_check()
 	then
 		echo ok
 	else
-		FAILURES$(expr $FAILURES + 1);
+		FAILURES=$(expr $FAILURES + 1);
 		echo fail
 	fi
 	rm b1 b2
