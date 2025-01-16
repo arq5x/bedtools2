@@ -22,7 +22,7 @@ bool isNumeric(const string &str) {
 }
 
 //As above, but does not allow decimal points
-bool isInteger(const string &str) {
+bool isBedInteger(const string &str) {
 	bool hasDigits = false;
 	for (int i=0; i < (int)str.size(); i++) {
 		char currChar = str[i];

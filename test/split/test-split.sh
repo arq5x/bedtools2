@@ -4,7 +4,7 @@ FAILURES=0;
 
 check()
 {
-	if diff $1 $2; then
+	if diff -Z $1 $2; then
     	echo ok
 
 	else

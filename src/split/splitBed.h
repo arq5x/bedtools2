@@ -29,7 +29,7 @@ private:
     std::string bedFileName;
     std::string outfileprefix;
     unsigned int num_chuncks;
-    int bedType;
+    int bedType{};
     std::vector<BED> items;
     
     void usage(std::ostream& out);

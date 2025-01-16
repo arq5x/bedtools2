@@ -215,7 +215,7 @@ protected:
     int _bamHeaderAndRefIdx;
     int _maxNumDatabaseFields;
     bool _useFullBamTags;
-	bool _isCram;   // Used when a "BAM" type which is actually a CRAM
+	bool _isCram{};   // Used when a "BAM" type which is actually a CRAM
 
 	int _numOutputRecords;
 
@@ -247,9 +247,9 @@ protected:
 
 	//set cmd line params and counter, i, as members so code
 	//is more readable (as opposed to passing all 3 everywhere).
-	int _argc;
-	char **_argv;
-	int _i;
+	int _argc{};
+	char **_argv{};
+	int _i{};
 
 	//track whether each file has the letters chr in their chrom names.
 	//this is needed for enforcing consistent naming conventions across

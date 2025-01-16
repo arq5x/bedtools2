@@ -175,8 +175,8 @@ public:
 */
 struct MATE {
     BED bed;
-    int lineNum;
-    MATE *mate;
+    int lineNum{};
+    MATE *mate{};
 };
 
 
@@ -483,10 +483,10 @@ public:
 
     // the bedfile with which this instance is associated
     string bedFile;
-    unsigned int bedType;  // 3-6, 12 for BED
+    unsigned int bedType{};  // 3-6, 12 for BED
                            // 9 for GFF
-    bool isBed12;          // is it file of true blocked BED12 records?
-    bool isZeroBased;
+    bool isBed12{};          // is it file of true blocked BED12 records?
+    bool isZeroBased{};
 
     // Main data structures used by BEDTools
     masterBedCovMap      bedCovMap;
@@ -496,7 +496,7 @@ public:
     masterBedMapNoBin    bedMapNoBin;
     
     BedLineStatus _status;
-    int _lineNum;
+    int _lineNum{};
 
 private:
 
@@ -505,21 +505,21 @@ private:
     bool _isVcf;
     bool _typeIsKnown;        // do we know the type?   (i.e., BED, GFF, VCF)
     FileType   _fileType;     // what is the file type? (BED? GFF? VCF?)
-    istream   *_bedStream;
+    istream   *_bedStream{};
     string _bedLine;
 
     BED _nullBed;
     string _header;
-    bool _firstLine;
+    bool _firstLine{};
     vector<string> _bedFields;
-    unsigned int _numFields;
+    unsigned int _numFields{};
     CHRPOS _merged_start;
     CHRPOS _merged_end;
     string _merged_chrom;
     CHRPOS _prev_start;
     string _prev_chrom;
     unsigned long _total_length;
-    unsigned long _total_flattened_length;
+    unsigned long _total_flattened_length{};
 
     void setZeroBased(bool zeroBased);
     void setGff (bool isGff);

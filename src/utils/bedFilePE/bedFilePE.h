@@ -80,13 +80,13 @@ public:
 
 
     string bedFile;
-    unsigned int bedType;
+    unsigned int bedType{};
 
     masterMateMap bedMapEnd1;
     masterMateMap bedMapEnd2;
 
 private:
-    istream *_bedStream;
+    istream *_bedStream{};
 
     // methods
     BedLineStatus parseLine (BEDPE &bedpe, const vector<string> &lineVector, int &lineNum);

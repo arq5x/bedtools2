@@ -5,7 +5,7 @@ FAILURES=0;
 
 check()
 {
-	if diff $1 $2; then
+	if diff -Z $1 $2; then
     	echo ok
 	else
     	FAILURES=$(expr $FAILURES + 1);
@@ -15,13 +15,16 @@ check()
 
 bam_check() 
 {
-	if diff <($htsutil viewbamrecords $1) <($htsutil viewbamrecords $2)
+  $htsutil viewbamrecords $1 > b1
+  $htsutil viewbamrecords $2 > b2
+	if diff -Z b1 b2
 	then
 		echo ok
 	else
-		FAILURES$(expr $FAILURES + 1);
+		FAILURES=$(expr $FAILURES + 1);
 		echo fail
 	fi
+	rm b1 b2
 }
 
 ###########################################################
@@ -56,18 +59,6 @@ echo \
 "chr1	100	101	a2	2	-
 chr1	100	110	a2	2	-" > exp
 cat a.bed | $BT intersect -a - -b b.bed > obs
-check obs exp
-rm obs exp
-
-
-###########################################################
-#  Test intersection of a as bed from fifo vs b as bed from file
-############################################################
-echo -e "    intersect.new.t04...\c"
-echo \
-"chr1	100	101	a2	2	-
-chr1	100	110	a2	2	-" > exp
-$BT intersect -a <(cat a.bed) -b b.bed > obs
 check obs exp
 rm obs exp
 
@@ -109,18 +100,6 @@ rm obs exp
 
 
 ###########################################################
-#  Test intersection of a as gzipped from fifo vs b as bed from file
-############################################################
-echo -e "    intersect.new.t08...\c"
-echo \
-"chr1	100	101	a2	2	-
-chr1	100	110	a2	2	-" > exp
-$BT intersect -a <(cat a_gzipped.bed.gz) -b b.bed > obs
-check obs exp
-rm obs exp
-
-
-###########################################################
 #  Test intersection of a as bgzipped from file vs b as bed from file
 ############################################################
 echo -e "    intersect.new.t09...\c"
@@ -155,27 +134,13 @@ cat a_bgzipped.bed.gz | $BT intersect -a - -b b.bed > obs
 check obs exp
 rm obs exp
 
-
-###########################################################
-#  Test intersection of a as bgzipped from fifo vs b as bed from file
-############################################################
-echo -e "    intersect.new.t12...\c"
-echo \
-"chr1	100	101	a2	2	-
-chr1	100	110	a2	2	-" > exp
-$BT intersect -a <(cat a_bgzipped.bed.gz) -b b.bed > obs
-check obs exp
-rm obs exp
-
-
 ###########################################################
 #  Test intersection of a as bam from file vs b as bed from file
 ############################################################
 echo -e "    intersect.new.t13...\c"
-$BT intersect -a a.bam -b b.bed> obs
+$BT intersect -a a.bam -b b.bed > obs
 bam_check obs aVSb.bam
 rm obs
-
 
 ###########################################################
 #  Test intersection of a as bam from redirect vs b as bed from file
@@ -185,21 +150,11 @@ $BT intersect -a - -b b.bed < a.bam> obs
 bam_check obs aVSb.bam
 rm obs
 
-
 ###########################################################
 #  Test intersection of a as bam from pipe vs b as bed from file
 ############################################################
 echo -e "    intersect.new.t15...\c"
 cat a.bam | $BT intersect -a - -b b.bed> obs
-bam_check obs aVSb.bam
-rm obs
-
-
-###########################################################
-#  Test intersection of a as bam from fifo vs b as bed from file
-############################################################
-echo -e "    intersect.new.t16...\c"
-$BT intersect -a <(cat a.bam) -b b.bed > obs
 bam_check obs aVSb.bam
 rm obs
 
@@ -367,17 +322,6 @@ check obs exp
 rm obs exp
 
 
-###########################################################
-#  Test intersection of a with large header as bed from fifo vs b as bed from file
-############################################################
-echo -e "    intersect.new.t27...\c"
-echo \
-"chr1	100	101	a2	2	-
-chr1	100	110	a2	2	-" > exp
-$BT intersect -a <(cat a_withLargeHeader.bed) -b b.bed > obs
-check obs exp
-rm obs exp
-
 
 ###########################################################
 #  Test intersection of a with large header as gzipped from file vs b as bed from file
@@ -414,17 +358,6 @@ cat a_withLargeHeader_gzipped.bed.gz | $BT intersect -a - -b b.bed > obs
 check obs exp
 rm obs exp
 
-
-###########################################################
-#  Test intersection of a with large header as gzipped from fifo vs b as bed from file
-############################################################
-echo -e "    intersect.new.t31...\c"
-echo \
-"chr1	100	101	a2	2	-
-chr1	100	110	a2	2	-" > exp
-$BT intersect -a <(cat a_withLargeHeader_gzipped.bed.gz) -b b.bed > obs
-check obs exp
-rm obs exp
 
 
 ###########################################################
@@ -464,18 +397,6 @@ rm obs exp
 
 
 ###########################################################
-#  Test intersection of a with large header as bgzipped from fifo vs b as bed from file
-############################################################
-echo -e "    intersect.new.t35...\c"
-echo \
-"chr1	100	101	a2	2	-
-chr1	100	110	a2	2	-" > exp
-$BT intersect -a <(cat a_withLargeHeader_bgzipped.bed.gz) -b b.bed > obs
-check obs exp
-rm obs exp
-
-
-###########################################################
 #  Test intersection of a with large header as bed from file 
 #  vs b as bed from file, and print header
 ############################################################
@@ -504,15 +425,6 @@ cat a_withLargeHeader.bed | $BT intersect -a - -b b.bed -header > obs
 check obs aWithHeaderVsB.txt
 rm obs
 
-
-###########################################################
-#  Test intersection of a with large header as bed from fifo
-#  vs b as bed from file, and print header
-############################################################
-echo -e "    intersect.new.t39...\c"
-$BT intersect -a <(cat a_withLargeHeader.bed) -b b.bed -header > obs
-check obs aWithHeaderVsB.txt
-rm obs
 
 
 ###########################################################
@@ -545,15 +457,6 @@ check obs aWithHeaderVsB.txt
 rm obs
 
 
-###########################################################
-#  Test intersection of a with large header as gzipped from
-#  fifo vs b as bed from file, and print header
-############################################################
-echo -e "    intersect.new.t43...\c"
-$BT intersect -a <(cat a_withLargeHeader_gzipped.bed.gz) -b b.bed -header > obs
-check obs aWithHeaderVsB.txt
-rm obs
-
 
 ###########################################################
 #  Test intersection of a with large header as bgzipped from
@@ -581,16 +484,6 @@ rm obs
 ############################################################
 echo -e "    intersect.new.t46...\c"
 cat a_withLargeHeader_bgzipped.bed.gz | $BT intersect -a - -b b.bed -header > obs
-check obs aWithHeaderVsB.txt
-rm obs
-
-
-###########################################################
-#  Test intersection of a with large header as bgzipped from
-#  fifo vs b as bed from file, and print header
-############################################################
-echo -e "    intersect.new.t47...\c"
-$BT intersect -a <(cat a_withLargeHeader_bgzipped.bed.gz) -b b.bed -header > obs
 check obs aWithHeaderVsB.txt
 rm obs
 

@@ -31,7 +31,7 @@ public:
 
 
 protected:
-    FileRecordMgr *_frm;
+    FileRecordMgr *_frm{};
     Record *_currRec;
     uint64_t _total_length;
     uint64_t _total_intervals;
@@ -39,7 +39,7 @@ protected:
     const vector<string> &_chromList;
     map<string, vector<Interval>, std::less<string> > _chromData;
 
-    FileRecordMgr *_inputFile;
+    FileRecordMgr *_inputFile{};
     virtual ContextSummary *upCast(ContextBase *context) { return static_cast<ContextSummary *>(context); }
 
 };

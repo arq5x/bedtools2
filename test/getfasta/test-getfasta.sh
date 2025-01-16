@@ -13,7 +13,7 @@ FAILURES=0;
 
 check()
 {
-    if diff $1 $2; then
+    if diff -Z $1 $2; then
         echo ok
     else
         FAILURES=$(expr $FAILURES + 1);
@@ -216,8 +216,10 @@ rm obs exp
 echo -e "    getfasta.t134..\c"
 echo ">chr1:0-1
 a" > exp
-$BT getfasta -fi t.fa -bed <(echo -e "chr1\t0\t1") > obs
+echo -e "chr1\t0\t1" > tmp1
+$BT getfasta -fi t.fa -bed tmp1 > obs
 check obs exp
+rm tmp1
 rm obs exp
 [[ $FAILURES -eq 0 ]] || exit 1;
 

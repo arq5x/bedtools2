@@ -56,7 +56,7 @@ private:
     size_t _tot_queries;
     
     // instance of a bed file class.
-    BedFile *_bedA, *_bedB;
+    BedFile *_bedA{}, *_bedB{};
     bool _summary;
 
     //------------------------------------------------

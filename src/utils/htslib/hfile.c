@@ -96,6 +96,7 @@ for seek():
 hFILE *hfile_init(size_t struct_size, const char *mode, size_t capacity)
 {
     hFILE *fp = (hFILE *) malloc(struct_size);
+    memset(fp, 0, struct_size);
     if (fp == NULL) goto error;
 
     if (capacity == 0) capacity = 32768;
@@ -104,7 +105,7 @@ hFILE *hfile_init(size_t struct_size, const char *mode, size_t capacity)
 
     fp->buffer = (char *) malloc(capacity);
     if (fp->buffer == NULL) goto error;
-
+    memset(fp->buffer, 0, capacity);
     fp->begin = fp->end = fp->buffer;
     fp->limit = &fp->buffer[capacity];
 

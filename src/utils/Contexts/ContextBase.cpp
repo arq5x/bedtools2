@@ -69,7 +69,8 @@ ContextBase::ContextBase()
   _allFileHaveLeadingZeroInChromNames(UNTESTED),
   _noEnforceCoordSort(false),
   _inheader(false),
-  _nameConventionWarningTripped(false)
+  _nameConventionWarningTripped(false),
+  _runToQueryEnd(false)
 
 {
 	_programNames["intersect"] = INTERSECT;

@@ -21,7 +21,7 @@ public:
 
 private:
   bool handle_limit_chroms();
-  bool _onlyChromsWithBedRecords;
+  bool _onlyChromsWithBedRecords{};
 protected:
 
 };

@@ -48,7 +48,7 @@ public:
 
 private:
 
-	Record * _val;
+	Record * _val{};
 	RecordListNode *_next;
 };
 

@@ -4,7 +4,7 @@ FAILURES=0;
 
 check()
 {
-	if diff $1 $2; then
+	if diff -Z $1 $2; then
     	echo ok
 
 	else
@@ -135,7 +135,10 @@ rm obs exp
 ###############################################################
 echo -e "    shuffle.t6...\c"
 echo "Error, line 1: tried 1000 potential loci for entry, but could not avoid excluded regions.  Ignoring entry and moving on." > exp
-$BT shuffle -i <(echo -e "chr1\t0\t110") -g <(echo -e "chr1\t100") &> obs
+echo -e "chr1\t0\t110" > t1
+echo -e "chr1\t100" > t2
+$BT shuffle -i t1 -g t2 &> obs
 check obs exp
-rm obs exp
+rm obs exp t1 t2
 [[ $FAILURES -eq 0 ]] || exit 1;
+

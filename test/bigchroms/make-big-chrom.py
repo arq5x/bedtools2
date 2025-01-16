@@ -10,13 +10,13 @@ linelen = 200
 extra = "ACTGACCCCGAGACGTTTGCATCCTGCACAGCTAGAGATCCTTTATTAAAAGCACACTGT"
 
 with open("bigx.fasta", "wb") as fh:
-    fh.write(">chrbig\n")
+    fh.write(b">chrbig\n")
     line = ("N" * linelen) + "\n"
     for i in xrange(0, size, len(line) - 1):
-        fh.write(line)
-    fh.write(extra + "\n")
+        fh.write(bytes(line, "utf8"))
+    fh.write(bytes(extra + "\n", "utf8"))
 fh.close()
 
 with open("bigx.fasta.fai", "wb") as fh:
-    fh.write("chrbig\t%d\t8\t%d\t%d\n" % (size + len(extra), linelen, linelen+1))
+    fh.write(b"chrbig\t%d\t8\t%d\t%d\n" % (size + len(extra), linelen, linelen+1))
 

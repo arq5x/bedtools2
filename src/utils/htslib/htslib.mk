@@ -147,28 +147,28 @@ HTSLIB_ALL = \
 	$(HTSDIR)/os/rand.c
 
 $(HTSDIR)/config.h:
-	+cd $(HTSDIR) && $(MAKE) config.h
+	+cd $(HTSDIR) && "$(MAKE)" config.h
 
 $(HTSDIR)/libhts.a: $(HTSLIB_ALL)
-	+cd $(HTSDIR) && $(MAKE) lib-static
+	+cd $(HTSDIR) && "$(MAKE)" lib-static
 
 $(HTSDIR)/libhts.so $(HTSDIR)/libhts.dylib: $(HTSLIB_ALL)
-	+cd $(HTSDIR) && $(MAKE) lib-shared
+	+cd $(HTSDIR) && "$(MAKE)" lib-shared
 
 $(HTSDIR)/bgzip: $(HTSDIR)/bgzip.c $(HTSLIB_PUBLIC_HEADERS)
-	+cd $(HTSDIR) && $(MAKE) bgzip
+	+cd $(HTSDIR) && "$(MAKE)" bgzip
 
 $(HTSDIR)/htsfile: $(HTSDIR)/htsfile.c $(HTSLIB_PUBLIC_HEADERS)
-	+cd $(HTSDIR) && $(MAKE) htsfile
+	+cd $(HTSDIR) && "$(MAKE)" htsfile
 
 $(HTSDIR)/tabix: $(HTSDIR)/tabix.c $(HTSLIB_PUBLIC_HEADERS)
-	+cd $(HTSDIR) && $(MAKE) tabix
+	+cd $(HTSDIR) && "$(MAKE)" tabix
 
 $(HTSDIR)/htslib_static.mk: $(HTSDIR)/htslib.pc.tmp
-	+cd $(HTSDIR) && $(MAKE) htslib_static.mk
+	+cd $(HTSDIR) && "$(MAKE)" htslib_static.mk
 
 $(HTSDIR)/htslib.pc.tmp:
-	+cd $(HTSDIR) && $(MAKE) htslib.pc.tmp
+	+cd $(HTSDIR) && "$(MAKE)" htslib.pc.tmp
 
 # Rules for phony targets.  You may wish to have your corresponding phony
 # targets invoke these in addition to their own recipes:
@@ -176,6 +176,6 @@ $(HTSDIR)/htslib.pc.tmp:
 #	clean: clean-htslib
 
 all-htslib clean-htslib install-htslib plugins-htslib:
-	+cd $(HTSDIR) && $(MAKE) $(@:-htslib=)
+	+cd $(HTSDIR) && "$(MAKE)" $(@:-htslib=)
 
 .PHONY: all-htslib clean-htslib install-htslib plugins-htslib

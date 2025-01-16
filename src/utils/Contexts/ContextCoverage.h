@@ -26,7 +26,7 @@ private:
     bool _count;
     bool _perBase;
     bool _showHist;
-    bool _mean;
+    bool _mean{};
     coverageType _coverageType;
 
 	bool handle_c();

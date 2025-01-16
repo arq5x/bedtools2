@@ -12,6 +12,8 @@ ContextClosest::ContextClosest()
 	_ignoreOverlaps(false),
 	_ignoreUpstream(false),
 	_ignoreDownstream(false),
+	_forceUpstream(false),
+	_forceDownstream(false),
 	_reportDistance(false),
 	_signDistance(false),
 	_haveStrandedDistMode(false),

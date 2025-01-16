@@ -20,7 +20,7 @@ not a pipe/device.
 This implies that the file can be opened/closed/seek'd multiple times without losing information
 */
 bool isRegularFile(const string& filename) {
-    struct stat buf ;
+    struct stat buf{} ;
     int i;
 
     i = stat(filename.c_str(), &buf);
