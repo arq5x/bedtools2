@@ -40,6 +40,12 @@ else
 BT_CXXFLAGS += -std=c++11
 endif
 
+# Support building on MSYS2
+UNAME := $(shell sh -c 'uname 2>/dev/null || echo Unknown')
+ifeq (MSYS_NT,$(findstring MSYS_NT,$(UNAME)))
+BT_CXXFLAGS += -D_GNU_SOURCE -D_DEFAULT_SOURCE
+endif
+
 BT_LDFLAGS =
 BT_LIBS    = -lz -lm -lbz2 -llzma -lpthread
 
