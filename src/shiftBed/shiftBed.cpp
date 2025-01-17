@@ -10,46 +10,42 @@
 #include "lineFileUtilities.h"
 #include "shiftBed.h"
 
-BedShift::BedShift(string &bedFile, string &genomeFile, float shiftMinus,
-                   float shiftPlus, bool fractional, bool printHeader) {
-
-  _bedFile = bedFile;
-  _genomeFile = genomeFile;
-  _shiftMinus = shiftMinus;
-  _shiftPlus = shiftPlus;
-  _fractional = fractional;
-  _printHeader = printHeader;
-
-  _bed = new BedFile(bedFile);
-  _genome = new GenomeFile(genomeFile);
-
+BedShift::BedShift(const string &bedFile, const string &genomeFile, float shiftMinus,
+                   float shiftPlus, bool fractional, bool printHeader) :
+  _bedFile(bedFile),
+  _genomeFile(genomeFile),
+  _shiftMinus(shiftMinus),
+  _shiftPlus(shiftPlus),
+  _fractional(fractional),
+  _printHeader(printHeader),
+  _bed(_bedFile),
+  _genome(genomeFile)
+{
   // get going, shift it around.
   ShiftBed();
 }
-
-BedShift::~BedShift(void) {}
 
 void BedShift::ShiftBed() {
 
   BED bedEntry; // used to store the current BED line from the BED file.
 
-  _bed->Open();
+  _bed.Open();
   // report header first if asked.
   if (_printHeader == true) {
-    _bed->PrintHeader();
+    _bed.PrintHeader();
   }
-  while (_bed->GetNextBed(bedEntry)) {
-    if (_bed->_status == BED_VALID) {
+  while (_bed.GetNextBed(bedEntry)) {
+    if (_bed._status == BED_VALID) {
       AddShift(bedEntry);
-      _bed->reportBedNewLine(bedEntry);
+      _bed.reportBedNewLine(bedEntry);
     }
   }
-  _bed->Close();
+  _bed.Close();
 }
 
 void BedShift::AddShift(BED &bed) {
 
-  CHRPOS chromSize = (CHRPOS)_genome->getChromSize(bed.chrom);
+  CHRPOS chromSize = _genome.getChromSize(bed.chrom);
 
   double shift;
 
