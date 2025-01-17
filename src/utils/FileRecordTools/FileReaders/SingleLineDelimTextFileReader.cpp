@@ -184,5 +184,5 @@ CHRPOS SingleLineDelimTextFileReader::getVcfSVlen() {
 		}
     }
     // not found
-    return INT_MIN;
+	return 1;
 }
