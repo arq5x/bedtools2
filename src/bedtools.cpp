@@ -300,7 +300,7 @@ int bedtools_help(void)
     cout  << "[ General help ]" << endl;
     cout  << "    --help        "  << "Print this help menu.\n";
     //cout  << "    --faq         "  << "Frequently asked questions.\n";  TODO
-    cout  << "    --version     "  << "What version of bedtools are you using?.\n";
+    cout  << "    --version     "  << "What version of bedtools are you using?\n";
     cout  << "    --contact     "  << "Feature requests, bugs, mailing lists, etc.\n";
 
     cout << "\n";
