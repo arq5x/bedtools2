@@ -16,9 +16,7 @@
 #include <vector>
 #include <iostream>
 #include <fstream>
-#include <stdlib.h>
-
-using namespace std;
+#include <cstdlib>
 
 
 // define our program name
@@ -29,10 +27,15 @@ using namespace std;
 
 // function declarations
 static void bedpeintersect_help(void);
-static void ProcessBedPEs(BedFilePE *bedpe_a, BedFilePE *bedpe_b);
+static void ProcessBedPEs_intersect(BedFilePE *bedpe_a, BedFilePE *bedpe_b);
 inline bool operator<(BEDPE bedpeEntry_a, BEDPE bedpeEntry_b);
 inline bool operator>(BEDPE bedpeEntry_a, BEDPE bedpeEntry_b);
 inline bool operator==(BEDPE bedpeEntry_a, BEDPE bedpeEntry_b);
+
+#ifdef TRACE
+inline void dumpBEDPE(BEDPE bedpeEntry);
+inline void dumpleft(BEDPE bedpeEntry_a, BEDPE bedpeEntry_b);
+#endif
 
 int bedpeintersect_main(int argc, char* argv[]) {
 
@@ -87,7 +90,7 @@ int bedpeintersect_main(int argc, char* argv[]) {
         BedFilePE *bedpe_a= new BedFilePE(bedpeFileA);
         BedFilePE *bedpe_b= new BedFilePE(bedpeFileB);
 
-        ProcessBedPEs(bedpe_a, bedpe_b);
+        ProcessBedPEs_intersect(bedpe_a, bedpe_b);
     }
     else {
         bedpeintersect_help();
@@ -110,7 +113,7 @@ static void bedpeintersect_help(void) {
     exit(1);
 }
 
-static void ProcessBedPEs(BedFilePE *bedpe_a, BedFilePE *bedpe_b) {
+static void ProcessBedPEs_intersect(BedFilePE *bedpe_a, BedFilePE *bedpe_b) {
     // process each BEDPE entry and compare to B
     BEDPE bedpeEntry_a;
     int lineNum_a = 0;
@@ -128,15 +131,19 @@ static void ProcessBedPEs(BedFilePE *bedpe_a, BedFilePE *bedpe_b) {
 
     // Assume sorted
     do {
+        // Ensure we have a record and not a header line etc.
         if (bedpeStatus_a == BED_VALID) {
             // Don't read b if it's already EOF
             if (bedpeStatus_b != BED_INVALID) {
                 // Read b file until matching coord or past
                 do {
+                    // Ensure we have a record and not a header line etc.
                     if (bedpeStatus_b == BED_VALID) {
                         // compare to a are past it?
-                        if ( bedpeEntry_a < bedpeEntry_b )
-                            break; // if so break out of this loop we need another record from a
+                        if ( bedpeEntry_a < bedpeEntry_b ) {
+                            break; // if so break out of this loop we need another record from BEDPE a
+                        }
+
                         // If not past it do the comparison
                         if (bedpeEntry_a == bedpeEntry_b) {
                             bedpe_a->reportBedPENewLine(bedpeEntry_a);
@@ -155,9 +162,9 @@ ProcessBedPEs_bail:
 
 inline bool operator<(BEDPE bedpeEntry_a, BEDPE bedpeEntry_b) {
     // TODO: simplify this
-    return (bedpeEntry_a.chrom1.compare(bedpeEntry_b.chrom1) <= 0) // Compare chrom1 and chrom1 first
+    return (bedpeEntry_a.chrom1.compare(bedpeEntry_b.chrom1) < 0) // Compare chrom1 and chrom1 first
         || ((bedpeEntry_a.chrom1.compare(bedpeEntry_b.chrom1) == 0) && (bedpeEntry_a.start1 < bedpeEntry_b.start1 || (bedpeEntry_a.start1 == bedpeEntry_b.start1 && bedpeEntry_a.end1 < bedpeEntry_b.end1)))
-        || ((bedpeEntry_a.chrom1.compare(bedpeEntry_b.chrom1) == 0) && (bedpeEntry_a.start1 == bedpeEntry_b.start1) && (bedpeEntry_a.end1 == bedpeEntry_b.end1) && (bedpeEntry_a.chrom2.compare(bedpeEntry_b.chrom2) <= 0))
+        || ((bedpeEntry_a.chrom1.compare(bedpeEntry_b.chrom1) == 0) && (bedpeEntry_a.start1 == bedpeEntry_b.start1) && (bedpeEntry_a.end1 == bedpeEntry_b.end1) && (bedpeEntry_a.chrom2.compare(bedpeEntry_b.chrom2) < 0))
         || ((bedpeEntry_a.chrom1.compare(bedpeEntry_b.chrom1) == 0) && (bedpeEntry_a.start1 == bedpeEntry_b.start1) && (bedpeEntry_a.end1 == bedpeEntry_b.end1) && (bedpeEntry_a.chrom2.compare(bedpeEntry_b.chrom2) == 0) && (bedpeEntry_a.start2 < bedpeEntry_b.start2 || (bedpeEntry_a.start2 == bedpeEntry_b.start2 && bedpeEntry_a.end2 < bedpeEntry_b.end2)));
 }
 
@@ -169,3 +176,18 @@ inline bool operator==(BEDPE bedpeEntry_a, BEDPE bedpeEntry_b) {
     return bedpeEntry_a.chrom1.compare(bedpeEntry_b.chrom1) == 0 && bedpeEntry_a.start1 == bedpeEntry_b.start1 && bedpeEntry_a.end1 == bedpeEntry_b.end1 &&
            bedpeEntry_a.chrom2.compare(bedpeEntry_b.chrom2) == 0 && bedpeEntry_a.start2 == bedpeEntry_b.start2 && bedpeEntry_a.end2 == bedpeEntry_b.end2;
 }
+
+#ifdef TRACE
+inline void dumpBEDPE(BEDPE bedpeEntry)
+{
+    std::cerr << "chrom1: " << bedpeEntry.chrom1 << " start1: " << bedpeEntry.start1 << " end1: " << bedpeEntry.end1
+        << "chrom2: " << bedpeEntry.chrom2 << " start2: " << bedpeEntry.start2 << " end2: " << bedpeEntry.end2 << std::endl;
+}
+
+inline void dumpleft(BEDPE bedpeEntry_a, BEDPE bedpeEntry_b) {
+    std::cerr << "1:" << (bedpeEntry_a.chrom1.compare(bedpeEntry_b.chrom1) < 0) << std::endl;
+    std::cerr << "2:" << ((bedpeEntry_a.chrom1.compare(bedpeEntry_b.chrom1) == 0) && (bedpeEntry_a.start1 < bedpeEntry_b.start1 || (bedpeEntry_a.start1 == bedpeEntry_b.start1 && bedpeEntry_a.end1 < bedpeEntry_b.end1))) << std::endl;
+    std::cerr << "3:" << ((bedpeEntry_a.chrom1.compare(bedpeEntry_b.chrom1) == 0) && (bedpeEntry_a.start1 == bedpeEntry_b.start1) && (bedpeEntry_a.end1 == bedpeEntry_b.end1) && (bedpeEntry_a.chrom2.compare(bedpeEntry_b.chrom2) < 0)) << std::endl;
+    std::cerr << "4:" << ((bedpeEntry_a.chrom1.compare(bedpeEntry_b.chrom1) == 0) && (bedpeEntry_a.start1 == bedpeEntry_b.start1) && (bedpeEntry_a.end1 == bedpeEntry_b.end1) && (bedpeEntry_a.chrom2.compare(bedpeEntry_b.chrom2) == 0) && (bedpeEntry_a.start2 < bedpeEntry_b.start2 || (bedpeEntry_a.start2 == bedpeEntry_b.start2 && bedpeEntry_a.end2 < bedpeEntry_b.end2))) << std::endl;
+}
+#endif
