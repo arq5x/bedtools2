@@ -30,7 +30,9 @@ using namespace std;
 // function declarations
 static void bedpeintersect_help(void);
 static void ProcessBedPEs(BedFilePE *bedpe_a, BedFilePE *bedpe_b);
-
+inline bool operator<(BEDPE bedpeEntry_a, BEDPE bedpeEntry_b);
+inline bool operator>(BEDPE bedpeEntry_a, BEDPE bedpeEntry_b);
+inline bool operator==(BEDPE bedpeEntry_a, BEDPE bedpeEntry_b);
 
 int bedpeintersect_main(int argc, char* argv[]) {
 
@@ -119,29 +121,51 @@ static void ProcessBedPEs(BedFilePE *bedpe_a, BedFilePE *bedpe_b) {
 
     // open the BEDPE file for reading.
     bedpe_a->Open();
+    bedpe_b->Open();
+    // Prime the pump
+    if ((bedpeStatus_a = bedpe_a->GetNextBedPE(bedpeEntry_a, lineNum_a)) == BED_INVALID) goto ProcessBedPEs_bail;
+    bedpeStatus_b = bedpe_b->GetNextBedPE(bedpeEntry_b, lineNum_b);
+
     // Assume sorted
-    while ((bedpeStatus_a = bedpe_a->GetNextBedPE(bedpeEntry_a, lineNum_a)) != BED_INVALID) {
+    do {
         if (bedpeStatus_a == BED_VALID) {
-            // Read b file until matching coord or past
-            while ((bedpeStatus_b = bedpe_b->GetNextBedPE(bedpeEntry_b, lineNum_b)) != BED_INVALID)
-            {
-                if (bedpeStatus_b == BED_VALID) {
-                    // compare to a are we at or past it?
-                    if ((bedpeEntry_a.chrom1.compare(bedpeEntry_b.chrom1) <= 0) // Compare chrom1 and chrom2 first here <-
-                        || (bedpeEntry_a.chrom2.compare(bedpeEntry_b.chrom2) <= 0)
-                        || (bedpeEntry_a.chrom1.compare(bedpeEntry_b.chrom1) == 0 && (bedpeEntry_a.start1 <= bedpeEntry_b.start1 || (bedpeEntry_a.start1 == bedpeEntry_b.start1 && bedpeEntry_a.end1 <= bedpeEntry_b.end1)))
-                        || (bedpeEntry_a.chrom2.compare(bedpeEntry_b.chrom2) == 0 && (bedpeEntry_a.start2 <= bedpeEntry_b.start2 || (bedpeEntry_a.start2 == bedpeEntry_b.start2 && bedpeEntry_a.end2 <= bedpeEntry_b.end2))))
-                    // if so break out of this loop
-                    break;
-                }
-            }
-            if (bedpeEntry_a.chrom1.compare(bedpeEntry_b.chrom1) == 0 && bedpeEntry_a.start1 == bedpeEntry_b.start1 && bedpeEntry_a.end1 == bedpeEntry_b.end1 &&
-                bedpeEntry_a.chrom2.compare(bedpeEntry_b.chrom2) == 0 && bedpeEntry_a.start2 == bedpeEntry_b.start2 && bedpeEntry_a.end2 == bedpeEntry_b.end2) {
-                bedpe_a->reportBedPENewLine(bedpeEntry_a);
+            // Don't read b if it's already EOF
+            if (bedpeStatus_b != BED_INVALID) {
+                // Read b file until matching coord or past
+                do {
+                    if (bedpeStatus_b == BED_VALID) {
+                        // compare to a are past it?
+                        if ( bedpeEntry_a < bedpeEntry_b )
+                            break; // if so break out of this loop we need another record from a
+                        // If not past it do the comparison
+                        if (bedpeEntry_a == bedpeEntry_b) {
+                            bedpe_a->reportBedPENewLine(bedpeEntry_a);
+                        }
+                    }
+                } while ((bedpeStatus_b = bedpe_b->GetNextBedPE(bedpeEntry_b, lineNum_b)) != BED_INVALID);
             }
         }
-    }
+    } while ((bedpeStatus_a = bedpe_a->GetNextBedPE(bedpeEntry_a, lineNum_a)) != BED_INVALID);
+
+ProcessBedPEs_bail:
     //close up
     bedpe_b->Close();
     bedpe_a->Close();
+}
+
+inline bool operator<(BEDPE bedpeEntry_a, BEDPE bedpeEntry_b) {
+    // TODO: simplify this
+    return (bedpeEntry_a.chrom1.compare(bedpeEntry_b.chrom1) <= 0) // Compare chrom1 and chrom1 first
+        || ((bedpeEntry_a.chrom1.compare(bedpeEntry_b.chrom1) == 0) && (bedpeEntry_a.start1 < bedpeEntry_b.start1 || (bedpeEntry_a.start1 == bedpeEntry_b.start1 && bedpeEntry_a.end1 < bedpeEntry_b.end1)))
+        || ((bedpeEntry_a.chrom1.compare(bedpeEntry_b.chrom1) == 0) && (bedpeEntry_a.start1 == bedpeEntry_b.start1) && (bedpeEntry_a.end1 == bedpeEntry_b.end1) && (bedpeEntry_a.chrom2.compare(bedpeEntry_b.chrom2) <= 0))
+        || ((bedpeEntry_a.chrom1.compare(bedpeEntry_b.chrom1) == 0) && (bedpeEntry_a.start1 == bedpeEntry_b.start1) && (bedpeEntry_a.end1 == bedpeEntry_b.end1) && (bedpeEntry_a.chrom2.compare(bedpeEntry_b.chrom2) == 0) && (bedpeEntry_a.start2 < bedpeEntry_b.start2 || (bedpeEntry_a.start2 == bedpeEntry_b.start2 && bedpeEntry_a.end2 < bedpeEntry_b.end2)));
+}
+
+inline bool operator>(BEDPE bedpeEntry_a, BEDPE bedpeEntry_b) {
+    return bedpeEntry_b < bedpeEntry_a;
+}
+
+inline bool operator==(BEDPE bedpeEntry_a, BEDPE bedpeEntry_b) {
+    return bedpeEntry_a.chrom1.compare(bedpeEntry_b.chrom1) == 0 && bedpeEntry_a.start1 == bedpeEntry_b.start1 && bedpeEntry_a.end1 == bedpeEntry_b.end1 &&
+           bedpeEntry_a.chrom2.compare(bedpeEntry_b.chrom2) == 0 && bedpeEntry_a.start2 == bedpeEntry_b.start2 && bedpeEntry_a.end2 == bedpeEntry_b.end2;
 }
