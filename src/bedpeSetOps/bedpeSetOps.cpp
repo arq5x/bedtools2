@@ -126,8 +126,11 @@ static void ProcessBedPEs_intersect(BedFilePE *bedpe_a, BedFilePE *bedpe_b) {
     bedpe_a->Open();
     bedpe_b->Open();
     // Prime the pump
-    if ((bedpeStatus_a = bedpe_a->GetNextBedPE(bedpeEntry_a, lineNum_a)) == BED_INVALID) goto ProcessBedPEs_bail;
+    bedpeStatus_a = bedpe_a->GetNextBedPE(bedpeEntry_a, lineNum_a);
+    if (bedpeStatus_a == BED_INVALID) goto ProcessBedPEs_bail;
     bedpeStatus_b = bedpe_b->GetNextBedPE(bedpeEntry_b, lineNum_b);
+    // Print out the header from a
+    bedpe_a->reportHeader();
 
     // Assume sorted
     do {
@@ -283,7 +286,10 @@ static void ProcessBedPEs_subtract(BedFilePE *bedpe_a, BedFilePE *bedpe_b) {
     if ((bedpeStatus_a = bedpe_a->GetNextBedPE(bedpeEntry_a, lineNum_a)) == BED_INVALID) goto ProcessBedPEs_subtract_bail;
     bedpeStatus_b = bedpe_b->GetNextBedPE(bedpeEntry_b, lineNum_b);
 
-    // Assume sorted
+     // Print out the header from a
+    bedpe_a->reportHeader();
+
+   // Assume sorted
     do {
         // Ensure we have a record and not a header line etc.
         if (bedpeStatus_a == BED_VALID) {
