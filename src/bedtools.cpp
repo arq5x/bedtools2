@@ -38,12 +38,15 @@ bool sub_main(const string &subCmd);
 void showHelp(const string &subCmd);
 void showErrors(const string &errors);
 
+// Forward declare our subprogram's main functions
 int annotate_main(int argc, char* argv[]);//
 int bamtobed_main(int argc, char* argv[]);//
 int bamtofastq_main(int argc, char* argv[]);//
 int bed12tobed6_main(int argc, char* argv[]); //
 int bedtobam_main(int argc, char* argv[]);//
 int bedtoigv_main(int argc, char* argv[]);//
+int bedpeintersect_main(int argc, char* argv[]);//
+int bedpesubtract_main(int argc, char* argv[]);//
 int bedpetobam_main(int argc, char* argv[]);//
 void closest_help();
 int cluster_main(int argc, char* argv[]); //
@@ -155,6 +158,10 @@ int main(int argc, char *argv[])
     else if (subCmd == "bamtofastq")  return bamtofastq_main(argc-1, argv+1);
     else if (subCmd == "bedpetobam")  return bedpetobam_main(argc-1, argv+1);
     else if (subCmd == "bed12tobed6") return bed12tobed6_main(argc-1, argv+1);
+
+    // bedpe specific tools
+    else if (subCmd == "bedpeintersect")  return bedpeintersect_main(argc-1, argv+1);
+    else if (subCmd == "bedpesubtract")  return bedpesubtract_main(argc-1, argv+1);
 
     // BAM-specific tools
     else if (subCmd == "multicov")    return multibamcov_main(argc-1, argv+1);
