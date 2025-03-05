@@ -135,7 +135,7 @@ int main(int argc, char *argv[])
     else if (subCmd == "window")      return window_main(argc-1, argv+1);
     else if (subCmd == "genomecov")   return genomecoverage_main(argc-1, argv+1);
     else if (subCmd == "cluster")     return cluster_main(argc-1, argv+1);
-	  else if (subCmd == "shift")       return shift_main(argc-1, argv+1);
+    else if (subCmd == "shift")       return shift_main(argc-1, argv+1);
     else if (subCmd == "slop")        return slop_main(argc-1, argv+1);
     else if (subCmd == "split")       return split_main(argc-1, argv+1);
     else if (subCmd == "flank")       return flank_main(argc-1, argv+1);
@@ -298,6 +298,11 @@ int bedtools_help(void)
     cout  << "    expand        "  << "Replicate lines based on lists of values in columns.\n";
     cout  << "    split         "  << "Split a file into multiple files with equal records or base pairs.\n"; 
     cout  << "    summary       "  << "Statistical summary of intervals in a file.\n"; 
+
+    cout  << endl;
+    cout  << "[ BEDPE tools ]" << endl;
+    cout  << "    bedpeintersect "  << "Computes the overlap from two BEDPE files." << endl;
+    cout  << "    bedpesubtract  "  << "Computes the difference from two BEDPE files." << endl;
 
 	cout << endl;
 	cout << "[ General Parameters ]" << endl;
