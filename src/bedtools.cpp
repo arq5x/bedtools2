@@ -38,12 +38,15 @@ bool sub_main(const string &subCmd);
 void showHelp(const string &subCmd);
 void showErrors(const string &errors);
 
+// Forward declare our subprogram's main functions
 int annotate_main(int argc, char* argv[]);//
 int bamtobed_main(int argc, char* argv[]);//
 int bamtofastq_main(int argc, char* argv[]);//
 int bed12tobed6_main(int argc, char* argv[]); //
 int bedtobam_main(int argc, char* argv[]);//
 int bedtoigv_main(int argc, char* argv[]);//
+int bedpeintersect_main(int argc, char* argv[]);//
+int bedpesubtract_main(int argc, char* argv[]);//
 int bedpetobam_main(int argc, char* argv[]);//
 void closest_help();
 int cluster_main(int argc, char* argv[]); //
@@ -132,7 +135,7 @@ int main(int argc, char *argv[])
     else if (subCmd == "window")      return window_main(argc-1, argv+1);
     else if (subCmd == "genomecov")   return genomecoverage_main(argc-1, argv+1);
     else if (subCmd == "cluster")     return cluster_main(argc-1, argv+1);
-	  else if (subCmd == "shift")       return shift_main(argc-1, argv+1);
+    else if (subCmd == "shift")       return shift_main(argc-1, argv+1);
     else if (subCmd == "slop")        return slop_main(argc-1, argv+1);
     else if (subCmd == "split")       return split_main(argc-1, argv+1);
     else if (subCmd == "flank")       return flank_main(argc-1, argv+1);
@@ -155,6 +158,10 @@ int main(int argc, char *argv[])
     else if (subCmd == "bamtofastq")  return bamtofastq_main(argc-1, argv+1);
     else if (subCmd == "bedpetobam")  return bedpetobam_main(argc-1, argv+1);
     else if (subCmd == "bed12tobed6") return bed12tobed6_main(argc-1, argv+1);
+
+    // bedpe specific tools
+    else if (subCmd == "bedpeintersect")  return bedpeintersect_main(argc-1, argv+1);
+    else if (subCmd == "bedpesubtract")  return bedpesubtract_main(argc-1, argv+1);
 
     // BAM-specific tools
     else if (subCmd == "multicov")    return multibamcov_main(argc-1, argv+1);
@@ -291,6 +298,11 @@ int bedtools_help(void)
     cout  << "    expand        "  << "Replicate lines based on lists of values in columns.\n";
     cout  << "    split         "  << "Split a file into multiple files with equal records or base pairs.\n"; 
     cout  << "    summary       "  << "Statistical summary of intervals in a file.\n"; 
+
+    cout  << endl;
+    cout  << "[ BEDPE tools ]" << endl;
+    cout  << "    bedpeintersect "  << "Computes the overlap from two BEDPE files." << endl;
+    cout  << "    bedpesubtract  "  << "Computes the difference from two BEDPE files." << endl;
 
 	cout << endl;
 	cout << "[ General Parameters ]" << endl;
