@@ -16,7 +16,7 @@ by combining multiple bedtools operations on the UNIX command line.
 ==========================
 Tutorial
 ==========================
-- We have developed a fairly comprehensive `tutorial <http://quinlanlab.org/tutorials/bedtools/bedtools.html>`_ that demonstrates both the basics, as well as some more advanced examples of how bedtools can help you in your research. Please have a look.
+- We have developed a fairly comprehensive `tutorial <http://quinlanlab.org/tutorials/bedtools.html>`_ that demonstrates both the basics, as well as some more advanced examples of how bedtools can help you in your research. Please have a look.
 - Robert Aboukhalil has developed `sandbox.bio <https://sandbox.bio/>`_ an excellent, web-based playground for the bedtools tutorial and other widely-used genomics tools. 
 
 
