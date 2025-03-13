@@ -38,6 +38,8 @@ int windowmaker_main(int argc, char* argv[]) {
     uint32_t size = 0;
     uint32_t step = 0;
     uint32_t count = 0;
+    uint32_t initialSize = 0;
+    uint32_t initialStep = 0;
 
     bool haveGenome = false;
     bool haveBed = false;
@@ -45,6 +47,8 @@ int windowmaker_main(int argc, char* argv[]) {
     bool haveSize = false;
     bool haveCount = false;
     bool reverse = false;
+    bool haveInitialSize = false;
+    bool haveInitialStep = false;
 
     for(int i = 1; i < argc; i++) {
         int parameterLength = (int)strlen(argv[i]);
@@ -117,6 +121,30 @@ int windowmaker_main(int argc, char* argv[]) {
         else if(PARAMETER_CHECK("-reverse", 8, parameterLength)) {
             reverse = true;
         }
+        else if(PARAMETER_CHECK("-iw", 3, parameterLength)) {
+            if ((i+1) < argc) {
+                haveInitialSize = true;
+                int tmp = atoi(argv[i + 1]);
+                if (tmp <= 0) {
+                    cerr << endl << "*****" << endl << "*****ERROR: The initial window size (-iw) option must be greater than zero." << endl << "*****" << endl;
+                    showHelp = true;
+                }
+                initialSize = tmp;
+                i++;
+            }
+        }
+        else if(PARAMETER_CHECK("-is", 3, parameterLength)) {
+            if ((i+1) < argc) {
+                haveInitialStep = true;
+                int tmp = atoi(argv[i + 1]);
+                if (tmp <= 0) {
+                    cerr << endl << "*****" << endl << "*****ERROR: The initial step size (-is) option must be greater than zero." << endl << "*****" << endl;
+                    showHelp = true;
+                }
+                initialStep = tmp;
+                i++;
+            }
+        }
         else {
             cerr << endl << "*****ERROR: Unrecognized parameter: " << argv[i] << " *****" << endl << endl;
             showHelp = true;
@@ -151,6 +179,24 @@ int windowmaker_main(int argc, char* argv[]) {
         cerr << endl << "*****" << endl << "*****ERROR: The step (-s) option must be greater than zero. " << endl << "*****" << endl;
         showHelp = true;
     }
+    if (haveInitialSize && !haveSize) {
+        // imply that initialSize cannot be combined with count
+        cerr << endl << "*****" << endl << "*****ERROR: Need -w (window size) to use -iw (initial window size)." << endl << "*****" << endl;
+        showHelp = true;
+    }
+    if (haveInitialStep && !haveStep) {
+        // imply that initialStep cannot be combined with count
+        cerr << endl << "*****" << endl << "*****ERROR: Need -s (step size) to use -is (initial step size)." << endl << "*****" << endl;
+        showHelp = true;
+    }
+    if (!haveInitialSize) {
+        initialSize = size;
+        if (!haveInitialStep) {
+            initialStep = step;
+        }
+    } else if (!haveInitialStep) {
+        initialStep = initialSize;
+    }
 
     if (!showHelp) {
         WindowMaker *wm = NULL;
@@ -159,7 +205,7 @@ int windowmaker_main(int argc, char* argv[]) {
                                  inputFileType, count, reverse);
         if (haveSize)
             wm = new WindowMaker(inputFile, idMethod,
-                                 inputFileType, size, step, reverse);
+                                 inputFileType, size, step, initialSize, initialStep, reverse);
         delete wm;
     }
     else {
@@ -198,6 +244,15 @@ void windowmaker_help(void) {
     cerr << "\t\tStep size: i.e., how many base pairs to step before" << endl;
     cerr << "\t\tcreating a new window. Used to create \"sliding\" windows." << endl;
     cerr << "\t\t- Defaults to window size (non-sliding windows)." << endl << endl;
+
+    cerr << "\t-iw <initial_window_size>" << endl;
+    cerr << "\t\tWindow size for the first window. Cannot be used without -w <window_size>" << endl;
+    cerr << "\t\t- Defaults to window size (i.e., the first window is treated equally)." << endl << endl;
+
+    cerr << "\t-is <initial_step_size>" << endl;
+    cerr << "\t\tStep size for the first window. Cannot be used without -s <step_size>" << endl;
+    cerr << "\t\t- Defaults to <initial_window_size> if -iw is present." << endl;
+    cerr << "\t\t  Otherwise, defaults to step size." << endl << endl;
 
     cerr << "\t-n <number_of_windows>" << endl;
     cerr << "\t\tDivide each input interval (either a chromosome or a BED interval)" << endl;
