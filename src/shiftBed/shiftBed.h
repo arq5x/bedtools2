@@ -28,12 +28,7 @@ class BedShift {
 public:
 
     // constructor
-    BedShift(string &bedFile, string &genomeFile, float shiftMinus, float shiftPlus, bool fractional, bool printHeader);
-
-    // destructor
-    ~BedShift(void);
-
-
+    BedShift(const string &bedFile, const string &genomeFile, float shiftMinus, float shiftPlus, bool fractional, bool printHeader);
 
 private:
 
@@ -45,11 +40,10 @@ private:
     bool   _fractional;
     bool   _printHeader;
 
-    BedFile *_bed;
-    GenomeFile *_genome;
+    BedFile _bed;
+    GenomeFile _genome;
 
     // methods
-
     void ShiftBed();
 
     // method to add requested "slop" to a single BED entry
