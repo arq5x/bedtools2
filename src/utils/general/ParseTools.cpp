@@ -101,22 +101,21 @@ bool isHeaderLine(const string &line) {
 	if (line[0] == '#') {
 		return true;
 	}
-	
+
+	const char* full_text = NULL;
+	bool require_space = false;
 	if(line.length() > 4) {
 		uint32_t peek = *(uint32_t*)line.c_str() | 0x20202020u;
-		const char* full_text = NULL;
-		bool require_space = false;
-		bool require_digit = false;
+
 		switch(peek) {
 			case 0x6f726863: 
 				full_text = "chrom";
 				require_space = true;
-				require_digit = false;
 				break;
 			case 0x20726863:
-			case 0x09726863:
+			case 0x29726863:
 				full_text = "chr";
-				require_space = require_digit = true;
+				require_space = true;
 				break;
 			case 0x776f7262:
 				full_text = "browser";
@@ -137,8 +136,7 @@ bool isHeaderLine(const string &line) {
 				if(c >= 'A' && c <= 'Z') c += 32;
 				if(c != *full_text) return false;
 			}
-			if(require_space && !isspace(*(ptr++))) return false;
-			if(require_digit && !isdigit(*(ptr++))) return false;
+			if(require_space && (!isspace(*(ptr++)) || isdigit(*ptr))) return false;
 			return true;
 		}
 	}
