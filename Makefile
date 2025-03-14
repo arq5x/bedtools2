@@ -43,6 +43,13 @@ endif
 BT_LDFLAGS =
 BT_LIBS    = -lz -lm -lbz2 -llzma -lpthread
 
+# Support building on MSYS2
+UNAME := $(shell sh -c 'uname 2>/dev/null || echo Unknown')
+ifeq (MINGW64_NT,$(findstring MINGW64_NT,$(UNAME)))
+BT_CPPFLAGS += -D_GNU_SOURCE -D_DEFAULT_SOURCE
+BT_LIBS += -lwsock32
+endif
+
 prefix ?= /usr/local
 
 SUBDIRS = $(SRC_DIR)/annotateBed \

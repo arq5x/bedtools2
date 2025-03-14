@@ -12,6 +12,10 @@
 #include <cstdio>
 #include <vector>
 #include <fstream>
+#if (defined(_WIN32) || defined(__WIN32__))
+#include <direct.h>
+#endif
+
 
 using namespace std;
 
@@ -42,7 +46,7 @@ protected:
 	int _filesPerRun;
 	vector<string> _filePrecessorOptions;
 
-	FILE *_fpReportFile;
+	FILE *_fpReportFile{};
 	ifstream _configFile;
 
 	typedef vector<pair<string, string> > fileListType;

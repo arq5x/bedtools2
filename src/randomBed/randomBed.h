@@ -46,7 +46,7 @@ private:
     int _seed;
     bool _haveSeed;
 
-    GenomeFile *_genome;
+    GenomeFile *_genome{};
     CHRPOS _length;
     uint32_t _numToGenerate;
     

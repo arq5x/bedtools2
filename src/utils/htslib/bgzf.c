@@ -2025,7 +2025,7 @@ int bgzf_index_load(BGZF *fp, const char *bname, const char *suffix)
     return -1;
 }
 
-int bgzf_useek(BGZF *fp, long uoffset, int where)
+int bgzf_useek(BGZF *fp, off_t uoffset, int where)
 {
     if ( !fp->is_compressed )
     {
@@ -2082,7 +2082,7 @@ int bgzf_useek(BGZF *fp, long uoffset, int where)
     return 0;
 }
 
-long bgzf_utell(BGZF *fp)
+off_t bgzf_utell(BGZF *fp)
 {
     return fp->uncompressed_address;    // currently maintained only when reading
 }

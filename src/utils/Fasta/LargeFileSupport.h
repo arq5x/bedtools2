@@ -2,7 +2,7 @@
 
 #define _FILE_OFFSET_BITS 64
 
-#ifdef WIN32
+#ifdef  _MSC_VER
 #define ftell64(a)     _ftelli64(a)
 #define fseek64(a,b,c) _fseeki64(a,b,c)
 typedef __int64_t off_type;

@@ -96,7 +96,7 @@ private:
 	Tokenizer _tokenizer;
 
 	int _firstValidDataLineIdx;
-	int _numBytesInBuffer; //this will hold the length of the buffer after the scan.
+	int _numBytesInBuffer{}; //this will hold the length of the buffer after the scan.
 
 	int _numFields;
 	bool _isBinary;

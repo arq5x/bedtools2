@@ -21,8 +21,7 @@
 using namespace std;
 
 bool isNumeric(const string &str);
-bool isInteger(const string &str);
-
+bool isBedInteger(const string &str);
 void trimNewlines(string& str);
 
 //This method is a faster version of atoi, but is limited to a maximum of

@@ -51,7 +51,7 @@ private:
 	BTlist<int> _scanBuffer;
 	string _saveDataStr;
 	InflateStreamBuf *_infStreamBuf;
-	istream * _finalInputStream;
+	istream * _finalInputStream{};
 	istream *_oldInputStream;
 	bool _isStdin;
 	bool _isGzipped;

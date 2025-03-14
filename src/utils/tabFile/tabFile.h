@@ -56,7 +56,7 @@ public:
 private:
 
     // data
-    istream *_tabStream;
+    istream *_tabStream{};
     string _tabFile;
 
     // methods

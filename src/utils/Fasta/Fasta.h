@@ -20,7 +20,9 @@
 #include "bedFile.h"
 #include "htslib/faidx.h"
 #include <sys/stat.h>
+#if (!defined(_WIN32) || !defined(__WIN32__))
 #include <sys/mman.h>
+#endif
 #include "split.h"
 #include <stdlib.h>
 #include <ctype.h>
@@ -34,7 +36,7 @@ class FastaIndexEntry {
         FastaIndexEntry(void);
         ~FastaIndexEntry(void);
         string name;  // sequence name
-        CHRPOS length;  // length of sequence
+        CHRPOS length{};  // length of sequence
         void clear(void);
 };
 

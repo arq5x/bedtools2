@@ -68,7 +68,11 @@ bool RegressTest::init(int argc, char **argv)
 		}
 	}
 	_tmpDirname += timeStr;
+#if (defined(_WIN32) || defined(__WIN32__))
+	int mkdirRetval = _mkdir(_tmpDirname.c_str()); //mkdir directory.
+#else
 	int mkdirRetval = mkdir(_tmpDirname.c_str(), S_IRWXU | S_IRWXG | S_IRWXO ); //mkdir directory with all permissions allowed.
+#endif
 	if (mkdirRetval != 0) {
 		fprintf(stderr, "Error: Unable to create temporary output directory %s.\n", _tmpDirname.c_str());
 		return false;

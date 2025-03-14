@@ -7,7 +7,7 @@ FAILURES=0;
 
 check()
 {
-	if diff $1 $2; then
+	if diff -Z $1 $2; then
 		echo ok
 	else
 		FAILURES=$(expr $FAILURES + 1);
@@ -1065,65 +1065,81 @@ rm exp obs
 # BED        -----------
 echo -e "    intersect.t72...\c"
 echo "1	.	.	16	20	.	-	.	." > exp
-$BT intersect -a <(echo -e  "1\t.\t.\t10\t20\t.\t-\t.\t.") -b <(echo -e  "1\t15\t25") > obs
+echo -e  "1\t.\t.\t10\t20\t.\t-\t.\t." > t1
+echo -e  "1\t15\t25" > t2
+$BT intersect -a t1 -b t2 > obs
 check exp obs
-rm exp obs
+rm exp obs t1 t2
 
 # BED   ----------
 # GFF        -----------
 echo -e "    intersect.t73...\c"
 echo "1	15	20" > exp
-$BT intersect -a <(echo -e  "1\t15\t25") -b <(echo -e  "1\t.\t.\t10\t20\t.\t-\t.\t.")  > obs
+echo -e  "1\t15\t25" > t1
+echo -e  "1\t.\t.\t10\t20\t.\t-\t.\t." > t2
+$BT intersect -a t1 -b t2 > obs
 check exp obs
-rm exp obs
+rm exp obs t1 t2
 
 # GFF        ----------
 # BED    -----------
 echo -e "    intersect.t74...\c"
 echo "1	.	.	15	20	.	-	.	." > exp
-$BT intersect -a <(echo -e  "1\t.\t.\t15\t25\t.\t-\t.\t.") -b <(echo -e  "1\t10\t20") > obs
+echo -e  "1\t.\t.\t15\t25\t.\t-\t.\t." > t1
+echo -e  "1\t10\t20" > t2
+$BT intersect -a t1 -b t2 > obs
 check exp obs
-rm exp obs
+rm exp obs t1 t2
 
 # BED        ----------
 # GFF    -----------
 echo -e "    intersect.t75...\c"
 echo "1	15	20" > exp
-$BT intersect  -a <(echo -e  "1\t15\t25") -b <(echo -e  "1\t.\t.\t10\t20\t.\t-\t.\t.") > obs
+echo -e  "1\t15\t25" > t1
+echo -e  "1\t.\t.\t10\t20\t.\t-\t.\t." > t2
+$BT intersect  -a t1 -b t2 > obs
 check exp obs
-rm exp obs
+rm exp obs t1 t2
 
 # GFF        ----------
 # BED    -------------------
 echo -e "    intersect.t76...\c"
 echo "1	.	.	15	20	.	-	.	." > exp
-$BT intersect -a <(echo -e  "1\t.\t.\t15\t20\t.\t-\t.\t.") -b <(echo -e  "1\t10\t25") > obs
+echo -e  "1\t.\t.\t15\t20\t.\t-\t.\t." > t1
+echo -e  "1\t10\t25" > t2
+$BT intersect -a t1 -b t2 > obs
 check exp obs
-rm exp obs
+rm exp obs t1 t2
 
 # BED        ----------
 # GFF    --------------------
 echo -e "    intersect.t77...\c"
 echo "1	15	20" > exp
-$BT intersect -a <(echo -e "1\t15\t20") -b <(echo -e "1\t.\t.\t10\t25\t.\t-\t.\t.")  > obs
+echo -e "1\t15\t20" > t1
+echo -e "1\t.\t.\t10\t25\t.\t-\t.\t." > t2
+$BT intersect -a t1 -b t2  > obs
 check exp obs
-rm exp obs
+rm exp obs t1 t2
 
 # GFF        ----------
 # BED    -------------------
 echo -e "    intersect.t78...\c"
 echo "1	.	.	16	20	.	-	.	." > exp
-$BT intersect -a <(echo -e "1\t.\t.\t10\t25\t.\t-\t.\t.") -b <(echo -e "1\t15\t20") > obs
+echo -e "1\t.\t.\t10\t25\t.\t-\t.\t." > t1
+echo -e "1\t15\t20" > t2
+$BT intersect -a t1 -b t2 > obs
 check exp obs
-rm exp obs
+rm exp obs t1 t2
 
 # BED        ----------
 # GFF    --------------------
 echo -e "    intersect.t79...\c"
 echo "1	14	20" > exp
-$BT intersect -a <(echo -e "1\t10\t25") -b <(echo -e "1\t.\t.\t15\t20\t.\t-\t.\t.")  > obs
+echo -e "1\t10\t25" > t1
+echo -e "1\t.\t.\t15\t20\t.\t-\t.\t." > t2
+$BT intersect -a t1 -b t2  > obs
 check exp obs
-rm exp obs
+rm exp obs t1 t2
 
 # Make sure 1bp of overlap is reported for a VCF SNP and 1-bp overlapping BED.
 echo -e "    intersect.t80...\c"

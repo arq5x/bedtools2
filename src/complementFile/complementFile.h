@@ -32,7 +32,7 @@ public:
 
 
 protected:
-	FileRecordMergeMgr *_frm;
+	FileRecordMergeMgr *_frm{};
 	Bed3Interval _outRecord;
 	string _currChrom;
 	const NewGenomeFile *_genomeFile;

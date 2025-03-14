@@ -29,7 +29,7 @@ public:
 
 
 protected:
-	FileRecordMergeMgr *_frm;
+	FileRecordMergeMgr *_frm{};
 
 	virtual ContextMerge *upCast(ContextBase *context) { return static_cast<ContextMerge *>(context); }
 

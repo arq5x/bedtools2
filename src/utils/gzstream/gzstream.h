@@ -47,10 +47,10 @@ private:
     static const int bufferSize = 47+256;    // size of data buff
     // totals 512 bytes under g++ for igzstream at the end.
 
-    gzFile           file;               // file handle for compressed file
-    char             buffer[bufferSize]; // data buffer
+    gzFile           file{};               // file handle for compressed file
+    char             buffer[bufferSize]{}; // data buffer
     char             opened;             // open/close state of stream
-    int              mode;               // I/O mode
+    int              mode{};               // I/O mode
 
     int flush_buffer();
 public:

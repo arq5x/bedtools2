@@ -38,7 +38,7 @@ public:
 protected:
 	void printRemainingFields(string &outbuf) const;
 
-	int _numFields;
+	int _numFields{};
 	string _source;
 	string _frame;
 	string _group;

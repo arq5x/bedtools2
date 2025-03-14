@@ -48,20 +48,20 @@ public:
 
 private:
     string  _genomeFileName;
-    istream   *_genomeFile;
+    istream   *_genomeFile{};
     typedef map<string, pair<CHRPOS, int> > lookupType;
     lookupType _chromSizeIds;
     vector<string> _chromList;
     int _maxId;
 
     // projecting chroms onto a single coordinate system
-    CHRPOS _genomeLength;
+    CHRPOS _genomeLength{};
     vector<CHRPOS> _startOffsets;
     
     //cache members for quick lookup
     string _currChromName;
-    CHRPOS _currChromSize;
-    int _currChromId;
+    CHRPOS _currChromSize{};
+    int _currChromId{};
 
 };
 

@@ -32,7 +32,7 @@ public:
 
 protected:
 	vector<string> _fields;
-	int _numOffsetFields; //could be 3 for BedPlus, but GFF has 8 or 9
+	int _numOffsetFields{}; //could be 3 for BedPlus, but GFF has 8 or 9
 };
 
 

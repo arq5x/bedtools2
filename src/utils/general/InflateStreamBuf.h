@@ -140,11 +140,11 @@ public:
 
 protected:
 	std::istream* in;
-	unsigned char buffin[GZBUFSIZ];
-	unsigned char buffout[GZBUFSIZ];
+	unsigned char buffin[GZBUFSIZ]{};
+	unsigned char buffout[GZBUFSIZ]{};
 	char* buffer;
 	size_t bufsiz;
-	z_stream strm;
+	z_stream strm{};
 	int status_flag;
 };
 

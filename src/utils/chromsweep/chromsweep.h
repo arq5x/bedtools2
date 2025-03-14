@@ -62,14 +62,14 @@ private:
 
     // instances of a bed file class.
     BedFile *_query, *_db;
-    float _overlapFraction;
+    float _overlapFraction{};
     // do we care about strandedness.
-    bool _sameStrand;
-    bool _diffStrand;
+    bool _sameStrand{};
+    bool _diffStrand{};
     // do we care about reciprocal overlap?
-    bool _reciprocal;
+    bool _reciprocal{};
     // should we merge overlapping intervals before computing overlaps?
-    bool _useMergedIntervals;
+    bool _useMergedIntervals{};
 
     /* 
        a cache of still active features from the database file\
