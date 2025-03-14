@@ -1,3 +1,4 @@
+#include <stdint.h>
 
 struct _RefID_t {
     operator int32_t() const {return (int32_t)(_ptr()->core.tid);}

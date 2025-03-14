@@ -10,6 +10,8 @@
 #include "BamFileReader.h"
 #include "RecordKeyVector.h"
 
+#include <stdint.h>
+
 BamRecord::BamRecord()
 : _bamChromId(-1)
 {

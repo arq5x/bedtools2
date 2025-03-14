@@ -8,6 +8,7 @@
 #include <fstream>
 #include <sstream>
 #include <cstring>
+#include <stdint.h>
 #include <algorithm>
 #include "bedFile.h"
 #include "lineFileUtilities.h"

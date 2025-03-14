@@ -22,6 +22,7 @@ using namespace BamTools;
 #include <vector>
 #include <iostream>
 #include <fstream>
+#include <stdint.h>
 
 using namespace std;
 
