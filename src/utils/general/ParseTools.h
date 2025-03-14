@@ -16,6 +16,7 @@
 #include "string.h"
 #include <cstdio>
 #include <cstdlib>
+#include <cstdint>
 #include "BedtoolsTypes.h"
 
 using namespace std;
