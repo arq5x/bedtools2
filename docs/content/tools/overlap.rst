@@ -43,7 +43,7 @@ start and end coordinates. For example:
 
 ::
 
-  bedtools windo -a A.bed -b B.bed -w 10 | overlap -i stdin -cols 2,3,6,7
+  bedtools window -a A.bed -b B.bed -w 10 | bedtools overlap -i stdin -cols 2,3,6,7
   chr1  10  20  A  chr1  15  25  B  5
   chr1  10  20  C  chr1  25  35  D  -5
 
