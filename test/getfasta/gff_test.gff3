@@ -1,0 +1,5 @@
+##gff-version 3
+plasmid1	test	gene	90	110	.	 +	.	ID=wrap_gene1;Name=WrapGene1
+plasmid1	test	gene	105	115	.	 -	.	ID=beyond_gene1;Name=BeyondGene1
+plasmid1	test	gene	100	105	.	 +	.	ID=beyond_gene2;Name=BeyondEdge
+plasmid1	test	gene	90	100	.	 +	.	ID=wrap_gene2;Name=WrapEdge

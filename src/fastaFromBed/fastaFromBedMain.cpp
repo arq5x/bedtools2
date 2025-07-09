@@ -49,6 +49,7 @@ int fastafrombed_main(int argc, char* argv[]) {
     bool useFullHeader = false;
     bool useBedOut = false;
     bool isRNA = false;
+    bool circular = false;
 
     // check to see if we should print out some help
     if(argc <= 1) showHelp = true;
@@ -118,6 +119,9 @@ int fastafrombed_main(int argc, char* argv[]) {
         else if(PARAMETER_CHECK("-rna", 4, parameterLength)) {
             isRNA = true;
         }
+        else if(PARAMETER_CHECK("-circular", 9, parameterLength)) {
+            circular = true;
+        }
         else {
             cerr << "*****ERROR: Unrecognized parameter: " 
                  << argv[i] 
@@ -143,7 +147,7 @@ int fastafrombed_main(int argc, char* argv[]) {
                                  useBlocks, useFullHeader,
                                  useBedOut, useName, 
                                  useNamePlus, useNameOnly,
-                                 isRNA);
+                                 isRNA, circular);
         delete b2f;
     }
     else {
@@ -181,8 +185,11 @@ void fastafrombed_help(void) {
     cerr << "\t\t\t- By default, strand information is ignored." << endl;
     cerr << "\t-fullHeader\tUse full fasta header." << endl;
     cerr << "\t\t\t- By default, only the word before the first space or tab "
-	     << "\n\t\t\tis used." << endl;
-    cerr << "\t-rna\tThe FASTA is RNA not DNA. Reverse complementation handled accordingly." << endl << endl;
+         << "\n\t\t\tis used." << endl;
+    cerr << "\t-rna\tThe FASTA is RNA not DNA. Reverse complementation handled accordingly." << endl;
+    cerr << "\t-circular\tTreat chromosomes as circular. Features extending past" << endl;
+    cerr << "\t\t\tchromosome end will wrap to the beginning." << endl;
+    cerr << "\t\t\t- Not compatible with -split option." << endl << endl;
 
 
     // end the program here

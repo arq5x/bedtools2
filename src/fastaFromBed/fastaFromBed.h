@@ -36,7 +36,7 @@ public:
            bool useBlocks, bool useFullHeader,
            bool useBedOut, bool useName, 
            bool useNamePlus, bool useNameOnly,
-           bool isRNA);
+           bool isRNA, bool circular);
 
     // destructor
     ~Bed2Fa(void);
@@ -60,6 +60,7 @@ private:
     bool _useNamePlus;
     bool _useNameOnly;
     bool _isRNA;
+    bool _circular;
 
     // instance of a bed file class.
     BedFile  *_bed;

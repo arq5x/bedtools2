@@ -20,7 +20,7 @@ Bed2Fa::Bed2Fa(const string &dbFile,
                bool useBlocks, bool useFullHeader,
                bool useBedOut, bool useName, 
                bool useNamePlus, bool useNameOnly,
-               bool isRNA) :
+               bool isRNA, bool circular) :
     _dbFile(dbFile),
     _bedFile(bedFile),
     _fastaOutFile(fastaOutFile),
@@ -32,7 +32,8 @@ Bed2Fa::Bed2Fa(const string &dbFile,
     _useName(useName),
     _useNamePlus(useNamePlus),
     _useNameOnly(useNameOnly),
-    _isRNA(isRNA)
+    _isRNA(isRNA),
+    _circular(circular)
 {
     _bed = new BedFile(_bedFile);
 
@@ -159,6 +160,33 @@ void Bed2Fa::ExtractSeq() {
                                fr->getSubSequence(bed.chrom, bed.start, length);
                         }
                         ReportSeq(bed, sequence);
+                    }
+                    // Handle circular-mapping chromosome sequences (e.g., prokaryotic and organelle genomes)
+                    // The total length of the feature should never exceed the chromosome length.
+                    else if ( (_circular) && (bed.end - bed.start < seqLength) ) 
+                    {
+                        sequence.clear();
+                        // Case 1: Feature spans the chromosome boundary (wraps around from end to beginning)
+                        // Example: chromosome length = 1000, feature spans positions 950-1050
+                        // This means positions 950-1000 + positions 0-50
+                        if ( (bed.start <= seqLength) && (bed.end > seqLength) ) {
+                            sequence = fr->getSubSequence(bed.chrom, bed.start, seqLength - bed.start + 1);
+                            sequence += fr->getSubSequence(bed.chrom, 0, bed.end - seqLength);
+                        }
+                        // Case 2: Both start and end positions are beyond the chromosome length
+                        // Example: chromosome length = 1000, feature spans positions 1100-1200
+                        // This means positions 100-200
+                        else if ( (bed.start > seqLength) && (bed.end > seqLength) ) {
+                            sequence = fr->getSubSequence(bed.chrom, bed.start - seqLength, bed.end - bed.start);
+                        }
+
+                        if (!sequence.empty()) {
+                            ReportSeq(bed, sequence);
+                        } else {
+                            cerr << "WARNING. Could not extract circular sequence for "
+                                 << bed.chrom << ":" << bed.start << "-" << bed.end
+                                 << ". Skipping." << endl;
+                        }
                     }
                     else
                     {

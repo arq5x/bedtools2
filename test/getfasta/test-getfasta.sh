@@ -249,4 +249,112 @@ else
     echo ok
 fi
 
+###################################################################
+# Circular genome tests
+###################################################################
+
+echo -e "    getfasta.t19...\c"
+echo ">plasmid1:89-110
+CGTACGTACGTACGTACGTAC" > exp
+echo $'plasmid1\t89\t110' | $BT getfasta -circular -fi plasmid.fasta -bed - > obs
+check obs exp
+rm obs exp
+
+echo -e "    getfasta.t20...\c"
+echo ">plasmid2:90-110
+CCAAAATTTTGGGGTTTTGG" > exp
+echo -e "plasmid2\t90\t110" | $BT getfasta -fi plasmid.fasta -bed stdin -circular > obs
+check obs exp
+rm obs exp
+
+echo -e "    getfasta.t21...\c"
+echo ">plasmid3:80-120
+AAAACCCCGGGGTTTTAAAACCCCAAAACCCCGGGGTTTT" > exp
+echo -e "plasmid3\t80\t120" | $BT getfasta -fi plasmid.fasta -bed stdin -circular > obs
+check obs exp
+rm obs exp
+
+echo -e "    getfasta.t22...\c"
+echo ">plasmid4:15-25
+GATCGATCGA" > exp
+echo -e "plasmid4\t15\t25" | $BT getfasta -fi plasmid.fasta -bed stdin -circular > obs
+check obs exp
+rm obs exp
+
+echo -e "    getfasta.t23...\c"
+echo ">plasmid5:35-45
+AGCTAGCGCT" > exp
+echo -e "plasmid5\t35\t45" | $BT getfasta -fi plasmid.fasta -bed stdin -circular > obs
+check obs exp
+rm obs exp
+
+echo -e "    getfasta.t24...\c"
+echo "plasmid1:90-110	GTACGTACGTACGTACGTAC" > exp
+echo -e "plasmid1\t90\t110" | $BT getfasta -fi plasmid.fasta -bed stdin -circular -tab > obs
+check obs exp
+rm obs exp
+
+echo -e "    getfasta.t25...\c"
+echo ">wrap_basic::plasmid1:90-110
+GTACGTACGTACGTACGTAC" > exp
+echo -e "plasmid1\t90\t110\twrap_basic" | $BT getfasta -fi plasmid.fasta -bed stdin -circular -name > obs
+check obs exp
+rm obs exp
+
+echo -e "    getfasta.t26...\c"
+echo "plasmid1	90	110	wrap_basic	GTACGTACGTACGTACGTAC" > exp
+echo -e "plasmid1\t90\t110\twrap_basic" | $BT getfasta -fi plasmid.fasta -bed stdin -circular -bedOut > obs
+check obs exp
+rm obs exp
+
+echo -e "    getfasta.t27...\c"
+echo ">plasmid1:89-110
+CGTACGTACGTACGTACGTAC
+>plasmid1:104-115
+ACGTACGTACG
+>plasmid1:99-105
+TACGTA
+>plasmid1:89-100
+CGTACGTACGT" > exp
+$BT getfasta -fi plasmid.fasta -bed gff_test.gff3 -circular > obs
+check obs exp
+rm obs exp
+
+echo -e "    getfasta.t28...\c"
+LINES=$(echo -e "plasmid1\t0\t150" | $BT getfasta -fi plasmid.fasta -bed stdin -circular 2>&1 | grep -c "beyond the length")
+if [ "$LINES" != "1" ]; then
+    FAILURES=$(expr $FAILURES + 1);
+    echo fail
+else
+    echo ok
+fi
+
+echo -e "    getfasta.t29...\c"
+LINES=$(echo -e "plasmid7\t20\t20" | $BT getfasta -fi plasmid.fasta -bed stdin -circular 2>&1 | grep -c "length = 0")
+if [ "$LINES" != "1" ]; then
+    FAILURES=$(expr $FAILURES + 1);
+    echo fail
+else
+    echo ok
+fi
+
+echo -e "    getfasta.t30...\c"
+LINES=$(echo -e "nonexistent\t10\t20" | $BT getfasta -fi plasmid.fasta -bed stdin -circular 2>&1 | grep -c "was not found")
+if [ "$LINES" != "1" ]; then
+    FAILURES=$(expr $FAILURES + 1);
+    echo fail
+else
+    echo ok
+fi
+
+echo -e "    getfasta.t31...\c"
+CIRC_LINES=$(echo -e "plasmid1\t90\t110" | $BT getfasta -fi plasmid.fasta -bed stdin -circular 2>/dev/null | wc -l)
+NORM_LINES=$(echo -e "plasmid1\t90\t110" | $BT getfasta -fi plasmid.fasta -bed stdin 2>/dev/null | wc -l)
+if [ "$CIRC_LINES" -gt "$NORM_LINES" ]; then
+    echo ok
+else
+    FAILURES=$(expr $FAILURES + 1);
+    echo fail
+fi
+
 [[ $FAILURES -eq 0 ]] || exit 1;
