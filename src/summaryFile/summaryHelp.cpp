@@ -9,7 +9,7 @@
 
 void summary_help(void) {
 
-    cerr << "\nTool:    bedtools sammary" << endl;
+    cerr << "\nTool:    bedtools summary" << endl;
     cerr << "Version: " << VERSION << "\n";
     cerr << "Summary: Report summary statistics of the intervals in a file " << endl << endl;
 
