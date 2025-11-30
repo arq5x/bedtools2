@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 print("""\
 @HD\tVN:1.0\tSO:coordinate
 @SQ\tSN:c1\tAS:genome.txt\tLN:100""")
