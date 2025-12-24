@@ -1,4 +1,5 @@
 #include <string>
+#include <cstdint>
 
 #ifndef BAMAUX_H
 #define BAMAUX_H
