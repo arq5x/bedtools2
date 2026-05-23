@@ -19,6 +19,7 @@
 #include <fstream>
 #include <cstring>
 #include <cstdio>
+#include <stdint.h>
 #include <algorithm> // for bsearch lower_bound()
 #include "api/BamReader.h"
 #include "api/BamAux.h"

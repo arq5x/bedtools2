@@ -28,7 +28,7 @@ check obs abig.bed
 rm obs
 
 if [[ "$BT_NO_BIG_FILES" != "" ]]; then
-python make-big-chrom.py
+${PYTHON:-python} make-big-chrom.py
 
 echo -e "    bigchroms.t03...big get fasta \c"
 $BT getfasta -fi bigx.fasta -bed bigx.bed | tail -1 > obs

@@ -1,4 +1,5 @@
 #include <string>
+#include <stdint.h>
 
 #ifndef BAMAUX_H
 #define BAMAUX_H

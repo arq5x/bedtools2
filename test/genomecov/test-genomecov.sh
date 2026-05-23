@@ -288,7 +288,7 @@ CRAM_REFERENCE=test_ref.fa $BT genomecov -ibam empty.cram > obs
 check obs exp
 rm obs exp
 
-python mk-deep.py > deep.sam
+${PYTHON:-python} mk-deep.py > deep.sam
 echo -e "    genomecov.t18...\c"
 echo "c1	1	1000000" > exp
 $BT genomecov -d -ibam deep.sam | head -1 > obs
