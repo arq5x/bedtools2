@@ -12,6 +12,8 @@ Licenced under the GNU General Public License 2.0 license.
 #include "NewGenomeFile.h"
 #include "bedFile.h"
 
+#include <stdint.h>
+
 using namespace std;
 
 

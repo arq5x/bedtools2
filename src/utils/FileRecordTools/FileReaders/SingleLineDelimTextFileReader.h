@@ -9,6 +9,7 @@
 #define SINGLELINETEXTFILEREADER_H_
 
 #include <algorithm>
+#include <stdint.h>
 #include "FileReader.h"
 #include "string.h"
 #include "lineFileUtilities.h"
