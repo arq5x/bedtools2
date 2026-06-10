@@ -44,13 +44,14 @@ void BamToFastq::SingleFastq() {
     }
     // open the BAM file
     BamReader reader;
-    reader.Open(_bamFile);
     if (!reader.Open(_bamFile)) {
         cerr << "Failed to open BAM file " << _bamFile << endl;
         exit(1);
     }
     BamAlignment bam;
     while (reader.GetNextAlignment(bam)) {
+        // skip secondary and supplementary alignments
+        if (bam.IsSecondary() || bam.IsSupplementary()) continue;
         // extract the sequence and qualities for the BAM "query"
         string seq  = bam.QueryBases;
         string qual = bam.Qualities;
@@ -91,8 +92,10 @@ void BamToFastq::PairedFastq() {
     string currName = "";
     BamAlignment curr;
     while (reader.GetNextAlignment(curr)) {
+        // skip secondary and supplementary alignments
+        if (curr.IsSecondary() || curr.IsSupplementary()) continue;
         currName = curr.Name;
-        if ((currName != prevName) && (prevName != "")) 
+        if ((currName != prevName) && (prevName != ""))
         {
             WritePairs(alignments);
             alignments.clear();
@@ -270,7 +273,8 @@ void BamToFastq::PairedFastqUseTags() {
     // rip through the BAM file and convert each mapped entry to BEDPE
     BamAlignment bam1, bam2;
     while (reader.GetNextAlignment(bam1)) {
-        
+        // skip secondary and supplementary alignments
+        if (bam1.IsSecondary() || bam1.IsSupplementary()) continue;
         reader.GetNextAlignment(bam2);        
         if (bam1.Name != bam2.Name) {
             while (bam1.Name != bam2.Name)

@@ -334,6 +334,8 @@ namespace BamTools {
 		FLAG_ACCESSOR(Paired, BAM_FPAIRED);
 		FLAG_ACCESSOR(Duplicate, BAM_FDUP);
 		FLAG_ACCESSOR(FailedQC, BAM_FQCFAIL);
+		FLAG_ACCESSOR(Secondary, BAM_FSECONDARY);
+		FLAG_ACCESSOR(Supplementary, BAM_FSUPPLEMENTARY);
 
 		int GetEndPosition(bool usePadded = false, bool closedInterval = false) const
 		{
