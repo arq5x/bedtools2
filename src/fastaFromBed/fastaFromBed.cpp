@@ -91,7 +91,7 @@ void Bed2Fa::ReportSeq(const BED &bed, string &seq) {
                 cerr << "WARNING: attribute '" << _nameKey
                      << "' not found for feature at " << bed.chrom << ":"
                      << bed.start << "-" << bed.end
-                     << "; using feature name." << endl;
+                     << "; using feature type." << endl;
                 header << bed.name;
             }
         }
@@ -209,6 +209,9 @@ void Bed2Fa::ExtractSeq() {
 }
 
 
+// Parses a GFF3 column-9 attribute string ("key=value;key2=value2").
+// GFF3 syntax only: GTF-style 'key "value";' is not supported, and GFF3
+// percent-encoded characters (e.g. %3B) are not decoded.
 bool Bed2Fa::getGffAttribute(const BED &bed, const string &key, string &value) {
     // Only GFF records carry a column-9 attribute string.
     if (!_bed->isGff() || bed.fields.size() < 9)
@@ -231,6 +234,10 @@ bool Bed2Fa::getGffAttribute(const BED &bed, const string &key, string &value) {
                 // strip one pair of surrounding double-quotes
                 if (v.size() >= 2 && v.front() == '"' && v.back() == '"')
                     v = v.substr(1, v.size() - 2);
+                // An empty value (e.g. "Name=") is treated as absent so the
+                // caller warns and falls back rather than emitting a blank header.
+                if (v.empty())
+                    return false;
                 value = v;
                 return true;
             }
