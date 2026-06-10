@@ -287,4 +287,25 @@ $BT getfasta -fi t.fa -bed attr.gff -nameKey Name -s 2>/dev/null | head -1 > obs
 check obs exp
 rm -f exp obs
 
+# -nameKey strips surrounding double-quotes from the attribute value
+echo -e "    getfasta.t23...\c"
+echo ">geneB
+tggggggggg" > exp
+# record 3 has Name="geneB" (quoted); extract chr1:20-30
+$BT getfasta -fi t.fa -bed attr.gff -nameKey Name 2>/dev/null | grep -A1 "^>geneB$" > obs
+check obs exp
+rm -f exp obs
+
+# -nameKey treats an empty value (Name=) as absent: warn + fall back to feature type
+echo -e "    getfasta.t24...\c"
+$BT getfasta -fi t.fa -bed attr.gff -nameKey Name 2> err > obs
+# record 4 has Name= (empty); header falls back to the GFF type "CDS"
+if grep -q "^>CDS$" obs && [ "$(grep -c 'not found' err)" == "2" ]; then
+    echo ok
+else
+    FAILURES=$(expr $FAILURES + 1);
+    echo fail
+fi
+rm -f obs err
+
 [[ $FAILURES -eq 0 ]] || exit 1;

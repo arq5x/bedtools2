@@ -107,6 +107,11 @@ int fastafrombed_main(int argc, char* argv[]) {
                 nameKey = argv[i + 1];
                 i++;
             }
+            else {
+                cerr << "*****ERROR: -nameKey requires an attribute name "
+                     << "(e.g. -nameKey Name). *****" << endl << endl;
+                showHelp = true;
+            }
         }
         else if(PARAMETER_CHECK("-split", 6, parameterLength)) {
             useBlocks = true;
@@ -187,6 +192,7 @@ void fastafrombed_help(void) {
     cerr << "\t-nameOnly\tUse the name field for the FASTA header" << endl;
     cerr << "\t-nameKey\tUse the value of the named GFF3 attribute (col 9,"
          << "\n\t\t\te.g. -nameKey Name) for the FASTA header." << endl;
+    cerr << "\t\t\t- Cannot be combined with -name, -name+, or -nameOnly." << endl;
     cerr << "\t-split\t\tGiven BED12 fmt., extract and concatenate the sequences"
          << "\n\t\t\tfrom the BED \"blocks\" (e.g., exons)" << endl;
     cerr << "\t-tab\t\tWrite output in TAB delimited format." << endl;

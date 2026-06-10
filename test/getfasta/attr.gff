@@ -1,2 +1,4 @@
 chr1	src	gene	1	10	.	+	.	ID=g1;Name=geneA
 chr1	src	mRNA	11	20	.	+	.	ID=g2
+chr1	src	exon	21	30	.	+	.	ID=g3;Name="geneB"
+chr1	src	CDS	31	40	.	+	.	ID=g4;Name=
