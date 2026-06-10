@@ -8,12 +8,12 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v4
     - name: Compile and test Bedtools
       run: make -j8 && make test
     - name: Compile static binary
       run:  make -j8 static
-    - uses: actions/upload-artifact@v1
+    - uses: actions/upload-artifact@v4
       with:
           name: bedtools.static
           path: bin/bedtools.static
