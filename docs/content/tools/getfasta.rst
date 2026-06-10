@@ -53,7 +53,8 @@ Usage and option summary
 **-fo**                          Specify an output file name. By default, output goes to stdout.
 **-name**                        Use the name field and coordinates for the FASTA header
 **-name+**                       (deprecated) Use the name field and coordinates for the FASTA header
-**-nameOnly**                    Use the name field for the FASTA header		 
+**-nameOnly**                    Use the name field for the FASTA header
+**-nameKey**                     Use the value of a named GFF3 column-9 attribute (e.g. ``-nameKey Name``) for the FASTA header (header is the attribute value only). If the attribute is absent on a feature, a warning is written to stderr and the header falls back to the feature-type name. GFF3 ``key=value;`` syntax only (GTF ``key "value";`` is not parsed). Cannot be combined with ``-name``, ``-name+``, or ``-nameOnly``.
 **-tab**					               Report extract sequences in a tab-delimited format instead of in FASTA format.
 **-bedOut**                      Report extract sequences in a tab-delimited BED format instead of in FASTA format.
 **-s**                           Force strandedness. If the feature occupies the antisense strand, the sequence will be reverse complemented. *Default: strand information is ignored*.
