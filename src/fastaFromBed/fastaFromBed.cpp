@@ -20,6 +20,7 @@ Bed2Fa::Bed2Fa(const string &dbFile,
                bool useBlocks, bool useFullHeader,
                bool useBedOut, bool useName, 
                bool useNamePlus, bool useNameOnly,
+               bool useNameKey, const string &nameKey,
                bool isRNA) :
     _dbFile(dbFile),
     _bedFile(bedFile),
@@ -32,6 +33,8 @@ Bed2Fa::Bed2Fa(const string &dbFile,
     _useName(useName),
     _useNamePlus(useNamePlus),
     _useNameOnly(useNameOnly),
+    _useNameKey(useNameKey),
+    _nameKey(nameKey),
     _isRNA(isRNA)
 {
     _bed = new BedFile(_bedFile);
@@ -189,6 +192,11 @@ void Bed2Fa::ExtractSeq() {
         }
     }
     _bed->Close();
+}
+
+
+bool Bed2Fa::getGffAttribute(const BED &bed, const string &key, string &value) {
+    return false;
 }
 
 

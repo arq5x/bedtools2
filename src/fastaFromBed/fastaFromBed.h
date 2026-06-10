@@ -36,6 +36,7 @@ public:
            bool useBlocks, bool useFullHeader,
            bool useBedOut, bool useName, 
            bool useNamePlus, bool useNameOnly,
+           bool useNameKey, const string &nameKey,
            bool isRNA);
 
     // destructor
@@ -43,6 +44,9 @@ public:
 
     void ExtractSeq();
     void ReportSeq(const BED &bed, string &seq);
+    // Extract the value of GFF3 column-9 attribute `key` from `bed`.
+    // Returns true and sets `value` on success; false if not GFF or key absent.
+    bool getGffAttribute(const BED &bed, const string &key, string &value);
 
 
 private:
@@ -59,6 +63,8 @@ private:
     bool _useName;
     bool _useNamePlus;
     bool _useNameOnly;
+    bool _useNameKey;
+    string _nameKey;
     bool _isRNA;
 
     // instance of a bed file class.

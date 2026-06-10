@@ -43,6 +43,8 @@ int fastafrombed_main(int argc, char* argv[]) {
     bool useName = false;
     bool useNamePlus = false;
     bool useNameOnly = false;
+    bool useNameKey = false;
+    string nameKey;
     bool useFasta = true;
     bool useStrand = false;
     bool useBlocks = false;
@@ -99,6 +101,13 @@ int fastafrombed_main(int argc, char* argv[]) {
         else if(PARAMETER_CHECK("-nameOnly", 9, parameterLength)) {
             useNameOnly = true;
         }
+        else if(PARAMETER_CHECK("-nameKey", 8, parameterLength)) {
+            if ((i+1) < argc) {
+                useNameKey = true;
+                nameKey = argv[i + 1];
+                i++;
+            }
+        }
         else if(PARAMETER_CHECK("-split", 6, parameterLength)) {
             useBlocks = true;
         }
@@ -131,6 +140,12 @@ int fastafrombed_main(int argc, char* argv[]) {
         showHelp = true;
     }
 
+    if (useNameKey && (useName || useNamePlus || useNameOnly)) {
+        cerr << "*****ERROR: -nameKey cannot be combined with -name, "
+             << "-name+, or -nameOnly. Choose one. *****" << endl << endl;
+        fastafrombed_help();   // prints usage and exit(1)
+    }
+
     if (!haveFastaOut) {
         fastaOutFile = "stdout";
     }
@@ -143,6 +158,7 @@ int fastafrombed_main(int argc, char* argv[]) {
                                  useBlocks, useFullHeader,
                                  useBedOut, useName, 
                                  useNamePlus, useNameOnly,
+                                 useNameKey, nameKey,
                                  isRNA);
         delete b2f;
     }
@@ -169,6 +185,8 @@ void fastafrombed_help(void) {
     cerr << "\t-name\t\tUse the name field and coordinates for the FASTA header" << endl;
     cerr << "\t-name+\t\t(deprecated) Use the name field and coordinates for the FASTA header" << endl;
     cerr << "\t-nameOnly\tUse the name field for the FASTA header" << endl;
+    cerr << "\t-nameKey\tUse the value of the named GFF3 attribute (col 9,"
+         << "\n\t\t\te.g. -nameKey Name) for the FASTA header." << endl;
     cerr << "\t-split\t\tGiven BED12 fmt., extract and concatenate the sequences"
          << "\n\t\t\tfrom the BED \"blocks\" (e.g., exons)" << endl;
     cerr << "\t-tab\t\tWrite output in TAB delimited format." << endl;

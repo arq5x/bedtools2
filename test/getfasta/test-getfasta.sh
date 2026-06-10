@@ -249,4 +249,15 @@ else
     echo ok
 fi
 
+# -nameKey is mutually exclusive with -name/-name+/-nameOnly
+echo -e "    getfasta.t19...\c"
+$BT getfasta -fi t.fa -bed attr.gff -nameKey Name -name > /dev/null 2> obs && RC=0 || RC=$?
+if [ "$RC" == "1" ] && grep -q "cannot be combined" obs; then
+    echo ok
+else
+    FAILURES=$(expr $FAILURES + 1);
+    echo fail "rc=$RC"
+fi
+rm -f obs
+
 [[ $FAILURES -eq 0 ]] || exit 1;
