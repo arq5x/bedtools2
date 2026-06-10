@@ -260,4 +260,31 @@ else
 fi
 rm -f obs
 
+# -nameKey extracts the attribute value (name-only header)
+echo -e "    getfasta.t20...\c"
+echo ">geneA
+aggggggggg" > exp
+$BT getfasta -fi t.fa -bed attr.gff -nameKey Name 2>/dev/null | head -2 > obs
+check obs exp
+rm -f exp obs
+
+# -nameKey with a missing attribute warns and falls back to the feature type
+echo -e "    getfasta.t21...\c"
+$BT getfasta -fi t.fa -bed attr.gff -nameKey Name 2> err > obs
+# record 2 has no Name= ; header falls back to the GFF type "mRNA"
+if grep -q "^>mRNA$" obs && grep -q "not found" err; then
+    echo ok
+else
+    FAILURES=$(expr $FAILURES + 1);
+    echo fail
+fi
+rm -f obs err
+
+# -nameKey composes with -s (strand suffix appended)
+echo -e "    getfasta.t22...\c"
+echo ">geneA(+)" > exp
+$BT getfasta -fi t.fa -bed attr.gff -nameKey Name -s 2>/dev/null | head -1 > obs
+check obs exp
+rm -f exp obs
+
 [[ $FAILURES -eq 0 ]] || exit 1;

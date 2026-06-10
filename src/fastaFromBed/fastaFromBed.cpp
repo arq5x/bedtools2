@@ -81,7 +81,21 @@ void Bed2Fa::ReportSeq(const BED &bed, string &seq) {
     }
     else {
         ostringstream header;
-        if (_useName || _useNamePlus)
+        if (_useNameKey)
+        {
+            string attrVal;
+            if (getGffAttribute(bed, _nameKey, attrVal)) {
+                header << attrVal;
+            }
+            else {
+                cerr << "WARNING: attribute '" << _nameKey
+                     << "' not found for feature at " << bed.chrom << ":"
+                     << bed.start << "-" << bed.end
+                     << "; using feature name." << endl;
+                header << bed.name;
+            }
+        }
+        else if (_useName || _useNamePlus)
         {
             header << bed.name << "::" << bed.chrom << ":" 
                    << bed.start << "-" << bed.end;
@@ -196,6 +210,34 @@ void Bed2Fa::ExtractSeq() {
 
 
 bool Bed2Fa::getGffAttribute(const BED &bed, const string &key, string &value) {
+    // Only GFF records carry a column-9 attribute string.
+    if (!_bed->isGff() || bed.fields.size() < 9)
+        return false;
+
+    const string &attrs = bed.fields[8];
+    size_t pos = 0;
+    while (pos < attrs.size()) {
+        size_t semi = attrs.find(';', pos);
+        string token = attrs.substr(pos, (semi == string::npos)
+                                         ? string::npos : semi - pos);
+        // trim leading/trailing whitespace
+        size_t b = token.find_first_not_of(" \t");
+        size_t e = token.find_last_not_of(" \t");
+        if (b != string::npos) {
+            token = token.substr(b, e - b + 1);
+            size_t eq = token.find('=');
+            if (eq != string::npos && token.substr(0, eq) == key) {
+                string v = token.substr(eq + 1);
+                // strip one pair of surrounding double-quotes
+                if (v.size() >= 2 && v.front() == '"' && v.back() == '"')
+                    v = v.substr(1, v.size() - 2);
+                value = v;
+                return true;
+            }
+        }
+        if (semi == string::npos) break;
+        pos = semi + 1;
+    }
     return false;
 }
 

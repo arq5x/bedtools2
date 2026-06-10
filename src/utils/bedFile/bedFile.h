@@ -497,6 +497,7 @@ public:
     
     BedLineStatus _status;
     int _lineNum;
+    bool isGff(void) const { return _isGff; }
 
 private:
 
