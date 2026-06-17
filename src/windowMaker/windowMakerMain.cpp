@@ -12,6 +12,8 @@ Licenced under the GNU General Public License 2.0 license.
 #include "windowMaker.h"
 #include "version.h"
 
+#include <stdint.h>
+
 using namespace std;
 
 // define our program name

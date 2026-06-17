@@ -22,6 +22,7 @@
 #include <unistd.h>
 #include <sys/types.h>
 #include <algorithm>  // for binary search
+#include <stdint.h>
 using namespace std;
 
 const int MAX_TRIES = 1000000;
