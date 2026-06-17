@@ -1,6 +1,7 @@
 #ifndef SEQUENCEUTILS_H
 #define SEQUENCEUTILS_H
 
+#include <cstdint>
 #include <string>
 #include <algorithm>
 #include <cctype>
