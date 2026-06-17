@@ -217,7 +217,7 @@ By default, ``shuffle`` requires that an interval's original length must be
 fully-contained within the chromosome. Yet there are cases where you might 
 want to allow shuffled intervals to be relocated to a position
 in which the entire original interval cannot fit w/o exceeding
-the end of the chromosome.  By using the ``-noOverlapping`` option, 
+the end of the chromosome.  By using the ``-allowBeyondChromEnd`` option, 
 ``shuffle`` will allow intervals to be shuffled to locations that are so close
 to the chromosome end that the full length of the original record cannot
 be contained within the chromosome length.  In such cases, the end coordinate
