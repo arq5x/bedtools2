@@ -97,14 +97,7 @@ void BedIntersectPE::FindOverlaps(const BEDPE &a, vector<BED> &hits1, vector<BED
             // is there enough overlap relative to the user's request? (default ~ 1bp)
             if ( ( (float) overlapBases / (float) aLength ) >= _overlapFraction ) {
                 numOverlapsEnd1++;
-
-                if (type == "either") {
-                    _bedA->reportBedPETab(a);
-                    _bedB->reportBedNewLine(*h);
-                }
-                else {
-                    qualityHits1.push_back(*h);
-                }
+                qualityHits1.push_back(*h);
             }
         }
     }
@@ -128,20 +121,18 @@ void BedIntersectPE::FindOverlaps(const BEDPE &a, vector<BED> &hits1, vector<BED
             // is there enough overlap relative to the user's request? (default ~ 1bp)
             if ( ( (float) overlapBases / (float) aLength ) >= _overlapFraction ) {
                 numOverlapsEnd2++;
-
-                if (type == "either") {
-                    _bedA->reportBedPETab(a);
-                    _bedB->reportBedNewLine(*h);
-                }
-                else {
-                    qualityHits2.push_back(*h);
-                }
+                qualityHits2.push_back(*h);
             }
         }
     }
 
     // Now report the hits depending on what the user has requested.
-    if (type == "neither") {
+    if (type == "either") {
+        if ( (numOverlapsEnd1 > 0) || (numOverlapsEnd2 > 0) ) {
+            _bedA->reportBedPENewLine(a);
+        }
+    }
+    else if (type == "neither") {
         if ( (numOverlapsEnd1 == 0) && (numOverlapsEnd2 == 0) ) {
             _bedA->reportBedPENewLine(a);
         }
@@ -189,6 +180,7 @@ void BedIntersectPE::FindOverlaps(const BEDPE &a, vector<BED> &hits1, vector<BED
             }
         }
     }
+
 }
 
 
