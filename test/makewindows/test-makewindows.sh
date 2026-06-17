@@ -178,4 +178,90 @@ echo \
 $BT makewindows -b a.19bp.bed -n 10 -i srcwinnum 2> obs
 check obs exp
 rm obs exp
+
+###########################################################
+#  Test window + initial window size
+###########################################################
+echo -e "    makewindows.t10...\c"
+echo \
+"chr5	60000	62000	3
+chr5	62000	66000	2
+chr5	66000	70000	1
+chr5	73000	75000	5
+chr5	75000	79000	4
+chr5	79000	83000	3
+chr5	83000	87000	2
+chr5	87000	90000	1
+chr5	100000	101000	1" > exp
+$BT makewindows -b input.bed -w 4000 -iw 2000 -i winnum -reverse > obs
+check obs exp
+rm obs exp
+
+###########################################################
+#  Test window + step + initial step size
+###########################################################
+echo -e "    makewindows.t11...\c"
+echo \
+"chr5	60000	64000	3
+chr5	62000	66000	2
+chr5	66000	70000	1
+chr5	73000	77000	5
+chr5	75000	79000	4
+chr5	79000	83000	3
+chr5	83000	87000	2
+chr5	87000	90000	1
+chr5	100000	101000	1" > exp
+$BT makewindows -b input.bed -w 4000 -s 4000 -is 2000 -i winnum -reverse > obs
+check obs exp
+rm obs exp
+
+###########################################################
+#  Test window + initial window + step + initial step size
+###########################################################
+echo -e "    makewindows.t12...\c"
+echo \
+"chr5	60000	62000	3
+chr5	63000	67000	2
+chr5	68000	70000	1
+chr5	73000	75000	4
+chr5	76000	80000	3
+chr5	81000	85000	2
+chr5	86000	90000	1
+chr5	100000	101000	1" > exp
+$BT makewindows -b input.bed -w 4000 -iw 2000 -s 5000 -is 3000 -i winnum -reverse > obs
+check obs exp
+rm obs exp
+
+###########################################################
+#  Test window + initial window + step + initial step (forward numbering)
+###########################################################
+echo -e "    makewindows.t13...\c"
+echo \
+"chr5	60000	62000	1
+chr5	63000	67000	2
+chr5	68000	70000	3
+chr5	73000	75000	1
+chr5	76000	80000	2
+chr5	81000	85000	3
+chr5	86000	90000	4
+chr5	100000	101000	1" > exp
+$BT makewindows -b input.bed -w 4000 -iw 2000 -s 5000 -is 3000 -i winnum > obs
+check obs exp
+rm obs exp
+
+###########################################################
+#  Test window + initial window + step + initial step (large initial sizes)
+###########################################################
+echo -e "    makewindows.t14...\c"
+echo \
+"chr5	60000	68000	1
+chr5	73000	81000	4
+chr5	83000	85000	3
+chr5	86000	88000	2
+chr5	89000	90000	1
+chr5	100000	101000	1" > exp
+$BT makewindows -b input.bed -w 2000 -iw 8000 -s 3000 -is 10000 -i winnum -reverse > obs
+check obs exp
+rm obs exp
+
 [[ $FAILURES -eq 0 ]] || exit 1;

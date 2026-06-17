@@ -38,7 +38,7 @@ public:
 
     // constructor
     WindowMaker(string &fileName, ID_METHOD id_method, INPUT_FILE_TYPE input_file_type, uint32_t count, bool reverse);
-    WindowMaker(string &fileName, ID_METHOD id_method, INPUT_FILE_TYPE input_file_type, uint32_t size, uint32_t step, bool reverse);
+    WindowMaker(string &fileName, ID_METHOD id_method, INPUT_FILE_TYPE input_file_type, uint32_t size, uint32_t step, uint32_t initialSize, uint32_t initialStep, bool reverse);
 
     // destructor
     ~WindowMaker(void);
@@ -53,6 +53,8 @@ private:
     bool _reverse; // should window numbering be reversed?
     WINDOW_METHOD _window_method;
     ID_METHOD _id_method;
+    uint32_t _initialSize;
+    uint32_t _initialStep;
 
     void MakeBEDWindow(const BED& interval);
 
