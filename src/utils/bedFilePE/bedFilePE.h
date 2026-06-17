@@ -2,6 +2,7 @@
 #define BEDFILEPE_H
 
 #include <vector>
+#include <list>
 #include <map>
 #include <string>
 #include <iostream>
@@ -66,11 +67,14 @@ public:
     // Get the next BED entry in an opened BED file.
     BedLineStatus GetNextBedPE (BEDPE &bedpe, int &lineNum);
 
-
     // Methods
 
+    // Dump out header
+    void reportHeader();
+    // Print out entries
     void reportBedPETab(const BEDPE &a);
     void reportBedPENewLine(const BEDPE &a);
+
     void loadBedPEFileIntoMap();
     void splitBedPEIntoBeds(const BEDPE &a, const int &lineNum, MATE *bedEntry1, MATE *bedEntry2);
 
@@ -87,6 +91,7 @@ public:
 
 private:
     istream *_bedStream;
+    std::list<string> _header;
 
     // methods
     BedLineStatus parseLine (BEDPE &bedpe, const vector<string> &lineVector, int &lineNum);

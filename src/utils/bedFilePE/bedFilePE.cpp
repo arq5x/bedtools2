@@ -47,6 +47,12 @@ void BedFilePE::Open(void) {
                  << "). Exiting!" << endl;
             exit (1);
         }
+        while (_bedStream->good() && _bedStream->peek() == '#') {
+            std::string bedPELine;
+            if (getline(*_bedStream, bedPELine)) {
+                this->_header.push_back(bedPELine);
+            }
+        }
     }
 }
 
@@ -81,6 +87,12 @@ BedLineStatus BedFilePE::GetNextBedPE (BEDPE &bedpe, int &lineNum) {
     return BED_INVALID;
 }
 
+void BedFilePE::reportHeader()
+{
+    for (auto iter = this->_header.begin(); iter != this->_header.end(); iter++) {
+        std::cout << *iter << std::endl;
+    }
+}
 
 /*
     reportBedPETab
@@ -277,6 +289,7 @@ bool BedFilePE::parseBedPELine (BEDPE &bed, const vector<string> &lineVector, co
             bed.strand1 = lineVector[8];
             bed.strand2 = lineVector[9];
 
+            bed.other_idxs.clear();
             for (unsigned int i = 10; i < lineVector.size(); ++i) {
                 bed.other_idxs.push_back(i);
             }
@@ -367,6 +380,7 @@ bool BedFilePE::parseBedPELine (BEDPE &bed, const vector<string> &lineVector, co
 
             bed.strand1 = lineVector[8];
             bed.strand2 = lineVector[9];
+            bed.other_idxs.clear();
             for (unsigned int i = 10; i < lineVector.size(); ++i) {
                 bed.other_idxs.push_back(i);
             }
