@@ -32,9 +32,9 @@ The file description below is modified from: http://genome.ucsc.edu/FAQ/FAQforma
  - *The start position in each BED feature is therefore interpreted to be 1 greater than the start position listed in the feature. For example, start=9, end=20 is interpreted to span bases 10 through 20,inclusive*.
  - *This column is required*.
 
-3. **end** - The one-based ending position of the feature in the chromosome.
+3. **end** - The zero-based exclusive ending position of the feature in the chromosome.
 
- - *The end position in each BED feature is one-based. See example above*.
+ - *The end position in each BED feature is the 0-based coordinate of the next base not in the interval*.
  - *This column is required*.
 
 4. **name** - Defines the name of the BED feature.
