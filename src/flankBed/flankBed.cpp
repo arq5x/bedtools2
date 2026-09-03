@@ -58,13 +58,16 @@ void BedFlank::FlankBed() {
                 rightFlank = (int) (_rightFlank * bedEntry.size());
             }
             
-            if ((_forceStrand == false) || (bedEntry.strand == "+"))
+            // With -s, only a "-" strand swaps the flanks. Any other value
+            // (+, ., or no strand column at all) is treated as forward,
+            // as slop -s does, rather than silently dropping the record.
+            if ((_forceStrand == true) && (bedEntry.strand == "-" ))
+            {
+                AddStrandedFlank(bedEntry,  leftFlank, rightFlank);
+            }
+            else
             {
                 AddFlank(bedEntry,  leftFlank, rightFlank);
-            }
-            else if ((_forceStrand == true) && (bedEntry.strand == "-" ))
-            {
-                AddStrandedFlank(bedEntry,  leftFlank, rightFlank);                    
             }
         }
     }

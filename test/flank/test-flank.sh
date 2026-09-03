@@ -151,4 +151,37 @@ chr1	200	1000	a2	2	-" > exp
 $BT flank -i a.bed -b 2000 -s -g tiny.genome > obs
 check obs exp
 rm obs exp
+###########################################################
+# test -s on a BED3 file (no strand column): records must be
+# treated as forward, not silently dropped (issue #1123)
+###########################################################
+echo -e "    flank.t12...\c"
+echo \
+"chr1	95	100" > exp
+$BT flank -i nostrand.bed -l 5 -r 0 -s -g tiny.genome > obs
+check obs exp
+rm obs exp
+
+###########################################################
+# test -s on BED3 with -b: same result as without -s
+###########################################################
+echo -e "    flank.t13...\c"
+echo \
+"chr1	95	100
+chr1	200	205" > exp
+$BT flank -i nostrand.bed -b 5 -s -g tiny.genome > obs
+check obs exp
+rm obs exp
+
+###########################################################
+# test -s with a "." strand: treated as forward, while "-"
+# records in the same file still swap -l and -r
+###########################################################
+echo -e "    flank.t14...\c"
+echo \
+"chr1	95	100	d1	1	.
+chr1	200	205	d2	2	-" > exp
+$BT flank -i dotstrand.bed -l 5 -r 0 -s -g tiny.genome > obs
+check obs exp
+rm obs exp
 [[ $FAILURES -eq 0 ]] || exit 1;
