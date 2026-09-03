@@ -496,7 +496,8 @@ rm obs exp
 echo -e "    intersect.t22.q...\c"
 echo \
 "chr1	0	30	one_block_one_exon_30bp	40	-	0	30	0,0,0	1	30,	0,	chr1	0	100	exon1	1	+	30
-chr1	80	110	one_block_one_exon_20bp	40	-	80	110	0,0,0	1	30,	0,	chr1	0	100	exon1	1	+	20" > exp
+chr1	80	110	one_block_one_exon_20bp	40	-	80	110	0,0,0	1	30,	0,	chr1	0	100	exon1	1	+	20
+chr1	90	220	two_blocks_two_exons	40	-	90	220	0,0,0	2	10,20,	0,110,	chr1	200	300	exon2	2	-	20" > exp
 $BT intersect -a split.issue750.bam -b exons.issue750.bed  -F 0.20 -bed -split -wo > obs
 check obs exp
 rm obs exp
@@ -517,6 +518,39 @@ chr1	90	220	two_blocks_two_exons	40	-	90	220	0,0,0	2	10,20,	0,110,	chr1	200	300	
 $BT intersect -a split.issue750.bam -b exons.issue750.bed  -F 0.10 -bed -split -wo > obs
 check obs exp
 rm obs exp
+
+###########################################################
+#  Test that -F (and -r) are applied to each B record on
+#  its own with -split: three identical reads that lie
+#  entirely inside the A interval are all reported, whatever
+#  other B records overlap A. See issue #1142.
+############################################################
+echo -e "    intersect.t22.s...\c"
+echo \
+"chr1	100	200	gene	chr1	120	170	r1	0	+	120	170	0	1	50	0
+chr1	100	200	gene	chr1	120	170	r2	0	+	120	170	0	1	50	0
+chr1	100	200	gene	chr1	120	170	r3	0	+	120	170	0	1	50	0" > exp
+echo -e "chr1\t100\t200\tgene" > split_F_a.bed
+for r in r1 r2 r3; do echo -e "chr1\t120\t170\t$r\t0\t+\t120\t170\t0\t1\t50\t0"; done > split_F_b.bed12
+$BT intersect -a split_F_a.bed -b split_F_b.bed12 -split -F 0.5 -wa -wb > obs
+check obs exp
+rm obs
+$BT intersect -a split_F_a.bed -b split_F_b.bed12 -split -F 1.0 -wa -wb > obs
+check obs exp
+rm obs exp split_F_a.bed split_F_b.bed12
+
+###########################################################
+#  Issue #1142: a perfect reciprocal match must be reported
+#  even when another isoform shares the locus.
+############################################################
+echo -e "    intersect.t22.t...\c"
+echo \
+"chr1	1000	2000	A1	0	+	1000	2000	0	1	1000,	0,	chr1	1000	2000	B1_perfect_match	0	+	1000	2000	0	1	1000,	0,	1000" > exp
+echo -e "chr1\t1000\t2000\tA1\t0\t+\t1000\t2000\t0\t1\t1000,\t0," > issue1142_a.bed12
+echo -e "chr1\t1000\t2000\tB1_perfect_match\t0\t+\t1000\t2000\t0\t1\t1000,\t0,\nchr1\t1000\t6000\tB2_different_isoform\t0\t+\t1000\t6000\t0\t2\t1000,2000,\t0,3000," > issue1142_b.bed12
+$BT intersect -a issue1142_a.bed12 -b issue1142_b.bed12 -split -r -f 0.90 -wo > obs
+check obs exp
+rm obs exp issue1142_a.bed12 issue1142_b.bed12
 
 ###########################################################
 #  Test that -f is based on the cumulative fraction of the

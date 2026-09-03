@@ -227,10 +227,8 @@ int BlockMgr::findBlockedOverlaps(RecordKeyVector &keyList, RecordKeyVector &hit
 	_overlapStarts.clear();
 	_overlapEnds.clear();
 	CHRPOS keyBlocksSumLength = getTotalBlockLength(keyList);
-	CHRPOS hitBlockSumLength = 0;
-	vector<CHRPOS> overlappingStarts;
-	vector<CHRPOS> overlappingEnd;
-	
+	vector<CHRPOS> hitOverlapStarts;
+	vector<CHRPOS> hitOverlapEnds;
 
 	//Loop through every database record the query intersected with
 	RecordKeyVector::iterator_type hitListIter = hitList.begin();
@@ -239,10 +237,12 @@ int BlockMgr::findBlockedOverlaps(RecordKeyVector &keyList, RecordKeyVector &hit
 		RecordKeyVector hitBlocks(*hitListIter);
 		bool deleteHitBlocks = false;
 		getBlocks(hitBlocks, deleteHitBlocks); //get all blocks for the hit record.
-		hitBlockSumLength += getTotalBlockLength(hitBlocks); //get total length of the bocks for the hitRecord.
+		CHRPOS hitBlockLength = getTotalBlockLength(hitBlocks); //total length of the blocks of this hit record.
 		
 		bool hitHasOverlap = false;
 		CHRPOS totalDbOverlap = 0;
+		hitOverlapStarts.clear();
+		hitOverlapEnds.clear();
 		//loop through every block of the database record.
 		RecordKeyVector::iterator_type hitBlockIter = hitBlocks.begin();
 		for (; hitBlockIter != hitBlocks.end(); hitBlockIter = hitBlocks.next()) 
@@ -259,21 +259,37 @@ int BlockMgr::findBlockedOverlaps(RecordKeyVector &keyList, RecordKeyVector &hit
 				CHRPOS overlap  = minEnd - maxStart;
 				if (overlap > 0) {
 					hitHasOverlap = true;
-					if (overlapList != NULL) {
-						overlapList->push_back(allocateAndAssignRecord(keyList.getKey(), maxStart, minEnd));
-					}
 					totalDbOverlap += overlap;
-					_overlapStarts.push_back(maxStart);
-					_overlapEnds.push_back(minEnd);
+					hitOverlapStarts.push_back(maxStart);
+					hitOverlapEnds.push_back(minEnd);
 				}
 			}
 		}
-		// add the database record to the list of potential (i.e., subject to -f, -r, -F)
-		// hits if an overlap was observed
+		// -F and -r are tested per database record, as they are without -split:
+		// the fraction of this record's blocks that the query's blocks cover.
+		// (-f is cumulative over all records, below; see issue #750.)
+		if (hitHasOverlap && (float)totalDbOverlap / (float)hitBlockLength < _overlapFractionB)
+		{
+			hitHasOverlap = false;
+		}
+		if (hitHasOverlap && _hasReciprocal &&
+			(float)totalDbOverlap / (float)hitBlockLength < _overlapFractionA)
+		{
+			hitHasOverlap = false;
+		}
+		// add the database record to the list of potential (i.e., subject to -f)
+		// hits if a sufficient overlap was observed
 		if (hitHasOverlap)
 		{
 			resultList.push_back(*hitListIter);
 			_overlapBases.push_back(totalDbOverlap);
+			for (size_t i = 0; i < hitOverlapStarts.size(); i++) {
+				_overlapStarts.push_back(hitOverlapStarts[i]);
+				_overlapEnds.push_back(hitOverlapEnds[i]);
+				if (overlapList != NULL) {
+					overlapList->push_back(allocateAndAssignRecord(keyList.getKey(), hitOverlapStarts[i], hitOverlapEnds[i]));
+				}
+			}
 		}
 		if (deleteHitBlocks) {
 			deleteBlocks(hitBlocks);
@@ -282,21 +298,10 @@ int BlockMgr::findBlockedOverlaps(RecordKeyVector &keyList, RecordKeyVector &hit
 
 	int totalUniqueOverlap = getNonRedundantOverlap();
 
-	// was there sufficient overlap with respect ot -a? if not, delete.
+	// was there sufficient overlap with respect to -a? if not, delete.
+	// This is the cumulative fraction of the query's blocks covered by
+	// the records kept above (issue #750).
 	if ((float) totalUniqueOverlap / (float)keyBlocksSumLength < _overlapFractionA) 
-	{
-		resultList.clearAll();
-		_overlapBases.clear();
-	}
-	// was there sufficient overlap with respect ot -b? if not, delete.
-	if ((float)totalUniqueOverlap / (float)hitBlockSumLength < _overlapFractionB) 
-	{
-		resultList.clearAll();
-		_overlapBases.clear();
-	}	
-	// was there sufficient overlap with respect ot -b when using -r? if not, delete.
-	if (_hasReciprocal &&
-				((float)totalUniqueOverlap / (float)hitBlockSumLength < _overlapFractionA)) 
 	{
 		resultList.clearAll();
 		_overlapBases.clear();
