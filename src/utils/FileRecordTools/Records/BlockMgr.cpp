@@ -202,10 +202,9 @@ int BlockMgr::getNonRedundantOverlap()
 				start = currStart;
 				end = currEnd;
 			}
-			// current overlap block continues
+			// current overlap block continues; retain its original start
 			else
 			{
-				start = currStart;
 				end = currEnd;
 			}
 		}

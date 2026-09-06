@@ -1172,6 +1172,7 @@ rm exp obs
 STARTWD=$(pwd);
 for ADDITIONAL_TEST in \
     new_test-intersect.sh \
+    test-split-union.sh \
     multi_intersect/test-multi_intersect.sh \
     sortAndNaming/test-sort-and-naming.sh \
 ; do
