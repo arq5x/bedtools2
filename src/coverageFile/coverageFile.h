@@ -9,6 +9,7 @@
 #define COVERAGEFILE_H_
 
 #include <stdio.h> // for asprintf
+#include <vector>
 #include "intersectFile.h"
 #include "ContextCoverage.h"
 
@@ -27,9 +28,11 @@ protected:
 	size_t *_depthArray;
 	size_t _depthArrayCapacity;
 	size_t _queryLen;
+	size_t _queryMetricLen;
 	size_t _totalQueryLen;
 	size_t _hitCount;
 	CHRPOS _queryOffset;
+	std::vector<bool> _queryMask;
 	static const int DEFAULT_DEPTH_CAPACITY = 1024;
 	char *_floatValBuf;
 	static const int floatValBufLen = 16;
@@ -49,6 +52,7 @@ protected:
 	void doMean(RecordOutputMgr *outputMgr, RecordKeyVector &hits);
 	void doHist(RecordOutputMgr *outputMgr, RecordKeyVector &hits);
 	void doDefault(RecordOutputMgr *outputMgr, RecordKeyVector &hits);
+	bool isQueryBase(size_t offset) const { return _queryMask.empty() || _queryMask[offset]; }
 
 	virtual void checkSplits(RecordKeyVector &hitSet);
 };

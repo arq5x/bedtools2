@@ -38,6 +38,47 @@ $BT coverage -abam three_blocks.bam -b three_blocks_nomatch.bed -sorted > obs
 check obs exp
 rm obs exp
 
+##################################################################
+#  Test -split breadth for a BAM target
+##################################################################
+echo -e "    coverage.t1c...\c"
+echo "chr1	0	50	three_blocks	40	-	0	50	0,0,0	3	10,10,10,	0,20,40,	0	0	30	0.0000000" > exp
+$BT coverage -abam three_blocks.bam -b three_blocks_nomatch.bed -split > obs
+check exp obs
+rm obs exp
+
+##################################################################
+#  Test -split breadth for a BED12 target
+##################################################################
+echo -e "    coverage.t10c...\c"
+echo "chr1	0	1002	TX	0	+	0	1002	0	2	2,2,	0,1000,	2	4	4	1.0000000
+chr1	2000	3002	TX2	0	+	2000	3002	0	2	2,2,	0,1000,	0	0	4	0.0000000" > exp
+$BT coverage -a bed12_target.bed -b bed12_blocks.bed -split > obs
+check exp obs
+echo -e "    coverage.t10c.sorted...\c"
+$BT coverage -a bed12_target.bed -b bed12_blocks.bed -split -sorted > obs
+check exp obs
+echo -e "    coverage.t10d...\c"
+echo "chr1	0	1002	TX	0	+	0	1002	0	2	2,2,	0,1000,	1.0000000
+chr1	2000	3002	TX2	0	+	2000	3002	0	2	2,2,	0,1000,	0.0000000" > exp
+$BT coverage -a bed12_target.bed -b bed12_blocks.bed -split -mean > obs
+check exp obs
+echo -e "    coverage.t10e...\c"
+echo \
+"chr1	0	1002	TX	0	+	0	1002	0	2	2,2,	0,1000,	1	4	4	1.0000000
+chr1	2000	3002	TX2	0	+	2000	3002	0	2	2,2,	0,1000,	0	4	4	1.0000000
+all	0	4	8	0.5000000
+all	1	4	8	0.5000000" > exp
+$BT coverage -a bed12_target.bed -b bed12_blocks.bed -split -hist > obs
+check exp obs
+echo -e "    coverage.t10f...\c"
+echo \
+"chr1	0	1002	TX	0	+	0	1002	0	2	2,2,	0,1000,	3	984	1002	0.9820359
+chr1	2000	3002	TX2	0	+	2000	3002	0	2	2,2,	0,1000,	0	0	1002	0.0000000" > exp
+$BT coverage -a bed12_target.bed -b bed12_blocks.bed > obs
+check exp obs
+rm obs exp
+
 
 ##################################################################
 #  Test default

@@ -7,12 +7,14 @@
 
 #include "coverageFile.h"
 #include <iomanip>
+#include "BlockMgr.h"
 
 CoverageFile::CoverageFile(ContextCoverage *context)
 : IntersectFile(context),
  _depthArray(NULL),
  _depthArrayCapacity(0),
  _queryLen(0),
+ _queryMetricLen(0),
  _totalQueryLen(0),
  _hitCount(0),
  _queryOffset(0),
@@ -109,7 +111,39 @@ void CoverageFile::makeDepthCount(RecordKeyVector &hits) {
 	const Record *key = hits.getKey();
 	_queryOffset = key->getStartPos();
 	_queryLen = (size_t)(key->getEndPos() - _queryOffset);
-	_totalQueryLen += _queryLen;
+	_queryMetricLen = _queryLen;
+	_queryMask.clear();
+	FileRecordTypeChecker::RECORD_TYPE queryType = key->getType();
+	if (upCast(_context)->getObeySplits() &&
+		(queryType == FileRecordTypeChecker::BED12_RECORD_TYPE ||
+		 queryType == FileRecordTypeChecker::BAM_RECORD_TYPE)) {
+		RecordKeyVector queryBlocks(const_cast<Record *>(key));
+		bool mustDelete = false;
+		upCast(_context)->getSplitBlockInfo()->getBlocks(queryBlocks, mustDelete);
+		if (!queryBlocks.empty()) {
+			_queryMask.assign(_queryLen, false);
+			_queryMetricLen = 0;
+			for (RecordKeyVector::iterator_type iter = queryBlocks.begin(); iter != queryBlocks.end(); iter = queryBlocks.next()) {
+				const Record *block = *iter;
+				CHRPOS blockStart = max(_queryOffset, block->getStartPos()) - _queryOffset;
+				CHRPOS blockEnd = min(key->getEndPos(), block->getEndPos()) - _queryOffset;
+				for (CHRPOS pos = blockStart; pos < blockEnd; ++pos) {
+					if (!_queryMask[pos]) {
+						_queryMask[pos] = true;
+						_queryMetricLen++;
+					}
+				}
+			}
+			if (_queryMetricLen == 0) {
+				_queryMask.clear();
+				_queryMetricLen = _queryLen;
+			}
+		}
+		if (mustDelete) {
+			upCast(_context)->getSplitBlockInfo()->deleteBlocks(queryBlocks);
+		}
+	}
+	_totalQueryLen += _queryMetricLen;
 
 	// resize depth array if needed
 	if (_depthArrayCapacity < _queryLen) {
@@ -139,7 +173,7 @@ void CoverageFile::makeDepthCount(RecordKeyVector &hits) {
 size_t CoverageFile::countBasesAtDepth(size_t depth) {
 	size_t retCount = 0;
 	for (size_t i=0; i < _queryLen; i++) {
-		if (_depthArray[i] == depth) {
+		if (isQueryBase(i) && _depthArray[i] == depth) {
 			retCount++;
 		}
 	}
@@ -173,10 +207,12 @@ void CoverageFile::doMean(RecordOutputMgr *outputMgr, RecordKeyVector &hits)
 {
 	size_t sum =0;
 	for (size_t i= 0; i < _queryLen; i++) {
-		sum += _depthArray[i];
+		if (isQueryBase(i)) {
+			sum += _depthArray[i];
+		}
 	}
 	ostringstream s;
-	float mean = ((float)sum / (float)_queryLen);
+	float mean = ((float)sum / (float)_queryMetricLen);
 	char *meanString;
 	asprintf(&meanString, "%0.7f", mean);
 	s << meanString;
@@ -190,21 +226,23 @@ void CoverageFile::doHist(RecordOutputMgr *outputMgr, RecordKeyVector &hits)
 	//make a map of depths to num bases with that depth
 	_currDepthMap.clear();
 	for (size_t i=0; i < _queryLen; i++) {
-		_currDepthMap[_depthArray[i]]++;
-		_finalDepthMap[_depthArray[i]]++;
+		if (isQueryBase(i)) {
+			_currDepthMap[_depthArray[i]]++;
+			_finalDepthMap[_depthArray[i]]++;
+		}
 	}
 
 	for (depthMapType::iterator iter = _currDepthMap.begin(); iter != _currDepthMap.end(); iter++) {
 		size_t depth = iter->first;
 		size_t numBasesAtDepth = iter->second;
-		float coveredFraction = (float)numBasesAtDepth / (float)_queryLen;
+		float coveredFraction = (float)numBasesAtDepth / (float)_queryMetricLen;
 
 		ostringstream s;
 		s << depth;
 		s << "\t";
 		s << numBasesAtDepth;
 		s << "\t";
-		s << _queryLen;
+		s << _queryMetricLen;
 		s << "\t";
 		char *coveredFractionString;
 		asprintf(&coveredFractionString, "%0.7f", coveredFraction);
@@ -216,15 +254,15 @@ void CoverageFile::doHist(RecordOutputMgr *outputMgr, RecordKeyVector &hits)
 
 void CoverageFile::doDefault(RecordOutputMgr *outputMgr, RecordKeyVector &hits)
 {
-	size_t nonZeroBases = _queryLen - countBasesAtDepth(0);
-	float coveredFraction = (float)nonZeroBases / (float)_queryLen;
+	size_t nonZeroBases = _queryMetricLen - countBasesAtDepth(0);
+	float coveredFraction = (float)nonZeroBases / (float)_queryMetricLen;
 
 	ostringstream s;
 	s << _hitCount;
 	s << "\t";
 	s << nonZeroBases;
 	s << "\t";
-	s << _queryLen;
+	s << _queryMetricLen;
 	s << "\t";
 	char *coveredFractionString;
 	asprintf(&coveredFractionString, "%0.7f", coveredFraction);
