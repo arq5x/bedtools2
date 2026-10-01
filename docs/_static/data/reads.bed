@@ -1,0 +1,5 @@
+chr1	1500	1600	read1	0	+
+chr1	1800	1900	read2	0	-
+chr1	5500	5600	read3	0	+
+chr1	8000	8100	read4	0	+
+chr1	30000	30100	read5	0	-

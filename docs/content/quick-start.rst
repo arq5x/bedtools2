@@ -6,7 +6,7 @@ Quick start
 Install bedtools
 ================
 
-.. code-block:: bash
+::
 
   curl http://bedtools.googlecode.com/files/BEDTools.<version>.tar.gz > BEDTools.tar.gz
   tar -zxvf BEDTools.tar.gz
@@ -71,3 +71,10 @@ Merge nearby repetitive elements into a single entry, so long as they are within
 
 
     
+
+
+.. raw:: html
+
+   <script src="https://sandbox.bio/embed.js"
+           data-config="../_static/sandboxbio.json"
+           data-cwd="bedtools-quickstart"></script>
