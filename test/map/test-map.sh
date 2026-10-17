@@ -841,4 +841,1009 @@ rm exp obs
 
 
 
+###########################################################
+#
+# NEW TESTS: operations, formatting, options, record types
+#
+###########################################################
+
+###########################################################
+#  map.new.t001: sum adds decimal values; an A with no overlap
+#  gets the null value "."
+#  chr1:0-100 overlaps scores 1.5, 2.25 and -0.75: sum 3.
+#  chr2:0-100 has no B.
+###########################################################
+echo -e "    map.new.t001...\c"
+printf 'chr1\t0\t100\nchr2\t0\t100\n' > a.tmp.bed
+printf 'chr1\t10\t20\tb1\t1.5\nchr1\t20\t30\tb2\t2.25\nchr1\t30\t40\tb3\t-0.75\n' > b.tmp.bed
+printf 'chr1\t0\t100\t3\nchr2\t0\t100\t.\n' > exp
+$BT map -a a.tmp.bed -b b.tmp.bed -c 5 -o sum > obs
+check obs exp
+rm obs exp a.tmp.bed b.tmp.bed
+
+###########################################################
+#  map.new.t003: count_distinct counts unique strings; 0 for no
+#  overlap
+#  Names b, a, b have 2 distinct values. pins the current output:
+#  count_distinct prints 0, not ".", for no overlap; map.rst says an A with no
+#  overlap gets "." or the -null value (bugs.md #16).
+###########################################################
+echo -e "    map.new.t003...\c"
+printf 'chr1\t0\t100\nchr2\t0\t100\n' > a.tmp.bed
+printf 'chr1\t10\t20\tb\t1\nchr1\t20\t30\ta\t2\nchr1\t30\t40\tb\t3\n' > b.tmp.bed
+printf 'chr1\t0\t100\t2\nchr2\t0\t100\t0\n' > exp
+$BT map -a a.tmp.bed -b b.tmp.bed -c 4 -o count_distinct > obs
+check obs exp
+rm obs exp a.tmp.bed b.tmp.bed
+
+###########################################################
+#  map.new.t004: min with negative and decimal values
+#  Scores 3, -2.5, 10: min -2.5.
+###########################################################
+echo -e "    map.new.t004...\c"
+printf 'chr1\t0\t100\nchr2\t0\t100\n' > a.tmp.bed
+printf 'chr1\t10\t20\tb1\t3\nchr1\t20\t30\tb2\t-2.5\nchr1\t30\t40\tb3\t10\n' > b.tmp.bed
+printf 'chr1\t0\t100\t-2.5\nchr2\t0\t100\t.\n' > exp
+$BT map -a a.tmp.bed -b b.tmp.bed -c 5 -o min > obs
+check obs exp
+rm obs exp a.tmp.bed b.tmp.bed
+
+###########################################################
+#  map.new.t005: max compares numerically
+#  Scores 3, -2.5, 10: max 10 (a string comparison would pick 3).
+###########################################################
+echo -e "    map.new.t005...\c"
+printf 'chr1\t0\t100\nchr2\t0\t100\n' > a.tmp.bed
+printf 'chr1\t10\t20\tb1\t3\nchr1\t20\t30\tb2\t-2.5\nchr1\t30\t40\tb3\t10\n' > b.tmp.bed
+printf 'chr1\t0\t100\t10\nchr2\t0\t100\t.\n' > exp
+$BT map -a a.tmp.bed -b b.tmp.bed -c 5 -o max > obs
+check obs exp
+rm obs exp a.tmp.bed b.tmp.bed
+
+###########################################################
+#  map.new.t006: absmin keeps the fractional part
+#  Scores 3, -2.5, 10: absolute values 3, 2.5, 10; min 2.5.
+###########################################################
+echo -e "    map.new.t006...\c"
+printf 'chr1\t0\t100\nchr2\t0\t100\n' > a.tmp.bed
+printf 'chr1\t10\t20\tb1\t3\nchr1\t20\t30\tb2\t-2.5\nchr1\t30\t40\tb3\t10\n' > b.tmp.bed
+printf 'chr1\t0\t100\t2.5\nchr2\t0\t100\t.\n' > exp
+$BT map -a a.tmp.bed -b b.tmp.bed -c 5 -o absmin > obs
+check obs exp
+rm obs exp a.tmp.bed b.tmp.bed
+
+###########################################################
+#  map.new.t007: absmax reports the absolute value
+#  Scores -12, 3, 10: absolute values 12, 3, 10; max 12.
+###########################################################
+echo -e "    map.new.t007...\c"
+printf 'chr1\t0\t100\nchr2\t0\t100\n' > a.tmp.bed
+printf 'chr1\t10\t20\tb1\t-12\nchr1\t20\t30\tb2\t3\nchr1\t30\t40\tb3\t10\n' > b.tmp.bed
+printf 'chr1\t0\t100\t12\nchr2\t0\t100\t.\n' > exp
+$BT map -a a.tmp.bed -b b.tmp.bed -c 5 -o absmax > obs
+check obs exp
+rm obs exp a.tmp.bed b.tmp.bed
+
+###########################################################
+#  map.new.t008: mean prints 10 significant digits by default
+#  Scores 1, 2, 4: mean 7/3 = 2.3333333333... This is the one
+#  test of the default precision. pins the current output: the
+#  default precision is 10 significant digits; the usage text says
+#  5 (bugs.md #10).
+###########################################################
+echo -e "    map.new.t008...\c"
+printf 'chr1\t0\t100\nchr2\t0\t100\n' > a.tmp.bed
+printf 'chr1\t10\t20\tb1\t1\nchr1\t20\t30\tb2\t2\nchr1\t30\t40\tb3\t4\n' > b.tmp.bed
+printf 'chr1\t0\t100\t2.333333333\nchr2\t0\t100\t.\n' > exp
+$BT map -a a.tmp.bed -b b.tmp.bed -c 5 -o mean > obs
+check obs exp
+rm obs exp a.tmp.bed b.tmp.bed
+
+###########################################################
+#  map.new.t009: median of an odd count sorts numerically
+#  Scores 10, 9, 2 sort to 2, 9, 10: median 9 (a string sort,
+#  "10" "2" "9", would give 2).
+###########################################################
+echo -e "    map.new.t009...\c"
+printf 'chr1\t0\t100\nchr2\t0\t100\n' > a.tmp.bed
+printf 'chr1\t10\t20\tb1\t10\nchr1\t20\t30\tb2\t9\nchr1\t30\t40\tb3\t2\n' > b.tmp.bed
+printf 'chr1\t0\t100\t9\nchr2\t0\t100\t.\n' > exp
+$BT map -a a.tmp.bed -b b.tmp.bed -c 5 -o median > obs
+check obs exp
+rm obs exp a.tmp.bed b.tmp.bed
+
+###########################################################
+#  map.new.t010: median of an even count averages the middle two
+#  Scores 4, 1, 3, 10 sort to 1, 3, 4, 10: (3 + 4) / 2 = 3.5.
+###########################################################
+echo -e "    map.new.t010...\c"
+printf 'chr1\t0\t100\n' > a.tmp.bed
+printf 'chr1\t10\t20\tb1\t4\nchr1\t20\t30\tb2\t1\nchr1\t30\t40\tb3\t3\nchr1\t40\t50\tb4\t10\n' > b.tmp.bed
+printf 'chr1\t0\t100\t3.5\n' > exp
+$BT map -a a.tmp.bed -b b.tmp.bed -c 5 -o median > obs
+check obs exp
+rm obs exp a.tmp.bed b.tmp.bed
+
+###########################################################
+#  map.new.t011: mode breaks a frequency tie with the smallest
+#  string
+#  Names b, a, b, a, c: a and b both occur twice. pins the current
+#  output: the lexicographically smallest of the tied values, a.
+###########################################################
+echo -e "    map.new.t011...\c"
+printf 'chr1\t0\t100\nchr2\t0\t100\n' > a.tmp.bed
+printf 'chr1\t10\t20\tb\t1\nchr1\t20\t30\ta\t1\nchr1\t30\t40\tb\t1\nchr1\t40\t50\ta\t1\nchr1\t50\t60\tc\t1\n' > b.tmp.bed
+printf 'chr1\t0\t100\ta\nchr2\t0\t100\t.\n' > exp
+$BT map -a a.tmp.bed -b b.tmp.bed -c 4 -o mode > obs
+check obs exp
+rm obs exp a.tmp.bed b.tmp.bed
+
+###########################################################
+#  map.new.t012: mode compares numbers as strings
+#  Scores 9, 10, 9, 10 tie; "10" sorts before "9" as a string.
+#  pins the current output: 10.
+###########################################################
+echo -e "    map.new.t012...\c"
+printf 'chr1\t0\t100\n' > a.tmp.bed
+printf 'chr1\t10\t20\tb1\t9\nchr1\t20\t30\tb2\t10\nchr1\t30\t40\tb3\t9\nchr1\t40\t50\tb4\t10\n' > b.tmp.bed
+printf 'chr1\t0\t100\t10\n' > exp
+$BT map -a a.tmp.bed -b b.tmp.bed -c 5 -o mode > obs
+check obs exp
+rm obs exp a.tmp.bed b.tmp.bed
+
+###########################################################
+#  map.new.t013: antimode picks the least frequent value, smallest
+#  string first on ties
+#  Names b, c, a, b: a and c occur once, b twice. pins the current
+#  output: a.
+###########################################################
+echo -e "    map.new.t013...\c"
+printf 'chr1\t0\t100\nchr2\t0\t100\n' > a.tmp.bed
+printf 'chr1\t10\t20\tb\t1\nchr1\t20\t30\tc\t1\nchr1\t30\t40\ta\t1\nchr1\t40\t50\tb\t1\n' > b.tmp.bed
+printf 'chr1\t0\t100\ta\nchr2\t0\t100\t.\n' > exp
+$BT map -a a.tmp.bed -b b.tmp.bed -c 4 -o antimode > obs
+check obs exp
+rm obs exp a.tmp.bed b.tmp.bed
+
+###########################################################
+#  map.new.t014: collapse lists values in B order with duplicates
+#  Names b, a, b -> b,a,b.
+###########################################################
+echo -e "    map.new.t014...\c"
+printf 'chr1\t0\t100\nchr2\t0\t100\n' > a.tmp.bed
+printf 'chr1\t10\t20\tb\t1\nchr1\t20\t30\ta\t2\nchr1\t30\t40\tb\t3\n' > b.tmp.bed
+printf 'chr1\t0\t100\tb,a,b\nchr2\t0\t100\t.\n' > exp
+$BT map -a a.tmp.bed -b b.tmp.bed -c 4 -o collapse > obs
+check obs exp
+rm obs exp a.tmp.bed b.tmp.bed
+
+###########################################################
+#  map.new.t015: distinct lists unique values sorted as strings
+#  Scores 10, 9, 2, 9 -> unique 10, 2, 9 in string order. pins the
+#  current output: the usage text does not give the order.
+###########################################################
+echo -e "    map.new.t015...\c"
+printf 'chr1\t0\t100\nchr2\t0\t100\n' > a.tmp.bed
+printf 'chr1\t10\t20\tb1\t10\nchr1\t20\t30\tb2\t9\nchr1\t30\t40\tb3\t2\nchr1\t40\t50\tb4\t9\n' > b.tmp.bed
+printf 'chr1\t0\t100\t10,2,9\nchr2\t0\t100\t.\n' > exp
+$BT map -a a.tmp.bed -b b.tmp.bed -c 5 -o distinct > obs
+check obs exp
+rm obs exp a.tmp.bed b.tmp.bed
+
+###########################################################
+#  map.new.t016: distinct_only keeps only values seen once
+#  Names a, b, b, c: a and c occur once.
+###########################################################
+echo -e "    map.new.t016...\c"
+printf 'chr1\t0\t100\nchr2\t0\t100\n' > a.tmp.bed
+printf 'chr1\t10\t20\ta\t1\nchr1\t20\t30\tb\t2\nchr1\t30\t40\tb\t3\nchr1\t40\t50\tc\t4\n' > b.tmp.bed
+printf 'chr1\t0\t100\ta,c\nchr2\t0\t100\t.\n' > exp
+$BT map -a a.tmp.bed -b b.tmp.bed -c 4 -o distinct_only > obs
+check obs exp
+rm obs exp a.tmp.bed b.tmp.bed
+
+###########################################################
+#  map.new.t017: first reports the value of the first B in file
+#  order
+#  Names x, y, z -> x.
+###########################################################
+echo -e "    map.new.t017...\c"
+printf 'chr1\t0\t100\nchr2\t0\t100\n' > a.tmp.bed
+printf 'chr1\t10\t20\tx\t1\nchr1\t20\t30\ty\t2\nchr1\t30\t40\tz\t3\n' > b.tmp.bed
+printf 'chr1\t0\t100\tx\nchr2\t0\t100\t.\n' > exp
+$BT map -a a.tmp.bed -b b.tmp.bed -c 4 -o first > obs
+check obs exp
+rm obs exp a.tmp.bed b.tmp.bed
+
+###########################################################
+#  map.new.t018: last reports the value of the last B in file order
+#  Names x, y, z -> z.
+###########################################################
+echo -e "    map.new.t018...\c"
+printf 'chr1\t0\t100\nchr2\t0\t100\n' > a.tmp.bed
+printf 'chr1\t10\t20\tx\t1\nchr1\t20\t30\ty\t2\nchr1\t30\t40\tz\t3\n' > b.tmp.bed
+printf 'chr1\t0\t100\tz\nchr2\t0\t100\t.\n' > exp
+$BT map -a a.tmp.bed -b b.tmp.bed -c 4 -o last > obs
+check obs exp
+rm obs exp a.tmp.bed b.tmp.bed
+
+###########################################################
+#  map.new.t019: stdev is the population standard deviation
+#  Scores 2,4,4,4,5,5,7,9: mean 5, squared deviations sum to 32,
+#  sqrt(32/8) = 2.
+###########################################################
+echo -e "    map.new.t019...\c"
+printf 'chr1\t0\t100\n' > a.tmp.bed
+printf 'chr1\t1\t2\tb\t2\nchr1\t2\t3\tb\t4\nchr1\t3\t4\tb\t4\nchr1\t4\t5\tb\t4\nchr1\t5\t6\tb\t5\nchr1\t6\t7\tb\t5\nchr1\t7\t8\tb\t7\nchr1\t8\t9\tb\t9\n' > b.tmp.bed
+printf 'chr1\t0\t100\t2\n' > exp
+$BT map -a a.tmp.bed -b b.tmp.bed -c 5 -o stdev > obs
+check obs exp
+rm obs exp a.tmp.bed b.tmp.bed
+
+###########################################################
+#  map.new.t020: sstdev is the sample standard deviation
+#  Same scores as t019: sqrt(32/7) = 2.13808993529..., printed with
+#  -prec 10 significant digits.
+###########################################################
+echo -e "    map.new.t020...\c"
+printf 'chr1\t0\t100\n' > a.tmp.bed
+printf 'chr1\t1\t2\tb\t2\nchr1\t2\t3\tb\t4\nchr1\t3\t4\tb\t4\nchr1\t4\t5\tb\t4\nchr1\t5\t6\tb\t5\nchr1\t6\t7\tb\t5\nchr1\t7\t8\tb\t7\nchr1\t8\t9\tb\t9\n' > b.tmp.bed
+printf 'chr1\t0\t100\t2.138089935\n' > exp
+$BT map -a a.tmp.bed -b b.tmp.bed -c 5 -o sstdev -prec 10 > obs
+check obs exp
+rm obs exp a.tmp.bed b.tmp.bed
+
+###########################################################
+#  map.new.t021: stdev and sstdev of a single value
+#  Population: sqrt(0/1) = 0. Sample: 0/0 is undefined, so the
+#  null value is printed.
+###########################################################
+echo -e "    map.new.t021...\c"
+printf 'chr1\t0\t100\n' > a.tmp.bed
+printf 'chr1\t10\t20\tb1\t6\n' > b.tmp.bed
+printf 'chr1\t0\t100\t0\t.\n' > exp
+$BT map -a a.tmp.bed -b b.tmp.bed -c 5 -o stdev,sstdev > obs
+check obs exp
+rm obs exp a.tmp.bed b.tmp.bed
+
+###########################################################
+#  map.new.t022: freqasc lists value:count by increasing count
+#  Names b, a, b, a, c: c:1, then a:2 and b:2. pins the current
+#  output: values with equal counts are in string order.
+###########################################################
+echo -e "    map.new.t022...\c"
+printf 'chr1\t0\t100\nchr2\t0\t100\n' > a.tmp.bed
+printf 'chr1\t10\t20\tb\t1\nchr1\t20\t30\ta\t1\nchr1\t30\t40\tb\t1\nchr1\t40\t50\ta\t1\nchr1\t50\t60\tc\t1\n' > b.tmp.bed
+printf 'chr1\t0\t100\tc:1,a:2,b:2\nchr2\t0\t100\t.\n' > exp
+$BT map -a a.tmp.bed -b b.tmp.bed -c 4 -o freqasc > obs
+check obs exp
+rm obs exp a.tmp.bed b.tmp.bed
+
+###########################################################
+#  map.new.t023: freqdesc lists value:count by decreasing count
+#  Same names as t022: a:2, b:2, then c:1. pins the current output:
+#  values with equal counts are in string order.
+###########################################################
+echo -e "    map.new.t023...\c"
+printf 'chr1\t0\t100\nchr2\t0\t100\n' > a.tmp.bed
+printf 'chr1\t10\t20\tb\t1\nchr1\t20\t30\ta\t1\nchr1\t30\t40\tb\t1\nchr1\t40\t50\ta\t1\nchr1\t50\t60\tc\t1\n' > b.tmp.bed
+printf 'chr1\t0\t100\ta:2,b:2,c:1\nchr2\t0\t100\t.\n' > exp
+$BT map -a a.tmp.bed -b b.tmp.bed -c 4 -o freqdesc > obs
+check obs exp
+rm obs exp a.tmp.bed b.tmp.bed
+
+###########################################################
+#  map.new.t024: concat joins values in B order with no delimiter
+#  Names a, b, c -> abc. concat is accepted by the parser though
+#  the usage text does not list it. pins the current output: concat
+#  uses no delimiter; map.rst says "print a comma separated list"
+#  (bugs.md #15).
+###########################################################
+echo -e "    map.new.t024...\c"
+printf 'chr1\t0\t100\nchr2\t0\t100\n' > a.tmp.bed
+printf 'chr1\t10\t20\ta\t1\nchr1\t20\t30\tb\t2\nchr1\t30\t40\tc\t3\n' > b.tmp.bed
+printf 'chr1\t0\t100\tabc\nchr2\t0\t100\t.\n' > exp
+$BT map -a a.tmp.bed -b b.tmp.bed -c 4 -o concat > obs
+check obs exp
+rm obs exp a.tmp.bed b.tmp.bed
+
+###########################################################
+#  map.new.t025: distinct_sort_num sorts unique values numerically
+#  Scores 10, 9, 2, 9 -> 2,9,10.
+###########################################################
+echo -e "    map.new.t025...\c"
+printf 'chr1\t0\t100\nchr2\t0\t100\n' > a.tmp.bed
+printf 'chr1\t10\t20\tb1\t10\nchr1\t20\t30\tb2\t9\nchr1\t30\t40\tb3\t2\nchr1\t40\t50\tb4\t9\n' > b.tmp.bed
+printf 'chr1\t0\t100\t2,9,10\nchr2\t0\t100\t.\n' > exp
+$BT map -a a.tmp.bed -b b.tmp.bed -c 5 -o distinct_sort_num > obs
+check obs exp
+rm obs exp a.tmp.bed b.tmp.bed
+
+###########################################################
+#  map.new.t026: distinct_sort_num_desc sorts unique values
+#  numerically, descending
+#  Scores 10, 9, 2, 9 -> 10,9,2.
+###########################################################
+echo -e "    map.new.t026...\c"
+printf 'chr1\t0\t100\n' > a.tmp.bed
+printf 'chr1\t10\t20\tb1\t10\nchr1\t20\t30\tb2\t9\nchr1\t30\t40\tb3\t2\nchr1\t40\t50\tb4\t9\n' > b.tmp.bed
+printf 'chr1\t0\t100\t10,9,2\n' > exp
+$BT map -a a.tmp.bed -b b.tmp.bed -c 5 -o distinct_sort_num_desc > obs
+check obs exp
+rm obs exp a.tmp.bed b.tmp.bed
+
+###########################################################
+#  map.new.t027: -delim sets the collapse delimiter
+#  Names b, a, b with -delim "|" -> b|a|b.
+###########################################################
+echo -e "    map.new.t027...\c"
+printf 'chr1\t0\t100\n' > a.tmp.bed
+printf 'chr1\t10\t20\tb\t1\nchr1\t20\t30\ta\t2\nchr1\t30\t40\tb\t3\n' > b.tmp.bed
+printf 'chr1\t0\t100\tb|a|b\n' > exp
+$BT map -a a.tmp.bed -b b.tmp.bed -c 4 -o collapse -delim "|" > obs
+check obs exp
+rm obs exp a.tmp.bed b.tmp.bed
+
+###########################################################
+#  map.new.t028: -delim also separates distinct, freqdesc and
+#  distinct_sort_num items
+#  Names b, a, b and scores 3, 1, 3: distinct a;b, freqdesc
+#  b:2;a:1, distinct_sort_num 1;3.
+###########################################################
+echo -e "    map.new.t028...\c"
+printf 'chr1\t0\t100\n' > a.tmp.bed
+printf 'chr1\t10\t20\tb\t3\nchr1\t20\t30\ta\t1\nchr1\t30\t40\tb\t3\n' > b.tmp.bed
+printf 'chr1\t0\t100\ta;b\tb:2;a:1\t1;3\n' > exp
+$BT map -a a.tmp.bed -b b.tmp.bed -c 4,4,5 -o distinct,freqdesc,distinct_sort_num -delim ";" > obs
+check obs exp
+rm obs exp a.tmp.bed b.tmp.bed
+
+###########################################################
+#  map.new.t029: -null replaces "." for numeric and list operations
+#  but count and count_distinct still print 0
+#  chr1:0-100 overlaps b (1) and a (2); chr2:0-100 overlaps nothing.
+#  pins the current output: count and count_distinct print 0 and
+#  ignore -null; map.rst says an A with no
+#  overlap gets "." or the -null value (bugs.md #16).
+###########################################################
+echo -e "    map.new.t029...\c"
+printf 'chr1\t0\t100\nchr2\t0\t100\n' > a.tmp.bed
+printf 'chr1\t10\t20\tb\t1\nchr1\t20\t30\ta\t2\n' > b.tmp.bed
+printf 'chr1\t0\t100\t3\tb,a\t2\t2\nchr2\t0\t100\tNA\tNA\t0\t0\n' > exp
+$BT map -a a.tmp.bed -b b.tmp.bed -c 5,4,5,4 -o sum,collapse,count,count_distinct -null NA > obs
+check obs exp
+rm obs exp a.tmp.bed b.tmp.bed
+
+###########################################################
+#  map.new.t030: -prec sets significant digits
+#  Scores 1, 2, 4: mean 7/3 with -prec 3 -> 2.33. pins the current
+#  output: -prec counts significant digits; the usage text says
+#  "decimal precision" (bugs.md #10).
+###########################################################
+echo -e "    map.new.t030...\c"
+printf 'chr1\t0\t100\n' > a.tmp.bed
+printf 'chr1\t10\t20\tb1\t1\nchr1\t20\t30\tb2\t2\nchr1\t30\t40\tb3\t4\n' > b.tmp.bed
+printf 'chr1\t0\t100\t2.33\n' > exp
+$BT map -a a.tmp.bed -b b.tmp.bed -c 5 -o mean -prec 3 > obs
+check obs exp
+rm obs exp a.tmp.bed b.tmp.bed
+
+###########################################################
+#  map.new.t031: a sum with more digits than -prec switches to
+#  scientific notation
+#  Scores 12000 and 345: sum 12345 with -prec 2. pins the current
+#  output: 1.2e+04.
+###########################################################
+echo -e "    map.new.t031...\c"
+printf 'chr1\t0\t100\n' > a.tmp.bed
+printf 'chr1\t10\t20\tb1\t12000\nchr1\t20\t30\tb2\t345\n' > b.tmp.bed
+printf 'chr1\t0\t100\t1.2e+04\n' > exp
+$BT map -a a.tmp.bed -b b.tmp.bed -c 5 -o sum -prec 2 > obs
+check obs exp
+rm obs exp a.tmp.bed b.tmp.bed
+
+###########################################################
+#  map.new.t032: an 11-digit sum exceeds -prec 10
+#  Scores 12345678900 and 1: sum 12345678901 has 11 digits. pins
+#  the current output: 1.23456789e+10.
+###########################################################
+echo -e "    map.new.t032...\c"
+printf 'chr1\t0\t100\n' > a.tmp.bed
+printf 'chr1\t10\t20\tb1\t12345678900\nchr1\t20\t30\tb2\t1\n' > b.tmp.bed
+printf 'chr1\t0\t100\t1.23456789e+10\n' > exp
+$BT map -a a.tmp.bed -b b.tmp.bed -c 5 -o sum -prec 10 > obs
+check obs exp
+rm obs exp a.tmp.bed b.tmp.bed
+
+###########################################################
+#  map.new.t033: a 10-digit sum prints every digit at -prec 10
+#  Scores 1234567800 and 90: sum 1234567890.
+###########################################################
+echo -e "    map.new.t033...\c"
+printf 'chr1\t0\t100\n' > a.tmp.bed
+printf 'chr1\t10\t20\tb1\t1234567800\nchr1\t20\t30\tb2\t90\n' > b.tmp.bed
+printf 'chr1\t0\t100\t1234567890\n' > exp
+$BT map -a a.tmp.bed -b b.tmp.bed -c 5 -o sum -prec 10 > obs
+check obs exp
+rm obs exp a.tmp.bed b.tmp.bed
+
+###########################################################
+#  map.new.t034: one column with several operations, output in the
+#  order the operations are given
+#  Scores 1, 2, 4 with -prec 10: sum 7, count 3, mean 2.333333333,
+#  min 1, max 4.
+###########################################################
+echo -e "    map.new.t034...\c"
+printf 'chr1\t0\t100\n' > a.tmp.bed
+printf 'chr1\t10\t20\tb1\t1\nchr1\t20\t30\tb2\t2\nchr1\t30\t40\tb3\t4\n' > b.tmp.bed
+printf 'chr1\t0\t100\t7\t3\t2.333333333\t1\t4\n' > exp
+$BT map -a a.tmp.bed -b b.tmp.bed -c 5 -o sum,count,mean,min,max -prec 10 > obs
+check obs exp
+rm obs exp a.tmp.bed b.tmp.bed
+
+###########################################################
+#  map.new.t035: several columns with one operation
+#  -c 2,3 -o max: largest B start 30 and largest B end 40.
+###########################################################
+echo -e "    map.new.t035...\c"
+printf 'chr1\t0\t100\n' > a.tmp.bed
+printf 'chr1\t10\t20\tb1\t1\nchr1\t20\t30\tb2\t2\nchr1\t30\t40\tb3\t4\n' > b.tmp.bed
+printf 'chr1\t0\t100\t30\t40\n' > exp
+$BT map -a a.tmp.bed -b b.tmp.bed -c 2,3 -o max > obs
+check obs exp
+rm obs exp a.tmp.bed b.tmp.bed
+
+###########################################################
+#  map.new.t036: column/operation pairs are applied in order
+#  -c 5,4 -o sum,collapse: 1+2+4 = 7, then names b1,b2,b3.
+###########################################################
+echo -e "    map.new.t036...\c"
+printf 'chr1\t0\t100\n' > a.tmp.bed
+printf 'chr1\t10\t20\tb1\t1\nchr1\t20\t30\tb2\t2\nchr1\t30\t40\tb3\t4\n' > b.tmp.bed
+printf 'chr1\t0\t100\t7\tb1,b2,b3\n' > exp
+$BT map -a a.tmp.bed -b b.tmp.bed -c 5,4 -o sum,collapse > obs
+check obs exp
+rm obs exp a.tmp.bed b.tmp.bed
+
+###########################################################
+#  map.new.t037: -ops is an alias for -o
+#  Same input as t036 with -c 5 -ops max: 4.
+###########################################################
+echo -e "    map.new.t037...\c"
+printf 'chr1\t0\t100\n' > a.tmp.bed
+printf 'chr1\t10\t20\tb1\t1\nchr1\t20\t30\tb2\t2\nchr1\t30\t40\tb3\t4\n' > b.tmp.bed
+printf 'chr1\t0\t100\t4\n' > exp
+$BT map -a a.tmp.bed -b b.tmp.bed -c 5 -ops max > obs
+check obs exp
+rm obs exp a.tmp.bed b.tmp.bed
+
+###########################################################
+#  map.new.t038: -prec 0 is an error
+###########################################################
+echo -e "    map.new.t038...\c"
+printf 'chr1\t0\t100\n' > a.tmp.bed
+printf 'chr1\t10\t20\tb1\t1\n' > b.tmp.bed
+printf '***** ERROR: -prec must be followed by a positive integer. Exiting. *****\nexit 1\n' > exp
+$BT map -a a.tmp.bed -b b.tmp.bed -o mean -prec 0 > out.tmp 2>&1 && echo "exit 0" >> out.tmp || echo "exit $?" >> out.tmp
+sed -n '/ERROR/,$p' out.tmp > obs
+check obs exp
+rm obs exp out.tmp a.tmp.bed b.tmp.bed
+
+###########################################################
+#  map.new.t039: more than one -b file is an error
+###########################################################
+echo -e "    map.new.t039...\c"
+printf 'chr1\t0\t100\n' > a.tmp.bed
+printf 'chr1\t10\t20\tb1\t1\n' > b1.tmp.bed
+printf 'chr1\t10\t20\tb2\t2\n' > b2.tmp.bed
+printf '***** ERROR: multiple database files currently not supported for map. *****\nexit 1\n' > exp
+$BT map -a a.tmp.bed -b b1.tmp.bed b2.tmp.bed > out.tmp 2>&1 && echo "exit 0" >> out.tmp || echo "exit $?" >> out.tmp
+sed -n '/ERROR/,$p' out.tmp > obs
+check obs exp
+rm obs exp out.tmp a.tmp.bed b1.tmp.bed b2.tmp.bed
+
+###########################################################
+#  map.new.t040: -e with -F but no -f is an error
+###########################################################
+echo -e "    map.new.t040...\c"
+printf 'chr1\t0\t100\n' > a.tmp.bed
+printf 'chr1\t10\t20\tb1\t1\n' > b.tmp.bed
+printf '***** ERROR: -e must be used with -f. *****\nexit 1\n' > exp
+$BT map -a a.tmp.bed -b b.tmp.bed -F 0.5 -e > out.tmp 2>&1 && echo "exit 0" >> out.tmp || echo "exit $?" >> out.tmp
+sed -n '/ERROR/,$p' out.tmp > obs
+check obs exp
+rm obs exp out.tmp a.tmp.bed b.tmp.bed
+
+###########################################################
+#  map.new.t041: -r with -F is an error
+###########################################################
+echo -e "    map.new.t041...\c"
+printf 'chr1\t0\t100\n' > a.tmp.bed
+printf 'chr1\t10\t20\tb1\t1\n' > b.tmp.bed
+printf '***** ERROR: -r must be used solely with -f. *****\nexit 1\n' > exp
+$BT map -a a.tmp.bed -b b.tmp.bed -F 0.5 -r > out.tmp 2>&1 && echo "exit 0" >> out.tmp || echo "exit $?" >> out.tmp
+sed -n '/ERROR/,$p' out.tmp > obs
+check obs exp
+rm obs exp out.tmp a.tmp.bed b.tmp.bed
+
+###########################################################
+#  map.new.t042: -s uses only B on the same known strand
+#  A is +. b1 (+, 1), b2 (-, 2), b3 (+, 4), b4 (., 8): -s sums
+#  1 + 4 = 5.
+###########################################################
+echo -e "    map.new.t042...\c"
+printf 'chr1\t0\t100\ta1\t0\t+\n' > a.tmp.bed
+printf 'chr1\t10\t20\tb1\t1\t+\nchr1\t20\t30\tb2\t2\t-\nchr1\t30\t40\tb3\t4\t+\nchr1\t40\t50\tb4\t8\t.\n' > b.tmp.bed
+printf 'chr1\t0\t100\ta1\t0\t+\t5\n' > exp
+$BT map -a a.tmp.bed -b b.tmp.bed -s > obs
+check obs exp
+rm obs exp a.tmp.bed b.tmp.bed
+
+###########################################################
+#  map.new.t043: -S uses only B on the opposite known strand
+#  Same input as t042: only b2 (-) qualifies: 2. The unknown-strand
+#  b4 is excluded.
+###########################################################
+echo -e "    map.new.t043...\c"
+printf 'chr1\t0\t100\ta1\t0\t+\n' > a.tmp.bed
+printf 'chr1\t10\t20\tb1\t1\t+\nchr1\t20\t30\tb2\t2\t-\nchr1\t30\t40\tb3\t4\t+\nchr1\t40\t50\tb4\t8\t.\n' > b.tmp.bed
+printf 'chr1\t0\t100\ta1\t0\t+\t2\n' > exp
+$BT map -a a.tmp.bed -b b.tmp.bed -S > obs
+check obs exp
+rm obs exp a.tmp.bed b.tmp.bed
+
+###########################################################
+#  map.new.t044: -f keeps B covering exactly the fraction of A
+#  A chr1:0-100. b1 chr1:50-150 overlaps 50 bp = 0.50 (kept at
+#  -f 0.5), b2 chr1:60-200 overlaps 40 bp = 0.40 (dropped): sum 1.
+###########################################################
+echo -e "    map.new.t044...\c"
+printf 'chr1\t0\t100\n' > a.tmp.bed
+printf 'chr1\t50\t150\tb1\t1\nchr1\t60\t200\tb2\t2\n' > b.tmp.bed
+printf 'chr1\t0\t100\t1\n' > exp
+$BT map -a a.tmp.bed -b b.tmp.bed -f 0.5 > obs
+check obs exp
+rm obs exp a.tmp.bed b.tmp.bed
+
+###########################################################
+#  map.new.t045: -F tests the fraction of each B
+#  A chr1:0-100. b1 chr1:50-150: 50/100 = 0.50 of B (kept);
+#  b2 chr1:80-200: 20/120 = 0.17 (dropped); b3 chr1:90-100:
+#  10/10 = 1.0 (kept). -F 0.5 sums 1 + 4 = 5.
+###########################################################
+echo -e "    map.new.t045...\c"
+printf 'chr1\t0\t100\n' > a.tmp.bed
+printf 'chr1\t50\t150\tb1\t1\nchr1\t80\t200\tb2\t2\nchr1\t90\t100\tb3\t4\n' > b.tmp.bed
+printf 'chr1\t0\t100\t5\n' > exp
+$BT map -a a.tmp.bed -b b.tmp.bed -F 0.5 > obs
+check obs exp
+rm obs exp a.tmp.bed b.tmp.bed
+
+###########################################################
+#  map.new.t046: -f with -r requires the fraction of A and of B
+#  Same input as t045 with -f 0.5 -r: b1 0.50/0.50 (kept), b2
+#  0.20/0.17, b3 0.10/1.0 (dropped): sum 1.
+###########################################################
+echo -e "    map.new.t046...\c"
+printf 'chr1\t0\t100\n' > a.tmp.bed
+printf 'chr1\t50\t150\tb1\t1\nchr1\t80\t200\tb2\t2\nchr1\t90\t100\tb3\t4\n' > b.tmp.bed
+printf 'chr1\t0\t100\t1\n' > exp
+$BT map -a a.tmp.bed -b b.tmp.bed -f 0.5 -r > obs
+check obs exp
+rm obs exp a.tmp.bed b.tmp.bed
+
+###########################################################
+#  map.new.t047: -e accepts B passing either fraction
+#  Same input as t045 with -f 0.6 -F 0.6 -e: b1 0.50/0.50 fails
+#  both, b2 0.20/0.17 fails both, b3 0.10/1.0 passes -F: sum 4.
+###########################################################
+echo -e "    map.new.t047...\c"
+printf 'chr1\t0\t100\n' > a.tmp.bed
+printf 'chr1\t50\t150\tb1\t1\nchr1\t80\t200\tb2\t2\nchr1\t90\t100\tb3\t4\n' > b.tmp.bed
+printf 'chr1\t0\t100\t4\n' > exp
+$BT map -a a.tmp.bed -b b.tmp.bed -f 0.6 -F 0.6 -e > obs
+check obs exp
+rm obs exp a.tmp.bed b.tmp.bed
+
+###########################################################
+#  map.new.t048: a BED12 A without -split uses its whole span
+#  A chr1:0-100 has blocks 0-10 and 90-100. b1 chr1:40-50 (in the
+#  gap, score 1) and b2 chr1:5-15 (in block 1, score 2) both
+#  overlap the span: sum 3. All 12 fields of A are printed.
+###########################################################
+echo -e "    map.new.t048...\c"
+printf 'chr1\t0\t100\ta1\t0\t+\t0\t100\t0\t2\t10,10,\t0,90,\n' > a.tmp.bed
+printf 'chr1\t5\t15\tb2\t2\nchr1\t40\t50\tb1\t1\n' > b.tmp.bed
+printf 'chr1\t0\t100\ta1\t0\t+\t0\t100\t0\t2\t10,10,\t0,90,\t3\n' > exp
+$BT map -a a.tmp.bed -b b.tmp.bed > obs
+check obs exp
+rm obs exp a.tmp.bed b.tmp.bed
+
+###########################################################
+#  map.new.t049: -split with a BED12 A drops B in the gap
+#  Same input as t048: only b2 overlaps a block: sum 2.
+###########################################################
+echo -e "    map.new.t049...\c"
+printf 'chr1\t0\t100\ta1\t0\t+\t0\t100\t0\t2\t10,10,\t0,90,\n' > a.tmp.bed
+printf 'chr1\t5\t15\tb2\t2\nchr1\t40\t50\tb1\t1\n' > b.tmp.bed
+printf 'chr1\t0\t100\ta1\t0\t+\t0\t100\t0\t2\t10,10,\t0,90,\t2\n' > exp
+$BT map -a a.tmp.bed -b b.tmp.bed -split > obs
+check obs exp
+rm obs exp a.tmp.bed b.tmp.bed
+
+###########################################################
+#  map.new.t050: -split with a BED12 B drops it when A lies in its
+#  gap
+#  B chr1:0-100 has blocks 0-10 and 90-100 (score 7). A1
+#  chr1:40-50 lies in the gap: null. A2 chr1:95-120 overlaps the
+#  second block: 7.
+###########################################################
+echo -e "    map.new.t050...\c"
+printf 'chr1\t40\t50\nchr1\t95\t120\n' > a.tmp.bed
+printf 'chr1\t0\t100\tb1\t7\t+\t0\t100\t0\t2\t10,10,\t0,90,\n' > b.tmp.bed
+printf 'chr1\t40\t50\t.\nchr1\t95\t120\t7\n' > exp
+$BT map -a a.tmp.bed -b b.tmp.bed -split > obs
+check obs exp
+rm obs exp a.tmp.bed b.tmp.bed
+
+###########################################################
+#  map.new.t051: -header prints the query's "#" and "track" lines
+###########################################################
+echo -e "    map.new.t051...\c"
+printf '# comment\ntrack name=a\nchr1\t0\t100\n' > a.tmp.bed
+printf 'chr1\t10\t20\tb1\t1\n' > b.tmp.bed
+printf '# comment\ntrack name=a\nchr1\t0\t100\t1\n' > exp
+$BT map -a a.tmp.bed -b b.tmp.bed -header > obs
+check obs exp
+rm obs exp a.tmp.bed b.tmp.bed
+
+###########################################################
+#  map.new.t052: a non-numeric value in a numeric operation gives
+#  the null value and a warning
+#  Scores 1, x, 3: sum is undefined, so "." on stdout; stderr has
+#  the warning naming x and column 5. The test appends stderr
+#  after stdout.
+###########################################################
+echo -e "    map.new.t052...\c"
+printf 'chr1\t0\t100\n' > a.tmp.bed
+printf 'chr1\t10\t20\tb1\t1\nchr1\t20\t30\tb2\tx\nchr1\t30\t40\tb3\t3\n' > b.tmp.bed
+printf 'chr1\t0\t100\t.\n ***** WARNING: Non numeric value x in 5.\n' > exp
+$BT map -a a.tmp.bed -b b.tmp.bed -c 5 -o sum > obs 2> err.tmp
+cat err.tmp >> obs
+check obs exp
+rm obs exp err.tmp a.tmp.bed b.tmp.bed
+
+###########################################################
+#  map.new.t053: one warning per A record, naming the last
+#  non-numeric value
+#  Scores x, 2, y for one A: one warning, for y. pins the current
+#  output.
+###########################################################
+echo -e "    map.new.t053...\c"
+printf 'chr1\t0\t100\n' > a.tmp.bed
+printf 'chr1\t10\t20\tb1\tx\nchr1\t20\t30\tb2\t2\nchr1\t30\t40\tb3\ty\n' > b.tmp.bed
+printf 'chr1\t0\t100\t.\n ***** WARNING: Non numeric value y in 5.\n' > exp
+$BT map -a a.tmp.bed -b b.tmp.bed -c 5 -o sum > obs 2> err.tmp
+cat err.tmp >> obs
+check obs exp
+rm obs exp err.tmp a.tmp.bed b.tmp.bed
+
+###########################################################
+#  map.new.t054: non-numeric operations on a text column give no
+#  warning
+#  count and collapse of names b1, b2: 2 and b1,b2; stderr empty.
+###########################################################
+echo -e "    map.new.t054...\c"
+printf 'chr1\t0\t100\n' > a.tmp.bed
+printf 'chr1\t10\t20\tb1\t1\nchr1\t20\t30\tb2\t2\n' > b.tmp.bed
+printf 'chr1\t0\t100\t2\tb1,b2\n' > exp
+$BT map -a a.tmp.bed -b b.tmp.bed -c 4 -o count,collapse > obs 2> err.tmp
+cat err.tmp >> obs
+check obs exp
+rm obs exp err.tmp a.tmp.bed b.tmp.bed
+
+###########################################################
+#  map.new.t055: exponent notation is numeric
+#  Scores 1e2 and 2.5E1: sum 100 + 25 = 125.
+###########################################################
+echo -e "    map.new.t055...\c"
+printf 'chr1\t0\t100\n' > a.tmp.bed
+printf 'chr1\t10\t20\tb1\t1e2\nchr1\t20\t30\tb2\t2.5E1\n' > b.tmp.bed
+printf 'chr1\t0\t100\t125\n' > exp
+$BT map -a a.tmp.bed -b b.tmp.bed -c 5 -o sum > obs
+check obs exp
+rm obs exp a.tmp.bed b.tmp.bed
+
+###########################################################
+#  map.new.t056: a GFF query prints as read, with 1-based start
+#  converted for the overlap test
+#  GFF chr1 1-100 is 0-based chr1:0-100. b0 chr1:0-1 (1) and b1
+#  chr1:99-110 (5) overlap it; b2 chr1:100-110 (7) is book-ended.
+#  Sum 6 (reading 1 as 0-based, A would be book-ended to b0: 5).
+###########################################################
+echo -e "    map.new.t056...\c"
+printf 'chr1\tsrc\tgene\t1\t100\t.\t+\t.\tID=a1\n' > a.tmp.gff
+printf 'chr1\t0\t1\tb0\t1\nchr1\t99\t110\tb1\t5\nchr1\t100\t110\tb2\t7\n' > b.tmp.bed
+printf 'chr1\tsrc\tgene\t1\t100\t.\t+\t.\tID=a1\t6\n' > exp
+$BT map -a a.tmp.gff -b b.tmp.bed > obs
+check obs exp
+rm obs exp a.tmp.gff b.tmp.bed
+
+###########################################################
+#  map.new.t057: a VCF query prints as read, without its header
+#  POS 101 REF A is 0-based chr1:100-101. b2 chr1:100-110 (3)
+#  overlaps it; b1 chr1:101-110 (4) starts at its end and does not.
+#  Sum 3 (reading POS as 0-based, A chr1:101-102 would overlap both:
+#  7).
+###########################################################
+echo -e "    map.new.t057...\c"
+printf '##fileformat=VCFv4.1\n#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\nchr1\t101\trs1\tA\tG\t50\tPASS\tDP=3\n' > a.tmp.vcf
+printf 'chr1\t100\t110\tb2\t3\nchr1\t101\t110\tb1\t4\n' > b.tmp.bed
+printf 'chr1\t101\trs1\tA\tG\t50\tPASS\tDP=3\t3\n' > exp
+$BT map -a a.tmp.vcf -b b.tmp.bed > obs
+check obs exp
+rm obs exp a.tmp.vcf b.tmp.bed
+
+###########################################################
+#  map.new.t058: a BED6+3 query prints every column before the
+#  value
+###########################################################
+echo -e "    map.new.t058...\c"
+printf 'chr1\t0\t100\ta1\t9\t-\tp\tq\tr\n' > a.tmp.bed
+printf 'chr1\t10\t20\tb1\t1\nchr1\t20\t30\tb2\t2\n' > b.tmp.bed
+printf 'chr1\t0\t100\ta1\t9\t-\tp\tq\tr\t3\n' > exp
+$BT map -a a.tmp.bed -b b.tmp.bed > obs
+check obs exp
+rm obs exp a.tmp.bed b.tmp.bed
+
+###########################################################
+#  map.new.t059: a zero-length query inside B gets its value and is
+#  printed with its original coordinates
+#  A chr1:50-50 lies inside B chr1:10-100 (score 6).
+###########################################################
+echo -e "    map.new.t059...\c"
+printf 'chr1\t50\t50\n' > a.tmp.bed
+printf 'chr1\t10\t100\tb1\t6\n' > b.tmp.bed
+printf 'chr1\t50\t50\t6\n' > exp
+$BT map -a a.tmp.bed -b b.tmp.bed > obs
+check obs exp
+rm obs exp a.tmp.bed b.tmp.bed
+
+###########################################################
+#  map.new.t060: book-ended B records are not overlaps
+#  A chr1:100-200. chr1:50-100 (1) and chr1:200-250 (2) only touch
+#  A; chr1:150-160 (4) overlaps: sum 4.
+###########################################################
+echo -e "    map.new.t060...\c"
+printf 'chr1\t100\t200\n' > a.tmp.bed
+printf 'chr1\t50\t100\tb1\t1\nchr1\t150\t160\tb3\t4\nchr1\t200\t250\tb2\t2\n' > b.tmp.bed
+printf 'chr1\t100\t200\t4\n' > exp
+$BT map -a a.tmp.bed -b b.tmp.bed > obs
+check obs exp
+rm obs exp a.tmp.bed b.tmp.bed
+
+###########################################################
+#  map.new.t061: a B spanning two A records counts for both
+#  B chr1:50-150 (3) overlaps chr1:0-100 and chr1:100-200.
+###########################################################
+echo -e "    map.new.t061...\c"
+printf 'chr1\t0\t100\nchr1\t100\t200\n' > a.tmp.bed
+printf 'chr1\t50\t150\tb1\t3\n' > b.tmp.bed
+printf 'chr1\t0\t100\t3\nchr1\t100\t200\t3\n' > exp
+$BT map -a a.tmp.bed -b b.tmp.bed > obs
+check obs exp
+rm obs exp a.tmp.bed b.tmp.bed
+
+###########################################################
+#  map.new.t062: identical A records each get the value
+#  Two copies of chr1:0-100 overlap B scores 1 and 2.
+###########################################################
+echo -e "    map.new.t062...\c"
+printf 'chr1\t0\t100\nchr1\t0\t100\n' > a.tmp.bed
+printf 'chr1\t10\t20\tb1\t1\nchr1\t20\t30\tb2\t2\n' > b.tmp.bed
+printf 'chr1\t0\t100\t3\nchr1\t0\t100\t3\n' > exp
+$BT map -a a.tmp.bed -b b.tmp.bed > obs
+check obs exp
+rm obs exp a.tmp.bed b.tmp.bed
+
+###########################################################
+#  map.new.t063: B chromosomes absent from A are skipped
+#  A has chr1 and chr3; B also has chr2 (score 2) between them.
+#  chr1 gets 1, chr3 gets 4.
+###########################################################
+echo -e "    map.new.t063...\c"
+printf 'chr1\t0\t100\nchr3\t0\t100\n' > a.tmp.bed
+printf 'chr1\t10\t20\tb1\t1\nchr2\t10\t20\tb2\t2\nchr3\t10\t20\tb3\t4\n' > b.tmp.bed
+printf 'chr1\t0\t100\t1\nchr3\t0\t100\t4\n' > exp
+$BT map -a a.tmp.bed -b b.tmp.bed > obs
+check obs exp
+rm obs exp a.tmp.bed b.tmp.bed
+
+###########################################################
+#  map.new.t064: GFF database, score column, 1-based start
+#  GFF e1 101-150 is 0-based chr1:100-150, e2 151-250 is
+#  chr1:150-250. A chr1:0-101 overlaps e1 by 1 bp: 2.5 (reading 101
+#  as 0-based, e1 would be book-ended: "."). A chr1:100-200 overlaps
+#  both: 2.5 + 1.5 = 4.
+###########################################################
+echo -e "    map.new.t064...\c"
+printf 'chr1\t0\t101\nchr1\t100\t200\n' > a.tmp.bed
+printf 'chr1\tsrc\texon\t101\t150\t2.5\t+\t.\tID=e1\nchr1\tsrc\texon\t151\t250\t1.5\t+\t.\tID=e2\n' > b.tmp.gff
+printf 'chr1\t0\t101\t2.5\nchr1\t100\t200\t4\n' > exp
+$BT map -a a.tmp.bed -b b.tmp.gff -c 6 -o sum > obs
+check obs exp
+rm obs exp a.tmp.bed b.tmp.gff
+
+###########################################################
+#  map.new.t065: VCF database, QUAL column, 1-based POS
+#  POS 100 is 0-based chr1:99-100 (QUAL 10), POS 101 is
+#  chr1:100-101 (QUAL 20). A chr1:0-100 gets 10, chr1:100-200
+#  gets 20.
+###########################################################
+echo -e "    map.new.t065...\c"
+printf 'chr1\t0\t100\nchr1\t100\t200\n' > a.tmp.bed
+printf '##fileformat=VCFv4.1\n#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\nchr1\t100\trs1\tA\tG\t10\tPASS\t.\nchr1\t101\trs2\tC\tT\t20\tPASS\t.\n' > b.tmp.vcf
+printf 'chr1\t0\t100\t10\nchr1\t100\t200\t20\n' > exp
+$BT map -a a.tmp.bed -b b.tmp.vcf -c 6 -o sum > obs
+check obs exp
+rm obs exp a.tmp.bed b.tmp.vcf
+
+###########################################################
+#  map.new.t066: bedGraph database, value column
+#  Values 1 and 4 over chr1:0-100: mean 2.5.
+###########################################################
+echo -e "    map.new.t066...\c"
+printf 'chr1\t0\t100\n' > a.tmp.bed
+printf 'chr1\t0\t50\t1\nchr1\t50\t100\t4\n' > b.tmp.bed
+printf 'chr1\t0\t100\t2.5\n' > exp
+$BT map -a a.tmp.bed -b b.tmp.bed -c 4 -o mean > obs
+check obs exp
+rm obs exp a.tmp.bed b.tmp.bed
+
+###########################################################
+#  map.new.t067: with -g, inputs follow the genome file's
+#  chromosome order
+#  The genome lists chr2 before chr1, and both files follow it.
+###########################################################
+echo -e "    map.new.t067...\c"
+printf 'chr2\t1000\nchr1\t1000\n' > g.tmp
+printf 'chr2\t0\t100\nchr1\t0\t100\n' > a.tmp.bed
+printf 'chr2\t10\t20\tb1\t1\nchr1\t10\t20\tb2\t2\n' > b.tmp.bed
+printf 'chr2\t0\t100\t1\nchr1\t0\t100\t2\n' > exp
+$BT map -a a.tmp.bed -b b.tmp.bed -g g.tmp > obs
+check obs exp
+rm obs exp g.tmp a.tmp.bed b.tmp.bed
+
+###########################################################
+#  map.new.t068: with -g, a file in another chromosome order is an
+#  error
+#  The genome lists chr2 before chr1, but A has chr1 first.
+###########################################################
+echo -e "    map.new.t068...\c"
+printf 'chr2\t1000\nchr1\t1000\n' > g.tmp
+printf 'chr1\t0\t100\nchr2\t0\t100\n' > a.tmp.bed
+printf 'chr2\t10\t20\tb1\t1\nchr1\t10\t20\tb2\t2\n' > b.tmp.bed
+printf 'Error: Sorted input specified, but the file a.tmp.bed has the following record with a different sort order than the genomeFile g.tmp\nchr2\t0\t100\nexit 1\n' > exp
+$BT map -a a.tmp.bed -b b.tmp.bed -g g.tmp > obs 2>&1 && echo "exit 0" >> obs || echo "exit $?" >> obs
+check obs exp
+rm obs exp g.tmp a.tmp.bed b.tmp.bed
+
+###########################################################
+#  map.new.t069: an unsorted database is an error
+###########################################################
+echo -e "    map.new.t069...\c"
+printf 'chr1\t0\t100\n' > a.tmp.bed
+printf 'chr1\t30\t40\tb1\t1\nchr1\t10\t20\tb2\t2\n' > b.tmp.bed
+printf 'Error: Sorted input specified, but the file b.tmp.bed has the following out of order record\nchr1\t10\t20\tb2\t2\nexit 1\n' > exp
+$BT map -a a.tmp.bed -b b.tmp.bed > obs 2>&1 && echo "exit 0" >> obs || echo "exit $?" >> obs
+check obs exp
+rm obs exp a.tmp.bed b.tmp.bed
+
+###########################################################
+#  map.new.t070: the query can be read from stdin
+#  Same records as t001.
+###########################################################
+echo -e "    map.new.t070...\c"
+printf 'chr1\t0\t100\nchr2\t0\t100\n' > a.tmp.bed
+printf 'chr1\t10\t20\tb1\t1.5\nchr1\t20\t30\tb2\t2.25\nchr1\t30\t40\tb3\t-0.75\n' > b.tmp.bed
+printf 'chr1\t0\t100\t3\nchr2\t0\t100\t.\n' > exp
+cat a.tmp.bed | $BT map -a - -b b.tmp.bed -c 5 -o sum > obs
+check obs exp
+rm obs exp a.tmp.bed b.tmp.bed
+
+###########################################################
+#  map.new.t071: a BAM query with -bed is printed as BED12
+#  values.bam holds a1-a4 on chr1 at POS 1, 11, 21, 121 and a5-a8
+#  on chr3 at the same positions, each 10M, MAPQ 255, flag 0: so
+#  0-based chr1:0-10, 10-20, 20-30, 120-130 (likewise chr3), name,
+#  score 255, strand +. B chr1:5-15 (2) overlaps a1 and a2; B
+#  chr3:0-5 (7) overlaps a5. pins the current output: the key is
+#  printed as BED12 (thick start/end = start/end, itemRgb 0,0,0,
+#  one block of the aligned length).
+###########################################################
+echo -e "    map.new.t071...\c"
+printf 'chr1\t5\t15\tb1\t2\nchr3\t0\t5\tb2\t7\n' > b.tmp.bed
+printf '%b\n' \
+	'chr1\t0\t10\ta1\t255\t+\t0\t10\t0,0,0\t1\t10,\t0,\t2' \
+	'chr1\t10\t20\ta2\t255\t+\t10\t20\t0,0,0\t1\t10,\t0,\t2' \
+	'chr1\t20\t30\ta3\t255\t+\t20\t30\t0,0,0\t1\t10,\t0,\t.' \
+	'chr1\t120\t130\ta4\t255\t+\t120\t130\t0,0,0\t1\t10,\t0,\t.' \
+	'chr3\t0\t10\ta5\t255\t+\t0\t10\t0,0,0\t1\t10,\t0,\t7' \
+	'chr3\t10\t20\ta6\t255\t+\t10\t20\t0,0,0\t1\t10,\t0,\t.' \
+	'chr3\t20\t30\ta7\t255\t+\t20\t30\t0,0,0\t1\t10,\t0,\t.' \
+	'chr3\t120\t130\ta8\t255\t+\t120\t130\t0,0,0\t1\t10,\t0,\t.' > exp
+$BT map -a values.bam -b b.tmp.bed -bed -c 5 -o sum > obs
+check obs exp
+rm obs exp b.tmp.bed
+
+###########################################################
+#  map.new.t072: an input buffer shorter than one line gives the
+#  same result
+#  -iobuf 8 forces many refills per line. Same records as t001
+#  plus a second chr1 A and a chr2 B: chr1:0-100 gets 1.5 + 2.25 =
+#  3.75 (collapse 1.5,2.25), chr1:100-200 gets -0.75, chr2:0-100
+#  gets 4.
+###########################################################
+echo -e "    map.new.t072...\c"
+printf 'chr1\t0\t100\nchr1\t100\t200\nchr2\t0\t100\n' > a.tmp.bed
+printf 'chr1\t10\t20\tb1\t1.5\nchr1\t20\t30\tb2\t2.25\nchr1\t150\t160\tb3\t-0.75\nchr2\t50\t60\tb4\t4\n' > b.tmp.bed
+printf 'chr1\t0\t100\t3.75\t1.5,2.25\nchr1\t100\t200\t-0.75\t-0.75\nchr2\t0\t100\t4\t4\n' > exp
+$BT map -a a.tmp.bed -b b.tmp.bed -c 5 -o sum,collapse -iobuf 8 > obs
+check obs exp
+rm obs exp a.tmp.bed b.tmp.bed
+
+###########################################################
+#  map.new.t073: -nobuf writes the same lines
+#  Same input and result as t072, without -iobuf.
+###########################################################
+echo -e "    map.new.t073...\c"
+printf 'chr1\t0\t100\nchr1\t100\t200\nchr2\t0\t100\n' > a.tmp.bed
+printf 'chr1\t10\t20\tb1\t1.5\nchr1\t20\t30\tb2\t2.25\nchr1\t150\t160\tb3\t-0.75\nchr2\t50\t60\tb4\t4\n' > b.tmp.bed
+printf 'chr1\t0\t100\t3.75\t1.5,2.25\nchr1\t100\t200\t-0.75\t-0.75\nchr2\t0\t100\t4\t4\n' > exp
+$BT map -a a.tmp.bed -b b.tmp.bed -c 5 -o sum,collapse -nobuf > obs
+check obs exp
+rm obs exp a.tmp.bed b.tmp.bed
+
+###########################################################
+#  map.new.t074: an -iobuf below the 8-byte minimum is an error
+###########################################################
+echo -e "    map.new.t074...\c"
+printf 'chr1\t0\t100\n' > a.tmp.bed
+printf 'chr1\t10\t20\tb1\t1\n' > b.tmp.bed
+printf '***** ERROR: specified buffer size is too small. *****\nexit 1\n' > exp
+$BT map -a a.tmp.bed -b b.tmp.bed -iobuf 4 > out.tmp 2>&1 && echo "exit 0" >> out.tmp || echo "exit $?" >> out.tmp
+sed -n '/ERROR/,$p' out.tmp > obs
+check obs exp
+rm obs exp out.tmp a.tmp.bed b.tmp.bed
+
+###########################################################
+#  map.new.t075: chromosome names with and without "chr" give a
+#  warning
+#  A uses chr1, B uses 1, so nothing overlaps (null on stdout) and
+#  stderr warns about the B record. pins the current output: the
+#  warning is printed when found and again at exit. The test
+#  appends stderr after stdout.
+###########################################################
+echo -e "    map.new.t075...\c"
+printf 'chr1\t0\t100\n' > a.tmp.bed
+printf '1\t10\t20\tb1\t1\n' > b.tmp.bed
+printf 'chr1\t0\t100\t.\n***** WARNING: File b.tmp.bed has inconsistent naming convention for record:\n1\t10\t20\tb1\t1\n\n***** WARNING: File b.tmp.bed has inconsistent naming convention for record:\n1\t10\t20\tb1\t1\n\n' > exp
+$BT map -a a.tmp.bed -b b.tmp.bed > obs 2> err.tmp
+cat err.tmp >> obs
+check obs exp
+rm obs exp err.tmp a.tmp.bed b.tmp.bed
+
+###########################################################
+#  map.new.t076: -nonamecheck suppresses the naming warning
+#  Same input as t075: only the null line, nothing on stderr.
+###########################################################
+echo -e "    map.new.t076...\c"
+printf 'chr1\t0\t100\n' > a.tmp.bed
+printf '1\t10\t20\tb1\t1\n' > b.tmp.bed
+printf 'chr1\t0\t100\t.\n' > exp
+$BT map -a a.tmp.bed -b b.tmp.bed -nonamecheck > obs 2> err.tmp
+cat err.tmp >> obs
+check obs exp
+rm obs exp err.tmp a.tmp.bed b.tmp.bed
+
 [[ $FAILURES -eq 0 ]] || exit 1;
