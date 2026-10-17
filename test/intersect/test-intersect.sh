@@ -1174,6 +1174,8 @@ for ADDITIONAL_TEST in \
     new_test-intersect.sh \
     multi_intersect/test-multi_intersect.sh \
     sortAndNaming/test-sort-and-naming.sh \
+    options/test-intersect-options.sh \
+    formats/test-intersect-formats.sh \
 ; do
     # In case the cd operation fails, combine it with the script execution
     cd $(dirname "${STARTWD}/${ADDITIONAL_TEST}") \
