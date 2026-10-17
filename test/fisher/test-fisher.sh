@@ -493,6 +493,10 @@ rm obs exp g.tmp a.tmp.bed b.tmp.bed
 #  (C(3,2)C(35,1) + 1)/C(38,3) = 106/8436 = 0.012565, left = 1 -
 #  1/8436 = 0.99988; ratio 2/(1/34) = 68.000. -exclude is accepted
 #  by the parser but missing from the usage text.
+#  The expectation is correct, but master computes it only while
+#  BedFile::_total_flattened_length starts at zero: no constructor
+#  initializes it (bedFile.h), so this test fails when fresh heap
+#  memory is not zero (e.g. MALLOC_PERTURB_).
 ###########################################################
 echo -e "    fisher.new.t011...\c"
 printf 'chr1\t1000\n' > g.tmp

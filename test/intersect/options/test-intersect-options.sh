@@ -2084,6 +2084,10 @@ rm obs exp out err a.tmp.bed b.tmp.bed g.tmp.genome
 #  files order chromosomes differently (A lexicographic, B
 #  natural); pins the current output: which file and record
 #  are named
+#  The error depends on ContextBase::_runToQueryEnd and
+#  ContextIntersect::_shouldRunToDbEnd being false, which no
+#  constructor guarantees; with MALLOC_PERTURB_ set, a g++ build
+#  exits 0 without the error.
 ###########################################################
 echo -e "    intersect.opt.t144...\c"
 printf 'chr1\t10\t20\ta1\nchr10\t10\t20\ta10\nchr2\t10\t20\ta2\n' > a.tmp.bed
