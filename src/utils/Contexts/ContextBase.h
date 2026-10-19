@@ -151,6 +151,11 @@ public:
 
 
     void testNameConventions(const Record *);
+    // testNameConventions for a mapped record known only by its chromosome
+    // name: when it would print no warning, makes the same changes and
+    // returns true; when it would, changes nothing and returns false, and
+    // the caller passes the record to testNameConventions.
+    bool testNameConventionsQuietly(const string &chrName);
     BlockMgr *getSplitBlockInfo() { return _splitBlockInfo; }
 
     string getErrorMessages() const { return _errorMsg; }
@@ -251,15 +256,12 @@ protected:
 	char **_argv;
 	int _i;
 
-	//track whether each file has the letters chr in their chrom names.
-	//this is needed for enforcing consistent naming conventions across
-	//multiple files, and auto-detecting errors when they're not followed.
+	//track whether the files have the letters chr in their chrom names,
+	//and whether the first digit to appear in a chrom name is a zero, as
+	//set by the first mapped record checked. This is needed for enforcing
+	//consistent naming conventions across multiple files, and
+	//auto-detecting errors when they're not followed.
 	typedef enum { YES, NO, UNTESTED } testType;
-	typedef map<int, testType> conventionType;
-	conventionType _fileHasChrInChromNames;
-	// as above, but check whether first digit to appear in
-	// a chrom name is a zero.
-	conventionType _fileHasLeadingZeroInChromNames;
 
 	static const int MIN_ALLOWED_BUF_SIZE = 8;
 	BlockMgr *_splitBlockInfo;
@@ -293,9 +295,6 @@ protected:
 	virtual bool handle_nonamecheck();
 	bool handle_prec();
 	bool parseIoBufSize(string bufStr);
-
-    testType fileHasChrInChromNames(int fileIdx);
-    testType fileHasLeadingZeroInChromNames(int fileIdx);
 
     void setNoEnforceCoordSort(bool val) { _noEnforceCoordSort = val; }
     //Warning messages.

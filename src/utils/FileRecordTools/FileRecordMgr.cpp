@@ -3,6 +3,7 @@
 #include "FreeList.h"
 #include "Record.h"
 #include "NewGenomeFile.h"
+#include <typeinfo>
 
 FileRecordMgr::FileRecordMgr(const string &filename)
 : _fileIdx(-1),
@@ -28,13 +29,16 @@ FileRecordMgr::FileRecordMgr(const string &filename)
   _ioBufSize(0),
   _noEnforceCoordSort(false),
   _isGroupBy(false),
-  _isCram(false)
+  _isCram(false),
+  _lineReader(NULL)
  {
 }
 
 FileRecordMgr::~FileRecordMgr()
 {
 	close(); 
+	delete _lineReader;
+	_lineReader = NULL;
 	//delete _recordMgr;
 	_recordMgr = NULL;
 }
@@ -145,6 +149,188 @@ Record *FileRecordMgr::getNextRecord(RecordKeyVector *keyList)
 	if (keyList != NULL) {
 		keyList->setKey(record);
 	}
+	record->setFileRecordManager(this);
+	return record;
+}
+
+bool FileRecordMgr::linesLoadable() const
+{
+	// a subclass may read records its own way
+	if (typeid(*this) != typeid(FileRecordMgr) || _fileReader == NULL || !_fileReader->isOpen()) {
+		return false;
+	}
+	// sorted input and genome files give records chromosome ids that depend
+	// on the records read before
+	if (_fileType != FileRecordTypeChecker::SINGLE_LINE_DELIM_TEXT_FILE_TYPE || _isSortedInput || _hasGenomeFile) {
+		return false;
+	}
+	switch (_recordType) {
+	case FileRecordTypeChecker::BED3_RECORD_TYPE:
+	case FileRecordTypeChecker::BED4_RECORD_TYPE:
+	case FileRecordTypeChecker::BED5_RECORD_TYPE:
+	case FileRecordTypeChecker::BEDGRAPH_RECORD_TYPE:
+	case FileRecordTypeChecker::BED6_RECORD_TYPE:
+	case FileRecordTypeChecker::BED_PLUS_RECORD_TYPE:
+	case FileRecordTypeChecker::BED6_PLUS_RECORD_TYPE:
+		return true;
+	default:
+		return false;
+	}
+}
+
+// Each class linesLoadable allows prints its fields in file order joined by
+// tabs, start and end as signed decimal and the rest as read (BedPlus prints
+// a tab after its fixed fields, so it needs a field beyond them); a line has
+// exactly the file's number of fields, or readEntry exits.
+bool FileRecordMgr::linesPrintAsText() const
+{
+	const SingleLineDelimTextFileReader *reader = static_cast<const SingleLineDelimTextFileReader *>(_fileReader);
+	if (reader->getDelimChar() != '\t') {
+		return false;
+	}
+	int numFields = reader->getNumFields();
+	switch (_recordType) {
+	case FileRecordTypeChecker::BED3_RECORD_TYPE:
+		return numFields == 3;
+	case FileRecordTypeChecker::BED4_RECORD_TYPE:
+	case FileRecordTypeChecker::BEDGRAPH_RECORD_TYPE:
+		return numFields == 4;
+	case FileRecordTypeChecker::BED5_RECORD_TYPE:
+		return numFields == 5;
+	case FileRecordTypeChecker::BED6_RECORD_TYPE:
+		return numFields == 6;
+	case FileRecordTypeChecker::BED_PLUS_RECORD_TYPE:
+		return numFields > 3;
+	case FileRecordTypeChecker::BED6_PLUS_RECORD_TYPE:
+		return numFields > 6;
+	default:
+		return false;
+	}
+}
+
+// Field i of the reader's line as str2chrPos reads it: in place when it is 1
+// to 18 digits, else copied into field and parsed, which exits on an illegal
+// number. Returns whether the value prints back as the field: 1 to 18 digits
+// without a leading zero.
+static inline bool lineCoord(const SingleLineDelimTextFileReader *reader, int i, string &field, CHRPOS &val)
+{
+	const char *s = reader->fieldStart(i);
+	size_t n = reader->fieldLength(i);
+	if (str2chrPosDigits(s, n, val)) {
+		return s[0] != '0' || n == 1;
+	}
+	reader->getField(i, field);
+	val = str2chrPos(field.c_str(), field.size());
+	return false;
+}
+
+// getNextRecord for a file linesLoadable allows, without the Record. Of the
+// classes it allows, only Bed3Interval::initFromFile can fail (str2chrPos on
+// columns 2 and 3); the error after it prints the Record, so that one is
+// built here too.
+bool FileRecordMgr::getNextLine(string &chrName, CHRPOS &start, CHRPOS &end, unsigned *flags)
+{
+	if (!_fileReader->isOpen()) {
+		return false;
+	}
+	if (!_fileReader->readEntry()) {
+		return false;
+	}
+	SingleLineDelimTextFileReader *reader = static_cast<SingleLineDelimTextFileReader *>(_fileReader);
+	if (_lineReader == NULL) {
+		_lineReader = new SingleLineDelimTextFileReader(reader->getNumFields(), reader->getDelimChar());
+		_lineReader->setFileName(_filename);
+		_lineReader->setFileIdx(reader->getFileIdx());
+	}
+	reader->getField(0, chrName);
+	bool canonical = lineCoord(reader, 1, _lineField, start);
+	canonical = lineCoord(reader, 2, _lineField, end) && canonical;
+	// Record::coordsValid and adjustZeroLength
+	if (start < 0 || end < 0 || end < start) {
+		Record *record = _recordMgr->allocateRecord();
+		record->initFromFile(_fileReader);
+		cerr << "Error: Invalid record in file " << _filename << ". Record is " << endl << *record << endl;
+		exit(1);
+	}
+	if (flags != NULL) {
+		*flags = (start == end ? LINE_ZERO_LENGTH : 0)
+		         | (canonical && !reader->lineHasNul() ? LINE_CANONICAL : 0);
+	}
+	if (start == end) {
+		start--;
+		end++;
+	}
+	// assignChromId leaves the id at _prevChromId, which only sorted input or
+	// a genome file changes; recordFromLine sets it
+	_totalRecordLength += (unsigned long)(end - start);
+	return true;
+}
+
+bool FileRecordMgr::bulkLoadable() const
+{
+	if (!linesLoadable()) {
+		return false;
+	}
+	const SingleLineDelimTextFileReader *reader = static_cast<const SingleLineDelimTextFileReader *>(_fileReader);
+	char delim = reader->getDelimChar();
+	return reader->linesRead() == 0 && reader->getNumFields() >= 3 && !_bufStreamMgr->isCompressed()
+	       && delim != '\n' && delim != '\r' && delim != '\0';
+}
+
+void FileRecordMgr::makeLineReader()
+{
+	if (_lineReader == NULL) {
+		SingleLineDelimTextFileReader *reader = static_cast<SingleLineDelimTextFileReader *>(_fileReader);
+		_lineReader = new SingleLineDelimTextFileReader(reader->getNumFields(), reader->getDelimChar());
+		_lineReader->setFileName(_filename);
+		_lineReader->setFileIdx(reader->getFileIdx());
+	}
+}
+
+// getNextLine for a line given: what follows readEntry there.
+bool FileRecordMgr::takeNextLine(const char *line, size_t len, string &chrName, CHRPOS &start, CHRPOS &end,
+                                 unsigned *flags)
+{
+	SingleLineDelimTextFileReader *reader = static_cast<SingleLineDelimTextFileReader *>(_fileReader);
+	if (!reader->takeLine(line, len)) {
+		return false;
+	}
+	makeLineReader();
+	reader->getField(0, chrName);
+	bool canonical = lineCoord(reader, 1, _lineField, start);
+	canonical = lineCoord(reader, 2, _lineField, end) && canonical;
+	if (start < 0 || end < 0 || end < start) {
+		Record *record = _recordMgr->allocateRecord();
+		record->initFromFile(_fileReader);
+		cerr << "Error: Invalid record in file " << _filename << ". Record is " << endl << *record << endl;
+		exit(1);
+	}
+	if (flags != NULL) {
+		*flags = (start == end ? LINE_ZERO_LENGTH : 0)
+		         | (canonical && !reader->lineHasNul() ? LINE_CANONICAL : 0);
+	}
+	if (start == end) {
+		start--;
+		end++;
+	}
+	_totalRecordLength += (unsigned long)(end - start);
+	return true;
+}
+
+void FileRecordMgr::skipLines(size_t n, unsigned long totalLength)
+{
+	makeLineReader();
+	static_cast<SingleLineDelimTextFileReader *>(_fileReader)->skipLines(n);
+	_totalRecordLength += totalLength;
+}
+
+Record *FileRecordMgr::recordFromLine(const char *line, size_t len)
+{
+	_lineReader->setLine(line, len);
+	Record *record = _recordMgr->allocateRecord();
+	record->initFromFile(_lineReader);
+	record->coordsValid(); // true: getNextLine checked it; adjusts a zero-length record
+	assignChromId(record);
 	record->setFileRecordManager(this);
 	return record;
 }

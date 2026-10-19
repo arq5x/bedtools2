@@ -15,6 +15,7 @@
 using namespace std;
 
 class BlockMgr;
+class SingleLineDelimTextFileReader;
 
 class RecordOutputMgr {
 public:
@@ -31,6 +32,16 @@ public:
 
 	void printClosest(RecordKeyVector &keyList, const vector<CHRPOS> *dists = NULL);
 
+	// For one printRecord call: key was read from reader's current line, in
+	// a file whose Records print as their fields in file order joined by
+	// tabs, so the key prints from that line.
+	void setKeyLine(const Record *key, const SingleLineDelimTextFileReader *reader) {
+		_lineKey = key;
+		_lineKeyReader = reader;
+		_lineKeyFlags = 0;
+	}
+	void clearKeyLine() { _lineKey = NULL; }
+
 	void tab() { _outBuf.append("\t"); }
 	void newline() { _outBuf.append("\n"); }
 
@@ -46,6 +57,17 @@ private:
 
 	BlockMgr *_bamBlockMgr;
 	string _afterVal; //to store values to be printed after record, such as column operations.
+
+	// the key setKeyLine names (NULL if none), its reader, and its line's
+	// KEY_LINE_* flags, 0 until keyLineFlags finds them, chromosome length
+	// and offset of the fields after end
+	enum { KEY_LINE_FOUND = 1, KEY_LINE_NO_NUL = 2, KEY_LINE_CANONICAL = 4 };
+	const Record *_lineKey;
+	const SingleLineDelimTextFileReader *_lineKeyReader;
+	unsigned _lineKeyFlags;
+	size_t _lineKeyChromLen;
+	size_t _lineKeyTail;
+	unsigned keyLineFlags();
 	//some helper functions to neaten the code.
 	void null(bool queryType, bool dbType);
 

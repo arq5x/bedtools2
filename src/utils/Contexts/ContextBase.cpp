@@ -48,6 +48,7 @@ ContextBase::ContextBase()
   _printHeader(false),
   _printable(true),
   _explicitBedOutput(false),
+  _runToQueryEnd(false),
   _queryFileIdx(-1),
   _bamHeaderAndRefIdx(-1),
   _maxNumDatabaseFields(0),
@@ -696,11 +697,6 @@ void ContextBase::testNameConventions(const Record *record) {
 	//
 
 	bool hasChr = record->hasChrInChromName();
-	testType testChrVal = fileHasChrInChromNames(fileIdx);
-
-	if (testChrVal == UNTESTED) {
-		_fileHasChrInChromNames[fileIdx] = hasChr ? YES : NO;
-	}
 	if ((_allFilesHaveChrInChromNames == YES && !hasChr) || (_allFilesHaveChrInChromNames == NO && hasChr)) {
 		nameConventionWarning(record, _fileNames[fileIdx], " has inconsistent naming convention for record:\n");
 	}
@@ -716,10 +712,6 @@ void ContextBase::testNameConventions(const Record *record) {
 
 
 	bool zeroVal = record->hasLeadingZeroInChromName(hasChr);
-	testChrVal = fileHasLeadingZeroInChromNames(fileIdx);
-	if (testChrVal == UNTESTED) {
-		_fileHasLeadingZeroInChromNames[fileIdx] = zeroVal ? YES : NO;
-	}
 	if ((_allFileHaveLeadingZeroInChromNames == YES && !zeroVal) || (_allFileHaveLeadingZeroInChromNames == NO && zeroVal)) {
 		nameConventionWarning(record, _fileNames[fileIdx], " has a record where naming convention (leading zero) is inconsistent with other files:\n");
 	}
@@ -729,20 +721,27 @@ void ContextBase::testNameConventions(const Record *record) {
 	}
 }
 
-ContextBase::testType ContextBase::fileHasChrInChromNames(int fileIdx) {
-	conventionType::iterator iter = _fileHasChrInChromNames.find(fileIdx);
-	if (iter == _fileHasChrInChromNames.end()) {
-		return UNTESTED;
-	}
-	return iter->second;
-}
+bool ContextBase::testNameConventionsQuietly(const string &chrName) {
+	if (getNameCheckDisabled() || _nameConventionWarningTripped) return true;
 
-ContextBase::testType ContextBase::fileHasLeadingZeroInChromNames(int fileIdx) {
-	conventionType::iterator iter = _fileHasLeadingZeroInChromNames.find(fileIdx);
-	if (iter == _fileHasLeadingZeroInChromNames.end()) {
-		return UNTESTED;
+	// the two warnings testNameConventions can print; the updates between
+	// them do not change the second test
+	bool hasChr = Record::chromHasChr(chrName);
+	if ((_allFilesHaveChrInChromNames == YES && !hasChr) || (_allFilesHaveChrInChromNames == NO && hasChr)) {
+		return false;
 	}
-	return iter->second;
+	bool zeroVal = Record::chromHasLeadingZero(chrName, hasChr);
+	if ((_allFileHaveLeadingZeroInChromNames == YES && !zeroVal) || (_allFileHaveLeadingZeroInChromNames == NO && zeroVal)) {
+		return false;
+	}
+
+	if (_allFilesHaveChrInChromNames == UNTESTED) {
+		_allFilesHaveChrInChromNames = hasChr ? YES : NO;
+	}
+	if (_allFileHaveLeadingZeroInChromNames == UNTESTED) {
+		_allFileHaveLeadingZeroInChromNames = zeroVal ? YES : NO;
+	}
+	return true;
 }
 
 

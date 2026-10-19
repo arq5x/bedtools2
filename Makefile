@@ -28,9 +28,56 @@ PYTHON ?= $(shell python --version >/dev/null 2>&1 && echo "python" || echo pyth
 ifeq ($(DEBUG),1)
 BT_CPPFLAGS = -DDEBUG -D_DEBUG -D_FILE_OFFSET_BITS=64 -DWITH_HTS_CB_API $(INCLUDES)
 BT_CXXFLAGS = -Wconversion -Wall -Wextra -g -O0
+BT_LDFLAGS =
 else
 BT_CPPFLAGS = -D_FILE_OFFSET_BITS=64 -DWITH_HTS_CB_API $(INCLUDES)
+ifeq ($(FAST),1)
+# The optimized build, `make FAST=1`: the same code built with -O3, link-time
+# optimization (LTO) and profile-guided optimization (PGO), each of LTO and PGO
+# used when the compiler passes its probe below and skipped when it does not.
+# Its output is the same as the default build's. A plain `make` builds with
+# -O2 and neither. Run `make clean` when switching between the two, and give
+# FAST=1 to every make on a tree built with it (`make FAST=1 test`, `static`,
+# `install`), since each of them links bin/bedtools again. DEBUG=1 ignores it.
+BT_CXXFLAGS = -g -Wall -O3
+BT_LDFLAGS = -g -O3
+# Link-time optimization inlines calls across source files. It is used when the
+# compiler and linker accept it (clang on Linux also needs lld or the LLVMgold
+# plugin); `make FAST=1 LTO=` builds without it.
+ifeq ($(origin LTO),undefined)
+LTO := $(shell d=`mktemp -d 2>/dev/null || mktemp -d -t bedtools` && \
+	printf 'int main(void) { return 0; }\n' > $$d/t.cpp && \
+	for f in -flto=auto -flto; do \
+		if $(CXX) $(CXXFLAGS) $$f $(LDFLAGS) -o $$d/t $$d/t.cpp > /dev/null 2>&1; then echo $$f; break; fi; \
+	done; rm -f $$d/t $$d/t.cpp; rmdir $$d)
+endif
+BT_CXXFLAGS += $(LTO)
+BT_LDFLAGS += $(LTO)
+# Profile-guided optimization: `make FAST=1` compiles an instrumented copy of
+# every object into obj/pgo/, runs scripts/pgo-train.sh with it on inputs from
+# test/, and compiles the release objects with the profile it records.
+# Functions the training never runs are optimized as they would be without a
+# profile. It is used when the compiler can build, run and read back a program
+# instrumented this way (GCC; clang writes .profraw files, which need
+# llvm-profdata, and falls back); `make FAST=1 PGO=` builds without it.
+ifeq ($(origin PGO),undefined)
+PGO := $(shell d=`mktemp -d 2>/dev/null || mktemp -d -t bedtools` && { \
+	printf 'int f();\nstatic int g = f();\nint f() { return 1; }\nint main(void) { return g - 1; }\n' > $$d/t.cpp && \
+	$(CXX) $(CXXFLAGS) $(LTO) -fprofile-generate -dumpbase $$d/u -c -o $$d/t.o $$d/t.cpp > /dev/null 2>&1 && \
+	$(CXX) $(CXXFLAGS) $(LTO) -fprofile-generate $(LDFLAGS) -o $$d/t $$d/t.o > /dev/null 2>&1 && \
+	(cd $$d && ./t) > /dev/null 2>&1 && test -f $$d/u.gcda && \
+	$(CXX) $(CXXFLAGS) $(LTO) -fprofile-use -fprofile-partial-training -Werror -c -o $$d/u.o $$d/t.cpp > /dev/null 2>&1 && \
+	$(CXX) $(CXXFLAGS) $(LTO) -fprofile-use -fprofile-partial-training $(LDFLAGS) -o $$d/u $$d/u.o > /dev/null 2>&1 && \
+	echo 1; rm -f $$d/t $$d/t.o $$d/t.cpp $$d/u $$d/u.o $$d/u.gcda $$d/*.profraw; rmdir $$d; })
+endif
+ifneq ($(PGO),)
+PGO_GEN_FLAGS = -fprofile-generate
+PGO_USE_FLAGS = -fprofile-use -fprofile-partial-training
+endif
+else
 BT_CXXFLAGS = -g -Wall -O2
+BT_LDFLAGS =
+endif
 endif
 
 # If the user has specified to do so, tell the compile to use rand() (instead of mt19937).
@@ -40,7 +87,6 @@ else
 BT_CXXFLAGS += -std=c++11
 endif
 
-BT_LDFLAGS =
 BT_LIBS    = -lz -lm -lbz2 -llzma -lpthread
 
 prefix ?= /usr/local
@@ -177,6 +223,66 @@ include $(HTSDIR)/htslib.mk
 # but ignores the directory's timestamp, which changes every time a .o file is written.
 $(BUILT_OBJECTS): | $(OBJ_DIR)
 
+ifneq ($(PGO_USE_FLAGS),)
+# Profile-guided optimization (see PGO above). The instrumented objects are
+# compiled from the same sources as $(BUILT_OBJECTS), found through vpath, and
+# with the same auxiliary name (-dumpbase), which GCC uses to tell apart the
+# profiles of functions local to an object and to name its .gcda file. The
+# release objects and binaries take the profile, after bedtools's flags and
+# before the user's.
+ALL_CXXFLAGS = $(BT_CXXFLAGS) $(PGO_USE_FLAGS) $(CXXFLAGS)
+ALL_LDFLAGS  = $(BT_LDFLAGS) $(PGO_USE_FLAGS) $(LDFLAGS)
+PGO_DIR     = $(OBJ_DIR)/pgo
+PGO_OBJECTS = $(patsubst $(OBJ_DIR)/%,$(PGO_DIR)/%,$(BUILT_OBJECTS))
+vpath %.cpp $(SRC_DIR) $(SUBDIRS) $(UTIL_SUBDIRS)
+vpath %.C $(SRC_DIR)/utils/gzstream
+
+define PGO_COMPILE
+@echo "  * compiling $< (instrumented)"
+$(CCPREFIX) $(CC_WRAPPER) $(CXX) $(BT_CXXFLAGS) $(PGO_GEN_FLAGS) $(CXXFLAGS) $(ALL_CPPFLAGS) -dumpbase $(OBJ_DIR)/$* -MT $@ -MMD -MP -MF $(PGO_DIR)/$*.Td -c -o $@ $<
+@mv -f $(PGO_DIR)/$*.Td $(PGO_DIR)/$*.d
+endef
+
+$(PGO_DIR)/%.o: %.cpp $(PGO_DIR)/%.d | $(PGO_DIR) autoversion
+	$(PGO_COMPILE)
+
+$(PGO_DIR)/%.o: %.C $(PGO_DIR)/%.d | $(PGO_DIR) autoversion
+	$(PGO_COMPILE)
+
+-include $(patsubst %.o,%.d,$(PGO_OBJECTS))
+
+$(PGO_DIR):
+	@mkdir -p $@
+
+$(PGO_DIR)/bedtools: $(PGO_OBJECTS) $(HTSDIR)/libhts.a
+	@echo "- Building the instrumented bedtools binary."
+	$(CCPREFIX) $(CC_WRAPPER) $(CXX) $(BT_LDFLAGS) $(PGO_GEN_FLAGS) $(LDFLAGS) -o $@ $(PGO_OBJECTS) $(HTSDIR)/libhts.a $(ALL_LIBS)
+
+# Each training call adds its counts to one .gcda file per object, written
+# under GCOV_PREFIX. A release object's profile, $(OBJ_DIR)/<object>.gcda, is
+# replaced only when the new one differs, so only those objects recompile.
+$(PGO_DIR)/profile: $(PGO_DIR)/bedtools scripts/pgo-train.sh
+	@echo "- Training the instrumented binary (scripts/pgo-train.sh)."
+	@rm -rf $(PGO_DIR)/train
+	$(CCPREFIX) GCOV_PREFIX=$(CURDIR)/$(PGO_DIR)/train/gcda sh scripts/pgo-train.sh $(PGO_DIR)/bedtools $(PGO_DIR)/train/data || \
+		{ echo "The training failed; \`make FAST=1 PGO=\` builds without profile-guided optimization." >&2; exit 1; }
+	@for f in `find $(PGO_DIR)/train/gcda -name '*.gcda'`; do \
+		o=$(OBJ_DIR)/`basename $$f`; cmp -s $$f $$o || cp $$f $$o; \
+	done
+	@rm -rf $(PGO_DIR)/train
+	@touch $@
+
+# Release objects compile after the training; one whose profile changed
+# recompiles. htsutil (test/htsutil) is not trained.
+$(BUILT_OBJECTS): | $(PGO_DIR)/profile
+PGO_GCDA := $(wildcard $(patsubst %.o,%.gcda,$(BUILT_OBJECTS)))
+ifneq ($(PGO_GCDA),)
+$(PGO_GCDA): $(PGO_DIR)/profile ;
+$(foreach g,$(PGO_GCDA),$(eval $(patsubst %.gcda,%.o,$(g)): $(g)))
+endif
+$(OBJ_DIR)/htsutil.o test/htsutil: PGO_USE_FLAGS =
+endif
+
 $(BIN_DIR)/bedtools: autoversion $(BUILT_OBJECTS) $(HTSDIR)/libhts.a | $(BIN_DIR)
 	@echo "- Building main bedtools binary."
 	$(CCPREFIX) $(CC_WRAPPER) $(CXX) $(ALL_LDFLAGS) -o $(BIN_DIR)/bedtools $(BUILT_OBJECTS) $(HTSDIR)/libhts.a $(ALL_LIBS)
@@ -220,6 +326,7 @@ $(OBJ_DIR) $(BIN_DIR):
 # not existing), so clean should also remove the generated config.h.
 clean:
 	@echo " * Cleaning up."
+	@rm -rf $(OBJ_DIR)/pgo
 	@rm -f $(VERSION_FILE) $(OBJ_DIR)/* $(BIN_DIR)/* test/htsutil
 	@cd src/utils/htslib && make clean > /dev/null
 	@test -e src/utils/htslib/config.mk || rm -f src/utils/htslib/config.h

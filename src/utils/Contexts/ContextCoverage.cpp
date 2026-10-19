@@ -11,6 +11,7 @@ ContextCoverage::ContextCoverage()
 : _count(false),
   _perBase(false),
   _showHist(false),
+  _mean(false),
   _coverageType(DEFAULT)
 {
 	setExplicitBedOutput(true); //do not allow BAM output

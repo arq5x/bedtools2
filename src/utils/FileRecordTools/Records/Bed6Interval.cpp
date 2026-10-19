@@ -24,8 +24,14 @@ bool Bed6Interval::initFromFile(SingleLineDelimTextFileReader *fileReader)
 }
 
 inline void print_record(const string& chrom_name, CHRPOS start, CHRPOS end, const string& name, const string& score, const string& strand, string& buf) {
-	const char* buffer = buffer_printf("%s\t%" PRId_CHRPOS "\t%" PRId_CHRPOS"\t%s\t%s\t%s", chrom_name.c_str(), start, end, name.c_str(), score.c_str(), strand.c_str());
-	buf.append(buffer);
+	append_cstr(buf, chrom_name);
+	append_coords(buf, start, end);
+	buf.push_back('\t');
+	append_cstr(buf, name);
+	buf.push_back('\t');
+	append_cstr(buf, score);
+	buf.push_back('\t');
+	append_cstr(buf, strand);
 }
 
 void Bed6Interval::print(string &outBuf) const

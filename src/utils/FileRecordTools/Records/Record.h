@@ -22,34 +22,50 @@ class FileRecordMgr;
 class FileReader;
 class ChromIdLookup;
 
-static inline const char* buffer_printf(const char* fmt, ...) __attribute__((format(printf, 1, 2)));
-static inline const char* buffer_printf(const char* fmt, ...) {
-	static char static_buffer[1024];
-	static char* dynamic_buffer = NULL;
-	static size_t dynamic_buffer_size;
+// Append helpers for the BED-family print functions. Each produces the bytes
+// the printf conversion it replaces would: a "%s" of field.c_str() stops at the
+// first NUL, and "%" PRId_CHRPOS prints a signed decimal, INT64_MIN included.
+static inline void append_cstr(string &buf, const string &field) {
+	buf.append(field.c_str());
+}
 
-	char* current_buffer = dynamic_buffer ? dynamic_buffer : static_buffer;
-	size_t current_buffer_size =  dynamic_buffer ? dynamic_buffer_size : sizeof(static_buffer);
-
-	va_list ap;
-
-	va_start(ap, fmt);
-
-	for(;;) {
-		va_list ap_copy;
-		va_copy(ap_copy, ap);
-		int required_size = vsnprintf(current_buffer, current_buffer_size, fmt, ap_copy);
-		if(required_size < (int)current_buffer_size)
-			break;
-
-		free(dynamic_buffer);
-		dynamic_buffer = current_buffer = (char*)malloc(dynamic_buffer_size = required_size + 1);
-		current_buffer_size = required_size + 1;
+// Appends "\t<start>\t<end>" in one append.
+static inline void append_coords(string &buf, CHRPOS start, CHRPOS end) {
+	static const char digitPairs[201] =
+		"00010203040506070809"
+		"10111213141516171819"
+		"20212223242526272829"
+		"30313233343536373839"
+		"40414243444546474849"
+		"50515253545556575859"
+		"60616263646566676869"
+		"70717273747576777879"
+		"80818283848586878889"
+		"90919293949596979899";
+	// two signed 64-bit values (at most 20 characters each) and two tabs
+	char tmp[48];
+	char *const last = tmp + sizeof(tmp);
+	char *p = last;
+	const CHRPOS values[2] = {end, start};
+	for (int i = 0; i < 2; i++) {
+		CHRPOS value = values[i];
+		uint64_t u = value < 0 ? (uint64_t)0 - (uint64_t)value : (uint64_t)value;
+		while (u >= 100) {
+			unsigned int r = (unsigned int)(u % 100);
+			u /= 100;
+			p -= 2;
+			memcpy(p, digitPairs + 2 * r, 2);
+		}
+		if (u >= 10) {
+			p -= 2;
+			memcpy(p, digitPairs + 2 * u, 2);
+		} else {
+			*--p = (char)('0' + u);
+		}
+		if (value < 0) *--p = '-';
+		*--p = '\t';
 	}
-
-	va_end(ap);
-
-	return current_buffer;
+	buf.append(p, last - p);
 }
 
 
@@ -189,13 +205,13 @@ public:
 
 	bool hasChrInChromName() const;
 	bool hasLeadingZeroInChromName(bool chrKnown = false) const;
+	// the same tests on a chromosome name
+	static bool chromHasChr(const string &chrName);
+	static bool chromHasLeadingZero(const string &chrName, bool chrKnown = false);
 	virtual CHRPOS getLength(bool obeySplits) const;
 
 	void setFileRecordManager(FileRecordMgr *frm);
 	FileRecordMgr * getFileRecordManager();
-
-	vector<int> block_starts;
-	vector<int> block_ends;
 
 protected:
 

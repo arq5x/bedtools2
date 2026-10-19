@@ -55,6 +55,13 @@ The following commands will install ``bedtools`` in a local directory on an UNIX
   $ cd bedtools2
   $ make
 
+``make`` builds with ``-O2``. ``make FAST=1`` builds a faster binary with
+``-O3``, link-time optimization when the compiler supports it and, with GCC,
+profile-guided optimization, which compiles everything twice and runs a short
+training workload from ``test/``, so it takes about twice as long. Run
+``make clean`` before switching between the two, and pass ``FAST=1`` to later
+``make test``, ``make static`` and ``make install`` calls on a ``FAST=1`` tree.
+
 At this point, one should copy the binaries in ./bin/ to either
 ``usr/local/bin/`` or some other repository for commonly used UNIX tools in
 your environment. You will typically require administrator (e.g. "root" or

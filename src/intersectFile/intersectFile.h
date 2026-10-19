@@ -19,6 +19,8 @@
 
 class BlockMgr;
 class BinTree;
+class WorkerPool;
+class SingleLineDelimTextFileReader;
 
 class IntersectFile : public ToolBase {
 
@@ -31,12 +33,24 @@ public:
 	virtual void cleanupHits(RecordKeyVector &);
 	virtual bool finalizeCalculations();
 	virtual void  giveFinalReport(RecordOutputMgr *) {}
+	virtual void setOutputMgr(RecordOutputMgr *outputMgr) { _outputMgr = outputMgr; }
 
 
 protected:
 	NewChromSweep *_sweep;
 	BinTree *_binTree;
 	FileRecordMgr *_queryFRM;
+	// whether processHits gives the output manager each key's line, and
+	// the reader whose current line it is
+	bool _keyLines;
+	const SingleLineDelimTextFileReader *_keyLineReader;
+	RecordOutputMgr *_outputMgr;
+
+	// -threads N: its threads, and unsorted queries answered on them
+	// (intersectFile.cpp)
+	WorkerPool *_pool;
+	class ParallelQueries;
+	ParallelQueries *_parallel;
 
 	virtual bool nextSortedFind(RecordKeyVector &hits);
 	virtual bool nextUnsortedFind(RecordKeyVector &hits);
