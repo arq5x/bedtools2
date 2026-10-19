@@ -1473,8 +1473,8 @@ rm obs exp a.tmp.sam a.tmp.bam b.tmp.bed
 #  sv2 <DUP> at POS 201 with END=300 covers far more than its
 #  1 bp REF. A 210-260 lies inside it under any reading of
 #  its first and last base and is removed; A 100-150 is far
-#  from it and kept. (The SVLEN/END span disagreement is in
-#  bugs.md and is not asserted.)
+#  from it and kept. (Its span is not asserted: the
+#  SVLEN and END spans disagree.)
 ###########################################################
 echo -e "    subtract.new.t090...\c"
 printf 'chr1\t100\t150\nchr1\t210\t260\n' > a.tmp.bed

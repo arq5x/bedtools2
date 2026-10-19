@@ -251,7 +251,7 @@ rm obs exp a.tmp.bed b.tmp.bed
 #  chr1:50-150: intersection 100, union 200 + 100 - 100 = 200,
 #  jaccard 0.5, 1 pair. pins the current output: book-ended records
 #  are merged before counting, so n_intersections is 1; the usage
-#  text and jaccard.rst do not mention merging (bugs.md #18).
+#  text and jaccard.rst do not mention merging.
 ###########################################################
 echo -e "    jaccard.new.t006...\c"
 printf 'chr1\t0\t100\nchr1\t100\t200\n' > a.tmp.bed
@@ -412,8 +412,7 @@ rm obs exp a.tmp.bed b.tmp.bed
 #  apart because their strands differ. Only the + B intersects A:
 #  20 bp. Union 100 + (100 + 20) - 20 = 200, jaccard 0.1, 1 pair.
 #  pins the current output: with -s each file is merged per strand;
-#  the docs say only that hits must be on the same strand
-#  (bugs.md #17).
+#  the docs say only that hits must be on the same strand.
 ###########################################################
 echo -e "    jaccard.new.t018...\c"
 printf 'chr1\t0\t100\ta1\t0\t+\n' > a.tmp.bed
@@ -430,7 +429,7 @@ rm obs exp a.tmp.bed b.tmp.bed
 #  -s this is 200 200 1 2; with -s only the + records count:
 #  100 100 1 1. pins the current output: with -s unknown-strand
 #  records are removed from both files, union included; the docs
-#  say only that hits must be on the same strand (bugs.md #17).
+#  say only that hits must be on the same strand.
 ###########################################################
 echo -e "    jaccard.new.t019...\c"
 printf 'chr1\t0\t100\ta1\t0\t+\nchr1\t200\t300\ta2\t0\t.\n' > a.tmp.bed

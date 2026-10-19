@@ -974,7 +974,7 @@ rm obs exp a.tmp.bed b.tmp.bed
 #  touches A without sharing a base, so it is kept at distance 1.
 #  pins the current output: -io removes only B that overlap A, so a
 #  book-ended B is kept; the usage text says "close, yet not
-#  touching features only" (bugs.md #19).
+#  touching features only".
 ###########################################################
 echo -e "    closest.new.t013...\c"
 printf 'chr1\t100\t200\n' > a.tmp.bed
@@ -989,7 +989,7 @@ rm obs exp a.tmp.bed b.tmp.bed
 #  Nothing is left, so the BED3 null record and distance -1 are
 #  printed. pins the current output: BED3 null record ". -1 -1";
 #  the usage notes say "none" for
-#  the chromosome and -1 for all other fields (bugs.md #9).
+#  the chromosome and -1 for all other fields.
 ###########################################################
 echo -e "    closest.new.t014...\c"
 printf 'chr1\t100\t200\n' > a.tmp.bed
@@ -1004,7 +1004,7 @@ rm obs exp a.tmp.bed b.tmp.bed
 #  A on chr2 has no B on its chromosome; a BED4 null is
 #  ". -1 -1 ." (chrom, start, end, name). pins the current output:
 #  BED4 null record format; the usage notes say "none" for
-#  the chromosome and -1 for all other fields (bugs.md #9).
+#  the chromosome and -1 for all other fields.
 ###########################################################
 echo -e "    closest.new.t015...\c"
 printf 'chr1\t100\t200\nchr2\t100\t200\n' > a.tmp.bed
@@ -1018,7 +1018,7 @@ rm obs exp a.tmp.bed b.tmp.bed
 #  closest.new.t016: null record for a BED5 database
 #  BED5 null is ". -1 -1 . -1" (name ".", score -1). pins the
 #  current output: BED5 null record format; the usage notes say "none" for
-#  the chromosome and -1 for all other fields (bugs.md #9).
+#  the chromosome and -1 for all other fields.
 ###########################################################
 echo -e "    closest.new.t016...\c"
 printf 'chr1\t100\t200\nchr2\t100\t200\n' > a.tmp.bed
@@ -1032,7 +1032,7 @@ rm obs exp a.tmp.bed b.tmp.bed
 #  closest.new.t017: null record for a BED6 database with -d
 #  BED6 null is ". -1 -1 . -1 ." and -d appends distance -1. pins
 #  the current output: BED6 null record format; the usage notes say "none" for
-#  the chromosome and -1 for all other fields (bugs.md #9).
+#  the chromosome and -1 for all other fields.
 ###########################################################
 echo -e "    closest.new.t017...\c"
 printf 'chr1\t100\t200\nchr2\t100\t200\n' > a.tmp.bed
@@ -1047,7 +1047,7 @@ rm obs exp a.tmp.bed b.tmp.bed
 #  The hit prints all 12 fields; the null is the BED6 null plus
 #  six "." fields. pins the current output: BED12 null record
 #  format; the usage notes say "none" for
-#  the chromosome and -1 for all other fields (bugs.md #9).
+#  the chromosome and -1 for all other fields.
 ###########################################################
 echo -e "    closest.new.t018...\c"
 printf 'chr1\t100\t200\nchr2\t100\t200\n' > a.tmp.bed
@@ -1063,7 +1063,7 @@ rm obs exp a.tmp.bed b.tmp.bed
 #  extra columns: ". -1 -1" followed by five "." fields. pins the
 #  current output: BED6+ null record format, whose score column is
 #  ".", unlike the -1 of a BED6 null; the usage notes say "none" for
-#  the chromosome and -1 for all other fields (bugs.md #9).
+#  the chromosome and -1 for all other fields.
 ###########################################################
 echo -e "    closest.new.t019...\c"
 printf 'chr1\t100\t200\nchr2\t100\t200\n' > a.tmp.bed
@@ -1078,7 +1078,7 @@ rm obs exp a.tmp.bed b.tmp.bed
 #  A 4-column file with a numeric 4th field is bedGraph; its null
 #  is ". -1 -1 .". pins the current output: bedGraph null record
 #  format; the usage notes say "none" for
-#  the chromosome and -1 for all other fields (bugs.md #9).
+#  the chromosome and -1 for all other fields.
 ###########################################################
 echo -e "    closest.new.t020...\c"
 printf 'chr1\t100\t200\nchr2\t100\t200\n' > a.tmp.bed
@@ -1095,7 +1095,7 @@ rm obs exp a.tmp.bed b.tmp.bed
 #  0-based would give 2). The GFF line is printed as read; the null
 #  for a 9-column GFF is ". . . -1 -1 . . . .". pins the current
 #  output: GFF null record format; the usage notes say "none" for
-#  the chromosome and -1 for all other fields (bugs.md #9).
+#  the chromosome and -1 for all other fields.
 ###########################################################
 echo -e "    closest.new.t021...\c"
 printf 'chr1\t100\t200\nchr2\t100\t200\n' > a.tmp.bed
@@ -1125,7 +1125,7 @@ rm obs exp a.tmp.bed b.tmp.gff
 #  The VCF line is printed as read; the null for an 8-column VCF is
 #  ". -1 ." followed by five "." fields. pins the current output:
 #  VCF null record format; the usage notes say "none" for the
-#  chromosome and -1 for all other fields (bugs.md #9).
+#  chromosome and -1 for all other fields.
 ###########################################################
 echo -e "    closest.new.t023...\c"
 printf 'chr1\t100\t200\nchr2\t100\t200\n' > a.tmp.bed
@@ -1225,7 +1225,7 @@ rm obs exp a.tmp.bed b.tmp.bed
 #  null record, and chr3 A finds chr3:50-60 (100-60+1 = 41), not
 #  a record from another chromosome. pins the current output: BED3
 #  null record ". -1 -1"; the usage notes say "none" for
-#  the chromosome and -1 for all other fields (bugs.md #9).
+#  the chromosome and -1 for all other fields.
 ###########################################################
 echo -e "    closest.new.t030...\c"
 printf 'chr1\t100\t200\nchr2\t100\t200\nchr3\t100\t200\n' > a.tmp.bed
@@ -1240,7 +1240,7 @@ rm obs exp a.tmp.bed b.tmp.bed
 #  B starts on chr2, so the chr1 A gets the null record and the
 #  chr2 A finds chr2:300-310 (300-200+1 = 101). pins the current
 #  output: BED3 null record ". -1 -1"; the usage notes say "none" for
-#  the chromosome and -1 for all other fields (bugs.md #9).
+#  the chromosome and -1 for all other fields.
 ###########################################################
 echo -e "    closest.new.t031...\c"
 printf 'chr1\t100\t200\nchr2\t100\t200\n' > a.tmp.bed

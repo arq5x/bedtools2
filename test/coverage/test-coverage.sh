@@ -974,7 +974,7 @@ rm obs exp a.tmp.bed b.tmp.bed
 #  is in the intron; B 190-195 is in block 2.
 #  Without -split: 2 hits, 25 bases of the 100 bp span.
 #  -counts -split: only 190-195 overlaps a block -> 1.
-#  (The -split denominator is in bugs.md and is not asserted.)
+#  (The fraction's denominator under -split is not asserted.)
 ###########################################################
 echo -e "    coverage.new.t016...\c"
 printf 'chr1\t100\t200\ttx1\t0\t+\t100\t200\t0\t2\t20,20,\t0,80,\n' > a.tmp.bed
@@ -1025,7 +1025,7 @@ rm obs exp a.tmp.vcf b.tmp.bed
 #  B 120-130 covers 10 bases of r1. B 225-245 lies wholly in
 #  r2's N gap: without -split it covers 20 bases of r2's span
 #  (20/70 = 0.2857143); -counts -split gives r1 1 and r2 0.
-#  (The -split denominator is in bugs.md and is not asserted.)
+#  (The fraction's denominator under -split is not asserted.)
 ###########################################################
 echo -e "    coverage.new.t019...\c"
 printf '@HD\tVN:1.0\tSO:coordinate\n@SQ\tSN:chr1\tLN:1000\nr1\t0\tchr1\t101\t60\t50M\t*\t0\t0\t*\t*\nr2\t16\tchr1\t201\t30\t20M30N20M\t*\t0\t0\t*\t*\n' > a.tmp.sam
@@ -1641,7 +1641,7 @@ rm obs exp a.tmp.bed e.tmp.bed
 #  1 bp REF. B 202-205 and 250-260 lie inside it under any
 #  reading of its first and last base; B 150-190 and 320-330
 #  lie well outside: count 2. Its length is not asserted (the
-#  SVLEN/END span disagreement is in bugs.md).
+#  SVLEN and END spans disagree).
 ###########################################################
 echo -e "    coverage.new.t064...\c"
 printf '##fileformat=VCFv4.2\n#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\nchr1\t201\tsv2\tN\t<DUP>\t50\tPASS\tSVTYPE=DUP;END=300\n' > a.tmp.vcf

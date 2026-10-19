@@ -866,7 +866,7 @@ rm obs exp a.tmp.bed b.tmp.bed
 #  overlap
 #  Names b, a, b have 2 distinct values. pins the current output:
 #  count_distinct prints 0, not ".", for no overlap; map.rst says an A with no
-#  overlap gets "." or the -null value (bugs.md #16).
+#  overlap gets "." or the -null value.
 ###########################################################
 echo -e "    map.new.t003...\c"
 printf 'chr1\t0\t100\nchr2\t0\t100\n' > a.tmp.bed
@@ -929,7 +929,7 @@ rm obs exp a.tmp.bed b.tmp.bed
 #  Scores 1, 2, 4: mean 7/3 = 2.3333333333... This is the one
 #  test of the default precision. pins the current output: the
 #  default precision is 10 significant digits; the usage text says
-#  5 (bugs.md #10).
+#  5.
 ###########################################################
 echo -e "    map.new.t008...\c"
 printf 'chr1\t0\t100\nchr2\t0\t100\n' > a.tmp.bed
@@ -1136,8 +1136,7 @@ rm obs exp a.tmp.bed b.tmp.bed
 #  map.new.t024: concat joins values in B order with no delimiter
 #  Names a, b, c -> abc. concat is accepted by the parser though
 #  the usage text does not list it. pins the current output: concat
-#  uses no delimiter; map.rst says "print a comma separated list"
-#  (bugs.md #15).
+#  uses no delimiter; map.rst says "print a comma separated list".
 ###########################################################
 echo -e "    map.new.t024...\c"
 printf 'chr1\t0\t100\nchr2\t0\t100\n' > a.tmp.bed
@@ -1204,7 +1203,7 @@ rm obs exp a.tmp.bed b.tmp.bed
 #  chr1:0-100 overlaps b (1) and a (2); chr2:0-100 overlaps nothing.
 #  pins the current output: count and count_distinct print 0 and
 #  ignore -null; map.rst says an A with no
-#  overlap gets "." or the -null value (bugs.md #16).
+#  overlap gets "." or the -null value.
 ###########################################################
 echo -e "    map.new.t029...\c"
 printf 'chr1\t0\t100\nchr2\t0\t100\n' > a.tmp.bed
@@ -1218,7 +1217,7 @@ rm obs exp a.tmp.bed b.tmp.bed
 #  map.new.t030: -prec sets significant digits
 #  Scores 1, 2, 4: mean 7/3 with -prec 3 -> 2.33. pins the current
 #  output: -prec counts significant digits; the usage text says
-#  "decimal precision" (bugs.md #10).
+#  "decimal precision".
 ###########################################################
 echo -e "    map.new.t030...\c"
 printf 'chr1\t0\t100\n' > a.tmp.bed
