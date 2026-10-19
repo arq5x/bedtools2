@@ -58,23 +58,26 @@ void Bed12Interval::clear() {
 }
 
  inline void Bed12Interval::print_record(const Bed12Interval& what, CHRPOS start, CHRPOS end, string& outBuf) {
-	const char* buffer = buffer_printf(
-			"%s\t%" PRId_CHRPOS "\t%" PRId_CHRPOS"\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s", 
-			what._chrName.c_str(), 
-			start, 
-			end, 
-			what._name.c_str(), 
-			what._score.c_str(), 
-			what._strand.c_str(),
-			what._thickStartStr.c_str(),
-			what._thickEndStr.c_str(),
-			what._itemRGB.c_str(),
-			what._blockCountStr.c_str(),
-			what._blockSizes.c_str(),
-			what._blockStarts.c_str()
-	);
-
-	outBuf.append(buffer);
+	append_cstr(outBuf, what._chrName);
+	append_coords(outBuf, start, end);
+	outBuf.push_back('\t');
+	append_cstr(outBuf, what._name);
+	outBuf.push_back('\t');
+	append_cstr(outBuf, what._score);
+	outBuf.push_back('\t');
+	append_cstr(outBuf, what._strand);
+	outBuf.push_back('\t');
+	append_cstr(outBuf, what._thickStartStr);
+	outBuf.push_back('\t');
+	append_cstr(outBuf, what._thickEndStr);
+	outBuf.push_back('\t');
+	append_cstr(outBuf, what._itemRGB);
+	outBuf.push_back('\t');
+	append_cstr(outBuf, what._blockCountStr);
+	outBuf.push_back('\t');
+	append_cstr(outBuf, what._blockSizes);
+	outBuf.push_back('\t');
+	append_cstr(outBuf, what._blockStarts);
 }
 
 void Bed12Interval::print(string &outBuf) const

@@ -92,7 +92,8 @@ BedFile::BedFile(string &bedFile)
   _merged_chrom(""),
   _prev_start(-1),
   _prev_chrom(""),
-  _total_length(0)
+  _total_length(0),
+  _total_flattened_length(0)
 {}
 
 BedFile::BedFile(void)
@@ -104,7 +105,8 @@ BedFile::BedFile(void)
   _merged_chrom(""),
   _prev_start(-1),
   _prev_chrom(""),
-  _total_length(0)
+  _total_length(0),
+  _total_flattened_length(0)
 {}
 
 // Destructor

@@ -42,10 +42,6 @@ void trimNewlines(string& str) {
 }
 
 
-CHRPOS str2chrPos(const string &str) {
-	return str2chrPos(str.c_str(), str.size());
-}
-
 CHRPOS str2chrPos(const char * __restrict str, size_t ulen) {
 
 	if (ulen == 0) {
@@ -90,8 +86,12 @@ string vectorIntToStr(const vector<int> &vec) {
 }
 
 
-#if defined(__i386__) || defined(__x86_64__)
 bool isHeaderLine(const string &line) {
+	return isHeaderLine(line.c_str(), line.size());
+}
+
+#if defined(__i386__) || defined(__x86_64__)
+bool isHeaderLine(const char *line, size_t len) {
 	if (line[0] == '>') {
 		return true;
 	}
@@ -102,8 +102,10 @@ bool isHeaderLine(const string &line) {
 		return true;
 	}
 	
-	if(line.length() > 4) {
-		uint32_t peek = *(uint32_t*)line.c_str() | 0x20202020u;
+	if(len > 4) {
+		uint32_t peek;
+		memcpy(&peek, line, 4);
+		peek |= 0x20202020u;
 		const char* full_text = NULL;
 		bool require_space = false;
 		bool require_digit = false;
@@ -132,7 +134,7 @@ bool isHeaderLine(const string &line) {
 		}
 		if(full_text) {
 			const char* ptr = NULL;
-			for(ptr = line.c_str(); *ptr && *full_text; ptr ++, full_text ++) {
+			for(ptr = line; *ptr && *full_text; ptr ++, full_text ++) {
 				char c = *ptr;
 				if(c >= 'A' && c <= 'Z') c += 32;
 				if(c != *full_text) return false;
@@ -146,7 +148,7 @@ bool isHeaderLine(const string &line) {
 	return false;
 }
 #else
-bool isHeaderLine(const string &line) {
+bool isHeaderLine(const char *line, size_t len) {
 	if (line[0] == '>') {
 		return true;
 	}
@@ -157,7 +159,7 @@ bool isHeaderLine(const string &line) {
 		return true;
 	}
 	
-	string tmp = line;
+	string tmp(line, len);
 	transform(tmp.begin(), tmp.end(), tmp.begin(), ::tolower);
 	//allow chr chrom to start a header line
 	if (memcmp(tmp.c_str(), "chrom", 5) == 0 && isspace(tmp[5]) && ! isdigit(tmp[6])) {

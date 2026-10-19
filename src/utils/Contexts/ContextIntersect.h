@@ -107,10 +107,14 @@ public:
 	bool shouldRunToDbEnd() { return _shouldRunToDbEnd; }
 	void runToDbEnd() { _shouldRunToDbEnd = true; }
 
+	// -threads N (intersect only): threads for unsorted intersection; 1 by default.
+	int getNumThreads() const { return _numThreads; }
+
 protected:
 
 	BlockMgr *_splitBlockMgr;
 	bool _shouldRunToDbEnd;
+	int _numThreads;
 
 	virtual bool handle_a();
 	virtual bool handle_abam();
@@ -133,6 +137,7 @@ protected:
 	virtual bool handle_wao();
 	virtual bool handle_wb();
 	virtual bool handle_wo();
+	bool handle_threads();
 };
 
 #endif /* CONTEXTINTERSECT_H_ */

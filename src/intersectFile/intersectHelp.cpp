@@ -33,6 +33,10 @@ void intersect_help(void) {
     IntersectCommonHelp();
 
     sortedHelp();
+
+    cerr << "\t-threads\t"     << "Number of threads for unsorted intersection (default 1)." << endl;
+    cerr                        << "\t\tOutput is identical at every thread count. Ignored with -sorted." << endl << endl;
+
     multiDbOutputHelp();
     allToolsCommonHelp();
 

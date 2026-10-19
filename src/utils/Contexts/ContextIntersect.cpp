@@ -8,6 +8,8 @@
 #include "ContextIntersect.h"
 
 ContextIntersect::ContextIntersect()
+: _shouldRunToDbEnd(false),
+  _numThreads(1)
 {
 
 }
@@ -82,6 +84,9 @@ bool ContextIntersect::parseCmdArgs(int argc, char **argv, int skipFirstArgs) {
         }
         else if (strcmp(_argv[_i], "-loj") == 0) {
 			if (!handle_loj()) return false;
+        }
+        else if (strcmp(_argv[_i], "-threads") == 0 && _program == INTERSECT) {
+			if (!handle_threads()) return false;
         }
 	}
 	return ContextBase::parseCmdArgs(argc, argv, _skipFirstArgs);
@@ -408,4 +413,34 @@ bool ContextIntersect::handle_wo()
 	setWriteOverlap(true);
 	markUsed(_i - _skipFirstArgs);
     return true;
+}
+
+// -threads N: a whole number from 1 to MAX_THREADS, as decimal digits.
+bool ContextIntersect::handle_threads()
+{
+	static const int MAX_THREADS = 1024;
+	if (_argc <= _i+1) {
+		_errorMsg = "\n***** ERROR: -threads option given, but number of threads not specified. *****";
+		return false;
+	}
+	const char *arg = _argv[_i + 1];
+	int val = 0;
+	bool ok = (*arg != '\0');
+	for (const char *c = arg; ok && *c != '\0'; c++) {
+		if (*c < '0' || *c > '9') {
+			ok = false;
+		} else {
+			val = val * 10 + (*c - '0');
+			ok = (val <= MAX_THREADS);
+		}
+	}
+	if (!ok || val < 1) {
+		_errorMsg = "\n***** ERROR: -threads must be a whole number from 1 to 1024. *****";
+		return false;
+	}
+	_numThreads = val;
+	markUsed(_i - _skipFirstArgs);
+	_i++;
+	markUsed(_i - _skipFirstArgs);
+	return true;
 }

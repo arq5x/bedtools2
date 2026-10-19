@@ -77,6 +77,7 @@ bool BedtoolsDriver::subMain(int argc, char **argv)
 	//set-up output manager.
 	RecordOutputMgr *outputMgr = new RecordOutputMgr();
 	outputMgr->init(context);
+	tool->setOutputMgr(outputMgr);
 
 	//process input
 	RecordKeyVector hits;

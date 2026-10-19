@@ -47,6 +47,56 @@ public:
 	void deleteRecord(const Record *);
 	virtual void deleteRecord(RecordKeyVector *keyList);
 
+	// Loading without Records, for BinTree. linesLoadable says whether this
+	// file allows it: a plain FileRecordMgr on a BED3/4/5/6, bedGraph, BED+
+	// or BED6+ text file, read unsorted and without a genome file, so every
+	// record gets the same chromosome id. getNextLine reads the next entry
+	// as getNextRecord does, with the same errors at the same line, but
+	// returns only the chromosome and the start and end after the zero-length
+	// adjustment; the line stays in currentLine() until the next read.
+	// recordFromLine then builds the Record getNextRecord would have
+	// returned for a copy of that line. Given flags, getNextLine also sets
+	// LINE_ZERO_LENGTH when the line has start == end, and LINE_CANONICAL
+	// when its start and end are canonical decimal (digits, no sign or
+	// leading zero, at most 18, so they print back as written) and it holds
+	// no NUL. When linesPrintAsText holds too, the Record of a canonical
+	// line, with the zero-length adjustment undone, prints as the line.
+	enum { LINE_ZERO_LENGTH = 1, LINE_CANONICAL = 2 };
+	bool linesLoadable() const;
+	bool linesPrintAsText() const;
+	bool getNextLine(string &chrName, CHRPOS &start, CHRPOS &end, unsigned *flags = NULL);
+	// the file index of the Records recordFromLine builds
+	int lineFileIdx() const { return _fileReader->getFileIdx(); }
+	const char *currentLine() const {
+		return static_cast<const SingleLineDelimTextFileReader *>(_fileReader)->currentLine();
+	}
+	size_t currentLineLength() const {
+		return static_cast<const SingleLineDelimTextFileReader *>(_fileReader)->currentLineLength();
+	}
+	Record *recordFromLine(const char *line, size_t len);
+	// The reader of a text file; its current line is the entry last read.
+	const SingleLineDelimTextFileReader *textReader() const {
+		return static_cast<const SingleLineDelimTextFileReader *>(_fileReader);
+	}
+
+	// Loading lines split from the file elsewhere (BinTree's parallel load),
+	// for a file linesLoadable allows. bulkLoadable says whether this one
+	// can: nothing read from it yet, a delimiter getLine's line scan takes,
+	// and no decompression, whose errors print while the file is read, so
+	// that reading ahead would print them early. readRaw then gives the
+	// file's bytes from its start
+	// (BufferedStreamMgr::readRaw), and each line split from them goes,
+	// in order, either to takeNextLine, which reads it as getNextLine would
+	// have read it from the file (SingleLineDelimTextFileReader::takeLine),
+	// or to skipLines, for lines found to be entries elsewhere: n of them,
+	// whose end - start, after the zero-length adjustment, sum to
+	// totalLength.
+	bool bulkLoadable() const;
+	size_t readRaw(char *dst, size_t cap) { return _bufStreamMgr->readRaw(dst, cap); }
+	bool takeNextLine(const char *line, size_t len, string &chrName, CHRPOS &start, CHRPOS &end,
+	                  unsigned *flags = NULL);
+	void skipLines(size_t n, unsigned long totalLength);
+
 
 
 	const string &getFileName() const { return _filename;}
@@ -145,6 +195,12 @@ protected:
 	bool _noEnforceCoordSort; //only true for GroupBy
 	bool _isGroupBy; //hopefully also only true for GroupBy
 	bool _isCram;
+
+	// parses the lines recordFromLine is given; its own copy, so the file's
+	// reader is never disturbed
+	SingleLineDelimTextFileReader *_lineReader;
+	string _lineField;
+	void makeLineReader();
 
 	void allocateFileReader(bool inheader=false);
 	void testInputSortOrder(Record *record);

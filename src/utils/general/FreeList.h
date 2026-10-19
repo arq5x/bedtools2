@@ -19,14 +19,15 @@ class FreeList {
 public:
 	FreeList(int blockSize=512)
 	: _nextPos(0),
-	  _blockSize(blockSize)
+	  _blockSize(blockSize),
+	  _growSize(blockSize)
 	{
 		_freeList.reserve(_blockSize);
 	}
 
 	~FreeList() {
-		for (int i=0; i < (int)_buffer.size(); i++) {
-			delete _buffer[i];
+		for (int i=0; i < (int)_blocks.size(); i++) {
+			delete [] _blocks[i];
 		}
 	}
 
@@ -64,14 +65,31 @@ public:
 
 private:
 	deque<T *> _buffer;
+	vector<T *> _blocks; // one array per growBuffer call
 	vector<T *> _freeList;
 	int _nextPos;
 	int _blockSize;
+	int _growSize; // objects in the next block
+	// One allocation per block instead of one per object. Nothing deletes a
+	// pooled object on its own: deleteObj returns it to _freeList and the
+	// destructor frees whole blocks. new T[n]() value-initializes each
+	// element, as new T() did. Blocks double from _blockSize up to
+	// MAX_BLOCK_MULTIPLE times it, so a pool that keeps growing (database
+	// records, never returned) makes few large allocations.
 	void growBuffer() {
-		for (int i=0; i < _blockSize; ++i) {
-			_buffer.push_back(new T());
+		if (_growSize <= 0) {
+			return;
+		}
+		T *block = new T[_growSize]();
+		_blocks.push_back(block);
+		for (int i=0; i < _growSize; ++i) {
+			_buffer.push_back(block + i);
+		}
+		if (_growSize / _blockSize < MAX_BLOCK_MULTIPLE) {
+			_growSize *= 2;
 		}
 	}
+	static const int MAX_BLOCK_MULTIPLE = 8;
 
 	//this number determines how many times larger than the blockSize the freeList
 	//is allowed to grow. If speed performance is poor, we may need to increase this number.

@@ -1,8 +1,80 @@
 #include "SingleLineDelimTextFileReader.h"
 #include <iostream>
 #include <limits.h>
+#include <stdint.h>
 #include "BufferedStreamMgr.h"
 #include "ParseTools.h"
+
+// findDelimiters reads a line 16 bytes at a time where SSE2 is available
+// and one byte at a time elsewhere; both stop at the first NUL, as strchr does.
+#if defined(__SSE2__) && defined(__GNUC__)
+#include <emmintrin.h>
+#define DELIM_SCAN_SSE2 1
+// Bit k of d is set where s[k] == c, and bit k of z where s[k] == '\0', k < 16.
+static inline void scan16(const char *s, char c, unsigned &d, unsigned &z) {
+	__m128i v = _mm_loadu_si128((const __m128i *)s);
+	d = (unsigned)_mm_movemask_epi8(_mm_cmpeq_epi8(v, _mm_set1_epi8(c)));
+	z = (unsigned)_mm_movemask_epi8(_mm_cmpeq_epi8(v, _mm_setzero_si128()));
+}
+#endif
+
+// The number of fields in the NUL-terminated line s split at delim. The
+// offset of delimiter j (from 1) goes to pos[j] while j <= cap; delimiters
+// past cap are counted but not stored.
+static int scanDelimsBytes(const char *s, char delim, int *pos, int cap) {
+	int nfields = 1;
+	for (int i = 0; ; i++) {
+		char c = s[i];
+		if (c == delim) {
+			if (nfields <= cap) {
+				pos[nfields] = i;
+			}
+			nfields++;
+		} else if (c == '\0') {
+			return nfields;
+		}
+	}
+}
+
+#ifdef DELIM_SCAN_SSE2
+// As scanDelimsBytes, for a line of n >= 16 bytes counting its terminator.
+// Each block of up to 64 bytes becomes one mask of its delimiters and one of
+// its NULs; a block's last partial 16 bytes are read by a load ending at the
+// terminator, which overlaps bytes already read.
+static int scanDelimsSSE2(const char *s, size_t n, char delim, int *pos, int cap) {
+	int nfields = 1;
+	for (size_t i = 0; ; i += 64) {
+		size_t blk = n - i < 64 ? n - i : 64;
+		size_t full = blk & ~(size_t)15;
+		uint64_t dm = 0, zm = 0;
+		unsigned d, z;
+		for (size_t k = 0; k < full; k += 16) {
+			scan16(s + i + k, delim, d, z);
+			dm |= (uint64_t)d << k;
+			zm |= (uint64_t)z << k;
+		}
+		size_t r = blk - full;
+		if (r) {
+			scan16(s + n - 16, delim, d, z);
+			dm |= (uint64_t)(d >> (16 - r)) << full;
+			zm |= (uint64_t)(z >> (16 - r)) << full;
+		}
+		if (zm) {
+			dm &= (zm & (0 - zm)) - 1;	// only the delimiters before the first NUL
+		}
+		while (dm) {
+			if (nfields <= cap) {
+				pos[nfields] = (int)(i + __builtin_ctzll(dm));
+			}
+			nfields++;
+			dm &= dm - 1;
+		}
+		if (zm) {
+			return nfields;
+		}
+	}
+}
+#endif
 
 bool abs_cmp(int i, int j) { return abs(i)<abs(j); }
 
@@ -12,15 +84,23 @@ SingleLineDelimTextFileReader::SingleLineDelimTextFileReader(int numFields, char
   _fullHeaderFound(false),
   _currDataPos(0),
   _lineNum(0),
-  _inheader(false)
+  _inheader(false),
+  _takeAfterHeader(false)
 {
 	_delimPositions = new int[numFields +1];
+	_scanPositions = new int[numFields +1];
+	_scanFields = 0;
+	_scanInGetLine = delimChar != '\n' && delimChar != '\r' && delimChar != '\0';
+	_line = _sLine.c_str();
+	_lineLen = 0;
 }
 
 SingleLineDelimTextFileReader::~SingleLineDelimTextFileReader()
 {
 	delete [] _delimPositions;
 	_delimPositions = NULL;
+	delete [] _scanPositions;
+	_scanPositions = NULL;
 }
 
 bool SingleLineDelimTextFileReader::readEntry()
@@ -32,11 +112,12 @@ bool SingleLineDelimTextFileReader::readEntry()
 	if (_bufStreamMgr->eof()) {
 		return false;
 	}
-	if (!_bufStreamMgr->getLine(_sLine)) {
+	if (!_bufStreamMgr->getLine(_sLine, _line, _lineLen, _delimChar,
+			_scanInGetLine ? _scanPositions : NULL, _numFields, _scanFields)) {
 		return false;
 	}
 	_lineNum++;
-	if (_sLine.empty()) {
+	if (_lineLen == 0) {
 		return false;
 	}
 
@@ -44,7 +125,8 @@ bool SingleLineDelimTextFileReader::readEntry()
 	bool wasHeader = false;
 	while (detectAndHandleHeader()) { //header line
 		_lineNum++;
-		if (!_bufStreamMgr->getLine(_sLine)) {
+		if (!_bufStreamMgr->getLine(_sLine, _line, _lineLen, _delimChar,
+				_scanInGetLine ? _scanPositions : NULL, _numFields, _scanFields)) {
 			return false;
 		}
 	}
@@ -55,9 +137,9 @@ bool SingleLineDelimTextFileReader::readEntry()
 
 	//check to make sure line has something besides whitespace.
 	bool hasNonSpace = false;
-	int lineLen = (int)_sLine.size();
+	int lineLen = (int)_lineLen;
 	for (int i=0; i < lineLen; i++) {
-		if (!isspace(_sLine[i])) {
+		if (!isspace(_line[i])) {
 			hasNonSpace = true;
 			break;
 		}
@@ -77,10 +159,50 @@ bool SingleLineDelimTextFileReader::readEntry()
 }
 
 
+// readEntry, one line at a time: readEntry's first line returns early when
+// empty, while a line its header loop reads goes straight to the header test.
+bool SingleLineDelimTextFileReader::takeLine(const char *line, size_t len)
+{
+	_lineNum++;
+	if (!_takeAfterHeader && len == 0) {
+		return false;
+	}
+	_line = line;
+	_lineLen = len;
+	_scanFields = 0;
+	if (detectAndHandleHeader()) {
+		_takeAfterHeader = true;
+		return false;
+	}
+	_takeAfterHeader = false;
+	_fullHeaderFound = true;
+
+	bool hasNonSpace = false;
+	int lineLen = (int)_lineLen;
+	for (int i=0; i < lineLen; i++) {
+		if (!isspace(_line[i])) {
+			hasNonSpace = true;
+			break;
+		}
+	}
+	if (!hasNonSpace) {
+		return false;
+	}
+	return findDelimiters();
+}
+
+void SingleLineDelimTextFileReader::setLine(const char *line, size_t len) {
+	_sLine.assign(line, len);
+	_line = _sLine.c_str();
+	_lineLen = _sLine.size();
+	_scanFields = 0;
+	findDelimiters();
+}
+
 void SingleLineDelimTextFileReader::getField(int fieldNum, string &str) const {
 	CHRPOS startPos = _delimPositions[fieldNum] +1;
 	CHRPOS endPos = _delimPositions[fieldNum+1];
-	str.assign(_sLine.c_str() + startPos, endPos - startPos);
+	str.assign(_line + startPos, endPos - startPos);
 }
 
 
@@ -91,45 +213,54 @@ void SingleLineDelimTextFileReader::getField(int fieldNum, CHRPOS &val) const {
 }
 
 void SingleLineDelimTextFileReader::getField(int fieldNum, char &val) const {
-	val = _sLine[_delimPositions[fieldNum] +1];
+	val = _line[_delimPositions[fieldNum] +1];
 }
 
 void SingleLineDelimTextFileReader::appendField(int fieldNum, string &str) const {
 	int startPos = _delimPositions[fieldNum] +1;
 	int endPos = _delimPositions[fieldNum+1];
-	str.append(_sLine.c_str() + startPos, endPos - startPos);
+	str.append(_line + startPos, endPos - startPos);
 }
 
 bool SingleLineDelimTextFileReader::detectAndHandleHeader()
 {
-	//not sure why the linker is giving me a hard time about
-	//passing a non-const string to isHeaderLine, but
-	//this const ref is a workaround.
-	const string &sLine2 = _sLine;
-	if (!isHeaderLine(sLine2) && (!(_inheader && _lineNum==1))) {
+	if (!isHeaderLine(_line, _lineLen) && (!(_inheader && _lineNum==1))) {
 		return false;
 	}
 	if (!_fullHeaderFound) {
-		_header += _sLine;
+		_header.append(_line, _lineLen);
 		_header += "\n"; //add new line, since it was chomped by getline
 	}
 	return true;
 }
 
 bool SingleLineDelimTextFileReader::findDelimiters() {
-	memset(_delimPositions, 0, (_numFields +1) * sizeof(int));
-	//scan the line for delimiters, determine their positions
-	int nfields = 0;
-	const char* ptr = _sLine.c_str();
-	const char* start = ptr;
-	int target = _delimChar;
-
-	while(ptr) {
-		_delimPositions[nfields++] = ptr - start - 1;
-		ptr = strchr(ptr, target);
-		if(ptr) ptr ++;
+	//scan the line for delimiters, determine their positions: field i runs
+	//from _delimPositions[i] + 1 to _delimPositions[i + 1]. Only the
+	//_numFields + 1 entries are written; a line with more fields is counted.
+	const char *line = _line;
+	size_t len = _lineLen;
+	int nfields;
+	if (_scanFields > 0) {
+		// getLine found them
+		nfields = _scanFields;
+		_scanFields = 0;
+		int *found = _scanPositions;
+		_scanPositions = _delimPositions;
+		_delimPositions = found;
+		_delimPositions[0] = -1;
+	} else {
+		_delimPositions[0] = -1;
+#ifdef DELIM_SCAN_SSE2
+		if (len >= 15) {
+			nfields = scanDelimsSSE2(line, len + 1, _delimChar, _delimPositions, _numFields);
+		} else {
+			nfields = scanDelimsBytes(line, _delimChar, _delimPositions, _numFields);
+		}
+#else
+		nfields = scanDelimsBytes(line, _delimChar, _delimPositions, _numFields);
+#endif
 	}
-	_delimPositions[nfields] = _sLine.size();
 
 	// count the number of fields allow for lines ending in \t\n
 	if (nfields != _numFields) {
@@ -138,10 +269,11 @@ bool SingleLineDelimTextFileReader::findDelimiters() {
 			 << _filename << " has " 
 			 << nfields << " fields, but " 
 			 << _numFields 
-			 << " were expected." 
+			 << " were expected."
 			 << endl;
 		exit(1);
 	}
+	_delimPositions[nfields] = len;
 	return true;
 }
 

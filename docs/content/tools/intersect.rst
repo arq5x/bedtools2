@@ -91,6 +91,7 @@ Option                         Description
 **-sortout**                   When using *multiple databases* (`-b`), sort the output DB hits for each record.
 **-nobuf**                     Disable buffered output. Using this option will cause each line of output to be printed as it is generated, rather than saved in a buffer. This will make printing large output files noticeably slower, but can be useful in conjunction with other software tools and scripts that need to process one line of bedtools output at a time.
 **-iobuf**                     Follow with desired integer size of read buffer. Optional suffixes `K/M/G` supported. **Note**: currently has no effect with compressed files.
+**-threads**                   Number of threads for unsorted intersection (default 1). The threads load the `-b` files and find hits; output is identical at every thread count. It helps most when `-b` is a large uncompressed file. Ignored with ``-sorted``.
 ===========================    =========================================================================================================================================================
 
 

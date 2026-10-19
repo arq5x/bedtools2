@@ -26,6 +26,8 @@ public:
 	//do any last things needed to wrap up.
 	virtual bool finalizeCalculations() = 0;
 	virtual void  giveFinalReport(RecordOutputMgr *outputMgr) = 0;
+	// the output manager processHits will be given, before the first findNext
+	virtual void setOutputMgr(RecordOutputMgr *) {}
 protected:
 	ContextBase *_context;
 };

@@ -275,21 +275,29 @@ const string &Record::getField(int fieldNum) const
 
 
 bool Record::hasChrInChromName() const {
-	const char *str = _chrName.c_str();
+	return chromHasChr(_chrName);
+}
+
+bool Record::hasLeadingZeroInChromName(bool chrKnown) const {
+	return chromHasLeadingZero(_chrName, chrKnown);
+}
+
+bool Record::chromHasChr(const string &chrName) {
+	const char *str = chrName.c_str();
 	//if the chrom name has at least 3 characters,
 	//and the first 3 are c, h, r, case-insensitive,
 	//return true. Otherwise, return false.
-	return ((_chrName.size() >= 3) &&
+	return ((chrName.size() >= 3) &&
 			(str[0] == 'c' || str[0] == 'C') &&
 			(str[1] == 'h' || str[1] == 'H') &&
 			(str[2] == 'r' || str[2] == 'R'));
 }
 
-bool Record::hasLeadingZeroInChromName(bool chrKnown) const {
-	const char *str = _chrName.c_str();
+bool Record::chromHasLeadingZero(const string &chrName, bool chrKnown) {
+	const char *str = chrName.c_str();
 	// only check to see if the digit zero follows the occurance of
 	// "chr", case insensitive.
-	return (_chrName.size() >= 4 && str[3] == '0' && (chrKnown || hasChrInChromName()));
+	return (chrName.size() >= 4 && str[3] == '0' && (chrKnown || chromHasChr(chrName)));
 }
 
 void Record::print(FILE *fp, bool newline) const {

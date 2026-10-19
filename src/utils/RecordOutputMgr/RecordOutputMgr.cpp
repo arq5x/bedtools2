@@ -22,6 +22,8 @@
 #include "VcfRecord.h"
 #include "GffRecord.h"
 #include "NoPosPlusRecord.h"
+#include "SingleLineDelimTextFileReader.h"
+#include "ParseTools.h"
 
 
 
@@ -33,7 +35,12 @@ RecordOutputMgr::RecordOutputMgr()
   _printable(true),
   _bamWriter(NULL),
   _currBamBlockList(NULL),
-  _bamBlockMgr(NULL)
+  _bamBlockMgr(NULL),
+  _lineKey(NULL),
+  _lineKeyReader(NULL),
+  _lineKeyFlags(0),
+  _lineKeyChromLen(0),
+  _lineKeyTail(0)
 {
 	_bamBlockMgr = new BlockMgr();
 }
@@ -98,7 +105,7 @@ bool RecordOutputMgr::printKeyAndTerminate(RecordKeyVector &keyList) {
 	if (bamCode == BAM_AS_BAM) {
 		return true;
 	} else if (bamCode == NOT_BAM) {
-		keyList.getKey()->print(_outBuf);
+		printKey(keyList.getKey());
 		return false;
 	}
 	//otherwise, it was BAM_AS_BED, and the key was printed.
@@ -488,8 +495,8 @@ void RecordOutputMgr::reportOverlapSummary(RecordKeyVector &keyList)
 }
 
 void RecordOutputMgr::addDbFileId(int fileId) {
-	ostringstream s;
 	if ((static_cast<ContextIntersect *>(_context))->getNumDatabaseFiles()  == 1) return;
+	ostringstream s;
 	if (!_context->getUseDBnameTags() && (!_context->getUseDBfileNames())) {
 		s << fileId;
 	} else if (_context->getUseDBnameTags()){
@@ -576,8 +583,48 @@ void RecordOutputMgr::printKey(const Record *key, const string & start, const st
 	}
 }
 
+// Whether the key line holds no NUL, and whether its start and end are also
+// canonical decimal (digits, no sign or leading zero, at most 18), so that
+// they print back as written; with no NUL, the line's chromosome length and
+// the offset of its fields after end (the tab before field 4, or the line's
+// length). Found once per key.
+unsigned RecordOutputMgr::keyLineFlags()
+{
+	if (_lineKeyFlags == 0) {
+		const SingleLineDelimTextFileReader *reader = _lineKeyReader;
+		unsigned flags = KEY_LINE_FOUND;
+		if (!reader->lineHasNul()) {
+			flags |= KEY_LINE_NO_NUL;
+			_lineKeyChromLen = reader->fieldLength(0);
+			_lineKeyTail = reader->getNumFields() > 3
+			               ? (size_t)(reader->fieldStart(3) - 1 - reader->currentLine())
+			               : reader->currentLineLength();
+			const char *s1 = reader->fieldStart(1), *s2 = reader->fieldStart(2);
+			size_t n1 = reader->fieldLength(1), n2 = reader->fieldLength(2);
+			CHRPOS val;
+			if (str2chrPosDigits(s1, n1, val) && (s1[0] != '0' || n1 == 1)
+			    && str2chrPosDigits(s2, n2, val) && (s2[0] != '0' || n2 == 1)) {
+				flags |= KEY_LINE_CANONICAL;
+			}
+		}
+		_lineKeyFlags = flags;
+	}
+	return _lineKeyFlags;
+}
+
 void RecordOutputMgr::printKey(const Record *key, CHRPOS start, CHRPOS end)
 {
+	// the key's chromosome, then start and end, then its fields after end
+	if (key == _lineKey && (keyLineFlags() & KEY_LINE_NO_NUL)) {
+		const char *line = _lineKeyReader->currentLine();
+		size_t len = _lineKeyReader->currentLineLength();
+		_outBuf.append(line, _lineKeyChromLen);
+		append_coords(_outBuf, start, end);
+		if (_lineKeyTail < len) {
+			_outBuf.append(line + _lineKeyTail, len - _lineKeyTail);
+		}
+		return;
+	}
 	if (key->getType() != FileRecordTypeChecker::BAM_RECORD_TYPE) {
 		key->print(_outBuf, start, end);
 	} else {
@@ -587,6 +634,12 @@ void RecordOutputMgr::printKey(const Record *key, CHRPOS start, CHRPOS end)
 
 void RecordOutputMgr::printKey(const Record *key)
 {
+	// printRecord undid the key's zero-length adjustment, so it prints as
+	// its line when start and end print back as written
+	if (key == _lineKey && (keyLineFlags() & KEY_LINE_CANONICAL)) {
+		_outBuf.append(_lineKeyReader->currentLine(), _lineKeyReader->currentLineLength());
+		return;
+	}
 	if (key->getType() != FileRecordTypeChecker::BAM_RECORD_TYPE) {
 		key->print(_outBuf);
 	} else {

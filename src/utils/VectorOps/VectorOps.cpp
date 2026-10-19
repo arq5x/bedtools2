@@ -13,6 +13,7 @@
   Licensed under the GNU General Public License 2.0 license.
 ******************************************************************************/
 #include "VectorOps.h"
+#include <iterator>
 
 // functor to convert a single string to a double
 double MakeDouble(const string &element) {
