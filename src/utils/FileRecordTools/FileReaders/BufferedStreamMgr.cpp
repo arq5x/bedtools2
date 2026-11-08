@@ -135,6 +135,29 @@ bool BufferedStreamMgr::getLine(string &line)
 	return retVal;
 }
 
+bool BufferedStreamMgr::getLineRef(string &scratch, const char *&ptr, size_t &len)
+{
+	if (_mainBufCurrStartPos < _mainBufCurrLen) {
+		char *base = (char *)_mainBuf + _mainBufCurrStartPos;
+		char *eol = (char *)memchr(base, '\n', _mainBufCurrLen - _mainBufCurrStartPos);
+		if (eol) {
+			size_t n = eol - base;
+			_mainBufCurrStartPos = (int)(eol - (char *)_mainBuf) + 1;
+			while (n > 0 && base[n-1] == '\r') n--;
+			base[n] = '\0';
+			ptr = base;
+			len = n;
+			return true;
+		}
+	}
+	if (!getLine(scratch)) {
+		return false;
+	}
+	ptr = scratch.c_str();
+	len = scratch.size();
+	return true;
+}
+
 bool BufferedStreamMgr::readFileChunk()
 {
 	if (eof()) {

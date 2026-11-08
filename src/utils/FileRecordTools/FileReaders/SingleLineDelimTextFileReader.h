@@ -26,7 +26,7 @@ public:
 
 	virtual bool readEntry();
 	virtual int getNumFields() const { return _numFields; }
-	const char *getLineData() const { return _sLine.c_str(); }
+	const char *getLineData() const { return _line; }
 	const int *getDelimPositions() const { return _delimPositions; }
 	virtual void getField(int numField, string &val) const;
 	virtual void getField(int numField, CHRPOS &val) const; //this signaiture isn't const because it operates on an internal string for speed.
@@ -46,13 +46,17 @@ protected:
 	string _header;
 	bool _fullHeaderFound;
 	int _currDataPos;
-	string _sLine;
+	string _sLine; // scratch for lines not wholly inside the stream buffer
+	const char *_line;
+	size_t _lineLen;
+	bool nextLine();
 	int *_delimPositions;
 	string _currChromStr;
 	string _tempChrPosStr;
 	int _lineNum;
 	bool _inheader;
 	bool detectAndHandleHeader();
+	bool mayBeHeader() const;
 	bool findDelimiters();
 
 	//This is actually a very specialized function strictly for VCF
