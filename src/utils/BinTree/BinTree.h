@@ -205,6 +205,7 @@ private:
 	int64_t appendText(Record *record);
 	int64_t appendRaw(const char *text, size_t len);
 	int64_t _lastTextOff; // offset of the last appended text
+	bool _stopAtFirst; // only whether a query has a hit is read (-u, -v)
 	bool textEquals(int64_t off, const char *text, size_t len) const;
 
 	bool addRecordToTree(Record *);

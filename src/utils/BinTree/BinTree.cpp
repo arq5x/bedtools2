@@ -4,7 +4,7 @@
 
 BinTree::BinTree(ContextIntersect *context) 
 :  _context(context), _lastQueryBins(NULL), _haveQueryChr(false), _lastAddBins(NULL),
-   _compact(false), _poolUsed(0), _text(false), _textUsed(0), _lastTextOff(0) {
+   _compact(false), _poolUsed(0), _text(false), _textUsed(0), _lastTextOff(0), _stopAtFirst(false) {
 }
 
 BinTree::~BinTree() {
@@ -80,6 +80,11 @@ void BinTree::loadDB()
 	// Compact when no database record is read beyond its coordinates, file index and
 	// zero-length flag, and hits are not sorted (sorting compares whole records).
 	_compact = !_context->getSortOutput();
+	// -u and -v read only whether a query has any hit (reportOverlapSummary).
+	_stopAtFirst = _context->getProgram() == ContextBase::INTERSECT &&
+			(_context->getAnyHit() != _context->getNoHit()) &&
+			!_context->getWriteCount() && !_context->getWriteCountsPerDatabase() &&
+			!_context->getObeySplits();
 	for (int i=0; _compact && i < _context->getNumDatabaseFiles(); i++) {
 		FileRecordMgr *f = _context->getDatabaseFile(i);
 		FileRecordTypeChecker::RECORD_TYPE t = f->getRecordType();
@@ -267,6 +272,7 @@ void BinTree::getHits(Record *record, RecordKeyVector &hitSet)
                 {
             		hitSet.push_back(dbRec);
             		if (_compact) _poolUsed++;
+            		if (_stopAtFirst) return;
             	}
             }
         }
