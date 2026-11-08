@@ -96,6 +96,23 @@ void SingleLineDelimTextFileReader::getField(int fieldNum, CHRPOS &val) const {
 	getPosField(fieldNum, val, temp);
 }
 
+bool SingleLineDelimTextFileReader::getPlainPos(int fieldNum, CHRPOS &val) const {
+	const char *q = _line + _delimPositions[fieldNum] + 1;
+	const char *e = _line + _delimPositions[fieldNum+1];
+	const char *digits = q;
+	long long result = 0;
+	while (q < e && (unsigned char)(*q - '0') <= 9) {
+		result = result * 10 + (*q - '0');
+		q++;
+	}
+	size_t nd = q - digits;
+	if (q == e && nd >= 1 && nd <= 18 && (*digits != '0' || nd == 1)) {
+		val = result;
+		return true;
+	}
+	return false;
+}
+
 bool SingleLineDelimTextFileReader::getPosField(int fieldNum, CHRPOS &val, string &str) const {
 	const char *p = _line + _delimPositions[fieldNum] + 1;
 	const char *e = _line + _delimPositions[fieldNum+1];

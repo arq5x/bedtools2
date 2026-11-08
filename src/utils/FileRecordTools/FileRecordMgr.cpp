@@ -119,6 +119,40 @@ Record *FileRecordMgr::getNextRecord(RecordKeyVector *keyList)
 	if (!_fileReader->readEntry()) {
 		return NULL;
 	}
+	return recordFromLine(keyList);
+}
+
+int FileRecordMgr::getNextCoords(const string *lastChr, CHRPOS &start, CHRPOS &end, bool &zeroLen, Record *&rec)
+{
+	rec = NULL;
+	if (!_fileReader->isOpen() || !_fileReader->readEntry()) {
+		return 0;
+	}
+	if (lastChr != NULL && !_hasGenomeFile && !_isSortedInput) {
+		const SingleLineDelimTextFileReader *r = static_cast<SingleLineDelimTextFileReader*>(_fileReader);
+		const char *line = r->getLineData();
+		const int *dp = r->getDelimPositions();
+		size_t chrLen = (size_t)(dp[1] - dp[0] - 1);
+		CHRPOS s, e;
+		if (chrLen == lastChr->size() && memcmp(line + dp[0] + 1, lastChr->data(), chrLen) == 0
+				&& r->getPlainPos(1, s) && r->getPlainPos(2, e) && s <= e) {
+			zeroLen = (s == e);
+			if (zeroLen) {
+				s--;
+				e++;
+			}
+			start = s;
+			end = e;
+			_totalRecordLength += (unsigned long)(e - s);
+			return 1;
+		}
+	}
+	rec = recordFromLine(NULL);
+	return rec == NULL ? 0 : 2;
+}
+
+Record *FileRecordMgr::recordFromLine(RecordKeyVector *keyList)
+{
 	Record *record = NULL;
 	record = _recordMgr->allocateRecord();
 	if (!record->initFromFile(_fileReader)) {

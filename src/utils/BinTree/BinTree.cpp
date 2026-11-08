@@ -96,6 +96,40 @@ void BinTree::loadDB()
 		FileRecordMgr *databaseFile = _context->getDatabaseFile(i);
 
 		Record *record = NULL;
+		if (_compact && !_text) {
+			// Lines of the previous line's chromosome with plain coordinates skip the
+			// Record; the first line of a chromosome and every other line take the full path.
+			string lastChr;
+			const string *lastChrPtr = NULL;
+			while (!databaseFile->eof()) {
+				CHRPOS start = 0, end = 0;
+				bool zeroLen = false;
+				int got = databaseFile->getNextCoords(lastChrPtr, start, end, zeroLen, record);
+				if (got == 0) continue;
+				if (got == 1) {
+					if (!stageCoords(start, end, ((int64_t)databaseFile->getFileIdx() << 1) | (zeroLen ? 1 : 0))) {
+						fprintf(stderr, "ERROR: Unable to add record to tree.\n");
+						databaseFile->close();
+						exit(1);
+					}
+					continue;
+				}
+				if (record->isUnmapped()) {
+					databaseFile->deleteRecord(record);
+					continue;
+				}
+				_context->testNameConventions(record);
+				if (!addRecordToTree(record)) {
+					fprintf(stderr, "ERROR: Unable to add record to tree.\n");
+					databaseFile->close();
+					exit(1);
+				}
+				lastChr = record->getChrName();
+				lastChrPtr = &lastChr;
+				databaseFile->deleteRecord(record);
+			}
+			continue;
+		}
 		while (!databaseFile->eof()) {
 			record = databaseFile->getNextRecord();
 			//In addition to NULL records, we also don't want to add unmapped reads.
@@ -208,6 +242,27 @@ void BinTree::getHits(Record *record, RecordKeyVector &hitSet)
 	if (_context->getSortOutput()) {
 		hitSet.sortVector();
 	}
+}
+
+// Stages an entry for the chromosome of the last addRecordToTree call.
+bool BinTree::stageCoords(binNumType startPos, binNumType endPos, int64_t meta)
+{
+	binNumType binNum = getBin(startPos, endPos);
+	if (binNum < 0 || binNum >= NUM_BINS) {
+		fprintf(stderr, "ERROR: Received illegal bin number %" PRId_BINNUMTYPE " from getBin call.\n"
+                                "Maximum values is: %" PRId_BINNUMTYPE "\n"
+                                "This typically means that your coordinates are\n"
+                                "negative or too large to represent in the data\n"
+                                "structure bedtools uses to find intersections.", binNum, NUM_BINS);
+		return false;
+	}
+	_haveQueryChr = false;
+	binEntry entry;
+	entry.start = startPos;
+	entry.end = endPos;
+	entry.meta = meta;
+	_lastAddBins->stage(binNum, entry);
+	return true;
 }
 
 bool BinTree::addRecordToTree(Record *record)
