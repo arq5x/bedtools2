@@ -112,6 +112,7 @@ public:
 
 	// Text records of this file need only chrom, start and end; set before open().
 	void setCoordsOnly(bool val) { _coordsOnly = val; }
+	bool getCoordsOnly() const { return _coordsOnly; }
 	// Parses the reader's current line into record in full; for messages that print the record.
 	void fullReparse(Record *record);
 

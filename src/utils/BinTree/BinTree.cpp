@@ -3,17 +3,44 @@
 
 
 BinTree::BinTree(ContextIntersect *context) 
-:  _context(context), _lastQueryBins(NULL), _haveQueryChr(false), _lastAddBins(NULL) {
+:  _context(context), _lastQueryBins(NULL), _haveQueryChr(false), _lastAddBins(NULL),
+   _compact(false), _poolUsed(0) {
 }
 
 BinTree::~BinTree() {
 	for (mainMapType::iterator it = _mainMap.begin(); it != _mainMap.end(); ++it) {
 		delete it->second;
 	}
+	for (size_t i = 0; i < _poolBlocks.size(); i++) {
+		delete [] _poolBlocks[i];
+	}
+}
+
+Bed3Interval *BinTree::nextPoolRecord() {
+	if (_poolUsed == _pool.size()) {
+		const size_t block = 256;
+		Bed3Interval *b = new Bed3Interval[block];
+		_poolBlocks.push_back(b);
+		for (size_t i = 0; i < block; i++) _pool.push_back(b + i);
+	}
+	return _pool[_poolUsed];
 }
 
 void BinTree::loadDB()
 {
+	// Compact when no database record is read beyond its coordinates, file index and
+	// zero-length flag, and hits are not sorted (sorting compares whole records).
+	_compact = !_context->getSortOutput();
+	for (int i=0; _compact && i < _context->getNumDatabaseFiles(); i++) {
+		FileRecordMgr *f = _context->getDatabaseFile(i);
+		FileRecordTypeChecker::RECORD_TYPE t = f->getRecordType();
+		if (!f->getCoordsOnly() || !(t == FileRecordTypeChecker::BED3_RECORD_TYPE ||
+				t == FileRecordTypeChecker::BED4_RECORD_TYPE || t == FileRecordTypeChecker::BED5_RECORD_TYPE ||
+				t == FileRecordTypeChecker::BED6_RECORD_TYPE || t == FileRecordTypeChecker::BED_PLUS_RECORD_TYPE ||
+				t == FileRecordTypeChecker::BED6_PLUS_RECORD_TYPE)) {
+			_compact = false;
+		}
+	}
 	for (int i=0; i < _context->getNumDatabaseFiles(); i++) {
 		FileRecordMgr *databaseFile = _context->getDatabaseFile(i);
 
@@ -32,6 +59,10 @@ void BinTree::loadDB()
 				databaseFile->close();
 				exit(1);
 			}
+			// The scratch Record is recycled by the next read.
+			if (_compact) {
+				databaseFile->deleteRecord(record);
+			}
 		}
 	}
 	for (mainMapType::iterator it = _mainMap.begin(); it != _mainMap.end(); ++it) {
@@ -42,6 +73,7 @@ void BinTree::loadDB()
 
 void BinTree::getHits(Record *record, RecordKeyVector &hitSet)
 {
+	_poolUsed = 0;
 	if (record->isUnmapped()) {
 		return;
 	}
@@ -87,7 +119,15 @@ void BinTree::getHits(Record *record, RecordKeyVector &hitSet)
             	if (iter->end < startPos || iter->start > endPos) {
             		continue;
             	}
-            	Record *dbRec = iter->record;
+            	Record *dbRec;
+            	if (_compact) {
+            		Bed3Interval *h = nextPoolRecord();
+            		h->setHitFields(_lastQueryBins->chr, iter->start, iter->end,
+            				(int)(iter->meta >> 1), (iter->meta & 1) != 0);
+            		dbRec = h;
+            	} else {
+            		dbRec = iter->record;
+            	}
             	if (record->intersects(dbRec,
                                        _context->getSameStrand(),
                                        _context->getDiffStrand(),
@@ -100,6 +140,7 @@ void BinTree::getHits(Record *record, RecordKeyVector &hitSet)
                     )
                 {
             		hitSet.push_back(dbRec);
+            		if (_compact) _poolUsed++;
             	}
             }
         }
@@ -131,13 +172,21 @@ bool BinTree::addRecordToTree(Record *record)
 		allBinsType *&slot = _mainMap[chr];
 		if (slot == NULL) {
 			slot = new allBinsType();
+			slot->chr = record->getChrRef();
 		}
 		_lastAddChr = chr;
 		_lastAddBins = slot;
 	}
 	allBinsType *bins = _lastAddBins;
 	_haveQueryChr = false;
-	binEntry entry = {startPos, endPos, record};
+	binEntry entry;
+	entry.start = startPos;
+	entry.end = endPos;
+	if (_compact) {
+		entry.meta = ((int64_t)record->getFileIdx() << 1) | (record->isZeroLength() ? 1 : 0);
+	} else {
+		entry.record = record;
+	}
 	bins->stage(binNum, entry);
 	return true;
 }

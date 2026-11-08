@@ -138,6 +138,16 @@ public:
 	virtual void setChrName(const string &chr) { _chrName = chr; }
 	virtual void setChrName(const char *chr) { _chrName = chr; }
 
+	const ChrRef &getChrRef() const { return _chrName; }
+	// Sets the fields of a database hit rebuilt from a compact entry.
+	void setHitFields(const ChrRef &chr, CHRPOS start, CHRPOS end, int fileIdx, bool zeroLength) {
+		_chrName = chr;
+		_startPos = start;
+		_endPos = end;
+		_fileIdx = fileIdx;
+		_zeroLength = zeroLength;
+	}
+
 	virtual int getFileIdx() const { return _fileIdx; }
 	virtual void setFileIdx(int fileIdx) { _fileIdx = fileIdx; }
 

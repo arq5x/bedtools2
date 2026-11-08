@@ -19,6 +19,8 @@
 #include "string.h"
 #include "RecordKeyList.h"
 #include "ContextIntersect.h"
+#include "Record.h"
+#include "Bed3Interval.h"
 
 using namespace std;
 
@@ -58,10 +60,15 @@ private:
 
 	// A database record beside its coordinates (as stored when it was added), so a
 	// candidate that cannot overlap the query is rejected without touching the Record.
+	// When the database is held compactly (see loadDB) the entry carries no Record: `meta`
+	// holds the file index and the zero-length flag, and getHits rebuilds a transient hit.
 	struct binEntry {
 		CHRPOS start;
 		CHRPOS end;
-		Record *record;
+		union {
+			Record *record;
+			int64_t meta;
+		};
 	};
 	// For each bin number, its entries. Filled in two steps: addRecordToTree stages
 	// (bin, entry) pairs; finalize() lays the entries of every bin out in one
@@ -70,6 +77,7 @@ private:
 	// consecutive bin numbers, allocated on first use.
 	class allBinsType {
 	public:
+		ChrRef chr; // the chromosome's name, for hits rebuilt from compact entries
 		allBinsType() : _table((NUM_BINS + CHUNK_BINS - 1) / CHUNK_BINS, (Chunk *)NULL) {}
 		~allBinsType() {
 			for (size_t i = 0; i < _table.size(); i++) delete _table[i];
@@ -150,6 +158,14 @@ private:
 	allBinsType *_lastAddBins;
 
 	map<binNumType, int> _binsHit;
+
+	// Compact mode: the database is staged as (start, end, file index, zero-length flag)
+	// and each query's hits are transient Records from a pool reset by the next getHits.
+	bool _compact;
+	vector<Bed3Interval *> _pool;
+	vector<Bed3Interval *> _poolBlocks;
+	size_t _poolUsed;
+	Bed3Interval *nextPoolRecord();
 
 	bool addRecordToTree(Record *);
 	binNumType getBin(binNumType start, binNumType end) const;
