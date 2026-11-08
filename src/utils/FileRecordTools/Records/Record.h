@@ -212,8 +212,6 @@ public:
 	void setFileRecordManager(FileRecordMgr *frm);
 	FileRecordMgr * getFileRecordManager();
 
-	vector<int> block_starts;
-	vector<int> block_ends;
 
 protected:
 
