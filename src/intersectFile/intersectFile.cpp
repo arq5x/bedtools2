@@ -44,7 +44,7 @@ bool IntersectFile::init() {
 	 } else {
 		_binTree = new BinTree( upCast(_context));
 		_binTree->loadDB();
-		if (!upCast(_context)->getSameStrand() && !upCast(_context)->getDiffStrand() && !upCast(_context)->getObeySplits()) {
+		if (!upCast(_context)->getObeySplits()) {
 			_queryFRM->setQueryFast(true);
 		}
 	 }
