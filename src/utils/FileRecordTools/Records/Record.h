@@ -151,13 +151,14 @@ public:
 	virtual bool isValid() const { return _isValidHit; }
 
 	virtual const string &getChrName() const { return _chrName.str(); }
-	virtual void setChrName(const string &chr) { _chrName = chr; }
-	virtual void setChrName(const char *chr) { _chrName = chr; }
+	virtual void setChrName(const string &chr) { _chrName = chr; _lineValid = false; }
+	virtual void setChrName(const char *chr) { _chrName = chr; _lineValid = false; }
 
 	const ChrRef &getChrRef() const { return _chrName; }
 	// Sets the fields of a database hit rebuilt from a compact entry.
 	void setHitFields(const ChrRef &chr, CHRPOS start, CHRPOS end, int fileIdx, bool zeroLength) {
 		_chrName = chr;
+		_lineValid = false;
 		_startPos = start;
 		_endPos = end;
 		_fileIdx = fileIdx;
@@ -345,6 +346,19 @@ protected:
 	// Fast path for fields 4-6 of a tab-delimited line; false when it does not apply.
 	bool initNameScoreStrand(SingleLineDelimTextFileReader *fileReader);
 	void setFastCoords(const ChrRef &chr, CHRPOS s, CHRPOS e, int fileIdx);
+	// The whole input line of a fast-path record; printed as it stands while nothing it
+	// holds has changed since the parse.
+	string _line;
+	bool _lineValid;
+	void setFastLine(const char *line, size_t len) { _line.assign(line, len); _lineValid = true; }
+	bool appendLine(string &buf) const {
+		if (_lineValid && !_zeroLength && _posMode == POS_PLAIN && _nsMode != NS_FIELDS
+				&& _startPos == _origStart && _endPos == _origEnd) {
+			buf.append(_line);
+			return true;
+		}
+		return false;
+	}
 	void setFastNameScoreStrand(const char *p, size_t len);
 	string &nameRef() const { if (_nsMode != NS_FIELDS) nsToFields(); return _nsBox.get()->name; }
 	string &scoreRef() const { if (_nsMode != NS_FIELDS) nsToFields(); return _nsBox.get()->score; }
