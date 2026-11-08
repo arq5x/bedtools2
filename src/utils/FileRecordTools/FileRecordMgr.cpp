@@ -29,7 +29,8 @@ FileRecordMgr::FileRecordMgr(const string &filename)
   _noEnforceCoordSort(false),
   _isGroupBy(false),
   _isCram(false),
-  _coordsOnly(false)
+  _coordsOnly(false),
+  _sweepCoords(false)
  {
 }
 
@@ -120,6 +121,22 @@ Record *FileRecordMgr::getNextRecord(RecordKeyVector *keyList)
 		return NULL;
 	}
 	return recordFromLine(keyList);
+}
+
+Record *FileRecordMgr::getNextRecordSweep()
+{
+	if (!_sweepCoords) return getNextRecord();
+	if (!_fileReader->isOpen() || !_fileReader->readEntry()) {
+		return NULL;
+	}
+	SingleLineDelimTextFileReader *r = static_cast<SingleLineDelimTextFileReader*>(_fileReader);
+	const int *dp = r->getDelimPositions();
+	size_t chrLen = (size_t)(dp[1] - dp[0] - 1);
+	bool same = chrLen == _sweepChr.size() && memcmp(r->getLineData() + dp[0] + 1, _sweepChr.data(), chrLen) == 0;
+	r->setCoordsOnly(same);
+	Record *rec = recordFromLine(NULL);
+	if (!same && rec != NULL) _sweepChr = rec->getChrName();
+	return rec;
 }
 
 void FileRecordMgr::getCurrentLine(const char *&line, size_t &lineLen) const
@@ -265,9 +282,8 @@ void FileRecordMgr::sortError(const Record *record, bool genomeFileError)
 // An error message prints the whole record: parse the current line in full first.
 void FileRecordMgr::fullReparse(Record *record)
 {
-	if (!_coordsOnly) return;
 	SingleLineDelimTextFileReader *r = dynamic_cast<SingleLineDelimTextFileReader *>(_fileReader);
-	if (r == NULL) return;
+	if (r == NULL || !r->getCoordsOnly()) return;
 	r->setCoordsOnly(false);
 	record->initFromFile(r);
 }
@@ -294,6 +310,7 @@ void FileRecordMgr::allocateFileReader(bool inheader)
 
 	case FileRecordTypeChecker::BAM_FILE_TYPE:
 		_fileReader = new BamFileReader();
+		_sweepCoords = false;
 		(static_cast<BamFileReader *>(_fileReader))->setUseTags(_useFullBamTags);
 		(static_cast<BamFileReader *>(_fileReader))->setBamReader(_bufStreamMgr->getBamReader());
 		break;

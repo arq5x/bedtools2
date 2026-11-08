@@ -289,7 +289,7 @@ bool NewChromSweep::nextRecord(bool query, int dbIdx) {
         }
         return false;
     } else { //database
-        Record *rec = _dbFRMs[dbIdx]->getNextRecord();
+        Record *rec = _dbFRMs[dbIdx]->getNextRecordSweep();
         _currDbRecs[dbIdx] = rec;
         if (rec != NULL) {
             _databaseRecordsTotalLength += (unsigned long)(rec->getLength(_context->getObeySplits()));

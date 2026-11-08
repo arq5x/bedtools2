@@ -44,6 +44,10 @@ public:
 	//NOTE!! User MUST pass back the returned pointer to deleteRecord method for cleanup!
 	//Also Note! User must check for NULL returned, meaning we failed to get the next record.
 	virtual Record *getNextRecord(RecordKeyVector *keyList = NULL);
+	// Sweep database read: a line of the previous line's chromosome is parsed
+	// with coordinates only when setSweepCoords(true); other lines in full.
+	Record *getNextRecordSweep();
+	void setSweepCoords(bool val) { _sweepCoords = val; }
 	// For BED-type coords-only files loaded without keeping Records: 0 = no record,
 	// 1 = line of chromosome lastChr with plain coordinates, returned in start/end
 	// (zero-length adjusted, flagged in zeroLen), 2 = any other line, parsed in full into rec.
@@ -160,6 +164,8 @@ protected:
 	bool _isGroupBy; //hopefully also only true for GroupBy
 	bool _isCram;
 	bool _coordsOnly;
+	bool _sweepCoords;
+	string _sweepChr;
 
 	void allocateFileReader(bool inheader=false);
 	void testInputSortOrder(Record *record);
