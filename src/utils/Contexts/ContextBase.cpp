@@ -345,6 +345,7 @@ bool ContextBase::openFiles() {
 		frm->setFullBamFlags(_useFullBamTags);
 		frm->setIsSorted(_sortedInput);
 		frm->setCoordsOnly(coordsOnlyFile(i));
+		frm->setSweepCoords(sweepCoordsFile(i));
 		frm->setIoBufSize(_ioBufSize);
 		frm->setIsGroupBy(_program == GROUP_BY);
 		if (!frm->open(_inheader)) {

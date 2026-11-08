@@ -110,11 +110,21 @@ public:
 	// Plain intersect never prints or reads a database record's name, score,
 	// strand or extra columns under these options.
 	virtual bool coordsOnlyFile(int fileIdx) const {
+		return !_sortedInput && dbCoordsOnly(fileIdx);
+	}
+
+	// The same options under -sorted: the sweep parses a database line after the
+	// first of its chromosome with coordinates only (FileRecordMgr::getNextRecordSweep).
+	virtual bool sweepCoordsFile(int fileIdx) const {
+		return _sortedInput && dbCoordsOnly(fileIdx);
+	}
+
+	bool dbCoordsOnly(int fileIdx) const {
 		if (_program != INTERSECT || fileIdx == _queryFileIdx) return false;
 		bool isDb = false;
 		for (size_t i = 0; i < _dbFileIdxs.size(); i++) if (_dbFileIdxs[i] == fileIdx) isDb = true;
 		return isDb && !_writeB && !_writeOverlap && !_writeAllOverlap && !_leftJoin
-			&& !_sortedInput && !_sameStrand && !_diffStrand && !_obeySplits && !_reportDBnameTags
+			&& !_sameStrand && !_diffStrand && !_obeySplits && !_reportDBnameTags
 			&& !_reportDBfileNames && !_hasColumnOpsMethods && !_useMergedIntervals;
 	}
 
