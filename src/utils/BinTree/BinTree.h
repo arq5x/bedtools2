@@ -197,6 +197,7 @@ private:
 	int64_t appendText(Record *record);
 
 	bool addRecordToTree(Record *);
+	bool stageCoords(binNumType startPos, binNumType endPos, int64_t meta);
 	binNumType getBin(binNumType start, binNumType end) const;
 	binNumType getBin(const Record *record) const;
 

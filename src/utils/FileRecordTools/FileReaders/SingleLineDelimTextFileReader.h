@@ -28,6 +28,8 @@ public:
 	virtual int getNumFields() const { return _numFields; }
 	const char *getLineData() const { return _line; }
 	const int *getDelimPositions() const { return _delimPositions; }
+	// True and val set only for a non-negative plain decimal (no leading zero, 1-18 digits).
+	bool getPlainPos(int fieldNum, CHRPOS &val) const;
 	virtual void getField(int numField, string &val) const;
 	virtual void getField(int numField, CHRPOS &val) const; //this signaiture isn't const because it operates on an internal string for speed.
 	virtual void getField(int fieldNum, char &val) const;
