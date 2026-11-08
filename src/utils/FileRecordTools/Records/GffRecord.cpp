@@ -32,12 +32,12 @@ bool GffRecord::initFromFile(SingleLineDelimTextFileReader *fileReader)
 	//endPos is just the startPos plus the length of the variant
 	_endPos = str2chrPos(endStr());
 
-	fileReader->getField(2, _name);
+	fileReader->getField(2, nameRef());
 	fileReader->getField(1, _source);
-	fileReader->getField(5, _score);
+	fileReader->getField(5, scoreRef());
 
 	//GFF allows a '.' for the strandChar, signifying it is not known.
-	fileReader->getField(6, _strand);
+	fileReader->getField(6, strandRef());
 	adjustStrandVal();
 
 	fileReader->getField(7, _frame);
@@ -57,7 +57,7 @@ void GffRecord::print(string &outBuf) const
 	s << "\t";
 	s << _source;
 	s << "\t";
-	s << _name;
+	s << nameRef();
 	s << "\t";
 	s << startStr();
 	s << "\t";
@@ -74,7 +74,7 @@ void GffRecord::print(string &outBuf, CHRPOS start, CHRPOS end) const
 	s << "\t";
 	s << _source;
 	s << "\t";
-	s << _name;
+	s << nameRef();
 	s << "\t";
 	s << start;
 	s << "\t";
@@ -90,7 +90,7 @@ void GffRecord::print(string &outBuf, const string & start, const string & end) 
 	outBuf.append("\t");
 	outBuf.append(_source);
 	outBuf.append("\t");
-	outBuf.append(_name);
+	outBuf.append(nameRef());
 	outBuf.append("\t");
 	outBuf.append(start);
 	outBuf.append("\t");
@@ -102,9 +102,9 @@ void GffRecord::print(string &outBuf, const string & start, const string & end) 
 
 void GffRecord::printRemainingFields(string &outBuf) const
 {
-	outBuf.append(_score);
+	outBuf.append(scoreRef());
 	outBuf.append("\t");
-	outBuf.append(_strand);
+	outBuf.append(strandRef());
 	outBuf.append("\t");
 	outBuf.append(_frame);
 	if (_numFields == 9) {
@@ -134,7 +134,7 @@ const string &GffRecord::getField(int fieldNum) const
 		return _source;
 		break;
 	case 3:
-		return _name;
+		return nameRef();
 		break;
 	case 4:
 		return startStr();
@@ -143,10 +143,10 @@ const string &GffRecord::getField(int fieldNum) const
 		return endStr();
 		break;
 	case 6:
-		return _score;
+		return scoreRef();
 		break;
 	case 7:
-		return _strand;
+		return strandRef();
 		break;
 	case 8:
 		return _frame;

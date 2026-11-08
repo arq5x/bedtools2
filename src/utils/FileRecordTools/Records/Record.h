@@ -105,6 +105,8 @@ static inline void append_cstr(string& buf, const string& s) {
 	buf.append(s.c_str());
 }
 
+class SingleLineDelimTextFileReader;
+
 class Record {
 public:
 	friend class RecordMgr;
@@ -155,27 +157,30 @@ public:
 	virtual bool getZeroLength() const { return _zeroLength; }
 	virtual void setZeroLength(bool val) { _zeroLength = val; }
 
-	virtual const string &getStrand() const { return _strand; }
+	virtual const string &getStrand() const { return strandRef(); }
 	virtual void setStrand(const string &val) {
-		_strand = val;
+		strandRef() = val;
 		_strandVal = (val == "+" ? FORWARD : (val == "-" ? REVERSE : UNKNOWN));
 	}
-	virtual void setStrand(char val) { _strand = val;
+	virtual void setStrand(char val) { strandRef() = val;
 		_strandVal = (val == '+' ? FORWARD : (val == '-' ? REVERSE : UNKNOWN));
 	}
 	virtual void adjustStrandVal() {
-		_strandVal = (_strand == "+" ? FORWARD : (_strand == "-" ? REVERSE : UNKNOWN));
+		_strandVal = (strandRef() == "+" ? FORWARD : (strandRef() == "-" ? REVERSE : UNKNOWN));
 	}
 
 	virtual strandType getStrandVal() const {return _strandVal; }
 
-	virtual const string &getName() const { return _name; }
-	virtual void setName(const string &name) { _name = name; }
-	virtual void setName(const char *chr) { _name = chr; }
+	virtual const string &getName() const { return nameRef(); }
+	virtual void setName(const string &name) { nameRef() = name; }
+	virtual void setName(const char *chr) { nameRef() = chr; }
 
-	virtual const string &getScore() const { return _score; }
-	virtual void setScore(const string &score) { _score = score; }
-	virtual void setScore(const char *chr) { _score = chr; }
+	virtual const string &getScore() const { return scoreRef(); }
+	virtual void setScore(const string &score) { scoreRef() = score; }
+	virtual void setScore(const char *chr) { scoreRef() = chr; }
+
+	// Appends "name\tscore\tstrand" to buf.
+	void appendNameScoreStrand(string &buf) const;
 
 	virtual const string &getField(int fieldNum) const;
 	virtual int getNumFields() const  = 0;
@@ -284,9 +289,40 @@ protected:
 	void materializePosStrs() const;
 	string &startStr() const { if (_posMode != POS_STRINGS) materializePosStrs(); return _posBox.get()->start; }
 	string &endStr() const { if (_posMode != POS_STRINGS) materializePosStrs(); return _posBox.get()->end; }
-	string _name;
-	string _score;
-	string _strand;
+	// Name, score and strand are kept as one tab-joined string when a BED6 line is parsed
+	// (NS_TEXT); the three strings of a side box are built on first access (NS_FIELDS).
+	enum { NS_EMPTY = 0, NS_TEXT = 1, NS_FIELDS = 2 };
+	struct NSBox {
+		string name;
+		string score;
+		string strand;
+	};
+	class NSPtr {
+	public:
+		NSPtr() : _p(NULL) {}
+		NSPtr(const NSPtr &o) : _p(o._p ? new NSBox(*o._p) : NULL) {}
+		NSPtr &operator=(const NSPtr &o) {
+			if (this != &o) { NSBox *n = o._p ? new NSBox(*o._p) : NULL; delete _p; _p = n; }
+			return *this;
+		}
+		~NSPtr() { delete _p; }
+		NSBox *get() const { return _p; }
+		NSBox *make() { if (!_p) _p = new NSBox(); return _p; }
+	private:
+		NSBox *_p;
+	};
+	// Invariant: the box strings are empty unless _nsMode == NS_FIELDS.
+	mutable string _nsText;
+	mutable NSPtr _nsBox;
+	mutable char _nsMode;
+	void nsToFields() const;
+	// Fast path for fields 4-6 of a tab-delimited line; false when it does not apply.
+	bool initNameScoreStrand(SingleLineDelimTextFileReader *fileReader);
+	string &nameRef() const { if (_nsMode != NS_FIELDS) nsToFields(); return _nsBox.get()->name; }
+	string &scoreRef() const { if (_nsMode != NS_FIELDS) nsToFields(); return _nsBox.get()->score; }
+	string &strandRef() const { if (_nsMode != NS_FIELDS) nsToFields(); return _nsBox.get()->strand; }
+	// Sets the text "name\tscore\tstrand" (NS_TEXT).
+	void setNameScoreStrandText(const char *p, size_t len);
 	strandType _strandVal;
 	bool _zeroLength;
 	bool _isUnmapped;

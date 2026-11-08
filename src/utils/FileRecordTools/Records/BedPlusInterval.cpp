@@ -20,10 +20,12 @@ bool BedPlusInterval::initFromFile(SingleLineDelimTextFileReader *fileReader)
 	if (fileReader->getCoordsOnly()) return baseRetFlag;
 
 	if (_numFixedFields != defaultNumFixedFields) {
-		fileReader->getField(3, _name);
-		fileReader->getField(4, _score);
-		fileReader->getField(5, _strand);
-		adjustStrandVal();
+		if (!initNameScoreStrand(fileReader)) {
+			fileReader->getField(3, nameRef());
+			fileReader->getField(4, scoreRef());
+			fileReader->getField(5, strandRef());
+			adjustStrandVal();
+		}
 	}
 	_plusFields.initFromFile(fileReader);
 	return baseRetFlag;
@@ -75,12 +77,12 @@ const string &BedPlusInterval::getField(int fieldNum) const
 	if (fieldNum > _numFixedFields) {
 		return _plusFields.getField(fieldNum);
 	} else if (fieldNum == 4 && _numFixedFields >=4) {
-		return _name;
+		return nameRef();
 	} else if (fieldNum == 5 && _numFixedFields >=5) {
-		return _score;
+		return scoreRef();
 	}
 	else if (fieldNum == 6 && _numFixedFields >=6) {
-		return _strand;
+		return strandRef();
 	}
 	return Bed3Interval::getField(fieldNum);
 }
@@ -100,11 +102,7 @@ bool BedPlusInterval::isNumericField(int fieldNum) {
 
 void BedPlusInterval::printBed6PlusFields(string &outBuf) const {
 	if (_numFixedFields != defaultNumFixedFields) {
-		outBuf.append(_name);
-		outBuf.append("\t");
-		outBuf.append(_score);
-		outBuf.append("\t");
-		outBuf.append(_strand);
+		appendNameScoreStrand(outBuf);
 		outBuf.append("\t");
 	}
 }

@@ -34,8 +34,8 @@ bool VcfRecord::initFromFile(SingleLineDelimTextFileReader *fileReader)
 		_endPos = _startPos + _varRef.size();
 	}
 	int2str(_endPos, endStr());
-	fileReader->getField(2, _name);
-	fileReader->getField(5, _score);
+	fileReader->getField(2, nameRef());
+	fileReader->getField(5, scoreRef());
 
 	_plusFields.setNumOffsetFields(numFixedFields);
 	return _plusFields.initFromFile(fileReader);
@@ -79,13 +79,13 @@ void VcfRecord::printNull(string &outBuf) const {
 
 void VcfRecord::printOtherFields(string &outBuf) const {
 	outBuf.append("\t");
-	outBuf.append(_name);
+	outBuf.append(nameRef());
 	outBuf.append("\t");
 	outBuf.append(_varRef);
 	outBuf.append("\t");
 	outBuf.append(_varAlt);
 	outBuf.append("\t");
-	outBuf.append(_score);
+	outBuf.append(scoreRef());
 	outBuf.append("\t");
 	_plusFields.printFields(outBuf);
 }
@@ -103,7 +103,7 @@ const string &VcfRecord::getField(int fieldNum) const
 		return startStr();
 		break;
 	case 3:
-		return _name;
+		return nameRef();
 	case 4:
 		return _varRef;
 		break;
@@ -111,7 +111,7 @@ const string &VcfRecord::getField(int fieldNum) const
 		return _varAlt;
 		break;
 	case 6:
-		return _score;
+		return scoreRef();
 	default:
 		return BedPlusInterval::getField(fieldNum);
 		break;

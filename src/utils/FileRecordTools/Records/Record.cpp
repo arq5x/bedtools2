@@ -1,4 +1,5 @@
 #include "Record.h"
+#include "SingleLineDelimTextFileReader.h"
 #include <cstdio>
 
 Record::Record()
@@ -10,6 +11,7 @@ Record::Record()
   _posMode(POS_NONE),
   _origStart(0),
   _origEnd(0),
+  _nsMode(NS_EMPTY),
   _zeroLength(false),
   _isUnmapped(false),
   _isMateUnmapped(false),
@@ -42,6 +44,56 @@ void Record::materializePosStrs() const {
 	_posMode = POS_STRINGS;
 }
 
+void Record::nsToFields() const {
+	NSBox *b = _nsBox.make();
+	if (_nsMode == NS_TEXT) {
+		size_t t1 = _nsText.find('\t');
+		size_t t2 = _nsText.find('\t', t1 + 1);
+		b->name.assign(_nsText, 0, t1);
+		b->score.assign(_nsText, t1 + 1, t2 - t1 - 1);
+		b->strand.assign(_nsText, t2 + 1, string::npos);
+		_nsText.clear();
+	}
+	_nsMode = NS_FIELDS;
+}
+
+bool Record::initNameScoreStrand(SingleLineDelimTextFileReader *fileReader) {
+	const char *line = fileReader->getLineData();
+	const int *d = fileReader->getDelimPositions();
+	if (line[d[4]] != '\t' || line[d[5]] != '\t') return false;
+	setNameScoreStrandText(line + d[3] + 1, d[6] - d[3] - 1);
+	char c = line[d[5] + 1];
+	bool one = (d[6] - d[5] == 2);
+	_strandVal = (one && c == '+') ? FORWARD : ((one && c == '-') ? REVERSE : UNKNOWN);
+	return true;
+}
+
+void Record::setNameScoreStrandText(const char *p, size_t len) {
+	if (_nsMode == NS_FIELDS) {
+		NSBox *b = _nsBox.get();
+		b->name.clear();
+		b->score.clear();
+		b->strand.clear();
+	}
+	_nsText.assign(p, len);
+	_nsMode = NS_TEXT;
+}
+
+void Record::appendNameScoreStrand(string &buf) const {
+	if (_nsMode == NS_TEXT) {
+		buf.append(_nsText);
+	} else if (_nsMode == NS_FIELDS) {
+		const NSBox *b = _nsBox.get();
+		append_cstr(buf, b->name);
+		buf.push_back('\t');
+		append_cstr(buf, b->score);
+		buf.push_back('\t');
+		append_cstr(buf, b->strand);
+	} else {
+		buf.append("\t\t", 2);
+	}
+}
+
 Record::~Record()
 {
 	//_frm->deleteRecord(this);
@@ -54,9 +106,9 @@ const Record &Record::operator=(const Record &other)
 	_chrId = other._chrId;
 	_startPos = other._startPos;
 	_endPos = other._endPos;
-	_strand = other._strand;
+	strandRef() = other.strandRef();
 	_strandVal = other._strandVal;
-	_name = other._name;
+	nameRef() = other.nameRef();
 	return *this;
 }
 
@@ -66,9 +118,15 @@ void Record::clear() {
 	_chrId = -1;
 	_startPos = -1;
 	_endPos = -1;
-	_name.clear();
-	_score.clear();
-	_strand.clear();
+	if (_nsMode == NS_FIELDS) {
+		NSBox *b = _nsBox.get();
+		b->name.clear();
+		b->score.clear();
+		b->strand.clear();
+	} else if (_nsMode == NS_TEXT) {
+		_nsText.clear();
+	}
+	_nsMode = NS_EMPTY;
 	_strandVal = UNKNOWN;
 	_posMode = POS_NONE;
 	_zeroLength = false;
