@@ -122,13 +122,27 @@ int SingleLineDelimTextFileReader::readCoordsLine(const string &lastChr, CHRPOS 
 			}
 			size_t nd2 = q - d2;
 			if (nd2 >= 1 && nd2 <= 18 && (*d2 != '0' || nd2 == 1) && v <= w) {
-				int tabs = 2;
-				unsigned char nul = 0;
-				for (const char *r = q; r < end; r++) {
-					tabs += (*r == '\t');
-					nul |= (unsigned char)(*r == 0);
+				// The line is NUL-terminated at _lineLen, so strlen finds an embedded NUL.
+				size_t tailLen = (size_t)(end - q);
+				bool nul = strlen(q) != tailLen;
+				size_t tabs = 2;
+				const char *r = q;
+				if (!nul) {
+					const uint64_t lo7 = 0x7f7f7f7f7f7f7f7fULL;
+					const uint64_t ones = 0x0101010101010101ULL;
+					for (; (size_t)(end - r) >= 8; r += 8) {
+						uint64_t x;
+						memcpy(&x, r, 8);
+						x ^= ones * '\t';
+						// high bit of each byte set where the byte is a tab
+						uint64_t t = ~(((x & lo7) + lo7) | x | lo7);
+						tabs += (size_t)(((t >> 7) * ones) >> 56);
+					}
+					for (; r < end; r++) {
+						tabs += (*r == '\t');
+					}
 				}
-				if (!nul && tabs + 1 == _numFields && memchr(line, 0, chrLen) == NULL) {
+				if (!nul && (int)(tabs + 1) == _numFields && memchr(line, 0, chrLen) == NULL) {
 					s = v;
 					e = w;
 					_fullHeaderFound = true;
