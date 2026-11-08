@@ -3,7 +3,7 @@
 
 
 BinTree::BinTree(ContextIntersect *context) 
-:  _context(context) {
+:  _context(context), _lastQueryBins(NULL), _haveQueryChr(false), _lastAddBins(NULL) {
 }
 
 BinTree::~BinTree() {
@@ -42,8 +42,13 @@ void BinTree::getHits(Record *record, RecordKeyVector &hitSet)
 		return;
 	}
     const string &chr = record->getChrName();
-	mainMapType::iterator mainIter = _mainMap.find(chr);
-	if (mainIter == _mainMap.end()) {
+	if (!_haveQueryChr || chr != _lastQueryChr) {
+		mainMapType::iterator mainIter = _mainMap.find(chr);
+		_lastQueryChr = chr;
+		_haveQueryChr = true;
+		_lastQueryBins = (mainIter == _mainMap.end()) ? NULL : mainIter->second;
+	}
+	if (_lastQueryBins == NULL) {
 		//given chrom not even in map.
 		return;
 	}
@@ -55,7 +60,7 @@ void BinTree::getHits(Record *record, RecordKeyVector &hitSet)
     binNumType endBin = ((endPos-1) >> _binFirstShift);
 
 
-	const allBinsType &bins = *mainIter->second;
+	const allBinsType &bins = *_lastQueryBins;
 
     /* SYNOPSIS:
          1. We loop through each UCSC BIN level for feature A's chrom.
@@ -119,10 +124,16 @@ bool BinTree::addRecordToTree(Record *record)
                                 "structure bedtools uses to find intersections.", binNum, NUM_BINS);
 		return false;
 	}
-	allBinsType *&bins = _mainMap[chr];
-	if (bins == NULL) {
-		bins = new allBinsType();
+	if (_lastAddBins == NULL || chr != _lastAddChr) {
+		allBinsType *&slot = _mainMap[chr];
+		if (slot == NULL) {
+			slot = new allBinsType();
+		}
+		_lastAddChr = chr;
+		_lastAddBins = slot;
 	}
+	allBinsType *bins = _lastAddBins;
+	_haveQueryChr = false;
 	binEntry entry = {startPos, endPos, record};
 	(*bins)[binNum].push_back(entry);
 	return true;
