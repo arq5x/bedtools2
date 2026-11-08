@@ -89,20 +89,33 @@ static inline const char* buffer_printf(const char* fmt, ...) {
 
 // Appends v as "%" PRId_CHRPOS would print it.
 static inline void append_chrpos(string& buf, CHRPOS v) {
+	static const char pairs[201] =
+		"00010203040506070809101112131415161718192021222324252627282930313233343536373839404142434445464748495051525354555657585960616263646566676869707172737475767778798081828384858687888990919293949596979899";
 	char tmp[24];
 	char* e = tmp + sizeof(tmp);
 	char* p = e;
 	uint64_t u = v < 0 ? 0 - (uint64_t)v : (uint64_t)v;
-	do {
-		*--p = (char)('0' + u % 10);
-		u /= 10;
-	} while (u);
+	while (u >= 100) {
+		uint64_t q = u / 100;
+		unsigned r = (unsigned)(u - q * 100);
+		p -= 2;
+		p[0] = pairs[2 * r];
+		p[1] = pairs[2 * r + 1];
+		u = q;
+	}
+	if (u >= 10) {
+		p -= 2;
+		p[0] = pairs[2 * u];
+		p[1] = pairs[2 * u + 1];
+	} else {
+		*--p = (char)('0' + u);
+	}
 	if (v < 0) *--p = '-';
 	buf.append(p, e - p);
 }
 
 static inline void append_cstr(string& buf, const string& s) {
-	buf.append(s.c_str());
+	buf.append(s.data(), s.size());
 }
 
 class SingleLineDelimTextFileReader;
