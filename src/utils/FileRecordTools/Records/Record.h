@@ -53,6 +53,24 @@ static inline const char* buffer_printf(const char* fmt, ...) {
 }
 
 
+// Appends v as "%" PRId_CHRPOS would print it.
+static inline void append_chrpos(string& buf, CHRPOS v) {
+	char tmp[24];
+	char* e = tmp + sizeof(tmp);
+	char* p = e;
+	uint64_t u = v < 0 ? 0 - (uint64_t)v : (uint64_t)v;
+	do {
+		*--p = (char)('0' + u % 10);
+		u /= 10;
+	} while (u);
+	if (v < 0) *--p = '-';
+	buf.append(p, e - p);
+}
+
+static inline void append_cstr(string& buf, const string& s) {
+	buf.append(s.c_str());
+}
+
 class Record {
 public:
 	friend class RecordMgr;
