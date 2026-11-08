@@ -49,6 +49,40 @@ void BlockMgr::getBlocks(RecordKeyVector &keyList, bool &mustDelete)
 	}
 }
 
+// Splits on ',' like getline: consecutive delimiters give empty tokens and a final empty token is dropped.
+static int splitBlockField(const string &str, vector<pair<size_t, size_t> > &toks)
+{
+	toks.clear();
+	size_t n = str.size();
+	const char *data = str.data();
+	size_t pos = 0;
+	while (pos < n) {
+		const void *hit = memchr(data + pos, ',', n - pos);
+		size_t end = hit ? (size_t)((const char *)hit - data) : n;
+		toks.push_back(make_pair(pos, end - pos));
+		pos = end + 1;
+	}
+	return (int)toks.size();
+}
+
+// Plain non-negative decimals are parsed in place; anything else goes through str2chrPos on a copy.
+static CHRPOS parseBlockToken(const string &str, const pair<size_t, size_t> &tok)
+{
+	const char *p = str.data() + tok.first;
+	size_t len = tok.second;
+	if (len > 0 && len <= 18) {
+		long long result = 0;
+		size_t i = 0;
+		for (; i < len; i++) {
+			char c = p[i];
+			if (c < '0' || c > '9') break;
+			result = result * 10 + (c - '0');
+		}
+		if (i == len) return (CHRPOS)result;
+	}
+	return str2chrPos(string(p, len));
+}
+
 void BlockMgr::getBlocksFromBed12(RecordKeyVector &keyList, bool &mustDelete)
 {
 	const Bed12Interval *keyRecord = static_cast<const Bed12Interval *>(keyList.getKey());
@@ -59,8 +93,10 @@ void BlockMgr::getBlocksFromBed12(RecordKeyVector &keyList, bool &mustDelete)
     	return;
     }
 
-    int sizeCount = _blockSizeTokens.tokenize(keyRecord->getBlockSizes(), ',');
-    int startCount = _blockStartTokens.tokenize(keyRecord->getBlockStarts(), ',');
+    const string &sizesStr = keyRecord->getBlockSizes();
+    const string &startsStr = keyRecord->getBlockStarts();
+    int sizeCount = splitBlockField(sizesStr, _blockSizeToks);
+    int startCount = splitBlockField(startsStr, _blockStartToks);
 
     if (blockCount != sizeCount || sizeCount != startCount) {
     	fprintf(stderr, "Error: found wrong block counts while splitting entry.\n");
@@ -68,8 +104,8 @@ void BlockMgr::getBlocksFromBed12(RecordKeyVector &keyList, bool &mustDelete)
     }
 
     for (int i=0; i < blockCount; i++) {
-    	CHRPOS startPos = keyRecord->getStartPos() + str2chrPos(_blockStartTokens.getElem(i).c_str());
-    	CHRPOS endPos = startPos + str2chrPos(_blockSizeTokens.getElem(i).c_str());
+    	CHRPOS startPos = keyRecord->getStartPos() + parseBlockToken(startsStr, _blockStartToks[i]);
+    	CHRPOS endPos = startPos + parseBlockToken(sizesStr, _blockSizeToks[i]);
 
     	Record *record = allocateAndAssignRecord(keyRecord, startPos, endPos);
     	keyList.push_back(record);
