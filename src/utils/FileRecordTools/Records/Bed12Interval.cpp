@@ -64,11 +64,7 @@ void Bed12Interval::clear() {
 	outBuf.push_back('\t');
 	append_chrpos(outBuf, end);
 	outBuf.push_back('\t');
-	append_cstr(outBuf, what._name);
-	outBuf.push_back('\t');
-	append_cstr(outBuf, what._score);
-	outBuf.push_back('\t');
-	append_cstr(outBuf, what._strand);
+	what.appendNameScoreStrand(outBuf);
 	outBuf.push_back('\t');
 	append_cstr(outBuf, what._thickStartStr);
 	outBuf.push_back('\t');

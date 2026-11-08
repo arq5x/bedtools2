@@ -56,8 +56,8 @@ bool BamRecord::initFromFile(BamFileReader *bamFileReader)
 	int2str((int)_startPos, startStr());
 	_endPos = bamFileReader->getEndPos();
 	int2str((int)_endPos, endStr());
-	bamFileReader->getName(_name);
-	bamFileReader->getScore(_score);
+	bamFileReader->getName(nameRef());
+	bamFileReader->getScore(scoreRef());
 	char strandChar = bamFileReader->getStrand();
 	setStrand(strandChar);
 
@@ -187,9 +187,9 @@ void BamRecord::printUnmapped(string &outBuf) const {
 	ostringstream s;
     s << (_chrName.empty() ? string(".") : _chrName.str());
     s << "\t-1\t-1\t";
-    s << (_name.empty() ? "." : _name);
+    s << (nameRef().empty() ? "." : nameRef());
     s << "\t";
-    s << (_score.empty() ? "." : _score);
+    s << (scoreRef().empty() ? "." : scoreRef());
     s << "\t.\t-1\t-1\t-1\t0,0,0\t0\t.\t."; // dot for strand, -1 for blockStarts and blockEnd
     outBuf.append(s.str());
 }
@@ -212,7 +212,7 @@ const string &BamRecord::getField(int fieldNum) const
 
 	switch (fieldNum) {
 	case 1:
-		return _name;
+		return nameRef();
 		break;
 	case 2:
 		// TBD - right now, there isn't a direct way to get the flag field.
@@ -225,7 +225,7 @@ const string &BamRecord::getField(int fieldNum) const
 		return startStr();
 		break;
 	case 5:
-		return _score;
+		return scoreRef();
 		break;
 	case 6:
 		return getCigarStr();
@@ -254,7 +254,7 @@ const string &BamRecord::getField(int fieldNum) const
 	// control can never reach here, but compiler is complaining about
 	// reaching end of non-void function, so this dummy statement will
 	// keep it happy.
-	return _name;
+	return nameRef();
 }
 
 
