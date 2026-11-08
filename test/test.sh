@@ -13,6 +13,16 @@ for tool in $(ls); do
     bash "test-${tool}.sh" \
         && TOOL_PASSES="$TOOL_PASSES $tool" \
         || TOOL_FAILURES="$TOOL_FAILURES $tool";
+    # Further test files for the tool: test-<tool>-<topic>.sh
+    for extra in test-${tool}-*.sh; do
+        [ -f "$extra" ] || continue;
+        name="${tool}/${extra%.sh}";
+        name="${name#${tool}/test-}";
+        echo "Testing bedtools $name:";
+        bash "$extra" \
+            && TOOL_PASSES="$TOOL_PASSES $name" \
+            || TOOL_FAILURES="$TOOL_FAILURES $name";
+    done
 done
 
 echo
