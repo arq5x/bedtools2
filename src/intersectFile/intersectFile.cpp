@@ -109,6 +109,9 @@ bool IntersectFile::nextUnsortedFind(RecordKeyVector &hits)
 		} else {
 			_context->testNameConventions(queryRecord);
 			hits.setKey(queryRecord);
+			if (upCast(_context)->getObeySplits() && upCast(_context)->getSplitBlockInfo()->noFractions()) {
+				_binTree->setKeyBlocks(&upCast(_context)->getSplitBlockInfo()->prepareKey(queryRecord));
+			}
 			 _binTree->getHits(queryRecord, hits);
 			return true;
 		}

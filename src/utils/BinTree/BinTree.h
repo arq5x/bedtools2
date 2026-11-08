@@ -56,6 +56,9 @@ public:
 	~BinTree();
 	void loadDB();
 	void getHits(Record *record, RecordKeyVector &hitSet);
+	// With -split and no overlap fractions, getHits drops a compact hit overlapping none of these blocks
+	// (findBlockedOverlaps would drop it); NULL turns the filter off.
+	void setKeyBlocks(const vector<pair<CHRPOS, CHRPOS> > *blocks) { _keyBlocks = blocks; }
 
 private:
 
@@ -205,6 +208,7 @@ private:
 	int64_t appendText(Record *record);
 	int64_t appendRaw(const char *text, size_t len);
 	int64_t _lastTextOff; // offset of the last appended text
+	const vector<pair<CHRPOS, CHRPOS> > *_keyBlocks;
 	bool _stopAtFirst; // only whether a query has a hit is read (-u, -v)
 	bool textEquals(int64_t off, const char *text, size_t len) const;
 
