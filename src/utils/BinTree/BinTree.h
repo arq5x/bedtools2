@@ -126,27 +126,18 @@ private:
 				base += sum;
 			}
 			_entries.resize(n);
+			// a bin is sorted (its bit is set when the chunk is made) until an entry
+			// starts before the entry written just before it in the same bin
 			for (size_t i = 0; i < n; i++) {
 				binNumType b = _stage[i].bin;
 				Chunk *chunk = _table[b >> CHUNK_SHIFT];
-				_entries[chunk->base + chunk->off[b & (CHUNK_BINS - 1)]++] = _stage[i].entry;
+				int bb = (int)(b & (CHUNK_BINS - 1));
+				uint32_t pos = chunk->off[bb]++;
+				binEntry *dst = &_entries[chunk->base + pos];
+				*dst = _stage[i].entry;
+				if (pos != 0 && dst->start < dst[-1].start) chunk->sorted[bb >> 6] &= ~((uint64_t)1 << (bb & 63));
 			}
 			vector<Staged>().swap(_stage);
-			// one bit per bin: its entries are in nondecreasing start order
-			for (size_t c = 0; c < _table.size(); c++) {
-				Chunk *chunk = _table[c];
-				if (chunk == NULL) continue;
-				for (int b = 0; b < CHUNK_BINS; b++) {
-					uint32_t lo = b == 0 ? 0 : chunk->off[b - 1];
-					uint32_t hi = chunk->off[b];
-					const binEntry *e = &_entries[chunk->base + lo];
-					bool ok = true;
-					for (uint32_t k = 1; k < hi - lo; k++) {
-						if (e[k].start < e[k - 1].start) { ok = false; break; }
-					}
-					if (ok) chunk->sorted[b >> 6] |= (uint64_t)1 << (b & 63);
-				}
-			}
 		}
 		// false when the bin was never filled or is out of range
 		bool find(binNumType binNum, const binEntry *&first, const binEntry *&last, bool &sorted) const {
@@ -169,7 +160,7 @@ private:
 		static const int CHUNK_SHIFT = 9;
 		static const binNumType CHUNK_BINS = (binNumType)1 << CHUNK_SHIFT;
 		struct Chunk {
-			Chunk() : base(0) { memset(off, 0, sizeof(off)); memset(sorted, 0, sizeof(sorted)); }
+			Chunk() : base(0) { memset(off, 0, sizeof(off)); memset(sorted, 0xff, sizeof(sorted)); }
 			size_t base;
 			uint64_t sorted[CHUNK_BINS / 64];
 			uint32_t off[CHUNK_BINS];
