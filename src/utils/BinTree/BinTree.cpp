@@ -7,6 +7,9 @@ BinTree::BinTree(ContextIntersect *context)
 }
 
 BinTree::~BinTree() {
+	for (mainMapType::iterator it = _mainMap.begin(); it != _mainMap.end(); ++it) {
+		delete it->second;
+	}
 }
 
 void BinTree::loadDB()
@@ -52,7 +55,7 @@ void BinTree::getHits(Record *record, RecordKeyVector &hitSet)
     binNumType endBin = ((endPos-1) >> _binFirstShift);
 
 
-	allBinsType &bins = mainIter->second;
+	const allBinsType &bins = *mainIter->second;
 
     /* SYNOPSIS:
          1. We loop through each UCSC BIN level for feature A's chrom.
@@ -65,13 +68,13 @@ void BinTree::getHits(Record *record, RecordKeyVector &hitSet)
         for (binNumType j = (startBin+offset); j <= (endBin+offset); j++)  {
 
         	// move to the next bin if this one is empty
-        	allBinsType::iterator allBinsIter = bins.find(j);
-        	if (allBinsIter == bins.end()) {
+        	const binType *binPtr = bins.find(j);
+        	if (binPtr == NULL) {
         		continue;
         	}
-        	binType &bin = allBinsIter->second;
+        	const binType &bin = *binPtr;
 
-        	for (binType::iterator iter = bin.begin(); iter != bin.end(); iter++) {
+        	for (binType::const_iterator iter = bin.begin(); iter != bin.end(); iter++) {
             	Record *dbRec = *iter;
             	if (record->intersects(dbRec,
                                        _context->getSameStrand(),
@@ -112,7 +115,11 @@ bool BinTree::addRecordToTree(Record *record)
                                 "structure bedtools uses to find intersections.", binNum, NUM_BINS);
 		return false;
 	}
-	_mainMap[chr][binNum].push_back(record);
+	allBinsType *&bins = _mainMap[chr];
+	if (bins == NULL) {
+		bins = new allBinsType();
+	}
+	(*bins)[binNum].push_back(record);
 	return true;
 }
 
