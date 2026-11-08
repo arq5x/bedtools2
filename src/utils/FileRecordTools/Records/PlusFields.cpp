@@ -13,8 +13,11 @@ bool PlusFields::initFromFile(SingleLineDelimTextFileReader *fileReader)
 		_fields.resize(numFields);
 	}
 
+	const char *line = fileReader->getLineData();
+	const int *delims = fileReader->getDelimPositions() + _numOffsetFields;
 	for (size_t i=0; i < numFields; i++) {
-		fileReader->getField((int)(i + _numOffsetFields), _fields[i]);
+		int startPos = delims[i] + 1;
+		_fields[i].assign(line + startPos, delims[i+1] - startPos);
 	}
 	return true;
 }
