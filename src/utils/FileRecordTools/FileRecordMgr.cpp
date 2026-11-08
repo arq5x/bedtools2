@@ -30,7 +30,9 @@ FileRecordMgr::FileRecordMgr(const string &filename)
   _isGroupBy(false),
   _isCram(false),
   _coordsOnly(false),
-  _sweepCoords(false)
+  _sweepCoords(false),
+  _queryFast(false),
+  _queryChrSet(false)
  {
 }
 
@@ -121,6 +123,57 @@ Record *FileRecordMgr::getNextRecord(RecordKeyVector *keyList)
 		return NULL;
 	}
 	return recordFromLine(keyList);
+}
+
+Record *FileRecordMgr::getNextQueryRecord()
+{
+	bool fast = _queryFast && !_hasGenomeFile && !_isSortedInput && !_coordsOnly
+		&& (_recordType == FileRecordTypeChecker::BED3_RECORD_TYPE
+			|| _recordType == FileRecordTypeChecker::BED6_RECORD_TYPE
+			|| _recordType == FileRecordTypeChecker::BED_PLUS_RECORD_TYPE
+			|| _recordType == FileRecordTypeChecker::BED6_PLUS_RECORD_TYPE);
+	if (fast) {
+		int nf = _fileReader->getNumFields();
+		fast = _recordType == FileRecordTypeChecker::BED3_RECORD_TYPE ? nf == 3
+			: _recordType == FileRecordTypeChecker::BED6_RECORD_TYPE ? nf == 6
+			: _recordType == FileRecordTypeChecker::BED_PLUS_RECORD_TYPE ? nf > 3
+			: nf > 6;
+	}
+	if (!fast) {
+		return getNextRecord();
+	}
+	if (!_fileReader->isOpen()) {
+		return NULL;
+	}
+	SingleLineDelimTextFileReader *rr = static_cast<SingleLineDelimTextFileReader*>(_fileReader);
+	if (_queryChrSet) {
+		CHRPOS s, e;
+		int got = rr->readCoordsLine(_queryChr.str(), s, e);
+		if (got == 0) {
+			return NULL;
+		}
+		if (got == 1) {
+			Record *record = _recordMgr->allocateRecord();
+			if (record->initFastLine(_queryChr, s, e, rr->getFileIdx(), rr->getLineData(), rr->getLineLength(),
+					rr->getCoordsTail(), rr->getNumFields())) {
+				record->setChromId(_prevChromId);
+				_totalRecordLength += (unsigned long)(record->getEndPos() - record->getStartPos());
+				record->setFileRecordManager(this);
+				return record;
+			}
+			// the gate above makes this unreachable
+			cerr << "Error: unable to read a record from file " << _filename << endl;
+			exit(1);
+		}
+	} else if (!_fileReader->readEntry()) {
+		return NULL;
+	}
+	Record *record = recordFromLine(NULL);
+	if (record != NULL) {
+		_queryChr = record->getChrRef();
+		_queryChrSet = true;
+	}
+	return record;
 }
 
 Record *FileRecordMgr::getNextRecordSweep()

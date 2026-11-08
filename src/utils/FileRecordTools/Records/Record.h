@@ -132,6 +132,9 @@ public:
 	typedef enum { FORWARD, REVERSE, UNKNOWN } strandType;
 	Record();
 	virtual bool initFromFile(FileReader *) =0;
+	// Fills a cleared record from a plain-coordinate line of chromosome chr (tail = offset of the
+	// tab after field 3, or lineLen); only BED3, BED6 and BED(6)+N records override it.
+	virtual bool initFastLine(const ChrRef &, CHRPOS, CHRPOS, int, const char *, size_t, size_t, int) { return false; }
 	virtual void clear();
 	virtual void print(string &) const {}
 	virtual void print(string &, CHRPOS, CHRPOS ) const {}
@@ -341,6 +344,8 @@ protected:
 	void nsToFields() const;
 	// Fast path for fields 4-6 of a tab-delimited line; false when it does not apply.
 	bool initNameScoreStrand(SingleLineDelimTextFileReader *fileReader);
+	void setFastCoords(const ChrRef &chr, CHRPOS s, CHRPOS e, int fileIdx);
+	void setFastNameScoreStrand(const char *p, size_t len);
 	string &nameRef() const { if (_nsMode != NS_FIELDS) nsToFields(); return _nsBox.get()->name; }
 	string &scoreRef() const { if (_nsMode != NS_FIELDS) nsToFields(); return _nsBox.get()->score; }
 	string &strandRef() const { if (_nsMode != NS_FIELDS) nsToFields(); return _nsBox.get()->strand; }

@@ -26,6 +26,7 @@ public:
 	void setNumOffsetFields(int numOffsetFields) { _numOffsetFields = numOffsetFields; }
 	virtual bool initFromFile(SingleLineDelimTextFileReader *);
 	virtual void clear();
+	void setFast(const char *p, size_t len, size_t numFields);
 	virtual void printFields(string &outBuf) const;
 
 	virtual const string &getField(int fieldNum) const;

@@ -19,6 +19,7 @@ public:
 
 	Bed6Interval();
 	virtual bool initFromFile(SingleLineDelimTextFileReader *);
+	virtual bool initFastLine(const ChrRef &chr, CHRPOS s, CHRPOS e, int fileIdx, const char *line, size_t lineLen, size_t tail, int numFields);
 	virtual void print(string &outBuf) const;
 	virtual void print(string &outBuf, CHRPOS start, CHRPOS end) const;
 	virtual void print(string &outBuf, const string & start, const string & end) const;
