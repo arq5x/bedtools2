@@ -170,7 +170,7 @@ private:
 	mainMapType _mainMap;
 
 	// last chrom looked up (queries) / inserted (load), to skip the map find.
-	string _lastQueryChr;
+	ChrRef _lastQueryChr;
 	allBinsType *_lastQueryBins;
 	bool _haveQueryChr;
 	string _lastAddChr;

@@ -128,9 +128,9 @@ void BinTree::getHits(Record *record, RecordKeyVector &hitSet)
 	if (record->isUnmapped()) {
 		return;
 	}
-    const string &chr = record->getChrName();
-	if (!_haveQueryChr || chr != _lastQueryChr) {
-		mainMapType::iterator mainIter = _mainMap.find(chr);
+    const ChrRef &chr = record->getChrRef();
+	if (!_haveQueryChr || !(chr == _lastQueryChr)) {
+		mainMapType::iterator mainIter = _mainMap.find(chr.str());
 		_lastQueryChr = chr;
 		_haveQueryChr = true;
 		_lastQueryBins = (mainIter == _mainMap.end()) ? NULL : mainIter->second;
