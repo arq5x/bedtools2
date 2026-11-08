@@ -29,6 +29,9 @@ public:
 	virtual int getNumFields() const { return _numFields; }
 	const char *getLineData() const { return _line; }
 	size_t getLineLength() const { return _lineLen; }
+	void setRetain(bool val) { _bufStreamMgr->setRetain(val); }
+	bool lastLineChunkPos(size_t &chunk, size_t &off) const { return _bufStreamMgr->lastLineChunkPos(chunk, off); }
+	void releaseChunks(vector<char *> &out) { _bufStreamMgr->releaseChunks(out); }
 	// After readCoordsLine returned 1: offset of the tab after field 3, or the line length.
 	size_t getCoordsTail() const { return _coordsTail; }
 	// After readCoordsLine returned 1: completes the entry as readEntry would (delimiters set).

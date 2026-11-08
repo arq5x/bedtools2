@@ -31,11 +31,13 @@ class Record;
 // the bytes of the record as it prints) print() appends that text.
 class CompactHit : public Bed3Interval {
 public:
-	CompactHit() : _text(NULL) {}
-	void setText(const char *text) { _text = text; }
+	CompactHit() : _text(NULL), _cstr(false) {}
+	void setText(const char *text, bool cstr = false) { _text = text; _cstr = cstr; }
 	virtual void print(string &outBuf) const {
 		if (_text == NULL) {
 			Bed3Interval::print(outBuf);
+		} else if (_cstr) {
+			outBuf.append(_text);
 		} else {
 			uint32_t len;
 			memcpy(&len, _text, sizeof(len));
@@ -44,6 +46,7 @@ public:
 	}
 private:
 	const char *_text;
+	bool _cstr; // _text is a NUL-terminated line in a retained read chunk, not length-prefixed
 };
 
 typedef int64_t binNumType;
@@ -295,6 +298,11 @@ private:
 	bool _text;
 	static const size_t TEXT_BLOCK = (size_t)1 << 22;
 	vector<char *> _textBlocks;
+	// Chunks of the database files' own reads, kept so a line read in place is not copied.
+	// An entry's text offset is TEXT_CHUNK_FLAG | chunk << TEXT_CHUNK_SHIFT | byte offset.
+	vector<char *> _chunks;
+	static const int64_t TEXT_CHUNK_FLAG = (int64_t)1 << 46;
+	static const int TEXT_CHUNK_SHIFT = 20;
 	size_t _textUsed; // bytes used in the last block
 	string _textScratch;
 	int64_t appendText(Record *record);

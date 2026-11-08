@@ -18,6 +18,9 @@ BinTree::~BinTree() {
 	for (size_t i = 0; i < _textBlocks.size(); i++) {
 		delete [] _textBlocks[i];
 	}
+	for (size_t i = 0; i < _chunks.size(); i++) {
+		delete [] _chunks[i];
+	}
 }
 
 CompactHit *BinTree::nextPoolRecord() {
@@ -126,6 +129,8 @@ void BinTree::loadDB()
 			// In text mode a line is also kept as its own text, once the first line of the
 			// chromosome has printed to exactly its line text (textLine).
 			bool textLine = false;
+			const size_t chunkBase = _chunks.size();
+			if (_text) databaseFile->setRetainChunks(true);
 			string lastChr;
 			const string *lastChrPtr = NULL;
 			while (!databaseFile->eof()) {
@@ -139,7 +144,13 @@ void BinTree::loadDB()
 				if (got == 1) {
 					int64_t meta = ((int64_t)databaseFile->getFileIdx() << 1) | (zeroLen ? 1 : 0);
 					if (_text) {
-						meta |= appendRaw(line, lineLen) << 16;
+						size_t chunk, off;
+						if (databaseFile->getLineChunkPos(chunk, off) && chunkBase + chunk < ((size_t)1 << 26)
+								&& off < ((size_t)1 << TEXT_CHUNK_SHIFT)) {
+							meta |= (TEXT_CHUNK_FLAG | ((int64_t)(chunkBase + chunk) << TEXT_CHUNK_SHIFT) | (int64_t)off) << 16;
+						} else {
+							meta |= appendRaw(line, lineLen) << 16;
+						}
 					}
 					if (!stageCoords(start, end, meta)) {
 						fprintf(stderr, "ERROR: Unable to add record to tree.\n");
@@ -168,6 +179,7 @@ void BinTree::loadDB()
 				lastChrPtr = &lastChr;
 				databaseFile->deleteRecord(record);
 			}
+			if (_text) databaseFile->releaseChunks(_chunks);
 			continue;
 		}
 		while (!databaseFile->eof()) {
@@ -314,7 +326,11 @@ void BinTree::getHits(Record *record, RecordKeyVector &hitSet)
             		CompactHit *h = nextPoolRecord();
             		if (_text) {
             			int64_t off = iter->meta >> 16;
-            			h->setText(_textBlocks[off / TEXT_BLOCK] + off % TEXT_BLOCK);
+            			if (off & TEXT_CHUNK_FLAG) {
+            				h->setText(_chunks[(off >> TEXT_CHUNK_SHIFT) & (((int64_t)1 << 26) - 1)] + (off & (((int64_t)1 << TEXT_CHUNK_SHIFT) - 1)), true);
+            			} else {
+            				h->setText(_textBlocks[off / TEXT_BLOCK] + off % TEXT_BLOCK);
+            			}
             			h->setHitFields(_lastQueryBins->chr, iter->start, iter->end,
             					(int)((iter->meta & 0xffff) >> 1), (iter->meta & 1) != 0);
             		} else {

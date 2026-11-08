@@ -60,6 +60,10 @@ public:
 			const char **line = NULL, size_t *lineLen = NULL);
 	// The text of the line last read (valid until the next read); BED-type text files only.
 	void getCurrentLine(const char *&line, size_t &lineLen) const;
+	// Chunk retention for BED-type text files (see BufferedStreamMgr::setRetain).
+	void setRetainChunks(bool val);
+	bool getLineChunkPos(size_t &chunk, size_t &off) const;
+	void releaseChunks(vector<char *> &out);
 	void deleteRecord(const Record *);
 	virtual void deleteRecord(RecordKeyVector *keyList);
 

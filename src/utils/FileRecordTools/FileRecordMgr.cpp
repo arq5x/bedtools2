@@ -248,6 +248,21 @@ void FileRecordMgr::getCurrentLine(const char *&line, size_t &lineLen) const
 	lineLen = r->getLineLength();
 }
 
+void FileRecordMgr::setRetainChunks(bool val)
+{
+	static_cast<SingleLineDelimTextFileReader*>(_fileReader)->setRetain(val);
+}
+
+bool FileRecordMgr::getLineChunkPos(size_t &chunk, size_t &off) const
+{
+	return static_cast<const SingleLineDelimTextFileReader*>(_fileReader)->lastLineChunkPos(chunk, off);
+}
+
+void FileRecordMgr::releaseChunks(vector<char *> &out)
+{
+	static_cast<SingleLineDelimTextFileReader*>(_fileReader)->releaseChunks(out);
+}
+
 int FileRecordMgr::getNextCoords(const string *lastChr, CHRPOS &start, CHRPOS &end, bool &zeroLen, Record *&rec,
 		const char **lineOut, size_t *lineLenOut)
 {
