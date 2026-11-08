@@ -189,6 +189,12 @@ private:
 	const binEntry *_curFirst[8];
 	size_t _curCnt[8];
 	binNumType _curStart;
+	// per level: the last start-bin lookup (bin number, find() result); -1 = none
+	binNumType _memoBin[8];
+	bool _memoFound[8];
+	bool _memoSorted[8];
+	const binEntry *_memoFirst[8];
+	const binEntry *_memoLast[8];
 	string _lastAddChr;
 	allBinsType *_lastAddBins;
 
