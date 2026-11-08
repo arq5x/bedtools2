@@ -32,6 +32,7 @@ FileRecordMgr::FileRecordMgr(const string &filename)
   _coordsOnly(false),
   _sweepCoords(false),
   _queryFast(false),
+  _sweepFast(false),
   _queryChrSet(false)
  {
 }
@@ -179,16 +180,52 @@ Record *FileRecordMgr::getNextQueryRecord()
 Record *FileRecordMgr::getNextRecordSweep()
 {
 	if (!_sweepCoords) return getNextRecord();
-	if (!_fileReader->isOpen() || !_fileReader->readEntry()) {
+	SingleLineDelimTextFileReader *r = static_cast<SingleLineDelimTextFileReader*>(_fileReader);
+	if (!_fileReader->isOpen()) {
 		return NULL;
 	}
-	SingleLineDelimTextFileReader *r = static_cast<SingleLineDelimTextFileReader*>(_fileReader);
+	if (_sweepFast) {
+		CHRPOS s, e;
+		int got = r->readCoordsLine(_sweepChr, s, e);
+		if (got == 0) {
+			return NULL;
+		}
+		if (got == 1) {
+			bool check = _isSortedInput && !_noEnforceCoordSort;
+			// testInputSortOrder compares s: its zero-length adjustment is -1 then +1
+			CHRPOS cs = s;
+			if (!check || cs >= _prevStart) {
+				Record *record = _recordMgr->allocateRecord();
+				record->initCoordsOnly(_sweepChrRef, s, e, r->getFileIdx());
+				if (check) _prevStart = cs;
+				record->setChromId(_prevChromId);
+				_totalRecordLength += (unsigned long)(record->getEndPos() - record->getStartPos());
+				record->setFileRecordManager(this);
+				return record;
+			}
+			// out of order: the full path reports the error
+			if (!r->completeEntry()) {
+				return NULL;
+			}
+		}
+	} else if (!r->readEntry()) {
+		return NULL;
+	}
 	const int *dp = r->getDelimPositions();
 	size_t chrLen = (size_t)(dp[1] - dp[0] - 1);
 	bool same = chrLen == _sweepChr.size() && memcmp(r->getLineData() + dp[0] + 1, _sweepChr.data(), chrLen) == 0;
 	r->setCoordsOnly(same);
 	Record *rec = recordFromLine(NULL);
-	if (!same && rec != NULL) _sweepChr = rec->getChrName();
+	if (!same && rec != NULL) {
+		_sweepChr = rec->getChrName();
+		_sweepChrRef = rec->getChrRef();
+		_sweepFast = !_hasGenomeFile
+			&& (_recordType == FileRecordTypeChecker::BED3_RECORD_TYPE
+				|| _recordType == FileRecordTypeChecker::BED6_RECORD_TYPE
+				|| _recordType == FileRecordTypeChecker::BED_PLUS_RECORD_TYPE
+				|| _recordType == FileRecordTypeChecker::BED6_PLUS_RECORD_TYPE)
+			&& (!(_isSortedInput && !_noEnforceCoordSort) || _prevChrom == _sweepChr);
+	}
 	return rec;
 }
 

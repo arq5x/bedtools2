@@ -31,6 +31,8 @@ public:
 	size_t getLineLength() const { return _lineLen; }
 	// After readCoordsLine returned 1: offset of the tab after field 3, or the line length.
 	size_t getCoordsTail() const { return _coordsTail; }
+	// After readCoordsLine returned 1: completes the entry as readEntry would (delimiters set).
+	bool completeEntry() { return finishEntry(); }
 	const int *getDelimPositions() const { return _delimPositions; }
 	// True and val set only for a non-negative plain decimal (no leading zero, 1-18 digits).
 	bool getPlainPos(int fieldNum, CHRPOS &val) const;
