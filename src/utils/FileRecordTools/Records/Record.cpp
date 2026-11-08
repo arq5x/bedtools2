@@ -54,6 +54,14 @@ void Record::nsToFields() const {
 		b->score.assign(_nsText, t1 + 1, t2 - t1 - 1);
 		b->strand.assign(_nsText, t2 + 1, string::npos);
 		_nsText.clear();
+	} else if (_nsMode == NS_LINE) {
+		const char *p = _line.data() + _nsOff;
+		const char *e = p + _nsLen;
+		const char *t1 = (const char *)memchr(p, '\t', e - p);
+		const char *t2 = (const char *)memchr(t1 + 1, '\t', e - t1 - 1);
+		b->name.assign(p, t1 - p);
+		b->score.assign(t1 + 1, t2 - t1 - 1);
+		b->strand.assign(t2 + 1, e - t2 - 1);
 	}
 	_nsMode = NS_FIELDS;
 }
@@ -83,6 +91,8 @@ void Record::setNameScoreStrandText(const char *p, size_t len) {
 void Record::appendNameScoreStrand(string &buf) const {
 	if (_nsMode == NS_TEXT) {
 		buf.append(_nsText);
+	} else if (_nsMode == NS_LINE) {
+		buf.append(_line, _nsOff, _nsLen);
 	} else if (_nsMode == NS_FIELDS) {
 		const NSBox *b = _nsBox.get();
 		append_cstr(buf, b->name);
@@ -109,8 +119,16 @@ void Record::setFastCoords(const ChrRef &chr, CHRPOS s, CHRPOS e, int fileIdx) {
 }
 
 // p..p+len is "name\tscore\tstrand" of a tab-delimited line.
-void Record::setFastNameScoreStrand(const char *p, size_t len) {
-	setNameScoreStrandText(p, len);
+void Record::setFastNameScoreStrand(const char *line, const char *p, size_t len) {
+	if (_nsMode == NS_FIELDS) {
+		NSBox *b = _nsBox.get();
+		b->name.clear();
+		b->score.clear();
+		b->strand.clear();
+	}
+	_nsOff = p - line;
+	_nsLen = len;
+	_nsMode = NS_LINE;
 	const char *q = p + len;
 	while (q > p && q[-1] != '\t') q--;
 	_strandVal = (p + len - q == 1) ? (*q == '+' ? FORWARD : (*q == '-' ? REVERSE : UNKNOWN)) : UNKNOWN;

@@ -39,8 +39,8 @@ bool BedPlusInterval::initFastLine(const ChrRef &chr, CHRPOS s, CHRPOS e, int fi
 	if (numFields <= _numFixedFields) return false;
 	if (_numFixedFields == defaultNumFixedFields) {
 		setFastCoords(chr, s, e, fileIdx);
-		_plusFields.setFast(line + tail + 1, lineLen - tail - 1, (size_t)(numFields - _numFixedFields));
 		setFastLine(line, lineLen);
+		_plusFields.setFastLazy(tail + 1, lineLen - tail - 1, (size_t)(numFields - _numFixedFields));
 		return true;
 	}
 	if (_numFixedFields != 6) return false;
@@ -52,14 +52,14 @@ bool BedPlusInterval::initFastLine(const ChrRef &chr, CHRPOS s, CHRPOS e, int fi
 	if (t == NULL) return false;
 	t = (const char *)memchr(t + 1, '\t', end - t - 1);
 	setFastCoords(chr, s, e, fileIdx);
+	setFastLine(line, lineLen);
 	if (t == NULL) {
-		setFastNameScoreStrand(p, end - p);
+		setFastNameScoreStrand(line, p, end - p);
 		_plusFields.setFast(end, 0, 0);
 	} else {
-		setFastNameScoreStrand(p, t - p);
-		_plusFields.setFast(t + 1, end - t - 1, (size_t)(numFields - 6));
+		setFastNameScoreStrand(line, p, t - p);
+		_plusFields.setFastLazy(t + 1 - line, end - t - 1, (size_t)(numFields - 6));
 	}
-	setFastLine(line, lineLen);
 	return true;
 }
 
@@ -74,6 +74,7 @@ void BedPlusInterval::print(string &outBuf) const
 	Bed3Interval::print(outBuf);
 	outBuf.append("\t");
 	printBed6PlusFields(outBuf);
+	_plusFields.resolve(_line);
 	_plusFields.printFields(outBuf);
 }
 
@@ -82,6 +83,7 @@ void BedPlusInterval::print(string &outBuf, CHRPOS start, CHRPOS end) const
 	Bed3Interval::print(outBuf, start, end);
 	outBuf.append("\t");
 	printBed6PlusFields(outBuf);
+	_plusFields.resolve(_line);
 	_plusFields.printFields(outBuf);
 }
 
@@ -90,6 +92,7 @@ void BedPlusInterval::print(string &outBuf, const string & start, const string &
 	Bed3Interval::print(outBuf, start, end);
 	outBuf.append("\t");
 	printBed6PlusFields(outBuf);
+	_plusFields.resolve(_line);
 	_plusFields.printFields(outBuf);
 }
 
@@ -106,6 +109,7 @@ void BedPlusInterval::printNull(string &outBuf) const
 const string &BedPlusInterval::getField(int fieldNum) const
 {
 	if (fieldNum > _numFixedFields) {
+		_plusFields.resolve(_line);
 		return _plusFields.getField(fieldNum);
 	} else if (fieldNum == 4 && _numFixedFields >=4) {
 		return nameRef();

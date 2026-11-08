@@ -318,7 +318,7 @@ protected:
 	string &endStr() const { if (_posMode != POS_STRINGS) materializePosStrs(); return _posBox.get()->end; }
 	// Name, score and strand are kept as one tab-joined string when a BED6 line is parsed
 	// (NS_TEXT); the three strings of a side box are built on first access (NS_FIELDS).
-	enum { NS_EMPTY = 0, NS_TEXT = 1, NS_FIELDS = 2 };
+	enum { NS_EMPTY = 0, NS_TEXT = 1, NS_FIELDS = 2, NS_LINE = 3 };
 	struct NSBox {
 		string name;
 		string score;
@@ -342,6 +342,9 @@ protected:
 	mutable string _nsText;
 	mutable NSPtr _nsBox;
 	mutable char _nsMode;
+	// NS_LINE: the name/score/strand text is _line[_nsOff, _nsOff + _nsLen).
+	size_t _nsOff;
+	size_t _nsLen;
 	void nsToFields() const;
 	// Fast path for fields 4-6 of a tab-delimited line; false when it does not apply.
 	bool initNameScoreStrand(SingleLineDelimTextFileReader *fileReader);
@@ -359,7 +362,8 @@ protected:
 		}
 		return false;
 	}
-	void setFastNameScoreStrand(const char *p, size_t len);
+	// p..p+len lies inside the line just given to setFastLine.
+	void setFastNameScoreStrand(const char *line, const char *p, size_t len);
 	string &nameRef() const { if (_nsMode != NS_FIELDS) nsToFields(); return _nsBox.get()->name; }
 	string &scoreRef() const { if (_nsMode != NS_FIELDS) nsToFields(); return _nsBox.get()->score; }
 	string &strandRef() const { if (_nsMode != NS_FIELDS) nsToFields(); return _nsBox.get()->strand; }
