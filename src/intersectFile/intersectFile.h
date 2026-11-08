@@ -37,6 +37,7 @@ protected:
 	NewChromSweep *_sweep;
 	BinTree *_binTree;
 	FileRecordMgr *_queryFRM;
+	RecordKeyVector _splitResult;
 
 	virtual bool nextSortedFind(RecordKeyVector &hits);
 	virtual bool nextUnsortedFind(RecordKeyVector &hits);
