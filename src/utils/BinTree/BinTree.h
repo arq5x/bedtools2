@@ -56,7 +56,14 @@ private:
 	static const binNumType NUM_BINS = (1 << (_binNextShift * NUM_BIN_LEVELS)) / ((1 << _binNextShift) - 1);
 
 
-	typedef vector<Record *> binType;
+	// A database record beside its coordinates (as stored when it was added), so a
+	// candidate that cannot overlap the query is rejected without touching the Record.
+	struct binEntry {
+		CHRPOS start;
+		CHRPOS end;
+		Record *record;
+	};
+	typedef vector<binEntry> binType;
 	// For each bin number, a RecordList. Two-level paged table: a pointer per
 	// CHUNK_BINS consecutive bin numbers, chunks allocated on first insert.
 	class allBinsType {

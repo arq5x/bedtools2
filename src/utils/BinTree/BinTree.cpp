@@ -75,7 +75,11 @@ void BinTree::getHits(Record *record, RecordKeyVector &hitSet)
         	const binType &bin = *binPtr;
 
         	for (binType::const_iterator iter = bin.begin(); iter != bin.end(); iter++) {
-            	Record *dbRec = *iter;
+            	// Record::sameChromIntersects returns false when minEnd < maxStart.
+            	if (iter->end < startPos || iter->start > endPos) {
+            		continue;
+            	}
+            	Record *dbRec = iter->record;
             	if (record->intersects(dbRec,
                                        _context->getSameStrand(),
                                        _context->getDiffStrand(),
@@ -119,7 +123,8 @@ bool BinTree::addRecordToTree(Record *record)
 	if (bins == NULL) {
 		bins = new allBinsType();
 	}
-	(*bins)[binNum].push_back(record);
+	binEntry entry = {startPos, endPos, record};
+	(*bins)[binNum].push_back(entry);
 	return true;
 }
 
