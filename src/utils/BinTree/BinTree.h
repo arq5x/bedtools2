@@ -27,6 +27,25 @@ using namespace std;
 class FileRecordMgr;
 class Record;
 
+// A database hit rebuilt from a compact entry. With stored text (a 4-byte length, then
+// the bytes of the record as it prints) print() appends that text.
+class CompactHit : public Bed3Interval {
+public:
+	CompactHit() : _text(NULL) {}
+	void setText(const char *text) { _text = text; }
+	virtual void print(string &outBuf) const {
+		if (_text == NULL) {
+			Bed3Interval::print(outBuf);
+		} else {
+			uint32_t len;
+			memcpy(&len, _text, sizeof(len));
+			outBuf.append(_text + sizeof(len), len);
+		}
+	}
+private:
+	const char *_text;
+};
+
 typedef int64_t binNumType;
 static const binNumType _binOffsetsExtended[] = {262144+32678+4096+512+64+8+1, 32678+4096+512+64+8+1, 4096+512+64+8+1, 512+64+8+1, 64+8+1, 8+1, 1, 0};
 
@@ -162,10 +181,20 @@ private:
 	// Compact mode: the database is staged as (start, end, file index, zero-length flag)
 	// and each query's hits are transient Records from a pool reset by the next getHits.
 	bool _compact;
-	vector<Bed3Interval *> _pool;
-	vector<Bed3Interval *> _poolBlocks;
+	vector<CompactHit *> _pool;
+	vector<CompactHit *> _poolBlocks;
 	size_t _poolUsed;
-	Bed3Interval *nextPoolRecord();
+	CompactHit *nextPoolRecord();
+
+	// Text mode (compact, and the database record is printed): each line's printed text
+	// is kept in an arena of fixed-size blocks; an entry's `meta` holds
+	// (offset << 16) | (fileIdx << 1) | zero-length flag.
+	bool _text;
+	static const size_t TEXT_BLOCK = (size_t)1 << 22;
+	vector<char *> _textBlocks;
+	size_t _textUsed; // bytes used in the last block
+	string _textScratch;
+	int64_t appendText(Record *record);
 
 	bool addRecordToTree(Record *);
 	binNumType getBin(binNumType start, binNumType end) const;

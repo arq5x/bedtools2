@@ -118,6 +118,14 @@ public:
 			&& !_reportDBfileNames && !_hasColumnOpsMethods && !_useMergedIntervals;
 	}
 
+	// Plain intersect prints a database record only through Record::print under
+	// these options (no strand test, no splits, no names, no column operations).
+	bool printOnlyDatabaseFiles() const {
+		return _program == INTERSECT && !_sortedInput && !_sameStrand && !_diffStrand
+			&& !_obeySplits && !_reportDBnameTags && !_reportDBfileNames
+			&& !_hasColumnOpsMethods && !_useMergedIntervals;
+	}
+
 protected:
 
 	BlockMgr *_splitBlockMgr;

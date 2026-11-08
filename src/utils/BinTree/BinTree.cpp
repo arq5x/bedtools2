@@ -4,7 +4,7 @@
 
 BinTree::BinTree(ContextIntersect *context) 
 :  _context(context), _lastQueryBins(NULL), _haveQueryChr(false), _lastAddBins(NULL),
-   _compact(false), _poolUsed(0) {
+   _compact(false), _poolUsed(0), _text(false), _textUsed(0) {
 }
 
 BinTree::~BinTree() {
@@ -14,16 +14,50 @@ BinTree::~BinTree() {
 	for (size_t i = 0; i < _poolBlocks.size(); i++) {
 		delete [] _poolBlocks[i];
 	}
+	for (size_t i = 0; i < _textBlocks.size(); i++) {
+		delete [] _textBlocks[i];
+	}
 }
 
-Bed3Interval *BinTree::nextPoolRecord() {
+CompactHit *BinTree::nextPoolRecord() {
 	if (_poolUsed == _pool.size()) {
 		const size_t block = 256;
-		Bed3Interval *b = new Bed3Interval[block];
+		CompactHit *b = new CompactHit[block];
 		_poolBlocks.push_back(b);
 		for (size_t i = 0; i < block; i++) _pool.push_back(b + i);
 	}
 	return _pool[_poolUsed];
+}
+
+// Appends the text the record prints (its coordinates as read) to the arena and returns
+// its offset. A zero-length record is printed with its coordinates undone.
+int64_t BinTree::appendText(Record *record)
+{
+	record->undoZeroLength();
+	_textScratch.clear();
+	record->print(_textScratch);
+	record->adjustZeroLength();
+	size_t need = sizeof(uint32_t) + _textScratch.size();
+	if (_textBlocks.empty() || _textUsed + need > TEXT_BLOCK) {
+		_textBlocks.push_back(new char[need > TEXT_BLOCK ? need : TEXT_BLOCK]);
+		_textUsed = 0;
+		if (need > TEXT_BLOCK) {
+			// an oversized line takes a block of its own
+			int64_t off = (int64_t)(_textBlocks.size() - 1) * (int64_t)TEXT_BLOCK;
+			uint32_t len = (uint32_t)_textScratch.size();
+			memcpy(_textBlocks.back(), &len, sizeof(len));
+			memcpy(_textBlocks.back() + sizeof(len), _textScratch.data(), len);
+			_textUsed = TEXT_BLOCK;
+			return off;
+		}
+	}
+	int64_t off = (int64_t)(_textBlocks.size() - 1) * (int64_t)TEXT_BLOCK + (int64_t)_textUsed;
+	char *dst = _textBlocks.back() + _textUsed;
+	uint32_t len = (uint32_t)_textScratch.size();
+	memcpy(dst, &len, sizeof(len));
+	memcpy(dst + sizeof(len), _textScratch.data(), len);
+	_textUsed += need;
+	return off;
 }
 
 void BinTree::loadDB()
@@ -40,6 +74,23 @@ void BinTree::loadDB()
 				t == FileRecordTypeChecker::BED6_PLUS_RECORD_TYPE)) {
 			_compact = false;
 		}
+	}
+	// Text mode: the same, but the database record is printed, so its text is kept.
+	_text = false;
+	if (!_compact && !_context->getSortOutput() && _context->printOnlyDatabaseFiles()
+			&& _context->getNumDatabaseFiles() < 1000) {
+		_text = true;
+		for (int i=0; _text && i < _context->getNumDatabaseFiles(); i++) {
+			FileRecordMgr *f = _context->getDatabaseFile(i);
+			FileRecordTypeChecker::RECORD_TYPE t = f->getRecordType();
+			if (f->getCoordsOnly() || !(t == FileRecordTypeChecker::BED3_RECORD_TYPE ||
+					t == FileRecordTypeChecker::BED4_RECORD_TYPE || t == FileRecordTypeChecker::BED5_RECORD_TYPE ||
+					t == FileRecordTypeChecker::BED6_RECORD_TYPE || t == FileRecordTypeChecker::BED_PLUS_RECORD_TYPE ||
+					t == FileRecordTypeChecker::BED6_PLUS_RECORD_TYPE)) {
+				_text = false;
+			}
+		}
+		if (_text) _compact = true;
 	}
 	for (int i=0; i < _context->getNumDatabaseFiles(); i++) {
 		FileRecordMgr *databaseFile = _context->getDatabaseFile(i);
@@ -121,9 +172,16 @@ void BinTree::getHits(Record *record, RecordKeyVector &hitSet)
             	}
             	Record *dbRec;
             	if (_compact) {
-            		Bed3Interval *h = nextPoolRecord();
-            		h->setHitFields(_lastQueryBins->chr, iter->start, iter->end,
-            				(int)(iter->meta >> 1), (iter->meta & 1) != 0);
+            		CompactHit *h = nextPoolRecord();
+            		if (_text) {
+            			int64_t off = iter->meta >> 16;
+            			h->setText(_textBlocks[off / TEXT_BLOCK] + off % TEXT_BLOCK);
+            			h->setHitFields(_lastQueryBins->chr, iter->start, iter->end,
+            					(int)((iter->meta & 0xffff) >> 1), (iter->meta & 1) != 0);
+            		} else {
+            			h->setHitFields(_lastQueryBins->chr, iter->start, iter->end,
+            					(int)(iter->meta >> 1), (iter->meta & 1) != 0);
+            		}
             		dbRec = h;
             	} else {
             		dbRec = iter->record;
@@ -184,6 +242,9 @@ bool BinTree::addRecordToTree(Record *record)
 	entry.end = endPos;
 	if (_compact) {
 		entry.meta = ((int64_t)record->getFileIdx() << 1) | (record->isZeroLength() ? 1 : 0);
+		if (_text) {
+			entry.meta |= appendText(record) << 16;
+		}
 	} else {
 		entry.record = record;
 	}
