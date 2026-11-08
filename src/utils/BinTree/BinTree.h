@@ -195,6 +195,9 @@ private:
 	size_t _textUsed; // bytes used in the last block
 	string _textScratch;
 	int64_t appendText(Record *record);
+	int64_t appendRaw(const char *text, size_t len);
+	int64_t _lastTextOff; // offset of the last appended text
+	bool textEquals(int64_t off, const char *text, size_t len) const;
 
 	bool addRecordToTree(Record *);
 	bool stageCoords(binNumType startPos, binNumType endPos, int64_t meta);

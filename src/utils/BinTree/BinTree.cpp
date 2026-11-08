@@ -4,7 +4,7 @@
 
 BinTree::BinTree(ContextIntersect *context) 
 :  _context(context), _lastQueryBins(NULL), _haveQueryChr(false), _lastAddBins(NULL),
-   _compact(false), _poolUsed(0), _text(false), _textUsed(0) {
+   _compact(false), _poolUsed(0), _text(false), _textUsed(0), _lastTextOff(0) {
 }
 
 BinTree::~BinTree() {
@@ -37,25 +37,40 @@ int64_t BinTree::appendText(Record *record)
 	_textScratch.clear();
 	record->print(_textScratch);
 	record->adjustZeroLength();
-	size_t need = sizeof(uint32_t) + _textScratch.size();
+	return appendRaw(_textScratch.data(), _textScratch.size());
+}
+
+bool BinTree::textEquals(int64_t off, const char *text, size_t len) const
+{
+	const char *src = _textBlocks[off / TEXT_BLOCK] + off % TEXT_BLOCK;
+	uint32_t l;
+	memcpy(&l, src, sizeof(l));
+	return l == len && memcmp(src + sizeof(l), text, len) == 0;
+}
+
+int64_t BinTree::appendRaw(const char *text, size_t len_)
+{
+	size_t need = sizeof(uint32_t) + len_;
 	if (_textBlocks.empty() || _textUsed + need > TEXT_BLOCK) {
 		_textBlocks.push_back(new char[need > TEXT_BLOCK ? need : TEXT_BLOCK]);
 		_textUsed = 0;
 		if (need > TEXT_BLOCK) {
 			// an oversized line takes a block of its own
 			int64_t off = (int64_t)(_textBlocks.size() - 1) * (int64_t)TEXT_BLOCK;
-			uint32_t len = (uint32_t)_textScratch.size();
+			_lastTextOff = off;
+			uint32_t len = (uint32_t)len_;
 			memcpy(_textBlocks.back(), &len, sizeof(len));
-			memcpy(_textBlocks.back() + sizeof(len), _textScratch.data(), len);
+			memcpy(_textBlocks.back() + sizeof(len), text, len_);
 			_textUsed = TEXT_BLOCK;
 			return off;
 		}
 	}
 	int64_t off = (int64_t)(_textBlocks.size() - 1) * (int64_t)TEXT_BLOCK + (int64_t)_textUsed;
+	_lastTextOff = off;
 	char *dst = _textBlocks.back() + _textUsed;
-	uint32_t len = (uint32_t)_textScratch.size();
+	uint32_t len = (uint32_t)len_;
 	memcpy(dst, &len, sizeof(len));
-	memcpy(dst + sizeof(len), _textScratch.data(), len);
+	memcpy(dst + sizeof(len), text, len_);
 	_textUsed += need;
 	return off;
 }
@@ -96,18 +111,28 @@ void BinTree::loadDB()
 		FileRecordMgr *databaseFile = _context->getDatabaseFile(i);
 
 		Record *record = NULL;
-		if (_compact && !_text) {
+		if (_compact) {
 			// Lines of the previous line's chromosome with plain coordinates skip the
 			// Record; the first line of a chromosome and every other line take the full path.
+			// In text mode a line is also kept as its own text, once the first line of the
+			// chromosome has printed to exactly its line text (textLine).
+			bool textLine = false;
 			string lastChr;
 			const string *lastChrPtr = NULL;
 			while (!databaseFile->eof()) {
 				CHRPOS start = 0, end = 0;
 				bool zeroLen = false;
-				int got = databaseFile->getNextCoords(lastChrPtr, start, end, zeroLen, record);
+				const char *line = NULL;
+				size_t lineLen = 0;
+				int got = databaseFile->getNextCoords((_text && !textLine) ? NULL : lastChrPtr, start, end, zeroLen, record,
+						&line, &lineLen);
 				if (got == 0) continue;
 				if (got == 1) {
-					if (!stageCoords(start, end, ((int64_t)databaseFile->getFileIdx() << 1) | (zeroLen ? 1 : 0))) {
+					int64_t meta = ((int64_t)databaseFile->getFileIdx() << 1) | (zeroLen ? 1 : 0);
+					if (_text) {
+						meta |= appendRaw(line, lineLen) << 16;
+					}
+					if (!stageCoords(start, end, meta)) {
 						fprintf(stderr, "ERROR: Unable to add record to tree.\n");
 						databaseFile->close();
 						exit(1);
@@ -123,6 +148,12 @@ void BinTree::loadDB()
 					fprintf(stderr, "ERROR: Unable to add record to tree.\n");
 					databaseFile->close();
 					exit(1);
+				}
+				if (_text && (lastChrPtr == NULL || lastChr != record->getChrName())) {
+					const char *l;
+					size_t ll;
+					databaseFile->getCurrentLine(l, ll);
+					textLine = textEquals(_lastTextOff, l, ll);
 				}
 				lastChr = record->getChrName();
 				lastChrPtr = &lastChr;

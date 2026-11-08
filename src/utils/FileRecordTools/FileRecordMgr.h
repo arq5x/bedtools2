@@ -47,7 +47,10 @@ public:
 	// For BED-type coords-only files loaded without keeping Records: 0 = no record,
 	// 1 = line of chromosome lastChr with plain coordinates, returned in start/end
 	// (zero-length adjusted, flagged in zeroLen), 2 = any other line, parsed in full into rec.
-	int getNextCoords(const string *lastChr, CHRPOS &start, CHRPOS &end, bool &zeroLen, Record *&rec);
+	int getNextCoords(const string *lastChr, CHRPOS &start, CHRPOS &end, bool &zeroLen, Record *&rec,
+			const char **line = NULL, size_t *lineLen = NULL);
+	// The text of the line last read (valid until the next read); BED-type text files only.
+	void getCurrentLine(const char *&line, size_t &lineLen) const;
 	void deleteRecord(const Record *);
 	virtual void deleteRecord(RecordKeyVector *keyList);
 

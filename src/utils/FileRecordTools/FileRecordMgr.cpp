@@ -122,7 +122,15 @@ Record *FileRecordMgr::getNextRecord(RecordKeyVector *keyList)
 	return recordFromLine(keyList);
 }
 
-int FileRecordMgr::getNextCoords(const string *lastChr, CHRPOS &start, CHRPOS &end, bool &zeroLen, Record *&rec)
+void FileRecordMgr::getCurrentLine(const char *&line, size_t &lineLen) const
+{
+	const SingleLineDelimTextFileReader *r = static_cast<SingleLineDelimTextFileReader*>(_fileReader);
+	line = r->getLineData();
+	lineLen = r->getLineLength();
+}
+
+int FileRecordMgr::getNextCoords(const string *lastChr, CHRPOS &start, CHRPOS &end, bool &zeroLen, Record *&rec,
+		const char **lineOut, size_t *lineLenOut)
 {
 	rec = NULL;
 	if (!_fileReader->isOpen() || !_fileReader->readEntry()) {
@@ -144,6 +152,10 @@ int FileRecordMgr::getNextCoords(const string *lastChr, CHRPOS &start, CHRPOS &e
 			start = s;
 			end = e;
 			_totalRecordLength += (unsigned long)(e - s);
+			if (lineOut != NULL) {
+				*lineOut = line;
+				*lineLenOut = r->getLineLength();
+			}
 			return 1;
 		}
 	}
