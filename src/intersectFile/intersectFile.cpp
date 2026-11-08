@@ -120,8 +120,9 @@ void IntersectFile::makeSweep() {
 void IntersectFile::checkSplits(RecordKeyVector &hitSet)
 {
 	if (upCast(_context)->getObeySplits()) {
-		RecordKeyVector resultSet(hitSet.getKey());
-		upCast(_context)->getSplitBlockInfo()->findBlockedOverlaps(hitSet.getKey(), hitSet, resultSet);
-		hitSet.swap(resultSet);
+		_splitResult.clearVector();
+		_splitResult.setKey(hitSet.getKey());
+		upCast(_context)->getSplitBlockInfo()->findBlockedOverlaps(hitSet.getKey(), hitSet, _splitResult);
+		hitSet.swap(_splitResult);
 	}
 }
