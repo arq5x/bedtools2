@@ -19,7 +19,8 @@ BlockMgr::BlockMgr(float overlapFractionA, float overlapFractionB, bool hasRecip
   	_breakOnSkipOps(true),
   	_overlapFractionA(overlapFractionA),
   	_overlapFractionB(overlapFractionB),
-  	_hasReciprocal(hasReciprocal)
+  	_hasReciprocal(hasReciprocal),
+  	_keyReady(false)
 {
 	_blockRecordsMgr = new RecordMgr(_blockRecordsType);
 }
@@ -285,19 +286,38 @@ void BlockMgr::getBlockPairs(const Record *rec, vector<pair<CHRPOS, CHRPOS> > &o
 	}
 }
 
+const vector<pair<CHRPOS, CHRPOS> > &BlockMgr::prepareKey(const Record *key)
+{
+	_keyPairs.clear();
+	getBlockPairs(key, _keyPairs);
+	_keyReady = true;
+	return _keyPairs;
+}
+
 // findBlockedOverlaps without an overlapList: blocks are plain (start, end) pairs.
 int BlockMgr::findBlockedOverlaps(const Record *key, RecordKeyVector &hitList, RecordKeyVector &resultList)
 {
 	_overlapBases.clear();
 	_overlapStarts.clear();
 	_overlapEnds.clear();
-	_keyPairs.clear();
-	getBlockPairs(key, _keyPairs);
+	if (!_keyReady) {
+		_keyPairs.clear();
+		getBlockPairs(key, _keyPairs);
+	}
+	_keyReady = false;
 	CHRPOS keyBlocksSumLength = 0;
 	for (size_t k = 0; k < _keyPairs.size(); k++) {
 		keyBlocksSumLength += _keyPairs[k].second - _keyPairs[k].first;
 	}
 	CHRPOS hitBlockSumLength = 0;
+	// Key blocks non-decreasing in start and end: overlaps lie in a contiguous range.
+	bool keySorted = true;
+	for (size_t k = 1; k < _keyPairs.size(); k++) {
+		if (_keyPairs[k].first < _keyPairs[k-1].first || _keyPairs[k].second < _keyPairs[k-1].second) {
+			keySorted = false;
+			break;
+		}
+	}
 
 	RecordKeyVector::iterator_type hitListIter = hitList.begin();
 	for (; hitListIter != hitList.end(); hitListIter = hitList.next())
@@ -311,7 +331,23 @@ int BlockMgr::findBlockedOverlaps(const Record *key, RecordKeyVector &hitList, R
 		bool hitHasOverlap = false;
 		CHRPOS totalDbOverlap = 0;
 		for (size_t h = 0; h < _hitPairs.size(); h++) {
-			for (size_t k = 0; k < _keyPairs.size(); k++) {
+			size_t kLo = 0, kHi = _keyPairs.size();
+			if (keySorted) {
+				// first key block with end > hit start, then first with start >= hit end
+				size_t lo = 0, hi = kHi;
+				while (lo < hi) {
+					size_t mid = (lo + hi) >> 1;
+					if (_keyPairs[mid].second > _hitPairs[h].first) hi = mid; else lo = mid + 1;
+				}
+				kLo = lo;
+				hi = kHi;
+				while (lo < hi) {
+					size_t mid = (lo + hi) >> 1;
+					if (_keyPairs[mid].first >= _hitPairs[h].second) hi = mid; else lo = mid + 1;
+				}
+				kHi = lo;
+			}
+			for (size_t k = kLo; k < kHi; k++) {
 				CHRPOS maxStart = max(_keyPairs[k].first, _hitPairs[h].first);
 				CHRPOS minEnd = min(_keyPairs[k].second, _hitPairs[h].second);
 				CHRPOS overlap = minEnd - maxStart;

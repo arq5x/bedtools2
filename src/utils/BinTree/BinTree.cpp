@@ -4,7 +4,7 @@
 
 BinTree::BinTree(ContextIntersect *context) 
 :  _context(context), _lastQueryBins(NULL), _haveQueryChr(false), _lastAddBins(NULL),
-   _compact(false), _poolUsed(0), _text(false), _textUsed(0), _lastTextOff(0), _stopAtFirst(false) {
+   _compact(false), _poolUsed(0), _text(false), _textUsed(0), _lastTextOff(0), _keyBlocks(NULL), _stopAtFirst(false) {
 }
 
 BinTree::~BinTree() {
@@ -242,6 +242,16 @@ void BinTree::getHits(Record *record, RecordKeyVector &hitSet)
             		// entries after a start past the query's end cannot hit
             		if (binSorted && iter->start > endPos) break;
             		continue;
+            	}
+            	if (_keyBlocks != NULL && _compact) {
+            		bool any = false;
+            		for (size_t k = 0; k < _keyBlocks->size(); k++) {
+            			if (min((*_keyBlocks)[k].second, iter->end) > max((*_keyBlocks)[k].first, iter->start)) {
+            				any = true;
+            				break;
+            			}
+            		}
+            		if (!any) continue;
             	}
             	Record *dbRec;
             	if (_compact) {

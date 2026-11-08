@@ -49,6 +49,11 @@ public:
 	// Same as above with no overlapList: the query's blocks come from key itself.
 	int findBlockedOverlaps(const Record *key, RecordKeyVector &hitList, RecordKeyVector &resultList);
 
+	// Computes key's block pairs ahead of findBlockedOverlaps(key, ...), which then reuses them.
+	const vector<pair<CHRPOS, CHRPOS> > &prepareKey(const Record *key);
+	// True when no -f/-F/-r is set, so a hit overlapping no key block cannot change the result.
+	bool noFractions() const { return _overlapFractionA == 0.0 && _overlapFractionB == 0.0 && !_hasReciprocal; }
+
 	//these are setting options for splitting BAM records
 	void setBreakOnDeletionOps(bool val) { _breakOnDeletionOps = val; }
 	void setBreakOnSkipOps(bool val) { _breakOnSkipOps = val; }
@@ -73,6 +78,7 @@ private:
 	vector<pair<size_t, size_t> > _blockSizeToks;
 	vector<pair<size_t, size_t> > _blockStartToks;
 	vector<pair<CHRPOS, CHRPOS> > _keyPairs;
+	bool _keyReady;
 	vector<pair<CHRPOS, CHRPOS> > _hitPairs;
 	void getBlockPairs(const Record *rec, vector<pair<CHRPOS, CHRPOS> > &out);
 	int finishBlockedOverlaps(const Record *key, CHRPOS keyBlocksSumLength,
