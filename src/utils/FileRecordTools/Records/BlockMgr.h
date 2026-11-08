@@ -46,6 +46,9 @@ public:
 	int findBlockedOverlaps(RecordKeyVector &keyList, RecordKeyVector &hitList,
 							RecordKeyVector &resultList, RecordKeyVector *overlapList = NULL);
 
+	// Same as above with no overlapList: the query's blocks come from key itself.
+	int findBlockedOverlaps(const Record *key, RecordKeyVector &hitList, RecordKeyVector &resultList);
+
 	//these are setting options for splitting BAM records
 	void setBreakOnDeletionOps(bool val) { _breakOnDeletionOps = val; }
 	void setBreakOnSkipOps(bool val) { _breakOnSkipOps = val; }
@@ -69,6 +72,11 @@ private:
 	bool _hasReciprocal;
 	vector<pair<size_t, size_t> > _blockSizeToks;
 	vector<pair<size_t, size_t> > _blockStartToks;
+	vector<pair<CHRPOS, CHRPOS> > _keyPairs;
+	vector<pair<CHRPOS, CHRPOS> > _hitPairs;
+	void getBlockPairs(const Record *rec, vector<pair<CHRPOS, CHRPOS> > &out);
+	int finishBlockedOverlaps(const Record *key, CHRPOS keyBlocksSumLength,
+			CHRPOS hitBlockSumLength, RecordKeyVector &resultList);
 
 	// For now, all records will be split into Bed6 records.
 	const static FileRecordTypeChecker::RECORD_TYPE _blockRecordsType = FileRecordTypeChecker::BED6_RECORD_TYPE;
