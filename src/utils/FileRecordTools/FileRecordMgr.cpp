@@ -28,7 +28,8 @@ FileRecordMgr::FileRecordMgr(const string &filename)
   _ioBufSize(0),
   _noEnforceCoordSort(false),
   _isGroupBy(false),
-  _isCram(false)
+  _isCram(false),
+  _coordsOnly(false)
  {
 }
 
@@ -131,6 +132,7 @@ Record *FileRecordMgr::getNextRecord(RecordKeyVector *keyList)
 
 	if (!record->isUnmapped() ) {
 		if (!record->coordsValid() && (record->getType() != FileRecordTypeChecker::NO_POS_PLUS_RECORD_TYPE)) {
+			fullReparse(record);
 			cerr << "Error: Invalid record in file " << _filename << ". Record is " << endl << *record << endl;
 			exit(1);
 		}
@@ -209,8 +211,19 @@ void FileRecordMgr::sortError(const Record *record, bool genomeFileError)
 	} else {
 		cerr << "Error: Sorted input specified, but the file " << _filename << " has the following out of order record" << endl;
 	}
+	fullReparse(const_cast<Record *>(record));
 	cerr << *record << endl;
 	exit(1);
+}
+
+// An error message prints the whole record: parse the current line in full first.
+void FileRecordMgr::fullReparse(Record *record)
+{
+	if (!_coordsOnly) return;
+	SingleLineDelimTextFileReader *r = dynamic_cast<SingleLineDelimTextFileReader *>(_fileReader);
+	if (r == NULL) return;
+	r->setCoordsOnly(false);
+	record->initFromFile(r);
 }
 
 
@@ -230,6 +243,7 @@ void FileRecordMgr::allocateFileReader(bool inheader)
 	case FileRecordTypeChecker::VCF_FILE_TYPE:
 		_fileReader = new SingleLineDelimTextFileReader(_bufStreamMgr->getTypeChecker().getNumFields(), _bufStreamMgr->getTypeChecker().getDelimChar());
 		static_cast<SingleLineDelimTextFileReader *>(_fileReader)->setInHeader(inheader);
+		static_cast<SingleLineDelimTextFileReader *>(_fileReader)->setCoordsOnly(_coordsOnly);
 		break;
 
 	case FileRecordTypeChecker::BAM_FILE_TYPE:

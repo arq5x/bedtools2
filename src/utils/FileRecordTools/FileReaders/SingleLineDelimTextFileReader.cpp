@@ -14,7 +14,8 @@ SingleLineDelimTextFileReader::SingleLineDelimTextFileReader(int numFields, char
   _line(_sLine.c_str()),
   _lineLen(0),
   _lineNum(0),
-  _inheader(false)
+  _inheader(false),
+  _coordsOnly(false)
 {
 	_delimPositions = new int[numFields +1];
 }

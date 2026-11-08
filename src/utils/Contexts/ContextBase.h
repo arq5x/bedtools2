@@ -243,6 +243,7 @@ protected:
 	virtual bool parseCmdArgs(int argc, char **argv, int skipFirstArgs);
 	bool cmdArgsValid();
 	virtual bool openFiles();
+	virtual bool coordsOnlyFile(int fileIdx) const { return false; }
 	virtual FileRecordMgr *getNewFRM(const string &filename, int fileIdx);
 
 	//set cmd line params and counter, i, as members so code

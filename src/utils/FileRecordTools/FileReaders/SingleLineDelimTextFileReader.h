@@ -35,6 +35,9 @@ public:
 	// field's text is exactly the plain decimal form of val (str is then untouched);
 	// otherwise str receives the field text.
 	bool getPosField(int fieldNum, CHRPOS &val, string &str) const;
+	// When set, Bed6/BedPlus records parse only chrom, start and end.
+	void setCoordsOnly(bool val) { _coordsOnly = val; }
+	bool getCoordsOnly() const { return _coordsOnly; }
 	virtual void appendField(int fieldNum, string &str) const;
 	virtual const string &getHeader() const { return _header; }
 	virtual bool hasHeader() const { return _fullHeaderFound; }
@@ -55,6 +58,7 @@ protected:
 	string _tempChrPosStr;
 	int _lineNum;
 	bool _inheader;
+	bool _coordsOnly;
 	bool detectAndHandleHeader();
 	bool mayBeHeader() const;
 	bool findDelimiters();
