@@ -110,6 +110,11 @@ public:
 
 	bool isCram() const { return _isCram; }
 
+	// Text records of this file need only chrom, start and end; set before open().
+	void setCoordsOnly(bool val) { _coordsOnly = val; }
+	// Parses the reader's current line into record in full; for messages that print the record.
+	void fullReparse(Record *record);
+
 protected:
 	int _fileIdx;
 	string _filename;
@@ -145,6 +150,7 @@ protected:
 	bool _noEnforceCoordSort; //only true for GroupBy
 	bool _isGroupBy; //hopefully also only true for GroupBy
 	bool _isCram;
+	bool _coordsOnly;
 
 	void allocateFileReader(bool inheader=false);
 	void testInputSortOrder(Record *record);

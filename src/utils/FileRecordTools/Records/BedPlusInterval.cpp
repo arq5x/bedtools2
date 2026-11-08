@@ -17,6 +17,7 @@ void BedPlusInterval::setNumFixedFields(int numFields) {
 bool BedPlusInterval::initFromFile(SingleLineDelimTextFileReader *fileReader)
 {
 	bool baseRetFlag = Bed3Interval::initFromFile(fileReader);
+	if (fileReader->getCoordsOnly()) return baseRetFlag;
 
 	if (_numFixedFields != defaultNumFixedFields) {
 		fileReader->getField(3, _name);

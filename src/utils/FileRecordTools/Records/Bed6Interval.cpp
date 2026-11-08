@@ -15,6 +15,7 @@ Bed6Interval::~Bed6Interval()
 bool Bed6Interval::initFromFile(SingleLineDelimTextFileReader *fileReader)
 {
 	bool baseRetFlag = Bed3Interval::initFromFile(fileReader);
+	if (fileReader->getCoordsOnly()) return baseRetFlag;
 
 	fileReader->getField(3, _name);
 	fileReader->getField(4, _score);
