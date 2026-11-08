@@ -226,13 +226,16 @@ void BinTree::getHits(Record *record, RecordKeyVector &hitSet)
 
         	// move to the next bin if this one is empty
         	const binEntry *iter, *binEnd;
-        	if (!bins.find(j, iter, binEnd)) {
+        	bool binSorted;
+        	if (!bins.find(j, iter, binEnd, binSorted)) {
         		continue;
         	}
 
         	for (; iter != binEnd; iter++) {
             	// Record::sameChromIntersects returns false when minEnd < maxStart.
             	if (iter->end < startPos || iter->start > endPos) {
+            		// entries after a start past the query's end cannot hit
+            		if (binSorted && iter->start > endPos) break;
             		continue;
             	}
             	Record *dbRec;
