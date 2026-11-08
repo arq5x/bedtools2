@@ -27,6 +27,7 @@ public:
 	virtual bool readEntry();
 	virtual int getNumFields() const { return _numFields; }
 	const char *getLineData() const { return _line; }
+	size_t getLineLength() const { return _lineLen; }
 	const int *getDelimPositions() const { return _delimPositions; }
 	// True and val set only for a non-negative plain decimal (no leading zero, 1-18 digits).
 	bool getPlainPos(int fieldNum, CHRPOS &val) const;
