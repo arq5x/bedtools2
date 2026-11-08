@@ -34,6 +34,10 @@ void BinTree::loadDB()
 			}
 		}
 	}
+	for (mainMapType::iterator it = _mainMap.begin(); it != _mainMap.end(); ++it) {
+		it->second->finalize();
+	}
+	_haveQueryChr = false;
 }
 
 void BinTree::getHits(Record *record, RecordKeyVector &hitSet)
@@ -73,13 +77,12 @@ void BinTree::getHits(Record *record, RecordKeyVector &hitSet)
         for (binNumType j = (startBin+offset); j <= (endBin+offset); j++)  {
 
         	// move to the next bin if this one is empty
-        	const binType *binPtr = bins.find(j);
-        	if (binPtr == NULL) {
+        	const binEntry *iter, *binEnd;
+        	if (!bins.find(j, iter, binEnd)) {
         		continue;
         	}
-        	const binType &bin = *binPtr;
 
-        	for (binType::const_iterator iter = bin.begin(); iter != bin.end(); iter++) {
+        	for (; iter != binEnd; iter++) {
             	// Record::sameChromIntersects returns false when minEnd < maxStart.
             	if (iter->end < startPos || iter->start > endPos) {
             		continue;
@@ -135,7 +138,7 @@ bool BinTree::addRecordToTree(Record *record)
 	allBinsType *bins = _lastAddBins;
 	_haveQueryChr = false;
 	binEntry entry = {startPos, endPos, record};
-	(*bins)[binNum].push_back(entry);
+	bins->stage(binNum, entry);
 	return true;
 }
 
