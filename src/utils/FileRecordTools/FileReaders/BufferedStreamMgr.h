@@ -30,6 +30,7 @@ public:
 	bool getLineRef(string &scratch, const char *&ptr, size_t &len);
 	BamTools::BamReader *getBamReader() { return _inputStreamMgr->getBamReader(); }
 	static const int DEFAULT_MAIN_BUF_READ_SIZE = 1023;
+	static const int PLAIN_FILE_BUF_READ_SIZE = 65535;
 	void setIoBufSize(size_t val) { _useBufSize = val; }
 private:
 	InputStreamMgr *_inputStreamMgr;
