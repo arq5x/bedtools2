@@ -52,7 +52,7 @@ bool Bed3Interval::initFromFile(SingleLineDelimTextFileReader *fileReader)
 bool Bed3Interval::initFastLine(const ChrRef &chr, CHRPOS s, CHRPOS e, int fileIdx, const char *line, size_t lineLen, size_t, int)
 {
 	setFastCoords(chr, s, e, fileIdx);
-	setFastLine(line, lineLen);
+	setFastLineRef(line, lineLen);
 	return true;
 }
 

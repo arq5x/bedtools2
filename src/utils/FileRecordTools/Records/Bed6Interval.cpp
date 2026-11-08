@@ -30,7 +30,7 @@ bool Bed6Interval::initFastLine(const ChrRef &chr, CHRPOS s, CHRPOS e, int fileI
 {
 	if (numFields != 6 || tail >= lineLen) return false;
 	setFastCoords(chr, s, e, fileIdx);
-	setFastLine(line, lineLen);
+	setFastLineRef(line, lineLen);
 	setFastNameScoreStrand(line, line + tail + 1, lineLen - tail - 1);
 	return true;
 }

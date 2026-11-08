@@ -128,7 +128,7 @@ Record *FileRecordMgr::getNextRecord(RecordKeyVector *keyList)
 
 Record *FileRecordMgr::getNextQueryRecord()
 {
-	bool fast = _queryFast && !_hasGenomeFile && !_isSortedInput && !_coordsOnly
+	bool fast = _queryFast && !_hasGenomeFile && !_coordsOnly
 		&& (_recordType == FileRecordTypeChecker::BED3_RECORD_TYPE
 			|| _recordType == FileRecordTypeChecker::BED6_RECORD_TYPE
 			|| _recordType == FileRecordTypeChecker::BED_PLUS_RECORD_TYPE
@@ -152,6 +152,18 @@ Record *FileRecordMgr::getNextQueryRecord()
 		int got = rr->readCoordsLine(_queryChr.str(), s, e);
 		if (got == 0) {
 			return NULL;
+		}
+		if (got == 1 && _isSortedInput && !_noEnforceCoordSort) {
+			// testInputSortOrder compares s: its zero-length adjustment is -1 then +1
+			if (s < _prevStart) {
+				// out of order: the full path reports the error
+				if (!rr->completeEntry()) {
+					return NULL;
+				}
+				got = 2;
+			} else {
+				_prevStart = s;
+			}
 		}
 		if (got == 1) {
 			Record *record = _recordMgr->allocateRecord();

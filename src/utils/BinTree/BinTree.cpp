@@ -4,7 +4,8 @@
 
 BinTree::BinTree(ContextIntersect *context) 
 :  _context(context), _lastQueryBins(NULL), _haveQueryChr(false), _lastAddBins(NULL),
-   _compact(false), _poolUsed(0), _text(false), _textUsed(0), _lastTextOff(0), _keyBlocks(NULL), _stopAtFirst(false) {
+   _compact(false), _poolUsed(0), _text(false), _textUsed(0), _lastTextOff(0), _keyBlocks(NULL), _stopAtFirst(false),
+   _fracFast(false), _fracA(0.0), _fracB(0.0), _fracEither(false) {
 }
 
 BinTree::~BinTree() {
@@ -85,6 +86,9 @@ void BinTree::loadDB()
 			(_context->getAnyHit() != _context->getNoHit()) &&
 			!_context->getWriteCount() && !_context->getWriteCountsPerDatabase() &&
 			!_context->getObeySplits();
+	_fracA = _context->getOverlapFractionA();
+	_fracB = _context->getOverlapFractionB();
+	_fracEither = _context->getEitherFraction();
 	for (int i=0; _compact && i < _context->getNumDatabaseFiles(); i++) {
 		FileRecordMgr *f = _context->getDatabaseFile(i);
 		FileRecordTypeChecker::RECORD_TYPE t = f->getRecordType();
@@ -190,6 +194,8 @@ void BinTree::loadDB()
 		it->second->finalize();
 	}
 	_haveQueryChr = false;
+	_fracFast = _compact && !_context->getSameStrand() && !_context->getDiffStrand() &&
+			!_context->getObeySplits() && (_fracA != 0.0 || _fracB != 0.0);
 }
 
 void BinTree::getHits(Record *record, RecordKeyVector &hitSet)
@@ -289,6 +295,19 @@ void BinTree::getHits(Record *record, RecordKeyVector &hitSet)
             			}
             		}
             		if (!any) continue;
+            	}
+            	if (_fracFast) {
+            		// same expressions as Record::sameChromIntersects; aLen == 0 takes the old path
+            		CHRPOS aLen = endPos - startPos;
+            		if (aLen != 0) {
+            			CHRPOS overlapBases = min(iter->end, endPos) - max(iter->start, startPos);
+            			CHRPOS bLen = iter->end - iter->start;
+            			float overlapA = (float)overlapBases / (float)aLen;
+            			float overlapB = (float)overlapBases / (float)bLen;
+            			bool okA = (overlapA >= _fracA);
+            			bool okB = (overlapB >= _fracB);
+            			if (_fracEither ? !(okA || okB) : !(okA && okB)) continue;
+            		}
             	}
             	Record *dbRec;
             	if (_compact) {

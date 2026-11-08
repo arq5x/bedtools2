@@ -30,8 +30,8 @@ public:
 	// The columns are line[off, off + len); copied into _text by resolve(line) on first use.
 	void setFastLazy(size_t off, size_t len, size_t numFields);
 	bool isLazy() const { return _lazy; }
-	void resolve(const string &line) const {
-		if (_lazy) { _text.assign(line, _lazyOff, _lazyLen); _lazy = false; }
+	void resolve(const char *line) const {
+		if (_lazy) { _text.assign(line + _lazyOff, _lazyLen); _lazy = false; }
 	}
 	virtual void printFields(string &outBuf) const;
 

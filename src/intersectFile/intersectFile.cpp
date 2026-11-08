@@ -40,6 +40,9 @@ bool IntersectFile::init() {
 
 	 if (upCast(_context)->getSortedInput()) {
 		 makeSweep();
+		if (!upCast(_context)->getObeySplits() && !upCast(_context)->getUseMergedIntervals()) {
+			_queryFRM->setQueryFast(true);
+		}
 		return _sweep->init();
 	 } else {
 		_binTree = new BinTree( upCast(_context));

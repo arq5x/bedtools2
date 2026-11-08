@@ -302,6 +302,10 @@ private:
 	int64_t _lastTextOff; // offset of the last appended text
 	const vector<pair<CHRPOS, CHRPOS> > *_keyBlocks;
 	bool _stopAtFirst; // only whether a query has a hit is read (-u, -v)
+	// -f/-F/-r without -s/-S/-split on compact entries: getHits tests the fractions on the stored coordinates
+	bool _fracFast;
+	float _fracA, _fracB;
+	bool _fracEither;
 	bool textEquals(int64_t off, const char *text, size_t len) const;
 
 	bool addRecordToTree(Record *);

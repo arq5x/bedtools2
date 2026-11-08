@@ -693,6 +693,14 @@ void ContextBase::testNameConventions(const Record *record) {
 
 	int fileIdx = record->getFileIdx();
 
+	if (fileIdx >= 0) {
+		if ((size_t)fileIdx >= _lastTested.size()) _lastTested.resize(fileIdx + 1);
+		LastTested &lt = _lastTested[fileIdx];
+		if (lt.valid && lt.chr == record->getChrRef()) return;
+		lt.chr = record->getChrRef();
+		lt.valid = true;
+	}
+
 	//
 	// First test whether chr in chrom names match
 	//
