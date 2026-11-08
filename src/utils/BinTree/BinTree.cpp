@@ -231,8 +231,14 @@ void BinTree::getHits(Record *record, RecordKeyVector &hitSet)
             hits if it meets all of the user's requests, which include:
                (a) overlap fraction, (b) strandedness, (c) reciprocal overlap
     */
+    // Bin numbers a level reaches never exceed offset + endBin, which falls with the level
+    // (for a non-negative start): once it is below the lowest stored bin number, no coarser
+    // level holds a hit either.
+    const binNumType minBin = bins.minBin();
+    const bool canStop = startPos >= 0;
     for (binNumType i = 0; i < NUM_BIN_LEVELS; i++) {
         binNumType offset = _binOffsetsExtended[i];
+        if (canStop && offset + endBin < minBin) break;
         for (binNumType j = (startBin+offset); j <= (endBin+offset); j++)  {
 
         	// move to the next bin if this one is empty
