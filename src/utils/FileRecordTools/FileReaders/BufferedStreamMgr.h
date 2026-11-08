@@ -28,6 +28,8 @@ public:
 	// point into it (NUL-terminated at ptr[len], valid until the next call); otherwise
 	// the line is built in scratch. Returns false exactly when getLine would.
 	bool getLineRef(string &scratch, const char *&ptr, size_t &len);
+	// True when the line the last getLineRef returned lies in a chunk known to hold no NUL byte.
+	bool lastLineNulFree() const { return _lineNulFree; }
 	BamTools::BamReader *getBamReader() { return _inputStreamMgr->getBamReader(); }
 	static const int DEFAULT_MAIN_BUF_READ_SIZE = 1023;
 	static const int PLAIN_FILE_BUF_READ_SIZE = 65535;
@@ -45,6 +47,8 @@ private:
 	bool _eof;
 	size_t _useBufSize;
 	bool _streamFinished;
+	bool _chunkNulFree;
+	bool _lineNulFree;
 	string _currScanBuffer;
 
 	//The minus ones in these constants are for leaving room for a null terminator after reading into buffers.

@@ -18,7 +18,9 @@ BufferedStreamMgr::BufferedStreamMgr(const string &filename)
   	_mainBufCurrLen(0),
   	_eof(false),
   	_useBufSize(DEFAULT_MAIN_BUF_READ_SIZE),
-  	_streamFinished(false)
+  	_streamFinished(false),
+	_chunkNulFree(false),
+	_lineNulFree(false)
 {
 
 }
@@ -64,6 +66,7 @@ bool BufferedStreamMgr::init()
 	memset(_mainBuf, 0, _useBufSize +1);
 	memcpy(_mainBuf, _currScanBuffer.c_str(), _currScanBuffer.size());
 	_mainBufCurrLen = (int)_currScanBuffer.size();
+	_chunkNulFree = false;
 
 	return true;
 }
@@ -139,6 +142,7 @@ bool BufferedStreamMgr::getLine(string &line)
 
 bool BufferedStreamMgr::getLineRef(string &scratch, const char *&ptr, size_t &len)
 {
+	_lineNulFree = false;
 	if (_mainBufCurrStartPos < _mainBufCurrLen) {
 		char *base = (char *)_mainBuf + _mainBufCurrStartPos;
 		char *eol = (char *)memchr(base, '\n', _mainBufCurrLen - _mainBufCurrStartPos);
@@ -149,6 +153,7 @@ bool BufferedStreamMgr::getLineRef(string &scratch, const char *&ptr, size_t &le
 			base[n] = '\0';
 			ptr = base;
 			len = n;
+			_lineNulFree = _chunkNulFree;
 			return true;
 		}
 	}
@@ -171,6 +176,7 @@ bool BufferedStreamMgr::readFileChunk()
 		_mainBufCurrLen = _inputStreamMgr->read((char *)_mainBuf, _useBufSize);
 		if (_mainBufCurrLen < 0) _mainBufCurrLen = 0;
 		_mainBuf[_mainBufCurrLen] = 0;
+		_chunkNulFree = memchr(_mainBuf, 0, _mainBufCurrLen) == NULL;
 		if (_mainBufCurrLen < _useBufSize) {
 			_streamFinished = true;
 		}
@@ -178,6 +184,7 @@ bool BufferedStreamMgr::readFileChunk()
 	} else {
 		_mainBufCurrLen = 0;
 		_mainBuf[0] = 0;
+		_chunkNulFree = false;
 		return false;
 	}
 }
