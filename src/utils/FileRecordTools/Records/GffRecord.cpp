@@ -22,7 +22,7 @@ void GffRecord::clear()
 bool GffRecord::initFromFile(SingleLineDelimTextFileReader *fileReader)
 {
 	setFileIdx(fileReader->getFileIdx());
-	fileReader->getField(0, _chrName);
+	{ string chrTmp; fileReader->getField(0, chrTmp); _chrName = chrTmp; }
 	fileReader->getField(3, startStr());
 	_startPos = str2chrPos(startStr());
 	_startPos--; // VCF is one-based. Here we intentionally don't decrement the string version,
@@ -128,7 +128,7 @@ const string &GffRecord::getField(int fieldNum) const
 	}
 	switch (fieldNum) {
 	case 1:
-		return _chrName;
+		return _chrName.str();
 		break;
 	case 2:
 		return _source;

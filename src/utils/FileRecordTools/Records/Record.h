@@ -9,6 +9,8 @@
 #define RECORD_H_
 
 #include <string>
+#include <unordered_set>
+#include <ostream>
 #include <cstdarg>
 #include "BedtoolsTypes.h"
 #include "FreeList.h"
@@ -17,6 +19,38 @@
 
 
 using namespace std;
+
+// A chromosome name shared between records: one pointer into a table of interned strings.
+class ChrRef {
+public:
+	ChrRef() : _p(&table().emptyStr) {}
+	operator const string &() const { return *_p; }
+	const string &str() const { return *_p; }
+	bool empty() const { return _p->empty(); }
+	size_t size() const { return _p->size(); }
+	const char *c_str() const { return _p->c_str(); }
+	ChrRef &operator=(const string &s) { assign(s.data(), s.size()); return *this; }
+	ChrRef &operator=(const char *s) { assign(s, strlen(s)); return *this; }
+	void clear() { _p = &table().emptyStr; }
+	void assign(const char *p, size_t n) {
+		Table &t = table();
+		if (t.last && t.last->size() == n && memcmp(t.last->data(), p, n) == 0) { _p = t.last; return; }
+		_p = t.last = &*t.set.insert(string(p, n)).first;
+	}
+	bool operator==(const ChrRef &o) const { return _p == o._p; }
+	bool operator<(const ChrRef &o) const { return *_p < *o._p; }
+	bool operator>(const ChrRef &o) const { return *_p > *o._p; }
+private:
+	struct Table {
+		unordered_set<string> set;
+		string emptyStr;
+		const string *last;
+		Table() : last(NULL) {}
+	};
+	static Table &table() { static Table t; return t; }
+	const string *_p;
+};
+inline ostream &operator<<(ostream &o, const ChrRef &c) { return o << c.str(); }
 
 class FileRecordMgr;
 class FileReader;
@@ -98,7 +132,7 @@ public:
 	virtual void setValid(const bool valid)  { _isValidHit = valid; }
 	virtual bool isValid() const { return _isValidHit; }
 
-	virtual const string &getChrName() const { return _chrName; }
+	virtual const string &getChrName() const { return _chrName.str(); }
 	virtual void setChrName(const string &chr) { _chrName = chr; }
 	virtual void setChrName(const char *chr) { _chrName = chr; }
 
@@ -216,7 +250,7 @@ public:
 protected:
 
 	int _fileIdx; //associated file the record came from
-	string _chrName;
+	ChrRef _chrName;
 	int _chrId;
 	CHRPOS _startPos;
 	CHRPOS _endPos;

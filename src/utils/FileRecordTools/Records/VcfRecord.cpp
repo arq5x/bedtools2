@@ -11,7 +11,7 @@
 bool VcfRecord::initFromFile(SingleLineDelimTextFileReader *fileReader)
 {
 	setFileIdx(fileReader->getFileIdx());
-	fileReader->getField(0, _chrName);
+	{ string chrTmp; fileReader->getField(0, chrTmp); _chrName = chrTmp; }
 	_chrId = fileReader->getCurrChromdId();
 	fileReader->getField(1, startStr());
 	_startPos = str2chrPos(startStr());
@@ -97,7 +97,7 @@ const string &VcfRecord::getField(int fieldNum) const
 
 	switch (fieldNum) {
 	case 1:
-		return _chrName;
+		return _chrName.str();
 		break;
 	case 2:
 		return startStr();

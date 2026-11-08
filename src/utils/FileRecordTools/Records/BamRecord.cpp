@@ -48,7 +48,7 @@ bool BamRecord::initFromFile(BamFileReader *bamFileReader)
 {
 	setFileIdx(bamFileReader->getFileIdx());
 	_bamAlignment = bamFileReader->getAlignment();
-	bamFileReader->getChrName(_chrName);
+	{ string chrTmp; bamFileReader->getChrName(chrTmp); _chrName = chrTmp; }
 
 	_bamChromId = bamFileReader->getCurrChromdId();
 	_startPos = bamFileReader->getStartPos();
@@ -185,7 +185,7 @@ void BamRecord::printRemainingBamFields(string &outBuf, RecordKeyVector *keyList
 
 void BamRecord::printUnmapped(string &outBuf) const {
 	ostringstream s;
-    s << (_chrName.empty() ? "." : _chrName);
+    s << (_chrName.empty() ? string(".") : _chrName.str());
     s << "\t-1\t-1\t";
     s << (_name.empty() ? "." : _name);
     s << "\t";
@@ -219,7 +219,7 @@ const string &BamRecord::getField(int fieldNum) const
 		// Context will have to error out if they try.
 		break;
 	case 3:
-		return _chrName;
+		return _chrName.str();
 		break;
 	case 4:
 		return startStr();

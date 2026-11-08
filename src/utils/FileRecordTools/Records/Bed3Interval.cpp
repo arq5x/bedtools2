@@ -23,7 +23,11 @@ bool Bed3Interval::initFromFile(FileReader *fileReader)
 bool Bed3Interval::initFromFile(SingleLineDelimTextFileReader *fileReader)
 {
 	setFileIdx(fileReader->getFileIdx());
-	fileReader->getField(0, _chrName);
+	{
+		const char *line = fileReader->getLineData();
+		const int *dp = fileReader->getDelimPositions();
+		_chrName.assign(line + dp[0] + 1, dp[1] - dp[0] - 1);
+	}
 	string s1, s2;
 	bool canonStart = fileReader->getPosField(1, _startPos, s1);
 	bool canonEnd = fileReader->getPosField(2, _endPos, s2);
@@ -77,7 +81,7 @@ const string &Bed3Interval::getField(int fieldNum) const
 {
 	switch (fieldNum) {
 	case 1:
-		return _chrName;
+		return _chrName.str();
 		break;
 	case 2:
 		return startStr();
