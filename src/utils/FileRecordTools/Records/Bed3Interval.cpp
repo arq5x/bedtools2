@@ -24,10 +24,22 @@ bool Bed3Interval::initFromFile(SingleLineDelimTextFileReader *fileReader)
 {
 	setFileIdx(fileReader->getFileIdx());
 	fileReader->getField(0, _chrName);
-	fileReader->getField(1, _startPosStr);
-	fileReader->getField(2, _endPosStr);
-	_startPos = str2chrPos(_startPosStr);
-	_endPos = str2chrPos(_endPosStr);
+	string s1, s2;
+	bool canonStart = fileReader->getPosField(1, _startPos, s1);
+	bool canonEnd = fileReader->getPosField(2, _endPos, s2);
+	if (canonStart && canonEnd) {
+		_posMode = POS_PLAIN;
+		_origStart = _startPos;
+		_origEnd = _endPos;
+	} else {
+		// not the plain decimal form (leading zeros, exponent, ...): keep the original text
+		if (canonStart) fileReader->getField(1, s1);
+		if (canonEnd) fileReader->getField(2, s2);
+		PosStrBox *b = _posBox.make();
+		b->start.swap(s1);
+		b->end.swap(s2);
+		_posMode = POS_STRINGS;
+	}
 	_zeroLength = false;
 	return true;
 }
@@ -68,10 +80,10 @@ const string &Bed3Interval::getField(int fieldNum) const
 		return _chrName;
 		break;
 	case 2:
-		return _startPosStr;
+		return startStr();
 		break;
 	case 3:
-		return _endPosStr;
+		return endStr();
 		break;
 	default:
 		return Record::getField(fieldNum);

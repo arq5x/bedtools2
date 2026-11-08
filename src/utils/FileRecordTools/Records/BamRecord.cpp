@@ -53,9 +53,9 @@ bool BamRecord::initFromFile(BamFileReader *bamFileReader)
 	_bamChromId = bamFileReader->getCurrChromdId();
 	_startPos = bamFileReader->getStartPos();
         // NOTE: casting to int here, but bam currently only supports int32_t for position
-	int2str((int)_startPos, _startPosStr);
+	int2str((int)_startPos, startStr());
 	_endPos = bamFileReader->getEndPos();
-	int2str((int)_endPos, _endPosStr);
+	int2str((int)_endPos, endStr());
 	bamFileReader->getName(_name);
 	bamFileReader->getScore(_score);
 	char strandChar = bamFileReader->getStrand();
@@ -147,7 +147,7 @@ void BamRecord::printRemainingBamFields(string &outBuf, RecordKeyVector *keyList
 {
 	ostringstream s;
     s << "\t";
-    s << _startPosStr;
+    s << startStr();
     s << "\t";
     s << _endPos;
     s << "\t0,0,0";
@@ -222,7 +222,7 @@ const string &BamRecord::getField(int fieldNum) const
 		return _chrName;
 		break;
 	case 4:
-		return _startPosStr;
+		return startStr();
 		break;
 	case 5:
 		return _score;

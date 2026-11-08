@@ -110,13 +110,13 @@ public:
 
 	virtual CHRPOS getStartPos() const { return _startPos; }
 	virtual void setStartPos(CHRPOS startPos) { _startPos = startPos; }
-	virtual const string &getStartPosStr() const { return _startPosStr; }
-	virtual void setStartPosStr(const string &str) { _startPosStr = str; }
+	virtual const string &getStartPosStr() const { return startStr(); }
+	virtual void setStartPosStr(const string &str) { startStr() = str; _posMode = POS_STRINGS; }
 
 	virtual CHRPOS getEndPos() const { return _endPos; }
 	virtual void setEndPos(CHRPOS endPos) { _endPos = endPos; }
-	virtual const string &getEndPosStr() const { return _endPosStr; }
-	virtual void setEndPosStr(const string &str) { _endPosStr = str; }
+	virtual const string &getEndPosStr() const { return endStr(); }
+	virtual void setEndPosStr(const string &str) { endStr() = str; _posMode = POS_STRINGS; }
 
 	virtual bool getZeroLength() const { return _zeroLength; }
 	virtual void setZeroLength(bool val) { _zeroLength = val; }
@@ -224,8 +224,34 @@ protected:
 	CHRPOS _endPos;
 	//It is actually faster to also store the start and end positions as their original strings than to
 	//have to convert their integer representations back to strings when printing them.
-	string _startPosStr;
-	string _endPosStr;
+	// The strings live in a side object, built on first use: a record parsed with plain
+	// decimal coordinates keeps only the two numbers (_origStart/_origEnd) until asked.
+	enum { POS_NONE = 0, POS_PLAIN = 1, POS_STRINGS = 2 };
+	struct PosStrBox {
+		string start;
+		string end;
+	};
+	class PosStrPtr {
+	public:
+		PosStrPtr() : _p(NULL) {}
+		PosStrPtr(const PosStrPtr &o) : _p(o._p ? new PosStrBox(*o._p) : NULL) {}
+		PosStrPtr &operator=(const PosStrPtr &o) {
+			if (this != &o) { PosStrBox *n = o._p ? new PosStrBox(*o._p) : NULL; delete _p; _p = n; }
+			return *this;
+		}
+		~PosStrPtr() { delete _p; }
+		PosStrBox *get() const { return _p; }
+		PosStrBox *make() { if (!_p) _p = new PosStrBox(); return _p; }
+	private:
+		PosStrBox *_p;
+	};
+	mutable PosStrPtr _posBox;
+	mutable char _posMode;
+	CHRPOS _origStart;
+	CHRPOS _origEnd;
+	void materializePosStrs() const;
+	string &startStr() const { if (_posMode != POS_STRINGS) materializePosStrs(); return _posBox.get()->start; }
+	string &endStr() const { if (_posMode != POS_STRINGS) materializePosStrs(); return _posBox.get()->end; }
 	string _name;
 	string _score;
 	string _strand;
