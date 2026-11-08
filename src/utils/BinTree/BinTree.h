@@ -93,6 +93,13 @@ private:
 	typedef map<string, allBinsType *> mainMapType; //for each chrom, a map of bin num to RecordLists.
 	mainMapType _mainMap;
 
+	// last chrom looked up (queries) / inserted (load), to skip the map find.
+	string _lastQueryChr;
+	allBinsType *_lastQueryBins;
+	bool _haveQueryChr;
+	string _lastAddChr;
+	allBinsType *_lastAddBins;
+
 	map<binNumType, int> _binsHit;
 
 	bool addRecordToTree(Record *);
