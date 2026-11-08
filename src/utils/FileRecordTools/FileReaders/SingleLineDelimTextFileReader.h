@@ -25,6 +25,7 @@ public:
 	~SingleLineDelimTextFileReader();
 
 	virtual bool readEntry();
+	int readCoordsLine(const string &lastChr, CHRPOS &s, CHRPOS &e);
 	virtual int getNumFields() const { return _numFields; }
 	const char *getLineData() const { return _line; }
 	size_t getLineLength() const { return _lineLen; }
@@ -56,6 +57,7 @@ protected:
 	const char *_line;
 	size_t _lineLen;
 	bool nextLine();
+	bool finishEntry();
 	int *_delimPositions;
 	string _currChromStr;
 	string _tempChrPosStr;

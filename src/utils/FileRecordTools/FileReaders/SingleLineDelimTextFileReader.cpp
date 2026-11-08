@@ -42,7 +42,11 @@ bool SingleLineDelimTextFileReader::readEntry()
 	if (_lineLen == 0) {
 		return false;
 	}
+	return finishEntry();
+}
 
+bool SingleLineDelimTextFileReader::finishEntry()
+{
 	//scan the whole header in one call.
 	bool wasHeader = false;
 	while (detectAndHandleHeader()) { //header line
@@ -79,6 +83,61 @@ bool SingleLineDelimTextFileReader::readEntry()
 	return true;
 }
 
+
+// Returns 0 when readEntry would return false, 1 when the line is a plain-coordinate
+// line of chromosome lastChr with the file's field count (s, e set; delimiter
+// positions not filled), and 2 when it took readEntry's full path (delimiters set).
+int SingleLineDelimTextFileReader::readCoordsLine(const string &lastChr, CHRPOS &s, CHRPOS &e)
+{
+	if (!_isFileOpen || _bufStreamMgr->eof() || !nextLine()) {
+		return 0;
+	}
+	_lineNum++;
+	if (_lineLen == 0) {
+		return 0;
+	}
+	if (mayBeHeader() || (_inheader && _lineNum == 1) || _delimChar != '\t') {
+		return finishEntry() ? 2 : 0;
+	}
+	const char *line = _line;
+	const char *end = line + _lineLen;
+	size_t chrLen = lastChr.size();
+	if (chrLen + 1 < _lineLen && line[chrLen] == '\t' && !isspace((unsigned char)line[0])
+			&& memcmp(line, lastChr.data(), chrLen) == 0) {
+		const char *q = line + chrLen + 1;
+		const char *digits = q;
+		long long v = 0;
+		while (q < end && (unsigned char)(*q - '0') <= 9) {
+			v = v * 10 + (*q - '0');
+			q++;
+		}
+		size_t nd = q - digits;
+		if (q < end && *q == '\t' && nd >= 1 && nd <= 18 && (*digits != '0' || nd == 1)) {
+			long long w = 0;
+			const char *d2 = ++q;
+			while (q < end && (unsigned char)(*q - '0') <= 9) {
+				w = w * 10 + (*q - '0');
+				q++;
+			}
+			size_t nd2 = q - d2;
+			if (nd2 >= 1 && nd2 <= 18 && (*d2 != '0' || nd2 == 1) && v <= w) {
+				int tabs = 2;
+				unsigned char nul = 0;
+				for (const char *r = q; r < end; r++) {
+					tabs += (*r == '\t');
+					nul |= (unsigned char)(*r == 0);
+				}
+				if (!nul && tabs + 1 == _numFields && memchr(line, 0, chrLen) == NULL) {
+					s = v;
+					e = w;
+					_fullHeaderFound = true;
+					return 1;
+				}
+			}
+		}
+	}
+	return finishEntry() ? 2 : 0;
+}
 
 bool SingleLineDelimTextFileReader::nextLine() {
 	return _bufStreamMgr->getLineRef(_sLine, _line, _lineLen);

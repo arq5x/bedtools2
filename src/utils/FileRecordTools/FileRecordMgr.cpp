@@ -150,7 +150,34 @@ int FileRecordMgr::getNextCoords(const string *lastChr, CHRPOS &start, CHRPOS &e
 		const char **lineOut, size_t *lineLenOut)
 {
 	rec = NULL;
-	if (!_fileReader->isOpen() || !_fileReader->readEntry()) {
+	if (!_fileReader->isOpen()) {
+		return 0;
+	}
+	if (lastChr != NULL && !_hasGenomeFile && !_isSortedInput) {
+		SingleLineDelimTextFileReader *rr = static_cast<SingleLineDelimTextFileReader*>(_fileReader);
+		CHRPOS fs, fe;
+		int got = rr->readCoordsLine(*lastChr, fs, fe);
+		if (got == 0) {
+			return 0;
+		}
+		if (got == 1) {
+			bool zl = (fs == fe);
+			if (zl) {
+				fs--;
+				fe++;
+			}
+			zeroLen = zl;
+			start = fs;
+			end = fe;
+			_totalRecordLength += (unsigned long)(fe - fs);
+			if (lineOut != NULL) {
+				*lineOut = rr->getLineData();
+				*lineLenOut = rr->getLineLength();
+			}
+			return 1;
+		}
+	}
+	else if (!_fileReader->readEntry()) {
 		return 0;
 	}
 	if (lastChr != NULL && !_hasGenomeFile && !_isSortedInput) {
