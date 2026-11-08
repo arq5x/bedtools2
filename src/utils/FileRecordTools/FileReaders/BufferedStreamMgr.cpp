@@ -54,6 +54,8 @@ bool BufferedStreamMgr::init()
 	}
 	if (_inputStreamMgr->isGzipped()) {
 		_useBufSize = GZIP_LINE_BUF_SIZE;
+	} else if (!_inputStreamMgr->isCompressed() && !_inputStreamMgr->isStdin()) {
+		_useBufSize = PLAIN_FILE_BUF_READ_SIZE;
 	}
 
 	size_t trueBufSize = max(_useBufSize, _currScanBuffer.size());
@@ -163,17 +165,19 @@ bool BufferedStreamMgr::readFileChunk()
 	if (eof()) {
 		return false;
 	}
-	memset(_mainBuf, 0, _useBufSize +1);
 	_mainBufCurrStartPos = 0;
 
 	if (!_streamFinished) {
 		_mainBufCurrLen = _inputStreamMgr->read((char *)_mainBuf, _useBufSize);
+		if (_mainBufCurrLen < 0) _mainBufCurrLen = 0;
+		_mainBuf[_mainBufCurrLen] = 0;
 		if (_mainBufCurrLen < _useBufSize) {
 			_streamFinished = true;
 		}
 		return _mainBufCurrLen > 0;
 	} else {
 		_mainBufCurrLen = 0;
+		_mainBuf[0] = 0;
 		return false;
 	}
 }
