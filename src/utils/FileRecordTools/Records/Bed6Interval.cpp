@@ -26,6 +26,14 @@ bool Bed6Interval::initFromFile(SingleLineDelimTextFileReader *fileReader)
 	return baseRetFlag;
 }
 
+bool Bed6Interval::initFastLine(const ChrRef &chr, CHRPOS s, CHRPOS e, int fileIdx, const char *line, size_t lineLen, size_t tail, int numFields)
+{
+	if (numFields != 6 || tail >= lineLen) return false;
+	setFastCoords(chr, s, e, fileIdx);
+	setFastNameScoreStrand(line + tail + 1, lineLen - tail - 1);
+	return true;
+}
+
 inline void print_record(const Record &rec, const string& chrom_name, CHRPOS start, CHRPOS end, string& buf) {
 	append_cstr(buf, chrom_name);
 	buf.push_back('\t');

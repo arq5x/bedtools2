@@ -1,5 +1,6 @@
 #include "BedPlusInterval.h"
 #include "SingleLineDelimTextFileReader.h"
+#include <cstring>
 
 BedPlusInterval::BedPlusInterval()
 :  _numFixedFields(defaultNumFixedFields),
@@ -32,6 +33,33 @@ bool BedPlusInterval::initFromFile(SingleLineDelimTextFileReader *fileReader)
 
 }
 
+
+bool BedPlusInterval::initFastLine(const ChrRef &chr, CHRPOS s, CHRPOS e, int fileIdx, const char *line, size_t lineLen, size_t tail, int numFields)
+{
+	if (numFields <= _numFixedFields) return false;
+	if (_numFixedFields == defaultNumFixedFields) {
+		setFastCoords(chr, s, e, fileIdx);
+		_plusFields.setFast(line + tail + 1, lineLen - tail - 1, (size_t)(numFields - _numFixedFields));
+		return true;
+	}
+	if (_numFixedFields != 6) return false;
+	const char *p = line + tail + 1;
+	const char *end = line + lineLen;
+	const char *t = (const char *)memchr(p, '\t', end - p);
+	if (t == NULL) return false;
+	t = (const char *)memchr(t + 1, '\t', end - t - 1);
+	if (t == NULL) return false;
+	t = (const char *)memchr(t + 1, '\t', end - t - 1);
+	setFastCoords(chr, s, e, fileIdx);
+	if (t == NULL) {
+		setFastNameScoreStrand(p, end - p);
+		_plusFields.setFast(end, 0, 0);
+	} else {
+		setFastNameScoreStrand(p, t - p);
+		_plusFields.setFast(t + 1, end - t - 1, (size_t)(numFields - 6));
+	}
+	return true;
+}
 
 void BedPlusInterval::clear() {
 	Bed3Interval::clear();

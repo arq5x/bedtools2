@@ -29,6 +29,8 @@ public:
 	virtual int getNumFields() const { return _numFields; }
 	const char *getLineData() const { return _line; }
 	size_t getLineLength() const { return _lineLen; }
+	// After readCoordsLine returned 1: offset of the tab after field 3, or the line length.
+	size_t getCoordsTail() const { return _coordsTail; }
 	const int *getDelimPositions() const { return _delimPositions; }
 	// True and val set only for a non-negative plain decimal (no leading zero, 1-18 digits).
 	bool getPlainPos(int fieldNum, CHRPOS &val) const;
@@ -56,6 +58,7 @@ protected:
 	string _sLine; // scratch for lines not wholly inside the stream buffer
 	const char *_line;
 	size_t _lineLen;
+	size_t _coordsTail;
 	bool nextLine();
 	bool finishEntry();
 	int *_delimPositions;

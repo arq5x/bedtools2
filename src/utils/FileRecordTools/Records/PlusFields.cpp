@@ -60,6 +60,21 @@ bool PlusFields::initFromFile(SingleLineDelimTextFileReader *fileReader)
 	return true;
 }
 
+void PlusFields::setFast(const char *p, size_t len, size_t numFields)
+{
+	_numFields = numFields;
+	if (_split != NULL) {
+		delete _split;
+		_split = NULL;
+	}
+	_lens.clear();
+	if (numFields == 0) {
+		_text.clear();
+	} else {
+		_text.assign(p, len);
+	}
+}
+
 void PlusFields::clear() {
 	_text.clear();
 	_lens.clear();

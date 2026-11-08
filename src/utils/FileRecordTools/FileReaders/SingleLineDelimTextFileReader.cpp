@@ -13,6 +13,7 @@ SingleLineDelimTextFileReader::SingleLineDelimTextFileReader(int numFields, char
   _currDataPos(0),
   _line(_sLine.c_str()),
   _lineLen(0),
+  _coordsTail(0),
   _lineNum(0),
   _inheader(false),
   _coordsOnly(false)
@@ -131,6 +132,7 @@ int SingleLineDelimTextFileReader::readCoordsLine(const string &lastChr, CHRPOS 
 					s = v;
 					e = w;
 					_fullHeaderFound = true;
+					_coordsTail = (size_t)(q - line);
 					return 1;
 				}
 			}

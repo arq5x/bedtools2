@@ -94,6 +94,26 @@ void Record::appendNameScoreStrand(string &buf) const {
 	}
 }
 
+void Record::setFastCoords(const ChrRef &chr, CHRPOS s, CHRPOS e, int fileIdx) {
+	_fileIdx = fileIdx;
+	_chrName = chr;
+	_startPos = s;
+	_endPos = e;
+	_posMode = POS_PLAIN;
+	_origStart = s;
+	_origEnd = e;
+	_zeroLength = false;
+	adjustZeroLength();
+}
+
+// p..p+len is "name\tscore\tstrand" of a tab-delimited line.
+void Record::setFastNameScoreStrand(const char *p, size_t len) {
+	setNameScoreStrandText(p, len);
+	const char *q = p + len;
+	while (q > p && q[-1] != '\t') q--;
+	_strandVal = (p + len - q == 1) ? (*q == '+' ? FORWARD : (*q == '-' ? REVERSE : UNKNOWN)) : UNKNOWN;
+}
+
 Record::~Record()
 {
 	//_frm->deleteRecord(this);

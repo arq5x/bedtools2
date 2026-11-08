@@ -48,6 +48,12 @@ bool Bed3Interval::initFromFile(SingleLineDelimTextFileReader *fileReader)
 	return true;
 }
 
+bool Bed3Interval::initFastLine(const ChrRef &chr, CHRPOS s, CHRPOS e, int fileIdx, const char *, size_t, size_t, int)
+{
+	setFastCoords(chr, s, e, fileIdx);
+	return true;
+}
+
 inline void print_record(const string& name, CHRPOS start, CHRPOS end, string& buf) {
 	append_cstr(buf, name);
 	buf.push_back('\t');

@@ -47,6 +47,11 @@ public:
 	// Sweep database read: a line of the previous line's chromosome is parsed
 	// with coordinates only when setSweepCoords(true); other lines in full.
 	Record *getNextRecordSweep();
+	// The query file of an unsorted intersect: a line of the previous record's chromosome with plain
+	// coordinates fills a recycled BED3/BED6/BED(6)+N Record straight from the line; any other line,
+	// and every line when the fast path does not apply, takes getNextRecord.
+	void setQueryFast(bool val) { _queryFast = val; }
+	Record *getNextQueryRecord();
 	void setSweepCoords(bool val) { _sweepCoords = val; }
 	// For BED-type coords-only files loaded without keeping Records: 0 = no record,
 	// 1 = line of chromosome lastChr with plain coordinates, returned in start/end
@@ -165,6 +170,9 @@ protected:
 	bool _isCram;
 	bool _coordsOnly;
 	bool _sweepCoords;
+	bool _queryFast;
+	ChrRef _queryChr;
+	bool _queryChrSet;
 	string _sweepChr;
 
 	void allocateFileReader(bool inheader=false);
