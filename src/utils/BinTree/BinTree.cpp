@@ -393,7 +393,7 @@ BinTree::binNumType BinTree::getBin(const Record *record) const {
 	return getBin((binNumType)(record->getStartPos()), (binNumType)(record->getEndPos()));
 }
 
-BinTree::binNumType BinTree::getBin(binNumType start, binNumType end) const {
+BinTree::binNumType BinTree::getBin(binNumType start, binNumType end) {
     --end;
     start >>= _binFirstShift;
     end   >>= _binFirstShift;
