@@ -25,8 +25,8 @@ public:
 	}
 
 	~FreeList() {
-		for (int i=0; i < (int)_buffer.size(); i++) {
-			delete _buffer[i];
+		for (int i=0; i < (int)_blocks.size(); i++) {
+			delete [] _blocks[i];
 		}
 	}
 
@@ -64,12 +64,18 @@ public:
 
 private:
 	deque<T *> _buffer;
+	vector<T *> _blocks;
 	vector<T *> _freeList;
 	int _nextPos;
 	int _blockSize;
 	void growBuffer() {
+		if (_blockSize <= 0) {
+			return;
+		}
+		T *block = new T[_blockSize];
+		_blocks.push_back(block);
 		for (int i=0; i < _blockSize; ++i) {
-			_buffer.push_back(new T());
+			_buffer.push_back(block + i);
 		}
 	}
 
