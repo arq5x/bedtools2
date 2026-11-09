@@ -354,12 +354,19 @@ protected:
 	// The whole input line of a fast-path record; printed as it stands while nothing it
 	// holds has changed since the parse.
 	string _line;
+	// When non-NULL the line is (_lineP, _lineN) in the reader's buffer, valid until the
+	// reader's next read (a query record is finished with before then); else it is _line.
+	const char *_lineP;
+	size_t _lineN;
 	bool _lineValid;
-	void setFastLine(const char *line, size_t len) { _line.assign(line, len); _lineValid = true; }
+	const char *lineData() const { return _lineP != NULL ? _lineP : _line.data(); }
+	size_t lineSize() const { return _lineP != NULL ? _lineN : _line.size(); }
+	void setFastLine(const char *line, size_t len) { _line.assign(line, len); _lineP = NULL; _lineValid = true; }
+	void setFastLineRef(const char *line, size_t len) { _lineP = line; _lineN = len; _lineValid = true; }
 	bool appendLine(string &buf) const {
 		if (_lineValid && !_zeroLength && _posMode == POS_PLAIN && _nsMode != NS_FIELDS
 				&& _startPos == _origStart && _endPos == _origEnd) {
-			buf.append(_line);
+			buf.append(lineData(), lineSize());
 			return true;
 		}
 		return false;

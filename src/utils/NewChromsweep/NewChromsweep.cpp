@@ -281,7 +281,7 @@ bool NewChromSweep::next(RecordKeyVector &retList) {
 
 bool NewChromSweep::nextRecord(bool query, int dbIdx) {
     if (query) {
-        _currQueryRec = _queryFRM->getNextRecord();
+        _currQueryRec = _queryFRM->getNextQueryRecord();
         if (_currQueryRec != NULL) {
             _queryRecordsTotalLength += (unsigned long)(_currQueryRec->getLength(_context->getObeySplits()));
             _queryTotalRecords++;

@@ -18,6 +18,7 @@ using namespace std;
 #include <cstdlib>
 
 #define GZBUFSIZ BUFSIZ
+#define INFLATE_MIN_ROOM 65536
 
 class InflateStreamBuf:public std::streambuf
 {
@@ -79,9 +80,17 @@ public:
 		strm.next_in=buffin;
 	   /* run inflate() on input until output buffer not full */
 		unsigned int total=0;
+		bool reset_done;
 		do {
-			strm.avail_out = GZBUFSIZ;
-			strm.next_out = buffout;
+			// inflate straight into the room left in buffer, grown 64 KB at a time
+			if (bufsiz - total < INFLATE_MIN_ROOM) {
+				buffer=(char*)std::realloc(buffer,sizeof(char)*(total+INFLATE_MIN_ROOM));
+				if(buffer==NULL) throw ("out of memory");
+				bufsiz = total + INFLATE_MIN_ROOM;
+			}
+			unsigned int room = (unsigned int)(bufsiz - total);
+			strm.avail_out = room;
+			strm.next_out = (unsigned char*)&buffer[total];
 			status_flag = ::inflate(&strm, Z_NO_FLUSH);
 
 			switch (status_flag) {
@@ -100,15 +109,9 @@ public:
 					throw status_flag;
 			}
 
-			unsigned int have = GZBUFSIZ - strm.avail_out;
-			if (total + have > bufsiz) {
-				buffer=(char*)std::realloc(buffer,sizeof(char)*(total+have));
-				if(buffer==NULL) throw ("out of memory");
-				bufsiz = total + have;
-			}
-			memcpy((void*)&buffer[total], &buffout[0], sizeof(char)*have);
-			total+=have;
-			
+			total += room - strm.avail_out;
+			reset_done = false;
+
 			// Handle the concatenated GZIP files: It's part of gzip standard that a GZIP file can be concatenated directly, just like BGZF
 			if(status_flag == Z_STREAM_END && (strm.avail_in != 0  || !in->eof())) {
 
@@ -128,8 +131,9 @@ public:
 				}
 
 				status_flag = 0;
+				reset_done = true;
 			}
-		} while (strm.avail_out == 0 && strm.avail_in > 0);
+		} while ((strm.avail_out == 0 || reset_done) && strm.avail_in > 0);
 
 
 

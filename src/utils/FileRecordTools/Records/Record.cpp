@@ -13,6 +13,8 @@ Record::Record()
   _origEnd(0),
   _nsMode(NS_EMPTY),
   _zeroLength(false),
+  _lineP(NULL),
+  _lineN(0),
   _lineValid(false),
   _isUnmapped(false),
   _isMateUnmapped(false),
@@ -55,7 +57,7 @@ void Record::nsToFields() const {
 		b->strand.assign(_nsText, t2 + 1, string::npos);
 		_nsText.clear();
 	} else if (_nsMode == NS_LINE) {
-		const char *p = _line.data() + _nsOff;
+		const char *p = lineData() + _nsOff;
 		const char *e = p + _nsLen;
 		const char *t1 = (const char *)memchr(p, '\t', e - p);
 		const char *t2 = (const char *)memchr(t1 + 1, '\t', e - t1 - 1);
@@ -92,7 +94,7 @@ void Record::appendNameScoreStrand(string &buf) const {
 	if (_nsMode == NS_TEXT) {
 		buf.append(_nsText);
 	} else if (_nsMode == NS_LINE) {
-		buf.append(_line, _nsOff, _nsLen);
+		buf.append(lineData() + _nsOff, _nsLen);
 	} else if (_nsMode == NS_FIELDS) {
 		const NSBox *b = _nsBox.get();
 		append_cstr(buf, b->name);
