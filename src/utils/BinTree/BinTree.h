@@ -104,7 +104,7 @@ private:
 	class allBinsType {
 	public:
 		ChrRef chr; // the chromosome's name, for hits rebuilt from compact entries
-		allBinsType() : _split(true), _dBin(-1), _dChunk(NULL) {
+		allBinsType() : _split(true), _dBin(-1), _dChunk(NULL), _minBin(FIRST_BIN) {
 			_a.table.assign((FIRST_BIN + CHUNK_BINS - 1) / CHUNK_BINS, (Chunk *)NULL);
 			_b.table.assign((NUM_BINS - FIRST_BIN + CHUNK_BINS - 1) / CHUNK_BINS, (Chunk *)NULL);
 		}
@@ -115,6 +115,7 @@ private:
 		void stage(binNumType binNum, const binEntry &entry) {
 			if (_split) {
 				if (binNum < FIRST_BIN) {
+					if (binNum < _minBin) _minBin = binNum;
 					_stage.push_back(Staged(binNum, entry));
 					return;
 				}
@@ -125,8 +126,13 @@ private:
 				}
 				toStaged();
 			}
+			if (binNum < _minBin) _minBin = binNum;
 			_stage.push_back(Staged(binNum, entry));
 		}
+		// No stored entry has a bin number below this (all of them are at or above FIRST_BIN
+		// when it is FIRST_BIN), so a level whose highest reachable bin number is below it
+		// cannot hold a hit.
+		binNumType minBin() const { return _minBin; }
 		void finalize() {
 			if (_split && _dBin >= 0) closeChunk(_b.entries.size());
 			size_t n = _stage.size();
@@ -248,6 +254,7 @@ private:
 		bool _split;
 		binNumType _dBin; // bin (minus FIRST_BIN) of the last direct entry, -1 for none
 		Chunk *_dChunk; // the chunk of that bin
+		binNumType _minBin; // lowest bin number of any entry staged or placed
 		Part _a, _b;
 		vector<Staged> _stage;
 	};
