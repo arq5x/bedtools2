@@ -277,6 +277,8 @@ public:
 
 	void setFileRecordManager(FileRecordMgr *frm);
 	FileRecordMgr * getFileRecordManager();
+	// Sets the coordinates of a plain-decimal line; what a coords-only initFromFile leaves.
+	void initCoordsOnly(const ChrRef &chr, CHRPOS s, CHRPOS e, int fileIdx) { setFastCoords(chr, s, e, fileIdx); }
 
 
 protected:

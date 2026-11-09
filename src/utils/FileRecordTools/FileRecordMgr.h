@@ -174,6 +174,8 @@ protected:
 	ChrRef _queryChr;
 	bool _queryChrSet;
 	string _sweepChr;
+	ChrRef _sweepChrRef;
+	bool _sweepFast;
 
 	void allocateFileReader(bool inheader=false);
 	void testInputSortOrder(Record *record);
