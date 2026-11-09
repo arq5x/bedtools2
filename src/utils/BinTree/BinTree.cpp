@@ -204,6 +204,8 @@ void BinTree::getHits(Record *record, RecordKeyVector &hitSet)
 		_lastQueryChr = chr;
 		_haveQueryChr = true;
 		_lastQueryBins = (mainIter == _mainMap.end()) ? NULL : mainIter->second;
+		for (int l = 0; l < 8; l++) { _curFirst[l] = NULL; _curCnt[l] = 0; }
+		_curStart = 0;
 	}
 	if (_lastQueryBins == NULL) {
 		//given chrom not even in map.
@@ -215,6 +217,10 @@ void BinTree::getHits(Record *record, RecordKeyVector &hitSet)
 
     binNumType startBin = (startPos >> _binFirstShift);
     binNumType endBin = ((endPos-1) >> _binFirstShift);
+	if (startPos < _curStart) {
+		for (int l = 0; l < 8; l++) { _curFirst[l] = NULL; _curCnt[l] = 0; }
+	}
+	_curStart = startPos;
 
 
 	const allBinsType &bins = *_lastQueryBins;
@@ -234,6 +240,14 @@ void BinTree::getHits(Record *record, RecordKeyVector &hitSet)
         	bool binSorted;
         	if (!bins.find(j, iter, binEnd, binSorted)) {
         		continue;
+        	}
+        	if (j == startBin + offset) {
+        		// skip leading entries already known to end before this query's start
+        		const binEntry *first = iter;
+        		if (_curFirst[i] == first) iter += _curCnt[i];
+        		while (iter != binEnd && iter->end < startPos) iter++;
+        		_curFirst[i] = first;
+        		_curCnt[i] = (size_t)(iter - first);
         	}
 
         	for (; iter != binEnd; iter++) {

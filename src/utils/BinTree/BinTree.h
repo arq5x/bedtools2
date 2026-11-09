@@ -184,6 +184,11 @@ private:
 	ChrRef _lastQueryChr;
 	allBinsType *_lastQueryBins;
 	bool _haveQueryChr;
+	// per level: first entry of the last visited start bin and how many leading entries
+	// had end < the previous query's start (valid while query starts do not decrease)
+	const binEntry *_curFirst[8];
+	size_t _curCnt[8];
+	binNumType _curStart;
 	string _lastAddChr;
 	allBinsType *_lastAddBins;
 
