@@ -31,6 +31,7 @@ bool Bed6Interval::initFastLine(const ChrRef &chr, CHRPOS s, CHRPOS e, int fileI
 	if (numFields != 6 || tail >= lineLen) return false;
 	setFastCoords(chr, s, e, fileIdx);
 	setFastNameScoreStrand(line + tail + 1, lineLen - tail - 1);
+	setFastLine(line, lineLen);
 	return true;
 }
 
@@ -46,6 +47,7 @@ inline void print_record(const Record &rec, const string& chrom_name, CHRPOS sta
 
 void Bed6Interval::print(string &outBuf) const
 {
+	if (appendLine(outBuf)) return;
 	print_record(*this, _chrName, _startPos, _endPos, outBuf);
 }
 

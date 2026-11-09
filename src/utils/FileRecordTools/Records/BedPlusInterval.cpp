@@ -40,6 +40,7 @@ bool BedPlusInterval::initFastLine(const ChrRef &chr, CHRPOS s, CHRPOS e, int fi
 	if (_numFixedFields == defaultNumFixedFields) {
 		setFastCoords(chr, s, e, fileIdx);
 		_plusFields.setFast(line + tail + 1, lineLen - tail - 1, (size_t)(numFields - _numFixedFields));
+		setFastLine(line, lineLen);
 		return true;
 	}
 	if (_numFixedFields != 6) return false;
@@ -58,6 +59,7 @@ bool BedPlusInterval::initFastLine(const ChrRef &chr, CHRPOS s, CHRPOS e, int fi
 		setFastNameScoreStrand(p, t - p);
 		_plusFields.setFast(t + 1, end - t - 1, (size_t)(numFields - 6));
 	}
+	setFastLine(line, lineLen);
 	return true;
 }
 
@@ -68,6 +70,7 @@ void BedPlusInterval::clear() {
 
 void BedPlusInterval::print(string &outBuf) const
 {
+	if (appendLine(outBuf)) return;
 	Bed3Interval::print(outBuf);
 	outBuf.append("\t");
 	printBed6PlusFields(outBuf);

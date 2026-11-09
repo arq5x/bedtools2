@@ -23,6 +23,7 @@ bool Bed3Interval::initFromFile(FileReader *fileReader)
 bool Bed3Interval::initFromFile(SingleLineDelimTextFileReader *fileReader)
 {
 	setFileIdx(fileReader->getFileIdx());
+	_lineValid = false;
 	{
 		const char *line = fileReader->getLineData();
 		const int *dp = fileReader->getDelimPositions();
@@ -48,9 +49,10 @@ bool Bed3Interval::initFromFile(SingleLineDelimTextFileReader *fileReader)
 	return true;
 }
 
-bool Bed3Interval::initFastLine(const ChrRef &chr, CHRPOS s, CHRPOS e, int fileIdx, const char *, size_t, size_t, int)
+bool Bed3Interval::initFastLine(const ChrRef &chr, CHRPOS s, CHRPOS e, int fileIdx, const char *line, size_t lineLen, size_t, int)
 {
 	setFastCoords(chr, s, e, fileIdx);
+	setFastLine(line, lineLen);
 	return true;
 }
 
@@ -63,6 +65,7 @@ inline void print_record(const string& name, CHRPOS start, CHRPOS end, string& b
 }
 
 void Bed3Interval::print(string &outBuf) const{
+	if (appendLine(outBuf)) return;
 	print_record(_chrName, _startPos, _endPos, outBuf);
 }
 

@@ -13,6 +13,7 @@ Record::Record()
   _origEnd(0),
   _nsMode(NS_EMPTY),
   _zeroLength(false),
+  _lineValid(false),
   _isUnmapped(false),
   _isMateUnmapped(false),
   _isValidHit(true),
@@ -99,6 +100,7 @@ void Record::setFastCoords(const ChrRef &chr, CHRPOS s, CHRPOS e, int fileIdx) {
 	_chrName = chr;
 	_startPos = s;
 	_endPos = e;
+	_lineValid = false;
 	_posMode = POS_PLAIN;
 	_origStart = s;
 	_origEnd = e;
@@ -123,6 +125,7 @@ const Record &Record::operator=(const Record &other)
 {
 	_fileIdx = other._fileIdx;
 	_chrName = other._chrName;
+	_lineValid = false;
 	_chrId = other._chrId;
 	_startPos = other._startPos;
 	_endPos = other._endPos;
@@ -149,6 +152,7 @@ void Record::clear() {
 	_nsMode = NS_EMPTY;
 	_strandVal = UNKNOWN;
 	_posMode = POS_NONE;
+	_lineValid = false;
 	_zeroLength = false;
 	_isUnmapped = false;
 	_isMateUnmapped = false;
