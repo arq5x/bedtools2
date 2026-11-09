@@ -43,6 +43,8 @@ private:
 	RecordKeyVector *_currBamBlockList;
 
 	string _outBuf;
+	string _nullText[4];
+	bool _nullTextSet[4] = {false, false, false, false};
 
 	BlockMgr *_bamBlockMgr;
 	string _afterVal; //to store values to be printed after record, such as column operations.

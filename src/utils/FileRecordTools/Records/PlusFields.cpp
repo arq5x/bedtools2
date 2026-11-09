@@ -2,12 +2,13 @@
 #include "SingleLineDelimTextFileReader.h"
 
 PlusFields::PlusFields()
-: _numFields(0), _split(NULL)
+: _numFields(0), _lazy(false), _lazyOff(0), _lazyLen(0), _split(NULL)
 {
 }
 
 PlusFields::PlusFields(const PlusFields &other)
-: _text(other._text), _numFields(other._numFields), _lens(other._lens), _split(NULL),
+	: _text(other._text), _numFields(other._numFields), _lazy(other._lazy), _lazyOff(other._lazyOff),
+  _lazyLen(other._lazyLen), _lens(other._lens), _split(NULL),
   _numOffsetFields(other._numOffsetFields)
 {
 }
@@ -17,6 +18,9 @@ PlusFields &PlusFields::operator=(const PlusFields &other)
 	if (this != &other) {
 		_text = other._text;
 		_numFields = other._numFields;
+		_lazy = other._lazy;
+		_lazyOff = other._lazyOff;
+		_lazyLen = other._lazyLen;
 		_lens = other._lens;
 		_numOffsetFields = other._numOffsetFields;
 		delete _split;
@@ -35,6 +39,7 @@ bool PlusFields::initFromFile(SingleLineDelimTextFileReader *fileReader)
 	size_t numFields = fileReader->getNumFields() - _numOffsetFields;
 
 	_numFields = numFields;
+	_lazy = false;
 	if (_split != NULL) {
 		delete _split;
 		_split = NULL;
@@ -68,6 +73,7 @@ void PlusFields::setFast(const char *p, size_t len, size_t numFields)
 		_split = NULL;
 	}
 	_lens.clear();
+	_lazy = false;
 	if (numFields == 0) {
 		_text.clear();
 	} else {
@@ -75,7 +81,26 @@ void PlusFields::setFast(const char *p, size_t len, size_t numFields)
 	}
 }
 
+void PlusFields::setFastLazy(size_t off, size_t len, size_t numFields)
+{
+	_numFields = numFields;
+	if (_split != NULL) {
+		delete _split;
+		_split = NULL;
+	}
+	_lens.clear();
+	if (numFields == 0) {
+		_lazy = false;
+		_text.clear();
+	} else {
+		_lazy = true;
+		_lazyOff = off;
+		_lazyLen = len;
+	}
+}
+
 void PlusFields::clear() {
+	_lazy = false;
 	_text.clear();
 	_lens.clear();
 	if (_split != NULL) {
