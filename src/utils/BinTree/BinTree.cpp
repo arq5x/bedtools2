@@ -204,7 +204,7 @@ void BinTree::getHits(Record *record, RecordKeyVector &hitSet)
 		_lastQueryChr = chr;
 		_haveQueryChr = true;
 		_lastQueryBins = (mainIter == _mainMap.end()) ? NULL : mainIter->second;
-		for (int l = 0; l < 8; l++) { _curFirst[l] = NULL; _curCnt[l] = 0; }
+		for (int l = 0; l < 8; l++) { _curFirst[l] = NULL; _curCnt[l] = 0; _memoBin[l] = -1; }
 		_curStart = 0;
 	}
 	if (_lastQueryBins == NULL) {
@@ -218,7 +218,7 @@ void BinTree::getHits(Record *record, RecordKeyVector &hitSet)
     binNumType startBin = (startPos >> _binFirstShift);
     binNumType endBin = ((endPos-1) >> _binFirstShift);
 	if (startPos < _curStart) {
-		for (int l = 0; l < 8; l++) { _curFirst[l] = NULL; _curCnt[l] = 0; }
+		for (int l = 0; l < 8; l++) { _curFirst[l] = NULL; _curCnt[l] = 0; _memoBin[l] = -1; }
 	}
 	_curStart = startPos;
 
@@ -238,10 +238,27 @@ void BinTree::getHits(Record *record, RecordKeyVector &hitSet)
         	// move to the next bin if this one is empty
         	const binEntry *iter, *binEnd;
         	bool binSorted;
-        	if (!bins.find(j, iter, binEnd, binSorted)) {
+        	const bool isStartBin = (j == startBin + offset);
+        	if (isStartBin) {
+        		// the previous query's start bin at this level is often this query's
+        		if (_memoBin[i] == j) {
+        			if (!_memoFound[i]) continue;
+        			iter = _memoFirst[i];
+        			binEnd = _memoLast[i];
+        			binSorted = _memoSorted[i];
+        		} else {
+        			bool found = bins.find(j, iter, binEnd, binSorted);
+        			_memoBin[i] = j;
+        			_memoFound[i] = found;
+        			if (!found) continue;
+        			_memoFirst[i] = iter;
+        			_memoLast[i] = binEnd;
+        			_memoSorted[i] = binSorted;
+        		}
+        	} else if (!bins.find(j, iter, binEnd, binSorted)) {
         		continue;
         	}
-        	if (j == startBin + offset) {
+        	if (isStartBin) {
         		// skip leading entries already known to end before this query's start
         		const binEntry *first = iter;
         		if (_curFirst[i] == first) iter += _curCnt[i];
