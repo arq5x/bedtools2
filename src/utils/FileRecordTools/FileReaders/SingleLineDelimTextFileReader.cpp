@@ -124,7 +124,7 @@ int SingleLineDelimTextFileReader::readCoordsLine(const string &lastChr, CHRPOS 
 			if (nd2 >= 1 && nd2 <= 18 && (*d2 != '0' || nd2 == 1) && v <= w) {
 				// The line is NUL-terminated at _lineLen, so strlen finds an embedded NUL.
 				size_t tailLen = (size_t)(end - q);
-				bool nul = strlen(q) != tailLen;
+				bool nul = !_bufStreamMgr->lastLineNulFree() && strlen(q) != tailLen;
 				size_t tabs = 2;
 				const char *r = q;
 				if (!nul) {
