@@ -20,7 +20,9 @@ BufferedStreamMgr::BufferedStreamMgr(const string &filename)
   	_useBufSize(DEFAULT_MAIN_BUF_READ_SIZE),
   	_streamFinished(false),
 	_chunkNulFree(false),
-	_lineNulFree(false)
+	_lineNulFree(false),
+	_retain(false),
+	_lineOff(0)
 {
 
 }
@@ -30,6 +32,9 @@ BufferedStreamMgr::~BufferedStreamMgr()
 
 	delete [] _mainBuf;
 	_mainBuf = NULL;
+	for (size_t i = 0; i < _retained.size(); i++) {
+		delete [] _retained[i];
+	}
 
 	delete _inputStreamMgr;
 	_inputStreamMgr = NULL;
@@ -154,6 +159,7 @@ bool BufferedStreamMgr::getLineRef(string &scratch, const char *&ptr, size_t &le
 			ptr = base;
 			len = n;
 			_lineNulFree = _chunkNulFree;
+			_lineOff = (size_t)(base - (char *)_mainBuf);
 			return true;
 		}
 	}
@@ -173,6 +179,10 @@ bool BufferedStreamMgr::readFileChunk()
 	_mainBufCurrStartPos = 0;
 
 	if (!_streamFinished) {
+		if (_retain) {
+			_retained.push_back((char *)_mainBuf);
+			_mainBuf = new bufType[_useBufSize + 1];
+		}
 		_mainBufCurrLen = _inputStreamMgr->read((char *)_mainBuf, _useBufSize);
 		if (_mainBufCurrLen < 0) _mainBufCurrLen = 0;
 		_mainBuf[_mainBufCurrLen] = 0;
@@ -187,4 +197,19 @@ bool BufferedStreamMgr::readFileChunk()
 		_chunkNulFree = false;
 		return false;
 	}
+}
+
+void BufferedStreamMgr::releaseChunks(vector<char *> &out)
+{
+	for (size_t i = 0; i < _retained.size(); i++) {
+		out.push_back(_retained[i]);
+	}
+	_retained.clear();
+	out.push_back((char *)_mainBuf);
+	// the stream is spent; a fresh empty buffer keeps a later read harmless
+	_mainBuf = new bufType[_useBufSize + 1];
+	memset(_mainBuf, 0, _useBufSize + 1);
+	_mainBufCurrStartPos = 0;
+	_mainBufCurrLen = 0;
+	_retain = false;
 }
