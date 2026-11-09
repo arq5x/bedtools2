@@ -124,7 +124,8 @@ int SingleLineDelimTextFileReader::readCoordsLine(const string &lastChr, CHRPOS 
 			if (nd2 >= 1 && nd2 <= 18 && (*d2 != '0' || nd2 == 1) && v <= w) {
 				// The line is NUL-terminated at _lineLen, so strlen finds an embedded NUL.
 				size_t tailLen = (size_t)(end - q);
-				bool nul = !_bufStreamMgr->lastLineNulFree() && strlen(q) != tailLen;
+				bool nulFree = _bufStreamMgr->lastLineNulFree();
+				bool nul = !nulFree && strlen(q) != tailLen;
 				size_t tabs = 2;
 				const char *r = q;
 				if (!nul) {
@@ -142,7 +143,7 @@ int SingleLineDelimTextFileReader::readCoordsLine(const string &lastChr, CHRPOS 
 						tabs += (*r == '\t');
 					}
 				}
-				if (!nul && (int)(tabs + 1) == _numFields && memchr(line, 0, chrLen) == NULL) {
+				if (!nul && (int)(tabs + 1) == _numFields && (nulFree || memchr(line, 0, chrLen) == NULL)) {
 					s = v;
 					e = w;
 					_fullHeaderFound = true;
