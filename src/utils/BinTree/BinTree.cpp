@@ -6,6 +6,12 @@ BinTree::BinTree(ContextIntersect *context)
 :  _context(context), _lastQueryBins(NULL), _haveQueryChr(false), _lastAddBins(NULL),
    _compact(false), _poolUsed(0), _text(false), _textUsed(0), _lastTextOff(0), _keyBlocks(NULL), _stopAtFirst(false),
    _fracFast(false), _fracA(0.0), _fracB(0.0), _fracEither(false) {
+	for (int l = 0; l < 8; l++) {
+		_curFirst[l] = NULL; _curCnt[l] = 0;
+		_memoBin[l] = MEMO_NONE; _memoFound[l] = false; _memoSorted[l] = false;
+		_memoFirst[l] = NULL; _memoLast[l] = NULL;
+	}
+	_curStart = 0;
 }
 
 BinTree::~BinTree() {
@@ -222,7 +228,7 @@ void BinTree::getHits(Record *record, RecordKeyVector &hitSet)
 		_lastQueryChr = chr;
 		_haveQueryChr = true;
 		_lastQueryBins = (mainIter == _mainMap.end()) ? NULL : mainIter->second;
-		for (int l = 0; l < 8; l++) { _curFirst[l] = NULL; _curCnt[l] = 0; _memoBin[l] = -1; }
+		for (int l = 0; l < 8; l++) { _curFirst[l] = NULL; _curCnt[l] = 0; _memoBin[l] = MEMO_NONE; }
 		_curStart = 0;
 	}
 	if (_lastQueryBins == NULL) {
@@ -236,7 +242,7 @@ void BinTree::getHits(Record *record, RecordKeyVector &hitSet)
     binNumType startBin = (startPos >> _binFirstShift);
     binNumType endBin = ((endPos-1) >> _binFirstShift);
 	if (startPos < _curStart) {
-		for (int l = 0; l < 8; l++) { _curFirst[l] = NULL; _curCnt[l] = 0; _memoBin[l] = -1; }
+		for (int l = 0; l < 8; l++) { _curFirst[l] = NULL; _curCnt[l] = 0; _memoBin[l] = MEMO_NONE; }
 	}
 	_curStart = startPos;
 
