@@ -91,7 +91,7 @@ bool RecordOutputMgr::printKeyAndTerminate(RecordKeyVector &keyList) {
 		//when printing merged records, we want to force the printing into
 		//bed3 format, which is surprisingly difficult to do. Had to use the following:
 		const Bed3Interval *bed3 = static_cast<const Bed3Interval *>(keyList.getKey());
-		bed3->Bed3Interval::print(_outBuf);
+		bed3->Bed3Interval::print(_outBuf, bed3->getStartPos(), bed3->getEndPos());
 		return false;
 	}
 	printBamType bamCode = printBamRecord(keyList);
