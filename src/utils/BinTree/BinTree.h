@@ -273,7 +273,9 @@ private:
 	const binEntry *_curFirst[8];
 	size_t _curCnt[8];
 	binNumType _curStart;
-	// per level: the last start-bin lookup (bin number, find() result); -1 = none
+	// per level: the last start-bin lookup (bin number, find() result); MEMO_NONE = none
+	// (a bin number can be -1 for a zero-length record at 0, so -1 is not a sentinel)
+	static const binNumType MEMO_NONE = INT64_MIN;
 	binNumType _memoBin[8];
 	bool _memoFound[8];
 	bool _memoSorted[8];
