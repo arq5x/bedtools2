@@ -22,22 +22,22 @@ void GffRecord::clear()
 bool GffRecord::initFromFile(SingleLineDelimTextFileReader *fileReader)
 {
 	setFileIdx(fileReader->getFileIdx());
-	fileReader->getField(0, _chrName);
-	fileReader->getField(3, _startPosStr);
-	_startPos = str2chrPos(_startPosStr);
+	{ string chrTmp; fileReader->getField(0, chrTmp); _chrName = chrTmp; }
+	fileReader->getField(3, startStr());
+	_startPos = str2chrPos(startStr());
 	_startPos--; // VCF is one-based. Here we intentionally don't decrement the string version,
 	//because we'll still want to output the one-based number in the print methods, even though
 	//internally we decrement the integer to comply with the 0-based format common to other records.
-	fileReader->getField(4, _endPosStr);
+	fileReader->getField(4, endStr());
 	//endPos is just the startPos plus the length of the variant
-	_endPos = str2chrPos(_endPosStr);
+	_endPos = str2chrPos(endStr());
 
-	fileReader->getField(2, _name);
+	fileReader->getField(2, nameRef());
 	fileReader->getField(1, _source);
-	fileReader->getField(5, _score);
+	fileReader->getField(5, scoreRef());
 
 	//GFF allows a '.' for the strandChar, signifying it is not known.
-	fileReader->getField(6, _strand);
+	fileReader->getField(6, strandRef());
 	adjustStrandVal();
 
 	fileReader->getField(7, _frame);
@@ -57,11 +57,11 @@ void GffRecord::print(string &outBuf) const
 	s << "\t";
 	s << _source;
 	s << "\t";
-	s << _name;
+	s << nameRef();
 	s << "\t";
-	s << _startPosStr;
+	s << startStr();
 	s << "\t";
-	s << _endPosStr;
+	s << endStr();
 	s << "\t";
 	outBuf.append(s.str());
 	printRemainingFields(outBuf);
@@ -74,7 +74,7 @@ void GffRecord::print(string &outBuf, CHRPOS start, CHRPOS end) const
 	s << "\t";
 	s << _source;
 	s << "\t";
-	s << _name;
+	s << nameRef();
 	s << "\t";
 	s << start;
 	s << "\t";
@@ -90,7 +90,7 @@ void GffRecord::print(string &outBuf, const string & start, const string & end) 
 	outBuf.append("\t");
 	outBuf.append(_source);
 	outBuf.append("\t");
-	outBuf.append(_name);
+	outBuf.append(nameRef());
 	outBuf.append("\t");
 	outBuf.append(start);
 	outBuf.append("\t");
@@ -102,9 +102,9 @@ void GffRecord::print(string &outBuf, const string & start, const string & end) 
 
 void GffRecord::printRemainingFields(string &outBuf) const
 {
-	outBuf.append(_score);
+	outBuf.append(scoreRef());
 	outBuf.append("\t");
-	outBuf.append(_strand);
+	outBuf.append(strandRef());
 	outBuf.append("\t");
 	outBuf.append(_frame);
 	if (_numFields == 9) {
@@ -128,25 +128,25 @@ const string &GffRecord::getField(int fieldNum) const
 	}
 	switch (fieldNum) {
 	case 1:
-		return _chrName;
+		return _chrName.str();
 		break;
 	case 2:
 		return _source;
 		break;
 	case 3:
-		return _name;
+		return nameRef();
 		break;
 	case 4:
-		return _startPosStr;
+		return startStr();
 		break;
 	case 5:
-		return _endPosStr;
+		return endStr();
 		break;
 	case 6:
-		return _score;
+		return scoreRef();
 		break;
 	case 7:
-		return _strand;
+		return strandRef();
 		break;
 	case 8:
 		return _frame;

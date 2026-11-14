@@ -44,6 +44,13 @@ public:
 	//NOTE!! User MUST pass back the returned pointer to deleteRecord method for cleanup!
 	//Also Note! User must check for NULL returned, meaning we failed to get the next record.
 	virtual Record *getNextRecord(RecordKeyVector *keyList = NULL);
+	// For BED-type coords-only files loaded without keeping Records: 0 = no record,
+	// 1 = line of chromosome lastChr with plain coordinates, returned in start/end
+	// (zero-length adjusted, flagged in zeroLen), 2 = any other line, parsed in full into rec.
+	int getNextCoords(const string *lastChr, CHRPOS &start, CHRPOS &end, bool &zeroLen, Record *&rec,
+			const char **line = NULL, size_t *lineLen = NULL);
+	// The text of the line last read (valid until the next read); BED-type text files only.
+	void getCurrentLine(const char *&line, size_t &lineLen) const;
 	void deleteRecord(const Record *);
 	virtual void deleteRecord(RecordKeyVector *keyList);
 
@@ -110,6 +117,13 @@ public:
 
 	bool isCram() const { return _isCram; }
 
+	// Text records of this file need only chrom, start and end; set before open().
+	void setCoordsOnly(bool val) { _coordsOnly = val; }
+	bool getCoordsOnly() const { return _coordsOnly; }
+	// Parses the reader's current line into record in full; for messages that print the record.
+	void fullReparse(Record *record);
+	Record *recordFromLine(RecordKeyVector *keyList);
+
 protected:
 	int _fileIdx;
 	string _filename;
@@ -145,6 +159,7 @@ protected:
 	bool _noEnforceCoordSort; //only true for GroupBy
 	bool _isGroupBy; //hopefully also only true for GroupBy
 	bool _isCram;
+	bool _coordsOnly;
 
 	void allocateFileReader(bool inheader=false);
 	void testInputSortOrder(Record *record);

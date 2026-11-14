@@ -344,6 +344,7 @@ bool ContextBase::openFiles() {
 		}
 		frm->setFullBamFlags(_useFullBamTags);
 		frm->setIsSorted(_sortedInput);
+		frm->setCoordsOnly(coordsOnlyFile(i));
 		frm->setIoBufSize(_ioBufSize);
 		frm->setIsGroupBy(_program == GROUP_BY);
 		if (!frm->open(_inheader)) {
@@ -780,6 +781,8 @@ void ContextBase::nameConventionWarning(const Record *record, const string &file
 	 _nameConventionWarningMsg = "***** WARNING: File ";
 	 _nameConventionWarningMsg.append(filename);
 	 _nameConventionWarningMsg.append(message);
+	 // Only BinTree::loadDB reaches here for a coordinates-only file, straight after reading the record.
+	 { Record *rec = const_cast<Record *>(record); if (rec->getFileRecordManager() != NULL) rec->getFileRecordManager()->fullReparse(rec); }
 	 record->print(_nameConventionWarningMsg);
 	 _nameConventionWarningMsg.append("\n");
 	 _nameConventionWarningTripped = true;
