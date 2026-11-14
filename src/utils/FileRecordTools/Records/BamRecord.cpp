@@ -48,14 +48,14 @@ bool BamRecord::initFromFile(BamFileReader *bamFileReader)
 {
 	setFileIdx(bamFileReader->getFileIdx());
 	_bamAlignment = bamFileReader->getAlignment();
-	bamFileReader->getChrName(_chrName);
+	{ string chrTmp; bamFileReader->getChrName(chrTmp); _chrName = chrTmp; }
 
 	_bamChromId = bamFileReader->getCurrChromdId();
 	_startPos = bamFileReader->getStartPos();
         // NOTE: casting to int here, but bam currently only supports int32_t for position
-	int2str((int)_startPos, _startPosStr);
+	int2str((int)_startPos, startStr());
 	_endPos = bamFileReader->getEndPos();
-	int2str((int)_endPos, _endPosStr);
+	int2str((int)_endPos, endStr());
 	bamFileReader->getName(_name);
 	bamFileReader->getScore(_score);
 	char strandChar = bamFileReader->getStrand();
@@ -147,7 +147,7 @@ void BamRecord::printRemainingBamFields(string &outBuf, RecordKeyVector *keyList
 {
 	ostringstream s;
     s << "\t";
-    s << _startPosStr;
+    s << startStr();
     s << "\t";
     s << _endPos;
     s << "\t0,0,0";
@@ -185,7 +185,7 @@ void BamRecord::printRemainingBamFields(string &outBuf, RecordKeyVector *keyList
 
 void BamRecord::printUnmapped(string &outBuf) const {
 	ostringstream s;
-    s << (_chrName.empty() ? "." : _chrName);
+    s << (_chrName.empty() ? string(".") : _chrName.str());
     s << "\t-1\t-1\t";
     s << (_name.empty() ? "." : _name);
     s << "\t";
@@ -219,10 +219,10 @@ const string &BamRecord::getField(int fieldNum) const
 		// Context will have to error out if they try.
 		break;
 	case 3:
-		return _chrName;
+		return _chrName.str();
 		break;
 	case 4:
-		return _startPosStr;
+		return startStr();
 		break;
 	case 5:
 		return _score;

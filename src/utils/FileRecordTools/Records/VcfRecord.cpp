@@ -11,10 +11,10 @@
 bool VcfRecord::initFromFile(SingleLineDelimTextFileReader *fileReader)
 {
 	setFileIdx(fileReader->getFileIdx());
-	fileReader->getField(0, _chrName);
+	{ string chrTmp; fileReader->getField(0, chrTmp); _chrName = chrTmp; }
 	_chrId = fileReader->getCurrChromdId();
-	fileReader->getField(1, _startPosStr);
-	_startPos = str2chrPos(_startPosStr);
+	fileReader->getField(1, startStr());
+	_startPos = str2chrPos(startStr());
 	_startPos--; // VCF is one-based. Here we intentionally don't decrement the string version,
 	//because we'll still want to output the one-based number in the print methods, even though
 	//internally we decrement the integer to comply with the 0-based format common to other records.
@@ -33,7 +33,7 @@ bool VcfRecord::initFromFile(SingleLineDelimTextFileReader *fileReader)
 		//endPos is just the startPos plus the length of the variant
 		_endPos = _startPos + _varRef.size();
 	}
-	int2str(_endPos, _endPosStr);
+	int2str(_endPos, endStr());
 	fileReader->getField(2, _name);
 	fileReader->getField(5, _score);
 
@@ -51,21 +51,21 @@ void VcfRecord::clear()
 void VcfRecord::print(string &outBuf) const {
 	outBuf.append(_chrName);
 	outBuf.append("\t");
-	outBuf.append(_startPosStr);
+	outBuf.append(startStr());
 	printOtherFields(outBuf);
 }
 
 void VcfRecord::print(string &outBuf, CHRPOS start, CHRPOS end) const {
 	outBuf.append(_chrName);
 	outBuf.append("\t");
-	outBuf.append(_startPosStr);
+	outBuf.append(startStr());
 	printOtherFields(outBuf);
 }
 
 void VcfRecord::print(string &outBuf, const string & start, const string & end) const {
 	outBuf.append(_chrName);
 	outBuf.append("\t");
-	outBuf.append(_startPosStr);
+	outBuf.append(startStr());
 	printOtherFields(outBuf);
 
 }
@@ -97,10 +97,10 @@ const string &VcfRecord::getField(int fieldNum) const
 
 	switch (fieldNum) {
 	case 1:
-		return _chrName;
+		return _chrName.str();
 		break;
 	case 2:
-		return _startPosStr;
+		return startStr();
 		break;
 	case 3:
 		return _name;
@@ -125,7 +125,7 @@ bool VcfRecord::isNumericField(int fieldNum) {
 		return false; //_chrName;
 		break;
 	case 2:
-		return true; //_startPosStr;
+		return true; //startStr();
 		break;
 	case 3:
 		return false; //_name;

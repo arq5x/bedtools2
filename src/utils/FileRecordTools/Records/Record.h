@@ -9,6 +9,8 @@
 #define RECORD_H_
 
 #include <string>
+#include <unordered_set>
+#include <ostream>
 #include <cstdarg>
 #include "BedtoolsTypes.h"
 #include "FreeList.h"
@@ -17,6 +19,38 @@
 
 
 using namespace std;
+
+// A chromosome name shared between records: one pointer into a table of interned strings.
+class ChrRef {
+public:
+	ChrRef() : _p(&table().emptyStr) {}
+	operator const string &() const { return *_p; }
+	const string &str() const { return *_p; }
+	bool empty() const { return _p->empty(); }
+	size_t size() const { return _p->size(); }
+	const char *c_str() const { return _p->c_str(); }
+	ChrRef &operator=(const string &s) { assign(s.data(), s.size()); return *this; }
+	ChrRef &operator=(const char *s) { assign(s, strlen(s)); return *this; }
+	void clear() { _p = &table().emptyStr; }
+	void assign(const char *p, size_t n) {
+		Table &t = table();
+		if (t.last && t.last->size() == n && memcmp(t.last->data(), p, n) == 0) { _p = t.last; return; }
+		_p = t.last = &*t.set.insert(string(p, n)).first;
+	}
+	bool operator==(const ChrRef &o) const { return _p == o._p; }
+	bool operator<(const ChrRef &o) const { return *_p < *o._p; }
+	bool operator>(const ChrRef &o) const { return *_p > *o._p; }
+private:
+	struct Table {
+		unordered_set<string> set;
+		string emptyStr;
+		const string *last;
+		Table() : last(NULL) {}
+	};
+	static Table &table() { static Table t; return t; }
+	const string *_p;
+};
+inline ostream &operator<<(ostream &o, const ChrRef &c) { return o << c.str(); }
 
 class FileRecordMgr;
 class FileReader;
@@ -53,6 +87,24 @@ static inline const char* buffer_printf(const char* fmt, ...) {
 }
 
 
+// Appends v as "%" PRId_CHRPOS would print it.
+static inline void append_chrpos(string& buf, CHRPOS v) {
+	char tmp[24];
+	char* e = tmp + sizeof(tmp);
+	char* p = e;
+	uint64_t u = v < 0 ? 0 - (uint64_t)v : (uint64_t)v;
+	do {
+		*--p = (char)('0' + u % 10);
+		u /= 10;
+	} while (u);
+	if (v < 0) *--p = '-';
+	buf.append(p, e - p);
+}
+
+static inline void append_cstr(string& buf, const string& s) {
+	buf.append(s.c_str());
+}
+
 class Record {
 public:
 	friend class RecordMgr;
@@ -80,7 +132,7 @@ public:
 	virtual void setValid(const bool valid)  { _isValidHit = valid; }
 	virtual bool isValid() const { return _isValidHit; }
 
-	virtual const string &getChrName() const { return _chrName; }
+	virtual const string &getChrName() const { return _chrName.str(); }
 	virtual void setChrName(const string &chr) { _chrName = chr; }
 	virtual void setChrName(const char *chr) { _chrName = chr; }
 
@@ -92,13 +144,13 @@ public:
 
 	virtual CHRPOS getStartPos() const { return _startPos; }
 	virtual void setStartPos(CHRPOS startPos) { _startPos = startPos; }
-	virtual const string &getStartPosStr() const { return _startPosStr; }
-	virtual void setStartPosStr(const string &str) { _startPosStr = str; }
+	virtual const string &getStartPosStr() const { return startStr(); }
+	virtual void setStartPosStr(const string &str) { startStr() = str; _posMode = POS_STRINGS; }
 
 	virtual CHRPOS getEndPos() const { return _endPos; }
 	virtual void setEndPos(CHRPOS endPos) { _endPos = endPos; }
-	virtual const string &getEndPosStr() const { return _endPosStr; }
-	virtual void setEndPosStr(const string &str) { _endPosStr = str; }
+	virtual const string &getEndPosStr() const { return endStr(); }
+	virtual void setEndPosStr(const string &str) { endStr() = str; _posMode = POS_STRINGS; }
 
 	virtual bool getZeroLength() const { return _zeroLength; }
 	virtual void setZeroLength(bool val) { _zeroLength = val; }
@@ -194,20 +246,44 @@ public:
 	void setFileRecordManager(FileRecordMgr *frm);
 	FileRecordMgr * getFileRecordManager();
 
-	vector<int> block_starts;
-	vector<int> block_ends;
 
 protected:
 
 	int _fileIdx; //associated file the record came from
-	string _chrName;
+	ChrRef _chrName;
 	int _chrId;
 	CHRPOS _startPos;
 	CHRPOS _endPos;
 	//It is actually faster to also store the start and end positions as their original strings than to
 	//have to convert their integer representations back to strings when printing them.
-	string _startPosStr;
-	string _endPosStr;
+	// The strings live in a side object, built on first use: a record parsed with plain
+	// decimal coordinates keeps only the two numbers (_origStart/_origEnd) until asked.
+	enum { POS_NONE = 0, POS_PLAIN = 1, POS_STRINGS = 2 };
+	struct PosStrBox {
+		string start;
+		string end;
+	};
+	class PosStrPtr {
+	public:
+		PosStrPtr() : _p(NULL) {}
+		PosStrPtr(const PosStrPtr &o) : _p(o._p ? new PosStrBox(*o._p) : NULL) {}
+		PosStrPtr &operator=(const PosStrPtr &o) {
+			if (this != &o) { PosStrBox *n = o._p ? new PosStrBox(*o._p) : NULL; delete _p; _p = n; }
+			return *this;
+		}
+		~PosStrPtr() { delete _p; }
+		PosStrBox *get() const { return _p; }
+		PosStrBox *make() { if (!_p) _p = new PosStrBox(); return _p; }
+	private:
+		PosStrBox *_p;
+	};
+	mutable PosStrPtr _posBox;
+	mutable char _posMode;
+	CHRPOS _origStart;
+	CHRPOS _origEnd;
+	void materializePosStrs() const;
+	string &startStr() const { if (_posMode != POS_STRINGS) materializePosStrs(); return _posBox.get()->start; }
+	string &endStr() const { if (_posMode != POS_STRINGS) materializePosStrs(); return _posBox.get()->end; }
 	string _name;
 	string _score;
 	string _strand;

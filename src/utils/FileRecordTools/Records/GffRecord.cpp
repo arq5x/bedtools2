@@ -22,15 +22,15 @@ void GffRecord::clear()
 bool GffRecord::initFromFile(SingleLineDelimTextFileReader *fileReader)
 {
 	setFileIdx(fileReader->getFileIdx());
-	fileReader->getField(0, _chrName);
-	fileReader->getField(3, _startPosStr);
-	_startPos = str2chrPos(_startPosStr);
+	{ string chrTmp; fileReader->getField(0, chrTmp); _chrName = chrTmp; }
+	fileReader->getField(3, startStr());
+	_startPos = str2chrPos(startStr());
 	_startPos--; // VCF is one-based. Here we intentionally don't decrement the string version,
 	//because we'll still want to output the one-based number in the print methods, even though
 	//internally we decrement the integer to comply with the 0-based format common to other records.
-	fileReader->getField(4, _endPosStr);
+	fileReader->getField(4, endStr());
 	//endPos is just the startPos plus the length of the variant
-	_endPos = str2chrPos(_endPosStr);
+	_endPos = str2chrPos(endStr());
 
 	fileReader->getField(2, _name);
 	fileReader->getField(1, _source);
@@ -59,9 +59,9 @@ void GffRecord::print(string &outBuf) const
 	s << "\t";
 	s << _name;
 	s << "\t";
-	s << _startPosStr;
+	s << startStr();
 	s << "\t";
-	s << _endPosStr;
+	s << endStr();
 	s << "\t";
 	outBuf.append(s.str());
 	printRemainingFields(outBuf);
@@ -128,7 +128,7 @@ const string &GffRecord::getField(int fieldNum) const
 	}
 	switch (fieldNum) {
 	case 1:
-		return _chrName;
+		return _chrName.str();
 		break;
 	case 2:
 		return _source;
@@ -137,10 +137,10 @@ const string &GffRecord::getField(int fieldNum) const
 		return _name;
 		break;
 	case 4:
-		return _startPosStr;
+		return startStr();
 		break;
 	case 5:
-		return _endPosStr;
+		return endStr();
 		break;
 	case 6:
 		return _score;

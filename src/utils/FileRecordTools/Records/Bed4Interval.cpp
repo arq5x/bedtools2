@@ -21,8 +21,13 @@ bool Bed4Interval::initFromFile(SingleLineDelimTextFileReader *fileReader)
 }
 
 inline void print_record(const string& chrom_name, CHRPOS start, CHRPOS end, const string& name, string& buf) {
-	const char* buffer = buffer_printf("%s\t%" PRId_CHRPOS "\t%" PRId_CHRPOS"\t%s", chrom_name.c_str(), start, end, name.c_str());
-	buf.append(buffer);
+	append_cstr(buf, chrom_name);
+	buf.push_back('\t');
+	append_chrpos(buf, start);
+	buf.push_back('\t');
+	append_chrpos(buf, end);
+	buf.push_back('\t');
+	append_cstr(buf, name);
 }
 
 void Bed4Interval::print(string &outBuf) const

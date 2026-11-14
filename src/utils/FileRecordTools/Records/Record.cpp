@@ -7,12 +7,40 @@ Record::Record()
   _startPos(-1),
   _endPos(-1),
   _strandVal(UNKNOWN),
+  _posMode(POS_NONE),
+  _origStart(0),
+  _origEnd(0),
   _zeroLength(false),
   _isUnmapped(false),
   _isMateUnmapped(false),
   _isValidHit(true),
   _frm(NULL)
 {}
+
+static void chrposToDecimal(CHRPOS v, string &out) {
+	char tmp[24];
+	int n = 0;
+	bool neg = v < 0;
+	unsigned long long u = neg ? 0ULL - (unsigned long long)v : (unsigned long long)v;
+	do {
+		tmp[23 - n++] = '0' + (char)(u % 10);
+		u /= 10;
+	} while (u);
+	if (neg) tmp[23 - n++] = '-';
+	out.assign(tmp + 24 - n, n);
+}
+
+void Record::materializePosStrs() const {
+	PosStrBox *b = _posBox.make();
+	if (_posMode == POS_PLAIN) {
+		chrposToDecimal(_origStart, b->start);
+		chrposToDecimal(_origEnd, b->end);
+	} else {
+		b->start.clear();
+		b->end.clear();
+	}
+	_posMode = POS_STRINGS;
+}
 
 Record::~Record()
 {
@@ -42,8 +70,7 @@ void Record::clear() {
 	_score.clear();
 	_strand.clear();
 	_strandVal = UNKNOWN;
-	_startPosStr.clear();
-	_endPosStr.clear();
+	_posMode = POS_NONE;
 	_zeroLength = false;
 	_isUnmapped = false;
 	_isMateUnmapped = false;

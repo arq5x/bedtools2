@@ -26,9 +26,15 @@ public:
 
 	virtual bool readEntry();
 	virtual int getNumFields() const { return _numFields; }
+	const char *getLineData() const { return _sLine.c_str(); }
+	const int *getDelimPositions() const { return _delimPositions; }
 	virtual void getField(int numField, string &val) const;
 	virtual void getField(int numField, CHRPOS &val) const; //this signaiture isn't const because it operates on an internal string for speed.
 	virtual void getField(int fieldNum, char &val) const;
+	// Parses the field as str2chrPos would, without copying it. Returns true when the
+	// field's text is exactly the plain decimal form of val (str is then untouched);
+	// otherwise str receives the field text.
+	bool getPosField(int fieldNum, CHRPOS &val, string &str) const;
 	virtual void appendField(int fieldNum, string &str) const;
 	virtual const string &getHeader() const { return _header; }
 	virtual bool hasHeader() const { return _fullHeaderFound; }
