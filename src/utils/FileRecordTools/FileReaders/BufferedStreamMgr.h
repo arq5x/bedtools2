@@ -24,6 +24,10 @@ public:
 
 	bool eof() const { return _eof; }
 	bool getLine(string &line);
+	// Same lines as getLine. When the line lies wholly inside the main buffer, ptr/len
+	// point into it (NUL-terminated at ptr[len], valid until the next call); otherwise
+	// the line is built in scratch. Returns false exactly when getLine would.
+	bool getLineRef(string &scratch, const char *&ptr, size_t &len);
 	BamTools::BamReader *getBamReader() { return _inputStreamMgr->getBamReader(); }
 	static const int DEFAULT_MAIN_BUF_READ_SIZE = 1023;
 	void setIoBufSize(size_t val) { _useBufSize = val; }

@@ -67,8 +67,8 @@ private:
 	float _overlapFractionA;
 	float _overlapFractionB;
 	bool _hasReciprocal;
-	Tokenizer _blockSizeTokens;
-	Tokenizer _blockStartTokens;
+	vector<pair<size_t, size_t> > _blockSizeToks;
+	vector<pair<size_t, size_t> > _blockStartToks;
 
 	// For now, all records will be split into Bed6 records.
 	const static FileRecordTypeChecker::RECORD_TYPE _blockRecordsType = FileRecordTypeChecker::BED6_RECORD_TYPE;
