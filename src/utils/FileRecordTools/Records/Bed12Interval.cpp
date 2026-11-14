@@ -41,7 +41,8 @@ bool Bed12Interval::initFromFile(SingleLineDelimTextFileReader *fileReader)
 	 _thickEnd = str2chrPos(_thickEndStr);
 	 _blockCount = (int)str2chrPos(_blockCountStr);
 	// All twelve fields are raw slices of the line, so a plain-parsed record prints as the line.
-	if (_posMode == POS_PLAIN && _nsMode == NS_TEXT && !fileReader->getCoordsOnly()) {
+	if (_posMode == POS_PLAIN && _nsMode == NS_TEXT && !fileReader->getCoordsOnly()
+			&& memchr(fileReader->getLineData(), 0, fileReader->getLineLength()) == NULL) {
 		setFastLine(fileReader->getLineData(), fileReader->getLineLength());
 	}
 	return baseRetFlag;
@@ -80,7 +81,7 @@ void Bed12Interval::clear() {
 	outBuf.push_back('\t');
 	append_cstr(outBuf, what._blockSizes);
 	outBuf.push_back('\t');
-	append_cstr(outBuf, what._blockStarts);
+	append_last(outBuf, what._blockStarts);
 }
 
 void Bed12Interval::print(string &outBuf) const

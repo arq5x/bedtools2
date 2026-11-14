@@ -92,7 +92,7 @@ void Record::setNameScoreStrandText(const char *p, size_t len) {
 
 void Record::appendNameScoreStrand(string &buf) const {
 	if (_nsMode == NS_TEXT) {
-		buf.append(_nsText);
+		append_last(buf, _nsText);
 	} else if (_nsMode == NS_LINE) {
 		buf.append(lineData() + _nsOff, _nsLen);
 	} else if (_nsMode == NS_FIELDS) {
@@ -101,7 +101,7 @@ void Record::appendNameScoreStrand(string &buf) const {
 		buf.push_back('\t');
 		append_cstr(buf, b->score);
 		buf.push_back('\t');
-		append_cstr(buf, b->strand);
+		append_last(buf, b->strand);
 	} else {
 		buf.append("\t\t", 2);
 	}

@@ -304,7 +304,8 @@ int FileRecordMgr::getNextCoords(const string *lastChr, CHRPOS &start, CHRPOS &e
 		size_t chrLen = (size_t)(dp[1] - dp[0] - 1);
 		CHRPOS s, e;
 		if (chrLen == lastChr->size() && memcmp(line + dp[0] + 1, lastChr->data(), chrLen) == 0
-				&& r->getPlainPos(1, s) && r->getPlainPos(2, e) && s <= e) {
+				&& r->getPlainPos(1, s) && r->getPlainPos(2, e) && s <= e
+				&& memchr(line, 0, r->getLineLength()) == NULL) {
 			zeroLen = (s == e);
 			if (zeroLen) {
 				s--;
