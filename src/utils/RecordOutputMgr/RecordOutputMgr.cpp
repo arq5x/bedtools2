@@ -503,6 +503,11 @@ void RecordOutputMgr::addDbFileId(int fileId) {
 
 void RecordOutputMgr::null(bool queryType, bool dbType)
 {
+	const int nullIdx = (queryType ? 2 : 0) + (dbType ? 1 : 0);
+	if (_nullTextSet[nullIdx]) {
+		_outBuf.append(_nullText[nullIdx]);
+		return;
+	}
 	FileRecordTypeChecker::RECORD_TYPE recordType = FileRecordTypeChecker::UNKNOWN_RECORD_TYPE;
 	if (_context->hasIntersectMethods()) {
 		if (queryType) {
@@ -562,8 +567,11 @@ void RecordOutputMgr::null(bool queryType, bool dbType)
 		break;
 	}
 	if (dummyRecord) {
+		const size_t before = _outBuf.size();
 		dummyRecord->printNull(_outBuf);
 		delete dummyRecord;
+		_nullText[nullIdx].assign(_outBuf, before, string::npos);
+		_nullTextSet[nullIdx] = true;
 	}
 }
 

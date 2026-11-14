@@ -11,8 +11,12 @@ SingleLineDelimTextFileReader::SingleLineDelimTextFileReader(int numFields, char
   _delimChar(delimChar),
   _fullHeaderFound(false),
   _currDataPos(0),
+  _line(_sLine.c_str()),
+  _lineLen(0),
+  _coordsTail(0),
   _lineNum(0),
-  _inheader(false)
+  _inheader(false),
+  _coordsOnly(false)
 {
 	_delimPositions = new int[numFields +1];
 }
@@ -32,19 +36,23 @@ bool SingleLineDelimTextFileReader::readEntry()
 	if (_bufStreamMgr->eof()) {
 		return false;
 	}
-	if (!_bufStreamMgr->getLine(_sLine)) {
+	if (!nextLine()) {
 		return false;
 	}
 	_lineNum++;
-	if (_sLine.empty()) {
+	if (_lineLen == 0) {
 		return false;
 	}
+	return finishEntry();
+}
 
+bool SingleLineDelimTextFileReader::finishEntry()
+{
 	//scan the whole header in one call.
 	bool wasHeader = false;
 	while (detectAndHandleHeader()) { //header line
 		_lineNum++;
-		if (!_bufStreamMgr->getLine(_sLine)) {
+		if (!nextLine()) {
 			return false;
 		}
 	}
@@ -55,9 +63,9 @@ bool SingleLineDelimTextFileReader::readEntry()
 
 	//check to make sure line has something besides whitespace.
 	bool hasNonSpace = false;
-	int lineLen = (int)_sLine.size();
+	int lineLen = (int)_lineLen;
 	for (int i=0; i < lineLen; i++) {
-		if (!isspace(_sLine[i])) {
+		if (!isspace(_line[i])) {
 			hasNonSpace = true;
 			break;
 		}
@@ -77,40 +85,164 @@ bool SingleLineDelimTextFileReader::readEntry()
 }
 
 
+// Returns 0 when readEntry would return false, 1 when the line is a plain-coordinate
+// line of chromosome lastChr with the file's field count (s, e set; delimiter
+// positions not filled), and 2 when it took readEntry's full path (delimiters set).
+int SingleLineDelimTextFileReader::readCoordsLine(const string &lastChr, CHRPOS &s, CHRPOS &e)
+{
+	if (!_isFileOpen || _bufStreamMgr->eof() || !nextLine()) {
+		return 0;
+	}
+	_lineNum++;
+	if (_lineLen == 0) {
+		return 0;
+	}
+	if (mayBeHeader() || (_inheader && _lineNum == 1) || _delimChar != '\t') {
+		return finishEntry() ? 2 : 0;
+	}
+	const char *line = _line;
+	const char *end = line + _lineLen;
+	size_t chrLen = lastChr.size();
+	if (chrLen + 1 < _lineLen && line[chrLen] == '\t' && !isspace((unsigned char)line[0])
+			&& memcmp(line, lastChr.data(), chrLen) == 0) {
+		const char *q = line + chrLen + 1;
+		const char *digits = q;
+		long long v = 0;
+		while (q < end && (unsigned char)(*q - '0') <= 9) {
+			v = v * 10 + (*q - '0');
+			q++;
+		}
+		size_t nd = q - digits;
+		if (q < end && *q == '\t' && nd >= 1 && nd <= 18 && (*digits != '0' || nd == 1)) {
+			long long w = 0;
+			const char *d2 = ++q;
+			while (q < end && (unsigned char)(*q - '0') <= 9) {
+				w = w * 10 + (*q - '0');
+				q++;
+			}
+			size_t nd2 = q - d2;
+			if (nd2 >= 1 && nd2 <= 18 && (*d2 != '0' || nd2 == 1) && v <= w) {
+				// The line is NUL-terminated at _lineLen, so strlen finds an embedded NUL.
+				size_t tailLen = (size_t)(end - q);
+				bool nul = !_bufStreamMgr->lastLineNulFree() && strlen(q) != tailLen;
+				size_t tabs = 2;
+				const char *r = q;
+				if (!nul) {
+					const uint64_t lo7 = 0x7f7f7f7f7f7f7f7fULL;
+					const uint64_t ones = 0x0101010101010101ULL;
+					for (; (size_t)(end - r) >= 8; r += 8) {
+						uint64_t x;
+						memcpy(&x, r, 8);
+						x ^= ones * '\t';
+						// high bit of each byte set where the byte is a tab
+						uint64_t t = ~(((x & lo7) + lo7) | x | lo7);
+						tabs += (size_t)(((t >> 7) * ones) >> 56);
+					}
+					for (; r < end; r++) {
+						tabs += (*r == '\t');
+					}
+				}
+				if (!nul && (int)(tabs + 1) == _numFields && memchr(line, 0, chrLen) == NULL) {
+					s = v;
+					e = w;
+					_fullHeaderFound = true;
+					_coordsTail = (size_t)(q - line);
+					return 1;
+				}
+			}
+		}
+	}
+	return finishEntry() ? 2 : 0;
+}
+
+bool SingleLineDelimTextFileReader::nextLine() {
+	return _bufStreamMgr->getLineRef(_sLine, _line, _lineLen);
+}
+
 void SingleLineDelimTextFileReader::getField(int fieldNum, string &str) const {
 	CHRPOS startPos = _delimPositions[fieldNum] +1;
 	CHRPOS endPos = _delimPositions[fieldNum+1];
-	str.assign(_sLine.c_str() + startPos, endPos - startPos);
+	str.assign(_line + startPos, endPos - startPos);
 }
 
 
 void SingleLineDelimTextFileReader::getField(int fieldNum, CHRPOS &val) const {
 	string temp;
-	getField(fieldNum, temp);
-	val = str2chrPos(temp.c_str());
+	getPosField(fieldNum, val, temp);
+}
+
+bool SingleLineDelimTextFileReader::getPlainPos(int fieldNum, CHRPOS &val) const {
+	const char *q = _line + _delimPositions[fieldNum] + 1;
+	const char *e = _line + _delimPositions[fieldNum+1];
+	const char *digits = q;
+	long long result = 0;
+	while (q < e && (unsigned char)(*q - '0') <= 9) {
+		result = result * 10 + (*q - '0');
+		q++;
+	}
+	size_t nd = q - digits;
+	if (q == e && nd >= 1 && nd <= 18 && (*digits != '0' || nd == 1)) {
+		val = result;
+		return true;
+	}
+	return false;
+}
+
+bool SingleLineDelimTextFileReader::getPosField(int fieldNum, CHRPOS &val, string &str) const {
+	const char *p = _line + _delimPositions[fieldNum] + 1;
+	const char *e = _line + _delimPositions[fieldNum+1];
+	const char *q = p;
+	bool neg = (q < e && *q == '-');
+	if (neg) q++;
+	const char *digits = q;
+	long long result = 0;
+	while (q < e && (unsigned char)(*q - '0') <= 9) {
+		result = result * 10 + (*q - '0');
+		q++;
+	}
+	size_t nd = q - digits;
+	// 1..18 digits cannot overflow; a leading zero or "-0" is not the plain form.
+	if (q == e && nd >= 1 && nd <= 18 && (*digits != '0' || (nd == 1 && !neg))) {
+		val = neg ? -result : result;
+		return true;
+	}
+	str.assign(p, e - p);
+	val = str2chrPos(str.c_str());
+	return false;
 }
 
 void SingleLineDelimTextFileReader::getField(int fieldNum, char &val) const {
-	val = _sLine[_delimPositions[fieldNum] +1];
+	val = _line[_delimPositions[fieldNum] +1];
 }
 
 void SingleLineDelimTextFileReader::appendField(int fieldNum, string &str) const {
 	int startPos = _delimPositions[fieldNum] +1;
 	int endPos = _delimPositions[fieldNum+1];
-	str.append(_sLine.c_str() + startPos, endPos - startPos);
+	str.append(_line + startPos, endPos - startPos);
+}
+
+// False only when isHeaderLine is certain to return false: its first character
+// must be one of > ! # or the start of chrom, chr, browser, track or visibility,
+// and "chr" followed by a digit is never one.
+bool SingleLineDelimTextFileReader::mayBeHeader() const {
+	unsigned char c = (unsigned char)_line[0];
+	if (c == '>' || c == '!' || c == '#') {
+		return true;
+	}
+	c |= 0x20;
+	if (c == 'c') {
+		return !(_lineLen >= 4 && (_line[1] | 0x20) == 'h' && (_line[2] | 0x20) == 'r' && isdigit((unsigned char)_line[3]));
+	}
+	return c == 'b' || c == 't' || c == 'v';
 }
 
 bool SingleLineDelimTextFileReader::detectAndHandleHeader()
 {
-	//not sure why the linker is giving me a hard time about
-	//passing a non-const string to isHeaderLine, but
-	//this const ref is a workaround.
-	const string &sLine2 = _sLine;
-	if (!isHeaderLine(sLine2) && (!(_inheader && _lineNum==1))) {
+	if (!(mayBeHeader() && isHeaderLine(string(_line, _lineLen))) && (!(_inheader && _lineNum==1))) {
 		return false;
 	}
 	if (!_fullHeaderFound) {
-		_header += _sLine;
+		_header.append(_line, _lineLen);
 		_header += "\n"; //add new line, since it was chomped by getline
 	}
 	return true;
@@ -120,7 +252,7 @@ bool SingleLineDelimTextFileReader::findDelimiters() {
 	memset(_delimPositions, 0, (_numFields +1) * sizeof(int));
 	//scan the line for delimiters, determine their positions
 	int nfields = 0;
-	const char* ptr = _sLine.c_str();
+	const char* ptr = _line;
 	const char* start = ptr;
 	int target = _delimChar;
 
@@ -129,7 +261,7 @@ bool SingleLineDelimTextFileReader::findDelimiters() {
 		ptr = strchr(ptr, target);
 		if(ptr) ptr ++;
 	}
-	_delimPositions[nfields] = _sLine.size();
+	_delimPositions[nfields] = (int)_lineLen;
 
 	// count the number of fields allow for lines ending in \t\n
 	if (nfields != _numFields) {

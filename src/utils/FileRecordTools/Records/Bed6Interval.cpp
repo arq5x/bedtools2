@@ -15,38 +15,52 @@ Bed6Interval::~Bed6Interval()
 bool Bed6Interval::initFromFile(SingleLineDelimTextFileReader *fileReader)
 {
 	bool baseRetFlag = Bed3Interval::initFromFile(fileReader);
+	if (fileReader->getCoordsOnly()) return baseRetFlag;
 
-	fileReader->getField(3, _name);
-	fileReader->getField(4, _score);
-	fileReader->getField(5, _strand);
-	adjustStrandVal();
+	if (!initNameScoreStrand(fileReader)) {
+		fileReader->getField(3, nameRef());
+		fileReader->getField(4, scoreRef());
+		fileReader->getField(5, strandRef());
+		adjustStrandVal();
+	}
 	return baseRetFlag;
 }
 
-inline void print_record(const string& chrom_name, CHRPOS start, CHRPOS end, const string& name, const string& score, const string& strand, string& buf) {
-	const char* buffer = buffer_printf("%s\t%" PRId_CHRPOS "\t%" PRId_CHRPOS"\t%s\t%s\t%s", chrom_name.c_str(), start, end, name.c_str(), score.c_str(), strand.c_str());
-	buf.append(buffer);
+bool Bed6Interval::initFastLine(const ChrRef &chr, CHRPOS s, CHRPOS e, int fileIdx, const char *line, size_t lineLen, size_t tail, int numFields)
+{
+	if (numFields != 6 || tail >= lineLen) return false;
+	setFastCoords(chr, s, e, fileIdx);
+	setFastLine(line, lineLen);
+	setFastNameScoreStrand(line, line + tail + 1, lineLen - tail - 1);
+	return true;
+}
+
+inline void print_record(const Record &rec, const string& chrom_name, CHRPOS start, CHRPOS end, string& buf) {
+	append_cstr(buf, chrom_name);
+	buf.push_back('\t');
+	append_chrpos(buf, start);
+	buf.push_back('\t');
+	append_chrpos(buf, end);
+	buf.push_back('\t');
+	rec.appendNameScoreStrand(buf);
 }
 
 void Bed6Interval::print(string &outBuf) const
 {
-	print_record(_chrName, _startPos, _endPos, _name, _score, _strand, outBuf);
+	if (appendLine(outBuf)) return;
+	print_record(*this, _chrName, _startPos, _endPos, outBuf);
 }
 
 void Bed6Interval::print(string &outBuf, CHRPOS start, CHRPOS end) const
 {
-	print_record(_chrName, start, end, _name, _score, _strand, outBuf);
+	print_record(*this, _chrName, start, end, outBuf);
 }
 
 void Bed6Interval::print(string &outBuf, const string & start, const string & end) const
 {
 	Bed3Interval::print(outBuf, start, end);
-	outBuf.append("\t");
-	outBuf.append(_name);
-	outBuf.append("\t");
-	outBuf.append(_score);
-	outBuf.append("\t");
-	outBuf.append(_strand);
+	outBuf.push_back('\t');
+	appendNameScoreStrand(outBuf);
 }
 
 
@@ -60,13 +74,13 @@ const string &Bed6Interval::getField(int fieldNum) const
 {
 	switch (fieldNum) {
 	case 4:
-		return _name;
+		return nameRef();
 		break;
 	case 5:
-		return _score;
+		return scoreRef();
 		break;
 	case 6:
-		return _strand;
+		return strandRef();
 		break;
 	default:
 		return Bed3Interval::getField(fieldNum);

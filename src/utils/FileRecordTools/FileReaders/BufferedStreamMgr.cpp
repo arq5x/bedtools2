@@ -18,7 +18,9 @@ BufferedStreamMgr::BufferedStreamMgr(const string &filename)
   	_mainBufCurrLen(0),
   	_eof(false),
   	_useBufSize(DEFAULT_MAIN_BUF_READ_SIZE),
-  	_streamFinished(false)
+  	_streamFinished(false),
+	_chunkNulFree(false),
+	_lineNulFree(false)
 {
 
 }
@@ -54,6 +56,8 @@ bool BufferedStreamMgr::init()
 	}
 	if (_inputStreamMgr->isGzipped()) {
 		_useBufSize = GZIP_LINE_BUF_SIZE;
+	} else if (!_inputStreamMgr->isCompressed() && !_inputStreamMgr->isStdin()) {
+		_useBufSize = PLAIN_FILE_BUF_READ_SIZE;
 	}
 
 	size_t trueBufSize = max(_useBufSize, _currScanBuffer.size());
@@ -62,6 +66,7 @@ bool BufferedStreamMgr::init()
 	memset(_mainBuf, 0, _useBufSize +1);
 	memcpy(_mainBuf, _currScanBuffer.c_str(), _currScanBuffer.size());
 	_mainBufCurrLen = (int)_currScanBuffer.size();
+	_chunkNulFree = false;
 
 	return true;
 }
@@ -135,22 +140,51 @@ bool BufferedStreamMgr::getLine(string &line)
 	return retVal;
 }
 
+bool BufferedStreamMgr::getLineRef(string &scratch, const char *&ptr, size_t &len)
+{
+	_lineNulFree = false;
+	if (_mainBufCurrStartPos < _mainBufCurrLen) {
+		char *base = (char *)_mainBuf + _mainBufCurrStartPos;
+		char *eol = (char *)memchr(base, '\n', _mainBufCurrLen - _mainBufCurrStartPos);
+		if (eol) {
+			size_t n = eol - base;
+			_mainBufCurrStartPos = (int)(eol - (char *)_mainBuf) + 1;
+			while (n > 0 && base[n-1] == '\r') n--;
+			base[n] = '\0';
+			ptr = base;
+			len = n;
+			_lineNulFree = _chunkNulFree;
+			return true;
+		}
+	}
+	if (!getLine(scratch)) {
+		return false;
+	}
+	ptr = scratch.c_str();
+	len = scratch.size();
+	return true;
+}
+
 bool BufferedStreamMgr::readFileChunk()
 {
 	if (eof()) {
 		return false;
 	}
-	memset(_mainBuf, 0, _useBufSize +1);
 	_mainBufCurrStartPos = 0;
 
 	if (!_streamFinished) {
 		_mainBufCurrLen = _inputStreamMgr->read((char *)_mainBuf, _useBufSize);
+		if (_mainBufCurrLen < 0) _mainBufCurrLen = 0;
+		_mainBuf[_mainBufCurrLen] = 0;
+		_chunkNulFree = memchr(_mainBuf, 0, _mainBufCurrLen) == NULL;
 		if (_mainBufCurrLen < _useBufSize) {
 			_streamFinished = true;
 		}
 		return _mainBufCurrLen > 0;
 	} else {
 		_mainBufCurrLen = 0;
+		_mainBuf[0] = 0;
+		_chunkNulFree = false;
 		return false;
 	}
 }
