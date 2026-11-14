@@ -23,21 +23,49 @@ bool Bed3Interval::initFromFile(FileReader *fileReader)
 bool Bed3Interval::initFromFile(SingleLineDelimTextFileReader *fileReader)
 {
 	setFileIdx(fileReader->getFileIdx());
-	fileReader->getField(0, _chrName);
-	fileReader->getField(1, _startPosStr);
-	fileReader->getField(2, _endPosStr);
-	_startPos = str2chrPos(_startPosStr);
-	_endPos = str2chrPos(_endPosStr);
+	_lineValid = false;
+	{
+		const char *line = fileReader->getLineData();
+		const int *dp = fileReader->getDelimPositions();
+		_chrName.assign(line + dp[0] + 1, dp[1] - dp[0] - 1);
+	}
+	string s1, s2;
+	bool canonStart = fileReader->getPosField(1, _startPos, s1);
+	bool canonEnd = fileReader->getPosField(2, _endPos, s2);
+	if (canonStart && canonEnd) {
+		_posMode = POS_PLAIN;
+		_origStart = _startPos;
+		_origEnd = _endPos;
+	} else {
+		// not the plain decimal form (leading zeros, exponent, ...): keep the original text
+		if (canonStart) fileReader->getField(1, s1);
+		if (canonEnd) fileReader->getField(2, s2);
+		PosStrBox *b = _posBox.make();
+		b->start.swap(s1);
+		b->end.swap(s2);
+		_posMode = POS_STRINGS;
+	}
 	_zeroLength = false;
 	return true;
 }
 
+bool Bed3Interval::initFastLine(const ChrRef &chr, CHRPOS s, CHRPOS e, int fileIdx, const char *line, size_t lineLen, size_t, int)
+{
+	setFastCoords(chr, s, e, fileIdx);
+	setFastLineRef(line, lineLen);
+	return true;
+}
+
 inline void print_record(const string& name, CHRPOS start, CHRPOS end, string& buf) {
-	const char* buffer = buffer_printf("%s\t%" PRId_CHRPOS "\t%" PRId_CHRPOS, name.c_str(), start, end);
-	buf.append(buffer);
+	append_cstr(buf, name);
+	buf.push_back('\t');
+	append_chrpos(buf, start);
+	buf.push_back('\t');
+	append_chrpos(buf, end);
 }
 
 void Bed3Interval::print(string &outBuf) const{
+	if (appendLine(outBuf)) return;
 	print_record(_chrName, _startPos, _endPos, outBuf);
 }
 
@@ -62,13 +90,13 @@ const string &Bed3Interval::getField(int fieldNum) const
 {
 	switch (fieldNum) {
 	case 1:
-		return _chrName;
+		return _chrName.str();
 		break;
 	case 2:
-		return _startPosStr;
+		return startStr();
 		break;
 	case 3:
-		return _endPosStr;
+		return endStr();
 		break;
 	default:
 		return Record::getField(fieldNum);

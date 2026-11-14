@@ -30,25 +30,25 @@ public:
 	const Bed12Interval &operator=(const Bed12Interval &other);
 
 	virtual CHRPOS getThickStart() const { return _thickStart; }
-	virtual void setThickStart(CHRPOS thickStart)  { _thickStart = thickStart; }
+	virtual void setThickStart(CHRPOS thickStart)  { _thickStart = thickStart; _lineValid = false; }
 
 	virtual CHRPOS getThickEnd() const { return _thickEnd; }
-	virtual void setThickEnd(CHRPOS thickEnd) { _thickEnd = thickEnd; }
+	virtual void setThickEnd(CHRPOS thickEnd) { _thickEnd = thickEnd; _lineValid = false; }
 
 	virtual const string & getItemRGB() const { return _itemRGB; }
-	virtual void setItemRGB(const string & rgb) { _itemRGB = rgb; }
-	virtual void setItemRGB(const char *rgb) { _itemRGB = rgb; }
+	virtual void setItemRGB(const string & rgb) { _itemRGB = rgb; _lineValid = false; }
+	virtual void setItemRGB(const char *rgb) { _itemRGB = rgb; _lineValid = false; }
 
 	virtual int getBlockCount() const { return _blockCount; }
-	virtual void setBlockCount(int blockCount) { _blockCount = blockCount; }
+	virtual void setBlockCount(int blockCount) { _blockCount = blockCount; _lineValid = false; }
 
 	virtual const string & getBlockSizes() const { return _blockSizes; }
-	virtual void setBlockSizes(const string & blockSizes) { _blockSizes = blockSizes; }
-	virtual void setBlockSizes(const char *blockSizes) { _blockSizes = blockSizes; }
+	virtual void setBlockSizes(const string & blockSizes) { _blockSizes = blockSizes; _lineValid = false; }
+	virtual void setBlockSizes(const char *blockSizes) { _blockSizes = blockSizes; _lineValid = false; }
 
 	virtual const string & getBlockStarts() const { return _blockStarts; }
-	virtual void setBlockStarts(const string & blockStarts) { _blockStarts = blockStarts; }
-	virtual void setBlockStarts(const char *blockStarts) { _blockStarts = blockStarts; }
+	virtual void setBlockStarts(const string & blockStarts) { _blockStarts = blockStarts; _lineValid = false; }
+	virtual void setBlockStarts(const char *blockStarts) { _blockStarts = blockStarts; _lineValid = false; }
 
 	virtual const string &getField(int fieldNum) const;
 	virtual int getNumFields() const  { return 12; }

@@ -23,6 +23,7 @@ public:
 	Bed3Interval();
 	bool initFromFile(FileReader *);
 	virtual bool initFromFile(SingleLineDelimTextFileReader *);
+	virtual bool initFastLine(const ChrRef &chr, CHRPOS s, CHRPOS e, int fileIdx, const char *, size_t, size_t, int);
 	virtual void print(string &outBuf) const;
 	virtual void print(string &outBuf, CHRPOS start, CHRPOS end) const;
 	virtual void print(string &outBuf, const string & start, const string & end) const;

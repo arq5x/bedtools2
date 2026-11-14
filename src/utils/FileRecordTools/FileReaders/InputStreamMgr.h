@@ -35,6 +35,7 @@ public:
 	bool isGzipped() const { return _isGzipped; }
 	bool isBGzipped() const { return _isBgzipped; }
 	bool isBam() const { return _isBam; }
+	bool isStdin() const { return _isStdin; }
 	bool isCram() const { return _isCram; }
 
 	bool isCompressed() const { return _isGzipped || _isBgzipped || _isBam; }

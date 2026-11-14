@@ -40,10 +40,16 @@ bool IntersectFile::init() {
 
 	 if (upCast(_context)->getSortedInput()) {
 		 makeSweep();
+		if (!upCast(_context)->getObeySplits() && !upCast(_context)->getUseMergedIntervals()) {
+			_queryFRM->setQueryFast(true);
+		}
 		return _sweep->init();
 	 } else {
 		_binTree = new BinTree( upCast(_context));
 		_binTree->loadDB();
+		if (!upCast(_context)->getObeySplits()) {
+			_queryFRM->setQueryFast(true);
+		}
 	 }
 
 	 return true;
@@ -100,12 +106,15 @@ bool IntersectFile::nextUnsortedFind(RecordKeyVector &hits)
 {
 
 	while (!_queryFRM->eof()) {
-		Record *queryRecord = _queryFRM->getNextRecord();
+		Record *queryRecord = _queryFRM->getNextQueryRecord();
 		if (queryRecord == NULL) {
 			continue;
 		} else {
 			_context->testNameConventions(queryRecord);
 			hits.setKey(queryRecord);
+			if (upCast(_context)->getObeySplits() && upCast(_context)->getSplitBlockInfo()->noFractions()) {
+				_binTree->setKeyBlocks(&upCast(_context)->getSplitBlockInfo()->prepareKey(queryRecord));
+			}
 			 _binTree->getHits(queryRecord, hits);
 			return true;
 		}
@@ -120,9 +129,9 @@ void IntersectFile::makeSweep() {
 void IntersectFile::checkSplits(RecordKeyVector &hitSet)
 {
 	if (upCast(_context)->getObeySplits()) {
-		RecordKeyVector keySet(hitSet.getKey());
-		RecordKeyVector resultSet(hitSet.getKey());
-		upCast(_context)->getSplitBlockInfo()->findBlockedOverlaps(keySet, hitSet, resultSet);
-		hitSet.swap(resultSet);
+		_splitResult.clearVector();
+		_splitResult.setKey(hitSet.getKey());
+		upCast(_context)->getSplitBlockInfo()->findBlockedOverlaps(hitSet.getKey(), hitSet, _splitResult);
+		hitSet.swap(_splitResult);
 	}
 }
