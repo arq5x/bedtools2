@@ -488,8 +488,8 @@ void RecordOutputMgr::reportOverlapSummary(RecordKeyVector &keyList)
 }
 
 void RecordOutputMgr::addDbFileId(int fileId) {
-	ostringstream s;
 	if ((static_cast<ContextIntersect *>(_context))->getNumDatabaseFiles()  == 1) return;
+	ostringstream s;
 	if (!_context->getUseDBnameTags() && (!_context->getUseDBfileNames())) {
 		s << fileId;
 	} else if (_context->getUseDBnameTags()){
