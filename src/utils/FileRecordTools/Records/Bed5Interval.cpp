@@ -30,7 +30,7 @@ inline void print_record(const string& chrom_name, CHRPOS start, CHRPOS end, con
 	buf.push_back('\t');
 	append_cstr(buf, name);
 	buf.push_back('\t');
-	append_cstr(buf, score);
+	append_last(buf, score);
 }
 
 void Bed5Interval::print(string &outBuf) const

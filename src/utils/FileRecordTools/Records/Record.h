@@ -118,6 +118,13 @@ static inline void append_cstr(string& buf, const string& s) {
 	buf.append(s.data(), s.size());
 }
 
+// Cuts the field at its first NUL byte, as `master` did when it printed the field as a C string.
+static inline void append_last(string& buf, const string& s) {
+	const char *p = s.data();
+	const void *z = memchr(p, 0, s.size());
+	buf.append(p, z != NULL ? (size_t)((const char *)z - p) : s.size());
+}
+
 class SingleLineDelimTextFileReader;
 
 class Record {

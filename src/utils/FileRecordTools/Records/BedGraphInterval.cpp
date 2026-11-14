@@ -27,7 +27,7 @@ inline void print_record(const string& chrom_name, CHRPOS start, CHRPOS end, con
 	buf.push_back('\t');
 	append_chrpos(buf, end);
 	buf.push_back('\t');
-	append_cstr(buf, name);
+	append_last(buf, name);
 }
 
 void BedGraphInterval::print(string &outBuf) const
