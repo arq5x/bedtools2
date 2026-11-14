@@ -344,6 +344,8 @@ bool ContextBase::openFiles() {
 		}
 		frm->setFullBamFlags(_useFullBamTags);
 		frm->setIsSorted(_sortedInput);
+		frm->setCoordsOnly(coordsOnlyFile(i));
+		frm->setSweepCoords(sweepCoordsFile(i));
 		frm->setIoBufSize(_ioBufSize);
 		frm->setIsGroupBy(_program == GROUP_BY);
 		if (!frm->open(_inheader)) {
@@ -691,6 +693,14 @@ void ContextBase::testNameConventions(const Record *record) {
 
 	int fileIdx = record->getFileIdx();
 
+	if (fileIdx >= 0) {
+		if ((size_t)fileIdx >= _lastTested.size()) _lastTested.resize(fileIdx + 1);
+		LastTested &lt = _lastTested[fileIdx];
+		if (lt.valid && lt.chr == record->getChrRef()) return;
+		lt.chr = record->getChrRef();
+		lt.valid = true;
+	}
+
 	//
 	// First test whether chr in chrom names match
 	//
@@ -780,6 +790,8 @@ void ContextBase::nameConventionWarning(const Record *record, const string &file
 	 _nameConventionWarningMsg = "***** WARNING: File ";
 	 _nameConventionWarningMsg.append(filename);
 	 _nameConventionWarningMsg.append(message);
+	 // Only BinTree::loadDB reaches here for a coordinates-only file, straight after reading the record.
+	 { Record *rec = const_cast<Record *>(record); if (rec->getFileRecordManager() != NULL) rec->getFileRecordManager()->fullReparse(rec); }
 	 record->print(_nameConventionWarningMsg);
 	 _nameConventionWarningMsg.append("\n");
 	 _nameConventionWarningTripped = true;

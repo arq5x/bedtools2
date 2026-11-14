@@ -243,6 +243,8 @@ protected:
 	virtual bool parseCmdArgs(int argc, char **argv, int skipFirstArgs);
 	bool cmdArgsValid();
 	virtual bool openFiles();
+	virtual bool coordsOnlyFile(int fileIdx) const { return false; }
+	virtual bool sweepCoordsFile(int fileIdx) const { return false; }
 	virtual FileRecordMgr *getNewFRM(const string &filename, int fileIdx);
 
 	//set cmd line params and counter, i, as members so code
@@ -260,6 +262,9 @@ protected:
 	// as above, but check whether first digit to appear in
 	// a chrom name is a zero.
 	conventionType _fileHasLeadingZeroInChromNames;
+	// chrom last tested per file index; a record on the same chrom repeats the same tests
+	struct LastTested { ChrRef chr; bool valid; LastTested() : valid(false) {} };
+	vector<LastTested> _lastTested;
 
 	static const int MIN_ALLOWED_BUF_SIZE = 8;
 	BlockMgr *_splitBlockInfo;

@@ -28,7 +28,12 @@ FileRecordMgr::FileRecordMgr(const string &filename)
   _ioBufSize(0),
   _noEnforceCoordSort(false),
   _isGroupBy(false),
-  _isCram(false)
+  _isCram(false),
+  _coordsOnly(false),
+  _sweepCoords(false),
+  _queryFast(false),
+  _sweepFast(false),
+  _queryChrSet(false)
  {
 }
 
@@ -118,6 +123,210 @@ Record *FileRecordMgr::getNextRecord(RecordKeyVector *keyList)
 	if (!_fileReader->readEntry()) {
 		return NULL;
 	}
+	return recordFromLine(keyList);
+}
+
+Record *FileRecordMgr::getNextQueryRecord()
+{
+	bool fast = _queryFast && !_hasGenomeFile && !_coordsOnly
+		&& (_recordType == FileRecordTypeChecker::BED3_RECORD_TYPE
+			|| _recordType == FileRecordTypeChecker::BED6_RECORD_TYPE
+			|| _recordType == FileRecordTypeChecker::BED_PLUS_RECORD_TYPE
+			|| _recordType == FileRecordTypeChecker::BED6_PLUS_RECORD_TYPE);
+	if (fast) {
+		int nf = _fileReader->getNumFields();
+		fast = _recordType == FileRecordTypeChecker::BED3_RECORD_TYPE ? nf == 3
+			: _recordType == FileRecordTypeChecker::BED6_RECORD_TYPE ? nf == 6
+			: _recordType == FileRecordTypeChecker::BED_PLUS_RECORD_TYPE ? nf > 3
+			: nf > 6;
+	}
+	if (!fast) {
+		return getNextRecord();
+	}
+	if (!_fileReader->isOpen()) {
+		return NULL;
+	}
+	SingleLineDelimTextFileReader *rr = static_cast<SingleLineDelimTextFileReader*>(_fileReader);
+	if (_queryChrSet) {
+		CHRPOS s, e;
+		int got = rr->readCoordsLine(_queryChr.str(), s, e);
+		if (got == 0) {
+			return NULL;
+		}
+		if (got == 1 && _isSortedInput && !_noEnforceCoordSort) {
+			// testInputSortOrder compares s: its zero-length adjustment is -1 then +1
+			if (s < _prevStart) {
+				// out of order: the full path reports the error
+				if (!rr->completeEntry()) {
+					return NULL;
+				}
+				got = 2;
+			} else {
+				_prevStart = s;
+			}
+		}
+		if (got == 1) {
+			Record *record = _recordMgr->allocateRecord();
+			if (record->initFastLine(_queryChr, s, e, rr->getFileIdx(), rr->getLineData(), rr->getLineLength(),
+					rr->getCoordsTail(), rr->getNumFields())) {
+				record->setChromId(_prevChromId);
+				_totalRecordLength += (unsigned long)(record->getEndPos() - record->getStartPos());
+				record->setFileRecordManager(this);
+				return record;
+			}
+			// the gate above makes this unreachable
+			cerr << "Error: unable to read a record from file " << _filename << endl;
+			exit(1);
+		}
+	} else if (!_fileReader->readEntry()) {
+		return NULL;
+	}
+	Record *record = recordFromLine(NULL);
+	if (record != NULL) {
+		_queryChr = record->getChrRef();
+		_queryChrSet = true;
+	}
+	return record;
+}
+
+Record *FileRecordMgr::getNextRecordSweep()
+{
+	if (!_sweepCoords) return getNextRecord();
+	SingleLineDelimTextFileReader *r = static_cast<SingleLineDelimTextFileReader*>(_fileReader);
+	if (!_fileReader->isOpen()) {
+		return NULL;
+	}
+	if (_sweepFast) {
+		CHRPOS s, e;
+		int got = r->readCoordsLine(_sweepChr, s, e);
+		if (got == 0) {
+			return NULL;
+		}
+		if (got == 1) {
+			bool check = _isSortedInput && !_noEnforceCoordSort;
+			// testInputSortOrder compares s: its zero-length adjustment is -1 then +1
+			CHRPOS cs = s;
+			if (!check || cs >= _prevStart) {
+				Record *record = _recordMgr->allocateRecord();
+				record->initCoordsOnly(_sweepChrRef, s, e, r->getFileIdx());
+				if (check) _prevStart = cs;
+				record->setChromId(_prevChromId);
+				_totalRecordLength += (unsigned long)(record->getEndPos() - record->getStartPos());
+				record->setFileRecordManager(this);
+				return record;
+			}
+			// out of order: the full path reports the error
+			if (!r->completeEntry()) {
+				return NULL;
+			}
+		}
+	} else if (!r->readEntry()) {
+		return NULL;
+	}
+	const int *dp = r->getDelimPositions();
+	size_t chrLen = (size_t)(dp[1] - dp[0] - 1);
+	bool same = chrLen == _sweepChr.size() && memcmp(r->getLineData() + dp[0] + 1, _sweepChr.data(), chrLen) == 0;
+	r->setCoordsOnly(same);
+	Record *rec = recordFromLine(NULL);
+	if (!same && rec != NULL) {
+		_sweepChr = rec->getChrName();
+		_sweepChrRef = rec->getChrRef();
+		_sweepFast = !_hasGenomeFile
+			&& (_recordType == FileRecordTypeChecker::BED3_RECORD_TYPE
+				|| _recordType == FileRecordTypeChecker::BED6_RECORD_TYPE
+				|| _recordType == FileRecordTypeChecker::BED_PLUS_RECORD_TYPE
+				|| _recordType == FileRecordTypeChecker::BED6_PLUS_RECORD_TYPE)
+			&& (!(_isSortedInput && !_noEnforceCoordSort) || _prevChrom == _sweepChr);
+	}
+	return rec;
+}
+
+void FileRecordMgr::getCurrentLine(const char *&line, size_t &lineLen) const
+{
+	const SingleLineDelimTextFileReader *r = static_cast<SingleLineDelimTextFileReader*>(_fileReader);
+	line = r->getLineData();
+	lineLen = r->getLineLength();
+}
+
+void FileRecordMgr::setRetainChunks(bool val)
+{
+	static_cast<SingleLineDelimTextFileReader*>(_fileReader)->setRetain(val);
+}
+
+bool FileRecordMgr::getLineChunkPos(size_t &chunk, size_t &off) const
+{
+	return static_cast<const SingleLineDelimTextFileReader*>(_fileReader)->lastLineChunkPos(chunk, off);
+}
+
+void FileRecordMgr::releaseChunks(vector<char *> &out)
+{
+	static_cast<SingleLineDelimTextFileReader*>(_fileReader)->releaseChunks(out);
+}
+
+int FileRecordMgr::getNextCoords(const string *lastChr, CHRPOS &start, CHRPOS &end, bool &zeroLen, Record *&rec,
+		const char **lineOut, size_t *lineLenOut)
+{
+	rec = NULL;
+	if (!_fileReader->isOpen()) {
+		return 0;
+	}
+	if (lastChr != NULL && !_hasGenomeFile && !_isSortedInput) {
+		SingleLineDelimTextFileReader *rr = static_cast<SingleLineDelimTextFileReader*>(_fileReader);
+		CHRPOS fs, fe;
+		int got = rr->readCoordsLine(*lastChr, fs, fe);
+		if (got == 0) {
+			return 0;
+		}
+		if (got == 1) {
+			bool zl = (fs == fe);
+			if (zl) {
+				fs--;
+				fe++;
+			}
+			zeroLen = zl;
+			start = fs;
+			end = fe;
+			_totalRecordLength += (unsigned long)(fe - fs);
+			if (lineOut != NULL) {
+				*lineOut = rr->getLineData();
+				*lineLenOut = rr->getLineLength();
+			}
+			return 1;
+		}
+	}
+	else if (!_fileReader->readEntry()) {
+		return 0;
+	}
+	if (lastChr != NULL && !_hasGenomeFile && !_isSortedInput) {
+		const SingleLineDelimTextFileReader *r = static_cast<SingleLineDelimTextFileReader*>(_fileReader);
+		const char *line = r->getLineData();
+		const int *dp = r->getDelimPositions();
+		size_t chrLen = (size_t)(dp[1] - dp[0] - 1);
+		CHRPOS s, e;
+		if (chrLen == lastChr->size() && memcmp(line + dp[0] + 1, lastChr->data(), chrLen) == 0
+				&& r->getPlainPos(1, s) && r->getPlainPos(2, e) && s <= e
+				&& memchr(line, 0, r->getLineLength()) == NULL) {
+			zeroLen = (s == e);
+			if (zeroLen) {
+				s--;
+				e++;
+			}
+			start = s;
+			end = e;
+			_totalRecordLength += (unsigned long)(e - s);
+			if (lineOut != NULL) {
+				*lineOut = line;
+				*lineLenOut = r->getLineLength();
+			}
+			return 1;
+		}
+	}
+	rec = recordFromLine(NULL);
+	return rec == NULL ? 0 : 2;
+}
+
+Record *FileRecordMgr::recordFromLine(RecordKeyVector *keyList)
+{
 	Record *record = NULL;
 	record = _recordMgr->allocateRecord();
 	if (!record->initFromFile(_fileReader)) {
@@ -131,6 +340,7 @@ Record *FileRecordMgr::getNextRecord(RecordKeyVector *keyList)
 
 	if (!record->isUnmapped() ) {
 		if (!record->coordsValid() && (record->getType() != FileRecordTypeChecker::NO_POS_PLUS_RECORD_TYPE)) {
+			fullReparse(record);
 			cerr << "Error: Invalid record in file " << _filename << ". Record is " << endl << *record << endl;
 			exit(1);
 		}
@@ -209,8 +419,18 @@ void FileRecordMgr::sortError(const Record *record, bool genomeFileError)
 	} else {
 		cerr << "Error: Sorted input specified, but the file " << _filename << " has the following out of order record" << endl;
 	}
+	fullReparse(const_cast<Record *>(record));
 	cerr << *record << endl;
 	exit(1);
+}
+
+// An error message prints the whole record: parse the current line in full first.
+void FileRecordMgr::fullReparse(Record *record)
+{
+	SingleLineDelimTextFileReader *r = dynamic_cast<SingleLineDelimTextFileReader *>(_fileReader);
+	if (r == NULL || !r->getCoordsOnly()) return;
+	r->setCoordsOnly(false);
+	record->initFromFile(r);
 }
 
 
@@ -230,10 +450,12 @@ void FileRecordMgr::allocateFileReader(bool inheader)
 	case FileRecordTypeChecker::VCF_FILE_TYPE:
 		_fileReader = new SingleLineDelimTextFileReader(_bufStreamMgr->getTypeChecker().getNumFields(), _bufStreamMgr->getTypeChecker().getDelimChar());
 		static_cast<SingleLineDelimTextFileReader *>(_fileReader)->setInHeader(inheader);
+		static_cast<SingleLineDelimTextFileReader *>(_fileReader)->setCoordsOnly(_coordsOnly);
 		break;
 
 	case FileRecordTypeChecker::BAM_FILE_TYPE:
 		_fileReader = new BamFileReader();
+		_sweepCoords = false;
 		(static_cast<BamFileReader *>(_fileReader))->setUseTags(_useFullBamTags);
 		(static_cast<BamFileReader *>(_fileReader))->setBamReader(_bufStreamMgr->getBamReader());
 		break;

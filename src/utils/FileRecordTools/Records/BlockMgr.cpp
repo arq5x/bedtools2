@@ -19,7 +19,8 @@ BlockMgr::BlockMgr(float overlapFractionA, float overlapFractionB, bool hasRecip
   	_breakOnSkipOps(true),
   	_overlapFractionA(overlapFractionA),
   	_overlapFractionB(overlapFractionB),
-  	_hasReciprocal(hasReciprocal)
+  	_hasReciprocal(hasReciprocal),
+  	_keyReady(false)
 {
 	_blockRecordsMgr = new RecordMgr(_blockRecordsType);
 }
@@ -49,6 +50,40 @@ void BlockMgr::getBlocks(RecordKeyVector &keyList, bool &mustDelete)
 	}
 }
 
+// Splits on ',' like getline: consecutive delimiters give empty tokens and a final empty token is dropped.
+static int splitBlockField(const string &str, vector<pair<size_t, size_t> > &toks)
+{
+	toks.clear();
+	size_t n = str.size();
+	const char *data = str.data();
+	size_t pos = 0;
+	while (pos < n) {
+		const void *hit = memchr(data + pos, ',', n - pos);
+		size_t end = hit ? (size_t)((const char *)hit - data) : n;
+		toks.push_back(make_pair(pos, end - pos));
+		pos = end + 1;
+	}
+	return (int)toks.size();
+}
+
+// Plain non-negative decimals are parsed in place; anything else goes through str2chrPos on a copy.
+static CHRPOS parseBlockToken(const string &str, const pair<size_t, size_t> &tok)
+{
+	const char *p = str.data() + tok.first;
+	size_t len = tok.second;
+	if (len > 0 && len <= 18) {
+		long long result = 0;
+		size_t i = 0;
+		for (; i < len; i++) {
+			char c = p[i];
+			if (c < '0' || c > '9') break;
+			result = result * 10 + (c - '0');
+		}
+		if (i == len) return (CHRPOS)result;
+	}
+	return str2chrPos(string(p, len));
+}
+
 void BlockMgr::getBlocksFromBed12(RecordKeyVector &keyList, bool &mustDelete)
 {
 	const Bed12Interval *keyRecord = static_cast<const Bed12Interval *>(keyList.getKey());
@@ -59,8 +94,10 @@ void BlockMgr::getBlocksFromBed12(RecordKeyVector &keyList, bool &mustDelete)
     	return;
     }
 
-    int sizeCount = _blockSizeTokens.tokenize(keyRecord->getBlockSizes(), ',');
-    int startCount = _blockStartTokens.tokenize(keyRecord->getBlockStarts(), ',');
+    const string &sizesStr = keyRecord->getBlockSizes();
+    const string &startsStr = keyRecord->getBlockStarts();
+    int sizeCount = splitBlockField(sizesStr, _blockSizeToks);
+    int startCount = splitBlockField(startsStr, _blockStartToks);
 
     if (blockCount != sizeCount || sizeCount != startCount) {
     	fprintf(stderr, "Error: found wrong block counts while splitting entry.\n");
@@ -68,8 +105,8 @@ void BlockMgr::getBlocksFromBed12(RecordKeyVector &keyList, bool &mustDelete)
     }
 
     for (int i=0; i < blockCount; i++) {
-    	CHRPOS startPos = keyRecord->getStartPos() + str2chrPos(_blockStartTokens.getElem(i).c_str());
-    	CHRPOS endPos = startPos + str2chrPos(_blockSizeTokens.getElem(i).c_str());
+    	CHRPOS startPos = keyRecord->getStartPos() + parseBlockToken(startsStr, _blockStartToks[i]);
+    	CHRPOS endPos = startPos + parseBlockToken(sizesStr, _blockSizeToks[i]);
 
     	Record *record = allocateAndAssignRecord(keyRecord, startPos, endPos);
     	keyList.push_back(record);
@@ -213,6 +250,146 @@ int BlockMgr::getNonRedundantOverlap()
 		totalNonRedundantOverlap += end - start;
 	}
 	return totalNonRedundantOverlap;
+}
+
+// Appends the (start, end) of every block of rec to out, in getBlocks' order.
+void BlockMgr::getBlockPairs(const Record *rec, vector<pair<CHRPOS, CHRPOS> > &out)
+{
+	FileRecordTypeChecker::RECORD_TYPE type = rec->getType();
+	if (type == FileRecordTypeChecker::BED12_RECORD_TYPE) {
+		const Bed12Interval *bed12 = static_cast<const Bed12Interval *>(rec);
+		int blockCount = bed12->getBlockCount();
+		if (blockCount <= 0) return;
+		const string &sizesStr = bed12->getBlockSizes();
+		const string &startsStr = bed12->getBlockStarts();
+		int sizeCount = splitBlockField(sizesStr, _blockSizeToks);
+		int startCount = splitBlockField(startsStr, _blockStartToks);
+		if (blockCount != sizeCount || sizeCount != startCount) {
+			fprintf(stderr, "Error: found wrong block counts while splitting entry.\n");
+			exit(-1);
+		}
+		for (int i = 0; i < blockCount; i++) {
+			CHRPOS startPos = bed12->getStartPos() + parseBlockToken(startsStr, _blockStartToks[i]);
+			CHRPOS endPos = startPos + parseBlockToken(sizesStr, _blockSizeToks[i]);
+			out.push_back(make_pair(startPos, endPos));
+		}
+	} else if (type == FileRecordTypeChecker::BAM_RECORD_TYPE) {
+		RecordKeyVector blocks(const_cast<Record *>(rec));
+		bool mustDelete = false;
+		getBlocks(blocks, mustDelete);
+		for (RecordKeyVector::iterator_type it = blocks.begin(); it != blocks.end(); it = blocks.next()) {
+			out.push_back(make_pair((*it)->getStartPos(), (*it)->getEndPos()));
+		}
+		if (mustDelete) deleteBlocks(blocks);
+	} else {
+		out.push_back(make_pair(rec->getStartPos(), rec->getEndPos()));
+	}
+}
+
+const vector<pair<CHRPOS, CHRPOS> > &BlockMgr::prepareKey(const Record *key)
+{
+	_keyPairs.clear();
+	getBlockPairs(key, _keyPairs);
+	_keyReady = true;
+	return _keyPairs;
+}
+
+// findBlockedOverlaps without an overlapList: blocks are plain (start, end) pairs.
+int BlockMgr::findBlockedOverlaps(const Record *key, RecordKeyVector &hitList, RecordKeyVector &resultList)
+{
+	_overlapBases.clear();
+	_overlapStarts.clear();
+	_overlapEnds.clear();
+	if (!_keyReady) {
+		_keyPairs.clear();
+		getBlockPairs(key, _keyPairs);
+	}
+	_keyReady = false;
+	CHRPOS keyBlocksSumLength = 0;
+	for (size_t k = 0; k < _keyPairs.size(); k++) {
+		keyBlocksSumLength += _keyPairs[k].second - _keyPairs[k].first;
+	}
+	CHRPOS hitBlockSumLength = 0;
+	// Key blocks non-decreasing in start and end: overlaps lie in a contiguous range.
+	bool keySorted = true;
+	for (size_t k = 1; k < _keyPairs.size(); k++) {
+		if (_keyPairs[k].first < _keyPairs[k-1].first || _keyPairs[k].second < _keyPairs[k-1].second) {
+			keySorted = false;
+			break;
+		}
+	}
+
+	RecordKeyVector::iterator_type hitListIter = hitList.begin();
+	for (; hitListIter != hitList.end(); hitListIter = hitList.next())
+	{
+		_hitPairs.clear();
+		getBlockPairs(*hitListIter, _hitPairs);
+		for (size_t h = 0; h < _hitPairs.size(); h++) {
+			hitBlockSumLength += _hitPairs[h].second - _hitPairs[h].first;
+		}
+
+		bool hitHasOverlap = false;
+		CHRPOS totalDbOverlap = 0;
+		for (size_t h = 0; h < _hitPairs.size(); h++) {
+			size_t kLo = 0, kHi = _keyPairs.size();
+			if (keySorted) {
+				// first key block with end > hit start, then first with start >= hit end
+				size_t lo = 0, hi = kHi;
+				while (lo < hi) {
+					size_t mid = (lo + hi) >> 1;
+					if (_keyPairs[mid].second > _hitPairs[h].first) hi = mid; else lo = mid + 1;
+				}
+				kLo = lo;
+				hi = kHi;
+				while (lo < hi) {
+					size_t mid = (lo + hi) >> 1;
+					if (_keyPairs[mid].first >= _hitPairs[h].second) hi = mid; else lo = mid + 1;
+				}
+				kHi = lo;
+			}
+			for (size_t k = kLo; k < kHi; k++) {
+				CHRPOS maxStart = max(_keyPairs[k].first, _hitPairs[h].first);
+				CHRPOS minEnd = min(_keyPairs[k].second, _hitPairs[h].second);
+				CHRPOS overlap = minEnd - maxStart;
+				if (overlap > 0) {
+					hitHasOverlap = true;
+					totalDbOverlap += overlap;
+					_overlapStarts.push_back(maxStart);
+					_overlapEnds.push_back(minEnd);
+				}
+			}
+		}
+		if (hitHasOverlap)
+		{
+			resultList.push_back(*hitListIter);
+			_overlapBases.push_back(totalDbOverlap);
+		}
+	}
+	return finishBlockedOverlaps(key, keyBlocksSumLength, hitBlockSumLength, resultList);
+}
+
+int BlockMgr::finishBlockedOverlaps(const Record *key, CHRPOS keyBlocksSumLength,
+		CHRPOS hitBlockSumLength, RecordKeyVector &resultList)
+{
+	int totalUniqueOverlap = getNonRedundantOverlap();
+	if ((float) totalUniqueOverlap / (float)keyBlocksSumLength < _overlapFractionA)
+	{
+		resultList.clearAll();
+		_overlapBases.clear();
+	}
+	if ((float)totalUniqueOverlap / (float)hitBlockSumLength < _overlapFractionB)
+	{
+		resultList.clearAll();
+		_overlapBases.clear();
+	}
+	if (_hasReciprocal &&
+				((float)totalUniqueOverlap / (float)hitBlockSumLength < _overlapFractionA))
+	{
+		resultList.clearAll();
+		_overlapBases.clear();
+	}
+	resultList.setKey(const_cast<Record *>(key));
+	return (int)resultList.size();
 }
 
 int BlockMgr::findBlockedOverlaps(RecordKeyVector &keyList, RecordKeyVector &hitList,

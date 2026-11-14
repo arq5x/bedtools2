@@ -1,5 +1,6 @@
 #include "BedPlusInterval.h"
 #include "SingleLineDelimTextFileReader.h"
+#include <cstring>
 
 BedPlusInterval::BedPlusInterval()
 :  _numFixedFields(defaultNumFixedFields),
@@ -17,18 +18,50 @@ void BedPlusInterval::setNumFixedFields(int numFields) {
 bool BedPlusInterval::initFromFile(SingleLineDelimTextFileReader *fileReader)
 {
 	bool baseRetFlag = Bed3Interval::initFromFile(fileReader);
+	if (fileReader->getCoordsOnly()) return baseRetFlag;
 
 	if (_numFixedFields != defaultNumFixedFields) {
-		fileReader->getField(3, _name);
-		fileReader->getField(4, _score);
-		fileReader->getField(5, _strand);
-		adjustStrandVal();
+		if (!initNameScoreStrand(fileReader)) {
+			fileReader->getField(3, nameRef());
+			fileReader->getField(4, scoreRef());
+			fileReader->getField(5, strandRef());
+			adjustStrandVal();
+		}
 	}
 	_plusFields.initFromFile(fileReader);
 	return baseRetFlag;
 
 }
 
+
+bool BedPlusInterval::initFastLine(const ChrRef &chr, CHRPOS s, CHRPOS e, int fileIdx, const char *line, size_t lineLen, size_t tail, int numFields)
+{
+	if (numFields <= _numFixedFields) return false;
+	if (_numFixedFields == defaultNumFixedFields) {
+		setFastCoords(chr, s, e, fileIdx);
+		setFastLineRef(line, lineLen);
+		_plusFields.setFastLazy(tail + 1, lineLen - tail - 1, (size_t)(numFields - _numFixedFields));
+		return true;
+	}
+	if (_numFixedFields != 6) return false;
+	const char *p = line + tail + 1;
+	const char *end = line + lineLen;
+	const char *t = (const char *)memchr(p, '\t', end - p);
+	if (t == NULL) return false;
+	t = (const char *)memchr(t + 1, '\t', end - t - 1);
+	if (t == NULL) return false;
+	t = (const char *)memchr(t + 1, '\t', end - t - 1);
+	setFastCoords(chr, s, e, fileIdx);
+	setFastLineRef(line, lineLen);
+	if (t == NULL) {
+		setFastNameScoreStrand(line, p, end - p);
+		_plusFields.setFast(end, 0, 0);
+	} else {
+		setFastNameScoreStrand(line, p, t - p);
+		_plusFields.setFastLazy(t + 1 - line, end - t - 1, (size_t)(numFields - 6));
+	}
+	return true;
+}
 
 void BedPlusInterval::clear() {
 	Bed3Interval::clear();
@@ -37,9 +70,11 @@ void BedPlusInterval::clear() {
 
 void BedPlusInterval::print(string &outBuf) const
 {
+	if (appendLine(outBuf)) return;
 	Bed3Interval::print(outBuf);
 	outBuf.append("\t");
 	printBed6PlusFields(outBuf);
+	_plusFields.resolve(lineData());
 	_plusFields.printFields(outBuf);
 }
 
@@ -48,6 +83,7 @@ void BedPlusInterval::print(string &outBuf, CHRPOS start, CHRPOS end) const
 	Bed3Interval::print(outBuf, start, end);
 	outBuf.append("\t");
 	printBed6PlusFields(outBuf);
+	_plusFields.resolve(lineData());
 	_plusFields.printFields(outBuf);
 }
 
@@ -56,6 +92,7 @@ void BedPlusInterval::print(string &outBuf, const string & start, const string &
 	Bed3Interval::print(outBuf, start, end);
 	outBuf.append("\t");
 	printBed6PlusFields(outBuf);
+	_plusFields.resolve(lineData());
 	_plusFields.printFields(outBuf);
 }
 
@@ -72,14 +109,15 @@ void BedPlusInterval::printNull(string &outBuf) const
 const string &BedPlusInterval::getField(int fieldNum) const
 {
 	if (fieldNum > _numFixedFields) {
+		_plusFields.resolve(lineData());
 		return _plusFields.getField(fieldNum);
 	} else if (fieldNum == 4 && _numFixedFields >=4) {
-		return _name;
+		return nameRef();
 	} else if (fieldNum == 5 && _numFixedFields >=5) {
-		return _score;
+		return scoreRef();
 	}
 	else if (fieldNum == 6 && _numFixedFields >=6) {
-		return _strand;
+		return strandRef();
 	}
 	return Bed3Interval::getField(fieldNum);
 }
@@ -99,11 +137,7 @@ bool BedPlusInterval::isNumericField(int fieldNum) {
 
 void BedPlusInterval::printBed6PlusFields(string &outBuf) const {
 	if (_numFixedFields != defaultNumFixedFields) {
-		outBuf.append(_name);
-		outBuf.append("\t");
-		outBuf.append(_score);
-		outBuf.append("\t");
-		outBuf.append(_strand);
+		appendNameScoreStrand(outBuf);
 		outBuf.append("\t");
 	}
 }

@@ -16,30 +16,35 @@ bool Bed4Interval::initFromFile(SingleLineDelimTextFileReader *fileReader)
 {
 	bool baseRetFlag = Bed3Interval::initFromFile(fileReader);
 
-	fileReader->getField(3, _name);
+	fileReader->getField(3, nameRef());
 	return baseRetFlag;
 }
 
 inline void print_record(const string& chrom_name, CHRPOS start, CHRPOS end, const string& name, string& buf) {
-	const char* buffer = buffer_printf("%s\t%" PRId_CHRPOS "\t%" PRId_CHRPOS"\t%s", chrom_name.c_str(), start, end, name.c_str());
-	buf.append(buffer);
+	append_cstr(buf, chrom_name);
+	buf.push_back('\t');
+	append_chrpos(buf, start);
+	buf.push_back('\t');
+	append_chrpos(buf, end);
+	buf.push_back('\t');
+	append_last(buf, name);
 }
 
 void Bed4Interval::print(string &outBuf) const
 {
-	print_record(_chrName, _startPos, _endPos, _name, outBuf);
+	print_record(_chrName, _startPos, _endPos, nameRef(), outBuf);
 }
 
 void Bed4Interval::print(string &outBuf, CHRPOS start, CHRPOS end) const
 {
-	print_record(_chrName, start, end, _name, outBuf);
+	print_record(_chrName, start, end, nameRef(), outBuf);
 }
 
 void Bed4Interval::print(string &outBuf, const string & start, const string & end) const
 {
 	Bed3Interval::print(outBuf, start, end);
 	outBuf.append("\t");
-	outBuf.append(_name);
+	outBuf.append(nameRef());
 }
 
 void Bed4Interval::printNull(string &outBuf) const
@@ -53,7 +58,7 @@ const string &Bed4Interval::getField(int fieldNum) const
 {
 	switch (fieldNum) {
 	case 4:
-		return _name;
+		return nameRef();
 		break;
 	default:
 		return Bed3Interval::getField(fieldNum);
