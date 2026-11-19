@@ -55,7 +55,7 @@ Usage and option summary
 ==========================================================================
 Default behavior
 ==========================================================================
-By default, ``bedtools shift`` will shift features a fixed number of bases. This shift can either be applied to all features (``-s``), or seperately to features on the plus (``-p``) and minus (``-m``) strands. Shifts can either be positive or negative.
+By default, ``bedtools shift`` will shift features a fixed number of bases. This shift can either be applied to all features (``-s``), or separately to features on the plus (``-p``) and minus (``-m``) strands. Shifts can either be positive or negative.
 
 .. code-block:: bash
 
@@ -115,4 +115,3 @@ For example:
 By default, if your A file has a header, it is ignored when reporting results.
 This option will instead tell bedtools to first print the header for the
 A file prior to reporting results.
-
